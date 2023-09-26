@@ -56,13 +56,13 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_2CDPs_Cert_Array[] = {
     0xbf, 0xce, 0x1f, 0x55, 0x81, 0xd0, 0x41, 0x4d, 0xf1, 0xe2, 0x4b, 0xf3,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0000_2CDPs_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0000_2CDPs_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_2CDPs_SKID_Array[] = {
     0xDA, 0x62, 0x76, 0x0D, 0xD9, 0xCA, 0xD8, 0xD1, 0x28, 0x33, 0x59, 0x94, 0x9B, 0x42, 0x9A, 0xA1, 0xD4, 0xD4, 0xA2, 0x19,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0000_2CDPs_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0000_2CDPs_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-2CDPs-Key.pem
 
@@ -73,14 +73,14 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_2CDPs_PublicKey_Array[] = {
     0x5e, 0x2e, 0xa5, 0xe5, 0xce, 0xad, 0x10, 0xdd, 0xdb, 0x41, 0xa3, 0x81, 0xd7, 0xf3,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_PublicKey = ByteSpan(sTestCert_DAC_FFF1_8000_0000_2CDPs_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_PublicKey = ByteSpan(sTestCert_DAC_FFF1_8000_0000_2CDPs_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_2CDPs_PrivateKey_Array[] = {
     0x39, 0x56, 0x75, 0x16, 0x2e, 0x60, 0x42, 0x38, 0x53, 0x56, 0x31, 0x47, 0x41, 0xe9, 0x6c, 0xc8,
     0x71, 0xa0, 0x0d, 0xb1, 0x5e, 0x25, 0x76, 0xa1, 0x58, 0xa5, 0xd8, 0xc2, 0x0b, 0x37, 0x32, 0xe2,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_PrivateKey = ByteSpan(sTestCert_DAC_FFF1_8000_0000_2CDPs_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_PrivateKey = ByteSpan(sTestCert_DAC_FFF1_8000_0000_2CDPs_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-2CDPs-Issuer-PAA-FFF1-Cert.pem
 
@@ -119,14 +119,14 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_Cert_Array[
     0x6a, 0x5d, 0x96, 0x10, 0xe1, 0x14, 0xca, 0xde, 0xfb, 0x21, 0xdb, 0x2d, 0x9d, 0x19, 0x80, 0x47,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_Cert =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_Cert =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_SKID_Array[] = {
     0x10, 0xAF, 0x8C, 0x65, 0x60, 0x83, 0xEE, 0x8D, 0xA6, 0xA1, 0x06, 0x7B, 0xFB, 0x79, 0xFB, 0x32, 0x9A, 0xAE, 0x69, 0x62,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_SKID =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_SKID =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-2CDPs-Issuer-PAA-FFF1-Key.pem
@@ -138,7 +138,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_PublicKey_A
     0x27, 0x24, 0x8a, 0x5f, 0x29, 0x36, 0x5d, 0x43, 0x28, 0x9d, 0x47, 0xc3, 0x67, 0x78,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_PublicKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_PrivateKey_Array[] = {
@@ -146,7 +146,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_PrivateKey_
     0xee, 0x65, 0xf2, 0xc3, 0xe7, 0x22, 0xfb, 0x44, 0xc3, 0xbd, 0x78, 0xa0, 0x58, 0x79, 0x55, 0xdb,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAA_FFF1_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-2CDPs-Issuer-PAI-FFF2-8004-Cert.pem
@@ -189,14 +189,14 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_Cert_A
     0xee, 0x2c, 0xcb, 0x9b, 0x72,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_Cert =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_Cert =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_SKID_Array[] = {
     0x2D, 0x72, 0x52, 0xEC, 0xF4, 0xC3, 0xC0, 0x97, 0xB1, 0xE9, 0x18, 0xC4, 0xD5, 0x2F, 0xEB, 0x94, 0x19, 0x51, 0xDE, 0x70,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_SKID =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_SKID =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-2CDPs-Issuer-PAI-FFF2-8004-Key.pem
@@ -208,7 +208,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_Public
     0xfd, 0xa5, 0x5d, 0xe0, 0x12, 0xe2, 0xa3, 0x4a, 0xe7, 0x15, 0xcd, 0x71, 0x86, 0x2b,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_PublicKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_PrivateKey_Array[] = {
@@ -216,7 +216,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_Privat
     0x0c, 0x28, 0xf6, 0x32, 0x1f, 0x9a, 0x2e, 0x6a, 0x9a, 0xbe, 0xa3, 0x1b, 0x6b, 0xbf, 0xce, 0x8a,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_2CDPs_Issuer_PAI_FFF2_8004_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-2CRLIssuers-PAA-FFF1-Cert.pem
@@ -257,14 +257,14 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_Cert_Arr
     0xa7, 0x09,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_Cert =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_Cert =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_SKID_Array[] = {
     0x60, 0xEA, 0x47, 0xC9, 0x3D, 0xF9, 0x08, 0xF8, 0x5C, 0xA3, 0xCD, 0x53, 0x20, 0x12, 0x6B, 0x61, 0xF5, 0x0A, 0x05, 0xBD,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_SKID =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_SKID =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-2CRLIssuers-PAA-FFF1-Key.pem
@@ -276,7 +276,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_PublicKe
     0xa6, 0x2f, 0x40, 0x6f, 0x03, 0x45, 0x32, 0xc6, 0x27, 0x82, 0x8a, 0xfe, 0x66, 0xb5,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_PublicKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_PrivateKey_Array[] = {
@@ -284,7 +284,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_PrivateK
     0xcc, 0x90, 0x64, 0x61, 0x75, 0x32, 0x97, 0xbf, 0xdb, 0x8a, 0x65, 0x70, 0x3c, 0xbb, 0xd3, 0xcb,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_2CRLIssuers_PAA_FFF1_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-2DPs-Cert.pem
@@ -321,13 +321,13 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_Cert_Array[] = {
     0x43, 0xb1, 0x45, 0xf8, 0x95, 0xc8,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_SKID_Array[] = {
     0x8C, 0x2A, 0x72, 0x18, 0x7F, 0x79, 0x0E, 0xD6, 0xCB, 0x61, 0xE2, 0xD2, 0x4F, 0x19, 0xFA, 0x57, 0xCF, 0x30, 0x97, 0x60,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-2DPs-Key.pem
 
@@ -338,7 +338,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_PublicKey_Array[] = {
     0xb9, 0xd3, 0x0a, 0xb5, 0x49, 0x75, 0x9b, 0x89, 0x39, 0x18, 0xdf, 0xdb, 0x3c, 0xa0,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_PublicKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_PrivateKey_Array[] = {
@@ -346,7 +346,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_PrivateKey_Array[] = {
     0x7c, 0x68, 0x43, 0x3a, 0x9f, 0x6a, 0xca, 0x2d, 0x5c, 0x6d, 0xbe, 0x4e, 0xc8, 0x7c, 0x4c, 0x37,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_2DPs_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-2URIs-Cert.pem
@@ -382,13 +382,13 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_Cert_Array[] = {
     0xc7, 0x61, 0xdb, 0x3c, 0xda, 0x3f, 0xa8, 0xe8, 0x58, 0xd1, 0xe1, 0xe8, 0x05, 0xeb, 0xcf, 0x15, 0xe9, 0xb8,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_SKID_Array[] = {
     0x3E, 0x18, 0x83, 0x15, 0x9C, 0x2A, 0x73, 0xCC, 0x28, 0x24, 0x16, 0xED, 0x83, 0x90, 0x12, 0xF1, 0x87, 0x5E, 0x66, 0x07,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-2URIs-Key.pem
 
@@ -399,7 +399,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_PublicKey_Array[] = {
     0xdb, 0x6d, 0xf7, 0x7d, 0xd5, 0x87, 0x97, 0x97, 0x58, 0x85, 0x28, 0xf1, 0xb7, 0x25,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_PublicKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_PrivateKey_Array[] = {
@@ -407,7 +407,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_PrivateKey_Array[] = {
     0x9d, 0xb9, 0x2e, 0x03, 0xc6, 0x38, 0x0b, 0xc3, 0x6e, 0xcb, 0x4c, 0xd6, 0x32, 0x12, 0x24, 0xfd,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_2URIs_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-Cert.pem
@@ -442,13 +442,13 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Cert_Array[] = {
     0xce, 0xd1, 0xdc, 0x33, 0x0d, 0x0d,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_SKID_Array[] = {
     0xEF, 0x78, 0x85, 0xE0, 0x97, 0xD3, 0x15, 0xFD, 0x09, 0x3B, 0x10, 0xAE, 0x55, 0xC9, 0xF4, 0x70, 0x11, 0x13, 0xE7, 0x8D,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-Key.pem
 
@@ -459,14 +459,14 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_PublicKey_Array[] = {
     0xef, 0x66, 0x5c, 0x74, 0x21, 0x38, 0x68, 0xc4, 0xad, 0x9c, 0xae, 0x04, 0x54, 0xc9,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_PublicKey = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_PublicKey = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_PrivateKey_Array[] = {
     0x25, 0xf8, 0xc0, 0x52, 0xd4, 0x8e, 0x6a, 0x87, 0xee, 0x4d, 0xce, 0x75, 0xda, 0xf3, 0x63, 0xd6,
     0x60, 0xf9, 0x01, 0x36, 0x58, 0xcd, 0x30, 0x55, 0x3e, 0x21, 0xb8, 0x5b, 0xa2, 0xba, 0xbe, 0x03,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_PrivateKey = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_PrivateKey = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-CRL-Issuer-PAA-FFF1-2DPs-Cert.pem
 
@@ -508,14 +508,14 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_Cert
     0x99, 0x8b, 0x92, 0xab,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_Cert =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_Cert =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_SKID_Array[] = {
     0x3C, 0x83, 0xB5, 0x8A, 0x32, 0xBC, 0x20, 0x02, 0xAD, 0x83, 0x6B, 0x97, 0xDF, 0x10, 0xE1, 0x1C, 0x81, 0x96, 0x99, 0x8F,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_SKID =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_SKID =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-CRL-Issuer-PAA-FFF1-2DPs-Key.pem
@@ -527,7 +527,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_Publ
     0x59, 0x4f, 0x9a, 0x88, 0x4e, 0x5c, 0x6f, 0x39, 0x11, 0x78, 0xf8, 0x2b, 0xe9, 0x57,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_PublicKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_PrivateKey_Array[] = {
@@ -535,7 +535,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_Priv
     0x87, 0x24, 0x42, 0x38, 0x00, 0x16, 0xf0, 0x4c, 0x6d, 0x10, 0x47, 0xcc, 0x05, 0xb0, 0xe6, 0x2f,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_CRL_Issuer_PAA_FFF1_2DPs_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-HTTPS-Cert.pem
@@ -570,13 +570,13 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_Cert_Array[] = {
     0x45, 0x81, 0x00, 0x83, 0xd6, 0x75,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_SKID_Array[] = {
     0xE3, 0xBE, 0xA7, 0x29, 0x96, 0xDC, 0xF7, 0x6B, 0xB9, 0xB0, 0xF1, 0x1D, 0x19, 0x2B, 0xBA, 0x17, 0xE9, 0x5C, 0x32, 0xF8,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-HTTPS-Key.pem
 
@@ -587,7 +587,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_PublicKey_Array[] = {
     0x31, 0xe3, 0xb4, 0x22, 0x1a, 0x9d, 0x61, 0x18, 0xdc, 0x79, 0x4b, 0x6e, 0xbd, 0x87,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_PublicKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_PrivateKey_Array[] = {
@@ -595,7 +595,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_PrivateKey_Array[] = {
     0x6d, 0xbd, 0xf9, 0x89, 0xfc, 0xea, 0xd6, 0x81, 0x06, 0xe2, 0xed, 0x1e, 0xca, 0x3c, 0x28, 0xf7,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_HTTPS_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-Issuer-PAA-FFF1-Cert.pem
@@ -633,14 +633,14 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_Cert_Array[] 
     0x37, 0x26, 0xb9, 0x39, 0xfb, 0x2e, 0xd0,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_Cert =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_Cert =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_SKID_Array[] = {
     0xD2, 0x08, 0xFC, 0xAD, 0xB7, 0x8F, 0x13, 0x5E, 0xF4, 0x19, 0x0A, 0xF2, 0xF6, 0x48, 0x31, 0x82, 0x79, 0x08, 0x7A, 0xEE,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_SKID =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_SKID =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-Issuer-PAA-FFF1-Key.pem
@@ -652,7 +652,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_PublicKey_Arr
     0x8f, 0x75, 0x8b, 0xd9, 0x26, 0x2b, 0xa2, 0x44, 0x0b, 0xe3, 0xf8, 0x5e, 0x47, 0xa8,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_PublicKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_PrivateKey_Array[] = {
@@ -660,7 +660,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_PrivateKey_Ar
     0xb6, 0xfb, 0xe7, 0x2a, 0x55, 0x59, 0xc0, 0x3a, 0x73, 0xd3, 0xa9, 0x9f, 0x38, 0x7f, 0xce, 0x9f,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_FFF1_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-Issuer-PAA-NoVID-Cert.pem
@@ -697,14 +697,14 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_Cert_Array[]
     0x9d, 0x08, 0x06, 0x20, 0x52, 0x40,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_Cert =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_Cert =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_SKID_Array[] = {
     0x20, 0xA8, 0x51, 0xB5, 0x59, 0x5A, 0x8B, 0x31, 0x28, 0x69, 0x03, 0xA6, 0x3F, 0xC9, 0x36, 0x00, 0x17, 0x39, 0xC0, 0x3E,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_SKID =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_SKID =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-Issuer-PAA-NoVID-Key.pem
@@ -716,7 +716,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_PublicKey_Ar
     0x15, 0x75, 0x1e, 0x1d, 0x20, 0x1a, 0xab, 0x96, 0x7e, 0x3c, 0xec, 0xbc, 0xfb, 0x21,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_PublicKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_PrivateKey_Array[] = {
@@ -724,7 +724,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_PrivateKey_A
     0x4e, 0x65, 0x1f, 0x85, 0xd0, 0x9b, 0x00, 0xbf, 0x02, 0x03, 0x8b, 0x12, 0xe5, 0xf6, 0xf8, 0x89,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAA_NoVID_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-Issuer-PAI-FFF2-8004-Cert.pem
@@ -762,14 +762,14 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Cert_Arr
     0xb1, 0xb9, 0x88, 0x25, 0x16, 0xbc, 0x34, 0x1b, 0xcf,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Cert =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Cert =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_SKID_Array[] = {
     0xCE, 0x80, 0xC0, 0x02, 0x33, 0x9B, 0xC6, 0x00, 0xD4, 0xF9, 0x4A, 0xF0, 0x95, 0xEE, 0x64, 0xF0, 0x29, 0x42, 0x32, 0xE2,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_SKID =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_SKID =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-Issuer-PAI-FFF2-8004-Key.pem
@@ -781,7 +781,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_PublicKe
     0x53, 0xa4, 0x96, 0xa9, 0x05, 0x05, 0xf1, 0x57, 0xc2, 0x52, 0x69, 0xfe, 0x4f, 0xb7,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_PublicKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_PrivateKey_Array[] = {
@@ -789,7 +789,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_PrivateK
     0xda, 0xe7, 0xc9, 0x78, 0x0c, 0xbb, 0x51, 0x14, 0x16, 0xdd, 0x5a, 0xe9, 0x86, 0x36, 0xa1, 0xcc,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-Issuer-PAI-FFF2-8004-Long-Cert.pem
@@ -829,14 +829,14 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_Cer
     0x1b, 0x24, 0x74, 0xe4, 0x38,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_Cert =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_Cert =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_SKID_Array[] = {
     0x1D, 0xF3, 0x52, 0x59, 0x9D, 0x41, 0xE0, 0xB0, 0x6C, 0x13, 0x02, 0x06, 0xFF, 0xC1, 0x57, 0xA7, 0x32, 0xCC, 0xF7, 0xA4,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_SKID =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_SKID =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-Issuer-PAI-FFF2-8004-Long-Key.pem
@@ -848,7 +848,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_Pub
     0xab, 0xd6, 0x2e, 0xe3, 0x35, 0x81, 0x69, 0xbd, 0x32, 0x08, 0x5a, 0x35, 0x28, 0xdd,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_PublicKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_PrivateKey_Array[] = {
@@ -856,7 +856,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_Pri
     0x0e, 0x9b, 0xff, 0xb2, 0x92, 0x7d, 0xf9, 0xce, 0x6f, 0xeb, 0x47, 0x82, 0x6b, 0x1d, 0xce, 0x38,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Issuer_PAI_FFF2_8004_Long_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-Long-Cert.pem
@@ -893,13 +893,13 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Long_Cert_Array[] = {
     0x63, 0xf1, 0xf3, 0x8a, 0xd6, 0xef, 0x90, 0xdb, 0xb6, 0xe6, 0x83,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Long_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Long_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Long_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Long_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Long_SKID_Array[] = {
     0xA8, 0x34, 0xCB, 0xEC, 0xFD, 0x6F, 0x47, 0x43, 0x06, 0xE5, 0x7D, 0x90, 0x7E, 0x4C, 0xF4, 0xAD, 0x3F, 0x7D, 0xFC, 0x4F,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Long_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Long_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Long_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Long_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-Long-Key.pem
 
@@ -910,7 +910,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Long_PublicKey_Array[] = {
     0x4c, 0xfa, 0xa8, 0xc5, 0xf0, 0xc5, 0xc4, 0x30, 0x8c, 0xae, 0x1a, 0xc6, 0xe1, 0x77,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Long_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Long_PublicKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Long_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Long_PrivateKey_Array[] = {
@@ -918,7 +918,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Long_PrivateKey_Array[] = {
     0x5e, 0x7e, 0x68, 0x36, 0x04, 0x33, 0x4e, 0x7b, 0x6e, 0x9a, 0xa7, 0xe4, 0x8b, 0x94, 0xbf, 0xf7,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Long_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Long_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Long_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-Wrong-Prefix-Cert.pem
@@ -953,14 +953,14 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_Cert_Array[] = {
     0x3f, 0x95, 0x58, 0xc9, 0xf5, 0x8b, 0xe5, 0x80, 0x81,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_Cert =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_Cert =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_SKID_Array[] = {
     0x58, 0x41, 0x3E, 0xE4, 0xED, 0xAD, 0x2F, 0x44, 0xA6, 0xCD, 0x06, 0xAB, 0xC0, 0x6C, 0xA3, 0x48, 0x5E, 0xE6, 0xC1, 0xF1,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_SKID =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_SKID =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-CDP-Wrong-Prefix-Key.pem
@@ -972,7 +972,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_PublicKey_Array[
     0xbe, 0x73, 0xfa, 0x4f, 0xdf, 0x70, 0xa2, 0x07, 0x49, 0xc2, 0x84, 0x92, 0xd9, 0x3f,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_PublicKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_PrivateKey_Array[] = {
@@ -980,7 +980,7 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_PrivateKey_Array
     0xc6, 0x12, 0x00, 0x4e, 0x08, 0x85, 0xee, 0x3e, 0x60, 0x3d, 0xe2, 0xdc, 0xb7, 0x9e, 0xce, 0xca,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF1_8000_0000_CDP_Wrong_Prefix_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-Cert.pem
@@ -1012,13 +1012,13 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_Cert_Array[] = {
     0x8e, 0xbe, 0xd6, 0x73, 0x06, 0x8d, 0x75, 0x52, 0xb2, 0xfd,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0000_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0000_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_SKID_Array[] = {
     0xE5, 0x70, 0x88, 0xF4, 0x48, 0xE6, 0xFF, 0x9F, 0xE2, 0x00, 0x97, 0x44, 0x52, 0x8B, 0xF9, 0xEC, 0x08, 0x2F, 0xC1, 0x1F,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0000_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0000_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0000-Key.pem
 
@@ -1029,14 +1029,14 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_PublicKey_Array[] = {
     0x10, 0x2b, 0xcf, 0x20, 0x70, 0x31, 0xda, 0x6c, 0xc0, 0xe3, 0x16, 0x4f, 0xe0, 0x35,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_PublicKey = ByteSpan(sTestCert_DAC_FFF1_8000_0000_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_PublicKey = ByteSpan(sTestCert_DAC_FFF1_8000_0000_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0000_PrivateKey_Array[] = {
     0x21, 0xf2, 0xe3, 0xe4, 0x20, 0xc0, 0x70, 0x17, 0x34, 0x81, 0x04, 0x69, 0xb6, 0xba, 0xd1, 0x5c,
     0xf3, 0x06, 0x78, 0x22, 0xc9, 0xa4, 0xa5, 0x96, 0xc1, 0x86, 0xfa, 0x9b, 0xef, 0x15, 0x3f, 0xa1,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_PrivateKey = ByteSpan(sTestCert_DAC_FFF1_8000_0000_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0000_PrivateKey = ByteSpan(sTestCert_DAC_FFF1_8000_0000_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0001-Cert.pem
 
@@ -1067,13 +1067,13 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0001_Cert_Array[] = {
     0x45, 0x5e, 0x44, 0x0d, 0x68, 0x25, 0xd9, 0x61, 0x03, 0x64,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0001_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0001_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0001_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0001_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0001_SKID_Array[] = {
     0x96, 0xC2, 0xD9, 0x24, 0x94, 0xEA, 0x97, 0x85, 0xC0, 0xD1, 0x67, 0x08, 0xE3, 0x88, 0xF1, 0xC0, 0x91, 0xEA, 0x0F, 0xD5,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0001_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0001_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0001_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0001_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0001-Key.pem
 
@@ -1084,14 +1084,14 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0001_PublicKey_Array[] = {
     0xd1, 0x24, 0x35, 0xde, 0xc2, 0xea, 0xd3, 0xd9, 0x92, 0x95, 0xbf, 0xce, 0xd6, 0xc3,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0001_PublicKey = ByteSpan(sTestCert_DAC_FFF1_8000_0001_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0001_PublicKey = ByteSpan(sTestCert_DAC_FFF1_8000_0001_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0001_PrivateKey_Array[] = {
     0x7b, 0x5c, 0x5a, 0x9f, 0xb4, 0x69, 0x55, 0x47, 0xf8, 0x30, 0x10, 0xdf, 0xc8, 0x97, 0xa6, 0x98,
     0x6a, 0x99, 0x3e, 0xcb, 0x7c, 0xc9, 0xcc, 0x0f, 0x85, 0x7f, 0x90, 0x8a, 0xac, 0xcf, 0x07, 0xee,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0001_PrivateKey = ByteSpan(sTestCert_DAC_FFF1_8000_0001_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0001_PrivateKey = ByteSpan(sTestCert_DAC_FFF1_8000_0001_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0002-Cert.pem
 
@@ -1122,13 +1122,13 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0002_Cert_Array[] = {
     0xc6, 0x8c, 0xf1, 0x2e, 0xd2, 0x56, 0x01, 0x97, 0xd4, 0xef,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0002_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0002_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0002_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0002_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0002_SKID_Array[] = {
     0x0D, 0xBC, 0x26, 0x6E, 0x28, 0xE4, 0x09, 0xF5, 0x9B, 0xA8, 0x96, 0xF9, 0x8D, 0x7C, 0x9B, 0xA9, 0x6F, 0x19, 0xF5, 0xB1,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0002_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0002_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0002_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0002_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0002-Key.pem
 
@@ -1139,14 +1139,14 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0002_PublicKey_Array[] = {
     0xe5, 0x7c, 0x4c, 0x7e, 0xf9, 0x06, 0x40, 0x8c, 0x9b, 0xf6, 0x94, 0x9e, 0x90, 0x9a,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0002_PublicKey = ByteSpan(sTestCert_DAC_FFF1_8000_0002_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0002_PublicKey = ByteSpan(sTestCert_DAC_FFF1_8000_0002_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0002_PrivateKey_Array[] = {
     0x4f, 0x14, 0x1b, 0xfc, 0x27, 0x67, 0xd3, 0xe8, 0xf9, 0x24, 0x7b, 0xf9, 0x23, 0x1c, 0xf5, 0xa2,
     0x5c, 0x58, 0x9f, 0xca, 0x02, 0x31, 0xc2, 0x56, 0xff, 0x88, 0x96, 0x4c, 0x98, 0xef, 0x82, 0x3a,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0002_PrivateKey = ByteSpan(sTestCert_DAC_FFF1_8000_0002_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0002_PrivateKey = ByteSpan(sTestCert_DAC_FFF1_8000_0002_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0003-Cert.pem
 
@@ -1177,13 +1177,13 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0003_Cert_Array[] = {
     0x2f, 0x1b, 0xf5, 0x63, 0xce, 0x15, 0xdc, 0xe2, 0x51, 0xd7,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0003_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0003_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0003_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0003_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0003_SKID_Array[] = {
     0x7A, 0x8A, 0x02, 0x5E, 0x3B, 0xDE, 0xA7, 0x84, 0x43, 0x3B, 0xAE, 0x18, 0xE0, 0xEC, 0x5E, 0xCD, 0x27, 0x71, 0xA4, 0xBE,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0003_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0003_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0003_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0003_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0003-Key.pem
 
@@ -1194,14 +1194,14 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0003_PublicKey_Array[] = {
     0x01, 0x63, 0xc5, 0xce, 0x9b, 0xf2, 0xdc, 0xbc, 0xf3, 0x34, 0xca, 0x5e, 0xa0, 0x9e,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0003_PublicKey = ByteSpan(sTestCert_DAC_FFF1_8000_0003_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0003_PublicKey = ByteSpan(sTestCert_DAC_FFF1_8000_0003_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0003_PrivateKey_Array[] = {
     0x9e, 0x5d, 0x2d, 0xc6, 0x2a, 0x06, 0x45, 0xfe, 0xaa, 0xcf, 0xd5, 0x75, 0x5f, 0x5a, 0x4e, 0xaf,
     0xd2, 0x0c, 0x6e, 0x67, 0xe9, 0xa0, 0xd9, 0xe9, 0x38, 0xfc, 0xb6, 0x89, 0x12, 0x34, 0x2e, 0x89,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0003_PrivateKey = ByteSpan(sTestCert_DAC_FFF1_8000_0003_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0003_PrivateKey = ByteSpan(sTestCert_DAC_FFF1_8000_0003_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0004-Cert.pem
 
@@ -1232,13 +1232,13 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0004_Cert_Array[] = {
     0x87, 0xb6, 0xa0, 0x08, 0x7e, 0x71, 0x6c, 0xbb, 0x60, 0x61, 0xbf,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0004_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0004_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0004_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0004_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0004_SKID_Array[] = {
     0xD5, 0xAD, 0xB2, 0xB8, 0x83, 0x8E, 0xC8, 0x07, 0x3C, 0x47, 0x72, 0xDC, 0x7E, 0x87, 0x97, 0xFE, 0xBB, 0x23, 0xB3, 0xAE,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0004_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0004_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0004_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0004_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0004-Key.pem
 
@@ -1249,14 +1249,14 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0004_PublicKey_Array[] = {
     0x28, 0x68, 0xa8, 0x1e, 0x26, 0x97, 0x9b, 0x36, 0x8b, 0x33, 0xb5, 0x54, 0x31, 0x03,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0004_PublicKey = ByteSpan(sTestCert_DAC_FFF1_8000_0004_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0004_PublicKey = ByteSpan(sTestCert_DAC_FFF1_8000_0004_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0004_PrivateKey_Array[] = {
     0x05, 0xc6, 0xc3, 0xa8, 0x4d, 0xc6, 0x05, 0xcc, 0x3c, 0xc8, 0x05, 0x80, 0x09, 0xb0, 0x1b, 0x32,
     0x9c, 0xf6, 0x0c, 0xf1, 0x59, 0x70, 0xc6, 0xa9, 0x0e, 0xad, 0xaa, 0xe2, 0xde, 0x49, 0x64, 0x9e,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0004_PrivateKey = ByteSpan(sTestCert_DAC_FFF1_8000_0004_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0004_PrivateKey = ByteSpan(sTestCert_DAC_FFF1_8000_0004_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0005-Cert.pem
 
@@ -1287,13 +1287,13 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0005_Cert_Array[] = {
     0x10, 0x76, 0xee, 0xe7, 0x33, 0x03, 0xb5, 0x10, 0x9d, 0x56, 0xb1,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0005_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0005_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0005_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0005_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0005_SKID_Array[] = {
     0x7D, 0x1A, 0x37, 0x72, 0xF6, 0x99, 0xAA, 0x54, 0xC6, 0xD9, 0xE2, 0x0A, 0x47, 0xBA, 0xD7, 0xF1, 0x49, 0xD7, 0xC6, 0x35,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0005_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0005_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0005_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0005_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0005-Key.pem
 
@@ -1304,14 +1304,14 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0005_PublicKey_Array[] = {
     0x73, 0x76, 0x29, 0x9e, 0xc0, 0x32, 0x38, 0xdf, 0x11, 0x1f, 0x92, 0x1b, 0x40, 0xc1,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0005_PublicKey = ByteSpan(sTestCert_DAC_FFF1_8000_0005_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0005_PublicKey = ByteSpan(sTestCert_DAC_FFF1_8000_0005_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0005_PrivateKey_Array[] = {
     0x64, 0x9f, 0xb7, 0xae, 0x06, 0xf2, 0x20, 0x02, 0xc9, 0xf5, 0x87, 0x52, 0x3e, 0x2f, 0x37, 0x95,
     0x04, 0x1c, 0x90, 0xe9, 0x0d, 0xa2, 0x06, 0x87, 0xce, 0x84, 0xdd, 0xee, 0xdc, 0x9c, 0x58, 0x1e,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0005_PrivateKey = ByteSpan(sTestCert_DAC_FFF1_8000_0005_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0005_PrivateKey = ByteSpan(sTestCert_DAC_FFF1_8000_0005_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0006-Cert.pem
 
@@ -1342,13 +1342,13 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0006_Cert_Array[] = {
     0x26, 0x20, 0x88, 0xb7, 0x83, 0xb8, 0x96, 0x38, 0x5f, 0x3a, 0xe5,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0006_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0006_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0006_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0006_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0006_SKID_Array[] = {
     0x26, 0xD1, 0x52, 0x59, 0xBE, 0x31, 0xD8, 0x1C, 0x7E, 0xEF, 0x5B, 0xA9, 0xF7, 0xF5, 0x30, 0xC6, 0x77, 0xE5, 0xC7, 0x66,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0006_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0006_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0006_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0006_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0006-Key.pem
 
@@ -1359,14 +1359,14 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0006_PublicKey_Array[] = {
     0xb0, 0x52, 0xeb, 0xe4, 0x2f, 0xc8, 0x28, 0x38, 0x4f, 0x2d, 0x4c, 0x38, 0x4d, 0x6a,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0006_PublicKey = ByteSpan(sTestCert_DAC_FFF1_8000_0006_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0006_PublicKey = ByteSpan(sTestCert_DAC_FFF1_8000_0006_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0006_PrivateKey_Array[] = {
     0x18, 0xa5, 0xd5, 0x70, 0x1b, 0x03, 0x31, 0xd7, 0x0b, 0x78, 0x02, 0x4d, 0xfb, 0xc2, 0xb6, 0x80,
     0xf0, 0xe2, 0x4a, 0x29, 0x87, 0xb5, 0x69, 0x99, 0x0a, 0x7d, 0x41, 0x87, 0x16, 0x0d, 0x87, 0xe4,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0006_PrivateKey = ByteSpan(sTestCert_DAC_FFF1_8000_0006_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0006_PrivateKey = ByteSpan(sTestCert_DAC_FFF1_8000_0006_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0007-Cert.pem
 
@@ -1397,13 +1397,13 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0007_Cert_Array[] = {
     0x88, 0x77, 0x7a, 0xdf, 0x9e, 0x2d, 0xcf, 0xf5, 0xe6,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0007_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0007_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0007_Cert = ByteSpan(sTestCert_DAC_FFF1_8000_0007_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0007_SKID_Array[] = {
     0xEE, 0x95, 0xAD, 0x96, 0x98, 0x3A, 0x9E, 0xA9, 0x5B, 0xCD, 0x2B, 0x00, 0xDC, 0x5E, 0x67, 0x17, 0x27, 0x69, 0x03, 0x83,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0007_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0007_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0007_SKID = ByteSpan(sTestCert_DAC_FFF1_8000_0007_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF1-8000-0007-Key.pem
 
@@ -1414,14 +1414,14 @@ constexpr uint8_t sTestCert_DAC_FFF1_8000_0007_PublicKey_Array[] = {
     0xec, 0x7b, 0x9e, 0x8b, 0xe0, 0xbd, 0xf3, 0xb2, 0x77, 0x49, 0x82, 0x47, 0x62, 0x20,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0007_PublicKey = ByteSpan(sTestCert_DAC_FFF1_8000_0007_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0007_PublicKey = ByteSpan(sTestCert_DAC_FFF1_8000_0007_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF1_8000_0007_PrivateKey_Array[] = {
     0x72, 0x7f, 0x10, 0x05, 0xcb, 0xa4, 0x7e, 0xd7, 0x82, 0x2a, 0x9d, 0x93, 0x09, 0x43, 0x62, 0x16,
     0x17, 0xcf, 0xd3, 0xb7, 0x9d, 0x9a, 0xf5, 0x28, 0xb8, 0x01, 0xec, 0xf9, 0xf1, 0x99, 0x22, 0x04,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF1_8000_0007_PrivateKey = ByteSpan(sTestCert_DAC_FFF1_8000_0007_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF1_8000_0007_PrivateKey = ByteSpan(sTestCert_DAC_FFF1_8000_0007_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8001-0008-Cert.pem
 
@@ -1452,13 +1452,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8001_0008_Cert_Array[] = {
     0x9d, 0x60, 0x21, 0xa2, 0x45, 0x69, 0xed, 0xee, 0x5c, 0xa3,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_0008_Cert = ByteSpan(sTestCert_DAC_FFF2_8001_0008_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_0008_Cert = ByteSpan(sTestCert_DAC_FFF2_8001_0008_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8001_0008_SKID_Array[] = {
     0xE2, 0x5B, 0x55, 0x28, 0x31, 0x82, 0x75, 0x3A, 0xF7, 0x5C, 0x12, 0x13, 0xCD, 0x11, 0x0A, 0x54, 0x2A, 0xAC, 0x99, 0x91,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_0008_SKID = ByteSpan(sTestCert_DAC_FFF2_8001_0008_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_0008_SKID = ByteSpan(sTestCert_DAC_FFF2_8001_0008_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8001-0008-Key.pem
 
@@ -1469,14 +1469,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8001_0008_PublicKey_Array[] = {
     0x50, 0xcb, 0x00, 0x75, 0x60, 0xb0, 0x60, 0xfb, 0xfd, 0x97, 0xef, 0x01, 0xa1, 0xca,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_0008_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8001_0008_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_0008_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8001_0008_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8001_0008_PrivateKey_Array[] = {
     0xb6, 0x9a, 0x32, 0x05, 0x3f, 0xe3, 0xb3, 0x29, 0x72, 0xe7, 0x41, 0x41, 0x04, 0xea, 0x22, 0x0b,
     0xa2, 0x89, 0xda, 0x8a, 0x51, 0x62, 0x63, 0xc0, 0x30, 0x01, 0x27, 0xab, 0xd3, 0x58, 0xee, 0x7e,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_0008_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8001_0008_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_0008_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8001_0008_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8001-0009-Cert.pem
 
@@ -1507,13 +1507,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8001_0009_Cert_Array[] = {
     0xe2, 0x7c, 0x7e, 0x90, 0x6b, 0xf5, 0xf8, 0xe0, 0x91,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_0009_Cert = ByteSpan(sTestCert_DAC_FFF2_8001_0009_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_0009_Cert = ByteSpan(sTestCert_DAC_FFF2_8001_0009_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8001_0009_SKID_Array[] = {
     0x48, 0x36, 0xF5, 0xAD, 0x51, 0x96, 0x8D, 0x50, 0x4B, 0xA1, 0xB3, 0x76, 0xFF, 0x60, 0x53, 0x17, 0x0B, 0xB2, 0xD5, 0x02,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_0009_SKID = ByteSpan(sTestCert_DAC_FFF2_8001_0009_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_0009_SKID = ByteSpan(sTestCert_DAC_FFF2_8001_0009_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8001-0009-Key.pem
 
@@ -1524,14 +1524,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8001_0009_PublicKey_Array[] = {
     0x1a, 0x64, 0xbd, 0xfa, 0x14, 0x8f, 0x72, 0x7b, 0x43, 0xd7, 0xb5, 0x75, 0xd8, 0x84,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_0009_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8001_0009_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_0009_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8001_0009_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8001_0009_PrivateKey_Array[] = {
     0x2d, 0x70, 0x20, 0x39, 0xf7, 0xa6, 0x25, 0x65, 0xe4, 0x7c, 0xf1, 0x40, 0xa9, 0x54, 0x3e, 0x55,
     0xd9, 0x0e, 0x41, 0x72, 0x2b, 0x01, 0x8d, 0xa2, 0x9f, 0x7e, 0x23, 0x85, 0x47, 0x93, 0xb3, 0x52,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_0009_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8001_0009_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_0009_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8001_0009_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8001-000A-Cert.pem
 
@@ -1562,13 +1562,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8001_000A_Cert_Array[] = {
     0xb5, 0x51, 0xc4, 0x5e, 0xaf, 0x5a, 0x28, 0x61, 0xb8,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000A_Cert = ByteSpan(sTestCert_DAC_FFF2_8001_000A_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000A_Cert = ByteSpan(sTestCert_DAC_FFF2_8001_000A_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8001_000A_SKID_Array[] = {
     0x32, 0x05, 0x94, 0xD8, 0xF0, 0xED, 0x8F, 0x62, 0x15, 0x22, 0xEF, 0x73, 0x9C, 0xDC, 0x4A, 0xAC, 0x18, 0x50, 0xE9, 0x73,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000A_SKID = ByteSpan(sTestCert_DAC_FFF2_8001_000A_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000A_SKID = ByteSpan(sTestCert_DAC_FFF2_8001_000A_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8001-000A-Key.pem
 
@@ -1579,14 +1579,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8001_000A_PublicKey_Array[] = {
     0x39, 0x60, 0xe3, 0xb7, 0xb3, 0x5c, 0x26, 0x6a, 0x19, 0xdf, 0xc2, 0xf2, 0xf3, 0xae,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000A_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8001_000A_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000A_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8001_000A_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8001_000A_PrivateKey_Array[] = {
     0xa2, 0xce, 0x69, 0xb0, 0x67, 0x20, 0xa2, 0xe1, 0x24, 0x63, 0xa4, 0xd6, 0xd7, 0x3c, 0xc6, 0xd6,
     0xa5, 0x30, 0x97, 0x7d, 0xb6, 0x7b, 0x4c, 0x5d, 0x63, 0xd1, 0x27, 0x25, 0x22, 0xb9, 0xf4, 0x76,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000A_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8001_000A_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000A_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8001_000A_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8001-000B-Cert.pem
 
@@ -1617,13 +1617,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8001_000B_Cert_Array[] = {
     0xbb, 0xd6, 0x2b, 0x44, 0xf9, 0x2a, 0x45, 0xfd, 0xa6, 0x44, 0x36,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000B_Cert = ByteSpan(sTestCert_DAC_FFF2_8001_000B_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000B_Cert = ByteSpan(sTestCert_DAC_FFF2_8001_000B_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8001_000B_SKID_Array[] = {
     0x7E, 0x35, 0xF7, 0x08, 0xED, 0x58, 0x5D, 0xD0, 0x53, 0xD8, 0x56, 0xE4, 0x13, 0xD7, 0xD1, 0x25, 0x13, 0x33, 0x9F, 0x17,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000B_SKID = ByteSpan(sTestCert_DAC_FFF2_8001_000B_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000B_SKID = ByteSpan(sTestCert_DAC_FFF2_8001_000B_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8001-000B-Key.pem
 
@@ -1634,14 +1634,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8001_000B_PublicKey_Array[] = {
     0x54, 0xa8, 0x99, 0x45, 0x28, 0x77, 0x2b, 0x02, 0xc2, 0x65, 0xe8, 0x21, 0xe4, 0xdd,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000B_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8001_000B_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000B_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8001_000B_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8001_000B_PrivateKey_Array[] = {
     0xb2, 0x7f, 0x21, 0xaf, 0x10, 0xec, 0x13, 0xb4, 0x56, 0xab, 0x2a, 0x6d, 0x6e, 0x3d, 0x99, 0xdc,
     0xbd, 0xa0, 0x5b, 0xab, 0x33, 0x99, 0xb7, 0x87, 0xfc, 0x39, 0x6d, 0xf9, 0xdb, 0xad, 0x67, 0x3c,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000B_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8001_000B_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000B_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8001_000B_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8001-000C-Cert.pem
 
@@ -1672,13 +1672,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8001_000C_Cert_Array[] = {
     0xad, 0xb6, 0x40, 0x58, 0x62, 0x4b, 0xa6, 0xf4, 0x97, 0x48,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000C_Cert = ByteSpan(sTestCert_DAC_FFF2_8001_000C_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000C_Cert = ByteSpan(sTestCert_DAC_FFF2_8001_000C_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8001_000C_SKID_Array[] = {
     0xDB, 0xA9, 0xAB, 0x53, 0x5A, 0xDC, 0x0B, 0x70, 0x3B, 0x2B, 0x6F, 0x14, 0x84, 0x9C, 0xD5, 0xCE, 0x88, 0x18, 0xA6, 0x6A,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000C_SKID = ByteSpan(sTestCert_DAC_FFF2_8001_000C_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000C_SKID = ByteSpan(sTestCert_DAC_FFF2_8001_000C_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8001-000C-Key.pem
 
@@ -1689,14 +1689,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8001_000C_PublicKey_Array[] = {
     0x18, 0x43, 0x4e, 0x5f, 0x65, 0xa0, 0x91, 0x16, 0x23, 0x75, 0x24, 0x40, 0xdb, 0x7a,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000C_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8001_000C_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000C_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8001_000C_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8001_000C_PrivateKey_Array[] = {
     0x85, 0x39, 0x19, 0x2d, 0x1f, 0x36, 0x1f, 0x06, 0x82, 0x8e, 0xfa, 0x3d, 0xd7, 0xd9, 0x0f, 0xb4,
     0xff, 0xc5, 0xf8, 0xae, 0x74, 0x92, 0x18, 0x2b, 0x91, 0x70, 0xf5, 0xf6, 0xb8, 0x89, 0xa2, 0x91,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000C_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8001_000C_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000C_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8001_000C_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8001-000D-Cert.pem
 
@@ -1727,13 +1727,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8001_000D_Cert_Array[] = {
     0x2c, 0x8b, 0x29, 0x1b, 0xcd, 0xe8, 0xa4, 0x01, 0x4d, 0xe4,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000D_Cert = ByteSpan(sTestCert_DAC_FFF2_8001_000D_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000D_Cert = ByteSpan(sTestCert_DAC_FFF2_8001_000D_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8001_000D_SKID_Array[] = {
     0x6C, 0xF4, 0x38, 0x5A, 0x9D, 0x75, 0xDF, 0xB7, 0x4D, 0x8F, 0xFA, 0xB3, 0x9D, 0xB6, 0xFF, 0x90, 0xE8, 0x90, 0x21, 0x12,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000D_SKID = ByteSpan(sTestCert_DAC_FFF2_8001_000D_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000D_SKID = ByteSpan(sTestCert_DAC_FFF2_8001_000D_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8001-000D-Key.pem
 
@@ -1744,14 +1744,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8001_000D_PublicKey_Array[] = {
     0xb9, 0xd3, 0xaa, 0x08, 0x36, 0x77, 0x8b, 0x2c, 0xb2, 0xee, 0x55, 0x35, 0xc7, 0x82,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000D_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8001_000D_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000D_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8001_000D_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8001_000D_PrivateKey_Array[] = {
     0x57, 0x02, 0x9f, 0xf9, 0xee, 0x08, 0xfa, 0x2e, 0xe2, 0x1b, 0x8c, 0xe1, 0xde, 0x9a, 0x12, 0x26,
     0x20, 0x4c, 0x87, 0x20, 0xb4, 0xd2, 0x55, 0x27, 0xdf, 0x7c, 0x66, 0x27, 0xc1, 0x00, 0x4c, 0x35,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000D_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8001_000D_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000D_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8001_000D_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8001-000E-Cert.pem
 
@@ -1782,13 +1782,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8001_000E_Cert_Array[] = {
     0x08, 0x56, 0x79, 0xa1, 0x67, 0x03, 0x25, 0x5a, 0xd1, 0xc7, 0xbf,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000E_Cert = ByteSpan(sTestCert_DAC_FFF2_8001_000E_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000E_Cert = ByteSpan(sTestCert_DAC_FFF2_8001_000E_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8001_000E_SKID_Array[] = {
     0x40, 0x9A, 0x35, 0xF2, 0x03, 0x52, 0x38, 0x1D, 0xB2, 0xE9, 0x2E, 0x40, 0xFD, 0xD2, 0x5B, 0x6C, 0x03, 0x3D, 0x5A, 0xCE,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000E_SKID = ByteSpan(sTestCert_DAC_FFF2_8001_000E_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000E_SKID = ByteSpan(sTestCert_DAC_FFF2_8001_000E_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8001-000E-Key.pem
 
@@ -1799,14 +1799,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8001_000E_PublicKey_Array[] = {
     0x55, 0x28, 0x5b, 0xcd, 0xce, 0x55, 0x59, 0x9f, 0x29, 0x57, 0x6f, 0xb2, 0x9a, 0xaf,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000E_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8001_000E_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000E_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8001_000E_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8001_000E_PrivateKey_Array[] = {
     0xd8, 0x5c, 0xb5, 0x46, 0x4d, 0x83, 0xa5, 0xd2, 0x10, 0x9f, 0xd8, 0x7e, 0x8e, 0x7f, 0xd3, 0xff,
     0x1b, 0x72, 0x1b, 0x0d, 0xea, 0xf3, 0x23, 0x53, 0x5a, 0xa4, 0x72, 0x4a, 0x99, 0x9d, 0x39, 0xce,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000E_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8001_000E_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000E_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8001_000E_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8001-000F-Cert.pem
 
@@ -1837,13 +1837,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8001_000F_Cert_Array[] = {
     0x85, 0xdb, 0x4f, 0x3a, 0x9a, 0xb4, 0x38, 0x03, 0xeb,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000F_Cert = ByteSpan(sTestCert_DAC_FFF2_8001_000F_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000F_Cert = ByteSpan(sTestCert_DAC_FFF2_8001_000F_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8001_000F_SKID_Array[] = {
     0xA3, 0xD5, 0x0F, 0x46, 0x6B, 0x03, 0xF0, 0x6B, 0xF6, 0x9C, 0x41, 0x48, 0x9E, 0x4B, 0x2B, 0xB4, 0x38, 0x0F, 0xFC, 0x10,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000F_SKID = ByteSpan(sTestCert_DAC_FFF2_8001_000F_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000F_SKID = ByteSpan(sTestCert_DAC_FFF2_8001_000F_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8001-000F-Key.pem
 
@@ -1854,14 +1854,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8001_000F_PublicKey_Array[] = {
     0xd9, 0xda, 0xda, 0x1c, 0xe4, 0x61, 0xbe, 0x61, 0x22, 0xa0, 0x6c, 0x0a, 0x8c, 0xc6,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000F_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8001_000F_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000F_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8001_000F_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8001_000F_PrivateKey_Array[] = {
     0x1c, 0x15, 0x18, 0x4f, 0x51, 0xc8, 0x24, 0x10, 0x03, 0x3f, 0xb0, 0x85, 0x33, 0xfc, 0xbd, 0xe3,
     0x5b, 0xc2, 0x5a, 0x2b, 0x1d, 0x16, 0x8b, 0x92, 0xce, 0x33, 0x97, 0xf4, 0x6f, 0xc9, 0xe9, 0x9c,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8001_000F_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8001_000F_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8001_000F_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8001_000F_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8002-0010-Cert.pem
 
@@ -1891,13 +1891,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8002_0010_Cert_Array[] = {
     0x44, 0xbc, 0xd8, 0x97, 0x05, 0xb3, 0xb8, 0x34, 0xb5, 0x02,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0010_Cert = ByteSpan(sTestCert_DAC_FFF2_8002_0010_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0010_Cert = ByteSpan(sTestCert_DAC_FFF2_8002_0010_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8002_0010_SKID_Array[] = {
     0x34, 0x5F, 0x0C, 0xE9, 0xF7, 0x06, 0x5C, 0x77, 0x82, 0xF8, 0xDF, 0x87, 0xB0, 0x12, 0x64, 0x36, 0x1F, 0xED, 0x9B, 0xD8,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0010_SKID = ByteSpan(sTestCert_DAC_FFF2_8002_0010_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0010_SKID = ByteSpan(sTestCert_DAC_FFF2_8002_0010_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8002-0010-Key.pem
 
@@ -1908,14 +1908,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8002_0010_PublicKey_Array[] = {
     0xbe, 0x86, 0x4c, 0xa9, 0x55, 0x6e, 0x6e, 0xaf, 0x0b, 0xcd, 0xef, 0x2e, 0x36, 0x3c,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0010_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8002_0010_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0010_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8002_0010_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8002_0010_PrivateKey_Array[] = {
     0xff, 0x00, 0x86, 0x1d, 0x2d, 0x9e, 0x6e, 0x5d, 0xba, 0xae, 0xaa, 0xbb, 0x32, 0xec, 0x35, 0x11,
     0xc4, 0xc4, 0x60, 0xda, 0x2a, 0x08, 0x61, 0x68, 0xef, 0x4a, 0x4b, 0x9d, 0x50, 0x7c, 0x6a, 0x99,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0010_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8002_0010_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0010_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8002_0010_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8002-0011-Cert.pem
 
@@ -1945,13 +1945,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8002_0011_Cert_Array[] = {
     0x0e, 0x97, 0x0e, 0xbb, 0xe0, 0x88, 0x2a, 0xb9, 0xe3,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0011_Cert = ByteSpan(sTestCert_DAC_FFF2_8002_0011_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0011_Cert = ByteSpan(sTestCert_DAC_FFF2_8002_0011_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8002_0011_SKID_Array[] = {
     0xD6, 0x1C, 0x56, 0x66, 0x02, 0xCE, 0xAD, 0xF9, 0x2B, 0xDF, 0x48, 0x12, 0xE3, 0x91, 0xAC, 0x10, 0x6F, 0x2E, 0x1E, 0xC9,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0011_SKID = ByteSpan(sTestCert_DAC_FFF2_8002_0011_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0011_SKID = ByteSpan(sTestCert_DAC_FFF2_8002_0011_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8002-0011-Key.pem
 
@@ -1962,14 +1962,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8002_0011_PublicKey_Array[] = {
     0x43, 0xb2, 0xd1, 0x74, 0xe0, 0x54, 0x5c, 0x9e, 0x0d, 0x20, 0xc9, 0x49, 0xff, 0x47,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0011_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8002_0011_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0011_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8002_0011_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8002_0011_PrivateKey_Array[] = {
     0x7d, 0xfd, 0x85, 0x68, 0x97, 0x5b, 0x3f, 0x22, 0x1b, 0x1d, 0x19, 0x6d, 0x49, 0x41, 0xd9, 0xd0,
     0x06, 0xa4, 0xa0, 0x78, 0x55, 0xce, 0x9d, 0xce, 0x79, 0x43, 0x0e, 0xdc, 0xb9, 0x32, 0x2e, 0xa2,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0011_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8002_0011_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0011_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8002_0011_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8002-0012-Cert.pem
 
@@ -1999,13 +1999,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8002_0012_Cert_Array[] = {
     0x43, 0x5e, 0x70, 0x87, 0xa0, 0xcc, 0x82, 0x63, 0x25, 0x2d,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0012_Cert = ByteSpan(sTestCert_DAC_FFF2_8002_0012_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0012_Cert = ByteSpan(sTestCert_DAC_FFF2_8002_0012_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8002_0012_SKID_Array[] = {
     0xE1, 0xA1, 0xC4, 0xD1, 0x41, 0xCA, 0x84, 0x41, 0x15, 0xF4, 0x2A, 0xF8, 0xE3, 0x23, 0xE8, 0xD4, 0x6A, 0xDA, 0xC7, 0x6D,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0012_SKID = ByteSpan(sTestCert_DAC_FFF2_8002_0012_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0012_SKID = ByteSpan(sTestCert_DAC_FFF2_8002_0012_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8002-0012-Key.pem
 
@@ -2016,14 +2016,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8002_0012_PublicKey_Array[] = {
     0xca, 0x54, 0xd1, 0xf2, 0xab, 0x1a, 0xc4, 0xed, 0xbe, 0x22, 0x17, 0x62, 0xa4, 0xd2,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0012_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8002_0012_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0012_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8002_0012_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8002_0012_PrivateKey_Array[] = {
     0x8b, 0x6c, 0xb3, 0x96, 0xcf, 0x5b, 0xf5, 0x18, 0x1f, 0x5c, 0x49, 0xfa, 0xd1, 0x64, 0x3a, 0xae,
     0xac, 0xdf, 0x79, 0xdf, 0x9a, 0x65, 0x3e, 0xd2, 0xe4, 0x22, 0x89, 0x7c, 0xd0, 0x8a, 0xbc, 0x93,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0012_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8002_0012_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0012_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8002_0012_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8002-0013-Cert.pem
 
@@ -2053,13 +2053,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8002_0013_Cert_Array[] = {
     0xb9, 0x58, 0xd4, 0xbe, 0xf2, 0x68, 0x7a, 0x46, 0x97, 0x34,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0013_Cert = ByteSpan(sTestCert_DAC_FFF2_8002_0013_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0013_Cert = ByteSpan(sTestCert_DAC_FFF2_8002_0013_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8002_0013_SKID_Array[] = {
     0x77, 0xF2, 0x48, 0xDE, 0x17, 0x8C, 0x07, 0xD1, 0xE4, 0xBC, 0x13, 0x62, 0x9D, 0xC6, 0x6D, 0xEA, 0xB2, 0xF7, 0xAC, 0x06,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0013_SKID = ByteSpan(sTestCert_DAC_FFF2_8002_0013_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0013_SKID = ByteSpan(sTestCert_DAC_FFF2_8002_0013_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8002-0013-Key.pem
 
@@ -2070,14 +2070,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8002_0013_PublicKey_Array[] = {
     0xfd, 0x45, 0x02, 0x03, 0x87, 0xc3, 0x0e, 0xc5, 0xbe, 0x2d, 0xc9, 0x57, 0xb3, 0x08,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0013_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8002_0013_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0013_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8002_0013_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8002_0013_PrivateKey_Array[] = {
     0xd7, 0x31, 0x94, 0x4c, 0xa9, 0xa8, 0x07, 0xd1, 0x89, 0xf9, 0xaa, 0xd9, 0xde, 0x63, 0x72, 0x0e,
     0x72, 0x81, 0x84, 0xf9, 0x88, 0x23, 0xea, 0xec, 0x4c, 0x52, 0x3a, 0xa9, 0x58, 0x1a, 0xa7, 0x78,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0013_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8002_0013_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0013_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8002_0013_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8002-0014-Cert.pem
 
@@ -2107,13 +2107,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8002_0014_Cert_Array[] = {
     0x14, 0xdc, 0xaf, 0x59, 0xf3, 0x6e, 0x06, 0x25,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0014_Cert = ByteSpan(sTestCert_DAC_FFF2_8002_0014_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0014_Cert = ByteSpan(sTestCert_DAC_FFF2_8002_0014_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8002_0014_SKID_Array[] = {
     0xD5, 0x5B, 0xE9, 0x31, 0x0B, 0x65, 0x43, 0x18, 0x53, 0xCB, 0xF9, 0xC2, 0xDD, 0x49, 0x7A, 0x55, 0xF4, 0x9F, 0x5E, 0x2A,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0014_SKID = ByteSpan(sTestCert_DAC_FFF2_8002_0014_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0014_SKID = ByteSpan(sTestCert_DAC_FFF2_8002_0014_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8002-0014-Key.pem
 
@@ -2124,14 +2124,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8002_0014_PublicKey_Array[] = {
     0x01, 0xef, 0x68, 0x98, 0x5d, 0xc9, 0x66, 0x3e, 0x12, 0x05, 0xe9, 0x9c, 0xed, 0xff,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0014_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8002_0014_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0014_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8002_0014_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8002_0014_PrivateKey_Array[] = {
     0x53, 0x7e, 0x8c, 0x7f, 0x71, 0xe8, 0xb1, 0x8b, 0x24, 0xe2, 0x28, 0x3d, 0x87, 0xe8, 0x1f, 0x8b,
     0x99, 0x7f, 0xf5, 0xbe, 0x35, 0xe7, 0x5f, 0x27, 0xe3, 0xde, 0x63, 0x1d, 0x22, 0x29, 0x51, 0x87,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0014_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8002_0014_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0014_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8002_0014_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8002-0015-Cert.pem
 
@@ -2161,13 +2161,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8002_0015_Cert_Array[] = {
     0x6d, 0x43, 0x50, 0x5b, 0xc8, 0x4e, 0x55, 0x16, 0x22, 0x90,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0015_Cert = ByteSpan(sTestCert_DAC_FFF2_8002_0015_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0015_Cert = ByteSpan(sTestCert_DAC_FFF2_8002_0015_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8002_0015_SKID_Array[] = {
     0xC1, 0xF4, 0x48, 0xF4, 0x97, 0xBA, 0x7F, 0xA9, 0xD6, 0x6E, 0xF2, 0x53, 0xCA, 0xE7, 0xA4, 0xF1, 0xEE, 0x35, 0xB3, 0x12,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0015_SKID = ByteSpan(sTestCert_DAC_FFF2_8002_0015_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0015_SKID = ByteSpan(sTestCert_DAC_FFF2_8002_0015_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8002-0015-Key.pem
 
@@ -2178,14 +2178,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8002_0015_PublicKey_Array[] = {
     0x53, 0x53, 0x9a, 0x4a, 0x73, 0xde, 0x29, 0xe2, 0x11, 0xe9, 0x80, 0xa4, 0x98, 0x3c,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0015_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8002_0015_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0015_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8002_0015_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8002_0015_PrivateKey_Array[] = {
     0x34, 0x69, 0x91, 0x54, 0x61, 0x90, 0x48, 0xf0, 0xb4, 0x90, 0xee, 0xdb, 0x01, 0x14, 0x03, 0x8e,
     0x41, 0x42, 0xb7, 0xfa, 0xb8, 0xc3, 0x6e, 0xbf, 0xc9, 0x56, 0xff, 0x62, 0xa2, 0x2c, 0xe3, 0xbb,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0015_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8002_0015_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0015_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8002_0015_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8002-0016-Cert.pem
 
@@ -2215,13 +2215,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8002_0016_Cert_Array[] = {
     0x7a, 0x7b, 0x5c, 0x74, 0x4d, 0xf2, 0xe1, 0x2c, 0x30, 0x85,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0016_Cert = ByteSpan(sTestCert_DAC_FFF2_8002_0016_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0016_Cert = ByteSpan(sTestCert_DAC_FFF2_8002_0016_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8002_0016_SKID_Array[] = {
     0x71, 0x72, 0x0A, 0x62, 0x72, 0x8F, 0xCA, 0xB3, 0xEF, 0xF0, 0x62, 0x85, 0xBC, 0x7C, 0x34, 0x55, 0x38, 0x01, 0x92, 0x12,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0016_SKID = ByteSpan(sTestCert_DAC_FFF2_8002_0016_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0016_SKID = ByteSpan(sTestCert_DAC_FFF2_8002_0016_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8002-0016-Key.pem
 
@@ -2232,14 +2232,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8002_0016_PublicKey_Array[] = {
     0xee, 0xc6, 0x7d, 0xc2, 0xe2, 0x30, 0x91, 0xb8, 0x6a, 0x08, 0x6f, 0x1e, 0x1d, 0x8e,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0016_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8002_0016_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0016_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8002_0016_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8002_0016_PrivateKey_Array[] = {
     0x26, 0xab, 0xde, 0x44, 0xa7, 0x80, 0x4d, 0xe4, 0x0f, 0xed, 0x59, 0x26, 0x99, 0x9a, 0x23, 0x51,
     0xf2, 0x04, 0x5a, 0x2d, 0x82, 0xff, 0xe5, 0x23, 0x58, 0x1e, 0x1f, 0xbd, 0x43, 0x2b, 0x07, 0x74,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0016_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8002_0016_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0016_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8002_0016_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8002-0017-Cert.pem
 
@@ -2269,13 +2269,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8002_0017_Cert_Array[] = {
     0x2b, 0x99, 0x5b, 0x30, 0xa6, 0x09, 0x1f, 0xc0,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0017_Cert = ByteSpan(sTestCert_DAC_FFF2_8002_0017_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0017_Cert = ByteSpan(sTestCert_DAC_FFF2_8002_0017_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8002_0017_SKID_Array[] = {
     0x39, 0x33, 0xE2, 0x48, 0xB1, 0x76, 0x97, 0x57, 0x15, 0x8B, 0x0E, 0x39, 0x9F, 0x5E, 0x5C, 0x2E, 0xEE, 0x60, 0xBC, 0x0A,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0017_SKID = ByteSpan(sTestCert_DAC_FFF2_8002_0017_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0017_SKID = ByteSpan(sTestCert_DAC_FFF2_8002_0017_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8002-0017-Key.pem
 
@@ -2286,14 +2286,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8002_0017_PublicKey_Array[] = {
     0x57, 0x29, 0xd7, 0x61, 0xd7, 0xe6, 0x88, 0x3e, 0x40, 0xd0, 0x53, 0xd9, 0xbd, 0xe8,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0017_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8002_0017_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0017_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8002_0017_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8002_0017_PrivateKey_Array[] = {
     0x4f, 0x55, 0xd1, 0xff, 0x27, 0xff, 0x69, 0xb3, 0x39, 0x5b, 0x69, 0xac, 0x53, 0x1e, 0x00, 0x83,
     0x49, 0xb1, 0x61, 0x40, 0x51, 0xa2, 0x6c, 0xb9, 0x92, 0x4f, 0xf2, 0xd7, 0x15, 0xe4, 0x32, 0x40,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8002_0017_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8002_0017_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8002_0017_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8002_0017_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8003-0018-FB-Cert.pem
 
@@ -2321,13 +2321,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8003_0018_FB_Cert_Array[] = {
     0xca, 0x4d, 0xe9, 0xc5, 0xe5, 0x20, 0x19, 0x22, 0x8e, 0xbf, 0x8a, 0x99, 0x2e, 0xf1, 0x4a,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8003_0018_FB_Cert = ByteSpan(sTestCert_DAC_FFF2_8003_0018_FB_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8003_0018_FB_Cert = ByteSpan(sTestCert_DAC_FFF2_8003_0018_FB_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8003_0018_FB_SKID_Array[] = {
     0xB9, 0x59, 0xDC, 0xED, 0xB2, 0x52, 0x93, 0xE4, 0xA8, 0xF2, 0xB7, 0x56, 0x71, 0x38, 0x5F, 0x62, 0x63, 0x84, 0xF1, 0xD6,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8003_0018_FB_SKID = ByteSpan(sTestCert_DAC_FFF2_8003_0018_FB_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8003_0018_FB_SKID = ByteSpan(sTestCert_DAC_FFF2_8003_0018_FB_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8003-0018-FB-Key.pem
 
@@ -2338,14 +2338,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8003_0018_FB_PublicKey_Array[] = {
     0x97, 0x08, 0x55, 0xb8, 0x8c, 0x5d, 0xec, 0x31, 0x13, 0xd9, 0x8f, 0x55, 0x04, 0x36,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8003_0018_FB_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8003_0018_FB_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8003_0018_FB_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8003_0018_FB_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8003_0018_FB_PrivateKey_Array[] = {
     0xb7, 0x50, 0x27, 0x5c, 0x30, 0x5a, 0xe8, 0xc7, 0xbf, 0xf8, 0xa0, 0xc7, 0x46, 0x24, 0x1b, 0xda,
     0x98, 0xde, 0xf5, 0x21, 0x6f, 0xcf, 0xba, 0x61, 0x26, 0x78, 0x3a, 0xb3, 0xae, 0xcb, 0x41, 0x68,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8003_0018_FB_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8003_0018_FB_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8003_0018_FB_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8003_0018_FB_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8003-0019-FB-Cert.pem
 
@@ -2373,13 +2373,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8003_0019_FB_Cert_Array[] = {
     0x8d, 0x6e, 0x9c, 0xf2, 0xb4, 0x66, 0xec, 0x88, 0x59, 0x3f, 0x86, 0x46, 0xfd, 0xe5, 0xb7,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8003_0019_FB_Cert = ByteSpan(sTestCert_DAC_FFF2_8003_0019_FB_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8003_0019_FB_Cert = ByteSpan(sTestCert_DAC_FFF2_8003_0019_FB_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8003_0019_FB_SKID_Array[] = {
     0x4C, 0x4F, 0x73, 0xB5, 0x17, 0x7E, 0xED, 0xB4, 0x86, 0x26, 0x80, 0xD6, 0x94, 0x08, 0x8A, 0x35, 0x1A, 0x45, 0x2C, 0x05,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8003_0019_FB_SKID = ByteSpan(sTestCert_DAC_FFF2_8003_0019_FB_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8003_0019_FB_SKID = ByteSpan(sTestCert_DAC_FFF2_8003_0019_FB_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8003-0019-FB-Key.pem
 
@@ -2390,14 +2390,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8003_0019_FB_PublicKey_Array[] = {
     0x53, 0x59, 0x1a, 0xb3, 0x7c, 0xe8, 0x86, 0xdd, 0x86, 0x45, 0xfb, 0x09, 0x12, 0x29,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8003_0019_FB_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8003_0019_FB_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8003_0019_FB_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8003_0019_FB_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8003_0019_FB_PrivateKey_Array[] = {
     0xd5, 0x30, 0x2b, 0xe9, 0x1e, 0x11, 0x11, 0x1d, 0x05, 0x79, 0x04, 0x1b, 0xac, 0x66, 0x17, 0x21,
     0xc5, 0xab, 0x51, 0x6d, 0xcb, 0x41, 0x18, 0x9f, 0xa3, 0x50, 0xa3, 0x0b, 0xc2, 0x6f, 0x13, 0xb9,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8003_0019_FB_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8003_0019_FB_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8003_0019_FB_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8003_0019_FB_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8003-001A-FB-Cert.pem
 
@@ -2425,13 +2425,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8003_001A_FB_Cert_Array[] = {
     0x58, 0x11, 0x9b, 0x9d, 0x27, 0x09, 0xc6, 0x24, 0x6d, 0xf4, 0x9b, 0xe9, 0x6b, 0x62, 0x89,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8003_001A_FB_Cert = ByteSpan(sTestCert_DAC_FFF2_8003_001A_FB_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8003_001A_FB_Cert = ByteSpan(sTestCert_DAC_FFF2_8003_001A_FB_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8003_001A_FB_SKID_Array[] = {
     0x55, 0xB3, 0xFC, 0x16, 0x29, 0x6D, 0x5A, 0x9D, 0xFA, 0xE5, 0xB3, 0x96, 0x68, 0x72, 0x34, 0x2A, 0x30, 0x81, 0x44, 0x99,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8003_001A_FB_SKID = ByteSpan(sTestCert_DAC_FFF2_8003_001A_FB_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8003_001A_FB_SKID = ByteSpan(sTestCert_DAC_FFF2_8003_001A_FB_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8003-001A-FB-Key.pem
 
@@ -2442,14 +2442,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8003_001A_FB_PublicKey_Array[] = {
     0x9c, 0x15, 0xe2, 0x16, 0x65, 0xe5, 0x30, 0xdb, 0x56, 0x0a, 0x87, 0x51, 0x4d, 0x71,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8003_001A_FB_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8003_001A_FB_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8003_001A_FB_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8003_001A_FB_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8003_001A_FB_PrivateKey_Array[] = {
     0x1a, 0x94, 0x70, 0x1e, 0x70, 0x5f, 0xb3, 0x83, 0x15, 0x5a, 0x4e, 0xdf, 0x84, 0xad, 0x67, 0xbf,
     0x9f, 0x93, 0x48, 0x76, 0x0d, 0x28, 0x46, 0xba, 0xdc, 0x75, 0xc4, 0xf8, 0x63, 0x5c, 0xcb, 0x0b,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8003_001A_FB_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8003_001A_FB_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8003_001A_FB_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8003_001A_FB_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8003-001B-FB-Cert.pem
 
@@ -2477,13 +2477,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8003_001B_FB_Cert_Array[] = {
     0x15, 0xd2, 0x50, 0x74, 0xc8, 0xad, 0x98, 0x2c, 0x5e, 0xcf, 0xa9, 0xc4, 0xab, 0x40, 0xbb, 0x83,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8003_001B_FB_Cert = ByteSpan(sTestCert_DAC_FFF2_8003_001B_FB_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8003_001B_FB_Cert = ByteSpan(sTestCert_DAC_FFF2_8003_001B_FB_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8003_001B_FB_SKID_Array[] = {
     0x11, 0xF1, 0x0F, 0x09, 0x08, 0x78, 0xB5, 0xB8, 0x29, 0x32, 0x45, 0xCE, 0x27, 0xE7, 0x8C, 0x5D, 0x3E, 0x97, 0x2F, 0xD9,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8003_001B_FB_SKID = ByteSpan(sTestCert_DAC_FFF2_8003_001B_FB_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8003_001B_FB_SKID = ByteSpan(sTestCert_DAC_FFF2_8003_001B_FB_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8003-001B-FB-Key.pem
 
@@ -2494,14 +2494,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8003_001B_FB_PublicKey_Array[] = {
     0x2a, 0xea, 0x4f, 0x89, 0xed, 0x70, 0xe2, 0x6e, 0x85, 0x0f, 0x49, 0xa9, 0xb5, 0x7e,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8003_001B_FB_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8003_001B_FB_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8003_001B_FB_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8003_001B_FB_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8003_001B_FB_PrivateKey_Array[] = {
     0xb9, 0xf1, 0x7e, 0xf4, 0xff, 0xc0, 0x26, 0xaf, 0x96, 0xf6, 0xb6, 0x3b, 0x96, 0x3d, 0x52, 0x97,
     0xe1, 0xc4, 0x24, 0xe3, 0xcd, 0xcf, 0x2e, 0x1b, 0xe1, 0x39, 0xc7, 0x2a, 0xc0, 0x68, 0x88, 0x1a,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8003_001B_FB_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8003_001B_FB_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8003_001B_FB_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8003_001B_FB_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8004-001C-FB-Cert.pem
 
@@ -2530,13 +2530,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8004_001C_FB_Cert_Array[] = {
     0x26, 0x73, 0x6e, 0x7d,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_001C_FB_Cert = ByteSpan(sTestCert_DAC_FFF2_8004_001C_FB_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_001C_FB_Cert = ByteSpan(sTestCert_DAC_FFF2_8004_001C_FB_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8004_001C_FB_SKID_Array[] = {
     0xC0, 0x32, 0x51, 0x0A, 0x09, 0xE4, 0x76, 0xDB, 0x55, 0x23, 0x0C, 0xA4, 0x7B, 0xD6, 0x5A, 0x6B, 0xA5, 0x12, 0x34, 0x79,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_001C_FB_SKID = ByteSpan(sTestCert_DAC_FFF2_8004_001C_FB_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_001C_FB_SKID = ByteSpan(sTestCert_DAC_FFF2_8004_001C_FB_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8004-001C-FB-Key.pem
 
@@ -2547,14 +2547,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8004_001C_FB_PublicKey_Array[] = {
     0x23, 0x79, 0xe9, 0x2f, 0xcc, 0x2c, 0x89, 0x27, 0x4d, 0xf1, 0x19, 0x23, 0xe7, 0x32,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_001C_FB_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8004_001C_FB_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_001C_FB_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8004_001C_FB_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8004_001C_FB_PrivateKey_Array[] = {
     0xf4, 0xd8, 0xd0, 0xb2, 0x50, 0x85, 0xa4, 0x8d, 0x96, 0xa6, 0x36, 0xda, 0xe5, 0x65, 0x36, 0xab,
     0x75, 0x10, 0xb8, 0xc0, 0x64, 0xd9, 0x4b, 0x5d, 0x0b, 0xcb, 0x6f, 0xa9, 0x00, 0x12, 0xeb, 0x80,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_001C_FB_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8004_001C_FB_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_001C_FB_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8004_001C_FB_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8004-001D-FB-Cert.pem
 
@@ -2583,13 +2583,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8004_001D_FB_Cert_Array[] = {
     0x92, 0xcf, 0xb8, 0xae,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_001D_FB_Cert = ByteSpan(sTestCert_DAC_FFF2_8004_001D_FB_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_001D_FB_Cert = ByteSpan(sTestCert_DAC_FFF2_8004_001D_FB_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8004_001D_FB_SKID_Array[] = {
     0x21, 0xF9, 0x47, 0x53, 0x37, 0x61, 0xA5, 0xD9, 0x3E, 0xBF, 0x88, 0x34, 0x9C, 0xA8, 0x1F, 0xFF, 0x77, 0x0B, 0x21, 0xB3,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_001D_FB_SKID = ByteSpan(sTestCert_DAC_FFF2_8004_001D_FB_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_001D_FB_SKID = ByteSpan(sTestCert_DAC_FFF2_8004_001D_FB_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8004-001D-FB-Key.pem
 
@@ -2600,14 +2600,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8004_001D_FB_PublicKey_Array[] = {
     0xd5, 0x1b, 0x12, 0x9f, 0x19, 0x46, 0x4e, 0xe4, 0x97, 0x2f, 0x24, 0xfa, 0x87, 0xd2,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_001D_FB_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8004_001D_FB_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_001D_FB_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8004_001D_FB_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8004_001D_FB_PrivateKey_Array[] = {
     0xeb, 0x02, 0x7e, 0x67, 0x6c, 0xb0, 0x6c, 0xa9, 0xf0, 0xb6, 0xee, 0x2a, 0x5b, 0xfb, 0x9c, 0x8c,
     0xb0, 0x9a, 0xc5, 0x47, 0x73, 0xd9, 0x11, 0x40, 0xd1, 0x1e, 0x45, 0x2a, 0x42, 0xaa, 0xa6, 0x0c,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_001D_FB_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8004_001D_FB_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_001D_FB_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8004_001D_FB_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8004-001E-FB-Cert.pem
 
@@ -2636,13 +2636,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8004_001E_FB_Cert_Array[] = {
     0xea, 0x7e, 0x1e, 0x46,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_001E_FB_Cert = ByteSpan(sTestCert_DAC_FFF2_8004_001E_FB_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_001E_FB_Cert = ByteSpan(sTestCert_DAC_FFF2_8004_001E_FB_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8004_001E_FB_SKID_Array[] = {
     0xF8, 0x92, 0x5A, 0xB3, 0x60, 0x86, 0x28, 0x94, 0x3F, 0x3D, 0xDB, 0x88, 0xF1, 0xE3, 0xE8, 0x1F, 0xEF, 0x35, 0xC7, 0x48,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_001E_FB_SKID = ByteSpan(sTestCert_DAC_FFF2_8004_001E_FB_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_001E_FB_SKID = ByteSpan(sTestCert_DAC_FFF2_8004_001E_FB_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8004-001E-FB-Key.pem
 
@@ -2653,14 +2653,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8004_001E_FB_PublicKey_Array[] = {
     0xfc, 0x92, 0x79, 0x9d, 0xb3, 0x1a, 0xde, 0xc0, 0x8d, 0xb1, 0x58, 0x84, 0x01, 0xd0,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_001E_FB_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8004_001E_FB_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_001E_FB_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8004_001E_FB_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8004_001E_FB_PrivateKey_Array[] = {
     0xaf, 0xba, 0xf0, 0x31, 0xe9, 0x4c, 0x9b, 0x75, 0x69, 0x4b, 0x52, 0x0e, 0x37, 0x1a, 0x41, 0xe4,
     0xb7, 0xf0, 0xd3, 0x83, 0x90, 0x10, 0xa1, 0xe7, 0x26, 0x72, 0x34, 0xe2, 0x07, 0x22, 0x48, 0x2f,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_001E_FB_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8004_001E_FB_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_001E_FB_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8004_001E_FB_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8004-001F-FB-Cert.pem
 
@@ -2689,13 +2689,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8004_001F_FB_Cert_Array[] = {
     0x06, 0x7a, 0xf7,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_001F_FB_Cert = ByteSpan(sTestCert_DAC_FFF2_8004_001F_FB_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_001F_FB_Cert = ByteSpan(sTestCert_DAC_FFF2_8004_001F_FB_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8004_001F_FB_SKID_Array[] = {
     0x3F, 0x6A, 0xD7, 0x91, 0x88, 0xD2, 0xE2, 0x7A, 0xEF, 0x11, 0x1B, 0x51, 0xF3, 0x89, 0xB4, 0xF6, 0x91, 0x16, 0x59, 0xE3,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_001F_FB_SKID = ByteSpan(sTestCert_DAC_FFF2_8004_001F_FB_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_001F_FB_SKID = ByteSpan(sTestCert_DAC_FFF2_8004_001F_FB_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8004-001F-FB-Key.pem
 
@@ -2706,14 +2706,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8004_001F_FB_PublicKey_Array[] = {
     0x3f, 0xa7, 0x91, 0x1f, 0x39, 0x84, 0x86, 0x8e, 0x2b, 0xe7, 0x70, 0x88, 0x70, 0xb3,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_001F_FB_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8004_001F_FB_PublicKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_001F_FB_PublicKey = ByteSpan(sTestCert_DAC_FFF2_8004_001F_FB_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8004_001F_FB_PrivateKey_Array[] = {
     0x2e, 0x29, 0xb7, 0x00, 0x5b, 0x46, 0x4e, 0x3a, 0x3d, 0xd8, 0x8b, 0x5a, 0xea, 0xcf, 0x7d, 0x16,
     0x27, 0x67, 0x1d, 0xa0, 0x32, 0x37, 0x7f, 0x21, 0xc2, 0xb6, 0xf6, 0xd9, 0x1a, 0xf8, 0xdd, 0x1b,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_001F_FB_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8004_001F_FB_PrivateKey_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_001F_FB_PrivateKey = ByteSpan(sTestCert_DAC_FFF2_8004_001F_FB_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8004-0020-ValInPast-Cert.pem
 
@@ -2743,13 +2743,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8004_0020_ValInPast_Cert_Array[] = {
     0x2f, 0xb7, 0xb4, 0xdc, 0xcd,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_0020_ValInPast_Cert = ByteSpan(sTestCert_DAC_FFF2_8004_0020_ValInPast_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_0020_ValInPast_Cert = ByteSpan(sTestCert_DAC_FFF2_8004_0020_ValInPast_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8004_0020_ValInPast_SKID_Array[] = {
     0x9C, 0xBF, 0x0B, 0xD8, 0x3B, 0xC6, 0x5E, 0x4F, 0x40, 0x2F, 0x15, 0xA1, 0xF7, 0x46, 0xFD, 0x17, 0x7D, 0x43, 0xE7, 0xA4,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_0020_ValInPast_SKID = ByteSpan(sTestCert_DAC_FFF2_8004_0020_ValInPast_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_0020_ValInPast_SKID = ByteSpan(sTestCert_DAC_FFF2_8004_0020_ValInPast_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8004-0020-ValInPast-Key.pem
 
@@ -2760,7 +2760,7 @@ constexpr uint8_t sTestCert_DAC_FFF2_8004_0020_ValInPast_PublicKey_Array[] = {
     0x80, 0x91, 0x9a, 0x3a, 0xe2, 0x5a, 0x4f, 0xa3, 0xac, 0x80, 0x8e, 0xaf, 0x11, 0x4b,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_0020_ValInPast_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_0020_ValInPast_PublicKey =
     ByteSpan(sTestCert_DAC_FFF2_8004_0020_ValInPast_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8004_0020_ValInPast_PrivateKey_Array[] = {
@@ -2768,7 +2768,7 @@ constexpr uint8_t sTestCert_DAC_FFF2_8004_0020_ValInPast_PrivateKey_Array[] = {
     0x3c, 0x97, 0x31, 0x50, 0x4a, 0xeb, 0x8a, 0x89, 0x79, 0x2c, 0x01, 0xfa, 0xec, 0x8b, 0xfe, 0x06,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_0020_ValInPast_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_0020_ValInPast_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF2_8004_0020_ValInPast_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8004-0021-ValInFuture-Cert.pem
@@ -2799,13 +2799,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8004_0021_ValInFuture_Cert_Array[] = {
     0xd0, 0xe5, 0xc4, 0xe7, 0x39, 0xbc, 0x32, 0xe8,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_0021_ValInFuture_Cert = ByteSpan(sTestCert_DAC_FFF2_8004_0021_ValInFuture_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_0021_ValInFuture_Cert = ByteSpan(sTestCert_DAC_FFF2_8004_0021_ValInFuture_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8004_0021_ValInFuture_SKID_Array[] = {
     0x08, 0x84, 0xFF, 0x0D, 0x25, 0x23, 0x97, 0x7F, 0xD9, 0xB6, 0x80, 0x2F, 0x9E, 0x7D, 0x7C, 0xD7, 0x40, 0x1F, 0x5B, 0xF1,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_0021_ValInFuture_SKID = ByteSpan(sTestCert_DAC_FFF2_8004_0021_ValInFuture_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_0021_ValInFuture_SKID = ByteSpan(sTestCert_DAC_FFF2_8004_0021_ValInFuture_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8004-0021-ValInFuture-Key.pem
 
@@ -2816,7 +2816,7 @@ constexpr uint8_t sTestCert_DAC_FFF2_8004_0021_ValInFuture_PublicKey_Array[] = {
     0x05, 0xf3, 0x31, 0x00, 0xa1, 0x72, 0x60, 0xd7, 0x27, 0x8a, 0xe7, 0xc2, 0xe0, 0x98,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_0021_ValInFuture_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_0021_ValInFuture_PublicKey =
     ByteSpan(sTestCert_DAC_FFF2_8004_0021_ValInFuture_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8004_0021_ValInFuture_PrivateKey_Array[] = {
@@ -2824,7 +2824,7 @@ constexpr uint8_t sTestCert_DAC_FFF2_8004_0021_ValInFuture_PrivateKey_Array[] = 
     0xb9, 0x27, 0x8c, 0x82, 0x3d, 0xdf, 0x95, 0xbc, 0x01, 0xc3, 0xb2, 0xb0, 0x33, 0xab, 0x38, 0x86,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_0021_ValInFuture_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_0021_ValInFuture_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF2_8004_0021_ValInFuture_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8004-0030-Val1SecBefore-Cert.pem
@@ -2855,14 +2855,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_Cert_Array[] = {
     0x58, 0x48, 0xca, 0x3d,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_Cert =
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_Cert =
     ByteSpan(sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_SKID_Array[] = {
     0xB4, 0x7E, 0xA8, 0xFF, 0x2E, 0xAA, 0x9E, 0x1E, 0xCD, 0x96, 0x35, 0xA7, 0xEB, 0xD7, 0x64, 0xD7, 0x09, 0xF0, 0x4A, 0x60,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_SKID =
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_SKID =
     ByteSpan(sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8004-0030-Val1SecBefore-Key.pem
@@ -2874,7 +2874,7 @@ constexpr uint8_t sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_PublicKey_Array[] =
     0x90, 0x8d, 0x8a, 0xc3, 0xec, 0xf0, 0x73, 0x5b, 0x98, 0xfa, 0xcf, 0x55, 0xb2, 0xc9,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_PublicKey =
     ByteSpan(sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_PrivateKey_Array[] = {
@@ -2882,7 +2882,7 @@ constexpr uint8_t sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_PrivateKey_Array[] 
     0x80, 0x92, 0xab, 0x1d, 0xad, 0x95, 0x87, 0xad, 0xdf, 0xc1, 0x0a, 0xba, 0x32, 0x0a, 0x6d, 0xa3,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF2_8004_0030_Val1SecBefore_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8005-0022-ValInPast-Cert.pem
@@ -2914,13 +2914,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8005_0022_ValInPast_Cert_Array[] = {
     0xab, 0xad, 0x14, 0x6f, 0x4e, 0x0f, 0x95, 0xa6, 0x19,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8005_0022_ValInPast_Cert = ByteSpan(sTestCert_DAC_FFF2_8005_0022_ValInPast_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8005_0022_ValInPast_Cert = ByteSpan(sTestCert_DAC_FFF2_8005_0022_ValInPast_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8005_0022_ValInPast_SKID_Array[] = {
     0x53, 0xD6, 0xDB, 0xEF, 0xCE, 0xC8, 0x53, 0xAF, 0x5D, 0x58, 0x49, 0xEC, 0x92, 0xE8, 0x29, 0x6A, 0x85, 0xA5, 0xCA, 0x20,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8005_0022_ValInPast_SKID = ByteSpan(sTestCert_DAC_FFF2_8005_0022_ValInPast_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8005_0022_ValInPast_SKID = ByteSpan(sTestCert_DAC_FFF2_8005_0022_ValInPast_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8005-0022-ValInPast-Key.pem
 
@@ -2931,7 +2931,7 @@ constexpr uint8_t sTestCert_DAC_FFF2_8005_0022_ValInPast_PublicKey_Array[] = {
     0x92, 0xad, 0x55, 0x7c, 0xdc, 0xb1, 0x76, 0xf8, 0xae, 0x9b, 0x52, 0x43, 0x13, 0x7d,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8005_0022_ValInPast_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF2_8005_0022_ValInPast_PublicKey =
     ByteSpan(sTestCert_DAC_FFF2_8005_0022_ValInPast_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8005_0022_ValInPast_PrivateKey_Array[] = {
@@ -2939,7 +2939,7 @@ constexpr uint8_t sTestCert_DAC_FFF2_8005_0022_ValInPast_PrivateKey_Array[] = {
     0x6d, 0x4d, 0x83, 0x0b, 0x34, 0xf4, 0xa1, 0xed, 0x7b, 0x80, 0x0d, 0x3a, 0xf9, 0xf2, 0x94, 0xc5,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8005_0022_ValInPast_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF2_8005_0022_ValInPast_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF2_8005_0022_ValInPast_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8005-0023-ValInFuture-Cert.pem
@@ -2971,13 +2971,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8005_0023_ValInFuture_Cert_Array[] = {
     0x6a, 0x98, 0x01, 0x33, 0x05, 0x0d, 0xa7, 0x19, 0x57, 0xd4, 0xc7,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8005_0023_ValInFuture_Cert = ByteSpan(sTestCert_DAC_FFF2_8005_0023_ValInFuture_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8005_0023_ValInFuture_Cert = ByteSpan(sTestCert_DAC_FFF2_8005_0023_ValInFuture_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8005_0023_ValInFuture_SKID_Array[] = {
     0xC7, 0x64, 0xA5, 0x6A, 0x84, 0xA0, 0xA8, 0x16, 0x88, 0x01, 0x16, 0x7C, 0x6A, 0x95, 0xD0, 0x9C, 0xA2, 0x53, 0x6C, 0x76,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8005_0023_ValInFuture_SKID = ByteSpan(sTestCert_DAC_FFF2_8005_0023_ValInFuture_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8005_0023_ValInFuture_SKID = ByteSpan(sTestCert_DAC_FFF2_8005_0023_ValInFuture_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8005-0023-ValInFuture-Key.pem
 
@@ -2988,7 +2988,7 @@ constexpr uint8_t sTestCert_DAC_FFF2_8005_0023_ValInFuture_PublicKey_Array[] = {
     0xef, 0x42, 0x00, 0xc4, 0x2a, 0x51, 0xe3, 0x88, 0x31, 0x7d, 0xad, 0x95, 0xd4, 0x6e,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8005_0023_ValInFuture_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF2_8005_0023_ValInFuture_PublicKey =
     ByteSpan(sTestCert_DAC_FFF2_8005_0023_ValInFuture_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8005_0023_ValInFuture_PrivateKey_Array[] = {
@@ -2996,7 +2996,7 @@ constexpr uint8_t sTestCert_DAC_FFF2_8005_0023_ValInFuture_PrivateKey_Array[] = 
     0xaa, 0xaa, 0x5c, 0xaa, 0xce, 0x61, 0xf0, 0xc2, 0xf4, 0x7e, 0xa3, 0x3b, 0x87, 0x49, 0x0e, 0xbf,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8005_0023_ValInFuture_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF2_8005_0023_ValInFuture_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF2_8005_0023_ValInFuture_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8005-0032-Val1SecBefore-Cert.pem
@@ -3028,14 +3028,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_Cert_Array[] = {
     0x98, 0xe3, 0x11, 0x05, 0xfd, 0xcd, 0x0b, 0xc1,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_Cert =
+constexpr ByteSpan sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_Cert =
     ByteSpan(sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_SKID_Array[] = {
     0x37, 0x6A, 0xCC, 0x5C, 0x8D, 0x7A, 0x75, 0xE0, 0x9F, 0xEF, 0xE9, 0xD8, 0xF3, 0xF5, 0xE5, 0xBB, 0x79, 0xC8, 0x87, 0x01,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_SKID =
+constexpr ByteSpan sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_SKID =
     ByteSpan(sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8005-0032-Val1SecBefore-Key.pem
@@ -3047,7 +3047,7 @@ constexpr uint8_t sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_PublicKey_Array[] =
     0x72, 0x70, 0x2c, 0x1a, 0x6d, 0x26, 0x56, 0x17, 0x6c, 0xc8, 0x3b, 0xb4, 0xde, 0x2e,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_PublicKey =
     ByteSpan(sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_PrivateKey_Array[] = {
@@ -3055,7 +3055,7 @@ constexpr uint8_t sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_PrivateKey_Array[] 
     0x46, 0x3c, 0x2e, 0xc4, 0x0a, 0x90, 0x20, 0x73, 0x67, 0x4e, 0x94, 0x1a, 0x18, 0xdb, 0x69, 0x99,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF2_8005_0032_Val1SecBefore_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8005-0033-Val1SecBefore-Cert.pem
@@ -3087,14 +3087,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8005_0033_Val1SecBefore_Cert_Array[] = {
     0x1b, 0xa5, 0x29, 0x94, 0x37, 0xda, 0x75, 0x2f, 0x88,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8005_0033_Val1SecBefore_Cert =
+constexpr ByteSpan sTestCert_DAC_FFF2_8005_0033_Val1SecBefore_Cert =
     ByteSpan(sTestCert_DAC_FFF2_8005_0033_Val1SecBefore_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8005_0033_Val1SecBefore_SKID_Array[] = {
     0xA6, 0xD2, 0x19, 0x27, 0xD5, 0x62, 0x73, 0xB3, 0x19, 0xCA, 0x04, 0x6D, 0x87, 0x82, 0x7C, 0x06, 0x31, 0x64, 0xC4, 0x9B,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8005_0033_Val1SecBefore_SKID =
+constexpr ByteSpan sTestCert_DAC_FFF2_8005_0033_Val1SecBefore_SKID =
     ByteSpan(sTestCert_DAC_FFF2_8005_0033_Val1SecBefore_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8005-0033-Val1SecBefore-Key.pem
@@ -3106,7 +3106,7 @@ constexpr uint8_t sTestCert_DAC_FFF2_8005_0033_Val1SecBefore_PublicKey_Array[] =
     0x72, 0x2e, 0x0c, 0xd0, 0xb6, 0xd7, 0x69, 0xd3, 0xc9, 0xe5, 0x59, 0xbb, 0x3d, 0x2e,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8005_0033_Val1SecBefore_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF2_8005_0033_Val1SecBefore_PublicKey =
     ByteSpan(sTestCert_DAC_FFF2_8005_0033_Val1SecBefore_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8005_0033_Val1SecBefore_PrivateKey_Array[] = {
@@ -3114,7 +3114,7 @@ constexpr uint8_t sTestCert_DAC_FFF2_8005_0033_Val1SecBefore_PrivateKey_Array[] 
     0x44, 0x52, 0x29, 0xbe, 0xc7, 0xee, 0xef, 0x02, 0x9e, 0x17, 0xc2, 0xdc, 0x3a, 0xfc, 0xd3, 0xd1,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8005_0033_Val1SecBefore_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF2_8005_0033_Val1SecBefore_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF2_8005_0033_Val1SecBefore_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8006-0024-ValInPast-Cert.pem
@@ -3146,13 +3146,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8006_0024_ValInPast_Cert_Array[] = {
     0x76, 0x10, 0xc0, 0x95, 0xcf, 0x60, 0x5c, 0x37, 0x7f,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8006_0024_ValInPast_Cert = ByteSpan(sTestCert_DAC_FFF2_8006_0024_ValInPast_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8006_0024_ValInPast_Cert = ByteSpan(sTestCert_DAC_FFF2_8006_0024_ValInPast_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8006_0024_ValInPast_SKID_Array[] = {
     0x3F, 0x04, 0x17, 0xA5, 0x5F, 0xE1, 0xC8, 0xA0, 0x44, 0xC9, 0xA4, 0x03, 0x5D, 0xBB, 0x30, 0x8E, 0x35, 0xE2, 0xA1, 0x5A,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8006_0024_ValInPast_SKID = ByteSpan(sTestCert_DAC_FFF2_8006_0024_ValInPast_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8006_0024_ValInPast_SKID = ByteSpan(sTestCert_DAC_FFF2_8006_0024_ValInPast_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8006-0024-ValInPast-Key.pem
 
@@ -3163,7 +3163,7 @@ constexpr uint8_t sTestCert_DAC_FFF2_8006_0024_ValInPast_PublicKey_Array[] = {
     0x77, 0xbd, 0x83, 0x9f, 0x09, 0xf7, 0x0f, 0x11, 0x57, 0xc8, 0x24, 0x86, 0xf3, 0x55,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8006_0024_ValInPast_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF2_8006_0024_ValInPast_PublicKey =
     ByteSpan(sTestCert_DAC_FFF2_8006_0024_ValInPast_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8006_0024_ValInPast_PrivateKey_Array[] = {
@@ -3171,7 +3171,7 @@ constexpr uint8_t sTestCert_DAC_FFF2_8006_0024_ValInPast_PrivateKey_Array[] = {
     0x46, 0x0c, 0xc4, 0x53, 0x28, 0xfa, 0x19, 0xd7, 0x10, 0x88, 0x21, 0xc2, 0xc4, 0x96, 0x8e, 0xc9,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8006_0024_ValInPast_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF2_8006_0024_ValInPast_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF2_8006_0024_ValInPast_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8006-0025-ValInFuture-Cert.pem
@@ -3203,13 +3203,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8006_0025_ValInFuture_Cert_Array[] = {
     0x1f, 0x9b, 0xf4, 0x02, 0x72, 0x86, 0x25, 0x3e, 0x9c, 0x6d,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8006_0025_ValInFuture_Cert = ByteSpan(sTestCert_DAC_FFF2_8006_0025_ValInFuture_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8006_0025_ValInFuture_Cert = ByteSpan(sTestCert_DAC_FFF2_8006_0025_ValInFuture_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8006_0025_ValInFuture_SKID_Array[] = {
     0xD0, 0x1A, 0xC5, 0xE6, 0x1C, 0x40, 0x03, 0x32, 0x64, 0xAD, 0x45, 0xE2, 0x42, 0x8C, 0x55, 0xFE, 0xDD, 0x00, 0xA7, 0xF3,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8006_0025_ValInFuture_SKID = ByteSpan(sTestCert_DAC_FFF2_8006_0025_ValInFuture_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8006_0025_ValInFuture_SKID = ByteSpan(sTestCert_DAC_FFF2_8006_0025_ValInFuture_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8006-0025-ValInFuture-Key.pem
 
@@ -3220,7 +3220,7 @@ constexpr uint8_t sTestCert_DAC_FFF2_8006_0025_ValInFuture_PublicKey_Array[] = {
     0x9a, 0xec, 0x70, 0x54, 0x6c, 0xce, 0xe0, 0x09, 0x6d, 0x3c, 0x91, 0x1f, 0xfa, 0xbd,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8006_0025_ValInFuture_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF2_8006_0025_ValInFuture_PublicKey =
     ByteSpan(sTestCert_DAC_FFF2_8006_0025_ValInFuture_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8006_0025_ValInFuture_PrivateKey_Array[] = {
@@ -3228,7 +3228,7 @@ constexpr uint8_t sTestCert_DAC_FFF2_8006_0025_ValInFuture_PrivateKey_Array[] = 
     0xf6, 0xfa, 0xcb, 0xf7, 0x75, 0x9e, 0x58, 0x49, 0xf6, 0x8f, 0xa3, 0x4c, 0xf7, 0xc1, 0x98, 0xb1,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8006_0025_ValInFuture_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF2_8006_0025_ValInFuture_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF2_8006_0025_ValInFuture_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8006-0034-ValInFuture-Cert.pem
@@ -3260,13 +3260,13 @@ constexpr uint8_t sTestCert_DAC_FFF2_8006_0034_ValInFuture_Cert_Array[] = {
     0x12, 0xf4, 0x61, 0x3a, 0x6f, 0xa6, 0xa0, 0xe5, 0xc1, 0xeb, 0x3d,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8006_0034_ValInFuture_Cert = ByteSpan(sTestCert_DAC_FFF2_8006_0034_ValInFuture_Cert_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8006_0034_ValInFuture_Cert = ByteSpan(sTestCert_DAC_FFF2_8006_0034_ValInFuture_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8006_0034_ValInFuture_SKID_Array[] = {
     0x50, 0x35, 0x1F, 0xBA, 0x3F, 0x92, 0xDB, 0x07, 0x26, 0xD7, 0x5D, 0xE4, 0x13, 0x00, 0xE9, 0x99, 0xDE, 0x4D, 0x3A, 0x7A,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8006_0034_ValInFuture_SKID = ByteSpan(sTestCert_DAC_FFF2_8006_0034_ValInFuture_SKID_Array);
+constexpr ByteSpan sTestCert_DAC_FFF2_8006_0034_ValInFuture_SKID = ByteSpan(sTestCert_DAC_FFF2_8006_0034_ValInFuture_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8006-0034-ValInFuture-Key.pem
 
@@ -3277,7 +3277,7 @@ constexpr uint8_t sTestCert_DAC_FFF2_8006_0034_ValInFuture_PublicKey_Array[] = {
     0x1c, 0x9f, 0xf1, 0xff, 0xd6, 0x16, 0x93, 0x94, 0x0a, 0xd7, 0x80, 0xf4, 0x67, 0x37,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8006_0034_ValInFuture_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF2_8006_0034_ValInFuture_PublicKey =
     ByteSpan(sTestCert_DAC_FFF2_8006_0034_ValInFuture_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8006_0034_ValInFuture_PrivateKey_Array[] = {
@@ -3285,7 +3285,7 @@ constexpr uint8_t sTestCert_DAC_FFF2_8006_0034_ValInFuture_PrivateKey_Array[] = 
     0xc2, 0xa6, 0xb1, 0x1a, 0x4a, 0x4f, 0x81, 0x2c, 0xc9, 0x33, 0xbf, 0xc1, 0x0a, 0x22, 0x1a, 0x2b,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8006_0034_ValInFuture_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF2_8006_0034_ValInFuture_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF2_8006_0034_ValInFuture_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8006-0035-Val1SecBefore-Cert.pem
@@ -3317,14 +3317,14 @@ constexpr uint8_t sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_Cert_Array[] = {
     0x5e, 0x7d, 0x62, 0x1f, 0xbe, 0x22, 0x2d, 0x8b, 0xb9,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_Cert =
+constexpr ByteSpan sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_Cert =
     ByteSpan(sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_Cert_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_SKID_Array[] = {
     0xF2, 0xC0, 0xB6, 0x87, 0x73, 0x43, 0x40, 0x85, 0x2B, 0xEB, 0x19, 0xA2, 0x7B, 0x93, 0xC4, 0xA2, 0x60, 0x5A, 0x4D, 0x34,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_SKID =
+constexpr ByteSpan sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_SKID =
     ByteSpan(sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-DAC-FFF2-8006-0035-Val1SecBefore-Key.pem
@@ -3336,7 +3336,7 @@ constexpr uint8_t sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_PublicKey_Array[] =
     0x69, 0x5f, 0xe6, 0x6e, 0x7e, 0x3f, 0xdf, 0x38, 0x9f, 0x90, 0x62, 0xb7, 0x1d, 0x80,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_PublicKey =
+constexpr ByteSpan sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_PublicKey =
     ByteSpan(sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_PublicKey_Array);
 
 constexpr uint8_t sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_PrivateKey_Array[] = {
@@ -3344,7 +3344,7 @@ constexpr uint8_t sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_PrivateKey_Array[] 
     0xa9, 0x38, 0x51, 0x24, 0xd4, 0xe9, 0x55, 0xbe, 0x64, 0x00, 0xc9, 0x73, 0xca, 0x60, 0x1d, 0x98,
 };
 
-extern const ByteSpan sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_PrivateKey =
+constexpr ByteSpan sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_PrivateKey =
     ByteSpan(sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAA-FFF1-Cert.pem
@@ -3374,13 +3374,13 @@ constexpr uint8_t sTestCert_PAA_FFF1_Cert_Array[] = {
     0xd4, 0x0d, 0x03, 0x4d, 0x51, 0x4b, 0x25, 0xde,
 };
 
-extern const ByteSpan sTestCert_PAA_FFF1_Cert = ByteSpan(sTestCert_PAA_FFF1_Cert_Array);
+constexpr ByteSpan sTestCert_PAA_FFF1_Cert = ByteSpan(sTestCert_PAA_FFF1_Cert_Array);
 
 constexpr uint8_t sTestCert_PAA_FFF1_SKID_Array[] = {
     0x6A, 0xFD, 0x22, 0x77, 0x1F, 0x51, 0x1F, 0xEC, 0xBF, 0x16, 0x41, 0x97, 0x67, 0x10, 0xDC, 0xDC, 0x31, 0xA1, 0x71, 0x7E,
 };
 
-extern const ByteSpan sTestCert_PAA_FFF1_SKID = ByteSpan(sTestCert_PAA_FFF1_SKID_Array);
+constexpr ByteSpan sTestCert_PAA_FFF1_SKID = ByteSpan(sTestCert_PAA_FFF1_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAA-FFF1-Key.pem
 
@@ -3391,14 +3391,14 @@ constexpr uint8_t sTestCert_PAA_FFF1_PublicKey_Array[] = {
     0x30, 0x3f, 0x1f, 0x19, 0x42, 0x1d, 0x75, 0x1e, 0x8f, 0x8f, 0x1a, 0x9a, 0x9b, 0x75,
 };
 
-extern const ByteSpan sTestCert_PAA_FFF1_PublicKey = ByteSpan(sTestCert_PAA_FFF1_PublicKey_Array);
+constexpr ByteSpan sTestCert_PAA_FFF1_PublicKey = ByteSpan(sTestCert_PAA_FFF1_PublicKey_Array);
 
 constexpr uint8_t sTestCert_PAA_FFF1_PrivateKey_Array[] = {
     0x65, 0x12, 0xca, 0xec, 0xae, 0xcf, 0xc5, 0x43, 0xd6, 0x06, 0x23, 0x16, 0x15, 0x97, 0x16, 0x2f,
     0x01, 0x46, 0x84, 0xc5, 0x65, 0xa1, 0x29, 0xb6, 0x2f, 0xd2, 0x8c, 0x27, 0xab, 0x1c, 0xcc, 0x50,
 };
 
-extern const ByteSpan sTestCert_PAA_FFF1_PrivateKey = ByteSpan(sTestCert_PAA_FFF1_PrivateKey_Array);
+constexpr ByteSpan sTestCert_PAA_FFF1_PrivateKey = ByteSpan(sTestCert_PAA_FFF1_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAA-FFF2-ValInFuture-Cert.pem
 
@@ -3427,13 +3427,13 @@ constexpr uint8_t sTestCert_PAA_FFF2_ValInFuture_Cert_Array[] = {
     0x89, 0xd7, 0x2d, 0x42, 0x0d, 0xde, 0x6b,
 };
 
-extern const ByteSpan sTestCert_PAA_FFF2_ValInFuture_Cert = ByteSpan(sTestCert_PAA_FFF2_ValInFuture_Cert_Array);
+constexpr ByteSpan sTestCert_PAA_FFF2_ValInFuture_Cert = ByteSpan(sTestCert_PAA_FFF2_ValInFuture_Cert_Array);
 
 constexpr uint8_t sTestCert_PAA_FFF2_ValInFuture_SKID_Array[] = {
     0x7F, 0x1D, 0xAA, 0xF2, 0x44, 0x98, 0xB9, 0x86, 0x68, 0x0E, 0xA0, 0x8F, 0xC1, 0x89, 0x21, 0xE8, 0x48, 0x48, 0x9D, 0x17,
 };
 
-extern const ByteSpan sTestCert_PAA_FFF2_ValInFuture_SKID = ByteSpan(sTestCert_PAA_FFF2_ValInFuture_SKID_Array);
+constexpr ByteSpan sTestCert_PAA_FFF2_ValInFuture_SKID = ByteSpan(sTestCert_PAA_FFF2_ValInFuture_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAA-FFF2-ValInFuture-Key.pem
 
@@ -3444,14 +3444,14 @@ constexpr uint8_t sTestCert_PAA_FFF2_ValInFuture_PublicKey_Array[] = {
     0x6a, 0xfb, 0xf5, 0xb9, 0x1b, 0xf5, 0x2c, 0x33, 0x86, 0x0d, 0xc6, 0x5f, 0x10, 0x39,
 };
 
-extern const ByteSpan sTestCert_PAA_FFF2_ValInFuture_PublicKey = ByteSpan(sTestCert_PAA_FFF2_ValInFuture_PublicKey_Array);
+constexpr ByteSpan sTestCert_PAA_FFF2_ValInFuture_PublicKey = ByteSpan(sTestCert_PAA_FFF2_ValInFuture_PublicKey_Array);
 
 constexpr uint8_t sTestCert_PAA_FFF2_ValInFuture_PrivateKey_Array[] = {
     0x97, 0xa0, 0x75, 0x64, 0xb3, 0x0f, 0x54, 0x62, 0x82, 0x78, 0x78, 0x9e, 0x23, 0x9a, 0x36, 0x57,
     0x70, 0x3c, 0x4a, 0xf2, 0x00, 0x5e, 0x84, 0x02, 0x8a, 0x9a, 0xfe, 0xa1, 0xa6, 0xb4, 0x83, 0xb4,
 };
 
-extern const ByteSpan sTestCert_PAA_FFF2_ValInFuture_PrivateKey = ByteSpan(sTestCert_PAA_FFF2_ValInFuture_PrivateKey_Array);
+constexpr ByteSpan sTestCert_PAA_FFF2_ValInFuture_PrivateKey = ByteSpan(sTestCert_PAA_FFF2_ValInFuture_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAA-FFF2-ValInPast-Cert.pem
 
@@ -3480,13 +3480,13 @@ constexpr uint8_t sTestCert_PAA_FFF2_ValInPast_Cert_Array[] = {
     0xa8, 0xbd, 0x28, 0xe7, 0xb7, 0x40, 0xb9,
 };
 
-extern const ByteSpan sTestCert_PAA_FFF2_ValInPast_Cert = ByteSpan(sTestCert_PAA_FFF2_ValInPast_Cert_Array);
+constexpr ByteSpan sTestCert_PAA_FFF2_ValInPast_Cert = ByteSpan(sTestCert_PAA_FFF2_ValInPast_Cert_Array);
 
 constexpr uint8_t sTestCert_PAA_FFF2_ValInPast_SKID_Array[] = {
     0x9B, 0xB2, 0x99, 0xBB, 0xA6, 0x49, 0x7D, 0xB5, 0xA0, 0x4E, 0x1E, 0x18, 0xC7, 0xC2, 0x0E, 0xAE, 0xC5, 0x4C, 0x42, 0xE9,
 };
 
-extern const ByteSpan sTestCert_PAA_FFF2_ValInPast_SKID = ByteSpan(sTestCert_PAA_FFF2_ValInPast_SKID_Array);
+constexpr ByteSpan sTestCert_PAA_FFF2_ValInPast_SKID = ByteSpan(sTestCert_PAA_FFF2_ValInPast_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAA-FFF2-ValInPast-Key.pem
 
@@ -3497,14 +3497,14 @@ constexpr uint8_t sTestCert_PAA_FFF2_ValInPast_PublicKey_Array[] = {
     0x26, 0xc5, 0x55, 0xfb, 0x92, 0x2d, 0x89, 0x09, 0xcc, 0x6f, 0x0c, 0x05, 0xb1, 0xca,
 };
 
-extern const ByteSpan sTestCert_PAA_FFF2_ValInPast_PublicKey = ByteSpan(sTestCert_PAA_FFF2_ValInPast_PublicKey_Array);
+constexpr ByteSpan sTestCert_PAA_FFF2_ValInPast_PublicKey = ByteSpan(sTestCert_PAA_FFF2_ValInPast_PublicKey_Array);
 
 constexpr uint8_t sTestCert_PAA_FFF2_ValInPast_PrivateKey_Array[] = {
     0x88, 0x8c, 0x1f, 0x57, 0x37, 0x4f, 0x03, 0xe7, 0x51, 0x8c, 0x17, 0x1a, 0x41, 0xc4, 0xa6, 0x74,
     0xd1, 0xa9, 0x71, 0x6c, 0x55, 0x4a, 0x0a, 0x76, 0x26, 0xc6, 0x0e, 0xf5, 0x56, 0x70, 0x22, 0x9a,
 };
 
-extern const ByteSpan sTestCert_PAA_FFF2_ValInPast_PrivateKey = ByteSpan(sTestCert_PAA_FFF2_ValInPast_PrivateKey_Array);
+constexpr ByteSpan sTestCert_PAA_FFF2_ValInPast_PrivateKey = ByteSpan(sTestCert_PAA_FFF2_ValInPast_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAA-NoVID-Cert.pem
 
@@ -3531,13 +3531,13 @@ constexpr uint8_t sTestCert_PAA_NoVID_Cert_Array[] = {
     0x4d, 0xd3, 0x73, 0x71, 0x5e, 0x5d,
 };
 
-extern const ByteSpan sTestCert_PAA_NoVID_Cert = ByteSpan(sTestCert_PAA_NoVID_Cert_Array);
+constexpr ByteSpan sTestCert_PAA_NoVID_Cert = ByteSpan(sTestCert_PAA_NoVID_Cert_Array);
 
 constexpr uint8_t sTestCert_PAA_NoVID_SKID_Array[] = {
     0x78, 0x5C, 0xE7, 0x05, 0xB8, 0x6B, 0x8F, 0x4E, 0x6F, 0xC7, 0x93, 0xAA, 0x60, 0xCB, 0x43, 0xEA, 0x69, 0x68, 0x82, 0xD5,
 };
 
-extern const ByteSpan sTestCert_PAA_NoVID_SKID = ByteSpan(sTestCert_PAA_NoVID_SKID_Array);
+constexpr ByteSpan sTestCert_PAA_NoVID_SKID = ByteSpan(sTestCert_PAA_NoVID_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAA-NoVID-Key.pem
 
@@ -3548,14 +3548,14 @@ constexpr uint8_t sTestCert_PAA_NoVID_PublicKey_Array[] = {
     0x5f, 0xcb, 0xa4, 0xc0, 0xf4, 0x7f, 0x87, 0x68, 0x80, 0x03, 0x9e, 0x07, 0x20, 0x4a,
 };
 
-extern const ByteSpan sTestCert_PAA_NoVID_PublicKey = ByteSpan(sTestCert_PAA_NoVID_PublicKey_Array);
+constexpr ByteSpan sTestCert_PAA_NoVID_PublicKey = ByteSpan(sTestCert_PAA_NoVID_PublicKey_Array);
 
 constexpr uint8_t sTestCert_PAA_NoVID_PrivateKey_Array[] = {
     0xe1, 0xf0, 0x73, 0xc9, 0x34, 0x85, 0x3b, 0xaf, 0xfb, 0x38, 0xbf, 0x7e, 0x8b, 0xda, 0xd7, 0xa0,
     0xa6, 0x74, 0x10, 0x7c, 0x77, 0x69, 0x89, 0x2a, 0x0f, 0xf2, 0xe0, 0x6c, 0x1a, 0x2e, 0xf7, 0xa7,
 };
 
-extern const ByteSpan sTestCert_PAA_NoVID_PrivateKey = ByteSpan(sTestCert_PAA_NoVID_PrivateKey_Array);
+constexpr ByteSpan sTestCert_PAA_NoVID_PrivateKey = ByteSpan(sTestCert_PAA_NoVID_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAA-NoVID-ToResignPAIs-Cert.pem
 
@@ -3583,13 +3583,13 @@ constexpr uint8_t sTestCert_PAA_NoVID_ToResignPAIs_Cert_Array[] = {
     0x1a, 0xab, 0xce, 0xcc, 0xf3, 0xd5, 0x9e, 0x0c, 0xd2, 0xc2, 0x72, 0x0c, 0xb2, 0xf0, 0xc8, 0x76,
 };
 
-extern const ByteSpan sTestCert_PAA_NoVID_ToResignPAIs_Cert = ByteSpan(sTestCert_PAA_NoVID_ToResignPAIs_Cert_Array);
+constexpr ByteSpan sTestCert_PAA_NoVID_ToResignPAIs_Cert = ByteSpan(sTestCert_PAA_NoVID_ToResignPAIs_Cert_Array);
 
 constexpr uint8_t sTestCert_PAA_NoVID_ToResignPAIs_SKID_Array[] = {
     0x78, 0x5C, 0xE7, 0x05, 0xB8, 0x6B, 0x8F, 0x4E, 0x6F, 0xC7, 0x93, 0xAA, 0x60, 0xCB, 0x43, 0xEA, 0x69, 0x68, 0x82, 0xD5,
 };
 
-extern const ByteSpan sTestCert_PAA_NoVID_ToResignPAIs_SKID = ByteSpan(sTestCert_PAA_NoVID_ToResignPAIs_SKID_Array);
+constexpr ByteSpan sTestCert_PAA_NoVID_ToResignPAIs_SKID = ByteSpan(sTestCert_PAA_NoVID_ToResignPAIs_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF1-8000-Cert.pem
 
@@ -3619,13 +3619,13 @@ constexpr uint8_t sTestCert_PAI_FFF1_8000_Cert_Array[] = {
     0x3e, 0xc7, 0xef, 0xad, 0x87, 0x14, 0xab, 0x71, 0x82, 0x19,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF1_8000_Cert = ByteSpan(sTestCert_PAI_FFF1_8000_Cert_Array);
+constexpr ByteSpan sTestCert_PAI_FFF1_8000_Cert = ByteSpan(sTestCert_PAI_FFF1_8000_Cert_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF1_8000_SKID_Array[] = {
     0xAF, 0x42, 0xB7, 0x09, 0x4D, 0xEB, 0xD5, 0x15, 0xEC, 0x6E, 0xCF, 0x33, 0xB8, 0x11, 0x15, 0x22, 0x5F, 0x32, 0x52, 0x88,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF1_8000_SKID = ByteSpan(sTestCert_PAI_FFF1_8000_SKID_Array);
+constexpr ByteSpan sTestCert_PAI_FFF1_8000_SKID = ByteSpan(sTestCert_PAI_FFF1_8000_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF1-8000-Key.pem
 
@@ -3636,14 +3636,14 @@ constexpr uint8_t sTestCert_PAI_FFF1_8000_PublicKey_Array[] = {
     0x4b, 0xe0, 0x17, 0xc9, 0xec, 0x15, 0x16, 0x05, 0x6d, 0x70, 0xf2, 0xcd, 0x0b, 0x22,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF1_8000_PublicKey = ByteSpan(sTestCert_PAI_FFF1_8000_PublicKey_Array);
+constexpr ByteSpan sTestCert_PAI_FFF1_8000_PublicKey = ByteSpan(sTestCert_PAI_FFF1_8000_PublicKey_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF1_8000_PrivateKey_Array[] = {
     0x46, 0x7b, 0x2d, 0x8a, 0x69, 0xb3, 0x5c, 0xfe, 0x6b, 0xdb, 0x0f, 0xc3, 0x6a, 0x81, 0xa7, 0xd8,
     0xe3, 0xe4, 0x5d, 0x06, 0x2d, 0xf7, 0xcd, 0xb8, 0x22, 0x58, 0xf3, 0xc8, 0x40, 0x1d, 0xc3, 0x18,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF1_8000_PrivateKey = ByteSpan(sTestCert_PAI_FFF1_8000_PrivateKey_Array);
+constexpr ByteSpan sTestCert_PAI_FFF1_8000_PrivateKey = ByteSpan(sTestCert_PAI_FFF1_8000_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-8001-Cert.pem
 
@@ -3672,13 +3672,13 @@ constexpr uint8_t sTestCert_PAI_FFF2_8001_Cert_Array[] = {
     0x24, 0x97, 0xaf, 0x37, 0xdc, 0x4a, 0xa5, 0x33,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8001_Cert = ByteSpan(sTestCert_PAI_FFF2_8001_Cert_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8001_Cert = ByteSpan(sTestCert_PAI_FFF2_8001_Cert_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_8001_SKID_Array[] = {
     0xD0, 0x5A, 0x9B, 0x67, 0x71, 0xA1, 0xA3, 0x7A, 0x9B, 0xC1, 0x9D, 0x95, 0xE8, 0xB5, 0xDB, 0x8F, 0x43, 0x00, 0xB6, 0x3A,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8001_SKID = ByteSpan(sTestCert_PAI_FFF2_8001_SKID_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8001_SKID = ByteSpan(sTestCert_PAI_FFF2_8001_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-8001-Key.pem
 
@@ -3689,14 +3689,14 @@ constexpr uint8_t sTestCert_PAI_FFF2_8001_PublicKey_Array[] = {
     0xfe, 0x87, 0xfe, 0x4f, 0xe0, 0xb4, 0x73, 0x14, 0x1b, 0xcc, 0xa1, 0x04, 0xb2, 0x8d,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8001_PublicKey = ByteSpan(sTestCert_PAI_FFF2_8001_PublicKey_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8001_PublicKey = ByteSpan(sTestCert_PAI_FFF2_8001_PublicKey_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_8001_PrivateKey_Array[] = {
     0xec, 0x56, 0xfc, 0x11, 0x59, 0xba, 0xc5, 0xa9, 0x00, 0xb4, 0x53, 0x7e, 0xd4, 0xfa, 0x0e, 0xd4,
     0x54, 0xa3, 0xfd, 0x45, 0xea, 0xfe, 0xc6, 0xc3, 0xf6, 0x5f, 0x61, 0x8f, 0x7a, 0x2e, 0x1a, 0xe1,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8001_PrivateKey = ByteSpan(sTestCert_PAI_FFF2_8001_PrivateKey_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8001_PrivateKey = ByteSpan(sTestCert_PAI_FFF2_8001_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-8001-Resigned-Cert.pem
 
@@ -3726,13 +3726,13 @@ constexpr uint8_t sTestCert_PAI_FFF2_8001_Resigned_Cert_Array[] = {
     0x54, 0x02, 0x38,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8001_Resigned_Cert = ByteSpan(sTestCert_PAI_FFF2_8001_Resigned_Cert_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8001_Resigned_Cert = ByteSpan(sTestCert_PAI_FFF2_8001_Resigned_Cert_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_8001_Resigned_SKID_Array[] = {
     0xD0, 0x5A, 0x9B, 0x67, 0x71, 0xA1, 0xA3, 0x7A, 0x9B, 0xC1, 0x9D, 0x95, 0xE8, 0xB5, 0xDB, 0x8F, 0x43, 0x00, 0xB6, 0x3A,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8001_Resigned_SKID = ByteSpan(sTestCert_PAI_FFF2_8001_Resigned_SKID_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8001_Resigned_SKID = ByteSpan(sTestCert_PAI_FFF2_8001_Resigned_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-8001-ResignedSKIDDiff-Cert.pem
 
@@ -3762,13 +3762,13 @@ constexpr uint8_t sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_Cert_Array[] = {
     0xc8, 0xf1,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_Cert = ByteSpan(sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_Cert_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_Cert = ByteSpan(sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_Cert_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_SKID_Array[] = {
     0xDB, 0x77, 0xD2, 0x5B, 0x63, 0x6D, 0x04, 0x38, 0xA1, 0x92, 0x1C, 0x41, 0x52, 0x10, 0x3E, 0xEA, 0xE2, 0xC4, 0x3B, 0x07,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_SKID = ByteSpan(sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_SKID_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_SKID = ByteSpan(sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-8001-ResignedSKIDDiff-Key.pem
 
@@ -3779,7 +3779,7 @@ constexpr uint8_t sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_PublicKey_Array[] = {
     0xb4, 0x36, 0x38, 0xac, 0x4c, 0x9e, 0xe4, 0x39, 0xc7, 0x41, 0x9c, 0x14, 0xdd, 0xfa,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_PublicKey =
+constexpr ByteSpan sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_PublicKey =
     ByteSpan(sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_PublicKey_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_PrivateKey_Array[] = {
@@ -3787,7 +3787,7 @@ constexpr uint8_t sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_PrivateKey_Array[] = 
     0xc0, 0xbf, 0xf9, 0x94, 0xa8, 0x74, 0xdc, 0xc5, 0xf5, 0x7a, 0x17, 0xf8, 0xb5, 0x18, 0x51, 0x35,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_PrivateKey =
+constexpr ByteSpan sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_PrivateKey =
     ByteSpan(sTestCert_PAI_FFF2_8001_ResignedSKIDDiff_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-8001-ResignedSubjectDiff-Cert.pem
@@ -3818,14 +3818,14 @@ constexpr uint8_t sTestCert_PAI_FFF2_8001_ResignedSubjectDiff_Cert_Array[] = {
     0xb9, 0xe3, 0x0a, 0x15, 0xbe, 0xc3, 0xd0, 0x5c, 0xe9, 0x11, 0x2f, 0xfc,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8001_ResignedSubjectDiff_Cert =
+constexpr ByteSpan sTestCert_PAI_FFF2_8001_ResignedSubjectDiff_Cert =
     ByteSpan(sTestCert_PAI_FFF2_8001_ResignedSubjectDiff_Cert_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_8001_ResignedSubjectDiff_SKID_Array[] = {
     0xD0, 0x5A, 0x9B, 0x67, 0x71, 0xA1, 0xA3, 0x7A, 0x9B, 0xC1, 0x9D, 0x95, 0xE8, 0xB5, 0xDB, 0x8F, 0x43, 0x00, 0xB6, 0x3A,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8001_ResignedSubjectDiff_SKID =
+constexpr ByteSpan sTestCert_PAI_FFF2_8001_ResignedSubjectDiff_SKID =
     ByteSpan(sTestCert_PAI_FFF2_8001_ResignedSubjectDiff_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-8004-FB-Cert.pem
@@ -3854,13 +3854,13 @@ constexpr uint8_t sTestCert_PAI_FFF2_8004_FB_Cert_Array[] = {
     0xba, 0x8c, 0x43, 0x21, 0xf6, 0xfb,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8004_FB_Cert = ByteSpan(sTestCert_PAI_FFF2_8004_FB_Cert_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8004_FB_Cert = ByteSpan(sTestCert_PAI_FFF2_8004_FB_Cert_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_8004_FB_SKID_Array[] = {
     0x15, 0x6E, 0xCD, 0x8C, 0x14, 0xBE, 0x80, 0xB4, 0x10, 0xAE, 0xE4, 0x02, 0xA3, 0xF2, 0x33, 0x17, 0xE7, 0x34, 0x06, 0x74,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8004_FB_SKID = ByteSpan(sTestCert_PAI_FFF2_8004_FB_SKID_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8004_FB_SKID = ByteSpan(sTestCert_PAI_FFF2_8004_FB_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-8004-FB-Key.pem
 
@@ -3871,14 +3871,14 @@ constexpr uint8_t sTestCert_PAI_FFF2_8004_FB_PublicKey_Array[] = {
     0xc9, 0x43, 0xf5, 0xf3, 0xea, 0xf4, 0x2f, 0x54, 0x2f, 0x12, 0x7e, 0xa6, 0x37, 0x0c,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8004_FB_PublicKey = ByteSpan(sTestCert_PAI_FFF2_8004_FB_PublicKey_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8004_FB_PublicKey = ByteSpan(sTestCert_PAI_FFF2_8004_FB_PublicKey_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_8004_FB_PrivateKey_Array[] = {
     0x61, 0xd1, 0x9e, 0x11, 0xf2, 0x1a, 0xd9, 0x78, 0x2c, 0x79, 0x45, 0x69, 0xcd, 0x35, 0x75, 0xf3,
     0x94, 0x1d, 0x27, 0x82, 0xd8, 0x9d, 0xf5, 0xa7, 0x1b, 0xdf, 0xbb, 0x6a, 0xa8, 0xb4, 0xd1, 0x69,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8004_FB_PrivateKey = ByteSpan(sTestCert_PAI_FFF2_8004_FB_PrivateKey_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8004_FB_PrivateKey = ByteSpan(sTestCert_PAI_FFF2_8004_FB_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-8005-Val1SecBefore-Cert.pem
 
@@ -3907,13 +3907,13 @@ constexpr uint8_t sTestCert_PAI_FFF2_8005_Val1SecBefore_Cert_Array[] = {
     0xdd, 0x8c, 0xfe, 0x20, 0x7d, 0x3a, 0x40, 0x71,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8005_Val1SecBefore_Cert = ByteSpan(sTestCert_PAI_FFF2_8005_Val1SecBefore_Cert_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8005_Val1SecBefore_Cert = ByteSpan(sTestCert_PAI_FFF2_8005_Val1SecBefore_Cert_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_8005_Val1SecBefore_SKID_Array[] = {
     0xB3, 0x0E, 0x90, 0x53, 0x42, 0x6F, 0x02, 0x0D, 0x13, 0x91, 0x1B, 0x03, 0xCB, 0x57, 0x8D, 0xCB, 0x4A, 0xAB, 0x9A, 0x52,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8005_Val1SecBefore_SKID = ByteSpan(sTestCert_PAI_FFF2_8005_Val1SecBefore_SKID_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8005_Val1SecBefore_SKID = ByteSpan(sTestCert_PAI_FFF2_8005_Val1SecBefore_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-8005-Val1SecBefore-Key.pem
 
@@ -3924,7 +3924,7 @@ constexpr uint8_t sTestCert_PAI_FFF2_8005_Val1SecBefore_PublicKey_Array[] = {
     0xb8, 0x46, 0xe6, 0x2d, 0xc4, 0xe8, 0xf2, 0x9b, 0x87, 0x26, 0x41, 0xf2, 0x0c, 0xce,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8005_Val1SecBefore_PublicKey =
+constexpr ByteSpan sTestCert_PAI_FFF2_8005_Val1SecBefore_PublicKey =
     ByteSpan(sTestCert_PAI_FFF2_8005_Val1SecBefore_PublicKey_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_8005_Val1SecBefore_PrivateKey_Array[] = {
@@ -3932,7 +3932,7 @@ constexpr uint8_t sTestCert_PAI_FFF2_8005_Val1SecBefore_PrivateKey_Array[] = {
     0x3a, 0x91, 0x84, 0xb9, 0x7e, 0xdc, 0x0b, 0x6a, 0x23, 0x11, 0x8a, 0x00, 0xd0, 0x99, 0x90, 0x72,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8005_Val1SecBefore_PrivateKey =
+constexpr ByteSpan sTestCert_PAI_FFF2_8005_Val1SecBefore_PrivateKey =
     ByteSpan(sTestCert_PAI_FFF2_8005_Val1SecBefore_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-8005-ValInFuture-Cert.pem
@@ -3962,13 +3962,13 @@ constexpr uint8_t sTestCert_PAI_FFF2_8005_ValInFuture_Cert_Array[] = {
     0xbb, 0x36, 0xbd, 0xfc, 0xc2, 0x74, 0xa5,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8005_ValInFuture_Cert = ByteSpan(sTestCert_PAI_FFF2_8005_ValInFuture_Cert_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8005_ValInFuture_Cert = ByteSpan(sTestCert_PAI_FFF2_8005_ValInFuture_Cert_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_8005_ValInFuture_SKID_Array[] = {
     0x29, 0x38, 0xBA, 0xC7, 0xF6, 0x23, 0xE1, 0x83, 0x26, 0x43, 0xA5, 0xEB, 0x76, 0x2B, 0xAF, 0xD4, 0x0A, 0x62, 0xC0, 0x21,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8005_ValInFuture_SKID = ByteSpan(sTestCert_PAI_FFF2_8005_ValInFuture_SKID_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8005_ValInFuture_SKID = ByteSpan(sTestCert_PAI_FFF2_8005_ValInFuture_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-8005-ValInFuture-Key.pem
 
@@ -3979,14 +3979,14 @@ constexpr uint8_t sTestCert_PAI_FFF2_8005_ValInFuture_PublicKey_Array[] = {
     0x44, 0x31, 0x8c, 0x32, 0x25, 0x2b, 0xe8, 0x8f, 0x0e, 0xc7, 0x73, 0xdb, 0xd4, 0xa8,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8005_ValInFuture_PublicKey = ByteSpan(sTestCert_PAI_FFF2_8005_ValInFuture_PublicKey_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8005_ValInFuture_PublicKey = ByteSpan(sTestCert_PAI_FFF2_8005_ValInFuture_PublicKey_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_8005_ValInFuture_PrivateKey_Array[] = {
     0x56, 0xda, 0x15, 0x5b, 0x02, 0x9b, 0xbb, 0x4c, 0xb3, 0xe9, 0xb5, 0xc1, 0xa9, 0x90, 0x2d, 0xd2,
     0xf9, 0x9c, 0x94, 0x33, 0x4c, 0x6e, 0xaa, 0x6b, 0x94, 0xe8, 0xf1, 0x19, 0x23, 0x6d, 0x2d, 0x93,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8005_ValInFuture_PrivateKey =
+constexpr ByteSpan sTestCert_PAI_FFF2_8005_ValInFuture_PrivateKey =
     ByteSpan(sTestCert_PAI_FFF2_8005_ValInFuture_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-8005-ValInPast-Cert.pem
@@ -4016,13 +4016,13 @@ constexpr uint8_t sTestCert_PAI_FFF2_8005_ValInPast_Cert_Array[] = {
     0x56, 0x52, 0xf6, 0x81, 0x09, 0xdf,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8005_ValInPast_Cert = ByteSpan(sTestCert_PAI_FFF2_8005_ValInPast_Cert_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8005_ValInPast_Cert = ByteSpan(sTestCert_PAI_FFF2_8005_ValInPast_Cert_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_8005_ValInPast_SKID_Array[] = {
     0xDA, 0xD4, 0x67, 0x6F, 0x50, 0x6D, 0x45, 0x43, 0xDB, 0x94, 0x76, 0xD6, 0x18, 0x69, 0x1C, 0x67, 0x49, 0x72, 0x8D, 0x08,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8005_ValInPast_SKID = ByteSpan(sTestCert_PAI_FFF2_8005_ValInPast_SKID_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8005_ValInPast_SKID = ByteSpan(sTestCert_PAI_FFF2_8005_ValInPast_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-8005-ValInPast-Key.pem
 
@@ -4033,14 +4033,14 @@ constexpr uint8_t sTestCert_PAI_FFF2_8005_ValInPast_PublicKey_Array[] = {
     0x2f, 0xf5, 0x28, 0xef, 0x95, 0x8b, 0xfd, 0x20, 0x32, 0x63, 0x2f, 0xbd, 0x88, 0x5f,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8005_ValInPast_PublicKey = ByteSpan(sTestCert_PAI_FFF2_8005_ValInPast_PublicKey_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8005_ValInPast_PublicKey = ByteSpan(sTestCert_PAI_FFF2_8005_ValInPast_PublicKey_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_8005_ValInPast_PrivateKey_Array[] = {
     0x6b, 0x27, 0x54, 0x62, 0x8f, 0x6a, 0x9b, 0xb4, 0xf2, 0x4f, 0xac, 0xee, 0xe2, 0x09, 0x79, 0x58,
     0x1f, 0xc7, 0x7a, 0x3c, 0x92, 0x08, 0xe4, 0x04, 0x5d, 0x51, 0xb7, 0xa4, 0x65, 0xbd, 0x00, 0x3d,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8005_ValInPast_PrivateKey = ByteSpan(sTestCert_PAI_FFF2_8005_ValInPast_PrivateKey_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8005_ValInPast_PrivateKey = ByteSpan(sTestCert_PAI_FFF2_8005_ValInPast_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-8006-ValInFuture-Cert.pem
 
@@ -4070,13 +4070,13 @@ constexpr uint8_t sTestCert_PAI_FFF2_8006_ValInFuture_Cert_Array[] = {
     0xfa, 0x18, 0x97, 0x2c, 0x6e, 0xad, 0x68, 0xe0,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8006_ValInFuture_Cert = ByteSpan(sTestCert_PAI_FFF2_8006_ValInFuture_Cert_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8006_ValInFuture_Cert = ByteSpan(sTestCert_PAI_FFF2_8006_ValInFuture_Cert_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_8006_ValInFuture_SKID_Array[] = {
     0x3C, 0x28, 0x86, 0xD0, 0x28, 0x54, 0x87, 0x00, 0x50, 0x2F, 0x89, 0x4B, 0xDA, 0x09, 0x82, 0xB9, 0xD9, 0x70, 0x5E, 0xB0,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8006_ValInFuture_SKID = ByteSpan(sTestCert_PAI_FFF2_8006_ValInFuture_SKID_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8006_ValInFuture_SKID = ByteSpan(sTestCert_PAI_FFF2_8006_ValInFuture_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-8006-ValInFuture-Key.pem
 
@@ -4087,14 +4087,14 @@ constexpr uint8_t sTestCert_PAI_FFF2_8006_ValInFuture_PublicKey_Array[] = {
     0x40, 0x04, 0xb5, 0xb4, 0x9f, 0x8e, 0x54, 0x38, 0x6f, 0x2f, 0x9c, 0xcb, 0xa0, 0x57,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8006_ValInFuture_PublicKey = ByteSpan(sTestCert_PAI_FFF2_8006_ValInFuture_PublicKey_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8006_ValInFuture_PublicKey = ByteSpan(sTestCert_PAI_FFF2_8006_ValInFuture_PublicKey_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_8006_ValInFuture_PrivateKey_Array[] = {
     0x30, 0x44, 0x66, 0xdf, 0x85, 0xf2, 0xe1, 0x49, 0xcf, 0x15, 0x7b, 0x1c, 0x79, 0xc1, 0x9a, 0x48,
     0x60, 0xf4, 0x28, 0x85, 0x2a, 0xd6, 0xa7, 0x84, 0xcc, 0x29, 0xf2, 0x43, 0xb5, 0xf7, 0x4f, 0xa3,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8006_ValInFuture_PrivateKey =
+constexpr ByteSpan sTestCert_PAI_FFF2_8006_ValInFuture_PrivateKey =
     ByteSpan(sTestCert_PAI_FFF2_8006_ValInFuture_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-8006-ValInPast-Cert.pem
@@ -4125,13 +4125,13 @@ constexpr uint8_t sTestCert_PAI_FFF2_8006_ValInPast_Cert_Array[] = {
     0x1e, 0xa2, 0x7b, 0x02, 0xe7, 0x88, 0x87, 0xa6,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8006_ValInPast_Cert = ByteSpan(sTestCert_PAI_FFF2_8006_ValInPast_Cert_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8006_ValInPast_Cert = ByteSpan(sTestCert_PAI_FFF2_8006_ValInPast_Cert_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_8006_ValInPast_SKID_Array[] = {
     0x0A, 0x6F, 0xAB, 0xBD, 0xE2, 0x77, 0xFD, 0x19, 0xF6, 0x46, 0x51, 0x25, 0x62, 0x91, 0x58, 0xAC, 0x3A, 0xB3, 0xA4, 0xE2,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8006_ValInPast_SKID = ByteSpan(sTestCert_PAI_FFF2_8006_ValInPast_SKID_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8006_ValInPast_SKID = ByteSpan(sTestCert_PAI_FFF2_8006_ValInPast_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-8006-ValInPast-Key.pem
 
@@ -4142,14 +4142,14 @@ constexpr uint8_t sTestCert_PAI_FFF2_8006_ValInPast_PublicKey_Array[] = {
     0x52, 0xe2, 0xfb, 0x88, 0x92, 0x69, 0x93, 0xae, 0xa2, 0xe6, 0xb6, 0x8c, 0xbe, 0x05,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8006_ValInPast_PublicKey = ByteSpan(sTestCert_PAI_FFF2_8006_ValInPast_PublicKey_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8006_ValInPast_PublicKey = ByteSpan(sTestCert_PAI_FFF2_8006_ValInPast_PublicKey_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_8006_ValInPast_PrivateKey_Array[] = {
     0xf3, 0x1e, 0x22, 0xd1, 0x3e, 0x33, 0x9d, 0xaa, 0xd9, 0xb6, 0x01, 0x4b, 0x08, 0x43, 0x5e, 0x9f,
     0x65, 0x47, 0xbc, 0x00, 0xf7, 0x93, 0xca, 0x9f, 0xe5, 0x26, 0xaa, 0x33, 0x8a, 0x40, 0x1d, 0x77,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_8006_ValInPast_PrivateKey = ByteSpan(sTestCert_PAI_FFF2_8006_ValInPast_PrivateKey_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_8006_ValInPast_PrivateKey = ByteSpan(sTestCert_PAI_FFF2_8006_ValInPast_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-NoPID-Cert.pem
 
@@ -4177,13 +4177,13 @@ constexpr uint8_t sTestCert_PAI_FFF2_NoPID_Cert_Array[] = {
     0x05, 0xa2, 0x0a, 0xf3, 0x3e, 0xd4, 0xca, 0xd9,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_NoPID_Cert = ByteSpan(sTestCert_PAI_FFF2_NoPID_Cert_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_NoPID_Cert = ByteSpan(sTestCert_PAI_FFF2_NoPID_Cert_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_NoPID_SKID_Array[] = {
     0x61, 0x3D, 0xD0, 0x87, 0x35, 0x5E, 0xF0, 0x8B, 0xAE, 0x01, 0xE4, 0xC6, 0x9A, 0x8F, 0xC7, 0x3D, 0xAC, 0x8C, 0x7D, 0xFD,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_NoPID_SKID = ByteSpan(sTestCert_PAI_FFF2_NoPID_SKID_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_NoPID_SKID = ByteSpan(sTestCert_PAI_FFF2_NoPID_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-NoPID-Key.pem
 
@@ -4194,14 +4194,14 @@ constexpr uint8_t sTestCert_PAI_FFF2_NoPID_PublicKey_Array[] = {
     0x6c, 0x56, 0xd0, 0xca, 0xd9, 0x99, 0xb0, 0x41, 0xc2, 0x70, 0xa9, 0xb1, 0xcb, 0x3f,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_NoPID_PublicKey = ByteSpan(sTestCert_PAI_FFF2_NoPID_PublicKey_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_NoPID_PublicKey = ByteSpan(sTestCert_PAI_FFF2_NoPID_PublicKey_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_NoPID_PrivateKey_Array[] = {
     0x6d, 0x25, 0x55, 0xa6, 0x85, 0x07, 0x3a, 0xc5, 0xfa, 0x44, 0xe5, 0x0f, 0x78, 0x0d, 0x8b, 0xb2,
     0xc3, 0x40, 0x4c, 0x55, 0xf0, 0xf8, 0x85, 0x26, 0x4c, 0xf5, 0x39, 0x2a, 0x44, 0xf4, 0x4c, 0x21,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_NoPID_PrivateKey = ByteSpan(sTestCert_PAI_FFF2_NoPID_PrivateKey_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_NoPID_PrivateKey = ByteSpan(sTestCert_PAI_FFF2_NoPID_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-NoPID-FB-Cert.pem
 
@@ -4228,13 +4228,13 @@ constexpr uint8_t sTestCert_PAI_FFF2_NoPID_FB_Cert_Array[] = {
     0x43, 0x8b, 0xe5, 0xa5, 0x9d, 0x74, 0x8a, 0xe9, 0xae, 0x31, 0x39, 0x0d, 0x9b, 0x12, 0x5b, 0xfe,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_NoPID_FB_Cert = ByteSpan(sTestCert_PAI_FFF2_NoPID_FB_Cert_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_NoPID_FB_Cert = ByteSpan(sTestCert_PAI_FFF2_NoPID_FB_Cert_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_NoPID_FB_SKID_Array[] = {
     0x19, 0xFA, 0x94, 0x74, 0x93, 0x29, 0xDA, 0x74, 0x0F, 0x55, 0x6A, 0x33, 0x3F, 0xB5, 0x13, 0x73, 0xD7, 0x08, 0x17, 0x56,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_NoPID_FB_SKID = ByteSpan(sTestCert_PAI_FFF2_NoPID_FB_SKID_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_NoPID_FB_SKID = ByteSpan(sTestCert_PAI_FFF2_NoPID_FB_SKID_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-NoPID-FB-Key.pem
 
@@ -4245,14 +4245,14 @@ constexpr uint8_t sTestCert_PAI_FFF2_NoPID_FB_PublicKey_Array[] = {
     0x64, 0x5c, 0xcc, 0x7a, 0x5a, 0xac, 0xbf, 0xb1, 0x7e, 0x41, 0xe5, 0xe2, 0x44, 0x81,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_NoPID_FB_PublicKey = ByteSpan(sTestCert_PAI_FFF2_NoPID_FB_PublicKey_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_NoPID_FB_PublicKey = ByteSpan(sTestCert_PAI_FFF2_NoPID_FB_PublicKey_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_NoPID_FB_PrivateKey_Array[] = {
     0x22, 0x78, 0xe1, 0xaa, 0x00, 0x59, 0x58, 0x1e, 0xcf, 0x2d, 0xbf, 0x68, 0xc3, 0xf2, 0x51, 0xf6,
     0x76, 0xfc, 0xde, 0xdd, 0x88, 0xb6, 0xe7, 0x50, 0x50, 0xdf, 0x6a, 0x72, 0x41, 0xc7, 0x65, 0x56,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_NoPID_FB_PrivateKey = ByteSpan(sTestCert_PAI_FFF2_NoPID_FB_PrivateKey_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_NoPID_FB_PrivateKey = ByteSpan(sTestCert_PAI_FFF2_NoPID_FB_PrivateKey_Array);
 
 // ${chip_root}/credentials/test/attestation/Chip-Test-PAI-FFF2-NoPID-Resigned-Cert.pem
 
@@ -4281,13 +4281,13 @@ constexpr uint8_t sTestCert_PAI_FFF2_NoPID_Resigned_Cert_Array[] = {
     0xda, 0x82,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_NoPID_Resigned_Cert = ByteSpan(sTestCert_PAI_FFF2_NoPID_Resigned_Cert_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_NoPID_Resigned_Cert = ByteSpan(sTestCert_PAI_FFF2_NoPID_Resigned_Cert_Array);
 
 constexpr uint8_t sTestCert_PAI_FFF2_NoPID_Resigned_SKID_Array[] = {
     0x61, 0x3D, 0xD0, 0x87, 0x35, 0x5E, 0xF0, 0x8B, 0xAE, 0x01, 0xE4, 0xC6, 0x9A, 0x8F, 0xC7, 0x3D, 0xAC, 0x8C, 0x7D, 0xFD,
 };
 
-extern const ByteSpan sTestCert_PAI_FFF2_NoPID_Resigned_SKID = ByteSpan(sTestCert_PAI_FFF2_NoPID_Resigned_SKID_Array);
+constexpr ByteSpan sTestCert_PAI_FFF2_NoPID_Resigned_SKID = ByteSpan(sTestCert_PAI_FFF2_NoPID_Resigned_SKID_Array);
 
 extern constexpr Span<const ByteSpan> kTestAttestationTrustStoreRoots((const ByteSpan[]){
     sTestCert_PAA_FFF1_Cert,
