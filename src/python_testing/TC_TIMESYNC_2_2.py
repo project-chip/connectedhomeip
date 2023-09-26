@@ -75,8 +75,8 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
 
         self.print_step(5, "Read time source")
         if self.check_pics("TIMESYNC.S.A0002"):
+            source = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.TimeSource)
             if utc_dut_initial is NullValue:
-                source = await self.read_ts_attribute_expect_success(endpoint=endpoint, attribute=attributes.TimeSource)
                 asserts.assert_equal(source, Clusters.Objects.TimeSynchronization.Enums.TimeSourceEnum.kAdmin)
 
 
