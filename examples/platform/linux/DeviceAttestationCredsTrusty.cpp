@@ -16,7 +16,7 @@
  *
  *    Copyright 2023 NXP
  */
-#include "DeviceAttestationCreds.h"
+#include "DeviceAttestationCredsTrusty.h"
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>

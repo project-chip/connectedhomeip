@@ -100,8 +100,8 @@ source_set("app-main") {
 
   if (chip_with_trusty_os == 1) {
     sources += [
-      "DeviceAttestationCreds.cpp",
-      "DeviceAttestationCreds.h",
+      "DeviceAttestationCredsTrusty.cpp",
+      "DeviceAttestationCredsTrusty.h",
       "PersistentStorageOperationalKeystoreTrusty.cpp",
       "PersistentStorageOperationalKeystoreTrusty.h",
     ]
@@ -109,6 +109,8 @@ source_set("app-main") {
 
   if (chip_with_imx_ele == 1) {
     sources += [
+      "DeviceAttestationCredsEle.cpp",
+      "DeviceAttestationCredsEle.h",
       "PersistentStorageOperationalKeystoreEle.cpp",
       "PersistentStorageOperationalKeystoreEle.h",
     ]
@@ -162,8 +164,10 @@ source_set("app-main") {
 
   if (chip_with_imx_ele == 1) {
     defines += [ "CHIP_OP_KEYSTORE_ELE=1" ]
+    defines += [ "CHIP_ATTESTATION_ELE=1" ]
   } else {
     defines += [ "CHIP_OP_KEYSTORE_ELE=0" ]
+    defines += [ "CHIP_ATTESTATION_ELE=0" ]
   }
 
   if (chip_enable_pw_rpc) {

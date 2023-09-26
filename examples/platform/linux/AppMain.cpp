@@ -14,6 +14,8 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
+ *
+ *    Copyright 2023 NXP
  */
 
 #include <platform/CHIPDeviceLayer.h>
@@ -127,13 +129,18 @@
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 
 #if CHIP_ATTESTATION_TRUSTY_OS
-#include "DeviceAttestationCreds.h"
+#include "DeviceAttestationCredsTrusty.h"
 using namespace chip::Credentials::Trusty;
 #endif
 
 #if CHIP_OP_KEYSTORE_TRUSTY_OS
 #include "PersistentStorageOperationalKeystoreTrusty.h"
 using namespace chip::Trusty;
+#endif
+
+#if CHIP_ATTESTATION_ELE
+#include "DeviceAttestationCredsEle.h"
+using namespace chip::Credentials::ele;
 #endif
 
 #if CHIP_OP_KEYSTORE_ELE
@@ -722,6 +729,8 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     // Initialize device attestation config
 #if CHIP_ATTESTATION_TRUSTY_OS
     SetDeviceAttestationCredentialsProvider(&TrustyDACProvider::GetTrustyDACProvider());
+#elif CHIP_ATTESTATION_ELE
+    SetDeviceAttestationCredentialsProvider(&EleDACProvider::GetEleDACProvider());
 #else
     SetDeviceAttestationCredentialsProvider(LinuxDeviceOptions::GetInstance().dacProvider);
 #endif
