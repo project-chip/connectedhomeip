@@ -28,7 +28,7 @@ RUN git clone --depth=1 --branch=MatterCert https://github.com/SiliconLabs/wisec
 # SLC-cli install
 # TODO: figure out a way to make this a fixed version. Currently a moving target.
 RUN wget https://www.silabs.com/documents/login/software/slc_cli_linux.zip && \
-    unzip ./slc_cli_linux.zip -d ./ && \
+    unzip ./slc_cli_linux.zip -d /tmp/slc_cli && \
     rm ./slc_cli_linux.zip \
     && : # last line
 
