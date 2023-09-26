@@ -207,11 +207,12 @@ if [ -n "$install_virtual_env" ]; then
     if [ "$install_pytest_requirements" = "yes" ]; then
         YAMLTESTS_GN_LABEL="//scripts:matter_yamltests_distribution._build_wheel"
         # Add wheels from pw_python_package or pw_python_distribution templates.
-        WHEEL+=(
+        YAMLTEST_WHEEL=(
             "$(ls -tr "$(wheel_output_dir "$YAMLTESTS_GN_LABEL")"/*.whl | head -n 1)"
         )
 
         echo_blue "Installing python test dependencies ..."
+        "$ENVIRONMENT_ROOT"/bin/pip install --upgrade "${YAMLTEST_WHEEL[@]}"
         "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/scripts/tests/requirements.txt"
         "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/src/python_testing/requirements.txt"
     fi
