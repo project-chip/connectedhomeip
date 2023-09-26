@@ -64,18 +64,18 @@ class TC_DISHM_1_2(MatterBaseTest):
 
             # common mode tags
             commonTags = {0x0: 'Auto',
-                        0x1: 'Quick',
-                        0x2: 'Quiet',
-                        0x3: 'LowNoise',
-                        0x4: 'LowEnergy',
-                        0x5: 'Vacation',
-                        0x6: 'Min',
-                        0x7: 'Max',
-                        0x8: 'Night',
-                        0x9: 'Day'}
+                          0x1: 'Quick',
+                          0x2: 'Quiet',
+                          0x3: 'LowNoise',
+                          0x4: 'LowEnergy',
+                          0x5: 'Vacation',
+                          0x6: 'Min',
+                          0x7: 'Max',
+                          0x8: 'Night',
+                          0x9: 'Day'}
 
             runTags = [tag.value for tag in Clusters.DishwasherMode.Enums.ModeTag
-                    if tag is not Clusters.DishwasherMode.Enums.ModeTag.kUnknownEnumValue]
+                       if tag is not Clusters.DishwasherMode.Enums.ModeTag.kUnknownEnumValue]
 
             for m in supported_modes:
                 for t in m.modeTags:
@@ -88,7 +88,7 @@ class TC_DISHM_1_2(MatterBaseTest):
                     if t.value == Clusters.DishwasherMode.Enums.ModeTag.kNormal:
                         normal_present = True
             asserts.assert_true(normal_present, "The Supported Modes does not have an entry of Normal(0x4000)")
-        
+
         if self.check_pics("DISHM.S.A0001"):
             self.print_step(3, "Read CurrentMode attribute")
             current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
