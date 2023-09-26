@@ -60,7 +60,7 @@ enum CommissioningStage : uint8_t
     kThreadNetworkEnable,        ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
     kFindOperational,            ///< Perform operational discovery and establish a CASE session with the device
     /// Optional steps for ICD
-    kIcdDiscovery, ///< Check whether the device is an ICD
+    kIcdIdentification, ///< Check whether the device is an ICD
     /// TODO(#29384): Finish ICD registration implementation in commissioner
     /// End of optional steps for ICD
     kSendComplete, ///< Send CommissioningComplete (0x30:4) command to the device

@@ -1880,7 +1880,7 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
     case CommissioningStage::kCheckForMatchingFabric:
         ParseFabrics();
         break;
-    case CommissioningStage::kIcdDiscovery:
+    case CommissioningStage::kIcdIdentification:
         ParseIcdInfo();
         break;
     default:
@@ -2184,6 +2184,7 @@ void DeviceCommissioner::ParseIcdInfo()
     IcdInfo info;
     IcdManagement::Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
 
+    // TODO(#29382): We probably want to read "ActiveMode" attribute (to be implemented) for ICD.
     err = mAttributeCache->Get<IcdManagement::Attributes::FeatureMap::TypeInfo>(kRootEndpointId, featureMap);
     if (err == CHIP_NO_ERROR)
     {
@@ -2822,9 +2823,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         );
     }
     break;
-    case CommissioningStage::kIcdDiscovery: {
+    case CommissioningStage::kIcdIdentification: {
         app::AttributePathParams readPaths[1];
-        // Read all the feature maps for all the networking clusters on any endpoint to determine what is supported
+        // TODO(#29382): We probably want to read "ActiveMode" attribute (to be implemented) for ICD.
         readPaths[0] =
             app::AttributePathParams(app::Clusters::IcdManagement::Id, app::Clusters::IcdManagement::Attributes::FeatureMap::Id);
         SendCommissioningReadRequest(proxy, timeout, readPaths, 1);

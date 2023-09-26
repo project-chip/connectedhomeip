@@ -394,10 +394,10 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kFindOperational:
         if (mParams.GetIcdRegistrationStrategy() != IcdRegistrationStrategy::kIgnore)
         {
-            return CommissioningStage::kIcdDiscovery;
+            return CommissioningStage::kIcdIdentification;
         }
         return CommissioningStage::kSendComplete;
-    case CommissioningStage::kIcdDiscovery:
+    case CommissioningStage::kIcdIdentification:
         // TODO(#29385): Register to the ICD.
         return CommissioningStage::kSendComplete;
     case CommissioningStage::kSendComplete:
@@ -712,7 +712,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         case CommissioningStage::kFindOperational:
             mOperationalDeviceProxy = report.Get<OperationalNodeFoundData>().operationalProxy;
             break;
-        case CommissioningStage::kIcdDiscovery: {
+        case CommissioningStage::kIcdIdentification: {
             IcdInfo icdInfo = report.Get<IcdInfo>();
             if (icdInfo.isIcd)
             {
