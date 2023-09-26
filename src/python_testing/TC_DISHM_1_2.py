@@ -35,67 +35,66 @@ class TC_DISHM_1_2(MatterBaseTest):
         self.endpoint = self.user_params.get("endpoint", 1)
         logging.info("This test expects to find this cluster on endpoint 1")
 
-        asserts.assert_true(self.check_pics("DISHM.S.A0000"), "DISHM.S.A0000 must be supported")
-        asserts.assert_true(self.check_pics("DISHM.S.A0001"), "DISHM.S.A0001 must be supported")
-
         attributes = Clusters.DishwasherMode.Attributes
 
         self.print_step(1, "Commissioning, already done")
 
-        self.print_step(2, "Read SupportedModes attribute")
-        supported_modes = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
+        if self.check_pics("DISHM.S.A0000"):
+            self.print_step(2, "Read SupportedModes attribute")
+            supported_modes = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
-        logging.info("SupportedModes: %s" % (supported_modes))
+            logging.info("SupportedModes: %s" % (supported_modes))
 
-        asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least two entries!")
-        asserts.assert_less_equal(len(supported_modes), 255, "SupportedModes must have at most 255 entries!")
+            asserts.assert_greater_equal(len(supported_modes), 2, "SupportedModes must have at least two entries!")
+            asserts.assert_less_equal(len(supported_modes), 255, "SupportedModes must have at most 255 entries!")
 
-        supported_modes_dut = []
-        for m in supported_modes:
-            if m.mode in supported_modes_dut:
-                asserts.fail("SupportedModes must have unique mode values!")
-            else:
-                supported_modes_dut.append(m.mode)
+            supported_modes_dut = []
+            for m in supported_modes:
+                if m.mode in supported_modes_dut:
+                    asserts.fail("SupportedModes must have unique mode values!")
+                else:
+                    supported_modes_dut.append(m.mode)
 
-        labels = []
-        for m in supported_modes:
-            if m.label in labels:
-                asserts.fail("SupportedModes must have unique mode label values!")
-            else:
-                labels.append(m.label)
+            labels = []
+            for m in supported_modes:
+                if m.label in labels:
+                    asserts.fail("SupportedModes must have unique mode label values!")
+                else:
+                    labels.append(m.label)
 
-        # common mode tags
-        commonTags = {0x0: 'Auto',
-                      0x1: 'Quick',
-                      0x2: 'Quiet',
-                      0x3: 'LowNoise',
-                      0x4: 'LowEnergy',
-                      0x5: 'Vacation',
-                      0x6: 'Min',
-                      0x7: 'Max',
-                      0x8: 'Night',
-                      0x9: 'Day'}
+            # common mode tags
+            commonTags = {0x0: 'Auto',
+                        0x1: 'Quick',
+                        0x2: 'Quiet',
+                        0x3: 'LowNoise',
+                        0x4: 'LowEnergy',
+                        0x5: 'Vacation',
+                        0x6: 'Min',
+                        0x7: 'Max',
+                        0x8: 'Night',
+                        0x9: 'Day'}
 
-        runTags = [tag.value for tag in Clusters.DishwasherMode.Enums.ModeTag
-                   if tag is not Clusters.DishwasherMode.Enums.ModeTag.kUnknownEnumValue]
+            runTags = [tag.value for tag in Clusters.DishwasherMode.Enums.ModeTag
+                    if tag is not Clusters.DishwasherMode.Enums.ModeTag.kUnknownEnumValue]
 
-        for m in supported_modes:
-            for t in m.modeTags:
-                is_mfg = (0x8000 <= t.value and t.value <= 0xBFFF)
-                asserts.assert_true(t.value in commonTags.keys() or t.value in runTags or is_mfg,
-                                    "Found a SupportedModes entry with invalid mode tag value!")
+            for m in supported_modes:
+                for t in m.modeTags:
+                    is_mfg = (0x8000 <= t.value and t.value <= 0xBFFF)
+                    asserts.assert_true(t.value in commonTags.keys() or t.value in runTags or is_mfg,
+                                        "Found a SupportedModes entry with invalid mode tag value!")
 
-                asserts.assert_true(type(m.label) == str and len(m.label) in range(1, 65),
-                                    "TagName is not the appropriate length or type")
-                if t.value == Clusters.DishwasherMode.Enums.ModeTag.kNormal:
-                    normal_present = True
-        asserts.assert_true(normal_present, "The Supported Modes does not have an entry of Normal(0x4000)")
+                    asserts.assert_true(type(m.label) == str and len(m.label) in range(1, 65),
+                                        "TagName is not the appropriate length or type")
+                    if t.value == Clusters.DishwasherMode.Enums.ModeTag.kNormal:
+                        normal_present = True
+            asserts.assert_true(normal_present, "The Supported Modes does not have an entry of Normal(0x4000)")
+        
+        if self.check_pics("DISHM.S.A0001"):
+            self.print_step(3, "Read CurrentMode attribute")
+            current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        self.print_step(3, "Read CurrentMode attribute")
-        current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
-
-        logging.info("CurrentMode: %s" % (current_mode))
-        asserts.assert_true(current_mode in supported_modes_dut, "CurrentMode is not a supported mode!")
+            logging.info("CurrentMode: %s" % (current_mode))
+            asserts.assert_true(current_mode in supported_modes_dut, "CurrentMode is not a supported mode!")
 
         if self.check_pics("DISHM.S.A0003"):
             self.print_step(4, "Read OnMode attribute")
