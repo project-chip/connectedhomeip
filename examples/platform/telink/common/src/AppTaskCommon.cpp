@@ -318,7 +318,8 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 
 #ifdef CONFIG_BOOTLOADER_MCUBOOT
 #if CONFIG_CHIP_OTA_REQUESTOR
-    if (GetRequestorInstance()->GetCurrentUpdateState() == Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kIdle && mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
+    if (GetRequestorInstance()->GetCurrentUpdateState() == Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kIdle &&
+        mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
 #else
     if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
 #endif
