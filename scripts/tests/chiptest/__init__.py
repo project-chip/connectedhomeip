@@ -160,6 +160,9 @@ def _GetInDevelopmentTests() -> Set[str]:
                                              # TestEventTriggersEnabled is true, which it's not in CI.
         "Test_TC_IDM_1_2.yaml",  # Broken harness: https://github.com/project-chip/connectedhomeip/issues/29115
         "Test_TC_S_2_4.yaml",  # https://github.com/project-chip/connectedhomeip/issues/29117
+        "Test_TC_LWM_3_1.yaml", # Target attribute now provisional and removed from the XML
+        "Test_TC_LWM_3_2.yaml", # Target attribute now provisional and removed from the XML
+        "Test_TC_LWM_3_3.yaml"  # Target attribute now provisional and removed from the XML
     }
 
 
