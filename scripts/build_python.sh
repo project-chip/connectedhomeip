@@ -183,7 +183,6 @@ else
     WHEEL=("$OUTPUT_ROOT"/controller/python/chip*.whl)
 fi
 
-
 if [ -n "$extra_packages" ]; then
     WHEEL+=("$extra_packages")
 fi
