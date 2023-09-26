@@ -466,13 +466,10 @@ void TimeSynchronizationServer::Init()
     {
         ClearDSTOffset();
     }
-    System::Clock::Microseconds64 utcTime;
 
-    if (System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR &&
-        !RuntimeOptionsProvider::Instance().GetSimulateNoInternalTime())
-    {
-        mGranularity = GranularityEnum::kMinutesGranularity;
-    }
+    // Set the granularity to none for now - this will force us to go to the delegate so it can
+    // properly report the time source
+    mGranularity = GranularityEnum::kNoTimeGranularity;
 
     // This can error, but it's not clear what should happen in this case. For now, just ignore it because we still
     // want time sync even if we can't register the deletgate here.

@@ -24,3 +24,4 @@ dependencies:
         # Issue: https://github.com/project-chip/connectedhomeip/issues/29125
         rules:
             - if: "idf_version >=5.0"
+            - if: "target != esp32h2"
