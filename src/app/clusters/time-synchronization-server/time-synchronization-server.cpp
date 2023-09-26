@@ -1095,7 +1095,7 @@ bool emberAfTimeSynchronizationClusterSetUTCTimeCallback(
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
-    if (timeSource.HasValue() && (timeSource.Value() < TimeSourceEnum::kNone || timeSource.Value() > TimeSourceEnum::kGnss))
+    if (timeSource.HasValue() && timeSource.Value() == TimeSourceEnum::kUnknownEnumValue)
     {
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
