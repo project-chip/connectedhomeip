@@ -853,7 +853,6 @@ TimeState TimeSynchronizationServer::UpdateTimeZoneState()
     }
     if (activeTzIndex != 0)
     {
-        mTimeZoneObj.validSize = tzList.size() - activeTzIndex;
         auto newTimeZoneList   = tzList.SubSpan(activeTzIndex);
         VerifyOrReturnValue(mTimeSyncDataProvider.StoreTimeZone(newTimeZoneList) == CHIP_NO_ERROR, TimeState::kInvalid);
         VerifyOrReturnValue(LoadTimeZone() == CHIP_NO_ERROR, TimeState::kInvalid);
@@ -911,7 +910,6 @@ TimeState TimeSynchronizationServer::UpdateDSTOffsetState()
     }
     if (activeDstIndex > 0)
     {
-        mDstOffsetObj.validSize = dstList.size() - activeDstIndex;
         auto newDstOffsetList   = dstList.SubSpan(activeDstIndex);
         VerifyOrReturnValue(mTimeSyncDataProvider.StoreDSTOffset(newDstOffsetList) == CHIP_NO_ERROR, TimeState::kInvalid);
         VerifyOrReturnValue(LoadDSTOffset() == CHIP_NO_ERROR, TimeState::kInvalid);
