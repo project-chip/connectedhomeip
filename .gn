@@ -29,6 +29,14 @@ default_args = {
   pw_build_PIP_CONSTRAINTS = [ "//scripts/setup/constraints.txt" ]
   pw_build_PIP_REQUIREMENTS = [ "//scripts/setup/requirements.build.txt" ]
 
+  pw_build_LINK_DEPS = [
+    "$dir_pw_assert:impl",
+    "$dir_pw_log:impl",
+  ]
+
   # GN target to use for the default Python build venv.
   pw_build_PYTHON_BUILD_VENV = "//:matter_build_venv"
+  pw_sys_io_BACKEND = "$dir_pw_sys_io_stdio"
+  pw_assert_BACKEND = "$dir_pw_assert_log"
+  pw_log_BACKEND = "$dir_pw_log_basic"
 }
