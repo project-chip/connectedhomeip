@@ -60,8 +60,8 @@ COPY --from=bouffalolab /opt/bouffalolab_sdk /opt/bouffalolab_sdk
 
 COPY --from=asr /opt/asr /opt/asr
 
-COPY --from=efr32 /gecko_sdk /opt/silabs/gecko_sdk
-COPY --from=efr32 /wifi_sdk /opt/silabs/wifi_sdk
+COPY --from=efr32 /opt/silabs/gecko_sdk /opt/silabs/gecko_sdk
+COPY --from=efr32 /opt/silabs/wifi_sdk /opt/silabs/wifi_sdk
 
 # Android license file "acceping" is done by writing license hashes
 # into the 'licenses' subfolder. This allows any user (in particular
