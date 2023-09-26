@@ -24,7 +24,8 @@ from builders.genio import GenioApp, GenioBuilder
 from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary, HostFuzzingType
 from builders.imx import IMXApp, IMXBuilder
 from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
-from builders.k32w import K32WApp, K32WBoard, K32WBuilder
+from builders.nxp.builder import NxpBuilder
+from builders.nxp.parts import NxpParts
 from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
@@ -467,32 +468,37 @@ def BuildASRTarget():
     return target
 
 
-def BuildK32WTarget():
-    target = BuildTarget('k32w', K32WBuilder)
+def BuildNxpTarget():
+    target = BuildTarget('nxp', NxpBuilder)
+    parts = NxpParts.generate_parts()
 
-    # boards
-    target.AppendFixedTargets([
-        TargetPart('k32w0', board=K32WBoard.K32W0),
-        TargetPart('k32w1', board=K32WBoard.K32W1)
-    ])
+    boards = list()
+    for board in parts.boards:
+        kwargs = {
+            'board': board,
+            'var_modifiers': list()
+        }
 
-    # apps
-    target.AppendFixedTargets([
-        TargetPart('light', app=K32WApp.LIGHT, release=True),
-        TargetPart('shell', app=K32WApp.SHELL, release=True),
-        TargetPart('lock', app=K32WApp.LOCK, release=True),
-        TargetPart('contact', app=K32WApp.CONTACT, release=True)
-    ])
+        for name in ['common', board.name]:
+            if name in parts.var_modifiers:
+                kwargs['var_modifiers'] += parts.var_modifiers[name]
+        boards.append(TargetPart(board.name, **kwargs))
 
-    target.AppendModifier(name="se05x", se05x=True)
-    target.AppendModifier(name="no-ble", disable_ble=True)
-    target.AppendModifier(name="no-ota", disable_ota=True)
-    target.AppendModifier(name="low-power", low_power=True).OnlyIfRe("-nologs")
-    target.AppendModifier(name="nologs", disable_logs=True)
-    target.AppendModifier(name="crypto-platform", crypto_platform=True)
-    target.AppendModifier(
-        name="tokenizer", tokenizer=True).ExceptIfRe("-nologs")
-    target.AppendModifier(name="openthread-ftd", openthread_ftd=True)
+    target.AppendFixedTargets(boards)
+
+    apps = list()
+    for name, app in parts.apps.items():
+        apps.append(TargetPart(name, app=app, release=True).OnlyIfRe(app.get_regex()))
+    target.AppendFixedTargets(apps)
+
+    parts.append_modifiers(target)
+
+    # Variable modifiers
+    for board, modifiers in parts.var_modifiers.items():
+        for modifier in modifiers:
+            part = target.AppendModifier(name=modifier['id'])
+            if board != 'common':
+                part.OnlyIfRe(board)
 
     return target
 
@@ -782,7 +788,7 @@ BUILD_TARGETS = [
     BuildHostTestRunnerTarget(),
     BuildIMXTarget(),
     BuildInfineonTarget(),
-    BuildK32WTarget(),
+    BuildNxpTarget(),
     BuildMbedTarget(),
     BuildMW320Target(),
     BuildNrfTarget(),

@@ -1,0 +1,97 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "NXP_platform_schema_for_targets",
+    "description": "A representation of NXP target support in Matter",
+    "type": "object",
+    "required": [
+        "name",
+        "base_path",
+        "apps"
+    ],
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "Name of the board."
+
+        },
+        "base_path": {
+            "type": "string",
+            "description": "Path where application code resides. E.g. k32w/k32w0 for k32w0, since all example apps have the following path format: examples/<app>/nxp/k32w/k32w0."
+        },
+        "apps": {
+            "type": "array",
+            "description": "List of application supported on this board.",
+            "items": {
+                "$ref": "#/$defs/app"
+            }
+        },
+        "modifiers": {
+            "type": "array",
+            "description": "Modifiers for the targets. These arguments will be added in the gn gen command.",
+            "items": {
+                "$ref": "#/$defs/modifier"
+            }
+        },
+        "variable_modifiers": {
+            "type": "array",
+            "description": "Variable modifiers for the targets. A variable modifier is one that does not have a fixed value.\nIt has the same format as a fixed modifier, but the value is passed by the user in the command, instead of relying on the value from the JSON file.",
+            "items": {
+                "$ref": "#/$defs/modifier"
+            }
+        }
+    },
+    "$defs": {
+        "app": {
+            "type": "object",
+            "required": [
+                "name",
+                "artifact"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Name of the application to be used as metadata."
+                },
+                "artifact": {
+                    "type": "string",
+                    "description": "Name of the output artifact after compilation."
+                }
+            }
+        },
+        "modifier": {
+            "type": "object",
+            "required": [
+                "name",
+                "description",
+                "id",
+                "value"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "A human-readable modifier name that can be used for the UX."
+                },
+                "description": {
+                    "type": "string",
+                    "description": "A description of the modifier."
+                },
+                "id": {
+                    "type": "string",
+                    "description": "An id that will be embedded in the target name."
+                },
+                "value": {
+                    "type": "object",
+                    "description": "A dictionary of equivalent gn arguments.\nFor variable modifiers, it will contain just one entry with an empty string value."
+                },
+                "except_if": {
+                    "type": "string",
+                    "description": "Modifier will not be applied to targets that contain this string."
+                },
+                "only_if": {
+                    "type": "string",
+                    "description": "Modifier will only be applied to targets that contain this string."
+                }
+            }
+        }
+    }
+}
