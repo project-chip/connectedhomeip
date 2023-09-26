@@ -157,32 +157,26 @@ public final class InvokeElement {
   }
 
   public static InvokeElement newGroupInstance(
-    int groupId,
-    long clusterId,
-    long commandId,
-    @Nullable byte[] tlv,
-    @Nullable String jsonString) {
-  return new InvokeElement(
-      null,
-      Optional.of(groupId),
-      ChipPathId.forId(clusterId),
-      ChipPathId.forId(commandId),
-      tlv,
-      jsonString);
+      int groupId,
+      long clusterId,
+      long commandId,
+      @Nullable byte[] tlv,
+      @Nullable String jsonString) {
+    return new InvokeElement(
+        null,
+        Optional.of(groupId),
+        ChipPathId.forId(clusterId),
+        ChipPathId.forId(commandId),
+        tlv,
+        jsonString);
   }
 
   public static InvokeElement newGroupInstance(
-    int groupId,
-    ChipPathId clusterId,
-    ChipPathId commandId,
-    @Nullable byte[] tlv,
-    @Nullable String jsonString) {
-  return new InvokeElement(
-      null,
-      Optional.of(groupId),
-      clusterId,
-      commandId,
-      tlv,
-      jsonString);
+      int groupId,
+      ChipPathId clusterId,
+      ChipPathId commandId,
+      @Nullable byte[] tlv,
+      @Nullable String jsonString) {
+    return new InvokeElement(null, Optional.of(groupId), clusterId, commandId, tlv, jsonString);
   }
 }
