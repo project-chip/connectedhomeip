@@ -4,49 +4,52 @@
 //#include <sys/time.h>
 #include <string>
 #include <lib/support/logging/CHIPLogging.h>
-//#include <system/SystemClock.h>
-//#include <src/system/SystemClock.h>
-//#include <platform/CHIPDeviceLayer.h>
+
+#include <chrono>
+#include <ctime>
+#include <iomanip>
+#include <algorithm>
+
 
 using namespace std;
-using namespace chip;
+using namespace std::literals;
+
 //todo add description
 namespace chip{
     namespace timing{
         /**   TimespecTimer implementations   */
 
-                //static function
-            double TimespecTimer::duration_calc(uint64_t start, uint64_t stop)
-        {
-            //return (stop.tv_sec - start.tv_sec) + ((stop.tv_usec - start.tv_usec) * 1e-9);
-            //start.
-            return (stop - start);
-        }
-
         // member functions
         void TimespecTimer::start()
         {
-            t1 = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
-
+            //System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
+             t1 = std::chrono::system_clock::now();
+           
             // todo use logging instead of stdout
-            cout << "Timer " << label << " start " << chip::System::SystemClock().GetClock_RealTimeMS(t1) << '\n';
+            const std::time_t t_c = std::chrono::system_clock::to_time_t(t1);
+            cout << "Timer " << (*label) << " start " << std::put_time(std::localtime(&t_c), "%F %T.\n") << std::flush;
         }
 
         void TimespecTimer::stop()
         {
-            t2 = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
+        
+            t2 = std::chrono::system_clock::now();
 
-            cout << "Timer " << label << " stop " << chip::System::SystemClock().GetClock_RealTimeMS(t2) << '\n';
+            const std::time_t t_c = std::chrono::system_clock::to_time_t(t2);
+            cout << "Timer " << (*label) << " start " << std::put_time(std::localtime(&t_c), "%F %T.\n") << std::flush;
             duration();
+
+            TimespecTimer::~TimespecTimer();
         }
 
         double TimespecTimer::duration()
         {
-            double dur = duration_calc(t1, t2);
-            cout << "Timer " << label << " TIME_SPENT (sec) " << dur << '\n';
+            double dur = (t2 - t1) / 1ms;
+            cout << "Timer " << *label << " TIME_SPENT (msec) " << dur << '\n';
             return dur;
         }
 
+        
 
     }
 }
