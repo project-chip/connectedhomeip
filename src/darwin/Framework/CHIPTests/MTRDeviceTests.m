@@ -75,6 +75,9 @@ static MTRBaseDevice * GetConnectedDevice(void)
 #ifdef DEBUG
 @interface MTRBaseDevice (Test)
 - (void)failSubscribers:(dispatch_queue_t)queue completion:(void (^)(void))completion;
+
+// Test function for whitebox testing
++ (id)CHIPEncodeAndDecodeNSObject:(id)object;
 @end
 #endif
 
@@ -1558,9 +1561,14 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     delegate.onNotReachable = ^() {
         [subscriptionDroppedExpectation fulfill];
     };
-    XCTestExpectation * resubscriptionExpectation = [self expectationWithDescription:@"Resubscription has happened"];
+    XCTestExpectation * resubscriptionReachableExpectation =
+        [self expectationWithDescription:@"Resubscription has become reachable"];
     delegate.onReachable = ^() {
-        [resubscriptionExpectation fulfill];
+        [resubscriptionReachableExpectation fulfill];
+    };
+    XCTestExpectation * resubscriptionGotReportsExpectation = [self expectationWithDescription:@"Resubscription got reports"];
+    delegate.onReportEnd = ^() {
+        [resubscriptionGotReportsExpectation fulfill];
     };
 
     // reset the onAttributeDataReceived to validate the following resubscribe test
@@ -1598,7 +1606,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     // Check that device resets start time on subscription drop
     XCTAssertNil(device.estimatedStartTime);
 
-    [self waitForExpectations:@[ resubscriptionExpectation ] timeout:60];
+    [self waitForExpectations:@[ resubscriptionReachableExpectation, resubscriptionGotReportsExpectation ] timeout:60];
 
     // Now make sure we ignore later tests.  Ideally we would just unsubscribe
     // or remove the delegate, but there's no good way to do that.
@@ -2583,11 +2591,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [[self class] shutdownStack];
 }
 
-@end
-
-@interface MTRBaseDevice (Test)
-// Test function for whitebox testing
-+ (id)CHIPEncodeAndDecodeNSObject:(id)object;
 @end
 
 @interface MTRDeviceEncoderTests : XCTestCase
