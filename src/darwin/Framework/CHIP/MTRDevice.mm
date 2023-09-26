@@ -18,7 +18,7 @@
 #import <Matter/MTRDefines.h>
 #import <os/lock.h>
 
-#import "MTRAsyncWorkQueue_Internal.h"
+#import "MTRAsyncWorkQueue.h"
 #import "MTRAttributeSpecifiedCheck.h"
 #import "MTRBaseDevice_Internal.h"
 #import "MTRBaseSubscriptionCallback.h"
@@ -882,7 +882,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         NSArray * readRequestData = @[ readRequestPath, params ?: [NSNull null] ];
 
         // But first, check if a duplicate read request is already queued and return
-        if ([_asyncWorkQueue isDuplicateForTypeID:MTRDeviceWorkItemDuplicateReadTypeID workItemData:readRequestData]) {
+        if ([_asyncWorkQueue hasDuplicateForTypeID:MTRDeviceWorkItemDuplicateReadTypeID workItemData:readRequestData]) {
             return attributeValueToReturn;
         }
 
@@ -893,8 +893,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         [workItem setBatchingID:MTRDeviceWorkItemBatchingReadID data:readRequests handler:^(id opaqueDataCurrent, id opaqueDataNext, BOOL * fullyMerged) {
             NSMutableArray<NSArray *> * readRequestsCurrent = opaqueDataCurrent;
             NSMutableArray<NSArray *> * readRequestsNext = opaqueDataNext;
-
-            *fullyMerged = NO;
 
             // Can only read up to 9 paths at a time, per spec
             if (readRequestsCurrent.count >= 9) {

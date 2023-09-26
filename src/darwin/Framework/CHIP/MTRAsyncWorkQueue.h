@@ -30,6 +30,54 @@ typedef NS_ENUM(NSInteger, MTRAsyncWorkOutcome) {
 /// being cancelled).
 typedef BOOL (^MTRAsyncWorkCompletionBlock)(MTRAsyncWorkOutcome outcome);
 
+/// An optional handler that controls batching of MTRAsyncWorkItem.
+///
+/// When a work item is dequeued to run, if it is of a type that can be
+/// combined with similar work items in a batch, this facility gives the
+/// provides an opportunity to coalesce and merge work items.
+///
+/// The batching handler is called by the work queue when all of the following
+/// are true:
+/// 1) A work item that is batchable is about to be executed for the first time
+/// 2) The next work item in the queue is also batchable
+/// 3) The two work items have identical batching ids
+///
+/// The handler will be passed the opaque data of the two work items:
+/// `opaqueDataCurrent` is the data of the item about to be executed and
+/// `opaqueDataNext` is the data for the next item.
+///
+/// The handler is expected to mutate the data as needed to achieve batching.
+///
+/// If after the data mutations opaqueDataNext no longer requires any work, the
+/// handler should set `fullyMerged` to YES to indicate that the next item can
+/// be dropped from the queue. In this case, the handler may be called again to
+/// possibly also batch the work item after the one that was dropped.
+///
+/// @see MTRAsyncWorkItem
+typedef void (^MTRAsyncWorkBatchingHandler)(id opaqueDataCurrent, id opaqueDataNext, BOOL * fullyMerged);
+
+/// An optional handler than enables duplicate checking for MTRAsyncWorkItem.
+///
+/// The duplicate check handler is called when the client wishes to check
+/// whether a new candidate work item is a duplicate of an existing queued
+/// item, so that the client may decide to not enqueue the duplicate work.
+/// Duplicate checking is performed in reverse queue order, i.e. more
+/// recently enqueued items will be checked first.
+///
+/// The handler will be passed the opaque data of the candidate work item.
+///
+/// If the handler determines the data is indeed duplicate work, it should
+/// set `stop` to YES, and set `isDuplicate` to YES.
+///
+/// If the handler determines the data is not duplicate work, it should set
+/// `stop` to YES, and set `isDuplicate` to NO.
+///
+/// If the handler is unable to determine if the data is duplicate work, it
+/// should set `stop` to NO; the value of `isDuplicate` will be ignored.
+///
+/// @see MTRAsyncWorkItem
+typedef void (^MTRAsyncWorkDuplicateCheckHandler)(id opaqueItemData, BOOL * isDuplicate, BOOL * stop);
+
 /// A unit of work that can be run on a `MTRAsyncWorkQueue`.
 ///
 /// A work item can be configured with a number of hander blocks called by the
@@ -50,7 +98,9 @@ MTR_TESTABLE
 /// Creates a work item that will run on the specified dispatch queue.
 - (instancetype)initWithQueue:(dispatch_queue_t)queue;
 
-/// Called by the work queue to start this work item
+/// Called by the work queue to start this work item.
+///
+/// Will be called on the dispatch queue associated with this item.
 ///
 /// This handler block must, synchronously or asynchronously from any thread,
 /// call the provided completion block exactly once. Passing an outcome of
@@ -63,9 +113,37 @@ MTR_TESTABLE
 @property (nonatomic, strong, nullable) void (^readyHandler)
     (ContextType context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion);
 
-/// Called by the work queue to cancel the work item. The work item may or may
-/// not have been started already.
+/// Called by the work queue to cancel the work item.
+///
+/// Will be called on the dispatch queue associated with this item.
+/// The work item may or may not have been started already.
 @property (nonatomic, strong, nullable) void (^cancelHandler)(void);
+
+@property (nonatomic, readonly) NSUInteger batchingID;
+@property (nonatomic, readonly) id batchableData;
+@property (nonatomic, readonly) MTRAsyncWorkBatchingHandler batchingHandler;
+
+/// Sets the batching handler and associated data for this work item.
+///
+/// Note: This handler is NOT called on the dispatch queue associated with
+/// this work item. Thread-safety is managed by the work queue internally.
+///
+/// @see MTRAsyncWorkBatchingHandler
+- (void)setBatchingID:(NSUInteger)opaqueBatchingID
+                 data:(id)opaqueBatchableData
+              handler:(MTRAsyncWorkBatchingHandler)batchingHandler;
+
+@property (nonatomic, readonly) NSUInteger duplicateTypeID;
+@property (nonatomic, readonly) MTRAsyncWorkDuplicateCheckHandler duplicateCheckHandler;
+
+/// Sets the duplicate check type and handler for this work item.
+///
+/// Note: This handler is NOT called on the dispatch queue associated with
+/// this work item. Thread-safety is managed by the work queue internally.
+///
+/// @see MTRAsyncWorkDuplicateCheckHandler
+- (void)setDuplicateTypeID:(NSUInteger)opaqueDuplicateTypeID
+                   handler:(MTRAsyncWorkDuplicateCheckHandler)duplicateCheckHandler;
 
 @end
 
@@ -99,6 +177,16 @@ MTR_TESTABLE
 /// no further modifications may be made to it. Work item objects cannot be
 /// re-used.
 - (void)enqueueWorkItem:(MTRAsyncWorkItem<ContextType> *)item;
+
+/// Checks whether the queue already contains a work item matching the provided
+/// details. A client may call this method to avoid enqueueing duplicate work.
+///
+/// This method will call the duplicate check handler for all work items
+/// matching the duplicate type ID, starting from the last item in the queue
+///
+/// @see MTRAsyncWorkDuplicateCheckHandler
+- (BOOL)hasDuplicateForTypeID:(NSUInteger)opaqueDuplicateTypeID
+                 workItemData:(id)opaqueWorkItemData;
 
 /// Cancels and removes all work items.
 - (void)invalidate;

@@ -17,7 +17,7 @@
 #import <Matter/Matter.h>
 #import <XCTest/XCTest.h>
 
-#import "MTRAsyncWorkQueue_Internal.h"
+#import "MTRAsyncWorkQueue.h"
 
 @interface MTRAsyncWorkQueueTests : XCTestCase
 @end
@@ -335,15 +335,15 @@
         [workQueue enqueueWorkItem:workItem3];
 
         // At this point we should have duplicate type 1 with data @(1) and @(2), and type 2 with data @(1).
-        XCTAssertTrue([workQueue isDuplicateForTypeID:1 workItemData:@(1)]);
-        XCTAssertTrue([workQueue isDuplicateForTypeID:1 workItemData:@(2)]);
-        XCTAssertTrue([workQueue isDuplicateForTypeID:2 workItemData:@(1)]);
+        XCTAssertTrue([workQueue hasDuplicateForTypeID:1 workItemData:@(1)]);
+        XCTAssertTrue([workQueue hasDuplicateForTypeID:1 workItemData:@(2)]);
+        XCTAssertTrue([workQueue hasDuplicateForTypeID:2 workItemData:@(1)]);
 
-        XCTAssertFalse([workQueue isDuplicateForTypeID:0 workItemData:@(1)]);
-        XCTAssertFalse([workQueue isDuplicateForTypeID:0 workItemData:@(2)]);
-        XCTAssertFalse([workQueue isDuplicateForTypeID:1 workItemData:@(0)]);
-        XCTAssertFalse([workQueue isDuplicateForTypeID:1 workItemData:@(3)]);
-        XCTAssertFalse([workQueue isDuplicateForTypeID:2 workItemData:@(2)]);
+        XCTAssertFalse([workQueue hasDuplicateForTypeID:0 workItemData:@(1)]);
+        XCTAssertFalse([workQueue hasDuplicateForTypeID:0 workItemData:@(2)]);
+        XCTAssertFalse([workQueue hasDuplicateForTypeID:1 workItemData:@(0)]);
+        XCTAssertFalse([workQueue hasDuplicateForTypeID:1 workItemData:@(3)]);
+        XCTAssertFalse([workQueue hasDuplicateForTypeID:2 workItemData:@(2)]);
 
         // Test returning *isDuplicate=NO and queuing one extra duplicate item, and that the extra item runs
 
@@ -363,7 +363,7 @@
                               }];
         [workQueue enqueueWorkItem:workItem4];
 
-        XCTAssertTrue([workQueue isDuplicateForTypeID:3 workItemData:@(1)]);
+        XCTAssertTrue([workQueue hasDuplicateForTypeID:3 workItemData:@(1)]);
 
         // Have a barrier item with ID/data == 3/1 that returns *isDuplicate=NO
         MTRAsyncWorkItem * workItem5 = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
@@ -382,7 +382,7 @@
         [workQueue enqueueWorkItem:workItem5];
 
         // After the above, the same ID/data should no longer be considered duplicate
-        XCTAssertFalse([workQueue isDuplicateForTypeID:3 workItemData:@(1)]);
+        XCTAssertFalse([workQueue hasDuplicateForTypeID:3 workItemData:@(1)]);
 
         // Now add regular regular item with ID/data == 3/1
         MTRAsyncWorkItem * workItem6 = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
@@ -402,7 +402,7 @@
         [workQueue enqueueWorkItem:workItem6];
 
         // After the above, the same ID/data should no longer be considered duplicate
-        XCTAssertTrue([workQueue isDuplicateForTypeID:3 workItemData:@(1)]);
+        XCTAssertTrue([workQueue hasDuplicateForTypeID:3 workItemData:@(1)]);
 
         completion(MTRAsyncWorkComplete);
         [workItem0ReadyExpectation fulfill];

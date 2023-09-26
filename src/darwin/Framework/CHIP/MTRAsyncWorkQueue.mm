@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#import "MTRAsyncWorkQueue_Internal.h"
+#import "MTRAsyncWorkQueue.h"
 #import "MTRDefines_Internal.h"
 #import "MTRLogging_Internal.h"
 
@@ -131,8 +131,8 @@ MTR_DIRECT_MEMBERS
 
 - (void)setBatchingID:(NSUInteger)opaqueBatchingID data:(id)opaqueBatchableData handler:(MTRAsyncWorkBatchingHandler)batchingHandler
 {
+    NSParameterAssert(batchingHandler);
     [self assertMutable];
-    _batchable = YES;
     _batchingID = opaqueBatchingID;
     _batchableData = opaqueBatchableData;
     _batchingHandler = batchingHandler;
@@ -140,8 +140,8 @@ MTR_DIRECT_MEMBERS
 
 - (void)setDuplicateTypeID:(NSUInteger)opaqueDuplicateTypeID handler:(MTRAsyncWorkDuplicateCheckHandler)duplicateCheckHandler
 {
+    NSParameterAssert(duplicateCheckHandler);
     [self assertMutable];
-    _supportsDuplicateCheck = YES;
     _duplicateTypeID = opaqueDuplicateTypeID;
     _duplicateCheckHandler = duplicateCheckHandler;
 }
@@ -241,19 +241,18 @@ MTR_DIRECT_MEMBERS
     MTRAsyncWorkItem * workItem = _items.firstObject;
 
     // Check if batching is possible or needed. Only ask work item to batch once for simplicity
-    if (workItem.batchable && workItem.batchingHandler && (workItem.retryCount == 0)) {
+    auto batchingHandler = workItem.batchingHandler;
+    if (batchingHandler && workItem.retryCount == 0) {
         while (_items.count >= 2) {
             MTRAsyncWorkItem * nextWorkItem = _items[1];
-            if (!nextWorkItem.batchable || (nextWorkItem.batchingID != workItem.batchingID)) {
-                // next item is not eligible to merge with this one
-                break;
+            if (!nextWorkItem.batchingHandler || nextWorkItem.batchingID != workItem.batchingID) {
+                break; // next item is not eligible to merge with this one
             }
 
             BOOL fullyMerged = NO;
-            workItem.batchingHandler(workItem.batchableData, nextWorkItem.batchableData, &fullyMerged);
+            batchingHandler(workItem.batchableData, nextWorkItem.batchableData, &fullyMerged);
             if (!fullyMerged) {
-                // We can't remove the next work item, so we can't merge anything else into this one.
-                break;
+                break; // not removing the next item, so we can't merge anything else
             }
 
             [_items removeObjectAtIndex:1];
@@ -276,22 +275,25 @@ MTR_DIRECT_MEMBERS
     }];
 }
 
-- (BOOL)isDuplicateForTypeID:(NSUInteger)opaqueDuplicateTypeID workItemData:(id)opaqueWorkItemData
+- (BOOL)hasDuplicateForTypeID:(NSUInteger)opaqueDuplicateTypeID workItemData:(id)opaqueWorkItemData
 {
-    BOOL isDuplicate = NO;
+    BOOL hasDuplicate = NO;
     os_unfair_lock_lock(&_lock);
     // Start from the last item
     for (MTRAsyncWorkItem * item in [_items reverseObjectEnumerator]) {
-        BOOL stop = NO;
-        if (item.supportsDuplicateCheck && (item.duplicateTypeID == opaqueDuplicateTypeID) && item.duplicateCheckHandler) {
-            item.duplicateCheckHandler(opaqueWorkItemData, &isDuplicate, &stop);
+        auto duplicateCheckHandler = item.duplicateCheckHandler;
+        if (duplicateCheckHandler && item.duplicateTypeID == opaqueDuplicateTypeID) {
+            BOOL stop = NO;
+            BOOL isDuplicate = NO;
+            duplicateCheckHandler(opaqueWorkItemData, &isDuplicate, &stop);
             if (stop) {
+                hasDuplicate = isDuplicate;
                 break;
             }
         }
     }
     os_unfair_lock_unlock(&_lock);
-    return isDuplicate;
+    return hasDuplicate;
 }
 
 @end
