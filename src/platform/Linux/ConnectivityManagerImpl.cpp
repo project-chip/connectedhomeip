@@ -1557,7 +1557,7 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
         {
             return 0;
         }
-        const gchar ** keyMgmts        = g_variant_get_strv(MakeUniquePointerReceiver(keyMgmt).Get(), nullptr);
+        const gchar ** keyMgmts        = g_variant_get_strv(keyMgmt.get(), nullptr);
         const gchar ** keyMgmtsForFree = keyMgmts;
         uint8_t res                    = 0;
         for (const gchar * keyMgmtVal = (keyMgmts != nullptr ? *keyMgmts : nullptr); keyMgmtVal != nullptr;
@@ -1585,7 +1585,7 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
         {
             return 0;
         }
-        const gchar ** keyMgmts        = g_variant_get_strv(MakeUniquePointerReceiver(keyMgmt).Get(), nullptr);
+        const gchar ** keyMgmts        = g_variant_get_strv(keyMgmt.get(), nullptr);
         const gchar ** keyMgmtsForFree = keyMgmts;
         uint8_t res                    = 0;
         for (const gchar * keyMgmtVal = (keyMgmts != nullptr ? *keyMgmts : nullptr); keyMgmtVal != nullptr;

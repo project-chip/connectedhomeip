@@ -142,7 +142,7 @@ static BluezLEAdvertisement1 * BluezAdvertisingCreate(BluezEndpoint * apEndpoint
     serviceUUID = g_variant_builder_end(&serviceUUIDsBuilder);
 
     debugStr = GAutoPtr<char>(g_variant_print(serviceData, TRUE));
-    ChipLogDetail(DeviceLayer, "SET service data to %s", StringOrNullMarker(MakeUniquePointerReceiver(debugStr).Get()));
+    ChipLogDetail(DeviceLayer, "SET service data to %s", StringOrNullMarker(debugStr.get()));
 
     bluez_leadvertisement1_set_type_(adv, (apEndpoint->mType & BLUEZ_ADV_TYPE_CONNECTABLE) ? "peripheral" : "broadcast");
     // empty manufacturer data
@@ -158,7 +158,7 @@ static BluezLEAdvertisement1 * BluezAdvertisingCreate(BluezEndpoint * apEndpoint
         bluez_leadvertisement1_set_discoverable_timeout(adv, UINT16_MAX);
 
     // advertising name corresponding to the PID and object path, for debug purposes
-    bluez_leadvertisement1_set_local_name(adv, MakeUniquePointerReceiver(localName).Get());
+    bluez_leadvertisement1_set_local_name(adv, localName.get());
     bluez_leadvertisement1_set_service_uuids(adv, serviceUUID);
 
     // 0xffff means no appearance
@@ -400,13 +400,12 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
         return FALSE;
     }
 
-    options = GAutoPtr<GVariantDict>(g_variant_dict_new(aOptions));
-    option_mtu =
-        GAutoPtr<GVariant>(g_variant_dict_lookup_value(MakeUniquePointerReceiver(options).Get(), "mtu", G_VARIANT_TYPE_UINT16));
+    options    = GAutoPtr<GVariantDict>(g_variant_dict_new(aOptions));
+    option_mtu = GAutoPtr<GVariant>(g_variant_dict_lookup_value(options.get(), "mtu", G_VARIANT_TYPE_UINT16));
     VerifyOrReturnValue(
         option_mtu != nullptr, FALSE, ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "MTU negotiation failed"));
-    conn->mMtu = g_variant_get_uint16(MakeUniquePointerReceiver(option_mtu).Get());
+    conn->mMtu = g_variant_get_uint16(option_mtu.get());
 
     channel = g_io_channel_unix_new(fds[0]);
     g_io_channel_set_encoding(channel, nullptr, nullptr);
@@ -463,14 +462,13 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
         conn != nullptr, FALSE,
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No Chipoble connection"));
 
-    options = GAutoPtr<GVariantDict>(g_variant_dict_new(aOptions));
-    option_mtu =
-        GAutoPtr<GVariant>(g_variant_dict_lookup_value(MakeUniquePointerReceiver(options).Get(), "mtu", G_VARIANT_TYPE_UINT16));
+    options    = GAutoPtr<GVariantDict>(g_variant_dict_new(aOptions));
+    option_mtu = GAutoPtr<GVariant>(g_variant_dict_lookup_value(options.get(), "mtu", G_VARIANT_TYPE_UINT16));
     VerifyOrReturnValue(option_mtu != nullptr, FALSE, {
         ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "MTU negotiation failed");
     });
-    conn->mMtu = g_variant_get_uint16(MakeUniquePointerReceiver(option_mtu).Get());
+    conn->mMtu = g_variant_get_uint16(option_mtu.get());
 
     if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, fds) < 0)
     {
@@ -1239,19 +1237,19 @@ static CHIP_ERROR BluezC2Indicate(ConnectionDataBundle * closure)
 
     if (bluez_gatt_characteristic1_get_notify_acquired(conn->mpC2) == TRUE)
     {
-        buf = (char *) g_variant_get_fixed_array(MakeUniquePointerReceiver(closure->mpVal).Get(), &len, sizeof(uint8_t));
+        buf = (char *) g_variant_get_fixed_array(closure->mpVal.get(), &len, sizeof(uint8_t));
         VerifyOrExit(len <= static_cast<size_t>(std::numeric_limits<gssize>::max()),
                      ChipLogError(DeviceLayer, "FAIL: buffer too large in %s", __func__));
         status = g_io_channel_write_chars(conn->mC2Channel.mpChannel, buf, static_cast<gssize>(len), &written,
                                           &MakeUniquePointerReceiver(error).Get());
-        g_variant_unref(MakeUniquePointerReceiver(closure->mpVal).Get());
+        g_variant_unref(closure->mpVal.get());
         closure->mpVal = nullptr;
 
         VerifyOrExit(status == G_IO_STATUS_NORMAL, ChipLogError(DeviceLayer, "FAIL: C2 Indicate: %s", error->message));
     }
     else
     {
-        bluez_gatt_characteristic1_set_value(conn->mpC2, MakeUniquePointerReceiver(closure->mpVal).Get());
+        bluez_gatt_characteristic1_set_value(conn->mpC2, closure->mpVal.get());
         closure->mpVal = nullptr;
     }
 
@@ -1436,8 +1434,8 @@ static CHIP_ERROR SendWriteRequestImpl(ConnectionDataBundle * data)
     g_variant_builder_add(&optionsBuilder, "{sv}", "type", g_variant_new_string("request"));
     options = g_variant_builder_end(&optionsBuilder);
 
-    bluez_gatt_characteristic1_call_write_value(data->mpConn->mpC1, MakeUniquePointerReceiver(data->mpVal).Get(), options, nullptr,
-                                                SendWriteRequestDone, data->mpConn);
+    bluez_gatt_characteristic1_call_write_value(data->mpConn->mpC1, data->mpVal.get(), options, nullptr, SendWriteRequestDone,
+                                                data->mpConn);
 
 exit:
     g_free(data);
