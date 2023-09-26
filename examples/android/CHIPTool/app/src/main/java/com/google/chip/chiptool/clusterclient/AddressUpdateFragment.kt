@@ -73,14 +73,24 @@ class AddressUpdateFragment : Fragment() {
     _binding = null
   }
 
-  public suspend fun getDevicePointer(context: Context): Long {
-    val deviceId = binding.deviceIdEd.text.toString().toULong()
-
-    return if (isGroupNodeId(deviceId)) {
-      deviceController.getGroupDevicePointer((deviceId and MASK_GROUP_ID).toInt())
+  suspend fun getDevicePointer(context: Context): Long {
+    return if (isGroupId()) {
+      deviceController.getGroupDevicePointer(getGroupId().toInt())
     } else {
-      ChipClient.getConnectedDevicePointer(context, deviceId.toLong())
+      ChipClient.getConnectedDevicePointer(context, getNodeId().toLong())
     }
+  }
+
+  fun isGroupId(): Boolean {
+    return isGroupNodeId(getNodeId())
+  }
+
+  fun getGroupId(): UInt {
+    return getGroupIdFromNodeId(getNodeId())
+  }
+
+  fun getNodeId(): ULong {
+    return binding.deviceIdEd.text.toString().toULong()
   }
 
   companion object {
@@ -95,6 +105,10 @@ class AddressUpdateFragment : Fragment() {
 
     fun getNodeIdFromGroupId(groupId: UInt): ULong {
       return groupId.toULong() or MIN_GROUP_NODE_ID
+    }
+
+    fun getGroupIdFromNodeId(nodeId: ULong): UInt {
+      return (nodeId and MASK_GROUP_ID).toUInt()
     }
   }
 }

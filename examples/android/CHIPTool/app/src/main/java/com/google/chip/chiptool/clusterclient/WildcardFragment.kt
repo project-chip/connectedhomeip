@@ -361,8 +361,11 @@ class WildcardFragment : Fragment() {
     val commandId = getChipPathIdForText(binding.commandIdEd.text.toString())
 
     val jsonString = invokeJson.ifEmpty { "{}" }
-    val invokeElement =
+    val invokeElement = if (addressUpdateFragment.isGroupId()) {
+      InvokeElement.newGroupInstance(addressUpdateFragment.getGroupId().toInt(), clusterId, commandId, null, jsonString)
+    } else {
       InvokeElement.newInstance(endpointId, clusterId, commandId, null, jsonString)
+    }
     deviceController.invoke(
       invokeCallback,
       addressUpdateFragment.getDevicePointer(requireContext()),

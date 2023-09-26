@@ -2417,14 +2417,21 @@ JNI_METHOD(void, invoke)
     uint32_t endpointId                     = 0;
     uint32_t clusterId                      = 0;
     uint32_t commandId                      = 0;
+    uint16_t groupId                        = 0;
+    bool isEndpointIdValid                  = false;
+    bool isGroupIdValid                     = false;
     jmethodID getEndpointIdMethod           = nullptr;
     jmethodID getClusterIdMethod            = nullptr;
     jmethodID getCommandIdMethod            = nullptr;
+    jmethodID getGroupIdMethod              = nullptr;
     jmethodID getTlvByteArrayMethod         = nullptr;
     jmethodID getJsonStringMethod           = nullptr;
+    jmethodID isEndpointIdValidMethod       = nullptr;
+    jmethodID isGroupIdValidMethod          = nullptr;
     jobject endpointIdObj                   = nullptr;
     jobject clusterIdObj                    = nullptr;
     jobject commandIdObj                    = nullptr;
+    jobject groupIdObj                      = nullptr;
     jbyteArray tlvBytesObj                  = nullptr;
     uint16_t convertedTimedRequestTimeoutMs = static_cast<uint16_t>(timedRequestTimeoutMs);
     ChipLogDetail(Controller, "IM invoke() called");
@@ -2441,12 +2448,37 @@ JNI_METHOD(void, invoke)
                                                                 "()Lchip/devicecontroller/model/ChipPathId;", &getClusterIdMethod));
     SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getCommandId",
                                                                 "()Lchip/devicecontroller/model/ChipPathId;", &getCommandIdMethod));
+    SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getGroupId", "()Ljava/util/Optional;", &getGroupIdMethod));
+    SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "isEndpointIdValid", "()Z", &isEndpointIdValidMethod));
+    SuccessOrExit(err = JniReferences::GetInstance().FindMethod(env, invokeElement, "isGroupIdValid", "()Z", &isGroupIdValidMethod));
     SuccessOrExit(
         err = JniReferences::GetInstance().FindMethod(env, invokeElement, "getTlvByteArray", "()[B", &getTlvByteArrayMethod));
 
-    endpointIdObj = env->CallObjectMethod(invokeElement, getEndpointIdMethod);
-    VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
-    VerifyOrExit(endpointIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    isEndpointIdValid = (env->CallBooleanMethod(invokeElement, isEndpointIdValidMethod) == JNI_TRUE);
+    isGroupIdValid = (env->CallBooleanMethod(invokeElement, isGroupIdValidMethod) == JNI_TRUE);
+
+    if (isEndpointIdValid)
+    {
+      endpointIdObj = env->CallObjectMethod(invokeElement, getEndpointIdMethod);
+      VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+      VerifyOrExit(endpointIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+      SuccessOrExit(err = GetChipPathIdValue(endpointIdObj, kInvalidEndpointId, endpointId));
+    }
+
+    if (isGroupIdValid)
+    {
+      VerifyOrExit(device->GetSecureSession().Value()->IsGroupSession(), err = CHIP_ERROR_INVALID_ARGUMENT);
+      groupIdObj = env->CallObjectMethod(invokeElement, getGroupIdMethod);
+      VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
+      VerifyOrExit(groupIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+      jobject boxedGroupId = nullptr;
+
+      SuccessOrExit(err = JniReferences::GetInstance().GetOptionalValue(groupIdObj, boxedGroupId));
+      VerifyOrExit(boxedGroupId != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+      groupId = static_cast<uint16_t>(JniReferences::GetInstance().IntegerToPrimitive(boxedGroupId));
+    }
 
     clusterIdObj = env->CallObjectMethod(invokeElement, getClusterIdMethod);
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
@@ -2456,18 +2488,15 @@ JNI_METHOD(void, invoke)
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
     VerifyOrExit(commandIdObj != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    SuccessOrExit(err = GetChipPathIdValue(endpointIdObj, kInvalidEndpointId, endpointId));
     SuccessOrExit(err = GetChipPathIdValue(clusterIdObj, kInvalidClusterId, clusterId));
     SuccessOrExit(err = GetChipPathIdValue(commandIdObj, kInvalidCommandId, commandId));
 
     tlvBytesObj = static_cast<jbyteArray>(env->CallObjectMethod(invokeElement, getTlvByteArrayMethod));
     VerifyOrExit(!env->ExceptionCheck(), err = CHIP_JNI_ERROR_EXCEPTION_THROWN);
     {
-        GroupId groupId = device->GetSecureSession().Value()->IsGroupSession()
-            ? device->GetSecureSession().Value()->AsOutgoingGroupSession()->GetGroupId()
-            : chip::kUndefinedGroupId;
-        app::CommandPathParams path(static_cast<EndpointId>(endpointId), groupId, static_cast<ClusterId>(clusterId),
-                                    static_cast<CommandId>(commandId), app::CommandPathFlags::kEndpointIdValid);
+        uint16_t id = isEndpointIdValid ? static_cast<uint16_t>(endpointId) : groupId;
+        app::CommandPathFlags flag = isEndpointIdValid ? app::CommandPathFlags::kEndpointIdValid : app::CommandPathFlags::kGroupIdValid;
+        app::CommandPathParams path(id, static_cast<ClusterId>(clusterId), static_cast<CommandId>(commandId), flag);
         if (tlvBytesObj != nullptr)
         {
             JniByteArray tlvBytesObjBytes(env, tlvBytesObj);
