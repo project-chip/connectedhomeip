@@ -86,8 +86,8 @@ public:
      * to attempt to obtain time from any source, it returns CHIP_NO_ERROR and calls the callback on completion.
      * If the delegate has a time available at the time of this call, it may call the callback synchronously from within
      * this function.
-     * If the delegate need to reach out asynchronously to obtain a time, it saves this callback to call asynchronously.
-     * The delegate should track these callbacks in a list to ensure they can be properly cancelled.
+     * If the delegate needs to reach out asynchronously to obtain a time, it saves this callback to call asynchronously.
+     * The delegate should track these callbacks in a CallbackDeque to ensure they can be properly cancelled.
      * If the delegate is successful in obtaining the time, it sets the time using the platform time API (SetClock_RealTime)
      * and calls the callback with the time source and granularity set as appropriate.
      * If the delegate is unsuccessful in obtaining the time, it calls the callback with timeSource set to kNone and
