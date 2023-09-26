@@ -64,7 +64,7 @@ template("k32w1_sdk") {
     _sdk_include_dirs = [
       "${k32w1_sdk_root}/devices/K32W1480",
       "${k32w1_sdk_root}/CMSIS/Core/Include",
-      "${k32w1_sdk_root}/platform/drivers/snt",
+      "${k32w1_sdk_root}/platform/drivers/elemu",
       "${k32w1_sdk_root}/platform/drivers/spc",
       "${k32w1_sdk_root}/platform/drivers/ccm32k",
       "${k32w1_sdk_root}/platform/drivers/wuu",
@@ -131,7 +131,7 @@ template("k32w1_sdk") {
       "${k32w1_sdk_root}/middleware/mbedtls/include/mbedtls",
       "${k32w1_sdk_root}/middleware/mbedtls/include",
       "${k32w1_sdk_root}/middleware/secure-subsystem/inc",
-      "${k32w1_sdk_root}/middleware/secure-subsystem/inc/snt",
+      "${k32w1_sdk_root}/middleware/secure-subsystem/inc/elemu",
       "${k32w1_sdk_root}/middleware/secure-subsystem/port/kw45_k4w1",
 
       "${k32w1_sdk_root}/middleware/wireless/XCVR/drv",
@@ -207,8 +207,8 @@ template("k32w1_sdk") {
       "gAppLowpowerEnabled_d=1",
       "BUTTON_SHORT_PRESS_THRESHOLD=1500",
       "BUTTON_LONG_PRESS_THRESHOLD=2500",
-      "SSS_CONFIG_FILE=\"fsl_sss_config_snt.h\"",
-      "SSCP_CONFIG_FILE=\"fsl_sscp_config_snt.h\"",
+      "SSS_CONFIG_FILE=\"fsl_sss_config_elemu.h\"",
+      "SSCP_CONFIG_FILE=\"fsl_sscp_config_elemu.h\"",
 
       "SDK_DEBUGCONSOLE=1",
       "NO_SYSCORECLK_UPD=0",
@@ -341,27 +341,28 @@ template("k32w1_sdk") {
     }
 
     if (sdk_release == 1) {
-     sources += [
-      "${k32w1_sdk_root}/middleware/wireless/bluetooth/application/common/matter/ble_init.c",
-      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_k4_flash.c",
-      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_k4_controller.c",
-      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_clock.c",
-      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_gpio.c",
-      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_lpuart.c",
-      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_ltc.c",
-      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_lptmr.c",
-      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_lpspi.c",
-      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_snt.c",
-      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_spc.c",
-      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_wuu.c",
-      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_imu.c",
-      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_crc.c",
-      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_cmc.c",
-      "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_ccm32k.c",
-      "${k32w1_sdk_root}/devices/K32W1480/utilities/fsl_assert.c",
-      "${k32w1_sdk_root}/devices/K32W1480/utilities/debug_console/fsl_debug_console.c",
-      "${k32w1_sdk_root}/devices/K32W1480/utilities/str/fsl_str.c",
-     ]
+      sources += [
+        "${k32w1_sdk_root}/middleware/wireless/bluetooth/application/common/matter/ble_init.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_k4_flash.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_k4_controller.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_clock.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_gpio.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_lpuart.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_ltc.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_lptmr.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_lpspi.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_elemu.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_spc.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_wuu.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_imu.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_crc.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_cmc.c",
+        "${k32w1_sdk_root}/devices/K32W1480/drivers/fsl_ccm32k.c",
+        "${k32w1_sdk_root}/devices/K32W1480/utilities/fsl_assert.c",
+        "${k32w1_sdk_root}/devices/K32W1480/utilities/debug_console/fsl_debug_console.c",
+        "${k32w1_sdk_root}/devices/K32W1480/utilities/str/fsl_str.c",
+      ]
+
     } else {
       sources += [
       "${k32w1_sdk_root}/middleware/wireless/bluetooth/application/common/ble_init.c",
@@ -373,7 +374,7 @@ template("k32w1_sdk") {
       "${k32w1_sdk_root}/platform/drivers/ltc/fsl_ltc.c",
       "${k32w1_sdk_root}/platform/drivers/lptmr/fsl_lptmr.c",
       "${k32w1_sdk_root}/platform/drivers/lpspi/fsl_lpspi.c",
-      "${k32w1_sdk_root}/platform/drivers/snt/fsl_snt.c",
+      "${k32w1_sdk_root}/platform/drivers/elemu/fsl_elemu.c",
       "${k32w1_sdk_root}/platform/drivers/spc/fsl_spc.c",
       "${k32w1_sdk_root}/platform/drivers/wuu/fsl_wuu.c",
       "${k32w1_sdk_root}/platform/drivers/imu/fsl_imu.c",
