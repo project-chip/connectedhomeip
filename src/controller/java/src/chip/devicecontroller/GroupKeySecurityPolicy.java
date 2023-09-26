@@ -22,7 +22,7 @@ public enum GroupKeySecurityPolicy {
   TrustFirst(0),
   CacheAndSync(1);
 
-  private int id;
+  private final int id;
 
   GroupKeySecurityPolicy(int id) {
     this.id = id;
@@ -32,12 +32,13 @@ public enum GroupKeySecurityPolicy {
     return id;
   }
 
-  public static GroupKeySecurityPolicy value(int id) {
+  public static GroupKeySecurityPolicy value(int id) throws IllegalArgumentException {
     for (GroupKeySecurityPolicy policy : GroupKeySecurityPolicy.values()) {
       if (policy.id == id) {
         return policy;
       }
     }
-    return null;
+    // Throw an exception or return a default value if no match is found.
+    throw new IllegalArgumentException("Invalid id: " + id);
   }
 }

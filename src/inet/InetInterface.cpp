@@ -528,7 +528,6 @@ static void backport_if_freenameindex(struct if_nameindex * inArray)
 static struct if_nameindex * backport_if_nameindex(void)
 {
     int err;
-    unsigned index;
     size_t intfIter              = 0;
     size_t maxIntfNum            = 0;
     size_t numIntf               = 0;
@@ -546,12 +545,11 @@ static struct if_nameindex * backport_if_nameindex(void)
     for (addrIter = addrList; addrIter != nullptr; addrIter = addrIter->ifa_next)
     {
         numAddrs++;
-        if (strcmp(addrIter->ifa_name, lastIntfName) == 0)
+        if (strcmp(addrIter->ifa_name, lastIntfName) != 0)
         {
-            continue;
+            numIntf++;
+            lastIntfName = addrIter->ifa_name;
         }
-        numIntf++;
-        lastIntfName = addrIter->ifa_name;
     }
 
     tmpval = (struct if_nameindex *) Platform::MemoryAlloc((numIntf + 1) * sizeof(struct if_nameindex));
@@ -566,7 +564,7 @@ static struct if_nameindex * backport_if_nameindex(void)
             continue;
         }
 
-        index = if_nametoindex(addrIter->ifa_name);
+        unsigned index = if_nametoindex(addrIter->ifa_name);
         if (index != 0)
         {
             tmpval[intfIter].if_index = index;
