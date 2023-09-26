@@ -1,7 +1,6 @@
 /*
- *    Copyright 2023 NXP
- *
  *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright 2023, 2025 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
