@@ -570,20 +570,20 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
         const auto & newTz = newTzL.GetValue();
         if (newTz.offset < -43200 || newTz.offset > 50400)
         {
-            ReturnErrorOnFailure(LoadTimeZone());
-            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+            LoadTimeZone();
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
         // first element shall have validAt entry of 0
         if (i == 0 && newTz.validAt != 0)
         {
-            ReturnErrorOnFailure(LoadTimeZone());
-            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+            LoadTimeZone();
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
         // if second element, it shall have validAt entry of non-0
         if (i != 0 && newTz.validAt == 0)
         {
-            ReturnErrorOnFailure(LoadTimeZone());
-            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+            LoadTimeZone();
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
         tzStore.timeZone.offset  = newTz.offset;
         tzStore.timeZone.validAt = newTz.validAt;
@@ -592,14 +592,14 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
             size_t len = newTz.name.Value().size();
             if (len > sizeof(tzStore.name))
             {
-                ReturnErrorOnFailure(LoadTimeZone());
-                return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
+                LoadTimeZone();
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
             }
             memset(tzStore.name, 0, sizeof(tzStore.name));
             chip::MutableCharSpan tempSpan(tzStore.name, len);
             if (CHIP_NO_ERROR != CopyCharSpanToMutableCharSpan(newTz.name.Value(), tempSpan))
             {
-                ReturnErrorOnFailure(LoadTimeZone());
+                LoadTimeZone();
                 return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
             }
             tzStore.timeZone.name.SetValue(CharSpan(tzStore.name, len));
@@ -612,7 +612,7 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
     }
     if (CHIP_NO_ERROR != newTzL.GetStatus())
     {
-        ReturnErrorOnFailure(LoadTimeZone());
+        LoadTimeZone();
         return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
     }
 
