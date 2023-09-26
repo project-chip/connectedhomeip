@@ -1,6 +1,6 @@
 /*
  *    Copyright (c) 2022 Project CHIP Authors
- *    Copyright 2023 NXP
+ *    Copyright 2023, 2025 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -75,12 +75,12 @@ PersistentStorageOperationalKeystoreEle::PersistentStorageOperationalKeystoreEle
     open_svc_key_store_args.key_store_identifier      = KEY_STORE_ID;
     open_svc_key_store_args.authentication_nonce      = AUTHEN_NONCE;
     // try to create a new keystore, if it already exist, open it
-    open_svc_key_store_args.flags = 1;
+    open_svc_key_store_args.flags = (HSM_SVC_KEY_STORE_FLAGS_CREATE | HSM_SVC_KEY_STORE_FLAGS_STRICT_OPERATION);
     err                           = hsm_open_key_store_service(hsm_session_hdl, &open_svc_key_store_args, &key_store_hdl);
     if (err == HSM_KEY_STORE_CONFLICT)
     {
         ChipLogDetail(Crypto, "keystore already existed, open it...\n");
-        open_svc_key_store_args.flags = 0;
+        open_svc_key_store_args.flags = HSM_SVC_KEY_STORE_FLAGS_LOAD;
         err                           = hsm_open_key_store_service(hsm_session_hdl, &open_svc_key_store_args, &key_store_hdl);
         if (err != HSM_NO_ERROR)
         {
