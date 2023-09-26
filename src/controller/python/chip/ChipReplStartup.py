@@ -107,7 +107,7 @@ elif (len(certificateAuthorityManager.activeCaList[0].adminList) == 0):
 
 caList = certificateAuthorityManager.activeCaList
 
-devCtrl = caList[0].adminList[0].NewController(paaTrustStorePath=args.trustStore)
+devCtrl = caList[0].adminList[0].NewController(paaTrustStorePath=args.trust_store)
 builtins.devCtrl = devCtrl
 
 atexit.register(StackShutdown)
