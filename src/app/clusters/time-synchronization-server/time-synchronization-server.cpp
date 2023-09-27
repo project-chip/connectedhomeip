@@ -620,7 +620,8 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
         {
             emit = true;
         }
-        if ((tz.name.HasValue() && lastTz.name.HasValue()) && !(tz.name.Value().data_equal(lastTz.name.Value())))
+        if (tz.name.HasValue() != lastTz.name.HasValue() ||
+            ((tz.name.HasValue() && lastTz.name.HasValue()) && !(tz.name.Value().data_equal(lastTz.name.Value()))))
         {
             emit = true;
         }
