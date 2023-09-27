@@ -206,6 +206,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         *errInfoOnFailure = err;
         return nullptr;
     }
+    chip::Credentials::SetGroupDataProvider(&wrapper->mGroupDataProvider);
     initParams.groupDataProvider = &wrapper->mGroupDataProvider;
 
     err = wrapper->mOpCertStore.Init(wrapperStorage);

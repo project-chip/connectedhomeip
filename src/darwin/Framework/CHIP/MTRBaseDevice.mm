@@ -57,9 +57,9 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::Protocols::InteractionModel;
-using chip::Messaging::ExchangeManager;
 using chip::Optional;
 using chip::SessionHandle;
+using chip::Messaging::ExchangeManager;
 
 NSString * const MTRAttributePathKey = @"attributePath";
 NSString * const MTRCommandPathKey = @"commandPath";
@@ -765,7 +765,8 @@ public:
     static void OnSuccessFn(void * context, id value) { DispatchSuccess(context, value); }
 };
 
-template <typename DecodableValueType> class BufferedReadClientCallback final : public app::ReadClient::Callback {
+template <typename DecodableValueType>
+class BufferedReadClientCallback final : public app::ReadClient::Callback {
 public:
     using OnSuccessAttributeCallbackType
         = std::function<void(const ConcreteAttributePath & aPath, const DecodableValueType & aData)>;
