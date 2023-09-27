@@ -45,6 +45,7 @@ static Instance gCarbonDioxideConcentrationMeasurementInstance =
 
 void emberAfCarbonDioxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
+    VerifyOrDie(1 == endpoint);
     gCarbonDioxideConcentrationMeasurementInstance.Init();
 }
 #endif
@@ -56,6 +57,7 @@ static Instance gCarbonMonoxideConcentrationMeasurementInstance =
 
 void emberAfCarbonMonoxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
+    VerifyOrDie(1 == endpoint);
     gCarbonMonoxideConcentrationMeasurementInstance.Init();
 }
 #endif
@@ -67,6 +69,7 @@ static Instance gNitrogenDioxideConcentrationMeasurementInstance =
 
 void emberAfNitrogenDioxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
+    VerifyOrDie(1 == endpoint);
     gNitrogenDioxideConcentrationMeasurementInstance.Init();
 }
 #endif
@@ -78,6 +81,7 @@ static Instance gPm1ConcentrationMeasurementInstance =
 
 void emberAfPm1ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
+    VerifyOrDie(1 == endpoint);
     gPm1ConcentrationMeasurementInstance.Init();
 }
 #endif
@@ -89,6 +93,7 @@ static Instance gPm10ConcentrationMeasurementInstance =
 
 void emberAfPm10ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
+    VerifyOrDie(1 == endpoint);
     gPm10ConcentrationMeasurementInstance.Init();
 }
 #endif
@@ -100,6 +105,7 @@ static Instance gPm25ConcentrationMeasurementInstance =
 
 void emberAfPm25ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
+    VerifyOrDie(1 == endpoint);
     gPm25ConcentrationMeasurementInstance.Init();
 }
 #endif
@@ -111,6 +117,7 @@ static Instance gRadonConcentrationMeasurementInstance =
 
 void emberAfRadonConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
+    VerifyOrDie(1 == endpoint);
     gRadonConcentrationMeasurementInstance.Init();
 }
 #endif
@@ -123,6 +130,7 @@ static Instance gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance =
 
 void emberAfTotalVolatileOrganicCompoundsConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
+    VerifyOrDie(1 == endpoint);
     gTotalVolatileOrganicCompoundsConcentrationMeasurementInstance.Init();
 }
 #endif
@@ -134,6 +142,7 @@ static Instance gOzoneConcentrationMeasurementInstance =
 
 void emberAfOzoneConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
+    VerifyOrDie(1 == endpoint);
     gOzoneConcentrationMeasurementInstance.Init();
 }
 #endif
@@ -145,6 +154,7 @@ static Instance gFormaldehydeConcentrationMeasurementInstance =
 
 void emberAfFormaldehydeConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
+    VerifyOrDie(1 == endpoint);
     gFormaldehydeConcentrationMeasurementInstance.Init();
 }
 #endif
