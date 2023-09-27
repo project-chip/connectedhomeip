@@ -324,4 +324,7 @@
 	url = https://github.com/STMicroelectronics/STM32CubeWB.git
         branch = v1.17.0
         platform = stm32
-
+[submodule "rtthread"]
+	path = third_party/rtthread/repo
+	url = https://github.com/RT-Thread/rt-thread.git
+        branch = v5.0.x
