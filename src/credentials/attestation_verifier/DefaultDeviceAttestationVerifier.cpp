@@ -29,14 +29,10 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 
-namespace chip {
-namespace TestCerts {
-extern const Span<const ByteSpan> kTestAttestationTrustStoreRoots;
-} // namespace TestCerts
-} // namespace chip
+#include "credentials/attestation_verifier/CHIPAttCert_test_paa_store.h"
 
 using namespace chip::Crypto;
-using chip::TestCerts::kTestAttestationTrustStoreRoots;
+using chip::TestCerts::GetTestPaaRootStore;
 
 namespace chip {
 namespace Credentials {
@@ -275,7 +271,7 @@ constexpr std::array<MatterCDSigningKey, 6> gCdSigningKeys = { {
 struct TestAttestationTrustStore final : public ArrayAttestationTrustStore
 {
     TestAttestationTrustStore() :
-        ArrayAttestationTrustStore(kTestAttestationTrustStoreRoots.data(), kTestAttestationTrustStoreRoots.size())
+        ArrayAttestationTrustStore(GetTestPaaRootStore().data(), GetTestPaaRootStore().size())
     {}
 };
 Global<TestAttestationTrustStore> gTestAttestationTrustStore;

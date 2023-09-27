@@ -57,6 +57,7 @@
 #endif
 
 #include <credentials/CHIPCert.h>
+#include <credentials/attestation_verifier/CHIPAttCert_test_paa_store.h>
 #include <credentials/tests/CHIPAttCert_test_vectors.h>
 #include <credentials/tests/CHIPCert_test_vectors.h>
 

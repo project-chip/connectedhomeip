@@ -20,6 +20,7 @@
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
+#include <credentials/attestation_verifier/CHIPAttCert_test_paa_store.h>
 #include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
 #include <credentials/attestation_verifier/DeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
