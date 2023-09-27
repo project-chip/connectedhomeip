@@ -25,7 +25,7 @@ namespace chip{
                 protected:
                     timeval t1;
                     timeval t2;
-                    const char * label;
+                    char * label;
                     //string s;
                 public:
                     //constructors
@@ -35,16 +35,17 @@ namespace chip{
                         label =  s.data();
                         //label =  s;
                     }
-                    ~TimespecTimer(){
+                    /*~TimespecTimer(){
                         delete label;
                         //t1=1;
                         //t2=1;
-                    }
+                    }*/
+                    ~TimespecTimer()=default;
                     //member functions
                     void start();
                     void stop();
                     double duration(); 
-                    char * toTimeStr(timeval time);
+                    static char * toTimeStr(timeval time);
 
         };
 
