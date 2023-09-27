@@ -305,7 +305,12 @@ class WildcardFragment : Fragment() {
     timedRequestTimeoutMs: Int,
     imTimeoutMs: Int
   ) {
-    val endpointId = getChipPathIdForText(binding.endpointIdEd.text.toString())
+    val endpointId =
+      if (!addressUpdateFragment.isGroupId()) {
+        getChipPathIdForText(binding.endpointIdEd.text.toString())
+      } else {
+        null
+      }
     val clusterId = getChipPathIdForText(binding.clusterIdEd.text.toString())
     val attributeId = getChipPathIdForText(binding.attributeIdEd.text.toString())
 
@@ -348,7 +353,7 @@ class WildcardFragment : Fragment() {
 
     deviceController.write(
       writeAttributeCallback,
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      addressUpdateFragment.getDevicePointer(requireContext()),
       listOf(writeRequest),
       timedRequestTimeoutMs,
       imTimeoutMs
@@ -362,10 +367,20 @@ class WildcardFragment : Fragment() {
 
     val jsonString = invokeJson.ifEmpty { "{}" }
     val invokeElement =
-      InvokeElement.newInstance(endpointId, clusterId, commandId, null, jsonString)
+      if (addressUpdateFragment.isGroupId()) {
+        InvokeElement.newGroupInstance(
+          addressUpdateFragment.getGroupId().toInt(),
+          clusterId,
+          commandId,
+          null,
+          jsonString
+        )
+      } else {
+        InvokeElement.newInstance(endpointId, clusterId, commandId, null, jsonString)
+      }
     deviceController.invoke(
       invokeCallback,
-      ChipClient.getConnectedDevicePointer(requireContext(), addressUpdateFragment.deviceId),
+      addressUpdateFragment.getDevicePointer(requireContext()),
       invokeElement,
       timedRequestTimeoutMs,
       imTimeoutMs
