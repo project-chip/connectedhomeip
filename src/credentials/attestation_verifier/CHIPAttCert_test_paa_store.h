@@ -28,5 +28,5 @@ extern const ByteSpan sTestCert_PAA_NoVID_Cert;
 
 const Span<const ByteSpan> & GetTestPaaRootStore();
 
-}  // TestCerts
-}  // chip
+} // namespace TestCerts
+} // namespace chip

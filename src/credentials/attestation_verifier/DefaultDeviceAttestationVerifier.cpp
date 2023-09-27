@@ -270,9 +270,7 @@ constexpr std::array<MatterCDSigningKey, 6> gCdSigningKeys = { {
 
 struct TestAttestationTrustStore final : public ArrayAttestationTrustStore
 {
-    TestAttestationTrustStore() :
-        ArrayAttestationTrustStore(GetTestPaaRootStore().data(), GetTestPaaRootStore().size())
-    {}
+    TestAttestationTrustStore() : ArrayAttestationTrustStore(GetTestPaaRootStore().data(), GetTestPaaRootStore().size()) {}
 };
 Global<TestAttestationTrustStore> gTestAttestationTrustStore;
 

@@ -84,9 +84,10 @@ const Span<const ByteSpan> kTestAttestationTrustStoreRoots((const ByteSpan[]){
     sTestCert_PAA_NoVID_Cert,
 });
 
-const Span<const ByteSpan> & GetTestPaaRootStore() {
+const Span<const ByteSpan> & GetTestPaaRootStore()
+{
     return kTestAttestationTrustStoreRoots;
 }
 
-}  // TestCerts
-}  // chip
+} // namespace TestCerts
+} // namespace chip
