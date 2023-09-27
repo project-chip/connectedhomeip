@@ -93,6 +93,21 @@ public:
     }
 };
 
+template <class LayerImpl>
+class LayerEvents<LayerImpl, typename std::enable_if<std::is_base_of<LayerImplRTThread, LayerImpl>::value>::type>
+{
+public:
+    static bool HasServiceEvents() { return true; }
+    static void ServiceEvents(Layer & aLayer)
+    {
+        LayerImplRTThread & layer = static_cast<LayerImplRTThread &>(aLayer);
+        if (layer.IsInitialized())
+        {
+            layer.HandlePlatformTimer();
+        }
+    }
+};
+
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 // Test input vector format.

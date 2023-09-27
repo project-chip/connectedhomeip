@@ -61,6 +61,7 @@ using TimerCompleteCallback = void (*)(Layer * aLayer, void * appState);
  * The abstract class hierarchy is:
  * - Layer: Core timer methods.
  *   - LayerFreeRTOS: Adds methods specific to CHIP_SYSTEM_CONFIG_USING_LWIP and CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT.
+ *   - LayerRTThread: Adds methods specific to CHIP_SYSTEM_CONFIG_USING_LWIP and CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT.
  *   - LayerSockets: Adds I/O event methods specific to CHIP_SYSTEM_CONFIG_USING_SOCKETS.
  *     - LayerSocketsLoop: Adds methods for event-loop-based implementations.
  *
@@ -214,6 +215,10 @@ private:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
 
 class LayerFreeRTOS : public Layer
+{
+};
+
+class LayerRTThread : public Layer
 {
 };
 

@@ -18,12 +18,12 @@ import("${chip_root}/src/lwip/lwip.gni")
 
 declare_args() {
   # Use the lwIP library.
-  chip_system_config_use_lwip = chip_with_lwip && current_os == "freertos"
+  chip_system_config_use_lwip = (chip_with_lwip && current_os == "freertos") || (chip_with_lwip && current_os == "rtthread")
 
   # Use BSD/POSIX socket API.
-  chip_system_config_use_sockets = current_os != "freertos"
+  chip_system_config_use_sockets = (current_os != "freertos") || (current_os != "rtthread")
 
-  # Mutex implementation: posix, freertos, none.
+  # Mutex implementation: posix, freertos, rtthread, none.
   chip_system_config_locking = ""
 
   # Clock implementation: clock_gettime, gettimeofday
@@ -64,6 +64,8 @@ if (chip_system_config_locking == "") {
     chip_system_config_locking = "cmsis-rtos"
   } else if (current_os == "zephyr") {
     chip_system_config_locking = "zephyr"
+  } else if (current_os == "rtthread") {
+    chip_system_config_locking = "rtthread"
   } else if (chip_system_config_use_dispatch == false) {
     chip_system_config_locking = "posix"
   } else {
@@ -78,7 +80,8 @@ assert(
         chip_system_config_locking == "mbed" ||
         chip_system_config_locking == "cmsis-rtos" ||
         chip_system_config_locking == "zephyr",
-    "Please select a valid mutex implementation: posix, freertos, mbed, cmsis-rtos, zephyr, none")
+        chip_system_config_locking == "rtthread",
+    "Please select a valid mutex implementation: posix, freertos, mbed, cmsis-rtos, zephyr, rtthread, none")
 
 assert(
     chip_system_config_clock == "clock_gettime" ||

@@ -48,6 +48,10 @@
 #endif
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
+#if CHIP_SYSTEM_CONFIG_RTTHREAD_LOCKING
+#include <rtthread.h>
+#endif // CHIP_SYSTEM_CONFIG_RTTHREAD_LOCKING
+
 #if CHIP_SYSTEM_CONFIG_MBED_LOCKING
 #include <rtos/Mutex.h>
 #endif // CHIP_SYSTEM_CONFIG_MBED_LOCKING
@@ -136,6 +140,13 @@ private:
     volatile bool mInitialized                    = 0;
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
+#if CHIP_SYSTEM_CONFIG_RTTHREAD_LOCKING
+inline void Mutex::Unlock(void)
+{
+    rt_mutex_release(mRTThreadMutex);
+}
+#endif // CHIP_SYSTEM_CONFIG_RTTHREAD_LOCKING
+
 #if CHIP_SYSTEM_CONFIG_MBED_LOCKING
     rtos::Mutex mMbedMutex;
 #endif // CHIP_SYSTEM_CONFIG_MBED_LOCKING
@@ -198,6 +209,13 @@ inline void Mutex::Unlock(void)
     return mMbedMutex.unlock();
 }
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
+
+#if CHIP_SYSTEM_CONFIG_RTTHREAD_LOCKING
+inline void Mutex::Unlock(void)
+{
+    rt_mutex_release(mRTThreadMutex);
+}
+#endif // CHIP_SYSTEM_CONFIG_RTTHREAD_LOCKING
 
 #if CHIP_SYSTEM_CONFIG_ZEPHYR_LOCKING
 inline CHIP_ERROR Mutex::Init(Mutex & aMutex)

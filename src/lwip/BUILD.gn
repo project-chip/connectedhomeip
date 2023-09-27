@@ -23,7 +23,7 @@ import("${lwip_root}/lwip.gni")
 assert(chip_with_lwip)
 
 if (lwip_platform == "") {
-  if (current_os != "freertos") {
+  if (current_os != "freertos" || current_os != "rtthread") {
     lwip_platform = "standalone"
   }
 }
@@ -124,6 +124,7 @@ if (current_os == "zephyr" || current_os == "mbed") {
       "${qpg_sdk_root}/Components/ThirdParty/Lwip/lwipopts.h",
       "${qpg_sdk_root}/Components/ThirdParty/Lwip/lwippools.h",
       "freertos/arch/sys_arch.h",
+      "rtthread/arch/sys_arch.h",
     ]
     sources = [ "${qpg_sdk_root}/Components/ThirdParty/Lwip/sys_arch.c" ]
 
@@ -170,6 +171,9 @@ if (current_os == "zephyr" || current_os == "mbed") {
     if (lwip_platform != "standalone" && lwip_platform != "mbed") {
       include_dirs += [ "freertos" ]
     }
+    else if (lwip_platform != "standalone" && lwip_platform != "mbed") {
+      include_dirs += [ "rtthread" ]
+    }
   }
 
   lwip_target("lwip") {
@@ -186,6 +190,9 @@ if (current_os == "zephyr" || current_os == "mbed") {
       sources += [ "standalone/sys_arch.c" ]
     } else if (lwip_platform == "cyw30739") {
     } else if (lwip_platform == "mt793x") {
+    } else if(lwip_platform == "rtthread" ) {
+      public += [ "rtthread/arch/sys_arch.h" ]
+      sources += [ "rtthread/sys_arch.c" ]
     } else {
       public += [
         "${lwip_platform}/lwippools.h",

@@ -139,6 +139,47 @@ DLL_EXPORT void Mutex::Unlock(void)
 }
 #endif // CHIP_SYSTEM_CONFIG_CMSIS_RTOS_LOCKING
 
+#if CHIP_SYSTEM_CONFIG_RTTHREAD_LOCKING
+DLL_EXPORT CHIP_ERROR Mutex::Init(Mutex & aThis)
+{
+restart:
+    if (__sync_bool_compare_and_swap(&aThis.mInitialized, 0, 1))
+    {
+#if (configSUPPORT_STATIC_ALLOCATION == 1)
+        // Initialize RT-Thread mutex here
+        rt_mutex_init(aThis.mRTThreadMutex, "CHIPMutex", RT_IPC_FLAG_PRIO);
+#else
+        aThis.mRTThreadMutex = rt_mutex_create("CHIPMutex", RT_IPC_FLAG_PRIO);
+#endif
+        if (aThis.mRTThreadMutex != RT_EOK)
+        {
+            aThis.mInitialized = 0;
+
+            return CHIP_ERROR_NO_MEMORY;
+        }
+    }
+    else
+    {
+        while (aThis.mRTThreadMutex != RT_EOK)
+        {
+            rt_thread_mdelay(1);
+
+            if (aThis.mInitialized == 0)
+            {
+                goto restart;
+            }
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+DLL_EXPORT void Mutex::Lock(void)
+{
+    rt_mutex_take(mRTThreadMutex, RT_WAITING_FOREVER);
+}
+#endif // CHIP_SYSTEM_CONFIG_RTTHREAD_LOCKING
+
 } // namespace System
 } // namespace chip
 
