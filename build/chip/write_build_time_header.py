@@ -18,10 +18,10 @@ import os
 from datetime import datetime, timezone
 
 
-def utc_time_in_matter_epoch_s():
+def utc_time_in_matter_epoch_s(time: datetime):
     """ Returns the time in matter epoch in s. """
     # Matter epoch is 0 hours, 0 minutes, 0 seconds on Jan 1, 2000 UTC
-    utc_matter = datetime.now(tz=timezone.utc) - datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)
+    utc_matter = time - datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)
     return int(utc_matter.total_seconds())
 
 
@@ -33,17 +33,24 @@ class Options:
 
 
 def GetOptions():
+    fallback_lkgt = datetime(2023, 10, 3, 0, 0, 0, 0, timezone.utc)
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', help="Output header name (inside gen dir)")
     parser.add_argument('--gen-dir',
                         help="Path to root of generated file directory tree.")
+    parser.add_argument('--use-current-time', default=False, action='store_true',
+                        help="Set the LKGT to the current time. If this flag is not used, the LKGT is set to a hardcoded time.")
     cmdline_options = parser.parse_args()
 
     # The actual output file is inside the gen dir.
     output = os.path.join(cmdline_options.gen_dir, cmdline_options.output)
 
     define_name = 'CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME_MATTER_EPOCH_S'
-    build_time = utc_time_in_matter_epoch_s()
+    if cmdline_options.use_current_time:
+        build_time = utc_time_in_matter_epoch_s(datetime.now(tz=timezone.utc))
+    else:
+        build_time = utc_time_in_matter_epoch_s(fallback_lkgt)
 
     return Options(output=output,
                    define_name=define_name,
