@@ -72,8 +72,8 @@ Next, you're ready to:
 The Casting Client is expected to consume the Matter TV Casting library built
 for its respective platform which implements the APIs described in this
 document. Refer to the tv-casting-app READMEs for [Linux](linux/README.md),
-[Android](android/README.md) and [iOS](darwin/TvCasting/README.md) to understand
-how to build and consume each platform's specific libraries.
+Android and [iOS](darwin/TvCasting/README.md) to understand how to build and
+consume each platform's specific libraries.
 
 ### Initialize the Casting Client
 
