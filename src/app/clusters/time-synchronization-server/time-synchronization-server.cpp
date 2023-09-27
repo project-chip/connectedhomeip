@@ -589,20 +589,14 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
         tzStore.timeZone.validAt = newTz.validAt;
         if (newTz.name.HasValue() && newTz.name.Value().size() > 0)
         {
-            size_t len = newTz.name.Value().size();
-            if (len > sizeof(tzStore.name))
-            {
-                LoadTimeZone();
-                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-            }
             memset(tzStore.name, 0, sizeof(tzStore.name));
-            chip::MutableCharSpan tempSpan(tzStore.name, len);
+            chip::MutableCharSpan tempSpan(tzStore.name);
             if (CHIP_NO_ERROR != CopyCharSpanToMutableCharSpan(newTz.name.Value(), tempSpan))
             {
                 LoadTimeZone();
                 return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
             }
-            tzStore.timeZone.name.SetValue(CharSpan(tzStore.name, len));
+            tzStore.timeZone.name.SetValue(tempSpan);
         }
         else
         {
