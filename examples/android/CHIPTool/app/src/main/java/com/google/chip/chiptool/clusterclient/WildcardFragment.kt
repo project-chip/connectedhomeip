@@ -305,7 +305,12 @@ class WildcardFragment : Fragment() {
     timedRequestTimeoutMs: Int,
     imTimeoutMs: Int
   ) {
-    val endpointId = getChipPathIdForText(binding.endpointIdEd.text.toString())
+    val endpointId =
+      if (!addressUpdateFragment.isGroupId()) {
+        getChipPathIdForText(binding.endpointIdEd.text.toString())
+      } else {
+        null
+      }
     val clusterId = getChipPathIdForText(binding.clusterIdEd.text.toString())
     val attributeId = getChipPathIdForText(binding.attributeIdEd.text.toString())
 
