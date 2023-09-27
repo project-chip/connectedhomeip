@@ -213,6 +213,8 @@ MTR_DIRECT_MEMBERS
 
 - (void)_postProcessWorkItem:(MTRAsyncWorkItem *)workItem retry:(BOOL)retry
 {
+    os_unfair_lock_assert_owner(&_lock);
+
     MTRAsyncWorkItem * runningWorkItem = (_runningWorkItemCount) ? _items.firstObject : nil;
     if (workItem != runningWorkItem) {
         NSAssert(NO, @"work item to post-process is not running");
@@ -230,9 +232,10 @@ MTR_DIRECT_MEMBERS
     [self _callNextReadyWorkItem];
 }
 
-// assume lock is held while calling this
 - (void)_callNextReadyWorkItem
 {
+    os_unfair_lock_assert_owner(&_lock);
+
     // when "concurrency width" is implemented this will be checked against the width
     if (_runningWorkItemCount) {
         return; // can't run next work item until the current one is done

@@ -44,7 +44,8 @@ typedef BOOL (^MTRAsyncWorkCompletionBlock)(MTRAsyncWorkOutcome outcome);
 ///
 /// The handler will be passed the opaque data of the two work items:
 /// `opaqueDataCurrent` is the data of the item about to be executed and
-/// `opaqueDataNext` is the data for the next item.
+/// `opaqueDataNext` is the data for the next item. The `fullyMerged` parameter
+/// will be initialized to NO by the caller.
 ///
 /// The handler is expected to mutate the data as needed to achieve batching.
 ///
@@ -64,7 +65,8 @@ typedef void (^MTRAsyncWorkBatchingHandler)(id opaqueDataCurrent, id opaqueDataN
 /// Duplicate checking is performed in reverse queue order, i.e. more
 /// recently enqueued items will be checked first.
 ///
-/// The handler will be passed the opaque data of the candidate work item.
+/// The handler will be passed the opaque data of the candidate work item. The
+/// `stop` and `isDuplicate` parameters will be initialized to NO by the caller.
 ///
 /// If the handler determines the data is indeed duplicate work, it should
 /// set `stop` to YES, and set `isDuplicate` to YES.
