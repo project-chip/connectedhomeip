@@ -35,6 +35,8 @@ MTR_DIRECT_MEMBERS
     MTRAsyncWorkItemState _state; // protected by queue lock once enqueued
 }
 
+#pragma mark Configuration by the client
+
 - (instancetype)initWithQueue:(dispatch_queue_t)queue
 {
     NSParameterAssert(queue);
@@ -43,11 +45,6 @@ MTR_DIRECT_MEMBERS
         _state = MTRAsyncWorkItemMutable;
     }
     return self;
-}
-
-- (void)assertMutable
-{
-    NSAssert(_state == MTRAsyncWorkItemMutable, @"work item is not mutable (%ld)", (long) _state);
 }
 
 - (void)setReadyHandler:(void (^)(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion))readyHandler
@@ -62,7 +59,31 @@ MTR_DIRECT_MEMBERS
     _cancelHandler = cancelHandler;
 }
 
-- (void)markedEnqueued
+- (void)setBatchingID:(NSUInteger)opaqueBatchingID data:(id)opaqueBatchableData handler:(MTRAsyncWorkBatchingHandler)batchingHandler
+{
+    NSParameterAssert(batchingHandler);
+    [self assertMutable];
+    _batchingID = opaqueBatchingID;
+    _batchableData = opaqueBatchableData;
+    _batchingHandler = batchingHandler;
+}
+
+- (void)setDuplicateTypeID:(NSUInteger)opaqueDuplicateTypeID handler:(MTRAsyncWorkDuplicateCheckHandler)duplicateCheckHandler
+{
+    NSParameterAssert(duplicateCheckHandler);
+    [self assertMutable];
+    _duplicateTypeID = opaqueDuplicateTypeID;
+    _duplicateCheckHandler = duplicateCheckHandler;
+}
+
+- (void)assertMutable
+{
+    NSAssert(_state == MTRAsyncWorkItemMutable, @"work item is not mutable (%ld)", (long) _state);
+}
+
+#pragma mark Management by the work queue (queue lock held)
+
+- (void)markEnqueued
 {
     [self assertMutable];
     _state = MTRAsyncWorkItemEnqueued;
@@ -82,6 +103,7 @@ MTR_DIRECT_MEMBERS
 
 - (void)callReadyHandlerWithContext:(id)context completion:(MTRAsyncWorkCompletionBlock)completion
 {
+    //
     NSAssert(_state >= MTRAsyncWorkItemEnqueued, @"work item is not enqueued (%ld)", (long) _state);
     NSInteger retryCount = 0;
     if (_state == MTRAsyncWorkItemEnqueued) {
@@ -105,6 +127,22 @@ MTR_DIRECT_MEMBERS
     });
 }
 
+- (void)cancel
+{
+    if (_state != MTRAsyncWorkItemComplete) {
+        auto cancelHandler = _cancelHandler;
+        [self markComplete];
+        if (cancelHandler) {
+            // Note that if the work item was running it may call the work
+            // completion handler before the cancel handler actually runs,
+            // however in this case the work completion handler will return
+            // NO, giving the work code the ability to deal with this race if
+            // necessary.
+            dispatch_async(_queue, cancelHandler);
+        }
+    }
+}
+
 - (BOOL)isComplete
 {
     return _state == MTRAsyncWorkItemComplete;
@@ -114,36 +152,12 @@ MTR_DIRECT_MEMBERS
 {
     NSAssert(_state >= MTRAsyncWorkItemEnqueued, @"work item was not enqueued (%ld)", (long) _state);
     _state = MTRAsyncWorkItemComplete;
-}
 
-- (void)cancel
-{
-    if (_state != MTRAsyncWorkItemComplete) {
-        _state = MTRAsyncWorkItemComplete;
-        auto cancelHandler = _cancelHandler;
-        if (cancelHandler) {
-            // Note that this does not prevent a race against
-            // the readyHandler calling the work completion.
-            dispatch_async(_queue, cancelHandler);
-        }
-    }
-}
-
-- (void)setBatchingID:(NSUInteger)opaqueBatchingID data:(id)opaqueBatchableData handler:(MTRAsyncWorkBatchingHandler)batchingHandler
-{
-    NSParameterAssert(batchingHandler);
-    [self assertMutable];
-    _batchingID = opaqueBatchingID;
-    _batchableData = opaqueBatchableData;
-    _batchingHandler = batchingHandler;
-}
-
-- (void)setDuplicateTypeID:(NSUInteger)opaqueDuplicateTypeID handler:(MTRAsyncWorkDuplicateCheckHandler)duplicateCheckHandler
-{
-    NSParameterAssert(duplicateCheckHandler);
-    [self assertMutable];
-    _duplicateTypeID = opaqueDuplicateTypeID;
-    _duplicateCheckHandler = duplicateCheckHandler;
+    // Clear all handlers in case any of them captured this object.
+    _readyHandler = nil;
+    _cancelHandler = nil;
+    _batchingHandler = nil;
+    _duplicateCheckHandler = nil;
 }
 
 @end
@@ -178,9 +192,9 @@ MTR_DIRECT_MEMBERS
 {
     NSParameterAssert(item);
     NSAssert(_context, @"context has been lost");
-    [item markedEnqueued];
 
     os_unfair_lock_lock(&_lock);
+    [item markEnqueued];
     [_items addObject:item];
     [self _callNextReadyWorkItem];
     os_unfair_lock_unlock(&_lock);

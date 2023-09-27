@@ -58,7 +58,7 @@
         XCTAssertNil(weakItem);
     }];
 
-    [self waitForExpectationsWithTimeout:0.5 handler:nil];
+    [self waitForExpectationsWithTimeout:1 handler:nil];
 
     // see that it only ran once
     XCTAssertEqual(counter, 1);

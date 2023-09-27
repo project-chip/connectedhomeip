@@ -33,8 +33,8 @@ typedef BOOL (^MTRAsyncWorkCompletionBlock)(MTRAsyncWorkOutcome outcome);
 /// An optional handler that controls batching of MTRAsyncWorkItem.
 ///
 /// When a work item is dequeued to run, if it is of a type that can be
-/// combined with similar work items in a batch, this facility gives the
-/// provides an opportunity to coalesce and merge work items.
+/// combined with similar work items in a batch, this facility provides an
+/// opportunity to coalesce and merge work items.
 ///
 /// The batching handler is called by the work queue when all of the following
 /// are true:
@@ -84,9 +84,9 @@ typedef void (^MTRAsyncWorkDuplicateCheckHandler)(id opaqueItemData, BOOL * isDu
 /// async work queue in various situations. Generally work items will have at
 /// least a `readyHandler` (though it is technically optional).
 ///
-/// This class is not thread-safe, and once a work item has be submitted to the
-/// queue via `enqueueWorkItem` ownership of the work item passes to the queue.
-/// No further modifications may be made to it after that point.
+/// This class is not thread-safe, and once a work item has been submitted to
+/// the queue via `enqueueWorkItem` ownership of the work item passes to the
+/// queue. No further modifications may be made to it after that point.
 ///
 /// @see -[MTRAsyncWorkQueue enqueueWorkItem:]
 MTR_TESTABLE
@@ -120,8 +120,8 @@ MTR_TESTABLE
 @property (nonatomic, strong, nullable) void (^cancelHandler)(void);
 
 @property (nonatomic, readonly) NSUInteger batchingID;
-@property (nonatomic, readonly) id batchableData;
-@property (nonatomic, readonly) MTRAsyncWorkBatchingHandler batchingHandler;
+@property (nonatomic, readonly, nullable) id batchableData;
+@property (nonatomic, readonly, nullable) MTRAsyncWorkBatchingHandler batchingHandler;
 
 /// Sets the batching handler and associated data for this work item.
 ///
@@ -134,7 +134,7 @@ MTR_TESTABLE
               handler:(MTRAsyncWorkBatchingHandler)batchingHandler;
 
 @property (nonatomic, readonly) NSUInteger duplicateTypeID;
-@property (nonatomic, readonly) MTRAsyncWorkDuplicateCheckHandler duplicateCheckHandler;
+@property (nonatomic, readonly, nullable) MTRAsyncWorkDuplicateCheckHandler duplicateCheckHandler;
 
 /// Sets the duplicate check type and handler for this work item.
 ///
