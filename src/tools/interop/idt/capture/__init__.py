@@ -17,7 +17,7 @@
 
 from capture import ecosystem, platform
 
-from .factory import EcosystemFactory, PlatformFactory, EcosystemCapture, PlatformLogStreamer, EcosystemController
+from .factory import EcosystemCapture, EcosystemController, EcosystemFactory, PlatformFactory, PlatformLogStreamer
 from .pcap import PacketCaptureRunner
 
 __all__ = [
