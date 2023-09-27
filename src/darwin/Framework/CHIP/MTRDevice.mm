@@ -246,6 +246,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)invalidate
 {
     MTR_LOG_INFO("%@ invalidate", self);
+
+    [_asyncWorkQueue invalidate];
+
     os_unfair_lock_lock(&self->_lock);
 
     _weakDelegate = nil;
