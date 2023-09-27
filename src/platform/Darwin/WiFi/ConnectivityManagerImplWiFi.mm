@@ -39,7 +39,7 @@ CWInterface * GetDefaultWiFiInterface()
 
     return interface;
 }
-}
+} // namespace
 
 namespace chip {
 namespace DeviceLayer {
@@ -108,5 +108,5 @@ namespace DeviceLayer {
         return CHIP_NO_ERROR;
     }
 
-}
-}
+} // namespace DeviceLayer
+} // namespace chip

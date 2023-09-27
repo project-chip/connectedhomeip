@@ -273,8 +273,7 @@ private:
 
         auto strongDelegate = mDelegate;
         dispatch_async(mDelegateNotificationQueue, ^{
-            if ([strongDelegate respondsToSelector:@selector
-                                (handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:)]) {
+            if ([strongDelegate respondsToSelector:@selector(handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:)]) {
                 [strongDelegate handleBDXTransferSessionBeginForNodeID:nodeId
                                                             controller:controller
                                                         fileDesignator:fileDesignator
@@ -380,8 +379,7 @@ private:
 
         auto strongDelegate = mDelegate;
         dispatch_async(mDelegateNotificationQueue, ^{
-            if ([strongDelegate respondsToSelector:@selector
-                                (handleBDXQueryForNodeID:controller:blockSize:blockIndex:bytesToSkip:completion:)]) {
+            if ([strongDelegate respondsToSelector:@selector(handleBDXQueryForNodeID:controller:blockSize:blockIndex:bytesToSkip:completion:)]) {
                 [strongDelegate handleBDXQueryForNodeID:nodeId
                                              controller:controller
                                               blockSize:blockSize
