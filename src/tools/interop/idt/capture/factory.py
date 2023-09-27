@@ -14,25 +14,31 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+
 import asyncio
+import copy
 import os
 import traceback
 import typing
-from asyncio import get_running_loop
 
 import capture
 from capture.base import EcosystemCapture, PlatformLogStreamer, UnsupportedCapturePlatformException
 from capture.file_utils import border_print, safe_mkdir
 
+_CONFIG_TIMEOUT = 45.0
 _PLATFORM_MAP: typing.Dict[str, PlatformLogStreamer] = {}
 _ECOSYSTEM_MAP: typing.Dict[str, PlatformLogStreamer] = {}
 
 
-class CapturePlatforms:
+def _get_timeout():
+    return asyncio.get_running_loop().time() + _CONFIG_TIMEOUT
+
+
+class PlatformFactory:
 
     @staticmethod
     def list_available_platforms() -> typing.List[str]:
-        return capture.platform.__all__
+        return copy.deepcopy(capture.platform.__all__)
 
     @staticmethod
     def get_platform_impl(
@@ -48,11 +54,11 @@ class CapturePlatforms:
         return platform_inst
 
 
-class CaptureEcosystems:
+class EcosystemFactory:
 
     @staticmethod
     def list_available_ecosystems() -> typing.List[str]:
-        return capture.ecosystem.__all__
+        return copy.deepcopy(capture.ecosystem.__all__)
 
     @staticmethod
     async def get_ecosystem_impl(
@@ -64,52 +70,55 @@ class CaptureEcosystems:
         ecosystem_class = getattr(capture.ecosystem, ecosystem)
         ecosystem_artifact_dir = os.path.join(artifact_dir, ecosystem)
         safe_mkdir(ecosystem_artifact_dir)
-        platform_instance = CapturePlatforms.get_platform_impl(
+        platform_instance = PlatformFactory.get_platform_impl(
             platform, artifact_dir)
         ecosystem_instance = ecosystem_class(platform_instance, ecosystem_artifact_dir)
         _ECOSYSTEM_MAP[ecosystem] = ecosystem_instance
         return ecosystem_instance
 
-
-async def init_ecosystems(platform, ecosystem, artifact_dir):
-    ecosystems_to_load = CaptureEcosystems.list_available_ecosystems() \
-        if ecosystem == 'ALL' \
-        else [ecosystem]
-    for ecosystem in ecosystems_to_load:
-        try:
-            async with asyncio.timeout(30):
-                await CaptureEcosystems.get_ecosystem_impl(
-                    ecosystem, platform, artifact_dir)
-        except UnsupportedCapturePlatformException:
-            print(f"ERROR unsupported platform {ecosystem} {platform}")
-        except TimeoutError:
-            print(f"ERROR timeout starting ecosystem {ecosystem} {platform}")
-        except Exception:
-            print("ERROR unknown error instantiating ecosystem")
-            print(traceback.format_exc())
-
-
-async def handle_capture(attr):
-    for ecosystem in _ECOSYSTEM_MAP:
-        try:
-            border_print(f"{attr} capture for {ecosystem}")
-            async with asyncio.timeout(get_running_loop().time() + 60):
-                await getattr(_ECOSYSTEM_MAP[ecosystem], attr)()
-        except TimeoutError:
-            print(f"ERROR timeout {attr} {ecosystem}")
-        except Exception:
-            print(f"ERROR unexpected error {attr} {ecosystem}")
-            print(traceback.format_exc())
+    @staticmethod
+    async def init_ecosystems(platform, ecosystem, artifact_dir):
+        ecosystems_to_load = EcosystemFactory.list_available_ecosystems() \
+            if ecosystem == 'ALL' \
+            else [ecosystem]
+        for ecosystem in ecosystems_to_load:
+            try:
+                async with asyncio.timeout_at(_get_timeout()):
+                    await EcosystemFactory.get_ecosystem_impl(
+                        ecosystem, platform, artifact_dir)
+            except UnsupportedCapturePlatformException:
+                print(f"ERROR unsupported platform {ecosystem} {platform}")
+            except TimeoutError:
+                print(f"ERROR timeout starting ecosystem {ecosystem} {platform}")
+            except Exception:
+                print("ERROR unknown error instantiating ecosystem")
+                print(traceback.format_exc())
 
 
-async def start_captures():
-    await handle_capture("start_capture")
+class EcosystemController:
 
+    @staticmethod
+    async def handle_capture(attr):
+        attr = f"{attr}_capture"
+        for ecosystem in _ECOSYSTEM_MAP:
+            try:
+                border_print(f"{attr} capture for {ecosystem}")
+                async with asyncio.timeout_at(_get_timeout()):
+                    await getattr(_ECOSYSTEM_MAP[ecosystem], attr)()
+            except TimeoutError:
+                print(f"ERROR timeout {attr} {ecosystem}")
+            except Exception:
+                print(f"ERROR unexpected error {attr} {ecosystem}")
+                print(traceback.format_exc())
 
-async def stop_captures():
-    await handle_capture("stop_capture")
+    @staticmethod
+    async def start():
+        await EcosystemController.handle_capture("start")
 
+    @staticmethod
+    async def stop():
+        await EcosystemController.handle_capture("stop")
 
-async def analyze_captures():
-    # TODO: Enable realtime but keep this post capture analysis step
-    await handle_capture("analyze_capture")
+    @staticmethod
+    async def analyze():
+        await EcosystemController.handle_capture("analyze")

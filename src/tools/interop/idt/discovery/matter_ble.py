@@ -46,7 +46,6 @@ class MatterBleScanner:
 
     def write_device_log(self, device_name: str, to_write: str) -> None:
         log_file_name = os.path.join(self.artifact_dir, f"{device_name}.txt")
-        # TODO: Don't call open every time
         with open(log_file_name, "a+") as log_file:
             ts = datetime.datetime.now().isoformat(sep=' ', timespec='milliseconds')
             to_write = f"{ts}\n{to_write}\n\n"
@@ -71,7 +70,6 @@ class MatterBleScanner:
             bin_data: bytes,
             ble_device: BLEDevice,
             rssi: int) -> None:
-        # TODO: Log discriminator
         loggable_data = bin_data.hex()
         if self.is_matter_device(name):
             device_id = f"{ble_device.name}_{ble_device.address}"
@@ -94,8 +92,6 @@ class MatterBleScanner:
         self.handle_device_states()
 
     def browse_interactive(self) -> None:
-        # TODO: "Client tried to send a message other than Hello..." when run
-        # for extended periods
         scanner = BleakScanner()
         self.logger.warning(
             "Scanning BLE\nDCL Lookup: https://webui.dcl.csa-iot.org/")

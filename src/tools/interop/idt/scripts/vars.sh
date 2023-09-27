@@ -15,5 +15,5 @@
 #    limitations under the License.
 #
 
-export PIHOST="kali-raspberry-pi"
-export PIUSER="kali"
+export PIHOST="pi-host"
+export PIUSER="pi-user"

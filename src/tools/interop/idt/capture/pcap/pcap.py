@@ -19,7 +19,7 @@ import os
 import time
 
 from capture.file_utils import create_standard_log_name
-from capture.shell_utils import BashRunner
+from capture.shell_utils import Bash
 
 
 class PacketCaptureRunner:
@@ -36,7 +36,7 @@ class PacketCaptureRunner:
         self.start_delay_seconds = 2
         self.interface = interface
         self.pcap_command = f"tcpdump -i {self.interface} -n -w {self.output_path}"
-        self.pcap_proc = BashRunner(self.pcap_command)
+        self.pcap_proc = Bash(self.pcap_command)
 
     def start_pcap(self) -> None:
         self.pcap_proc.start_command()
@@ -45,18 +45,17 @@ class PacketCaptureRunner:
         if not self.pcap_proc.command_is_running():
             print(
                 "Pcap did not start, you might need root; please authorize if prompted.")
-            BashRunner("sudo echo \"\"", sync=True)
+            Bash("sudo echo \"\"", sync=True)
             print("Retrying pcap with sudo...")
             self.pcap_command = f"sudo {self.pcap_command}"
-            self.pcap_proc = BashRunner(self.pcap_command)
+            self.pcap_proc = Bash(self.pcap_command)
             self.pcap_proc.start_command()
             time.sleep(self.start_delay_seconds)
         if not self.pcap_proc.command_is_running():
             print("WARNING Failed to start pcap!")
         else:
-            print(f"Pcap started, output in {self.output_path}")
+            print(f"Pcap output path {self.output_path}")
 
     def stop_pcap(self) -> None:
-        # TODO: Automated analysis
         self.pcap_proc.stop_command(soft=True)
         print("Pcap stopped")

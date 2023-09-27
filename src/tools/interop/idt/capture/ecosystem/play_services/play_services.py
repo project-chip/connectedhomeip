@@ -24,7 +24,7 @@ from capture.file_utils import create_standard_log_name
 from capture.platform.android import Android
 
 from .analysis import PlayServicesAnalysis
-from .command_map import dumpsys, props
+from .command_map import dumpsys, getprop
 
 
 class PlayServices(EcosystemCapture):
@@ -65,7 +65,7 @@ class PlayServices(EcosystemCapture):
             "shell getprop",
             capture_output=True).get_captured_output()
         for output in get_prop.split("\n"):
-            for prop in props:
+            for prop in getprop:
                 if prop in output:
                     self.standard_info_data[prop] = output[output.rindex("["):]
 

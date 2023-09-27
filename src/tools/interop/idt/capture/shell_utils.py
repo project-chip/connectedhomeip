@@ -21,7 +21,7 @@ import subprocess
 from mobly.utils import stop_standing_subprocess
 
 
-class BashRunner:
+class Bash:
     """
     Uses subprocess to execute bash commands
     Intended to be instantiated and then only interacted with through instance methods
@@ -49,7 +49,6 @@ class BashRunner:
         self.args = shlex.split(f'/bin/bash -c "{command_escaped}"')
 
     def command_is_running(self) -> bool:
-        """Check if subproc is still running"""
         return self.proc is not None and self.proc.poll() is None
 
     def get_captured_output(self) -> str:
@@ -61,10 +60,9 @@ class BashRunner:
         if not self.sync and not self.command_is_running():
             self.proc = subprocess.Popen(self.args)
         else:
-            print(f'WARNING {self.command} start requested while running')
+            print(f'INFO {self.command} start requested while running')
 
     def stop_command(self, soft: bool = False) -> None:
-        # TODO: Make this uniform
         if self.command_is_running():
             if soft:
                 self.proc.terminate()
@@ -76,5 +74,5 @@ class BashRunner:
             else:
                 stop_standing_subprocess(self.proc)
         else:
-            print(f'WARNING {self.command} stop requested while not running')
+            print(f'INFO {self.command} stop requested while not running')
         self.proc = None

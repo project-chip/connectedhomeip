@@ -23,13 +23,10 @@ import shutil
 import sys
 from pathlib import Path
 
-from capture import CaptureEcosystems, CapturePlatforms, PacketCaptureRunner
-from capture.factory import analyze_captures, init_ecosystems, start_captures, stop_captures
+from capture import EcosystemController, EcosystemFactory, PacketCaptureRunner, PlatformFactory
 from capture.file_utils import border_print, create_file_timestamp, safe_mkdir
-from discovery.matter_ble import MatterBleScanner
-from discovery.matter_dnssd import MatterDnssdListener
+from discovery import MatterBleScanner, MatterDnssdListener
 
-# TODO argument for log level
 logging.basicConfig(
     format='%(asctime)s.%(msecs)03d %(levelname)s {%(module)s} [%(funcName)s]\n%(message)s \n',
     level=logging.INFO)
@@ -63,11 +60,11 @@ class InteropDebuggingTool:
             safe_mkdir(self.artifact_dir)
             border_print(f"Using artifact dir {self.artifact_dir}")
 
-        self.available_platforms = CapturePlatforms.list_available_platforms()
+        self.available_platforms = PlatformFactory.list_available_platforms()
         self.available_platforms_default = 'Android' if 'Android' in self.available_platforms else None
         self.platform_required = self.available_platforms_default is None
 
-        self.available_ecosystems = CaptureEcosystems.list_available_ecosystems()
+        self.available_ecosystems = EcosystemFactory.list_available_ecosystems()
         self.available_ecosystems_default = 'ALL'
         self.available_ecosystems.append(self.available_ecosystems_default)
 
@@ -120,7 +117,6 @@ class InteropDebuggingTool:
                                     choices=self.available_platforms,
                                     default=self.available_platforms_default)
 
-        # TODO: Ability for each ecosystem to specify its own custom arguments
         capture_parser.add_argument(
             "--ecosystem",
             "-e",
@@ -172,9 +168,7 @@ class InteropDebuggingTool:
         print(f'Output zip: {output_zip}')
 
     def command_capture(self, args: argparse.Namespace) -> None:
-        self.available_ecosystems.remove('ALL')
-        asyncio.run(init_ecosystems(args.platform, args.ecosystem, self.artifact_dir))
-        asyncio.run(start_captures())
+
         pcap = args.pcap == 't'
         pcap_runner = None if not pcap else PacketCaptureRunner(
             self.pcap_artifact_dir, args.interface)
@@ -183,14 +177,20 @@ class InteropDebuggingTool:
             safe_mkdir(self.pcap_artifact_dir)
             pcap_runner.start_pcap()
 
-        # TODO: Non blocking e.g. select.select([sys.stdin], [], [], 5)
-        border_print("Press enter to stop streaming", important=True)
+        asyncio.run(EcosystemFactory.init_ecosystems(args.platform,
+                                                     args.ecosystem,
+                                                     self.artifact_dir))
+        asyncio.run(EcosystemController.start())
+
+        border_print("Press enter twice to stop streaming", important=True)
         input("")
 
         if pcap:
             border_print("Stopping pcap")
             pcap_runner.stop_pcap()
-        asyncio.run(stop_captures())
-        asyncio.run(analyze_captures())
+
+        asyncio.run(EcosystemController.stop())
+        asyncio.run(EcosystemController.analyze())
+
         border_print("Compressing artifacts, this may take some time!")
         self.zip_artifacts()

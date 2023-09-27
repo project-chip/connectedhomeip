@@ -14,16 +14,15 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
+
 import asyncio
 import ipaddress
 import os
-import time
 import typing
-from asyncio import get_running_loop
 
 from capture.base import PlatformLogStreamer
 from capture.file_utils import create_standard_log_name
-from capture.shell_utils import BashRunner
+from capture.shell_utils import Bash
 
 
 class Android(PlatformLogStreamer):
@@ -39,45 +38,41 @@ class Android(PlatformLogStreamer):
         self.artifact_dir = artifact_dir
 
         self.device_id: str | None = None
-        self.adb_devices: typing.Dict[str, bool] | None = None
+        self.adb_devices: typing.Dict[str, bool] = {}
         self._authorize_adb()
 
-        # TODO: Set a larger buffer size
-        # TODO: More efficient buffer for analysis than the file
         self.logcat_output_path = os.path.join(
             self.artifact_dir, create_standard_log_name(
                 'logcat', 'txt'))
         self.logcat_command = f'adb -s {self.device_id} logcat -T 1 >> {self.logcat_output_path}'
-        self.logcat_proc = BashRunner(self.logcat_command)
-
-        # TODO: BT Logs
+        self.logcat_proc = Bash(self.logcat_command)
 
         screen_cast_name = create_standard_log_name('screencast', 'mp4')
         self.screen_cap_output_path = os.path.join(
             self.artifact_dir, screen_cast_name)
         self.check_screen_command = "shell dumpsys deviceidle | grep mScreenOn"
         self.screen_path = f'/sdcard/Movies/{screen_cast_name}'
-        self.screen_command = f'adb -s {self.device_id} shell screenrecord {self.screen_path}'
-        self.screen_proc = BashRunner(self.screen_command)
-        self.screen_recording_already_pulled = False
+        self.screen_command = f'adb -s {self.device_id} shell screenrecord --bugreport {self.screen_path}'
+        self.screen_proc = Bash(self.screen_command)
+        self.pull_screen = False
         self.screen_pull_command = f'pull {self.screen_path} {self.screen_cap_output_path}'
 
     def run_adb_command(
             self,
             command: str,
-            capture_output: bool = False) -> BashRunner:
+            capture_output: bool = False) -> Bash:
         """
         Run an adb command synchronously
         Capture_output must be true to call get_captured_output() later
         """
-        return BashRunner(
+        return Bash(
             f'adb -s {self.device_id} {command}',
             sync=True,
             capture_output=capture_output)
 
     def get_adb_devices(self) -> typing.Dict[str, bool]:
         """Returns a dict of device ids and whether they are authorized"""
-        adb_devices = BashRunner('adb devices', sync=True, capture_output=True)
+        adb_devices = Bash('adb devices', sync=True, capture_output=True)
         adb_devices_output = adb_devices.get_captured_output().split('\n')
         devices_auth = {}
         header_done = False
@@ -89,7 +84,7 @@ class Android(PlatformLogStreamer):
                 if line_parsed[1] == "offline":
                     disconnect_command = f"adb disconnect {device_id}"
                     print(f"Device {device_id} is offline, trying disconnect!")
-                    BashRunner(
+                    Bash(
                         disconnect_command,
                         sync=True,
                         capture_output=False)
@@ -141,7 +136,7 @@ class Android(PlatformLogStreamer):
             connect_command = f"adb connect {temp_device_id}"
             print(
                 f"Detected connection string; attempting to connect: {connect_command}")
-            BashRunner(connect_command, sync=True, capture_output=False)
+            Bash(connect_command, sync=True, capture_output=False)
             self.get_adb_devices()
 
     def _device_id_user_input(self) -> None:
@@ -186,38 +181,37 @@ class Android(PlatformLogStreamer):
 
     async def prepare_screen_recording(self) -> None:
         if self.screen_proc.command_is_running():
-            return True
+            return
         try:
-            async with asyncio.timeout_at(get_running_loop().time() + 30.0):
+            async with asyncio.timeout_at(asyncio.get_running_loop().time() + 20.0):
                 screen_on = self.check_screen()
                 print("Please turn the screen on so screen recording can start!")
                 while not screen_on:
-                    await asyncio.sleep(5)
+                    await asyncio.sleep(2)
                     screen_on = self.check_screen()
                     if not screen_on:
                         print("Screen is still not on for recording!")
-                self.screen_recording_already_pulled = False
         except TimeoutError:
             print("WARNING screen recording timeout")
             return
 
     async def start_streaming(self) -> None:
         await self.prepare_screen_recording()
-        self.screen_proc.start_command()
+        if self.check_screen():
+            self.pull_screen = True
+            self.screen_proc.start_command()
         self.logcat_proc.start_command()
 
-    def pull_screen_recording(self) -> None:
-        self.run_adb_command(self.screen_pull_command)
+    async def pull_screen_recording(self) -> None:
+        if self.pull_screen:
+            self.screen_proc.stop_command()
+            print("screen proc stopped")
+            await asyncio.sleep(3)
+            self.run_adb_command(self.screen_pull_command)
+            print("screen recording pull attempted")
+            self.pull_screen = False
 
     async def stop_streaming(self) -> None:
-        self.screen_proc.stop_command()
-        print("screen proc stopped")
-        if not self.screen_recording_already_pulled:
-            # TODO: Make more robust
-            print("Pausing to pull screen cap...")
-            time.sleep(3)
-            self.pull_screen_recording()
-            self.screen_recording_already_pulled = True
-            print("screen proc pull attempted")
+        await self.pull_screen_recording()
         self.logcat_proc.stop_command()
         print("logcat stopped")

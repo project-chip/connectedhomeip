@@ -15,8 +15,7 @@
 #    limitations under the License.
 #
 
-# adb shell getprop
-props = {
+getprop = {
     'ro.product.model':               'android_model',
     'ro.build.version.release':       'android_version',
     'ro.build.version.sdk':           'android_api',
@@ -26,16 +25,15 @@ props = {
     'ro.ecosystem.build.fingerprint': 'vendor_build_fingerprint',
 }
 
-# adb shell dumpsys
 _ap = 'activity provider com.google.android.gms.chimera.container.GmsModuleProvider'
 dumpsys = {
     'display_width': 'display | grep StableDisplayWidth | awk -F\'=\' \'{print $2}\'',
     'display_height': 'display | grep StableDisplayHeight | awk -F\'=\' \'{print $2}\'',
+    'gha_info': ' package com.google.android.apps.chromecast.app | grep versionName',
     'container_info': 'package com.google.android.gms | grep "versionName"',
     'home_module_info': f'{_ap} | grep "com.google.android.gms.home" | grep -v graph',
     'optional_home_module_info': f'{_ap} | grep "com.google.android.gms.optional_home" | grep -v graph',
     'policy_home_module_info': f'{_ap} | grep "com.google.android.gms.policy_home" | grep -v graph',
     'thread_info': f'{_ap} | grep "com.google.android.gms.threadnetwork"',
     'mdns_info': f'{_ap} | grep -i com.google.android.gms.mdns',
-    'gha_info': ' package com.google.android.apps.chromecast.app | grep versionName',
 }

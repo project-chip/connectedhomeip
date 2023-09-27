@@ -16,18 +16,17 @@
 #
 
 from capture import ecosystem, platform
-from capture.pcap import PacketCaptureRunner
 
-from .factory import CaptureEcosystems, CapturePlatforms, EcosystemCapture, PlatformLogStreamer
-from .shell_utils import BashRunner
+from .factory import EcosystemFactory, PlatformFactory, EcosystemCapture, PlatformLogStreamer, EcosystemController
+from .pcap import PacketCaptureRunner
 
 __all__ = [
-    'BashRunner',
-    'CaptureEcosystems',
-    'CapturePlatforms',
-    'EcosystemCapture',
-    'PacketCaptureRunner',
-    'PlatformLogStreamer',
     'ecosystem',
     'platform',
+    'EcosystemCapture',
+    'EcosystemController',
+    'EcosystemFactory',
+    'PacketCaptureRunner',
+    'PlatformFactory',
+    'PlatformLogStreamer',
 ]

@@ -37,10 +37,24 @@ class CaptureImplsLoader:
                                  "__init__.py")
         return os.path.exists(init_path)
 
+    def verify_coroutines(self, subclass) -> bool:
+        for item in dir(self.search_type):
+            item_attr = getattr(self.search_type, item)
+            if inspect.iscoroutinefunction(item_attr):
+                if not hasattr(subclass, item):
+                    return False
+                if not inspect.iscoroutinefunction(getattr(subclass, item)):
+                    return False
+        return True
+
     def is_type_match(self, potential_class_match: Any) -> bool:
         if inspect.isclass(potential_class_match):
             if issubclass(potential_class_match, self.search_type):
-                return True
+                if self.verify_coroutines(potential_class_match):
+                    return True
+                else:
+                    print(f"WARNING missing coroutine {potential_class_match}")
+        return False
 
     def load_module(self, to_load):
         saw_more_than_one_impl = False
