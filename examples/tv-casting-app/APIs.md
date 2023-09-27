@@ -16,11 +16,12 @@ Matter Casting consists of three parts:
     for Android builds on top of the Matter SDK to demonstrate how a TV Content
     app works.
 -   **The TV platform app**: The TV platform app implements the Casting Video  
-    Player device type and provides common capabilities around media playback 
-    on the TV such as play/pause, keypad navigation, input and output control, 
-    content search, and an implementation of an app platform as described in 
-    the media chapter of the device library specification. This is generally 
-    implemented by the TV manufacturer. The [example Matter tv-app](https://github.com/project-chip/connectedhomeip/tree/master/examples/tv-app)
+    Player device type and provides common capabilities around media playback on
+    the TV such as play/pause, keypad navigation, input and output control,
+    content search, and an implementation of an app platform as described in the
+    media chapter of the device library specification. This is generally
+    implemented by the TV manufacturer. The
+    [example Matter tv-app](https://github.com/project-chip/connectedhomeip/tree/master/examples/tv-app)
     for Android builds on top of the Matter SDK to demonstrate how a TV platform
     app works.
 
@@ -69,28 +70,29 @@ Next, you're ready to:
 ## Build and Setup
 
 The Casting Client is expected to consume the Matter TV Casting library built
-for its respective platform which implements the APIs described in this document.
-Refer to the tv-casting-app READMEs for [Linux](linux), [Android](android) and
-[iOS](darwin) to understand how to build and consume each platform's specicific
-libraries.
+for its respective platform which implements the APIs described in this
+document. Refer to the tv-casting-app READMEs for [Linux](linux/README.md),
+[Android](android/README.md) and [iOS](darwin/TvCasting/README.md) to understand
+how to build and consume each platform's specific libraries.
 
 ### Initialize the Casting Client
 
-_{Complete Initialization examples:
-[Linux](linux/simple-app.cpp) | [Android](android/App/app/src/main/java/com/matter/casting/InitializationExample.java)
+_{Complete Initialization examples: [Linux](linux/simple-app.cpp) |
+[Android](android/App/app/src/main/java/com/matter/casting/InitializationExample.java)
 | [iOS](darwin/TvCasting/TvCasting/MTRInitializationExample.swift)}_
 
 A Casting Client must first initialize the Matter SDK and define the following
-"DataProvider" objects for the the Matter Casting library to use throughout the client's
-lifecycle:
+"DataProvider" objects for the the Matter Casting library to use throughout the
+client's lifecycle:
 
 1.  **Rotating Device Identifier** - Refer to the Matter specification for
     details on how to generate the
     [Rotating Device Identifier](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/rendezvous/DeviceDiscovery.adoc#245-rotating-device-identifier)).
     Then, instantiate a `DataProvider` object as described below.
 
-    On Linux, define a `RotatingDeviceIdUniqueIdProvider` to provide the
-    Casting Client's RotatingDeviceIdUniqueId, by implementing a `matter:casting::support::MutableByteSpanDataProvider`:
+    On Linux, define a `RotatingDeviceIdUniqueIdProvider` to provide the Casting
+    Client's RotatingDeviceIdUniqueId, by implementing a
+    `matter:casting::support::MutableByteSpanDataProvider`:
 
     ```c++
     class RotatingDeviceIdUniqueIdProvider : public MutableByteSpanDataProvider {
@@ -112,7 +114,8 @@ lifecycle:
     ```
 
     On Android, define a `rotatingDeviceIdUniqueIdProvider` to provide the
-    Casting Client's RotatingDeviceIdUniqueId, by implementing a `com.matter.casting.support.DataSource`:
+    Casting Client's RotatingDeviceIdUniqueId, by implementing a
+    `com.matter.casting.support.DataSource`:
 
     ```java
     private static final DataProvider<byte[]> rotatingDeviceIdUniqueIdProvider =
@@ -148,9 +151,10 @@ lifecycle:
     [Onboarding Payload](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/qr_code/OnboardingPayload.adoc#ref_OnboardingPayload)
     section for details on commissioning data.
 
-    On Linux, define a function `InitCommissionableDataProvider` to initialize intialize a 
-    `LinuxCommissionableDataProvider` that can provide the required values to the CastingApp.
-    
+    On Linux, define a function `InitCommissionableDataProvider` to initialize
+    initialize a `LinuxCommissionableDataProvider` that can provide the required
+    values to the CastingApp.
+
     ```c++
     CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, LinuxDeviceOptions & options) {
         chip::Optional<uint32_t> setupPasscode;
@@ -158,7 +162,7 @@ lifecycle:
         if (options.payload.setUpPINCode != 0) {
             setupPasscode.SetValue(options.payload.setUpPINCode);
         } else if (!options.spake2pVerifier.HasValue()) {
-            // default to TestOnlyCommissionableDataProvider for demonstration 
+            // default to TestOnlyCommissionableDataProvider for demonstration
             uint32_t defaultTestPasscode = 0;
             chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
             VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupPasscode(defaultTestPasscode) == CHIP_NO_ERROR);
@@ -189,8 +193,8 @@ lifecycle:
     ```
 
     On iOS, add a `func commissioningDataProvider` to the
-    `MTRAppParametersDataSource` class defined above, that can provide the required
-    values to the `MTRCastingApp`.
+    `MTRAppParametersDataSource` class defined above, that can provide the
+    required values to the `MTRCastingApp`.
 
     ```objectivec
     func castingAppDidReceiveRequestForCommissionableData(_ sender: Any) -> MTRCommissionableData {
@@ -209,14 +213,16 @@ lifecycle:
     etc. and implements a way to sign messages when called upon by the Matter TV
     Casting Library as part of the
     [Device Attestation process](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/device_attestation/Device_Attestation_Specification.adoc)
-    during commissoning.
+    during commissioning.
 
-    On Linux, implement a define a `dacProvider` to provide the Casting Client's Device
-    Attestation Credentials, by implementing a `chip::Credentials::DeviceAttestationCredentialsProvider`.
-    For this example, we will use the `chip::Credentials::Examples::ExampleDACProvider`
+    On Linux, implement a define a `dacProvider` to provide the Casting Client's
+    Device Attestation Credentials, by implementing a
+    `chip::Credentials::DeviceAttestationCredentialsProvider`. For this example,
+    we will use the `chip::Credentials::Examples::ExampleDACProvider`
 
     On Android, define a `dacProvider` to provide the Casting Client's Device
-    Attestation Credentials, by implementing a `com.matter.casting.support.DACProvider`:
+    Attestation Credentials, by implementing a
+    `com.matter.casting.support.DACProvider`:
 
     ```java
     private static final DACProvider dacProvider = new DACProviderStub();
@@ -260,12 +266,14 @@ lifecycle:
     };
     ```
 
-    On iOS, add functions `castingAppDidReceiveRequestForDeviceAttestationCredentials` 
-    and `didReceiveRequestToSignCertificateRequest` to the `MTRAppParametersDataSource` 
-    class defined above, that can return MTRDeviceAttestationCredentials and sign 
-    messages for the Casting Client, respectively.
+    On iOS, add functions
+    `castingAppDidReceiveRequestForDeviceAttestationCredentials` and
+    `didReceiveRequestToSignCertificateRequest` to the
+    `MTRAppParametersDataSource` class defined above, that can return
+    MTRDeviceAttestationCredentials and sign messages for the Casting Client,
+    respectively.
 
-    ```objectivec 
+    ```objectivec
     // dummy DAC values for demonstration only
     let kDevelopmentDAC_Cert_FFF1_8001: Data = Data(base64Encoded: "MIIB..<snipped>..CXE1M=")!;
     let kDevelopmentDAC_PrivateKey_FFF1_8001: Data = Data(base64Encoded: "qrYA<snipped>tE+/8=")!;
@@ -280,21 +288,21 @@ lifecycle:
             deviceAttestationCert: kDevelopmentDAC_Cert_FFF1_8001,
             productAttestationIntermediateCert: KPAI_FFF1_8000_Cert_Array)
     }
-    
+
     func castingApp(_ sender: Any, didReceiveRequestToSignCertificateRequest csrData: Data) -> Data {
         var privateKey = Data()
         privateKey.append(kDevelopmentDAC_PublicKey_FFF1_8001);
         privateKey.append(kDevelopmentDAC_PrivateKey_FFF1_8001);
-        
+
         let privateKeyRef: SecKey = SecKeyCreateWithData(privateKey as NSData,
                                     [
                                         kSecAttrKeyType: kSecAttrKeyTypeECSECPrimeRandom,
                                         kSecAttrKeyClass: kSecAttrKeyClassPrivate,
                                         kSecAttrKeySizeInBits: 256
                                     ] as NSDictionary, nil)!
-        
+
         let _:Unmanaged<SecKey> = Unmanaged<SecKey>.passRetained(privateKeyRef);
-        
+
         // use SecKey above to sign csrData and return resulting value
     }
     ```
@@ -305,9 +313,9 @@ Casting client, make sure your code initializes it only once, before it starts a
 Matter casting session.
 
 On Linux, create an AppParameters object using the
-`RotatingDeviceIdUniqueIdProvider`, `LinuxCommissionableDataProvider`, 
-`CommonCaseDeviceServerInitParamsProvider`, `ExampleDACProvider` and `DefaultDACVerifier`, 
-and call `CastingApp::GetInstance()->Initialize` with it.
+`RotatingDeviceIdUniqueIdProvider`, `LinuxCommissionableDataProvider`,
+`CommonCaseDeviceServerInitParamsProvider`, `ExampleDACProvider` and
+`DefaultDACVerifier`, and call `CastingApp::GetInstance()->Initialize` with it.
 
 ```c++
 LinuxCommissionableDataProvider gCommissionableDataProvider;
@@ -342,9 +350,10 @@ int main(int argc, char * argv[]) {
     ...
 }
 ```
+
 On Android, create an AppParameters object using the
-`rotatingDeviceIdUniqueIdProvider`, `commissioningDataProvider`, 
-`dacProvider` and `DataProvider<ConfigurationManager>`, and call 
+`rotatingDeviceIdUniqueIdProvider`, `commissioningDataProvider`, `dacProvider`
+and `DataProvider<ConfigurationManager>`, and call
 `CastingApp.getInstance().initialize` with it.
 
 ```java
@@ -396,14 +405,14 @@ func initialize() -> MatterError {
 
 ### Discover Casting Players
 
-_{Complete Discovery examples:
-[Linux](linux/simple-app.cpp)}_
+_{Complete Discovery examples: [Linux](linux/simple-app.cpp)}_
 
 The Casting Client discovers `CastingPlayers` using Matter Commissioner
 discovery over DNS-SD by listening for CastingPlayer events as they are
 discovered, updated, or lost from the network.
 
-On Linux, define a `DiscoveryDelegateImpl` that implements the `matter::casting::core::DiscoveryDelegate`.
+On Linux, define a `DiscoveryDelegateImpl` that implements the
+`matter::casting::core::DiscoveryDelegate`.
 
 ```c++
 class DiscoveryDelegateImpl : public DiscoveryDelegate {
@@ -429,10 +438,11 @@ public:
 
 Finally, register these listeners and start discovery.
 
-On Linux, register an instance of the `DiscoveryDelegateImpl` with 
-`matter::casting::core::CastingPlayerDiscovery` by calling SetDelegate on its singleton 
-instance. Then, call `StartDiscovery` by optionally specifying the 
+On Linux, register an instance of the `DiscoveryDelegateImpl` with
+`matter::casting::core::CastingPlayerDiscovery` by calling SetDelegate on its
+singleton instance. Then, call `StartDiscovery` by optionally specifying the
 `kTargetPlayerDeviceType` to filter results by.
+
 ```c++
 DiscoveryDelegateImpl delegate;
 CastingPlayerDiscovery::GetInstance()->SetDelegate(&delegate);
@@ -446,3 +456,15 @@ VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
 chip::DeviceLayer::PlatformMgr().RunEventLoop();
 ...
 ```
+
+### Connect to a Casting Player
+
+### Select an Endpoint on the Casting Player
+
+## Interacting with a Casting Endpoint
+
+### Issuing Commands
+
+### Read Operations
+
+### Subscriptions

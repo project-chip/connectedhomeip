@@ -42,7 +42,7 @@ using DisconnectCallback = std::function<void(void)>;
 const int kPortMaxLength = 5; // port is uint16_t
 const int kIdMaxLength   = chip::Dnssd::kHostNameMaxLength + kPortMaxLength;
 
-class Attributes
+class CastingPlayerAttributes
 {
 public:
     char id[kIdMaxLength]                                  = {};
@@ -66,10 +66,10 @@ class CastingPlayer : public std::enable_shared_from_this<CastingPlayer>
 private:
     // std::vector<memory::Strong<Endpoint>> endpoints;
     bool mConnected = false;
-    Attributes mAttributes;
+    CastingPlayerAttributes mAttributes;
 
 public:
-    CastingPlayer(Attributes playerAttributes) { mAttributes = playerAttributes; }
+    CastingPlayer(CastingPlayerAttributes playerAttributes) { mAttributes = playerAttributes; }
     const char * GetId() const { return mAttributes.id; }
 
     const char * GetDeviceName() const { return mAttributes.deviceName; }

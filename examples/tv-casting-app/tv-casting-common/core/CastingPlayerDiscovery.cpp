@@ -78,7 +78,7 @@ void DeviceDiscoveryDelegateImpl::OnDiscoveredDevice(const chip::Dnssd::Discover
                    ChipLogError(NotSpecified, "CastingPlayerDeviceDiscoveryDelegate, mClientDelegate is a nullptr"));
 
     // convert nodeData to CastingPlayer
-    Attributes attributes;
+    CastingPlayerAttributes attributes;
     strcpy(attributes.id, nodeData.resolutionData.hostName);
 
     char port[kPortMaxLength] = {};
