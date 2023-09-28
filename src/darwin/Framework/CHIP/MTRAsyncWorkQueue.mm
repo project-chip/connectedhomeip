@@ -202,8 +202,9 @@ MTR_DIRECT_MEMBERS
 
 - (void)invalidate
 {
+    NSString * contextDescription = [_context description]; // outside of lock
     os_unfair_lock_lock(&_lock);
-    MTR_LOG_INFO("MTRAsyncWorkQueue<%@> invalidate %tu items", _context, _items.count);
+    MTR_LOG_INFO("MTRAsyncWorkQueue<%@> invalidate %tu items", contextDescription, _items.count);
     for (MTRAsyncWorkItem * item in _items) {
         [item cancel];
     }

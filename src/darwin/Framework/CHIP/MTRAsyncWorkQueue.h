@@ -130,6 +130,10 @@ MTR_TESTABLE
 /// Note: This handler is NOT called on the dispatch queue associated with
 /// this work item. Thread-safety is managed by the work queue internally.
 ///
+/// If no `batchingHandler` is set using this method, the work item will not
+/// participate in batching, and the `batchingID` and `batchableData`
+/// properties are  meaningless.
+///
 /// @see MTRAsyncWorkBatchingHandler
 - (void)setBatchingID:(NSUInteger)opaqueBatchingID
                  data:(id)opaqueBatchableData
@@ -142,6 +146,10 @@ MTR_TESTABLE
 ///
 /// Note: This handler is NOT called on the dispatch queue associated with
 /// this work item. Thread-safety is managed by the work queue internally.
+///
+/// If no `duplicateCheckHandler` is set using this method, the work item
+/// will not participate in duplicate checking, and the `duplicateTypeID`
+/// property is meaningless.
 ///
 /// @see MTRAsyncWorkDuplicateCheckHandler
 - (void)setDuplicateTypeID:(NSUInteger)opaqueDuplicateTypeID
