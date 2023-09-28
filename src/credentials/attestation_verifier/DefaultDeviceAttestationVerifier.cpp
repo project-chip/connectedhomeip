@@ -17,6 +17,7 @@
 #include "DefaultDeviceAttestationVerifier.h"
 
 #include <controller/OperationalCredentialsDelegate.h>
+#include <credentials/attestation_verifier/TestPAAStore.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
 #include <credentials/DeviceAttestationConstructor.h>
@@ -28,8 +29,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
-
-#include "credentials/attestation_verifier/CHIPAttCert_test_paa_store.h"
 
 using namespace chip::Crypto;
 using chip::TestCerts::GetTestPaaRootStore;

@@ -14,6 +14,12 @@
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
+ *
+ * Storage for test attestation PAA certificates. Contains the certs for
+ * the 0xFFF1 vid PAA cert and the test PAA cert with no VID.
+ *
+ * These certs are used by the device attestation and crypto tests
+ * and by the DefaultDeviceAttestationVerifier.
  */
 
 #pragma once
