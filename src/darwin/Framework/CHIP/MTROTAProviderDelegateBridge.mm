@@ -60,6 +60,7 @@ MTROTAProviderDelegateBridge::~MTROTAProviderDelegateBridge()
 {
     Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, nullptr);
 
+    delete sOtaUnsolicitedBDXMsgHandler;
     sOtaUnsolicitedBDXMsgHandler = nullptr;
 }
 

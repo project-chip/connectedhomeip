@@ -22,11 +22,11 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- * This class creates a handler for listening to all unsolicited BDX messages and when a BDX ReceiveInit
- * message is received from a node, it creates a new MTROTAImageTransferHandler object as a delegate
- * that handles the OTA image file transfer for that node.
+ * This class creates an unsolicited handler for listening to all unsolicited BDX messages
+ * and when it receives a BDX ReceiveInit message from a node, it creates a new
+ * MTROTAImageTransferHandler object as a delegate that will prepare for transfer and
+ * handle all BDX messages for the BDX transfer session with that node.
  *
- * Each MTROTAImageTransferHandler instance will handle one BDX transfer session.
  */
 class MTROTAUnsolicitedBDXMessageHandler : public chip::Messaging::UnsolicitedMessageHandler
 {
@@ -39,10 +39,10 @@ public:
     // Returns the number of delegates that are currently handling BDX transfers
     static uint8_t GetNumberOfDelegates();
 
-    // Increase the number of delegates by 1.
+    // Increase the number of delegates handling BDX transfers by 1.
     static void IncrementNumberOfDelegates();
 
-    // Decrease the number of delegates by 1.
+    // Decrease the number of delegates handling BDX transfers by 1.
     static void DecrementNumberOfDelegates();
 
 private:
@@ -51,8 +51,6 @@ private:
 
 protected:
     chip::Messaging::ExchangeManager * mExchangeMgr;
-
-    MTROTAImageTransferHandler * otaImageTransferHandler;
 
     static inline uint8_t mNumberOfDelegates = 0;
 };

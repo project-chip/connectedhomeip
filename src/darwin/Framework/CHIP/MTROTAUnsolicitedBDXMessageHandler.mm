@@ -27,10 +27,7 @@ using namespace chip::bdx;
 MTROTAUnsolicitedBDXMessageHandler::~MTROTAUnsolicitedBDXMessageHandler()
 {
     assertChipStackLockedByCurrentThread();
-    if (mExchangeMgr) {
-        mExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::BDX::Id);
-        mExchangeMgr = nullptr;
-    }
+
     MTROTAUnsolicitedBDXMessageHandler::mNumberOfDelegates = 0;
 }
 
@@ -50,15 +47,16 @@ CHIP_ERROR MTROTAUnsolicitedBDXMessageHandler::OnUnsolicitedMessageReceived(
     const PayloadHeader & payloadHeader, ExchangeDelegate * _Nonnull & newDelegate)
 {
     assertChipStackLockedByCurrentThread();
-    ChipLogDetail(BDX, "%s: message " ChipLogFormatMessageType " protocol " ChipLogFormatProtocolId, __FUNCTION__,
+
+    ChipLogDetail(BDX, "OnUnsolicitedMessageReceived: message " ChipLogFormatMessageType " protocol " ChipLogFormatProtocolId,
         payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()));
 
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // If we receive a ReceiveInit BDX message, create a new MTROTAImageTransferHandler and register it
-    // as the handler for all BDX messages for the OTA file transfer that will come over this exchange.
+    // as the handler for all BDX messages that will come over this exchange.
     if (payloadHeader.HasMessageType(MessageType::ReceiveInit)) {
-        otaImageTransferHandler = new MTROTAImageTransferHandler();
+        MTROTAImageTransferHandler * otaImageTransferHandler = new MTROTAImageTransferHandler();
         newDelegate = otaImageTransferHandler;
     }
     return CHIP_NO_ERROR;

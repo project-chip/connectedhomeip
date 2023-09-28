@@ -34,9 +34,8 @@
 
 // TODO: Disable test005_DoBDXTransferAllowUpdateRequest,
 // test006_DoBDXTransferWithTwoOTARequesters and
-// test007_DoBDXTransferIncrementalOtaUpdate until PR #26040 is merged.
-// Currently the poll interval causes delays in the BDX transfer and
-// results in the test taking a long time.
+// test007_DoBDXTransferIncrementalOtaUpdate until issue #29533 is resolved.
+// Currently CI is taking a long time for those tests.
 #ifdef ENABLE_REAL_OTA_UPDATE_TESTS
 #undef ENABLE_REAL_OTA_UPDATE_TESTS
 #endif
@@ -1053,9 +1052,8 @@ static BOOL sNeedsStackShutdown = YES;
     [self waitForExpectations:@[ checker.notifyUpdateAppliedExpectation ] timeout:kTimeoutInSeconds];
 }
 
-// TODO: Enable tests 005, 006 and 007 when PR #26040 is merged. Currently the poll interval causes delays in the BDX transfer
-// and results in the tests taking a long time. With PR #26040 we eliminate the poll interval completely and hence the tests can run
-// in a short time.
+// TODO: Enable tests 005, 006 and 007 when issue #29533 is resolved.
+// Currently CI is taking a long time for these tests.
 #ifdef ENABLE_REAL_OTA_UPDATE_TESTS
 - (void)test005_DoBDXTransferAllowUpdateRequest
 {

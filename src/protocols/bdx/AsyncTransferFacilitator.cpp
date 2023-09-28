@@ -21,61 +21,116 @@
 namespace chip {
 namespace bdx {
 
-CHIP_ERROR AsyncTransferFacilitator::OnMessageReceived(Messaging::ExchangeContext * ec,
-                                                       const PayloadHeader & payloadHeader,
+AsyncTransferFacilitator::~AsyncTransferFacilitator()
+{
+    Reset();
+}
+
+void AsyncTransferFacilitator::Reset()
+{
+    mExchange.Release();
+    mTransfer.Reset();
+}
+
+CHIP_ERROR AsyncTransferFacilitator::SendMessage(TransferSession::OutputEvent & event)
+{
+
+    VerifyOrReturnError(mExchange, CHIP_ERROR_INCORRECT_STATE);
+
+    Messaging::SendFlags sendFlags;
+
+    // All messages sent from the Sender expect a response, except for a StatusReport which would indicate an error and
+    // the end of the transfer.
+    if (!event.msgTypeData.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
+    {
+        sendFlags.Set(Messaging::SendMessageFlags::kExpectResponse);
+    }
+
+    auto & msgTypeData = event.msgTypeData;
+
+    Messaging::ExchangeContext * ec = mExchange.Get();
+    VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // Set the response timeout on the exchange before sending the message.
+    ec->SetResponseTimeout(mTimeout);
+
+    CHIP_ERROR err = ec->SendMessage(msgTypeData.ProtocolId, msgTypeData.MessageType, std::move(event.MsgData), sendFlags);
+
+    // If there's an error sending the message, release the exchange.
+    if (err != CHIP_NO_ERROR)
+    {
+        mExchange.Release();
+    }
+    return err;
+}
+
+CHIP_ERROR AsyncTransferFacilitator::OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                                        System::PacketBufferHandle && payload)
 {
+
+    VerifyOrReturnError(mExchange, CHIP_ERROR_INCORRECT_STATE);
+
     VerifyOrReturnError(ec == mExchange.Get(), CHIP_ERROR_INCORRECT_STATE);
 
-    ChipLogDetail(BDX, " %s: message " ChipLogFormatMessageType " protocol " ChipLogFormatProtocolId, __FUNCTION__,
-                  payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()));
     CHIP_ERROR err =
         mTransfer.HandleMessageReceived(payloadHeader, std::move(payload), System::SystemClock().GetMonotonicTimestamp());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(BDX, "failed to handle message: %" CHIP_ERROR_FORMAT, err.Format());
+        mTransfer.AbortTransfer(AsyncResponder::GetBdxStatusCodeFromChipError(err));
+    }
+    else if (!payloadHeader.HasMessageType(MessageType::BlockAckEOF))
+    {
+
+        // Almost every BDX message expect BlockAckEOF will follow up with a response on the exchange.
+        ec->WillSendMessage();
     }
 
-    // Almost every BDX message will follow up with a response on the exchange. Even messages that might signify the end of a
-    // transfer could necessitate a response if they are received at the wrong time.
-    // For this reason, it is left up to the application logic to call ExchangeContext::Close() when it has determined that the
-    // transfer is finished.
-    ec->WillSendMessage();
-
-    // Get the next output event and send it to the delegate.
+    // Get the next output event and handle it based on the type of event.
     TransferSession::OutputEvent outEvent;
-    do
-    {
-        mTransfer.GetNextAction(outEvent);
 
-        if (outEvent.EventType == TransferSession::OutputEventType::kTransferTimeout)
+    mTransfer.GetNextAction(outEvent);
+    while (outEvent.EventType != TransferSession::OutputEventType::kNone)
+    {
+
+        // If its a message of type kMsgToSend, send the message over the exchange.
+        if (outEvent.EventType == TransferSession::OutputEventType::kMsgToSend)
         {
-            OnResponseTimeout(ec);
+            SendMessage(outEvent);
         }
         else
         {
-            HandleAsyncTransferSessionOutput(outEvent);
-        }
-    } while (outEvent.EventType != TransferSession::OutputEventType::kNone);
+            // Call the HandleTransferSessionOutput virtual method that's implemeted by the subclass to handle
+            // the output events.
+            HandleTransferSessionOutput(outEvent);
 
+            // If it's a message indicating either the end of the transfer or a timeout reported by the transfer session
+            // or an error occured, we need to call the CleanUp virtual method implemented by the subclass to clean up and
+            // delete both the sublcass and base class objects.
+            if (outEvent.EventType == TransferSession::OutputEventType::kAckEOFReceived ||
+                outEvent.EventType == TransferSession::OutputEventType::kInternalError ||
+                outEvent.EventType == TransferSession::OutputEventType::kTransferTimeout ||
+                outEvent.EventType == TransferSession::OutputEventType::kStatusReceived)
+            {
+                CleanUp();
+                return err;
+            }
+        }
+        mTransfer.GetNextAction(outEvent);
+    };
     return err;
 }
 
-Messaging::ExchangeContext * AsyncTransferFacilitator::GetExchangeContext()
+void AsyncTransferFacilitator::OnExchangeClosing(Messaging::ExchangeContext * ec)
 {
-    return mExchange.Get();
-}
-
-void AsyncTransferFacilitator::OnExchangeClosing(chip::Messaging::ExchangeContext * ec)
-{
-    ChipLogDetail(BDX, "%s, ec: " ChipLogFormatExchange, __FUNCTION__, ChipLogValueExchange(ec));
+    ChipLogDetail(BDX, "OnExchangeClosing, ec: " ChipLogFormatExchange, ChipLogValueExchange(ec));
     mExchange.Release();
 }
 
 void AsyncTransferFacilitator::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
-    ChipLogDetail(BDX, "%s, ec: " ChipLogFormatExchange, __FUNCTION__, ChipLogValueExchange(ec));
-    mExchange.Release();
+    ChipLogDetail(BDX, "OnResponseTimeout, ec: " ChipLogFormatExchange, ChipLogValueExchange(ec));
+    CleanUp();
 }
 
 CHIP_ERROR AsyncResponder::PrepareForTransfer(Messaging::ExchangeContext * exchangeCtx, TransferRole role,
@@ -83,22 +138,15 @@ CHIP_ERROR AsyncResponder::PrepareForTransfer(Messaging::ExchangeContext * excha
                                               System::Clock::Timeout timeout)
 {
     VerifyOrReturnError(exchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    ReturnErrorOnFailure(mTransfer.WaitForTransfer(role, xferControlOpts, maxBlockSize, timeout));
-
     VerifyOrReturnError(!mExchange, CHIP_ERROR_INCORRECT_STATE);
+
+    mTimeout = timeout;
+
+    ReturnErrorOnFailure(mTransfer.WaitForTransfer(role, xferControlOpts, maxBlockSize, mTimeout));
+
     mExchange.Grab(exchangeCtx);
 
     return CHIP_NO_ERROR;
-}
-
-void AsyncResponder::ResetTransfer()
-{
-    if (mExchange)
-    {
-        mExchange.Release();
-    }
-    mTransfer.Reset();
 }
 
 bdx::StatusCode AsyncResponder::GetBdxStatusCodeFromChipError(CHIP_ERROR err)
@@ -114,29 +162,39 @@ bdx::StatusCode AsyncResponder::GetBdxStatusCodeFromChipError(CHIP_ERROR err)
     return bdx::StatusCode::kUnknown;
 }
 
-void AsyncResponder::NotifyEventHandledWithError(CHIP_ERROR error)
+void AsyncResponder::NotifyEventHandled(CHIP_ERROR eventHandlingResult)
 {
-    ChipLogDetail(BDX, "%s : error %d", __FUNCTION__, error.AsInteger());
-    if (error != CHIP_NO_ERROR)
+    // We can only come here after we have handled a BDX message (like ReceiveInit/BlockQuery) asynchronously
+    // in the subclass. The base class needs to notify us when the handling of the event is done and the event
+    // handling result - success or failure.
+    ChipLogDetail(BDX, "NotifyEventHandled : error %" CHIP_ERROR_FORMAT, eventHandlingResult.Format());
+
+    // If there was an error, we abort the transfer.
+    if (eventHandlingResult != CHIP_NO_ERROR)
     {
-        mTransfer.AbortTransfer(GetBdxStatusCodeFromChipError(error));
+        CleanUp();
     }
-
-    // Get the next output event  and send it to the delegate.
-    TransferSession::OutputEvent outEvent;
-    do
+    else
     {
-        mTransfer.GetNextAction(outEvent);
 
-        if (outEvent.EventType == TransferSession::OutputEventType::kTransferTimeout)
+        // We need to get the next output event from the state machine which is a response to the
+        // BDX message handled by the subclass (ReceiveAccept/Block).
+        TransferSession::OutputEvent outEvent;
+
+        mTransfer.GetNextAction(outEvent);
+        while (outEvent.EventType != TransferSession::OutputEventType::kNone)
         {
-            OnResponseTimeout(mExchange.Get());
-        }
-        else
-        {
-            HandleAsyncTransferSessionOutput(outEvent);
-        }
-    } while (outEvent.EventType != TransferSession::OutputEventType::kNone);
+            if (outEvent.EventType == TransferSession::OutputEventType::kMsgToSend)
+            {
+                AsyncTransferFacilitator::SendMessage(outEvent);
+                mTransfer.GetNextAction(outEvent);
+            }
+            else
+            {
+                break;
+            }
+        };
+    }
 }
 
 } // namespace bdx

@@ -19,6 +19,7 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeHolder.h>
 #include <protocols/bdx/BdxTransferSession.h>
+#include <transport/raw/MessageHeader.h>
 
 #pragma once
 
@@ -27,7 +28,7 @@ namespace bdx {
 
 /**
  * An abstract class with methods for handling BDX messages from an ExchangeContext and using an event driven
- * async approach to get the next action from the transfer session state machine.
+ * asynchronous approach to get the next action from the transfer session state machine.
  *
  * This class does not define any methods for beginning a transfer or initializing the underlying TransferSession object.
  * See AsyncResponder for a class that does.
@@ -39,41 +40,52 @@ class AsyncTransferFacilitator : public Messaging::ExchangeDelegate
 {
 public:
     AsyncTransferFacilitator() : mExchange(*this) {}
-    ~AsyncTransferFacilitator() override = default;
+    ~AsyncTransferFacilitator() override;
 
     /**
-     * This method should be implemented to contain business-logic handling of BDX messages and other TransferSession events.
+     * This method should be implemented to contain business-logic handling of BDX messages
+     * and other TransferSession events.
      *
      * @param[in] event An OutputEvent that contains output from the TransferSession object.
      */
     virtual void HandleTransferSessionOutput(TransferSession::OutputEvent & event) = 0;
 
     /**
-     * This method returns the exchange on which the BDX transfer is happening.
+     * This method should be implemented to clean up and destroy the instance of the sub class
+     * implemeting it and the base class.
      *
-     * May return null if there is no such exchange (e.g. it has been closed due to the transfer completing
-     * or some error condition).
+     * Note: After this method has been called, we can't use the instance of the subclass that
+     * implements this.
      */
-    Messaging::ExchangeContext * GetExchangeContext();
+    virtual void CleanUp() = 0;
 
+protected:
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
     void OnExchangeClosing(Messaging::ExchangeContext * ec) override;
 
-protected:
+    CHIP_ERROR SendMessage(TransferSession::OutputEvent & event);
+
     // The transfer session coresponding to this AsynTransferFacilitator object.
     TransferSession mTransfer;
 
-    // The Exchange holder that holds the exchange context used for the BDX messages.
+    // The Exchange holder that holds the exchange context used for BDX messages.
     Messaging::ExchangeHolder mExchange;
+
+    // The timeout for the BDX transfer session.
+    System::Clock::Timeout mTimeout;
+
+private:
+    // Releases the exchange context and calls reset on the BDX transfer session.
+    void Reset();
 };
 
 /**
  * An AsyncTransferFacilitator that is initialized to respond to an incoming BDX transfer request.
  *
  * Provides a method for initializing the TransferSession member but still needs to be extended to implement
- * HandleAsyncTransferSessionOutput. 
+ * HandleTransferSessionOutput.
  *
  * This class, or a subclass of it, should be used as the exchange delegate for a BDX transfer.
  */
@@ -93,12 +105,9 @@ public:
                                   BitFlags<TransferControlFlags> xferControlOpts, uint16_t maxBlockSize,
                                   System::Clock::Timeout timeout);
 
-    void ResetTransfer();
-
     /**
-     * Notifies the transfer facilitator that an output event has been handled by the delegate and passes any error(s) that occured
-     * while handling the event. This is needed as the delegate calls async callbacks for handling the BDX messages and we need to
-     * get the next action from the state machine based on how the delegate handled the message.
+     * Notifies the transfer facilitator that an output event has been handled by the subclass that implements the
+     * HandleTransferSessionOutput and passes any error(s) that occured while handling the event back to the facilitator.
      *
      * @param[in] eventHandlingResult  The result of handling the event.  CHIP_NO_ERROR if
      *                                 it was handled successfully, otherwise the error that
@@ -106,8 +115,8 @@ public:
      */
     void NotifyEventHandled(CHIP_ERROR eventHandlingResult);
 
-private:
-    bdx::StatusCode GetBdxStatusCodeFromChipError(CHIP_ERROR err);
+    static bdx::StatusCode GetBdxStatusCodeFromChipError(CHIP_ERROR err);
 };
+
 } // namespace bdx
 } // namespace chip
