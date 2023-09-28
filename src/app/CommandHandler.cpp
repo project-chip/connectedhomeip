@@ -256,13 +256,7 @@ Status CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommandElem
     err = aCommandElement.GetPath(&commandPath);
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
-    err = commandPath.GetClusterId(&concretePath.mClusterId);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
-
-    err = commandPath.GetCommandId(&concretePath.mCommandId);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
-
-    err = commandPath.GetEndpointId(&concretePath.mEndpointId);
+    err = commandPath.GetConcreteCommandPath(concretePath);
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
     {
@@ -362,10 +356,7 @@ Status CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aComman
     err = aCommandElement.GetPath(&commandPath);
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
-    err = commandPath.GetClusterId(&clusterId);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
-
-    err = commandPath.GetCommandId(&commandId);
+    err = commandPath.GetGroupCommandPath(&clusterId, &commandId);
     VerifyOrReturnError(err == CHIP_NO_ERROR, Status::InvalidAction);
 
     groupId = mExchangeCtx->GetSessionHandle()->AsIncomingGroupSession()->GetGroupId();

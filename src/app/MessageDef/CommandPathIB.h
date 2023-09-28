@@ -79,6 +79,30 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetCommandId(chip::CommandId * const apCommandId) const;
+
+    /**
+     * @brief Get the concrete command path, if this command path is a concrete
+     *        path.
+     *
+     * This will validate that the cluster id and command id are actually valid for a
+     * concrete path.
+     *
+     *  @param [in] aCommandPath    The command path object to write to.
+     */
+    CHIP_ERROR GetConcreteCommandPath(ConcreteCommandPath & aCommandPath) const;
+
+    /**
+     * @brief Get a group command path.
+     *
+     * This will validate that the cluster id and command id are actually valid for a
+     * group path.
+     *
+     *  @param [out] apClusterId    The cluster id in the path.
+     *  @param [out] apCommandId    The command id in the path.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     */
+    CHIP_ERROR GetGroupCommandPath(ClusterId * apClusterId, CommandId * apCommandId) const;
 };
 
 class Builder : public ListBuilder

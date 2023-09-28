@@ -42,6 +42,8 @@ public:
     void RegisterDeviceDiscoveryDelegate(DeviceDiscoveryDelegate * delegate) { mDeviceDiscoveryDelegate = delegate; }
     CHIP_ERROR DiscoverCommissioners(Dnssd::DiscoveryFilter discoveryFilter = Dnssd::DiscoveryFilter());
 
+    CHIP_ERROR StopDiscovery();
+
     /**
      * @return
      *   Pointer to DiscoveredNodeData at index idx in the list of commissioners discovered
