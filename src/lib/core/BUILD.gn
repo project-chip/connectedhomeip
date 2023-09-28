@@ -84,6 +84,20 @@ source_set("chip_config_header") {
   allow_circular_includes_from = [ "${chip_root}/src/ble:ble_config_header" ]
 }
 
+source_set("chip_error") {
+  sources = [
+    "CHIPError.cpp",
+    "CHIPError.h",
+    "ErrorStr.cpp",
+    "ErrorStr.h",
+  ]
+
+  public_deps = [
+    ":chip_config_header",
+    "${chip_root}/src/lib/support:attributes",
+  ]
+}
+
 static_library("core") {
   output_name = "libChipCore"
 
@@ -95,8 +109,6 @@ static_library("core") {
     "CHIPCallback.h",
     "CHIPCore.h",
     "CHIPEncoding.h",
-    "CHIPError.cpp",
-    "CHIPError.h",
     "CHIPKeyIds.cpp",
     "CHIPKeyIds.h",
     "ClusterEnums.h",
@@ -124,6 +136,7 @@ static_library("core") {
 
   public_deps = [
     ":chip_config_header",
+    ":chip_error",
     "${chip_root}/src/ble",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/support",

@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 #include <lib/core/CHIPError.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <sstream>
 
 #include <functional>

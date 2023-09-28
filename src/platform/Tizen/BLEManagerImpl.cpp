@@ -50,9 +50,9 @@
 #include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/SetupDiscriminator.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceEvent.h>
