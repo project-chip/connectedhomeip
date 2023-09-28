@@ -17,11 +17,11 @@
 #include "DefaultDeviceAttestationVerifier.h"
 
 #include <controller/OperationalCredentialsDelegate.h>
-#include <credentials/attestation_verifier/TestPAAStore.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
 #include <credentials/DeviceAttestationConstructor.h>
 #include <credentials/DeviceAttestationVendorReserved.h>
+#include <credentials/attestation_verifier/TestPAAStore.h>
 #include <crypto/CHIPCryptoPAL.h>
 
 #include <lib/core/CHIPError.h>
