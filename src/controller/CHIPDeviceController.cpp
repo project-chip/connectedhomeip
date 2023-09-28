@@ -2827,8 +2827,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kICDIdentification: {
         app::AttributePathParams readPaths[1];
         // TODO(#29382): We probably want to read "ActiveMode" attribute (to be implemented) for ICD.
-        readPaths[0] =
-            app::AttributePathParams(app::Clusters::IcdManagement::Id, app::Clusters::IcdManagement::Attributes::FeatureMap::Id);
+        readPaths[0] = app::AttributePathParams(endpoint, app::Clusters::IcdManagement::Id,
+                                                app::Clusters::IcdManagement::Attributes::FeatureMap::Id);
         SendCommissioningReadRequest(proxy, timeout, readPaths, 1);
     }
     break;
