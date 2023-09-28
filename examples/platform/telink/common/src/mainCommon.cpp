@@ -31,10 +31,6 @@
 #include "Rpc.h"
 #endif
 
-#ifdef CONFIG_BOOTLOADER_MCUBOOT
-#include <zephyr/dfu/mcuboot.h>
-#endif /* CONFIG_BOOTLOADER_MCUBOOT */
-
 LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
@@ -156,21 +152,6 @@ int main(void)
         LOG_ERR("SetThreadDeviceType fail");
         goto exit;
     }
-
-#ifdef CONFIG_BOOTLOADER_MCUBOOT
-    if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
-    {
-        int img_confirmation = boot_write_img_confirmed();
-        if (img_confirmation)
-        {
-            LOG_ERR("Image not confirmed %d. Will be reverted!", img_confirmation);
-        }
-        else
-        {
-            LOG_INF("Image confirmed");
-        }
-    }
-#endif /* CONFIG_BOOTLOADER_MCUBOOT */
 
     err = GetAppTask().StartApp();
 

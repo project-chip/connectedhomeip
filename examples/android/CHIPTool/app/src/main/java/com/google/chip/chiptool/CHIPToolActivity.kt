@@ -39,6 +39,7 @@ import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
 import com.google.chip.chiptool.setuppayloadscanner.CHIPLedgerDetailsFragment
+import com.google.chip.chiptool.util.DeviceIdUtil
 import org.json.JSONObject
 
 class CHIPToolActivity :
@@ -94,11 +95,12 @@ class CHIPToolActivity :
     }
   }
 
-  override fun onCommissioningComplete(code: Int) {
+  override fun onCommissioningComplete(code: Int, nodeId: Long) {
     runOnUiThread {
       Toast.makeText(this, getString(R.string.commissioning_completed, code), Toast.LENGTH_SHORT)
         .show()
     }
+    DeviceIdUtil.setCommissionedNodeId(this, nodeId)
     ChipClient.getDeviceController(this).close()
     showFragment(SelectActionFragment.newInstance(), false)
   }
