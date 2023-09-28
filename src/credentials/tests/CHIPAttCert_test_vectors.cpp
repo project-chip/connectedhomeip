@@ -4289,7 +4289,7 @@ constexpr uint8_t sTestCert_PAI_FFF2_NoPID_Resigned_SKID_Array[] = {
 
 extern const ByteSpan sTestCert_PAI_FFF2_NoPID_Resigned_SKID = ByteSpan(sTestCert_PAI_FFF2_NoPID_Resigned_SKID_Array);
 
-extern constexpr Span<const ByteSpan> kTestAttestationTrustStoreRoots((const ByteSpan[]){
+extern const Span<const ByteSpan> kTestAttestationTrustStoreRoots((const ByteSpan[]){
     sTestCert_PAA_FFF1_Cert,
     sTestCert_PAA_NoVID_Cert,
 });
