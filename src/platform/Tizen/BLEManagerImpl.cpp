@@ -754,8 +754,8 @@ static bool __GattClientForeachServiceCb(int total, int index, bt_gatt_h svcHand
     auto conn = static_cast<BLEConnection *>(data);
     ChipLogProgress(DeviceLayer, "__GattClientForeachServiceCb");
 
-    VerifyOrReturnValue(__GetAttInfo(svcHandle, &MakeUniquePointerReceiver(uuid).Get(), &type) == BT_ERROR_NONE, true,
-                        ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from SVC handle"));
+    VerifyOrExit(__GetAttInfo(svcHandle, &MakeUniquePointerReceiver(uuid).Get(), &type) == BT_ERROR_NONE,
+                 ChipLogError(DeviceLayer, "Failed to fetch GATT Attribute from SVC handle"));
 
     if (strcasecmp(uuid.get(), chip_ble_service_uuid) == 0)
     {
@@ -768,6 +768,8 @@ static bool __GattClientForeachServiceCb(int total, int index, bt_gatt_h svcHand
         return false;
     }
 
+exit:
+    /* Try next Service UUID */
     return true;
 }
 
