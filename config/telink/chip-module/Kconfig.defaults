@@ -47,6 +47,9 @@ endif
 config SHELL
     default y if CHIP_LIB_SHELL
 
+config SHELL_STACK_SIZE
+    default 1024
+
 config PTHREAD_IPC
     bool
     default n
@@ -260,5 +263,46 @@ config OPENTHREAD_EXTERNAL_HEAP
 # getopt version
 config GETOPT_LONG
     default y
+
+# Disable not used shell modules
+
+config SHELL_WILDCARD
+    default n
+
+config SHELL_VT100_COLORS
+    default n
+
+config SHELL_STATS
+    default n
+
+config KERNEL_SHELL
+    default n
+
+config SENSOR_SHELL
+    default n
+
+config DEVICE_SHELL
+    default n
+
+config DATE_SHELL
+    default n
+
+config DEVMEM_SHELL
+    default n
+
+config MCUBOOT_SHELL
+    default n
+
+config FLASH_SHELL
+    default n
+
+config HWINFO_SHELL
+    default n
+
+config PWM_SHELL
+    default n
+
+config OPENTHREAD_SHELL
+    default n
 
 endif
