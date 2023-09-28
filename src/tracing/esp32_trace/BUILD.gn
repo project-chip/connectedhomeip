@@ -20,8 +20,12 @@ config("tracing") {
   include_dirs = [ "include" ]
 }
 
-source_set("esp32_trace") {
-  public = [ "include/matter/tracing/macros_impl.h" ]
-  sources = [ "include/matter/tracing/macros_impl.cpp" ]
+source_set("esp32_trace_tracing") {
+  public = [ "include/matter/tracing/macros_impl.h",
+             "include/matter/tracing/esp32_tracing.h", ]
+  sources = ["include/matter/tracing/esp32_tracing.cpp",]
+  public_deps = [
+   "${chip_root}/src/tracing",
+  ]
   public_configs = [ ":tracing" ]
 }
