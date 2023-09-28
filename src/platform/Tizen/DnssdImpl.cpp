@@ -371,10 +371,9 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * userData)
         // with the NSD internal mutex locked, which is also locked by the
         // dnssd_create_remote_service() function called in the Resolve(), and
         // the Resolve() itself is called with the stack mutex locked.
-        auto * sourceIdle = g_idle_source_new();
-        g_source_set_callback(sourceIdle, OnResolveFinalize, rCtx, NULL);
-        g_source_attach(sourceIdle, g_main_context_get_thread_default());
-        g_source_unref(sourceIdle);
+        chip::GAutoPtr<GSource> sourceIdle(g_idle_source_new());
+        g_source_set_callback(sourceIdle.get(), OnResolveFinalize, rCtx, NULL);
+        g_source_attach(sourceIdle.get(), g_main_context_get_thread_default());
     }
 
     return;
