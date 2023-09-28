@@ -19,11 +19,9 @@ import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/python.gni")
 
 source_set("nodatamodel") {
-  sources = ["EmptyDataModelHandler.cpp"]
+  sources = [ "EmptyDataModelHandler.cpp" ]
 
-  public_deps = [
-    "${chip_root}/src/app",
-  ]
+  public_deps = [ "${chip_root}/src/app" ]
 }
 
 static_library("controller") {
