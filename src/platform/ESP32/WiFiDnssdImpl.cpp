@@ -549,7 +549,7 @@ static void MdnsQueryDone(intptr_t context)
                     mdns_query_async_delete(resolveCtx->mSrvQueryHandle);
                     resolveCtx->mAddrQueryResult = nullptr;
                     resolveCtx->mSrvQueryHandle  = mdns_query_async_new(result->hostname, NULL, NULL, MDNS_TYPE_AAAA, kTimeoutMilli,
-                                                                       kMaxResults, MdnsQueryNotifier);
+                                                                        kMaxResults, MdnsQueryNotifier);
                     if (!resolveCtx->mSrvQueryHandle)
                     {
                         resolveCtx->mResolveCb(ctx->mCbContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_NO_MEMORY);
