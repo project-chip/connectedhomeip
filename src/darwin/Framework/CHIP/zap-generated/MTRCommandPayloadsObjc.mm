@@ -54,8 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: identifyTime:%@; >", NSStringFromClass([self class]), _identifyTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: identifyTime:%@; >", NSStringFromClass([self class]), _identifyTime];
     return descriptionString;
 }
 
@@ -88,8 +87,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: effectIdentifier:%@; effectVariant:%@; >",
-                                             NSStringFromClass([self class]), _effectIdentifier, _effectVariant];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: effectIdentifier:%@; effectVariant:%@; >", NSStringFromClass([self class]), _effectIdentifier, _effectVariant];
     return descriptionString;
 }
 
@@ -122,8 +120,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupID:%@; groupName:%@; >", NSStringFromClass([self class]), _groupID, _groupName];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; groupName:%@; >", NSStringFromClass([self class]), _groupID, _groupName];
     return descriptionString;
 }
 
@@ -167,8 +164,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; >", NSStringFromClass([self class]), _status, _groupID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; >", NSStringFromClass([self class]), _status, _groupID];
     return descriptionString;
 }
 
@@ -216,8 +212,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRGroupsClusterAddGroupResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -313,8 +308,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; groupName:%@; >",
-                                             NSStringFromClass([self class]), _status, _groupID, _groupName];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; groupName:%@; >", NSStringFromClass([self class]), _status, _groupID, _groupName];
     return descriptionString;
 }
 
@@ -362,8 +356,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRGroupsClusterViewGroupResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -450,8 +443,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: capacity:%@; groupList:%@; >", NSStringFromClass([self class]), _capacity, _groupList];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: capacity:%@; groupList:%@; >", NSStringFromClass([self class]), _capacity, _groupList];
     return descriptionString;
 }
 
@@ -499,8 +491,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRGroupsClusterGetGroupMembershipResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType &)decodableStruct
 {
     {
         if (decodableStruct.capacity.IsNull()) {
@@ -598,8 +589,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; >", NSStringFromClass([self class]), _status, _groupID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; >", NSStringFromClass([self class]), _status, _groupID];
     return descriptionString;
 }
 
@@ -647,8 +637,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRGroupsClusterRemoveGroupResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -727,8 +716,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupID:%@; groupName:%@; >", NSStringFromClass([self class]), _groupID, _groupName];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; groupName:%@; >", NSStringFromClass([self class]), _groupID, _groupName];
     return descriptionString;
 }
 
@@ -783,9 +771,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
-                  NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >", NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
     return descriptionString;
 }
 
@@ -842,8 +828,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >",
-                                             NSStringFromClass([self class]), _status, _groupID, _sceneID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID];
     return descriptionString;
 }
 
@@ -891,8 +876,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRScenesClusterAddSceneResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -957,8 +941,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
     return descriptionString;
 }
 
@@ -1024,9 +1007,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
-        NSStringFromClass([self class]), _status, _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
     return descriptionString;
 }
 
@@ -1074,8 +1055,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRScenesClusterViewSceneResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -1197,8 +1177,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
     return descriptionString;
 }
 
@@ -1255,8 +1234,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >",
-                                             NSStringFromClass([self class]), _status, _groupID, _sceneID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID];
     return descriptionString;
 }
 
@@ -1304,8 +1282,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRScenesClusterRemoveSceneResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -1411,8 +1388,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; >", NSStringFromClass([self class]), _status, _groupID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; >", NSStringFromClass([self class]), _status, _groupID];
     return descriptionString;
 }
 
@@ -1460,8 +1436,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRScenesClusterRemoveAllScenesResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -1513,8 +1488,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
     return descriptionString;
 }
 
@@ -1571,8 +1545,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >",
-                                             NSStringFromClass([self class]), _status, _groupID, _sceneID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID];
     return descriptionString;
 }
 
@@ -1620,8 +1593,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRScenesClusterStoreSceneResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -1689,8 +1661,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; >",
-                                             NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; >", NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime];
     return descriptionString;
 }
 
@@ -1793,8 +1764,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; capacity:%@; groupID:%@; sceneList:%@; >",
-                                             NSStringFromClass([self class]), _status, _capacity, _groupID, _sceneList];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; capacity:%@; groupID:%@; sceneList:%@; >", NSStringFromClass([self class]), _status, _capacity, _groupID, _sceneList];
     return descriptionString;
 }
 
@@ -1842,8 +1812,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRScenesClusterGetSceneMembershipResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -1932,9 +1901,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
-                  NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >", NSStringFromClass([self class]), _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
     return descriptionString;
 }
 
@@ -1991,8 +1958,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >",
-                                             NSStringFromClass([self class]), _status, _groupID, _sceneID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID];
     return descriptionString;
 }
 
@@ -2040,8 +2006,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRScenesClusterEnhancedAddSceneResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -2106,8 +2071,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupID:%@; sceneID:%@; >", NSStringFromClass([self class]), _groupID, _sceneID];
     return descriptionString;
 }
 
@@ -2173,9 +2137,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >",
-        NSStringFromClass([self class]), _status, _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupID:%@; sceneID:%@; transitionTime:%@; sceneName:%@; extensionFieldSets:%@; >", NSStringFromClass([self class]), _status, _groupID, _sceneID, _transitionTime, _sceneName, _extensionFieldSets];
     return descriptionString;
 }
 
@@ -2223,8 +2185,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRScenesClusterEnhancedViewSceneResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -2355,10 +2316,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:
-            @"<%@: mode:%@; groupIdentifierFrom:%@; sceneIdentifierFrom:%@; groupIdentifierTo:%@; sceneIdentifierTo:%@; >",
-        NSStringFromClass([self class]), _mode, _groupIdentifierFrom, _sceneIdentifierFrom, _groupIdentifierTo, _sceneIdentifierTo];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mode:%@; groupIdentifierFrom:%@; sceneIdentifierFrom:%@; groupIdentifierTo:%@; sceneIdentifierTo:%@; >", NSStringFromClass([self class]), _mode, _groupIdentifierFrom, _sceneIdentifierFrom, _groupIdentifierTo, _sceneIdentifierTo];
     return descriptionString;
 }
 
@@ -2435,8 +2393,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupIdentifierFrom:%@; sceneIdentifierFrom:%@; >",
-                                             NSStringFromClass([self class]), _status, _groupIdentifierFrom, _sceneIdentifierFrom];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; groupIdentifierFrom:%@; sceneIdentifierFrom:%@; >", NSStringFromClass([self class]), _status, _groupIdentifierFrom, _sceneIdentifierFrom];
     return descriptionString;
 }
 
@@ -2484,8 +2441,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRScenesClusterCopySceneResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::Scenes::Commands::CopySceneResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Scenes::Commands::CopySceneResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -2631,8 +2587,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: effectIdentifier:%@; effectVariant:%@; >",
-                                             NSStringFromClass([self class]), _effectIdentifier, _effectVariant];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: effectIdentifier:%@; effectVariant:%@; >", NSStringFromClass([self class]), _effectIdentifier, _effectVariant];
     return descriptionString;
 }
 
@@ -2708,8 +2663,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: onOffControl:%@; onTime:%@; offWaitTime:%@; >",
-                                             NSStringFromClass([self class]), _onOffControl, _onTime, _offWaitTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: onOffControl:%@; onTime:%@; offWaitTime:%@; >", NSStringFromClass([self class]), _onOffControl, _onTime, _offWaitTime];
     return descriptionString;
 }
 
@@ -2748,9 +2702,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: level:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
-                  NSStringFromClass([self class]), _level, _transitionTime, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: level:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _level, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -2789,8 +2741,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; optionsMask:%@; optionsOverride:%@; >",
-                                             NSStringFromClass([self class]), _moveMode, _rate, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _moveMode, _rate, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -2832,9 +2783,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
-                  NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -2867,8 +2816,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: optionsMask:%@; optionsOverride:%@; >",
-                                             NSStringFromClass([self class]), _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -2907,9 +2855,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: level:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
-                  NSStringFromClass([self class]), _level, _transitionTime, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: level:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _level, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -2948,8 +2894,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; optionsMask:%@; optionsOverride:%@; >",
-                                             NSStringFromClass([self class]), _moveMode, _rate, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _moveMode, _rate, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -2991,9 +2936,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
-                  NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -3026,8 +2969,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: optionsMask:%@; optionsOverride:%@; >",
-                                             NSStringFromClass([self class]), _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -3090,8 +3032,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; >", NSStringFromClass([self class]), _actionID, _invokeID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; >", NSStringFromClass([self class]), _actionID, _invokeID];
     return descriptionString;
 }
 
@@ -3127,8 +3068,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; transitionTime:%@; >",
-                                             NSStringFromClass([self class]), _actionID, _invokeID, _transitionTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; transitionTime:%@; >", NSStringFromClass([self class]), _actionID, _invokeID, _transitionTime];
     return descriptionString;
 }
 
@@ -3161,8 +3101,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; >", NSStringFromClass([self class]), _actionID, _invokeID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; >", NSStringFromClass([self class]), _actionID, _invokeID];
     return descriptionString;
 }
 
@@ -3198,8 +3137,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; duration:%@; >",
-                                             NSStringFromClass([self class]), _actionID, _invokeID, _duration];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; duration:%@; >", NSStringFromClass([self class]), _actionID, _invokeID, _duration];
     return descriptionString;
 }
 
@@ -3232,8 +3170,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; >", NSStringFromClass([self class]), _actionID, _invokeID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; >", NSStringFromClass([self class]), _actionID, _invokeID];
     return descriptionString;
 }
 
@@ -3266,8 +3203,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; >", NSStringFromClass([self class]), _actionID, _invokeID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; >", NSStringFromClass([self class]), _actionID, _invokeID];
     return descriptionString;
 }
 
@@ -3303,8 +3239,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; duration:%@; >",
-                                             NSStringFromClass([self class]), _actionID, _invokeID, _duration];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; duration:%@; >", NSStringFromClass([self class]), _actionID, _invokeID, _duration];
     return descriptionString;
 }
 
@@ -3337,8 +3272,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; >", NSStringFromClass([self class]), _actionID, _invokeID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; >", NSStringFromClass([self class]), _actionID, _invokeID];
     return descriptionString;
 }
 
@@ -3371,8 +3305,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; >", NSStringFromClass([self class]), _actionID, _invokeID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; >", NSStringFromClass([self class]), _actionID, _invokeID];
     return descriptionString;
 }
 
@@ -3408,8 +3341,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; duration:%@; >",
-                                             NSStringFromClass([self class]), _actionID, _invokeID, _duration];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; duration:%@; >", NSStringFromClass([self class]), _actionID, _invokeID, _duration];
     return descriptionString;
 }
 
@@ -3442,8 +3374,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; >", NSStringFromClass([self class]), _actionID, _invokeID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; >", NSStringFromClass([self class]), _actionID, _invokeID];
     return descriptionString;
 }
 
@@ -3479,8 +3410,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; duration:%@; >",
-                                             NSStringFromClass([self class]), _actionID, _invokeID, _duration];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: actionID:%@; invokeID:%@; duration:%@; >", NSStringFromClass([self class]), _actionID, _invokeID, _duration];
     return descriptionString;
 }
 
@@ -3558,11 +3488,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: vendorID:%@; productID:%@; softwareVersion:%@; protocolsSupported:%@; "
-                                   @"hardwareVersion:%@; location:%@; requestorCanConsent:%@; metadataForProvider:%@; >",
-                  NSStringFromClass([self class]), _vendorID, _productID, _softwareVersion, _protocolsSupported, _hardwareVersion,
-                  _location, _requestorCanConsent, [_metadataForProvider base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: vendorID:%@; productID:%@; softwareVersion:%@; protocolsSupported:%@; hardwareVersion:%@; location:%@; requestorCanConsent:%@; metadataForProvider:%@; >", NSStringFromClass([self class]), _vendorID, _productID, _softwareVersion, _protocolsSupported, _hardwareVersion, _location, _requestorCanConsent, [_metadataForProvider base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -3637,12 +3563,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: status:%@; delayedActionTime:%@; imageURI:%@; softwareVersion:%@; "
-                                   @"softwareVersionString:%@; updateToken:%@; userConsentNeeded:%@; metadataForRequestor:%@; >",
-                  NSStringFromClass([self class]), _status, _delayedActionTime, _imageURI, _softwareVersion, _softwareVersionString,
-                  [_updateToken base64EncodedStringWithOptions:0], _userConsentNeeded,
-                  [_metadataForRequestor base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; delayedActionTime:%@; imageURI:%@; softwareVersion:%@; softwareVersionString:%@; updateToken:%@; userConsentNeeded:%@; metadataForRequestor:%@; >", NSStringFromClass([self class]), _status, _delayedActionTime, _imageURI, _softwareVersion, _softwareVersionString, [_updateToken base64EncodedStringWithOptions:0], _userConsentNeeded, [_metadataForRequestor base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -3690,8 +3611,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTROTASoftwareUpdateProviderClusterQueryImageResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
@@ -3787,9 +3707,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: updateToken:%@; newVersion:%@; >", NSStringFromClass([self class]),
-                  [_updateToken base64EncodedStringWithOptions:0], _newVersion];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: updateToken:%@; newVersion:%@; >", NSStringFromClass([self class]), [_updateToken base64EncodedStringWithOptions:0], _newVersion];
     return descriptionString;
 }
 
@@ -3823,8 +3741,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: action:%@; delayedActionTime:%@; >", NSStringFromClass([self class]), _action, _delayedActionTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: action:%@; delayedActionTime:%@; >", NSStringFromClass([self class]), _action, _delayedActionTime];
     return descriptionString;
 }
 
@@ -3872,8 +3789,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType &)decodableStruct
 {
     {
         self.action = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.action)];
@@ -3915,9 +3831,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: updateToken:%@; softwareVersion:%@; >", NSStringFromClass([self class]),
-                  [_updateToken base64EncodedStringWithOptions:0], _softwareVersion];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: updateToken:%@; softwareVersion:%@; >", NSStringFromClass([self class]), [_updateToken base64EncodedStringWithOptions:0], _softwareVersion];
     return descriptionString;
 }
 
@@ -3962,10 +3876,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: providerNodeID:%@; vendorID:%@; announcementReason:%@; metadataForNode:%@; endpoint:%@; >",
-        NSStringFromClass([self class]), _providerNodeID, _vendorID, _announcementReason,
-        [_metadataForNode base64EncodedStringWithOptions:0], _endpoint];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: providerNodeID:%@; vendorID:%@; announcementReason:%@; metadataForNode:%@; endpoint:%@; >", NSStringFromClass([self class]), _providerNodeID, _vendorID, _announcementReason, [_metadataForNode base64EncodedStringWithOptions:0], _endpoint];
     return descriptionString;
 }
 
@@ -4024,8 +3935,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: expiryLengthSeconds:%@; breadcrumb:%@; >",
-                                             NSStringFromClass([self class]), _expiryLengthSeconds, _breadcrumb];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: expiryLengthSeconds:%@; breadcrumb:%@; >", NSStringFromClass([self class]), _expiryLengthSeconds, _breadcrumb];
     return descriptionString;
 }
 
@@ -4056,8 +3966,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: errorCode:%@; debugText:%@; >", NSStringFromClass([self class]), _errorCode, _debugText];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: errorCode:%@; debugText:%@; >", NSStringFromClass([self class]), _errorCode, _debugText];
     return descriptionString;
 }
 
@@ -4105,8 +4014,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRGeneralCommissioningClusterArmFailSafeResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType &)decodableStruct
 {
     {
         self.errorCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.errorCode)];
@@ -4152,8 +4060,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newRegulatoryConfig:%@; countryCode:%@; breadcrumb:%@; >",
-                                             NSStringFromClass([self class]), _newRegulatoryConfig, _countryCode, _breadcrumb];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: newRegulatoryConfig:%@; countryCode:%@; breadcrumb:%@; >", NSStringFromClass([self class]), _newRegulatoryConfig, _countryCode, _breadcrumb];
     return descriptionString;
 }
 
@@ -4184,8 +4091,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: errorCode:%@; debugText:%@; >", NSStringFromClass([self class]), _errorCode, _debugText];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: errorCode:%@; debugText:%@; >", NSStringFromClass([self class]), _errorCode, _debugText];
     return descriptionString;
 }
 
@@ -4233,8 +4139,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType &)decodableStruct
 {
     {
         self.errorCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.errorCode)];
@@ -4302,8 +4207,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: errorCode:%@; debugText:%@; >", NSStringFromClass([self class]), _errorCode, _debugText];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: errorCode:%@; debugText:%@; >", NSStringFromClass([self class]), _errorCode, _debugText];
     return descriptionString;
 }
 
@@ -4351,8 +4255,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRGeneralCommissioningClusterCommissioningCompleteResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType &)decodableStruct
 {
     {
         self.errorCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.errorCode)];
@@ -4395,8 +4298,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ssid:%@; breadcrumb:%@; >", NSStringFromClass([self class]),
-                                             [_ssid base64EncodedStringWithOptions:0], _breadcrumb];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ssid:%@; breadcrumb:%@; >", NSStringFromClass([self class]), [_ssid base64EncodedStringWithOptions:0], _breadcrumb];
     return descriptionString;
 }
 
@@ -4433,9 +4335,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: networkingStatus:%@; debugText:%@; wiFiScanResults:%@; threadScanResults:%@; >",
-                  NSStringFromClass([self class]), _networkingStatus, _debugText, _wiFiScanResults, _threadScanResults];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkingStatus:%@; debugText:%@; wiFiScanResults:%@; threadScanResults:%@; >", NSStringFromClass([self class]), _networkingStatus, _debugText, _wiFiScanResults, _threadScanResults];
     return descriptionString;
 }
 
@@ -4483,8 +4383,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRNetworkCommissioningClusterScanNetworksResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType &)decodableStruct
 {
     {
         self.networkingStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.networkingStatus)];
@@ -4594,9 +4493,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: ssid:%@; credentials:%@; breadcrumb:%@; >", NSStringFromClass([self class]),
-                  [_ssid base64EncodedStringWithOptions:0], [_credentials base64EncodedStringWithOptions:0], _breadcrumb];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: ssid:%@; credentials:%@; breadcrumb:%@; >", NSStringFromClass([self class]), [_ssid base64EncodedStringWithOptions:0], [_credentials base64EncodedStringWithOptions:0], _breadcrumb];
     return descriptionString;
 }
 
@@ -4629,9 +4526,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: operationalDataset:%@; breadcrumb:%@; >", NSStringFromClass([self class]),
-                  [_operationalDataset base64EncodedStringWithOptions:0], _breadcrumb];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: operationalDataset:%@; breadcrumb:%@; >", NSStringFromClass([self class]), [_operationalDataset base64EncodedStringWithOptions:0], _breadcrumb];
     return descriptionString;
 }
 
@@ -4664,9 +4559,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: networkID:%@; breadcrumb:%@; >", NSStringFromClass([self class]),
-                  [_networkID base64EncodedStringWithOptions:0], _breadcrumb];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkID:%@; breadcrumb:%@; >", NSStringFromClass([self class]), [_networkID base64EncodedStringWithOptions:0], _breadcrumb];
     return descriptionString;
 }
 
@@ -4700,8 +4593,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkingStatus:%@; debugText:%@; networkIndex:%@; >",
-                                             NSStringFromClass([self class]), _networkingStatus, _debugText, _networkIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkingStatus:%@; debugText:%@; networkIndex:%@; >", NSStringFromClass([self class]), _networkingStatus, _debugText, _networkIndex];
     return descriptionString;
 }
 
@@ -4749,8 +4641,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRNetworkCommissioningClusterNetworkConfigResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType &)decodableStruct
 {
     {
         self.networkingStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.networkingStatus)];
@@ -4804,9 +4695,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: networkID:%@; breadcrumb:%@; >", NSStringFromClass([self class]),
-                  [_networkID base64EncodedStringWithOptions:0], _breadcrumb];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkID:%@; breadcrumb:%@; >", NSStringFromClass([self class]), [_networkID base64EncodedStringWithOptions:0], _breadcrumb];
     return descriptionString;
 }
 
@@ -4840,8 +4729,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkingStatus:%@; debugText:%@; errorValue:%@; >",
-                                             NSStringFromClass([self class]), _networkingStatus, _debugText, _errorValue];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkingStatus:%@; debugText:%@; errorValue:%@; >", NSStringFromClass([self class]), _networkingStatus, _debugText, _errorValue];
     return descriptionString;
 }
 
@@ -4889,8 +4777,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRNetworkCommissioningClusterConnectNetworkResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType &)decodableStruct
 {
     {
         self.networkingStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.networkingStatus)];
@@ -4947,9 +4834,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: networkID:%@; networkIndex:%@; breadcrumb:%@; >", NSStringFromClass([self class]),
-                  [_networkID base64EncodedStringWithOptions:0], _networkIndex, _breadcrumb];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: networkID:%@; networkIndex:%@; breadcrumb:%@; >", NSStringFromClass([self class]), [_networkID base64EncodedStringWithOptions:0], _networkIndex, _breadcrumb];
     return descriptionString;
 }
 
@@ -4985,8 +4870,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: intent:%@; requestedProtocol:%@; transferFileDesignator:%@; >",
-                                             NSStringFromClass([self class]), _intent, _requestedProtocol, _transferFileDesignator];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: intent:%@; requestedProtocol:%@; transferFileDesignator:%@; >", NSStringFromClass([self class]), _intent, _requestedProtocol, _transferFileDesignator];
     return descriptionString;
 }
 
@@ -5023,9 +4907,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: status:%@; logContent:%@; utcTimeStamp:%@; timeSinceBoot:%@; >", NSStringFromClass([self class]),
-        _status, [_logContent base64EncodedStringWithOptions:0], _utcTimeStamp, _timeSinceBoot];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; logContent:%@; utcTimeStamp:%@; timeSinceBoot:%@; >", NSStringFromClass([self class]), _status, [_logContent base64EncodedStringWithOptions:0], _utcTimeStamp, _timeSinceBoot];
     return descriptionString;
 }
 
@@ -5073,8 +4955,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRDiagnosticLogsClusterRetrieveLogsResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
@@ -5150,9 +5031,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: enableKey:%@; eventTrigger:%@; >", NSStringFromClass([self class]),
-                  [_enableKey base64EncodedStringWithOptions:0], _eventTrigger];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: enableKey:%@; eventTrigger:%@; >", NSStringFromClass([self class]), [_enableKey base64EncodedStringWithOptions:0], _eventTrigger];
     return descriptionString;
 }
 
@@ -5296,8 +5175,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: utcTime:%@; granularity:%@; timeSource:%@; >",
-                                             NSStringFromClass([self class]), _utcTime, _granularity, _timeSource];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: utcTime:%@; granularity:%@; timeSource:%@; >", NSStringFromClass([self class]), _utcTime, _granularity, _timeSource];
     return descriptionString;
 }
 
@@ -5330,8 +5208,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: trustedTimeSource:%@; >", NSStringFromClass([self class]), _trustedTimeSource];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: trustedTimeSource:%@; >", NSStringFromClass([self class]), _trustedTimeSource];
     return descriptionString;
 }
 
@@ -5387,8 +5264,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: dstOffsetRequired:%@; >", NSStringFromClass([self class]), _dstOffsetRequired];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dstOffsetRequired:%@; >", NSStringFromClass([self class]), _dstOffsetRequired];
     return descriptionString;
 }
 
@@ -5436,8 +5312,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRTimeSynchronizationClusterSetTimeZoneResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::TimeSynchronization::Commands::SetTimeZoneResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TimeSynchronization::Commands::SetTimeZoneResponse::DecodableType &)decodableStruct
 {
     {
         self.dstOffsetRequired = [NSNumber numberWithBool:decodableStruct.DSTOffsetRequired];
@@ -5500,8 +5375,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: defaultNTP:%@; >", NSStringFromClass([self class]), _defaultNTP];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: defaultNTP:%@; >", NSStringFromClass([self class]), _defaultNTP];
     return descriptionString;
 }
 
@@ -5543,10 +5417,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: commissioningTimeout:%@; pakePasscodeVerifier:%@; discriminator:%@; iterations:%@; salt:%@; >",
-        NSStringFromClass([self class]), _commissioningTimeout, [_pakePasscodeVerifier base64EncodedStringWithOptions:0],
-        _discriminator, _iterations, [_salt base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: commissioningTimeout:%@; pakePasscodeVerifier:%@; discriminator:%@; iterations:%@; salt:%@; >", NSStringFromClass([self class]), _commissioningTimeout, [_pakePasscodeVerifier base64EncodedStringWithOptions:0], _discriminator, _iterations, [_salt base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -5589,8 +5460,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: commissioningTimeout:%@; >", NSStringFromClass([self class]), _commissioningTimeout];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: commissioningTimeout:%@; >", NSStringFromClass([self class]), _commissioningTimeout];
     return descriptionString;
 }
 
@@ -5647,8 +5517,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attestationNonce:%@; >", NSStringFromClass([self class]),
-                                             [_attestationNonce base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attestationNonce:%@; >", NSStringFromClass([self class]), [_attestationNonce base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -5679,9 +5548,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: attestationElements:%@; attestationSignature:%@; >", NSStringFromClass([self class]),
-        [_attestationElements base64EncodedStringWithOptions:0], [_attestationSignature base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attestationElements:%@; attestationSignature:%@; >", NSStringFromClass([self class]), [_attestationElements base64EncodedStringWithOptions:0], [_attestationSignature base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -5729,8 +5596,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTROperationalCredentialsClusterAttestationResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType &)decodableStruct
 {
     {
         self.attestationElements = AsData(decodableStruct.attestationElements);
@@ -5779,8 +5645,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: certificateType:%@; >", NSStringFromClass([self class]), _certificateType];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: certificateType:%@; >", NSStringFromClass([self class]), _certificateType];
     return descriptionString;
 }
 
@@ -5808,8 +5673,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: certificate:%@; >", NSStringFromClass([self class]),
-                                             [_certificate base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: certificate:%@; >", NSStringFromClass([self class]), [_certificate base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -5857,8 +5721,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTROperationalCredentialsClusterCertificateChainResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType &)decodableStruct
 {
     {
         self.certificate = AsData(decodableStruct.certificate);
@@ -5894,9 +5757,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: csrNonce:%@; isForUpdateNOC:%@; >", NSStringFromClass([self class]),
-                  [_csrNonce base64EncodedStringWithOptions:0], _isForUpdateNOC];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: csrNonce:%@; isForUpdateNOC:%@; >", NSStringFromClass([self class]), [_csrNonce base64EncodedStringWithOptions:0], _isForUpdateNOC];
     return descriptionString;
 }
 
@@ -5927,9 +5788,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: nocsrElements:%@; attestationSignature:%@; >", NSStringFromClass([self class]),
-                  [_nocsrElements base64EncodedStringWithOptions:0], [_attestationSignature base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: nocsrElements:%@; attestationSignature:%@; >", NSStringFromClass([self class]), [_nocsrElements base64EncodedStringWithOptions:0], [_attestationSignature base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -5977,8 +5836,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTROperationalCredentialsClusterCSRResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType &)decodableStruct
 {
     {
         self.nocsrElements = AsData(decodableStruct.NOCSRElements);
@@ -6026,11 +5884,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: nocValue:%@; icacValue:%@; ipkValue:%@; caseAdminSubject:%@; adminVendorId:%@; >",
-                  NSStringFromClass([self class]), [_nocValue base64EncodedStringWithOptions:0],
-                  [_icacValue base64EncodedStringWithOptions:0], [_ipkValue base64EncodedStringWithOptions:0], _caseAdminSubject,
-                  _adminVendorId];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: nocValue:%@; icacValue:%@; ipkValue:%@; caseAdminSubject:%@; adminVendorId:%@; >", NSStringFromClass([self class]), [_nocValue base64EncodedStringWithOptions:0], [_icacValue base64EncodedStringWithOptions:0], [_ipkValue base64EncodedStringWithOptions:0], _caseAdminSubject, _adminVendorId];
     return descriptionString;
 }
 
@@ -6063,9 +5917,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: nocValue:%@; icacValue:%@; >", NSStringFromClass([self class]),
-                  [_nocValue base64EncodedStringWithOptions:0], [_icacValue base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: nocValue:%@; icacValue:%@; >", NSStringFromClass([self class]), [_nocValue base64EncodedStringWithOptions:0], [_icacValue base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -6099,8 +5951,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: statusCode:%@; fabricIndex:%@; debugText:%@; >",
-                                             NSStringFromClass([self class]), _statusCode, _fabricIndex, _debugText];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: statusCode:%@; fabricIndex:%@; debugText:%@; >", NSStringFromClass([self class]), _statusCode, _fabricIndex, _debugText];
     return descriptionString;
 }
 
@@ -6148,8 +5999,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTROperationalCredentialsClusterNOCResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType &)decodableStruct
 {
     {
         self.statusCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.statusCode)];
@@ -6230,8 +6080,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: fabricIndex:%@; >", NSStringFromClass([self class]), _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: fabricIndex:%@; >", NSStringFromClass([self class]), _fabricIndex];
     return descriptionString;
 }
 
@@ -6261,8 +6110,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: rootCACertificate:%@; >", NSStringFromClass([self class]),
-                                             [_rootCACertificate base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: rootCACertificate:%@; >", NSStringFromClass([self class]), [_rootCACertificate base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -6305,8 +6153,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupKeySet:%@; >", NSStringFromClass([self class]), _groupKeySet];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupKeySet:%@; >", NSStringFromClass([self class]), _groupKeySet];
     return descriptionString;
 }
 
@@ -6336,8 +6183,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupKeySetID:%@; >", NSStringFromClass([self class]), _groupKeySetID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupKeySetID:%@; >", NSStringFromClass([self class]), _groupKeySetID];
     return descriptionString;
 }
 
@@ -6365,8 +6211,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupKeySet:%@; >", NSStringFromClass([self class]), _groupKeySet];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupKeySet:%@; >", NSStringFromClass([self class]), _groupKeySet];
     return descriptionString;
 }
 
@@ -6414,14 +6259,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRGroupKeyManagementClusterKeySetReadResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType &)decodableStruct
 {
     {
         self.groupKeySet = [MTRGroupKeyManagementClusterGroupKeySetStruct new];
         self.groupKeySet.groupKeySetID = [NSNumber numberWithUnsignedShort:decodableStruct.groupKeySet.groupKeySetID];
-        self.groupKeySet.groupKeySecurityPolicy =
-            [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.groupKeySet.groupKeySecurityPolicy)];
+        self.groupKeySet.groupKeySecurityPolicy = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.groupKeySet.groupKeySecurityPolicy)];
         if (decodableStruct.groupKeySet.epochKey0.IsNull()) {
             self.groupKeySet.epochKey0 = nil;
         } else {
@@ -6430,8 +6273,7 @@ NS_ASSUME_NONNULL_BEGIN
         if (decodableStruct.groupKeySet.epochStartTime0.IsNull()) {
             self.groupKeySet.epochStartTime0 = nil;
         } else {
-            self.groupKeySet.epochStartTime0 =
-                [NSNumber numberWithUnsignedLongLong:decodableStruct.groupKeySet.epochStartTime0.Value()];
+            self.groupKeySet.epochStartTime0 = [NSNumber numberWithUnsignedLongLong:decodableStruct.groupKeySet.epochStartTime0.Value()];
         }
         if (decodableStruct.groupKeySet.epochKey1.IsNull()) {
             self.groupKeySet.epochKey1 = nil;
@@ -6441,8 +6283,7 @@ NS_ASSUME_NONNULL_BEGIN
         if (decodableStruct.groupKeySet.epochStartTime1.IsNull()) {
             self.groupKeySet.epochStartTime1 = nil;
         } else {
-            self.groupKeySet.epochStartTime1 =
-                [NSNumber numberWithUnsignedLongLong:decodableStruct.groupKeySet.epochStartTime1.Value()];
+            self.groupKeySet.epochStartTime1 = [NSNumber numberWithUnsignedLongLong:decodableStruct.groupKeySet.epochStartTime1.Value()];
         }
         if (decodableStruct.groupKeySet.epochKey2.IsNull()) {
             self.groupKeySet.epochKey2 = nil;
@@ -6452,8 +6293,7 @@ NS_ASSUME_NONNULL_BEGIN
         if (decodableStruct.groupKeySet.epochStartTime2.IsNull()) {
             self.groupKeySet.epochStartTime2 = nil;
         } else {
-            self.groupKeySet.epochStartTime2 =
-                [NSNumber numberWithUnsignedLongLong:decodableStruct.groupKeySet.epochStartTime2.Value()];
+            self.groupKeySet.epochStartTime2 = [NSNumber numberWithUnsignedLongLong:decodableStruct.groupKeySet.epochStartTime2.Value()];
         }
     }
     return CHIP_NO_ERROR;
@@ -6484,8 +6324,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupKeySetID:%@; >", NSStringFromClass([self class]), _groupKeySetID];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupKeySetID:%@; >", NSStringFromClass([self class]), _groupKeySetID];
     return descriptionString;
 }
 
@@ -6540,8 +6379,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: groupKeySetIDs:%@; >", NSStringFromClass([self class]), _groupKeySetIDs];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupKeySetIDs:%@; >", NSStringFromClass([self class]), _groupKeySetIDs];
     return descriptionString;
 }
 
@@ -6589,8 +6427,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType &)decodableStruct
 {
     {
         { // Scope for our temporary variables
@@ -6646,10 +6483,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: checkInNodeID:%@; monitoredSubject:%@; key:%@; verificationKey:%@; >",
-                  NSStringFromClass([self class]), _checkInNodeID, _monitoredSubject, [_key base64EncodedStringWithOptions:0],
-                  [_verificationKey base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: checkInNodeID:%@; monitoredSubject:%@; key:%@; verificationKey:%@; >", NSStringFromClass([self class]), _checkInNodeID, _monitoredSubject, [_key base64EncodedStringWithOptions:0], [_verificationKey base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -6675,8 +6509,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: icdCounter:%@; >", NSStringFromClass([self class]), _icdCounter];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: icdCounter:%@; >", NSStringFromClass([self class]), _icdCounter];
     return descriptionString;
 }
 
@@ -6724,8 +6557,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRICDManagementClusterRegisterClientResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType &)decodableStruct
 {
     {
         self.icdCounter = [NSNumber numberWithUnsignedInt:decodableStruct.ICDCounter];
@@ -6761,9 +6593,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: checkInNodeID:%@; verificationKey:%@; >", NSStringFromClass([self class]), _checkInNodeID,
-                  [_verificationKey base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: checkInNodeID:%@; verificationKey:%@; >", NSStringFromClass([self class]), _checkInNodeID, [_verificationKey base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -6879,8 +6709,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: status:%@; statusText:%@; >", NSStringFromClass([self class]), _status, _statusText];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; statusText:%@; >", NSStringFromClass([self class]), _status, _statusText];
     return descriptionString;
 }
 
@@ -6928,8 +6757,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRLaundryWasherModeClusterChangeToModeResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -7002,8 +6830,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: status:%@; statusText:%@; >", NSStringFromClass([self class]), _status, _statusText];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; statusText:%@; >", NSStringFromClass([self class]), _status, _statusText];
     return descriptionString;
 }
 
@@ -7014,8 +6841,7 @@ NS_ASSUME_NONNULL_BEGIN
         return nil;
     }
 
-    using DecodableType
-        = chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeResponse::DecodableType;
+    using DecodableType = chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeResponse::DecodableType;
     chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
                                                                            clusterID:DecodableType::GetClusterId()
                                                                            commandID:DecodableType::GetCommandId()
@@ -7052,9 +6878,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeResponse::DecodableType &)
-        decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -7127,8 +6951,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: status:%@; statusText:%@; >", NSStringFromClass([self class]), _status, _statusText];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; statusText:%@; >", NSStringFromClass([self class]), _status, _statusText];
     return descriptionString;
 }
 
@@ -7176,8 +6999,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRRVCRunModeClusterChangeToModeResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::RvcRunMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::RvcRunMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -7250,8 +7072,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: status:%@; statusText:%@; >", NSStringFromClass([self class]), _status, _statusText];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; statusText:%@; >", NSStringFromClass([self class]), _status, _statusText];
     return descriptionString;
 }
 
@@ -7299,8 +7120,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRRVCCleanModeClusterChangeToModeResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -7347,8 +7167,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: targetTemperature:%@; targetTemperatureLevel:%@; >",
-                                             NSStringFromClass([self class]), _targetTemperature, _targetTemperatureLevel];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: targetTemperature:%@; targetTemperatureLevel:%@; >", NSStringFromClass([self class]), _targetTemperature, _targetTemperatureLevel];
     return descriptionString;
 }
 
@@ -7407,8 +7226,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: status:%@; statusText:%@; >", NSStringFromClass([self class]), _status, _statusText];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; statusText:%@; >", NSStringFromClass([self class]), _status, _statusText];
     return descriptionString;
 }
 
@@ -7456,8 +7274,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRDishwasherModeClusterChangeToModeResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::DishwasherMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DishwasherMode::Commands::ChangeToModeResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:decodableStruct.status];
@@ -7692,8 +7509,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: commandResponseState:%@; >", NSStringFromClass([self class]), _commandResponseState];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: commandResponseState:%@; >", NSStringFromClass([self class]), _commandResponseState];
     return descriptionString;
 }
 
@@ -7741,13 +7557,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTROperationalStateClusterOperationalCommandResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct
 {
     {
         self.commandResponseState = [MTROperationalStateClusterErrorStateStruct new];
-        self.commandResponseState.errorStateID =
-            [NSNumber numberWithUnsignedChar:decodableStruct.commandResponseState.errorStateID];
+        self.commandResponseState.errorStateID = [NSNumber numberWithUnsignedChar:decodableStruct.commandResponseState.errorStateID];
         if (decodableStruct.commandResponseState.errorStateLabel.HasValue()) {
             self.commandResponseState.errorStateLabel = AsString(decodableStruct.commandResponseState.errorStateLabel.Value());
             if (self.commandResponseState.errorStateLabel == nil) {
@@ -7899,8 +7713,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: commandResponseState:%@; >", NSStringFromClass([self class]), _commandResponseState];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: commandResponseState:%@; >", NSStringFromClass([self class]), _commandResponseState];
     return descriptionString;
 }
 
@@ -7948,13 +7761,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRRVCOperationalStateClusterOperationalCommandResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType &)decodableStruct
 {
     {
         self.commandResponseState = [MTRRVCOperationalStateClusterErrorStateStruct new];
-        self.commandResponseState.errorStateID =
-            [NSNumber numberWithUnsignedChar:decodableStruct.commandResponseState.errorStateID];
+        self.commandResponseState.errorStateID = [NSNumber numberWithUnsignedChar:decodableStruct.commandResponseState.errorStateID];
         if (decodableStruct.commandResponseState.errorStateLabel.HasValue()) {
             self.commandResponseState.errorStateLabel = AsString(decodableStruct.commandResponseState.errorStateLabel.Value());
             if (self.commandResponseState.errorStateLabel == nil) {
@@ -8056,8 +7867,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: pinCode:%@; >", NSStringFromClass([self class]), [_pinCode base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: pinCode:%@; >", NSStringFromClass([self class]), [_pinCode base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -8087,8 +7897,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: pinCode:%@; >", NSStringFromClass([self class]), [_pinCode base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: pinCode:%@; >", NSStringFromClass([self class]), [_pinCode base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -8121,8 +7930,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: timeout:%@; pinCode:%@; >", NSStringFromClass([self class]),
-                                             _timeout, [_pinCode base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: timeout:%@; pinCode:%@; >", NSStringFromClass([self class]), _timeout, [_pinCode base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -8170,10 +7978,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:
-            @"<%@: weekDayIndex:%@; userIndex:%@; daysMask:%@; startHour:%@; startMinute:%@; endHour:%@; endMinute:%@; >",
-        NSStringFromClass([self class]), _weekDayIndex, _userIndex, _daysMask, _startHour, _startMinute, _endHour, _endMinute];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: weekDayIndex:%@; userIndex:%@; daysMask:%@; startHour:%@; startMinute:%@; endHour:%@; endMinute:%@; >", NSStringFromClass([self class]), _weekDayIndex, _userIndex, _daysMask, _startHour, _startMinute, _endHour, _endMinute];
     return descriptionString;
 }
 
@@ -8206,8 +8011,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: weekDayIndex:%@; userIndex:%@; >", NSStringFromClass([self class]), _weekDayIndex, _userIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: weekDayIndex:%@; userIndex:%@; >", NSStringFromClass([self class]), _weekDayIndex, _userIndex];
     return descriptionString;
 }
 
@@ -8256,10 +8060,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: weekDayIndex:%@; userIndex:%@; status:%@; daysMask:%@; "
-                                                              @"startHour:%@; startMinute:%@; endHour:%@; endMinute:%@; >",
-                                             NSStringFromClass([self class]), _weekDayIndex, _userIndex, _status, _daysMask,
-                                             _startHour, _startMinute, _endHour, _endMinute];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: weekDayIndex:%@; userIndex:%@; status:%@; daysMask:%@; startHour:%@; startMinute:%@; endHour:%@; endMinute:%@; >", NSStringFromClass([self class]), _weekDayIndex, _userIndex, _status, _daysMask, _startHour, _startMinute, _endHour, _endMinute];
     return descriptionString;
 }
 
@@ -8307,8 +8108,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRDoorLockClusterGetWeekDayScheduleResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType &)decodableStruct
 {
     {
         self.weekDayIndex = [NSNumber numberWithUnsignedChar:decodableStruct.weekDayIndex];
@@ -8385,8 +8185,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: weekDayIndex:%@; userIndex:%@; >", NSStringFromClass([self class]), _weekDayIndex, _userIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: weekDayIndex:%@; userIndex:%@; >", NSStringFromClass([self class]), _weekDayIndex, _userIndex];
     return descriptionString;
 }
 
@@ -8425,9 +8224,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: yearDayIndex:%@; userIndex:%@; localStartTime:%@; localEndTime:%@; >",
-                  NSStringFromClass([self class]), _yearDayIndex, _userIndex, _localStartTime, _localEndTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: yearDayIndex:%@; userIndex:%@; localStartTime:%@; localEndTime:%@; >", NSStringFromClass([self class]), _yearDayIndex, _userIndex, _localStartTime, _localEndTime];
     return descriptionString;
 }
 
@@ -8460,8 +8257,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: yearDayIndex:%@; userIndex:%@; >", NSStringFromClass([self class]), _yearDayIndex, _userIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: yearDayIndex:%@; userIndex:%@; >", NSStringFromClass([self class]), _yearDayIndex, _userIndex];
     return descriptionString;
 }
 
@@ -8501,9 +8297,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: yearDayIndex:%@; userIndex:%@; status:%@; localStartTime:%@; localEndTime:%@; >",
-                  NSStringFromClass([self class]), _yearDayIndex, _userIndex, _status, _localStartTime, _localEndTime];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: yearDayIndex:%@; userIndex:%@; status:%@; localStartTime:%@; localEndTime:%@; >", NSStringFromClass([self class]), _yearDayIndex, _userIndex, _status, _localStartTime, _localEndTime];
     return descriptionString;
 }
 
@@ -8551,8 +8345,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRDoorLockClusterGetYearDayScheduleResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType &)decodableStruct
 {
     {
         self.yearDayIndex = [NSNumber numberWithUnsignedChar:decodableStruct.yearDayIndex];
@@ -8608,8 +8401,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: yearDayIndex:%@; userIndex:%@; >", NSStringFromClass([self class]), _yearDayIndex, _userIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: yearDayIndex:%@; userIndex:%@; >", NSStringFromClass([self class]), _yearDayIndex, _userIndex];
     return descriptionString;
 }
 
@@ -8648,9 +8440,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: holidayIndex:%@; localStartTime:%@; localEndTime:%@; operatingMode:%@; >",
-                  NSStringFromClass([self class]), _holidayIndex, _localStartTime, _localEndTime, _operatingMode];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: holidayIndex:%@; localStartTime:%@; localEndTime:%@; operatingMode:%@; >", NSStringFromClass([self class]), _holidayIndex, _localStartTime, _localEndTime, _operatingMode];
     return descriptionString;
 }
 
@@ -8680,8 +8470,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: holidayIndex:%@; >", NSStringFromClass([self class]), _holidayIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: holidayIndex:%@; >", NSStringFromClass([self class]), _holidayIndex];
     return descriptionString;
 }
 
@@ -8721,9 +8510,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: holidayIndex:%@; status:%@; localStartTime:%@; localEndTime:%@; operatingMode:%@; >",
-                  NSStringFromClass([self class]), _holidayIndex, _status, _localStartTime, _localEndTime, _operatingMode];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: holidayIndex:%@; status:%@; localStartTime:%@; localEndTime:%@; operatingMode:%@; >", NSStringFromClass([self class]), _holidayIndex, _status, _localStartTime, _localEndTime, _operatingMode];
     return descriptionString;
 }
 
@@ -8771,8 +8558,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRDoorLockClusterGetHolidayScheduleResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType &)decodableStruct
 {
     {
         self.holidayIndex = [NSNumber numberWithUnsignedChar:decodableStruct.holidayIndex];
@@ -8829,8 +8615,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: holidayIndex:%@; >", NSStringFromClass([self class]), _holidayIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: holidayIndex:%@; >", NSStringFromClass([self class]), _holidayIndex];
     return descriptionString;
 }
 
@@ -8878,11 +8663,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:
-            @"<%@: operationType:%@; userIndex:%@; userName:%@; userUniqueID:%@; userStatus:%@; userType:%@; credentialRule:%@; >",
-        NSStringFromClass([self class]), _operationType, _userIndex, _userName, _userUniqueID, _userStatus, _userType,
-        _credentialRule];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: operationType:%@; userIndex:%@; userName:%@; userUniqueID:%@; userStatus:%@; userType:%@; credentialRule:%@; >", NSStringFromClass([self class]), _operationType, _userIndex, _userName, _userUniqueID, _userStatus, _userType, _credentialRule];
     return descriptionString;
 }
 
@@ -8980,11 +8761,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: userIndex:%@; userName:%@; userUniqueID:%@; userStatus:%@; userType:%@; credentialRule:%@; "
-                         @"credentials:%@; creatorFabricIndex:%@; lastModifiedFabricIndex:%@; nextUserIndex:%@; >",
-        NSStringFromClass([self class]), _userIndex, _userName, _userUniqueID, _userStatus, _userType, _credentialRule,
-        _credentials, _creatorFabricIndex, _lastModifiedFabricIndex, _nextUserIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: userIndex:%@; userName:%@; userUniqueID:%@; userStatus:%@; userType:%@; credentialRule:%@; credentials:%@; creatorFabricIndex:%@; lastModifiedFabricIndex:%@; nextUserIndex:%@; >", NSStringFromClass([self class]), _userIndex, _userName, _userUniqueID, _userStatus, _userType, _credentialRule, _credentials, _creatorFabricIndex, _lastModifiedFabricIndex, _nextUserIndex];
     return descriptionString;
 }
 
@@ -9032,8 +8809,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRDoorLockClusterGetUserResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType &)decodableStruct
 {
     {
         self.userIndex = [NSNumber numberWithUnsignedShort:decodableStruct.userIndex];
@@ -9207,10 +8983,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: operationType:%@; credential:%@; credentialData:%@; userIndex:%@; userStatus:%@; userType:%@; >",
-        NSStringFromClass([self class]), _operationType, _credential, [_credentialData base64EncodedStringWithOptions:0],
-        _userIndex, _userStatus, _userType];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: operationType:%@; credential:%@; credentialData:%@; userIndex:%@; userStatus:%@; userType:%@; >", NSStringFromClass([self class]), _operationType, _credential, [_credentialData base64EncodedStringWithOptions:0], _userIndex, _userStatus, _userType];
     return descriptionString;
 }
 
@@ -9244,8 +9017,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; userIndex:%@; nextCredentialIndex:%@; >",
-                                             NSStringFromClass([self class]), _status, _userIndex, _nextCredentialIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; userIndex:%@; nextCredentialIndex:%@; >", NSStringFromClass([self class]), _status, _userIndex, _nextCredentialIndex];
     return descriptionString;
 }
 
@@ -9293,8 +9065,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRDoorLockClusterSetCredentialResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
@@ -9341,8 +9112,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: credential:%@; >", NSStringFromClass([self class]), _credential];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: credential:%@; >", NSStringFromClass([self class]), _credential];
     return descriptionString;
 }
 
@@ -9382,11 +9152,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:
-            @"<%@: credentialExists:%@; userIndex:%@; creatorFabricIndex:%@; lastModifiedFabricIndex:%@; nextCredentialIndex:%@; >",
-        NSStringFromClass([self class]), _credentialExists, _userIndex, _creatorFabricIndex, _lastModifiedFabricIndex,
-        _nextCredentialIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: credentialExists:%@; userIndex:%@; creatorFabricIndex:%@; lastModifiedFabricIndex:%@; nextCredentialIndex:%@; >", NSStringFromClass([self class]), _credentialExists, _userIndex, _creatorFabricIndex, _lastModifiedFabricIndex, _nextCredentialIndex];
     return descriptionString;
 }
 
@@ -9434,8 +9200,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRDoorLockClusterGetCredentialStatusResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType &)decodableStruct
 {
     {
         self.credentialExists = [NSNumber numberWithBool:decodableStruct.credentialExists];
@@ -9496,8 +9261,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: credential:%@; >", NSStringFromClass([self class]), _credential];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: credential:%@; >", NSStringFromClass([self class]), _credential];
     return descriptionString;
 }
 
@@ -9527,8 +9291,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: pinCode:%@; >", NSStringFromClass([self class]), [_pinCode base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: pinCode:%@; >", NSStringFromClass([self class]), [_pinCode base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -9669,8 +9432,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: liftPercent100thsValue:%@; >", NSStringFromClass([self class]), _liftPercent100thsValue];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: liftPercent100thsValue:%@; >", NSStringFromClass([self class]), _liftPercent100thsValue];
     return descriptionString;
 }
 
@@ -9730,8 +9492,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: tiltPercent100thsValue:%@; >", NSStringFromClass([self class]), _tiltPercent100thsValue];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: tiltPercent100thsValue:%@; >", NSStringFromClass([self class]), _tiltPercent100thsValue];
     return descriptionString;
 }
 
@@ -9761,8 +9522,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: percentOpen:%@; >", NSStringFromClass([self class]), _percentOpen];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: percentOpen:%@; >", NSStringFromClass([self class]), _percentOpen];
     return descriptionString;
 }
 
@@ -9822,8 +9582,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: mode:%@; amount:%@; >", NSStringFromClass([self class]), _mode, _amount];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mode:%@; amount:%@; >", NSStringFromClass([self class]), _mode, _amount];
     return descriptionString;
 }
 
@@ -9860,9 +9619,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: numberOfTransitionsForSequence:%@; dayOfWeekForSequence:%@; modeForSequence:%@; transitions:%@; >",
-        NSStringFromClass([self class]), _numberOfTransitionsForSequence, _dayOfWeekForSequence, _modeForSequence, _transitions];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: numberOfTransitionsForSequence:%@; dayOfWeekForSequence:%@; modeForSequence:%@; transitions:%@; >", NSStringFromClass([self class]), _numberOfTransitionsForSequence, _dayOfWeekForSequence, _modeForSequence, _transitions];
     return descriptionString;
 }
 
@@ -9910,8 +9667,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRThermostatClusterGetWeeklyScheduleResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType &)decodableStruct
 {
     {
         self.numberOfTransitionsForSequence = [NSNumber numberWithUnsignedChar:decodableStruct.numberOfTransitionsForSequence];
@@ -9987,9 +9743,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: numberOfTransitionsForSequence:%@; dayOfWeekForSequence:%@; modeForSequence:%@; transitions:%@; >",
-        NSStringFromClass([self class]), _numberOfTransitionsForSequence, _dayOfWeekForSequence, _modeForSequence, _transitions];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: numberOfTransitionsForSequence:%@; dayOfWeekForSequence:%@; modeForSequence:%@; transitions:%@; >", NSStringFromClass([self class]), _numberOfTransitionsForSequence, _dayOfWeekForSequence, _modeForSequence, _transitions];
     return descriptionString;
 }
 
@@ -10022,8 +9776,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: daysToReturn:%@; modeToReturn:%@; >",
-                                             NSStringFromClass([self class]), _daysToReturn, _modeToReturn];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: daysToReturn:%@; modeToReturn:%@; >", NSStringFromClass([self class]), _daysToReturn, _modeToReturn];
     return descriptionString;
 }
 
@@ -10086,8 +9839,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: direction:%@; wrap:%@; lowestOff:%@; >",
-                                             NSStringFromClass([self class]), _direction, _wrap, _lowestOff];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: direction:%@; wrap:%@; lowestOff:%@; >", NSStringFromClass([self class]), _direction, _wrap, _lowestOff];
     return descriptionString;
 }
 
@@ -10129,9 +9881,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: hue:%@; direction:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
-                  NSStringFromClass([self class]), _hue, _direction, _transitionTime, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: hue:%@; direction:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _hue, _direction, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -10170,8 +9920,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; optionsMask:%@; optionsOverride:%@; >",
-                                             NSStringFromClass([self class]), _moveMode, _rate, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _moveMode, _rate, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -10213,9 +9962,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
-                  NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -10254,9 +10001,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: saturation:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
-                  NSStringFromClass([self class]), _saturation, _transitionTime, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: saturation:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _saturation, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -10295,8 +10040,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; optionsMask:%@; optionsOverride:%@; >",
-                                             NSStringFromClass([self class]), _moveMode, _rate, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _moveMode, _rate, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -10338,9 +10082,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
-                  NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -10382,9 +10124,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: hue:%@; saturation:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
-                  NSStringFromClass([self class]), _hue, _saturation, _transitionTime, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: hue:%@; saturation:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _hue, _saturation, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -10426,9 +10166,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: colorX:%@; colorY:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
-                  NSStringFromClass([self class]), _colorX, _colorY, _transitionTime, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: colorX:%@; colorY:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _colorX, _colorY, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -10467,8 +10205,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: rateX:%@; rateY:%@; optionsMask:%@; optionsOverride:%@; >",
-                                             NSStringFromClass([self class]), _rateX, _rateY, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: rateX:%@; rateY:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _rateX, _rateY, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -10510,9 +10247,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: stepX:%@; stepY:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
-                  NSStringFromClass([self class]), _stepX, _stepY, _transitionTime, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: stepX:%@; stepY:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _stepX, _stepY, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -10551,9 +10286,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: colorTemperatureMireds:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
-                  NSStringFromClass([self class]), _colorTemperatureMireds, _transitionTime, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: colorTemperatureMireds:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _colorTemperatureMireds, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -10608,9 +10341,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: enhancedHue:%@; direction:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
-                  NSStringFromClass([self class]), _enhancedHue, _direction, _transitionTime, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: enhancedHue:%@; direction:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _enhancedHue, _direction, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -10649,8 +10380,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; optionsMask:%@; optionsOverride:%@; >",
-                                             NSStringFromClass([self class]), _moveMode, _rate, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _moveMode, _rate, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -10692,9 +10422,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
-                  NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -10736,9 +10464,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: enhancedHue:%@; saturation:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >",
-                  NSStringFromClass([self class]), _enhancedHue, _saturation, _transitionTime, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: enhancedHue:%@; saturation:%@; transitionTime:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _enhancedHue, _saturation, _transitionTime, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -10786,10 +10512,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:
-            @"<%@: updateFlags:%@; action:%@; direction:%@; time:%@; startHue:%@; optionsMask:%@; optionsOverride:%@; >",
-        NSStringFromClass([self class]), _updateFlags, _action, _direction, _time, _startHue, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: updateFlags:%@; action:%@; direction:%@; time:%@; startHue:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _updateFlags, _action, _direction, _time, _startHue, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -10822,8 +10545,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: optionsMask:%@; optionsOverride:%@; >",
-                                             NSStringFromClass([self class]), _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -10868,11 +10590,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; colorTemperatureMinimumMireds:%@; "
-                                   @"colorTemperatureMaximumMireds:%@; optionsMask:%@; optionsOverride:%@; >",
-                  NSStringFromClass([self class]), _moveMode, _rate, _colorTemperatureMinimumMireds, _colorTemperatureMaximumMireds,
-                  _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: moveMode:%@; rate:%@; colorTemperatureMinimumMireds:%@; colorTemperatureMaximumMireds:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _moveMode, _rate, _colorTemperatureMinimumMireds, _colorTemperatureMaximumMireds, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -10920,11 +10638,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; colorTemperatureMinimumMireds:%@; "
-                                   @"colorTemperatureMaximumMireds:%@; optionsMask:%@; optionsOverride:%@; >",
-                  NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _colorTemperatureMinimumMireds,
-                  _colorTemperatureMaximumMireds, _optionsMask, _optionsOverride];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: stepMode:%@; stepSize:%@; transitionTime:%@; colorTemperatureMinimumMireds:%@; colorTemperatureMaximumMireds:%@; optionsMask:%@; optionsOverride:%@; >", NSStringFromClass([self class]), _stepMode, _stepSize, _transitionTime, _colorTemperatureMinimumMireds, _colorTemperatureMaximumMireds, _optionsMask, _optionsOverride];
     return descriptionString;
 }
 
@@ -10985,8 +10699,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: status:%@; data:%@; >", NSStringFromClass([self class]), _status, _data];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; data:%@; >", NSStringFromClass([self class]), _status, _data];
     return descriptionString;
 }
 
@@ -11034,8 +10747,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRChannelClusterChangeChannelResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
@@ -11082,8 +10794,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: majorNumber:%@; minorNumber:%@; >", NSStringFromClass([self class]), _majorNumber, _minorNumber];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: majorNumber:%@; minorNumber:%@; >", NSStringFromClass([self class]), _majorNumber, _minorNumber];
     return descriptionString;
 }
 
@@ -11146,8 +10857,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: target:%@; data:%@; >", NSStringFromClass([self class]), _target, _data];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: target:%@; data:%@; >", NSStringFromClass([self class]), _target, _data];
     return descriptionString;
 }
 
@@ -11178,8 +10888,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: status:%@; data:%@; >", NSStringFromClass([self class]), _status, _data];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; data:%@; >", NSStringFromClass([self class]), _status, _data];
     return descriptionString;
 }
 
@@ -11227,8 +10936,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRTargetNavigatorClusterNavigateTargetResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
@@ -11491,8 +11199,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: deltaPositionMilliseconds:%@; >", NSStringFromClass([self class]), _deltaPositionMilliseconds];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: deltaPositionMilliseconds:%@; >", NSStringFromClass([self class]), _deltaPositionMilliseconds];
     return descriptionString;
 }
 
@@ -11522,8 +11229,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: deltaPositionMilliseconds:%@; >", NSStringFromClass([self class]), _deltaPositionMilliseconds];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: deltaPositionMilliseconds:%@; >", NSStringFromClass([self class]), _deltaPositionMilliseconds];
     return descriptionString;
 }
 
@@ -11554,8 +11260,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: status:%@; data:%@; >", NSStringFromClass([self class]), _status, _data];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; data:%@; >", NSStringFromClass([self class]), _status, _data];
     return descriptionString;
 }
 
@@ -11603,8 +11308,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRMediaPlaybackClusterPlaybackResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
@@ -11765,8 +11469,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: index:%@; name:%@; >", NSStringFromClass([self class]), _index, _name];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: index:%@; name:%@; >", NSStringFromClass([self class]), _index, _name];
     return descriptionString;
 }
 
@@ -11899,8 +11602,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRKeypadInputClusterSendKeyResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
@@ -11939,8 +11641,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: search:%@; autoPlay:%@; data:%@; >", NSStringFromClass([self class]), _search, _autoPlay, _data];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: search:%@; autoPlay:%@; data:%@; >", NSStringFromClass([self class]), _search, _autoPlay, _data];
     return descriptionString;
 }
 
@@ -11976,8 +11677,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contentURL:%@; displayString:%@; brandingInformation:%@; >",
-                                             NSStringFromClass([self class]), _contentURL, _displayString, _brandingInformation];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: contentURL:%@; displayString:%@; brandingInformation:%@; >", NSStringFromClass([self class]), _contentURL, _displayString, _brandingInformation];
     return descriptionString;
 }
 
@@ -12008,8 +11708,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: status:%@; data:%@; >", NSStringFromClass([self class]), _status, _data];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; data:%@; >", NSStringFromClass([self class]), _status, _data];
     return descriptionString;
 }
 
@@ -12057,8 +11756,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRContentLauncherClusterLauncherResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
@@ -12138,8 +11836,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: index:%@; name:%@; >", NSStringFromClass([self class]), _index, _name];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: index:%@; name:%@; >", NSStringFromClass([self class]), _index, _name];
     return descriptionString;
 }
 
@@ -12172,8 +11869,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: application:%@; data:%@; >", NSStringFromClass([self class]),
-                                             _application, [_data base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: application:%@; data:%@; >", NSStringFromClass([self class]), _application, [_data base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -12203,8 +11899,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: application:%@; >", NSStringFromClass([self class]), _application];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: application:%@; >", NSStringFromClass([self class]), _application];
     return descriptionString;
 }
 
@@ -12234,8 +11929,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: application:%@; >", NSStringFromClass([self class]), _application];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: application:%@; >", NSStringFromClass([self class]), _application];
     return descriptionString;
 }
 
@@ -12266,8 +11960,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; data:%@; >", NSStringFromClass([self class]),
-                                             _status, [_data base64EncodedStringWithOptions:0]];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: status:%@; data:%@; >", NSStringFromClass([self class]), _status, [_data base64EncodedStringWithOptions:0]];
     return descriptionString;
 }
 
@@ -12315,8 +12008,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRApplicationLauncherClusterLauncherResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType &)decodableStruct
 {
     {
         self.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.status)];
@@ -12356,8 +12048,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: tempAccountIdentifier:%@; >", NSStringFromClass([self class]), _tempAccountIdentifier];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: tempAccountIdentifier:%@; >", NSStringFromClass([self class]), _tempAccountIdentifier];
     return descriptionString;
 }
 
@@ -12433,8 +12124,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRAccountLoginClusterGetSetupPINResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType &)decodableStruct
 {
     {
         self.setupPIN = AsString(decodableStruct.setupPIN);
@@ -12474,8 +12164,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: tempAccountIdentifier:%@; setupPIN:%@; >",
-                                             NSStringFromClass([self class]), _tempAccountIdentifier, _setupPIN];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: tempAccountIdentifier:%@; setupPIN:%@; >", NSStringFromClass([self class]), _tempAccountIdentifier, _setupPIN];
     return descriptionString;
 }
 
@@ -12539,9 +12228,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: profileCount:%@; profileIntervalPeriod:%@; maxNumberOfIntervals:%@; listOfAttributes:%@; >",
-        NSStringFromClass([self class]), _profileCount, _profileIntervalPeriod, _maxNumberOfIntervals, _listOfAttributes];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: profileCount:%@; profileIntervalPeriod:%@; maxNumberOfIntervals:%@; listOfAttributes:%@; >", NSStringFromClass([self class]), _profileCount, _profileIntervalPeriod, _maxNumberOfIntervals, _listOfAttributes];
     return descriptionString;
 }
 
@@ -12589,8 +12276,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRElectricalMeasurementClusterGetProfileInfoResponseCommandParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType &)decodableStruct
 {
     {
         self.profileCount = [NSNumber numberWithUnsignedChar:decodableStruct.profileCount];
@@ -12686,10 +12372,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: startTime:%@; status:%@; profileIntervalPeriod:%@; "
-                                                              @"numberOfIntervalsDelivered:%@; attributeId:%@; intervals:%@; >",
-                                             NSStringFromClass([self class]), _startTime, _status, _profileIntervalPeriod,
-                                             _numberOfIntervalsDelivered, _attributeId, _intervals];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: startTime:%@; status:%@; profileIntervalPeriod:%@; numberOfIntervalsDelivered:%@; attributeId:%@; intervals:%@; >", NSStringFromClass([self class]), _startTime, _status, _profileIntervalPeriod, _numberOfIntervalsDelivered, _attributeId, _intervals];
     return descriptionString;
 }
 
@@ -12737,9 +12420,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRElectricalMeasurementClusterGetMeasurementProfileResponseCommandParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType &)
-        decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ElectricalMeasurement::Commands::GetMeasurementProfileResponseCommand::DecodableType &)decodableStruct
 {
     {
         self.startTime = [NSNumber numberWithUnsignedInt:decodableStruct.startTime];
@@ -12807,8 +12488,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeId:%@; startTime:%@; numberOfIntervals:%@; >",
-                                             NSStringFromClass([self class]), _attributeId, _startTime, _numberOfIntervals];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: attributeId:%@; startTime:%@; numberOfIntervals:%@; >", NSStringFromClass([self class]), _attributeId, _startTime, _numberOfIntervals];
     return descriptionString;
 }
 
@@ -12866,8 +12546,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: returnValue:%@; >", NSStringFromClass([self class]), _returnValue];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: returnValue:%@; >", NSStringFromClass([self class]), _returnValue];
     return descriptionString;
 }
 
@@ -12915,8 +12594,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRUnitTestingClusterTestSpecificResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::UnitTesting::Commands::TestSpecificResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestSpecificResponse::DecodableType &)decodableStruct
 {
     {
         self.returnValue = [NSNumber numberWithUnsignedChar:decodableStruct.returnValue];
@@ -12980,8 +12658,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: returnValue:%@; >", NSStringFromClass([self class]), _returnValue];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: returnValue:%@; >", NSStringFromClass([self class]), _returnValue];
     return descriptionString;
 }
 
@@ -13029,8 +12706,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRUnitTestingClusterTestAddArgumentsResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::UnitTesting::Commands::TestAddArgumentsResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestAddArgumentsResponse::DecodableType &)decodableStruct
 {
     {
         self.returnValue = [NSNumber numberWithUnsignedChar:decodableStruct.returnValue];
@@ -13094,8 +12770,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: returnValue:%@; >", NSStringFromClass([self class]), _returnValue];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: returnValue:%@; >", NSStringFromClass([self class]), _returnValue];
     return descriptionString;
 }
 
@@ -13143,8 +12818,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRUnitTestingClusterTestSimpleArgumentResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::UnitTesting::Commands::TestSimpleArgumentResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestSimpleArgumentResponse::DecodableType &)decodableStruct
 {
     {
         self.returnValue = [NSNumber numberWithBool:decodableStruct.returnValue];
@@ -13223,8 +12897,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; arg3:%@; arg4:%@; arg5:%@; arg6:%@; >",
-                                             NSStringFromClass([self class]), _arg1, _arg2, _arg3, _arg4, _arg5, _arg6];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; arg3:%@; arg4:%@; arg5:%@; arg6:%@; >", NSStringFromClass([self class]), _arg1, _arg2, _arg3, _arg4, _arg5, _arg6];
     return descriptionString;
 }
 
@@ -13272,8 +12945,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRUnitTestingClusterTestStructArrayArgumentResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType &)decodableStruct
 {
     {
         { // Scope for our temporary variables
@@ -13482,8 +13154,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; >", NSStringFromClass([self class]), _arg1, _arg2];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; >", NSStringFromClass([self class]), _arg1, _arg2];
     return descriptionString;
 }
 
@@ -13562,8 +13233,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRUnitTestingClusterTestListInt8UReverseResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::UnitTesting::Commands::TestListInt8UReverseResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestListInt8UReverseResponse::DecodableType &)decodableStruct
 {
     {
         { // Scope for our temporary variables
@@ -13647,8 +13317,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; >", NSStringFromClass([self class]), _arg1, _arg2];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; >", NSStringFromClass([self class]), _arg1, _arg2];
     return descriptionString;
 }
 
@@ -13696,8 +13365,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRUnitTestingClusterTestEnumsResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::UnitTesting::Commands::TestEnumsResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestEnumsResponse::DecodableType &)decodableStruct
 {
     {
         self.arg1 = [NSNumber numberWithUnsignedShort:chip::to_underlying(decodableStruct.arg1)];
@@ -13751,8 +13419,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; arg3:%@; arg4:%@; arg5:%@; arg6:%@; >",
-                                             NSStringFromClass([self class]), _arg1, _arg2, _arg3, _arg4, _arg5, _arg6];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; arg3:%@; arg4:%@; arg5:%@; arg6:%@; >", NSStringFromClass([self class]), _arg1, _arg2, _arg3, _arg4, _arg5, _arg6];
     return descriptionString;
 }
 
@@ -13792,8 +13459,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: wasPresent:%@; wasNull:%@; value:%@; originalValue:%@; >",
-                                             NSStringFromClass([self class]), _wasPresent, _wasNull, _value, _originalValue];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: wasPresent:%@; wasNull:%@; value:%@; originalValue:%@; >", NSStringFromClass([self class]), _wasPresent, _wasNull, _value, _originalValue];
     return descriptionString;
 }
 
@@ -13841,8 +13507,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRUnitTestingClusterTestNullableOptionalResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::UnitTesting::Commands::TestNullableOptionalResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestNullableOptionalResponse::DecodableType &)decodableStruct
 {
     {
         self.wasPresent = [NSNumber numberWithBool:decodableStruct.wasPresent];
@@ -14015,22 +13680,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString
-        stringWithFormat:@"<%@: nullableIntWasNull:%@; nullableIntValue:%@; optionalIntWasPresent:%@; optionalIntValue:%@; "
-                         @"nullableOptionalIntWasPresent:%@; nullableOptionalIntWasNull:%@; nullableOptionalIntValue:%@; "
-                         @"nullableStringWasNull:%@; nullableStringValue:%@; optionalStringWasPresent:%@; optionalStringValue:%@; "
-                         @"nullableOptionalStringWasPresent:%@; nullableOptionalStringWasNull:%@; nullableOptionalStringValue:%@; "
-                         @"nullableStructWasNull:%@; nullableStructValue:%@; optionalStructWasPresent:%@; optionalStructValue:%@; "
-                         @"nullableOptionalStructWasPresent:%@; nullableOptionalStructWasNull:%@; nullableOptionalStructValue:%@; "
-                         @"nullableListWasNull:%@; nullableListValue:%@; optionalListWasPresent:%@; optionalListValue:%@; "
-                         @"nullableOptionalListWasPresent:%@; nullableOptionalListWasNull:%@; nullableOptionalListValue:%@; >",
-        NSStringFromClass([self class]), _nullableIntWasNull, _nullableIntValue, _optionalIntWasPresent, _optionalIntValue,
-        _nullableOptionalIntWasPresent, _nullableOptionalIntWasNull, _nullableOptionalIntValue, _nullableStringWasNull,
-        _nullableStringValue, _optionalStringWasPresent, _optionalStringValue, _nullableOptionalStringWasPresent,
-        _nullableOptionalStringWasNull, _nullableOptionalStringValue, _nullableStructWasNull, _nullableStructValue,
-        _optionalStructWasPresent, _optionalStructValue, _nullableOptionalStructWasPresent, _nullableOptionalStructWasNull,
-        _nullableOptionalStructValue, _nullableListWasNull, _nullableListValue, _optionalListWasPresent, _optionalListValue,
-        _nullableOptionalListWasPresent, _nullableOptionalListWasNull, _nullableOptionalListValue];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: nullableIntWasNull:%@; nullableIntValue:%@; optionalIntWasPresent:%@; optionalIntValue:%@; nullableOptionalIntWasPresent:%@; nullableOptionalIntWasNull:%@; nullableOptionalIntValue:%@; nullableStringWasNull:%@; nullableStringValue:%@; optionalStringWasPresent:%@; optionalStringValue:%@; nullableOptionalStringWasPresent:%@; nullableOptionalStringWasNull:%@; nullableOptionalStringValue:%@; nullableStructWasNull:%@; nullableStructValue:%@; optionalStructWasPresent:%@; optionalStructValue:%@; nullableOptionalStructWasPresent:%@; nullableOptionalStructWasNull:%@; nullableOptionalStructValue:%@; nullableListWasNull:%@; nullableListValue:%@; optionalListWasPresent:%@; optionalListValue:%@; nullableOptionalListWasPresent:%@; nullableOptionalListWasNull:%@; nullableOptionalListValue:%@; >", NSStringFromClass([self class]), _nullableIntWasNull, _nullableIntValue, _optionalIntWasPresent, _optionalIntValue, _nullableOptionalIntWasPresent, _nullableOptionalIntWasNull, _nullableOptionalIntValue, _nullableStringWasNull, _nullableStringValue, _optionalStringWasPresent, _optionalStringValue, _nullableOptionalStringWasPresent, _nullableOptionalStringWasNull, _nullableOptionalStringValue, _nullableStructWasNull, _nullableStructValue, _optionalStructWasPresent, _optionalStructValue, _nullableOptionalStructWasPresent, _nullableOptionalStructWasNull, _nullableOptionalStructValue, _nullableListWasNull, _nullableListValue, _optionalListWasPresent, _optionalListValue, _nullableOptionalListWasPresent, _nullableOptionalListWasNull, _nullableOptionalListValue];
     return descriptionString;
 }
 
@@ -14078,8 +13728,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRUnitTestingClusterTestComplexNullableOptionalResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::UnitTesting::Commands::TestComplexNullableOptionalResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestComplexNullableOptionalResponse::DecodableType &)decodableStruct
 {
     {
         self.nullableIntWasNull = [NSNumber numberWithBool:decodableStruct.nullableIntWasNull];
@@ -14175,8 +13824,7 @@ NS_ASSUME_NONNULL_BEGIN
             self.nullableStructValue = [MTRUnitTestingClusterSimpleStruct new];
             self.nullableStructValue.a = [NSNumber numberWithUnsignedChar:decodableStruct.nullableStructValue.Value().a];
             self.nullableStructValue.b = [NSNumber numberWithBool:decodableStruct.nullableStructValue.Value().b];
-            self.nullableStructValue.c =
-                [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.nullableStructValue.Value().c)];
+            self.nullableStructValue.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.nullableStructValue.Value().c)];
             self.nullableStructValue.d = AsData(decodableStruct.nullableStructValue.Value().d);
             self.nullableStructValue.e = AsString(decodableStruct.nullableStructValue.Value().e);
             if (self.nullableStructValue.e == nil) {
@@ -14198,8 +13846,7 @@ NS_ASSUME_NONNULL_BEGIN
             self.optionalStructValue = [MTRUnitTestingClusterSimpleStruct new];
             self.optionalStructValue.a = [NSNumber numberWithUnsignedChar:decodableStruct.optionalStructValue.Value().a];
             self.optionalStructValue.b = [NSNumber numberWithBool:decodableStruct.optionalStructValue.Value().b];
-            self.optionalStructValue.c =
-                [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.optionalStructValue.Value().c)];
+            self.optionalStructValue.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.optionalStructValue.Value().c)];
             self.optionalStructValue.d = AsData(decodableStruct.optionalStructValue.Value().d);
             self.optionalStructValue.e = AsString(decodableStruct.optionalStructValue.Value().e);
             if (self.optionalStructValue.e == nil) {
@@ -14226,19 +13873,16 @@ NS_ASSUME_NONNULL_BEGIN
     {
         if (decodableStruct.nullableOptionalStructValue.HasValue()) {
             self.nullableOptionalStructValue = [MTRUnitTestingClusterSimpleStruct new];
-            self.nullableOptionalStructValue.a =
-                [NSNumber numberWithUnsignedChar:decodableStruct.nullableOptionalStructValue.Value().a];
+            self.nullableOptionalStructValue.a = [NSNumber numberWithUnsignedChar:decodableStruct.nullableOptionalStructValue.Value().a];
             self.nullableOptionalStructValue.b = [NSNumber numberWithBool:decodableStruct.nullableOptionalStructValue.Value().b];
-            self.nullableOptionalStructValue.c =
-                [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.nullableOptionalStructValue.Value().c)];
+            self.nullableOptionalStructValue.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(decodableStruct.nullableOptionalStructValue.Value().c)];
             self.nullableOptionalStructValue.d = AsData(decodableStruct.nullableOptionalStructValue.Value().d);
             self.nullableOptionalStructValue.e = AsString(decodableStruct.nullableOptionalStructValue.Value().e);
             if (self.nullableOptionalStructValue.e == nil) {
                 CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                 return err;
             }
-            self.nullableOptionalStructValue.f =
-                [NSNumber numberWithUnsignedChar:decodableStruct.nullableOptionalStructValue.Value().f.Raw()];
+            self.nullableOptionalStructValue.f = [NSNumber numberWithUnsignedChar:decodableStruct.nullableOptionalStructValue.Value().f.Raw()];
             self.nullableOptionalStructValue.g = [NSNumber numberWithFloat:decodableStruct.nullableOptionalStructValue.Value().g];
             self.nullableOptionalStructValue.h = [NSNumber numberWithDouble:decodableStruct.nullableOptionalStructValue.Value().h];
         } else {
@@ -14434,8 +14078,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRUnitTestingClusterBooleanResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::UnitTesting::Commands::BooleanResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::BooleanResponse::DecodableType &)decodableStruct
 {
     {
         self.value = [NSNumber numberWithBool:decodableStruct.value];
@@ -14550,8 +14193,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRUnitTestingClusterSimpleStructResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::UnitTesting::Commands::SimpleStructResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::SimpleStructResponse::DecodableType &)decodableStruct
 {
     {
         self.arg1 = [MTRUnitTestingClusterSimpleStruct new];
@@ -14678,8 +14320,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRUnitTestingClusterTestEmitTestEventResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventResponse::DecodableType &)decodableStruct
 {
     {
         self.value = [NSNumber numberWithUnsignedLongLong:decodableStruct.value];
@@ -14794,8 +14435,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @implementation MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:
-    (const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType &)decodableStruct
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType &)decodableStruct
 {
     {
         self.value = [NSNumber numberWithUnsignedLongLong:decodableStruct.value];
@@ -14900,8 +14540,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; >", NSStringFromClass([self class]), _arg1, _arg2];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; >", NSStringFromClass([self class]), _arg1, _arg2];
     return descriptionString;
 }
 
@@ -15000,13 +14639,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: nullableInt:%@; optionalInt:%@; nullableOptionalInt:%@; nullableString:%@; "
-                                   @"optionalString:%@; nullableOptionalString:%@; nullableStruct:%@; optionalStruct:%@; "
-                                   @"nullableOptionalStruct:%@; nullableList:%@; optionalList:%@; nullableOptionalList:%@; >",
-                  NSStringFromClass([self class]), _nullableInt, _optionalInt, _nullableOptionalInt, _nullableString,
-                  _optionalString, _nullableOptionalString, _nullableStruct, _optionalStruct, _nullableOptionalStruct,
-                  _nullableList, _optionalList, _nullableOptionalList];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: nullableInt:%@; optionalInt:%@; nullableOptionalInt:%@; nullableString:%@; optionalString:%@; nullableOptionalString:%@; nullableStruct:%@; optionalStruct:%@; nullableOptionalStruct:%@; nullableList:%@; optionalList:%@; nullableOptionalList:%@; >", NSStringFromClass([self class]), _nullableInt, _optionalInt, _nullableOptionalInt, _nullableString, _optionalString, _nullableOptionalString, _nullableStruct, _optionalStruct, _nullableOptionalStruct, _nullableList, _optionalList, _nullableOptionalList];
     return descriptionString;
 }
 
@@ -15141,8 +14774,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString =
-        [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; arg3:%@; >", NSStringFromClass([self class]), _arg1, _arg2, _arg3];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; arg3:%@; >", NSStringFromClass([self class]), _arg1, _arg2, _arg3];
     return descriptionString;
 }
 
@@ -15182,6 +14814,143 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams
+@end
+@implementation MTRSampleMEIClusterPingParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRSampleMEIClusterPingParams alloc] init];
+
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: >", NSStringFromClass([self class])];
+    return descriptionString;
+}
+
+@end
+@implementation MTRSampleMEIClusterAddArgumentsResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _returnValue = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRSampleMEIClusterAddArgumentsResponseParams alloc] init];
+
+    other.returnValue = self.returnValue;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: returnValue:%@; >", NSStringFromClass([self class]), _returnValue];
+    return descriptionString;
+}
+
+- (nullable instancetype)initWithResponseValue:(NSDictionary<NSString *, id> *)responseValue
+                                         error:(NSError * __autoreleasing *)error
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    using DecodableType = chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType;
+    chip::System::PacketBufferHandle buffer = [MTRBaseDevice _responseDataForCommand:responseValue
+                                                                           clusterID:DecodableType::GetClusterId()
+                                                                           commandID:DecodableType::GetCommandId()
+                                                                               error:error];
+    if (buffer.IsNull()) {
+        return nil;
+    }
+
+    chip::TLV::TLVReader reader;
+    reader.Init(buffer->Start(), buffer->DataLength());
+
+    CHIP_ERROR err = reader.Next(chip::TLV::AnonymousTag());
+    if (err == CHIP_NO_ERROR) {
+        DecodableType decodedStruct;
+        err = chip::app::DataModel::Decode(reader, decodedStruct);
+        if (err == CHIP_NO_ERROR) {
+            err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                return self;
+            }
+        }
+    }
+
+    NSString * errorStr = [NSString stringWithFormat:@"Command payload decoding failed: %s", err.AsString()];
+    MTR_LOG_ERROR("%s", errorStr.UTF8String);
+    if (error != nil) {
+        NSDictionary * userInfo = @{ NSLocalizedFailureReasonErrorKey : NSLocalizedString(errorStr, nil) };
+        *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:userInfo];
+    }
+    return nil;
+}
+
+@end
+
+@implementation MTRSampleMEIClusterAddArgumentsResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType &)decodableStruct
+{
+    {
+        self.returnValue = [NSNumber numberWithUnsignedChar:decodableStruct.returnValue];
+    }
+    return CHIP_NO_ERROR;
+}
+@end
+@implementation MTRSampleMEIClusterAddArgumentsParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _arg1 = @(0);
+
+        _arg2 = @(0);
+        _timedInvokeTimeoutMs = nil;
+        _serverSideProcessingTimeout = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+    auto other = [[MTRSampleMEIClusterAddArgumentsParams alloc] init];
+
+    other.arg1 = self.arg1;
+    other.arg2 = self.arg2;
+    other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+    other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: arg1:%@; arg2:%@; >", NSStringFromClass([self class]), _arg1, _arg2];
+    return descriptionString;
+}
+
 @end
 
 NS_ASSUME_NONNULL_END

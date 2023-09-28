@@ -2764,6 +2764,15 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kFindOperational: {
         // If there is an error, CommissioningStageComplete will be called from OnDeviceConnectionFailureFn.
         auto scopedPeerId = GetPeerScopedId(proxy->GetDeviceId());
+
+        // If we ever had a commissioned device with this node ID before, we may
+        // have stale sessions to it.  Make sure we don't re-use any of those,
+        // because clearly they are not related to this new device we are
+        // commissioning.  We only care about sessions we might reuse, so just
+        // clearing the ones associated with our fabric index is good enough and
+        // we don't need to worry about ExpireAllSessionsOnLogicalFabric.
+        mSystemState->SessionMgr()->ExpireAllSessions(scopedPeerId);
+
         mSystemState->CASESessionMgr()->FindOrEstablishSession(scopedPeerId, &mOnDeviceConnectedCallback,
                                                                &mOnDeviceConnectionFailureCallback
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES

@@ -108,12 +108,12 @@ enum class ScenesCopyMode : uint8_t
 
 namespace OnOff {
 
-// Enum for OnOffDelayedAllOffEffectVariant
-enum class OnOffDelayedAllOffEffectVariant : uint8_t
+// Enum for DelayedAllOffEffectVariantEnum
+enum class DelayedAllOffEffectVariantEnum : uint8_t
 {
-    kFadeToOffIn0p8Seconds                                = 0x00,
-    kNoFade                                               = 0x01,
-    k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 0x02,
+    kDelayedOffFastFade = 0x00,
+    kNoFade             = 0x01,
+    kDelayedOffSlowFade = 0x02,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -121,10 +121,10 @@ enum class OnOffDelayedAllOffEffectVariant : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for OnOffDyingLightEffectVariant
-enum class OnOffDyingLightEffectVariant : uint8_t
+// Enum for DyingLightEffectVariantEnum
+enum class DyingLightEffectVariantEnum : uint8_t
 {
-    k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0x00,
+    kDyingLightFadeOff = 0x00,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -132,8 +132,8 @@ enum class OnOffDyingLightEffectVariant : uint8_t
     kUnknownEnumValue = 1,
 };
 
-// Enum for OnOffEffectIdentifier
-enum class OnOffEffectIdentifier : uint8_t
+// Enum for EffectIdentifierEnum
+enum class EffectIdentifierEnum : uint8_t
 {
     kDelayedAllOff = 0x00,
     kDyingLight    = 0x01,
@@ -144,12 +144,12 @@ enum class OnOffEffectIdentifier : uint8_t
     kUnknownEnumValue = 2,
 };
 
-// Enum for OnOffStartUpOnOff
-enum class OnOffStartUpOnOff : uint8_t
+// Enum for StartUpOnOffEnum
+enum class StartUpOnOffEnum : uint8_t
 {
-    kOff                 = 0x00,
-    kOn                  = 0x01,
-    kTogglePreviousOnOff = 0x02,
+    kOff    = 0x00,
+    kOn     = 0x01,
+    kToggle = 0x02,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
@@ -160,12 +160,12 @@ enum class OnOffStartUpOnOff : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kLighting  = 0x1,
-    kDeadFront = 0x2,
+    kLighting          = 0x1,
+    kDeadFrontBehavior = 0x2,
 };
 
-// Bitmap for OnOffControl
-enum class OnOffControl : uint8_t
+// Bitmap for OnOffControlBitmap
+enum class OnOffControlBitmap : uint8_t
 {
     kAcceptOnlyWhenOn = 0x1,
 };
@@ -2612,7 +2612,23 @@ enum class SafetyStatus : uint16_t
 };
 } // namespace WindowCovering
 
-namespace BarrierControl {} // namespace BarrierControl
+namespace BarrierControl {
+
+// Bitmap for BarrierControlCapabilities
+enum class BarrierControlCapabilities : uint8_t
+{
+    kPartialBarrier = 0x1,
+};
+
+// Bitmap for BarrierControlSafetyStatus
+enum class BarrierControlSafetyStatus : uint16_t
+{
+    kRemoteLockout       = 0x1,
+    kTemperDetected      = 0x2,
+    kFailedCommunication = 0x4,
+    kPositionFailure     = 0x8,
+};
+} // namespace BarrierControl
 
 namespace PumpConfigurationAndControl {
 
@@ -4118,6 +4134,8 @@ enum class FaultType : uint8_t
     kUnknownEnumValue = 5,
 };
 } // namespace FaultInjection
+
+namespace SampleMei {} // namespace SampleMei
 
 } // namespace Clusters
 } // namespace app

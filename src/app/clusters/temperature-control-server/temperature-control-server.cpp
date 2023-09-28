@@ -145,6 +145,11 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
                 goto exit;
             }
 
+            if (targetTemperature.Value() < minTemperature || targetTemperature.Value() > maxTemperature)
+            {
+                status = Status::ConstraintError;
+                goto exit;
+            }
             if (TemperatureControlHasFeature(endpoint, TemperatureControl::Feature::kTemperatureStep))
             {
                 int16_t step  = 0;
@@ -156,14 +161,6 @@ bool emberAfTemperatureControlClusterSetTemperatureCallback(app::CommandHandler 
                 }
 
                 if ((targetTemperature.Value() - minTemperature) % step != 0)
-                {
-                    status = Status::ConstraintError;
-                    goto exit;
-                }
-            }
-            else
-            {
-                if (targetTemperature.Value() < minTemperature || targetTemperature.Value() > maxTemperature)
                 {
                     status = Status::ConstraintError;
                     goto exit;

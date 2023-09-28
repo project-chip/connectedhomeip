@@ -19,8 +19,8 @@ config:
     endpoint: 1
     cluster: "Unit Testing"
 
-    UnsupportedCluster: 0xFFF11FFF
-    UnsupportedCommand: 0xFFF11FFF
+    UnsupportedCluster: 0xFFF1FC00
+    UnsupportedCommand: 0xFFF100FF
     UnsupportedEndPoint: 254
 
     InvokeRequestMessage.Cluster: 0x00000006

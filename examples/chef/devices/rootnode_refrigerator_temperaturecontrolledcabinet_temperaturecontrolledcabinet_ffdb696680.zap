@@ -7152,7 +7152,7 @@
               "code": 16387,
               "mfgCode": null,
               "side": "server",
-              "type": "OnOffStartUpOnOff",
+              "type": "StartUpOnOffEnum",
               "included": 0,
               "storageOption": "External",
               "singleton": 0,

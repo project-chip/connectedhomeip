@@ -30,7 +30,7 @@ namespace DataModel {
 /**
  * NullNullable is an alias for NullOptional, for better readability.
  */
-constexpr auto NullNullable = NullOptional;
+inline constexpr auto NullNullable = NullOptional;
 
 /*
  * Dedicated type for nullable things, to differentiate them from optional

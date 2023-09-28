@@ -990,4 +990,19 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPSampleMeiClusterAddArgumentsResponseCallback
+    : public Callback::Callback<CHIPSampleMeiClusterAddArgumentsResponseCallbackType>
+{
+public:
+    CHIPSampleMeiClusterAddArgumentsResponseCallback(jobject javaCallback);
+
+    ~CHIPSampleMeiClusterAddArgumentsResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 } // namespace chip

@@ -574,14 +574,11 @@ static void TestRawIntegerToDerInvalidCases(nlTestSuite * inSuite, void * inCont
     HeapChecker heapChecker(inSuite);
     // Cover case of invalid buffers
     uint8_t placeholder[10] = { 0 };
-    MutableByteSpan good_out_buffer(placeholder, sizeof(placeholder));
-    ByteSpan good_buffer(placeholder, sizeof(placeholder));
+    MutableByteSpan good_out_buffer(placeholder);
+    ByteSpan good_buffer(placeholder);
 
-    MutableByteSpan bad_out_buffer_nullptr(nullptr, sizeof(placeholder));
-    MutableByteSpan bad_out_buffer_empty(placeholder, 0);
-
-    ByteSpan bad_buffer_nullptr(nullptr, sizeof(placeholder));
-    ByteSpan bad_buffer_empty(placeholder, 0);
+    MutableByteSpan bad_out_buffer_empty;
+    ByteSpan bad_buffer_empty;
 
     struct ErrorCase
     {
@@ -591,9 +588,7 @@ static void TestRawIntegerToDerInvalidCases(nlTestSuite * inSuite, void * inCont
     };
 
     const ErrorCase error_cases[] = {
-        { .input = good_buffer, .output = bad_out_buffer_nullptr, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
         { .input = good_buffer, .output = bad_out_buffer_empty, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
-        { .input = bad_buffer_nullptr, .output = good_out_buffer, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
         { .input = bad_buffer_empty, .output = good_out_buffer, .expected_status = CHIP_ERROR_INVALID_ARGUMENT }
     };
 
@@ -681,7 +676,6 @@ static void TestReadDerLengthInvalidCases(nlTestSuite * inSuite, void * inContex
 {
     uint8_t placeholder[1];
 
-    ByteSpan bad_buffer_nullptr(nullptr, sizeof(placeholder));
     ByteSpan bad_buffer_empty(placeholder, 0);
 
     const uint8_t zero_multi_byte_length[] = { 0x80 };
@@ -716,7 +710,6 @@ static void TestReadDerLengthInvalidCases(nlTestSuite * inSuite, void * inContex
     };
 
     const ErrorCase error_cases[] = {
-        { .input_buf = bad_buffer_nullptr, .expected_status = CHIP_ERROR_BUFFER_TOO_SMALL },
         { .input_buf = bad_buffer_empty, .expected_status = CHIP_ERROR_BUFFER_TOO_SMALL },
         { .input_buf = zero_multi_byte_length_buf, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
         { .input_buf = single_byte_length_zero_buf, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
@@ -2104,7 +2097,7 @@ static void TestX509_CertChainValidation(nlTestSuite * inSuite, void * inContext
         {  sTestCert_PAA_FFF2_ValInPast_Cert,   sTestCert_PAI_FFF2_8006_ValInPast_Cert,    sTestCert_DAC_FFF2_8006_0024_ValInPast_Cert,     CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
         {  sTestCert_PAA_FFF2_ValInFuture_Cert, sTestCert_PAI_FFF2_8006_ValInFuture_Cert,  sTestCert_DAC_FFF2_8006_0025_ValInFuture_Cert,   CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
         // Valid cases without intermediate:
-        {  ByteSpan(sTestCert_Root01_DER, sTestCert_Root01_DER_Len), ByteSpan(), ByteSpan(sTestCert_Node01_02_DER, sTestCert_Node01_02_DER_Len), CHIP_NO_ERROR,          CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_Root01_DER,                ByteSpan(),                                sTestCert_Node01_02_DER,                         CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
         // Error cases with invalid (empty Span) inputs:
         {  ByteSpan(),                          sTestCert_PAI_FFF1_8000_Cert,              sTestCert_DAC_FFF1_8000_0000_Cert,               CHIP_ERROR_INVALID_ARGUMENT, CertificateChainValidationResult::kRootArgumentInvalid },
         {  sTestCert_PAA_FFF1_Cert,             sTestCert_PAI_FFF1_8000_Cert,              ByteSpan(),                                      CHIP_ERROR_INVALID_ARGUMENT, CertificateChainValidationResult::kLeafArgumentInvalid },
@@ -2622,7 +2615,7 @@ static void TestVIDPID_StringExtraction(nlTestSuite * inSuite, void * inContext)
         { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute16), strlen(sTestCNAttribute16)), true, true, chip::VendorId::TestVendor1, 0xFE67, CHIP_NO_ERROR },
         // Other input combinations:
         { DNAttrType::kUnspecified, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute15), strlen(sTestCNAttribute15)), false, false, chip::VendorId::NotSpecified, 0, CHIP_NO_ERROR },
-        { DNAttrType::kCommonName, ByteSpan(nullptr, 0), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_INVALID_ARGUMENT },
+        { DNAttrType::kCommonName, ByteSpan(), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_INVALID_ARGUMENT },
     };
     // clang-format on
 

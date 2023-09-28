@@ -74,7 +74,7 @@
 
 namespace chip {
 
-constexpr size_t kMaxBlePendingPackets = 1;
+inline constexpr size_t kMaxBlePendingPackets = 1;
 
 //
 // NOTE: Please do not alter the order of template specialization here as the logic

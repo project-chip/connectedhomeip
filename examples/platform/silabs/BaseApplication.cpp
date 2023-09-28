@@ -400,6 +400,7 @@ bool BaseApplication::ActivateStatusLedPatterns()
     return isPatternSet;
 }
 
+// TODO Move State Monitoring elsewhere
 void BaseApplication::LightEventHandler()
 {
     // Collect connectivity and configuration state from the CHIP stack. Because
@@ -420,8 +421,17 @@ void BaseApplication::LightEventHandler()
         sIsAttached = ConnectivityMgr().IsThreadAttached();
 #endif /* CHIP_ENABLE_OPENTHREAD */
         sHaveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
+
+#ifdef DISPLAY_ENABLED
+        SilabsLCD::DisplayStatus_t status;
+        status.connected   = sIsEnabled && sIsAttached;
+        status.advertising = chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen();
+        status.nbFabric    = chip::Server::GetInstance().GetFabricTable().FabricCount();
+        slLCD.SetStatus(status);
+#endif
         PlatformMgr().UnlockChipStack();
     }
+
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 #if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
@@ -473,9 +483,8 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             mFunction = kFunction_NoneSelected;
 
             OutputQrCode(false);
-#ifdef QR_CODE_ENABLED
-            // TOGGLE QRCode/LCD demo UI
-            slLCD.ToggleQRCode();
+#ifdef DISPLAY_ENABLED
+            slLCD.CycleScreens();
 #endif
 
 #ifdef SL_WIFI
@@ -732,7 +741,7 @@ void BaseApplication::OutputQrCode(bool refreshLCD)
         if (refreshLCD)
         {
             slLCD.SetQRCode((uint8_t *) setupPayload.data(), setupPayload.size());
-            slLCD.ShowQRCode(true, true);
+            slLCD.ShowQRCode(true);
         }
 #endif // QR_CODE_ENABLED
 

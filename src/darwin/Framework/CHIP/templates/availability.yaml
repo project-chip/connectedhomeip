@@ -3062,10 +3062,17 @@
               - EffectVariantEnum
               - IdentifyTypeEnum
           OnOff:
-              - OnOffDelayedAllOffEffectVariant
-              - OnOffDyingLightEffectVariant
-              - OnOffEffectIdentifier
-              - OnOffStartUpOnOff
+              # DelayedOnOffEffectVariantEnum, DyingLightEffectVariantEnum,
+              # EffectIdentifierEnum, and StartUpOnOffEnum were originally named
+              # OnOffDelayedAllOffEffectVariant,
+              # OnOffDelayedAllOffEffectVariant, OnOffEffectIdentifier, and
+              # OnOffStartUpOnOff, but we generate the same API for the names
+              # with/without "Enum" at the end, and with/without the cluster
+              # name at the beginning, so the name can just change here.
+              - DelayedAllOffEffectVariantEnum
+              - DyingLightEffectVariantEnum
+              - EffectIdentifierEnum
+              - StartUpOnOffEnum
           LevelControl:
               - MoveMode
               - StepMode
@@ -3283,16 +3290,23 @@
                   - Display
                   - Actuator
           OnOff:
-              OnOffDelayedAllOffEffectVariant:
+              # DelayedOnOffEffectVariantEnum, DyingLightEffectVariantEnum,
+              # EffectIdentifierEnum, and StartUpOnOffEnum were originally named
+              # OnOffDelayedAllOffEffectVariant,
+              # OnOffDelayedAllOffEffectVariant, OnOffEffectIdentifier, and
+              # OnOffStartUpOnOff, but we generate the same API for the names
+              # with/without "Enum" at the end, and with/without the cluster
+              # name at the beginning, so the name can just change here.
+              DelayedAllOffEffectVariantEnum:
                   - FadeToOffIn0p8Seconds
                   - NoFade
                   - 50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds
-              OnOffDyingLightEffectVariant:
+              DyingLightEffectVariantEnum:
                   - 20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second
-              OnOffEffectIdentifier:
+              EffectIdentifierEnum:
                   - DelayedAllOff
                   - DyingLight
-              OnOffStartUpOnOff:
+              StartUpOnOffEnum:
                   - Off
                   - On
                   - TogglePreviousOnOff
@@ -7400,147 +7414,15 @@
           - LaundryWasherControls
           - RVCOperationalState
           - DishwasherAlarm
+          - SampleMEI
       attributes:
-          # EventList generally not stable yet.
           Scenes:
-              - EventList
               # New scenes bits not stable yet.
               - SceneTableSize
               - RemainingCapacity
-          OnOff:
-              - EventList
-          OnOffSwitchConfiguration:
-              - EventList
-          LevelControl:
-              - EventList
-          BinaryInputBasic:
-              - EventList
-          PulseWidthModulation:
-              - EventList
-          Descriptor:
-              - EventList
-          Binding:
-              - EventList
-          Identify:
-              - EventList
-          AccessControl:
-              - EventList
-          Actions:
-              - EventList
-          OTASoftwareUpdateProvider:
-              - EventList
-          OTASoftwareUpdateRequestor:
-              - EventList
-          LocalizationConfiguration:
-              - EventList
-          TimeFormatLocalization:
-              - EventList
-          UnitLocalization:
-              - EventList
-          PowerSourceConfiguration:
-              - EventList
-          PowerSource:
-              - EventList
-          GeneralCommissioning:
-              - EventList
-          NetworkCommissioning:
-              - EventList
-          DiagnosticLogs:
-              - EventList
-          GeneralDiagnostics:
-              - EventList
-          SoftwareDiagnostics:
-              - EventList
-          ThreadNetworkDiagnostics:
-              - EventList
-          WiFiNetworkDiagnostics:
-              - EventList
-          EthernetNetworkDiagnostics:
-              - EventList
-          TimeSynchronization:
-              - EventList
-          Switch:
-              - EventList
-          AdministratorCommissioning:
-              - EventList
-          OperationalCredentials:
-              - EventList
-          GroupKeyManagement:
-              - EventList
-          FixedLabel:
-              - EventList
-          UserLabel:
-              - EventList
-          BooleanState:
-              - EventList
-          ModeSelect:
-              - EventList
-          DoorLock:
-              - EventList
-          WindowCovering:
-              - EventList
-          BarrierControl:
-              - EventList
-          PumpConfigurationAndControl:
-              - EventList
           FanControl:
-              - EventList
               # New Fan Control bits not stable yet.
               - AirflowDirection
-          ThermostatUserInterfaceConfiguration:
-              - EventList
-          ColorControl:
-              - EventList
-          BallastConfiguration:
-              - EventList
-          IlluminanceMeasurement:
-              - EventList
-          TemperatureMeasurement:
-              - EventList
-          PressureMeasurement:
-              - EventList
-          Thermostat:
-              - EventList
-          FlowMeasurement:
-              - EventList
-          RelativeHumidityMeasurement:
-              - EventList
-          OccupancySensing:
-              - EventList
-          WakeOnLAN:
-              - EventList
-          Channel:
-              - EventList
-          Groups:
-              - EventList
-          TargetNavigator:
-              - EventList
-          MediaPlayback:
-              - EventList
-          MediaInput:
-              - EventList
-          LowPower:
-              - EventList
-          KeypadInput:
-              - EventList
-          ContentLauncher:
-              - EventList
-          AudioOutput:
-              - EventList
-          ApplicationLauncher:
-              - EventList
-          ApplicationBasic:
-              - EventList
-          AccountLogin:
-              - EventList
-          ElectricalMeasurement:
-              - EventList
-          UnitTesting:
-              - EventList
-          BasicInformation:
-              - EventList
-          BridgedDeviceBasicInformation:
-              - EventList
       commands:
           FanControl:
               # Not stable yet
@@ -7591,7 +7473,7 @@
                   - AirflowDirection
       global attributes:
           - EventList
-      # Once we actually unmark TimeSynchronization as provisional, all these bits should go away too, and we should instead
+      # Once we actually unmark TimeSynchronization as provisional, all these bits except EventList should go away too, and we should instead
       # mark things as introduced/deprecated as needed.  The "ids" entries should go away, in particular.
       ids:
           attributes:
@@ -7599,6 +7481,15 @@
                   - TimeZoneListMaxSize
                   - DSTOffsetListMaxSize
                   - SupportsDNSResolve
+                  # Because we are special-casing ids for TimeSynchronization
+                  # above, we need to explicitly mark the EventList id
+                  # provisional.
+                  - EventList
+              PulseWidthModulation:
+                  # Because we are special-casing ids for PulseWidthModulation
+                  # above, we need to explicitly mark the EventList id
+                  # provisional.
+                  - EventList
           commands:
               TimeSynchronization:
                   - SetUTCTime
@@ -7685,3 +7576,65 @@
 
 - release: "Future"
   versions: "future"
+  introduced:
+      enum values:
+          OnOff:
+              DelayedAllOffEffectVariantEnum:
+                  - DelayedOffFastFade
+                  - DelayedOffSlowFade
+              DyingLightEffectVariantEnum:
+                  - DyingLightFadeOff
+              StartUpOnOffEnum:
+                  - Toggle
+      bitmaps:
+          OnOff:
+              - OnOffControlBitmap
+      bitmap values:
+          OnOff:
+              Feature:
+                  - DeadFrontBehavior
+              OnOffControlBitmap:
+                  - AcceptOnlyWhenOn
+  deprecated:
+      enum values:
+          OnOff:
+              DelayedAllOffEffectVariantEnum:
+                  - FadeToOffIn0p8Seconds
+                  - 50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds
+              DyingLightEffectVariantEnum:
+                  - 20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second
+              StartUpOnOffEnum:
+                  - TogglePreviousOnOff
+      bitmaps:
+          OnOff:
+              - OnOffControl
+      bitmap values:
+          OnOff:
+              Feature:
+                  - DeadFront
+  provisional:
+      bitmaps:
+          BarrierControl:
+              - BarrierControlCapabilities
+              - BarrierControlSafetyStatus
+      attributes:
+          GeneralDiagnostics:
+              # Not in the spec yet.
+              - AverageWearCount
+  renames:
+      enum values:
+          OnOff:
+              DelayedAllOffEffectVariantEnum:
+                  DelayedOffFastFade: FadeToOffIn0p8Seconds
+                  DelayedOffSlowFade: 50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds
+              DyingLightEffectVariantEnum:
+                  DyingLightFadeOff: 20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second
+              StartUpOnOffEnum:
+                  Toggle: TogglePreviousOnOff
+      bitmaps:
+          OnOff:
+              OnOffControlBitmap: OnOffControl
+      bitmap values:
+          OnOff:
+              Feature:
+                  DeadFrontBehavior: DeadFront

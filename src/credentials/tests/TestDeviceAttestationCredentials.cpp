@@ -358,7 +358,7 @@ static void TestAttestationTrustStore(nlTestSuite * inSuite, void * inContext)
     ByteSpan kPaaFFF1BadSkidSpan1{ TestCerts::sTestCert_PAA_FFF1_Cert.data(), TestCerts::sTestCert_PAA_FFF1_Cert.size() - 1 };
 
     // SKID to trigger CHIP_ERROR_INVALID_ARGUMENT
-    ByteSpan kPaaFFF1BadSkidSpan2{ nullptr, TestCerts::sTestCert_PAA_FFF1_Cert.size() };
+    ByteSpan kPaaFFF1BadSkidSpan2;
 
     // SKID to trigger CHIP_ERROR_CA_CERT_NOT_FOUND
     uint8_t kPaaGoodSkidNotPresent[] = { 0x6A, 0xFD, 0x22, 0x77, 0x1F, 0x51, 0x71, 0x1F, 0xEC, 0xBF,

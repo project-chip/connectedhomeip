@@ -37,7 +37,7 @@ tests:
       command: "readAttribute"
       attribute: "MinMeasuredValue"
       response:
-          saveAs: MinMeasuredValue
+          saveAs: MinMeasuredValueValue
           constraints:
               type: int16s
               minValue: -32767
@@ -49,10 +49,10 @@ tests:
       command: "readAttribute"
       attribute: "MaxMeasuredValue"
       response:
-          saveAs: MaxMeasuredValue
+          saveAs: MaxMeasuredValueValue
           constraints:
               type: int16s
-              minValue: MinMeasuredValue
+              minValue: MinMeasuredValueValue
               maxValue: 32767
 
     - label: "Step 4: Read the mandatory attribute constraints: MeasuredValue"
@@ -62,8 +62,8 @@ tests:
       response:
           constraints:
               type: int16s
-              minValue: MinMeasuredValue
-              maxValue: MaxMeasuredValue
+              minValue: MinMeasuredValueValue
+              maxValue: MaxMeasuredValueValue
 
     - label: "Step 5: Read the optional attribute: Tolerance"
       PICS: PRS.S.A0003
@@ -80,7 +80,7 @@ tests:
       command: "readAttribute"
       attribute: "MinScaledValue"
       response:
-          saveAs: MinScaledValue
+          saveAs: MinScaledValueValue
           constraints:
               type: int16s
               minValue: -32767
@@ -91,10 +91,10 @@ tests:
       command: "readAttribute"
       attribute: "MaxScaledValue"
       response:
-          saveAs: MaxScaledValue
+          saveAs: MaxScaledValueValue
           constraints:
               type: int16s
-              minValue: MinScaledValue
+              minValue: MinScaledValueValue
               maxValue: 32767
 
     - label: "Step 8: Read the optional attribute: ScaledValue"
@@ -104,8 +104,8 @@ tests:
       response:
           constraints:
               type: int16s
-              minValue: MinScaledValue
-              maxValue: MaxScaledValue
+              minValue: MinScaledValueValue
+              maxValue: MaxScaledValueValue
 
     - label: "Step 9: Read the optional attribute: ScaledTolerance"
       PICS: PRS.S.A0013

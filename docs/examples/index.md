@@ -273,6 +273,7 @@ tv-app/**/README
 :maxdepth: 1
 
 tv-casting-app/**/README
+tv-casting-app/APIs.md
 ```
 
 ## Window example
@@ -291,4 +292,13 @@ window-app/**/README
 :maxdepth: 1
 
 resource-monitoring-app/**/README
+```
+
+## Air Quality Sensor example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+rvc-app/README
 ```
