@@ -679,7 +679,7 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
 /**
  *  Check whether concrete attribute path is an "existent attribute path" in spec terms.
  *  @param[in]    aPath                 The concrete path of the data being read.
- *  @retval  boolean   true if the concrete attribute path indicates a single existing instance on the node
+ *  @retval  boolean   true if the concrete attribute path indicates an attribute that exists on the node.
  */
 bool ConcreteAttributePathExists(const ConcreteAttributePath & aPath);
 
