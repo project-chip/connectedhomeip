@@ -102,8 +102,8 @@ if (chip_crypto == "openssl") {
   source_set("cryptopal_mbedtls") {
     sources = [
       "CHIPCryptoPALmbedTLS.cpp",
-      "CHIPCryptoPALmbedTLSCert.cpp",
       "CHIPCryptoPALmbedTLS.h",
+      "CHIPCryptoPALmbedTLSCert.cpp",
     ]
     public_deps = [ ":public_headers" ]
 
@@ -116,10 +116,10 @@ if (chip_crypto == "openssl") {
 
   source_set("cryptopal_psa") {
     sources = [
-      "CHIPCryptoPALmbedTLSCert.cpp",
-      "CHIPCryptoPALmbedTLS.h",
       "CHIPCryptoPALPSA.cpp",
       "CHIPCryptoPALPSA.h",
+      "CHIPCryptoPALmbedTLS.h",
+      "CHIPCryptoPALmbedTLSCert.cpp",
     ]
     public_deps = [ ":public_headers" ]
 
