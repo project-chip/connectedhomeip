@@ -273,6 +273,7 @@ tv-app/**/README
 :maxdepth: 1
 
 tv-casting-app/**/README
+tv-casting-app/APIs.md
 ```
 
 ## Window example
