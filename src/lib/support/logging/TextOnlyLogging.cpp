@@ -24,9 +24,8 @@
 
 #include "TextOnlyLogging.h"
 
-#include <lib/core/CHIPCore.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/CodeUtils.h>
 
 #include <platform/logging/LogV.h>
 

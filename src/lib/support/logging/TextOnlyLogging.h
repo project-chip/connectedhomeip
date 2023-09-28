@@ -38,6 +38,7 @@
 
 #include <lib/support/DLLUtil.h>
 #include <lib/support/EnforceFormat.h>
+#include <lib/support/VerificationMacrosNoLogging.h>
 #include <lib/support/logging/Constants.h>
 
 #include <inttypes.h>

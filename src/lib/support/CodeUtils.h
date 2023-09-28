@@ -155,23 +155,6 @@ constexpr inline const _T & max(const _T & a, const _T & b)
 } // namespace chip
 
 /**
- *  @def IgnoreUnusedVariable(aVariable)
- *
- *  @brief
- *    This casts the specified @a aVariable to void to quell any
- *    compiler-issued unused variable warnings or errors.
- *
- *  @code
- *  void foo (int err)
- *  {
- *      IgnoreUnusedVariable(err)
- *  }
- *  @endcode
- *
- */
-#define IgnoreUnusedVariable(aVariable) ((void) (aVariable))
-
-/**
  *  @def ReturnErrorOnFailure(expr)
  *
  *  @brief
