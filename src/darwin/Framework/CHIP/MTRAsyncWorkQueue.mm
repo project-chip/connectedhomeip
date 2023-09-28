@@ -26,7 +26,7 @@ typedef NS_ENUM(NSInteger, MTRAsyncWorkItemState) {
     MTRAsyncWorkItemComplete,
     MTRAsyncWorkItemEnqueued,
     MTRAsyncWorkItemRunning,
-    // values > MTRAsyncWorkItemRunning encode retryCount
+    MTRAsyncWorkItemRetryCountBase = MTRAsyncWorkItemRunning, // values >= MTRAsyncWorkItemRunning encode retryCount
 };
 
 MTR_DIRECT_MEMBERS
@@ -97,7 +97,7 @@ MTR_DIRECT_MEMBERS
     case MTRAsyncWorkItemEnqueued:
         return 0;
     default:
-        return ((NSInteger) _state) - MTRAsyncWorkItemRunning;
+        return ((NSInteger) _state) - MTRAsyncWorkItemRetryCountBase;
     }
 }
 
@@ -109,8 +109,8 @@ MTR_DIRECT_MEMBERS
     if (_state == MTRAsyncWorkItemEnqueued) {
         _state = MTRAsyncWorkItemRunning;
     } else if (_state >= MTRAsyncWorkItemRunning) {
-        retryCount = (_state - MTRAsyncWorkItemRunning) + 1; // increment retryCount
-        _state = (MTRAsyncWorkItemState) (MTRAsyncWorkItemRunning + retryCount);
+        retryCount = (_state - MTRAsyncWorkItemRetryCountBase) + 1; // increment retryCount
+        _state = (MTRAsyncWorkItemState) (MTRAsyncWorkItemRetryCountBase + retryCount);
     } else {
         return; // asserted above
     }
