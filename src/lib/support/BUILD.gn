@@ -170,7 +170,7 @@ static_library("support") {
     ":chip_version_header",
     ":logging_constants",
     "${chip_root}/src/lib/core:chip_config_header",
-    "${chip_root}/src/lib/core:chip_error",
+    "${chip_root}/src/lib/core:error",
     "${chip_root}/src/platform:platform_buildconfig",
     "${chip_root}/src/platform/logging:headers",
     "${nlassert_root}:nlassert",
