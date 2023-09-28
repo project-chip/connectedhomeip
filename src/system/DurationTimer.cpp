@@ -3,7 +3,7 @@
 #include <string>
 #include <lib/support/logging/CHIPLogging.h>
 
-//#include <chrono>
+#include <chrono>
 //#include <ctime>
 //#include <iomanip>
 //#include <algorithm>
@@ -18,6 +18,9 @@ using namespace std::literals;
 //todo add description
 namespace chip{
     namespace timing{
+        #define DATETIME_PATTERN  ("%Y-%m-%dT%H:%M:%S")
+        #define DATETIME_LEN (sizeof "1970-01-01T23:59:59")
+        #define ISO8601_LEN (sizeof "1970-01-01T23:59:59.123456Z")
         /**   TimespecTimer implementations   */
 
         // member functions
@@ -26,9 +29,9 @@ namespace chip{
             chip::System::Clock::Timestamp tv1 = chip::System::SystemClock().GetMonotonicTimestamp();
 
             chip::System::Clock::ToTimeval(tv1, t1 );
-            // todo use logging instead of stdout
 
-            ChipLogDetail(DeviceLayer, "Timer: %s start %ld", label, t1.tv_usec);
+            //ChipLogDetail(DeviceLayer, "Timer: %s start %ld", label.c_str(), t1.tv_usec);
+            ChipLogDetail(DeviceLayer, "Timer: %s start time: %s ", label.c_str(), toTimeStr(&t1).c_str());
             //ChipLogDetail(DeviceLayer, "Timer: start %ld", t1.tv_usec);
         }
 
@@ -38,40 +41,41 @@ namespace chip{
             chip::System::Clock::Timestamp tv2 = chip::System::SystemClock().GetMonotonicTimestamp();
 
             chip::System::Clock::ToTimeval(tv2, t2 );
-            //ChipLogDetail(DeviceLayer, "Timer: %s stop %ld, ts: %s ", label, t2.tv_usec,TimespecTimer::toTimeStr(t2));
-            ChipLogDetail(DeviceLayer, "Timer: %s stop %ld ", label, t2.tv_usec);
-            //ChipLogDetail(DeviceLayer, "Timer: stop %ld, ts: %s ", t2.tv_usec,TimespecTimer::toTimeStr(t2));
+
+            //std::chrono::hh_mm_ss hms { tv2 }
+            //string tfs = std::format("{:%T}", tv2);
+            //ChipLogDetail(DeviceLayer, "Timer: %s stop %s ", label.c_str(), tfs);
+
+            ChipLogDetail(DeviceLayer, "Timer: %s stop time: %s ", label.c_str(), toTimeStr(&t2).c_str());
+            //ChipLogDetail(DeviceLayer, "Timer: %s stop %lld - %ld ", label.c_str(), t2.tv_sec, t2.tv_usec);
             duration();
 
-            //TimespecTimer::~TimespecTimer();
+        
         }
 
         double TimespecTimer::duration()
         {
             double dur =  ((t2.tv_usec - t1.tv_usec) * 1e-6);
 
-            chip::System::Clock::Seconds32 ts;
-            //ChipLogDetail(DeviceLayer, "Timer: %s TIME_SPENT (sec) %f , ts: %s ", label, dur, TimespecTimer::toTimeStr(t2) );
-            ChipLogDetail(DeviceLayer, "Timer: %s TIME_SPENT (sec) %f ", label, dur );
-            //ChipLogDetail(DeviceLayer, "Timer: TIME_SPENT (sec) %f , ts: %s ", dur, TimespecTimer::toTimeStr(t2) );
+            string timestr = toTimeStr(&t2);
+            ChipLogDetail(DeviceLayer, "Timer: %s TIME_SPENT (sec) %f , time: %s ", label.c_str(), dur, timestr.c_str() );
+
             return dur;
         }
 
-        #define DATETIME_PATTERN  ("%Y-%m-%dT%H:%M:%SZ")
-        #define DATETIME_LEN (sizeof "1970-01-01T23:59:59.")
-        #define ISO8601_LEN (sizeof "1970-01-01T23:59:59.123456Z")
-
         // utility method
-        char * TimespecTimer::toTimeStr(timeval time)
+        string TimespecTimer::toTimeStr(timeval* time)
         {
-            char buff[DATETIME_LEN];
-            strftime(buff, sizeof buff, DATETIME_PATTERN, gmtime(&time.tv_sec));
-            char * str = new char[sizeof buff + 1];
-            snprintf(str, ISO8601_LEN, " %s.%05ld", buff, time.tv_usec);
-            return str; // timeval_to_str( buff, 0, &time);
+            char * buff = new char[DATETIME_LEN];
+            //struct tm* tm_info = localtime(&(time->tv_sec));
+            struct tm* tm_info = gmtime(&(time->tv_sec));
+            strftime(buff, DATETIME_LEN, DATETIME_PATTERN, tm_info);
+            //string str(buff, DATETIME_LEN );
+            char * str = new char[ISO8601_LEN];
+            snprintf(str, ISO8601_LEN, " %s.%05ld", buff, time->tv_usec);
+            
+            return str; 
         }
-
-        
 
     }
 }

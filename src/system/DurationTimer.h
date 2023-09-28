@@ -21,31 +21,24 @@ namespace chip{
         class TimespecTimer {
                 
                 private:
-                    //char* toTimeStr(std::chrono::time_point time);
+                    string toTimeStr(timeval* time);
                 protected:
                     timeval t1;
                     timeval t2;
-                    char * label;
-                    //string s;
+                    string label;
                 public:
                     //constructors
                     //TimespecTimer(uint8_t mod, string s ):  DurationTimer(mod, s){};
                     TimespecTimer( string s ){
-                        //label =  s.c_str();
-                        label =  s.data();
-                        //label =  s;
+                        label =  s;
                     }
-                    /*~TimespecTimer(){
-                        delete label;
-                        //t1=1;
-                        //t2=1;
-                    }*/
                     ~TimespecTimer()=default;
                     //member functions
                     void start();
                     void stop();
                     double duration(); 
-                    static char * toTimeStr(timeval time);
+                    //string toTimeStr(timeval* time);
+                    //void toDateTime(char* timestr, timeval* time);
 
         };
 
