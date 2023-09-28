@@ -638,7 +638,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     RunTest(apSuite, ctx,
             Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
+                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute2) },
                 .expectedStatus = { true, true },
             });
 
@@ -664,7 +664,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     RunTest(apSuite, ctx,
             Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .data           = { ListData::kNull, ListData::kList },
                 .expectedStatus = { true },
             });
@@ -675,7 +675,7 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     RunTest(apSuite, ctx,
             Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .data           = { ListData::kList, ListData::kNull },
                 .expectedStatus = { true },
             });
@@ -686,8 +686,8 @@ void TestWriteChunking::TestTransactionalList(nlTestSuite * apSuite, void * apCo
     RunTest(apSuite, ctx,
             Instructions{
                 .paths          = { ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
-                           ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
+                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute),
+                                    ConcreteAttributePath(kTestEndpointId, Clusters::UnitTesting::Id, kTestListAttribute) },
                 .data           = { ListData::kList, ListData::kNull, ListData::kList },
                 .expectedStatus = { true },
             });

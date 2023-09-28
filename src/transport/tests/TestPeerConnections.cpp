@@ -102,7 +102,7 @@ void TestBasicFunctionality(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, sessions[i].HasValue());
     }
 
-    //#endif
+    // #endif
     System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
 

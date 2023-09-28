@@ -34,11 +34,11 @@ static hal_pwm_channel_t convert_gpio_to_pwm_channel(hal_gpio_pin_t gpio)
     hal_pwm_channel_t ret = HAL_PWM_MAX;
     if (gpio >= HAL_GPIO_29 && gpio <= HAL_GPIO_40)
     {
-        ret = (hal_pwm_channel_t)(gpio - HAL_GPIO_29);
+        ret = (hal_pwm_channel_t) (gpio - HAL_GPIO_29);
     }
     else if (gpio >= HAL_GPIO_45 && gpio <= HAL_GPIO_52)
     {
-        ret = (hal_pwm_channel_t)(gpio - HAL_GPIO_45);
+        ret = (hal_pwm_channel_t) (gpio - HAL_GPIO_45);
     }
     else
     {

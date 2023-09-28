@@ -179,8 +179,8 @@ protected:
     ~KeyValueStoreManager() = default;
 
     // No copy, move or assignment.
-    KeyValueStoreManager(const KeyValueStoreManager &)  = delete;
-    KeyValueStoreManager(const KeyValueStoreManager &&) = delete;
+    KeyValueStoreManager(const KeyValueStoreManager &)             = delete;
+    KeyValueStoreManager(const KeyValueStoreManager &&)            = delete;
     KeyValueStoreManager & operator=(const KeyValueStoreManager &) = delete;
 };
 

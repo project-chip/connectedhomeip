@@ -52,7 +52,7 @@ public:
 
     // Non-copyable
     TestOnlyLocalCertificateAuthority(TestOnlyLocalCertificateAuthority const &) = delete;
-    void operator=(TestOnlyLocalCertificateAuthority const &) = delete;
+    void operator=(TestOnlyLocalCertificateAuthority const &)                    = delete;
 
     TestOnlyLocalCertificateAuthority & Init()
     {

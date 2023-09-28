@@ -779,8 +779,8 @@ constexpr EntryData entryData1[] = {
         .authMode    = AuthMode::kGroup,
         .subjects    = { kGroup2 },
         .targets     = { { .flags = Target::kCluster | Target::kEndpoint, .cluster = kLevelControlCluster, .endpoint = 1 },
-                     { .flags = Target::kCluster, .cluster = kOnOffCluster },
-                     { .flags = Target::kEndpoint, .endpoint = 2 } },
+                         { .flags = Target::kCluster, .cluster = kOnOffCluster },
+                         { .flags = Target::kEndpoint, .endpoint = 2 } },
     },
     {
         .fabricIndex = 1,

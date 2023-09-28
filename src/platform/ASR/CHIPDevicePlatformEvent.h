@@ -24,8 +24,7 @@
 namespace chip {
 namespace DeviceLayer {
 
-namespace DeviceEventType {
-} // namespace DeviceEventType
+namespace DeviceEventType {} // namespace DeviceEventType
 
 /**
  * Represents platform-specific event information for the ASR platform.

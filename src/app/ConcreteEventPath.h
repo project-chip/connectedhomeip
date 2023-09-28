@@ -35,7 +35,7 @@ struct ConcreteEventPath : public ConcreteClusterPath
 
     ConcreteEventPath() {}
 
-    ConcreteEventPath(const ConcreteEventPath & aOther) = default;
+    ConcreteEventPath(const ConcreteEventPath & aOther)             = default;
     ConcreteEventPath & operator=(const ConcreteEventPath & aOther) = default;
 
     bool operator==(const ConcreteEventPath & aOther) const

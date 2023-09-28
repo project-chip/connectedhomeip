@@ -166,13 +166,13 @@ const AesCtrTestEntry theAesCtrTestVector[] = {
         .ciphertextLen = 16,
     },
     {
-        .key       = (const uint8_t *) "\x7e\x24\x06\x78\x17\xfa\xe0\xd7\x43\xd6\xce\x1f\x32\x53\x91\x63",
-        .nonce     = (const uint8_t *) "\x00\x6c\xb6\xdb\xc0\x54\x3b\x59\xda\x48\xd9\x0b\x00",
-        .plaintext = (const uint8_t *) "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
-                                       "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
-        .plaintextLen = 32,
-        .ciphertext   = (const uint8_t *) "\x4f\x3d\xf9\x49\x15\x88\x4d\xe0\xdc\x0e\x30\x95\x0d\xe7\xa6\xe9"
-                                        "\x5a\x91\x7e\x1d\x06\x42\x22\xdb\x2f\x6e\xc7\x3d\x99\x4a\xd9\x5f",
+        .key           = (const uint8_t *) "\x7e\x24\x06\x78\x17\xfa\xe0\xd7\x43\xd6\xce\x1f\x32\x53\x91\x63",
+        .nonce         = (const uint8_t *) "\x00\x6c\xb6\xdb\xc0\x54\x3b\x59\xda\x48\xd9\x0b\x00",
+        .plaintext     = (const uint8_t *) "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
+                                           "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
+        .plaintextLen  = 32,
+        .ciphertext    = (const uint8_t *) "\x4f\x3d\xf9\x49\x15\x88\x4d\xe0\xdc\x0e\x30\x95\x0d\xe7\xa6\xe9"
+                                           "\x5a\x91\x7e\x1d\x06\x42\x22\xdb\x2f\x6e\xc7\x3d\x99\x4a\xd9\x5f",
         .ciphertextLen = 32,
     }
 };
@@ -1447,8 +1447,8 @@ void TestCSR_GenDirect(nlTestSuite * inSuite, void * inContext)
 
         // Let's corrupt the CSR buffer and make sure it fails to verify
         size_t length      = csrSpan.size();
-        csrBuf[length - 2] = (uint8_t)(csrBuf[length - 2] + 1);
-        csrBuf[length - 1] = (uint8_t)(csrBuf[length - 1] + 1);
+        csrBuf[length - 2] = (uint8_t) (csrBuf[length - 2] + 1);
+        csrBuf[length - 1] = (uint8_t) (csrBuf[length - 1] + 1);
 
         NL_TEST_ASSERT(inSuite, VerifyCertificateSigningRequest(csrSpan.data(), csrSpan.size(), pubkey) != CHIP_NO_ERROR);
     }
@@ -1478,8 +1478,8 @@ static void TestCSR_GenByKeypair(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, memcmp(pubkey.ConstBytes(), keypair.Pubkey().ConstBytes(), pubkey.Length()) == 0);
 
         // Let's corrupt the CSR buffer and make sure it fails to verify
-        csr[length - 2] = (uint8_t)(csr[length - 2] + 1);
-        csr[length - 1] = (uint8_t)(csr[length - 1] + 1);
+        csr[length - 2] = (uint8_t) (csr[length - 2] + 1);
+        csr[length - 1] = (uint8_t) (csr[length - 1] + 1);
 
         NL_TEST_ASSERT(inSuite, VerifyCertificateSigningRequest(csr, length, pubkey) != CHIP_NO_ERROR);
     }
