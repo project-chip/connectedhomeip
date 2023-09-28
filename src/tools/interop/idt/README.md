@@ -69,7 +69,7 @@ This directory contains tools for use on both the admin computer and the RPi.
 1. Flash the RPi SD with the debian based distribution of your choice.
 1. Plug the SD into the RPi.
 1. Ensure the RPi is connected to your network, either via ethernet or with
-   Wi-Fi preconfigured in the disk image.
+   Wi-Fi configured in the disk image.
 1. Boot the RPi.
 
 ### Configure admin computer and push to the RPi
@@ -283,5 +283,30 @@ artifact dir.
 
 Ecosystem and Platform implementations are dynamically loaded.
 
-See the `README` in `/capture/ecosystem` and `/capture/platform` for guidance on
-implementing each.
+For each package in `capture/ecosystem`, the ecosystem loader expects a module
+name matching the package name.  
+This module must contain a single class which is a subclass of
+`capture.base.EcosystemCapture`.
+
+`/capture/ecosystem/play_services_user` contains a minimal example
+implementation.
+
+As another example, link `/res/plugin_demo/ecosystem/demo_ext_ecosystem`.
+
+```
+$ idt_go && ln -s $PWD/idt/res/plugin_demo/ecosystem/demo_ext_ecosystem/ idt/capture/ecosystem
+$ idt capture -h
+usage: idt capture [-h] [--platform {Android}] [--ecosystem {DemoExtEcosystem...
+```
+
+The platform loader functions the same as `capture/ecosystem`.
+
+For each package in `capture/platform`, the platform loader expects a module
+name matching the package name.  
+This module must contain a single class which is a subclass of
+`capture.base.PlatformLogStreamer`.
+
+Note the following runtime expectations of platforms:
+
+-   Start should be able to be called repeatedly without restarting streaming.
+-   Stop should not cause an error even if the stream is not running.
