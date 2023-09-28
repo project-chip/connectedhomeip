@@ -37,6 +37,13 @@ assert(matter_software_ver_str != "",
 template("ti_simplelink_executable") {
   simplelink_target_name = target_name
 
+  # Run prebuild SDK driver generation
+  if (ti_simplelink_device_family == "cc13x2x7_26x2x7" ||
+        ti_simplelink_device_family == "cc13x4_26x4") {
+    exec_script("${ti_simplelink_sdk_build_root}/run_sdk_drivers_gen.py", [ rebase_path(ti_simplelink_sdk_root), rebase_path(chip_root)], "")
+
+ } 
+
   if (chip_enable_ota_requestor) {
     # Generating the ota binary image
     final_target = "${target_name}.ota"
