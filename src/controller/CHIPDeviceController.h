@@ -928,7 +928,7 @@ private:
     void ParseFabrics();
     // Called by ParseCommissioningInfo
     void ParseTimeSyncInfo(ReadCommissioningInfo & info);
-    void ParseIcdInfo();
+    void ParseICDInfo();
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
     static CHIP_ERROR

@@ -137,7 +137,7 @@ const char * StageToString(CommissioningStage stage)
         return "FindOperational";
         break;
 
-    case kIcdIdentification:
+    case kICDIdentification:
         return "ICDIdentification";
         break;
 

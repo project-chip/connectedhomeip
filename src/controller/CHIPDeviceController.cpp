@@ -1880,8 +1880,8 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
     case CommissioningStage::kCheckForMatchingFabric:
         ParseFabrics();
         break;
-    case CommissioningStage::kIcdIdentification:
-        ParseIcdInfo();
+    case CommissioningStage::kICDIdentification:
+        ParseICDInfo();
         break;
     default:
         // We're not trying to read anything here, just exit
@@ -2178,7 +2178,7 @@ void DeviceCommissioner::ParseFabrics()
     CommissioningStageComplete(return_err, report);
 }
 
-void DeviceCommissioner::ParseIcdInfo()
+void DeviceCommissioner::ParseICDInfo()
 {
     CHIP_ERROR err;
     IcdInfo info;
@@ -2189,30 +2189,31 @@ void DeviceCommissioner::ParseIcdInfo()
     if (err == CHIP_NO_ERROR)
     {
         info.isIcd                  = true;
-        info.checkInProtocolSupport = !!(featureMap & 0x1);
+        info.checkInProtocolSupport = !!(featureMap & to_underlying(IcdManagement::Feature::kCheckInProtocolSupport));
     }
     else if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
     {
         app::StatusIB statusIB;
         err = mAttributeCache->GetStatus(
             app::ConcreteAttributePath(kRootEndpointId, IcdManagement::Id, IcdManagement::Attributes::FeatureMap::Id), statusIB);
-        if (err != CHIP_NO_ERROR)
+        if (err == CHIP_NO_ERROR)
         {
-            CommissioningStageComplete(err);
-            return;
-        }
-        if (statusIB.mStatus == Protocols::InteractionModel::Status::UnsupportedCluster)
-        {
-            info.isIcd = false;
-        }
-        else
-        {
-            err = statusIB.ToChipError();
+            if (statusIB.mStatus == Protocols::InteractionModel::Status::UnsupportedCluster)
+            {
+                info.isIcd = false;
+            }
+            else
+            {
+                err = statusIB.ToChipError();
+            }
         }
     }
 
     CommissioningDelegate::CommissioningReport report;
-    report.Set<IcdInfo>(info);
+    if (err == CHIP_NO_ERROR)
+    {
+        report.Set<IcdInfo>(info);
+    }
     CommissioningStageComplete(err, report);
 }
 
@@ -2823,7 +2824,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         );
     }
     break;
-    case CommissioningStage::kIcdIdentification: {
+    case CommissioningStage::kICDIdentification: {
         app::AttributePathParams readPaths[1];
         // TODO(#29382): We probably want to read "ActiveMode" attribute (to be implemented) for ICD.
         readPaths[0] =

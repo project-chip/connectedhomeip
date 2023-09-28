@@ -60,7 +60,7 @@ enum CommissioningStage : uint8_t
     kThreadNetworkEnable,        ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
     kFindOperational,            ///< Perform operational discovery and establish a CASE session with the device
     /// Optional steps for ICD
-    kIcdIdentification, ///< Check whether the device is an ICD
+    kICDIdentification, ///< Check whether the device is an ICD
     /// TODO(#29384): Finish ICD registration implementation in commissioner
     /// End of optional steps for ICD
     kSendComplete, ///< Send CommissioningComplete (0x30:4) command to the device
@@ -75,7 +75,7 @@ enum CommissioningStage : uint8_t
     kNeedsNetworkCreds,
 };
 
-enum IcdRegistrationStrategy
+enum ICDRegistrationStrategy
 {
     kIgnore,         ///< Do not check whether the device is an ICD during commissioning
     kBeforeComplete, ///< Do commissioner self-registration or external controller registration,
@@ -504,10 +504,10 @@ public:
         return *this;
     }
 
-    IcdRegistrationStrategy GetIcdRegistrationStrategy() const { return mIcdRegistrationStrategy; }
-    CommissioningParameters & SetIcdRegistrationStrategy(IcdRegistrationStrategy icdRegistrationStrategy)
+    ICDRegistrationStrategy GetICDRegistrationStrategy() const { return mICDRegistrationStrategy; }
+    CommissioningParameters & SetICDRegistrationStrategy(ICDRegistrationStrategy icdRegistrationStrategy)
     {
-        mIcdRegistrationStrategy = icdRegistrationStrategy;
+        mICDRegistrationStrategy = icdRegistrationStrategy;
         return *this;
     }
 
@@ -568,7 +568,7 @@ private:
     Optional<bool> mAttemptWiFiNetworkScan;
     Optional<bool> mAttemptThreadNetworkScan; // This automatically gets set to false when a ThreadOperationalDataset is set
     Optional<bool> mSkipCommissioningComplete;
-    IcdRegistrationStrategy mIcdRegistrationStrategy = IcdRegistrationStrategy::kIgnore;
+    ICDRegistrationStrategy mICDRegistrationStrategy = ICDRegistrationStrategy::kBeforeComplete;
     bool mCheckForMatchingFabric                     = false;
 };
 
