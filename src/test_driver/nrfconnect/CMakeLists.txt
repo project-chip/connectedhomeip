@@ -44,6 +44,11 @@ set(CHIP_CFLAGS
     -I${CMAKE_CURRENT_SOURCE_DIR}/main/include
 )
 
+# Allow access to private members of mbedtls structures, which is needed by CHIP
+# crypto PAL implementation to make the add_entropy_source() independent for the
+# purpose of running unit tests.
+set(CHIP_CFLAGS ${CHIP_CFLAGS} -DMBEDTLS_ALLOW_PRIVATE_ACCESS=1)
+
 # Load NCS/Zephyr build system
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/nrfconnect/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
