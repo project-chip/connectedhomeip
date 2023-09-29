@@ -1,9 +1,15 @@
 #include "DurationTimer.h"
 #include <stdint.h>
 #include <string>
-//#include <chrono>
 #include <lib/support/logging/CHIPLogging.h>
+
+#ifdef CHIP_DEVICE_IS_NRF
 #include <system/SystemClock.h>
+#endif
+
+#if defined  (CHIP_DEVICE_IS_ESP32) || defined (CHIP_DEVICE_IS_ESP32_2)
+#include <time.h>
+#endif
 
 using namespace std;
 using namespace std::literals;
@@ -15,6 +21,7 @@ namespace chip{
         #define DATETIME_LEN (sizeof "1970-01-01T23:59:59")
         #define ISO8601_LEN (sizeof "1970-01-01T23:59:59.123456Z")
         
+        #ifdef CHIP_DEVICE_IS_NRF
         /*const FabricTable * fabricTable;
         System::Clock::Seconds32 lastKnownGoodChipEpochTime;
         err = mFabricsTable->GetLastKnownGoodChipEpochTime(lastKnownGoodChipEpochTime);
@@ -80,6 +87,47 @@ namespace chip{
             
             return str; 
         }
+        #endif
+
+         #ifdef CHIP_DEVICE_IS_ESP32
+         // member functions
+        void DurationTimer::start()
+        {
+            clock_gettime(CLOCK_REALTIME, &t1);
+            ChipLogDetail(DeviceLayer, "Timer: %s start time: %s ", label.c_str(), toTimeStr(&t1).c_str());
+        }
+
+        void DurationTimer::stop()
+        {
+            clock_gettime(CLOCK_REALTIME, &t2);
+            ChipLogDetail(DeviceLayer, "Timer: %s stop time: %s ", label.c_str(), toTimeStr(&t2).c_str());
+            duration();
+        }
+
+        double DurationTimer::duration()
+        {
+            double dur = (double)(t2.tv_sec - t1.tv_sec) + ((t2.tv_nsec - t1.tv_nsec) * 1e-6);
+
+            string timestr = toTimeStr(&t2);
+            ChipLogDetail(DeviceLayer, "Timer: %s TIME_SPENT (sec) %f , time: %s ", label.c_str(), dur, timestr.c_str() );
+
+            return dur;
+        }
+
+        // utility method
+        string DurationTimer::toTimeStr(timespec* time)
+        {
+            char * buff = new char[DATETIME_LEN];
+            //struct tm* tm_info = localtime(&(time->tv_sec));
+            struct tm* tm_info = gmtime(&(time->tv_sec));
+            strftime(buff, DATETIME_LEN, DATETIME_PATTERN, tm_info);
+            //string str(buff, DATETIME_LEN );
+            char * str = new char[ISO8601_LEN];
+            snprintf(str, ISO8601_LEN, " %s.%05ld", buff, time->tv_nsec);
+            
+            return str; 
+        }
+        #endif
 
         DurationTimer GetDefaultTimingInstance(string label)
         {
