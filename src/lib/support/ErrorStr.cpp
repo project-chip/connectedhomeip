@@ -32,6 +32,7 @@
 
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/LockTracker.h>
 
 namespace chip {
 
@@ -56,6 +57,7 @@ static ErrorFormatter * sErrorFormatterList = nullptr;
  */
 DLL_EXPORT const char * ErrorStr(CHIP_ERROR err)
 {
+    assertChipStackLockedByCurrentThread();
     char * formattedError   = sErrorStr;
     uint16_t formattedSpace = sizeof(sErrorStr);
 
