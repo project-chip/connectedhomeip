@@ -8,11 +8,15 @@ Args:
 
 import subprocess
 import sys
+import os
 
 SDK_ROOT = sys.argv[1]
-CHIP_ROOT = sys.argv[2]
+CHIP_ENV_ROOT = sys.argv[2]
 
-GCC_ARMCOMPILER_PATH = CHIP_ROOT + "/.environment/cipd/packages/arm/"
+if os.getenv('_PW_ACTUAL_ENVIRONMENT_ROOT'):
+    CHIP_ENV_ROOT = os.getenv('_PW_ACTUAL_ENVIRONMENT_ROOT')
+GCC_ARMCOMPILER_PATH = CHIP_ENV_ROOT + "/cipd/packages/arm/"
+
 make_command = ["make", "-C", SDK_ROOT, "CMAKE=cmake", "GCC_ARMCOMPILER=" +
                 GCC_ARMCOMPILER_PATH, "IAR_ARMCOMPILER=", "TICLANG_ARMCOMPILER=", "GENERATOR=Ninja"]
 
