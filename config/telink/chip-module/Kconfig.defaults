@@ -47,9 +47,6 @@ endif
 config SHELL
     default y if CHIP_LIB_SHELL
 
-config SHELL_STACK_SIZE
-    default 1024
-
 config PTHREAD_IPC
     bool
     default n
