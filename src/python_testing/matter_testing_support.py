@@ -333,6 +333,11 @@ class CommandPathLocation:
     cluster_id: int
     command_id: int
 
+@dataclass
+class ClusterPathLocation:
+    endpoint_id: int
+    cluster_id: int
+
 # ProblemSeverity is not using StrEnum, but rather Enum, since StrEnum only
 # appeared in 3.11. To make it JSON serializable easily, multiple inheritance
 # from `str` is used. See https://stackoverflow.com/a/51976841.
@@ -347,7 +352,7 @@ class ProblemSeverity(str, Enum):
 @dataclass
 class ProblemNotice:
     test_name: str
-    location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation]
+    location: Union[AttributePathLocation, EventPathLocation, CommandPathLocation, ClusterPathLocation]
     severity: ProblemSeverity
     problem: str
     spec_location: str = ""
