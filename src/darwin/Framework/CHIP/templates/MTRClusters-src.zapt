@@ -114,8 +114,8 @@ completionHandler
     // Make a copy of params before we go async.
     params = [params copy];
     MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
+    workItem.readyHandler = ^(MTRDevice * device, NSInteger retryCount, MTRAsyncWorkCompletionBlock workCompletion) {
+        MTRClustersLogDequeue(logPrefix, self.device.asyncWorkQueue);
         auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
         auto * cluster = [[{{> baseCluster}} alloc] initWithDevice:baseDevice endpointID:@(self.endpoint) queue:self.device.queue];
         [cluster {{asLowerCamelCase name}}WithParams:params {{> completionName}}:
@@ -127,7 +127,7 @@ completionHandler
                   not great from a type-safety perspective, of course. }}
               completion(value, error);
             });
-            [workItem endWork];
+            workCompletion(MTRAsyncWorkComplete);
         }
         {{else}}
         ^(NSError * _Nullable error) {
@@ -138,14 +138,13 @@ completionHandler
                   type-safety perspective, of course. }}
               completion(error);
             });
-            [workItem endWork];
+            workCompletion(MTRAsyncWorkComplete);
         }
         {{/if}}
         ];
     };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    MTRClustersLogEnqueue(logPrefix, self.device.asyncWorkQueue);
+    [self.device.asyncWorkQueue enqueueWorkItem:workItem];
 
     if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
       expectedValues = nil;

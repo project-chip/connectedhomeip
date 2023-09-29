@@ -19,8 +19,8 @@
 #include <tracing/json/json_tracing.h>
 
 #include <lib/address_resolve/TracingStructs.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/StringBuilder.h>
 #include <lib/support/StringSplitter.h>
 #include <transport/TracingStructs.h>

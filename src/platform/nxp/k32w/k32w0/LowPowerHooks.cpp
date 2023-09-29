@@ -246,7 +246,7 @@ void dm_switch_init15_4AfterWakeUp(void)
 
     if (dualModeStates.threadWarmBootInitTime == kThreadWarmNotInitializedValue)
     {
-        dualModeStates.threadWarmBootInitTime = (uint32_t)(otPlatTimeGet() - tick1);
+        dualModeStates.threadWarmBootInitTime = (uint32_t) (otPlatTimeGet() - tick1);
 
         /* Add a margin of 0.5 ms */
         dualModeStates.threadWarmBootInitTime += 500;

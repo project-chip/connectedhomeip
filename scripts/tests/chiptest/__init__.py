@@ -143,8 +143,6 @@ def _GetExtraSlowTests() -> Set[str]:
 def _GetInDevelopmentTests() -> Set[str]:
     """Tests that fail in YAML for some reason."""
     return {
-        "Test_TC_TIMESYNC_1_1.yaml",         # Time sync SDK is not yet ready
-        "Test_TC_TIMESYNC_2_3.yaml",         # Time sync SDK is not yet ready
         "Test_TC_PSCFG_1_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
         "Test_TC_PSCFG_2_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
         "Test_TC_PSCFG_2_2.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
@@ -166,6 +164,7 @@ def _GetInDevelopmentTests() -> Set[str]:
         "Test_TC_TCCM_3_1.yaml",  # Target attribute now provisional and removed from the XML
         "Test_TC_TCCM_3_2.yaml",  # Target attribute now provisional and removed from the XML
         "Test_TC_TCCM_3_3.yaml"   # Target attribute now provisional and removed from the XML
+        "Test_TC_S_2_4.yaml"      # https://github.com/project-chip/connectedhomeip/issues/29117
     }
 
 

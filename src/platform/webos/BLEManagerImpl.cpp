@@ -500,7 +500,7 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
 {
     bool result = false;
     result      = SubscribeCharacteristicToWebOS(conId, static_cast<const uint8_t *>(svcId->bytes),
-                                            static_cast<const uint8_t *>(charId->bytes));
+                                                 static_cast<const uint8_t *>(charId->bytes));
     return result;
 }
 

@@ -89,6 +89,9 @@ chip_data_model("tv-casting-common") {
   sources += [
     "core/CastingApp.cpp",
     "core/CastingApp.h",
+    "core/CastingPlayer.h",
+    "core/CastingPlayerDiscovery.cpp",
+    "core/CastingPlayerDiscovery.h",
     "core/Types.h",
     "support/AppParameters.h",
     "support/DataProvider.h",

@@ -35,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * If not nil, must be 32 bytes of data.
  */
-@property (nonatomic, copy, nullable) NSData * csrNonce API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@property (nonatomic, copy, nullable) NSData * csrNonce MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * The nonce to use when requesting attestation information from the device.
@@ -78,7 +78,7 @@ NS_ASSUME_NONNULL_BEGIN
  * If nil, the fail-safe will not be extended before calling into the
  * deviceAttestationDelegate.
  */
-@property (nonatomic, copy, nullable) NSNumber * failSafeTimeout API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+@property (nonatomic, copy, nullable) NSNumber * failSafeTimeout MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Only perform the PASE steps of commissioning.
@@ -86,7 +86,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * Defaults to NO.
  */
-@property (nonatomic, assign) BOOL skipCommissioningComplete API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+@property (nonatomic, assign) BOOL skipCommissioningComplete MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
  * The country code to provide to the device during commissioning.
@@ -94,7 +94,7 @@ NS_ASSUME_NONNULL_BEGIN
  * If not nil, this must be a 2-character ISO 3166-1 country code, which the
  * device can use to decide on things like radio communications bands.
  */
-@property (nonatomic, copy, nullable) NSString * countryCode API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+@property (nonatomic, copy, nullable) NSString * countryCode MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 @end
 

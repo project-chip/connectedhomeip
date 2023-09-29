@@ -30,6 +30,7 @@
     <string name="enter_endpoint_id_hint_text">Enter Endpoint ID</string>
     <string name="update_device_address_btn_text">Update address</string>
     <string name="update_device_address_failure">Device address update failed: %1$s</string>
+    <string name="commissioned_device_id_text">Commissioned Device ID :</string>
 
     <string name="address_commissioning_title_text">Commission with IP address</string>
     <string name="default_discriminator">3840</string>
@@ -219,4 +220,38 @@
     <string name="wifi_connect_btn_text">Connect</string>
 
     <string name="unpair_device_btn_text">Unpair</string>
+
+    <string name="group_setting_btn_text">Group Setting</string>
+    <string name="group_setting_group_text">Group :</string>
+    <string name="group_setting_key_text">Key :</string>
+    <string name="group_setting_send_key_set_write_text">Send KeySetWrite</string>
+    <string name="group_setting_write_group_key_map_text">Write GroupKey</string>
+    <string name="group_setting_group_key_set_id_text">GroupKeySetID</string>
+    <string name="group_setting_key_set_text">Key Set</string>
+    <string name="group_setting_group_key_text">GroupKey</string>
+    <string name="group_setting_send_add_group_text">Send AddGroup</string>
+    <string name="group_setting_add_access_control_text">Add Acl</string>
+    <string name="group_setting_add_group_text">Add Group</string>
+    <string name="group_setting_remove_group_text">Remove Group</string>
+    <string name="group_setting_add_key_set_text">Add KeySet</string>
+    <string name="group_setting_remove_key_set_text">remove KeySet</string>
+    <string name="group_setting_bind_key_set_text">Bind KeySet</string>
+    <string name="group_setting_unbind_key_set_text">Unbind KeySet</string>
+    <string name="group_setting_group_id_text">Group ID</string>
+    <string name="group_setting_group_name_text">Group Name</string>
+    <string name="group_setting_key_set_id_text">Key Set ID</string>
+    <string name="group_setting_key_policy_text">Key Policy</string>
+    <string name="group_setting_validity_time_text">Validity Time</string>
+    <string name="group_setting_validity_time_default_text">2220000</string>
+    <string name="group_setting_validity_time_default1_text">2220001</string>
+    <string name="group_setting_validity_time_default2_text">2220002</string>
+    <string name="group_setting_epoch_key_text">Epoch Key</string>
+    <string name="group_setting_epoch_key_default_text">d0d1d2d3d4d5d6d7d8d9dadbdcdddedf</string>
+    <string name="group_setting_access_control_entry_text">Access Control Entry :</string>
+    <string name="group_setting_add_btn_text">Add</string>
+    <string name="group_setting_remove_btn_text">Remove</string>
+    <string name="group_setting_bind_btn_text">Bind</string>
+    <string name="group_setting_unbind_btn_text">Unbind</string>
+    <string name="group_setting_send_btn_text">Send</string>
+    <string name="group_setting_write_btn_text">Write</string>
 </resources>

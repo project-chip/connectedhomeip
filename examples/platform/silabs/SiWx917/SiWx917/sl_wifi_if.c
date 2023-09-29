@@ -310,6 +310,7 @@ sl_status_t scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_t *
         break;
     case SL_WIFI_WPA:
     case SL_WIFI_WPA_ENTERPRISE:
+    case SL_WIFI_WPA_WPA2_MIXED:
         wfx_rsi.sec.security = WFX_SEC_WPA;
         break;
     case SL_WIFI_WPA2:
@@ -429,9 +430,11 @@ static sl_status_t wfx_rsi_do_join(void)
     case WFX_SEC_WPA2:
         connect_security_mode = SL_WIFI_WPA_WPA2_MIXED;
         break;
+#if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
     case WFX_SEC_WPA3:
-        connect_security_mode = SL_WIFI_WPA3;
+        connect_security_mode = SL_WIFI_WPA3_TRANSITION;
         break;
+#endif /*WIFI_ENABLE_SECURITY_WPA3_TRANSITION*/
     case WFX_SEC_NONE:
         connect_security_mode = SL_WIFI_OPEN;
         break;

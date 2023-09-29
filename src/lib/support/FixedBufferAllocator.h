@@ -86,7 +86,7 @@ public:
 
 private:
     FixedBufferAllocator(const FixedBufferAllocator &) = delete;
-    void operator=(const FixedBufferAllocator &) = delete;
+    void operator=(const FixedBufferAllocator &)       = delete;
 
     uint8_t * mBegin     = nullptr;
     uint8_t * mEnd       = nullptr;

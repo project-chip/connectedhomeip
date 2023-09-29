@@ -48,10 +48,10 @@ public:
     SessionHandle(Transport::Session & session) : mSession(session) {}
     ~SessionHandle() {}
 
-    SessionHandle(const SessionHandle &) = delete;
+    SessionHandle(const SessionHandle &)           = delete;
     SessionHandle operator=(const SessionHandle &) = delete;
     SessionHandle(SessionHandle &&)                = default;
-    SessionHandle & operator=(SessionHandle &&) = delete;
+    SessionHandle & operator=(SessionHandle &&)    = delete;
 
     bool operator==(const SessionHandle & that) const { return &mSession.Get() == &that.mSession.Get(); }
 

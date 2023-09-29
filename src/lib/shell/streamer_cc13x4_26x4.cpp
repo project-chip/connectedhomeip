@@ -103,7 +103,7 @@ streamer_t * streamer_get()
     return &streamer_cc13xx_26xx;
 }
 
-#endif //#ifndef SHELL_STREAMER_APP_SPECIFIC
+#endif // #ifndef SHELL_STREAMER_APP_SPECIFIC
 
 } // namespace Shell
 } // namespace chip

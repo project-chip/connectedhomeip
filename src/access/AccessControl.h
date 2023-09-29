@@ -71,7 +71,7 @@ public:
         public:
             Delegate() = default;
 
-            Delegate(const Delegate &) = delete;
+            Delegate(const Delegate &)             = delete;
             Delegate & operator=(const Delegate &) = delete;
 
             virtual ~Delegate() = default;
@@ -118,7 +118,7 @@ public:
             return *this;
         }
 
-        Entry(const Entry &) = delete;
+        Entry(const Entry &)             = delete;
         Entry & operator=(const Entry &) = delete;
 
         ~Entry() { mDelegate->Release(); }
@@ -245,7 +245,7 @@ public:
         public:
             Delegate() = default;
 
-            Delegate(const Delegate &) = delete;
+            Delegate(const Delegate &)             = delete;
             Delegate & operator=(const Delegate &) = delete;
 
             virtual ~Delegate() = default;
@@ -257,7 +257,7 @@ public:
 
         EntryIterator() = default;
 
-        EntryIterator(const EntryIterator &) = delete;
+        EntryIterator(const EntryIterator &)             = delete;
         EntryIterator & operator=(const EntryIterator &) = delete;
 
         ~EntryIterator() { mDelegate->Release(); }
@@ -327,7 +327,7 @@ public:
     public:
         Delegate() = default;
 
-        Delegate(const Delegate &) = delete;
+        Delegate(const Delegate &)             = delete;
         Delegate & operator=(const Delegate &) = delete;
 
         virtual ~Delegate() = default;
@@ -400,7 +400,7 @@ public:
 
     AccessControl() = default;
 
-    AccessControl(const AccessControl &) = delete;
+    AccessControl(const AccessControl &)             = delete;
     AccessControl & operator=(const AccessControl &) = delete;
 
     ~AccessControl()

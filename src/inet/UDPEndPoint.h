@@ -53,10 +53,10 @@ namespace Inet {
 class DLL_EXPORT UDPEndPoint : public EndPointBasis<UDPEndPoint>
 {
 public:
-    UDPEndPoint(const UDPEndPoint &) = delete;
-    UDPEndPoint(UDPEndPoint &&)      = delete;
+    UDPEndPoint(const UDPEndPoint &)             = delete;
+    UDPEndPoint(UDPEndPoint &&)                  = delete;
     UDPEndPoint & operator=(const UDPEndPoint &) = delete;
-    UDPEndPoint & operator=(UDPEndPoint &&) = delete;
+    UDPEndPoint & operator=(UDPEndPoint &&)      = delete;
 
     /**
      * Type of message text reception event handling function.

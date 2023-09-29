@@ -74,12 +74,12 @@ public:
         return T2{};
     }
 
-    Map()            = delete;
-    Map(const Map &) = delete;
-    Map(Map &&)      = delete;
+    Map()                        = delete;
+    Map(const Map &)             = delete;
+    Map(Map &&)                  = delete;
     Map & operator=(const Map &) = delete;
-    Map & operator=(Map &&) = delete;
-    ~Map()                  = default;
+    Map & operator=(Map &&)      = delete;
+    ~Map()                       = default;
 
 private:
     Pair mMap[N];

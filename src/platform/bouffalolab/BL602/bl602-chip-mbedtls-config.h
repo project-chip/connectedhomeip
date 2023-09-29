@@ -36,7 +36,7 @@
  * Enable FreeRTOS threading support
  */
 #define MBEDTLS_FREERTOS
-//#define MBEDTLS_THREADING_C
+// #define MBEDTLS_THREADING_C
 
 #define SL_CATALOG_FREERTOS_KERNEL_PRESENT
 
@@ -96,7 +96,7 @@ typedef void mbedtls_ecp_restart_ctx;
 #define MBEDTLS_PK_WRITE_C
 #define MBEDTLS_PKCS5_C
 #define MBEDTLS_PLATFORM_C
-//#define MBEDTLS_PLATFORM_MEMORY
+// #define MBEDTLS_PLATFORM_MEMORY
 #define MBEDTLS_PLATFORM_NO_STD_FUNCTIONS
 #define MBEDTLS_PSA_CRYPTO_C
 #define MBEDTLS_PSA_CRYPTO_CONFIG
@@ -145,5 +145,5 @@ typedef void mbedtls_ecp_restart_ctx;
 #define MBEDTLS_AES_ALT
 #define MBEDTLS_ECP_ALT
 
-//#include "config-device-acceleration.h"
+// #include "config-device-acceleration.h"
 #include "mbedtls/check_config.h"
