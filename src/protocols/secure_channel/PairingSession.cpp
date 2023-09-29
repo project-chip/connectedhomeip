@@ -35,7 +35,7 @@ CHIP_ERROR PairingSession::AllocateSecureSession(SessionManager & sessionManager
 
 CHIP_ERROR PairingSession::ActivateSecureSession(const Transport::PeerAddress & peerAddress)
 {
-    chip::timing::TimespecTimer timer ( "Inet: ActivateSecureSession" );
+    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance( "Inet: ActivateSecureSession" );
     timer.start();
 
     // Prepare SecureSession fields, including key derivation, first, before activation

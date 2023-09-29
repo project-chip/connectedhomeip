@@ -124,7 +124,7 @@ exit:
 
 void CASEServer::PrepareForSessionEstablishment(const ScopedNodeId & previouslyEstablishedPeer)
 {
-    chip::timing::TimespecTimer timer ( "Inet: CASE Session establishment" );
+    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance( "Inet: CASE Session establishment" );
     timer.start();
 
     GetSession().Clear();

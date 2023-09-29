@@ -1,24 +1,16 @@
 #pragma once
 
 #include <string>
-//#include <time.h>
-//#include <sys/time.h>
-//#include <iostream>
-//#include <stdio.h>
-//#include <chrono>
-//#include <ctime>
 #include <system/SystemClock.h>
 
 using namespace std;
-
-//using namespace chip::System;
 
 //todo add description
 namespace chip{
     namespace timing{
         
         //todo add description
-        class TimespecTimer {
+        class DurationTimer {
                 
                 private:
                     string toTimeStr(timeval* time);
@@ -29,18 +21,19 @@ namespace chip{
                 public:
                     //constructors
                     //TimespecTimer(uint8_t mod, string s ):  DurationTimer(mod, s){};
-                    TimespecTimer( string s ){
+                    DurationTimer( string s ){
                         label =  s;
                     }
-                    ~TimespecTimer()=default;
+                    ~DurationTimer()=default;
                     //member functions
                     void start();
                     void stop();
                     double duration(); 
-                    //string toTimeStr(timeval* time);
-                    //void toDateTime(char* timestr, timeval* time);
 
         };
+
+        DurationTimer GetDefaultTimingInstance(string label);
+        DurationTimer * GetDefaultTimingInstancePtr(string label);
 
     }
 }

@@ -1,16 +1,9 @@
 #include "DurationTimer.h"
 #include <stdint.h>
 #include <string>
+//#include <chrono>
 #include <lib/support/logging/CHIPLogging.h>
-
-#include <chrono>
-//#include <ctime>
-//#include <iomanip>
-//#include <algorithm>
-//#include <sys/time.h>
-
 #include <system/SystemClock.h>
-
 
 using namespace std;
 using namespace std::literals;
@@ -21,10 +14,21 @@ namespace chip{
         #define DATETIME_PATTERN  ("%Y-%m-%dT%H:%M:%S")
         #define DATETIME_LEN (sizeof "1970-01-01T23:59:59")
         #define ISO8601_LEN (sizeof "1970-01-01T23:59:59.123456Z")
-        /**   TimespecTimer implementations   */
+        
+        /*const FabricTable * fabricTable;
+        System::Clock::Seconds32 lastKnownGoodChipEpochTime;
+        err = mFabricsTable->GetLastKnownGoodChipEpochTime(lastKnownGoodChipEpochTime);
+        if (err != CHIP_NO_ERROR)
+        {
+            // If we have no time available, the Validity Policy will
+            // determine what to do.
+            ChipLogError(DeviceLayer, "Failed to retrieve Last Known Good UTC Time");
+        }*/
+        
+        /**   DurationTimer implementations   */
 
         // member functions
-        void TimespecTimer::start()
+        void DurationTimer::start()
         {
             chip::System::Clock::Timestamp tv1 = chip::System::SystemClock().GetMonotonicTimestamp();
 
@@ -35,7 +39,7 @@ namespace chip{
             //ChipLogDetail(DeviceLayer, "Timer: start %ld", t1.tv_usec);
         }
 
-        void TimespecTimer::stop()
+        void DurationTimer::stop()
         {
         
             chip::System::Clock::Timestamp tv2 = chip::System::SystemClock().GetMonotonicTimestamp();
@@ -53,7 +57,7 @@ namespace chip{
         
         }
 
-        double TimespecTimer::duration()
+        double DurationTimer::duration()
         {
             double dur =  ((t2.tv_usec - t1.tv_usec) * 1e-6);
 
@@ -64,7 +68,7 @@ namespace chip{
         }
 
         // utility method
-        string TimespecTimer::toTimeStr(timeval* time)
+        string DurationTimer::toTimeStr(timeval* time)
         {
             char * buff = new char[DATETIME_LEN];
             //struct tm* tm_info = localtime(&(time->tv_sec));
@@ -75,6 +79,16 @@ namespace chip{
             snprintf(str, ISO8601_LEN, " %s.%05ld", buff, time->tv_usec);
             
             return str; 
+        }
+
+        DurationTimer GetDefaultTimingInstance(string label)
+        {
+            return chip::timing::DurationTimer(label);      
+        }
+
+        DurationTimer * GetDefaultTimingInstancePtr(string label)
+        {
+            return new chip::timing::DurationTimer(label);            
         }
 
     }
