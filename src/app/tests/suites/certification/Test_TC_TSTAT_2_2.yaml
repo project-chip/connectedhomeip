@@ -1737,33 +1737,33 @@ tests:
 
     - label:
           "Step 12: TH writes value 1 for attribute ControlSequenceOfOperation.
-          If TSTAT.S.F00 is true & TSTAT.S.F01 is false"
+          If TSTAT.S.F01 is true & TSTAT.S.F00 is false"
       command: "writeAttribute"
       attribute: "ControlSequenceOfOperation"
-      PICS: TSTAT.S.F00 && !TSTAT.S.F01
+      PICS: TSTAT.S.F01 && !TSTAT.S.F00
       arguments:
           value: 1
 
     - label: "Step 12: Read it back again to confirm the successful write"
       command: "readAttribute"
       attribute: "ControlSequenceOfOperation"
-      PICS: TSTAT.S.F00 && !TSTAT.S.F01
+      PICS: TSTAT.S.F01 && !TSTAT.S.F00
       response:
           value: 1
 
     - label:
           "Step 12: TH writes value 3 for attribute ControlSequenceOfOperation.
-          If TSTAT.S.F01 is true & TSTAT.S.F00 is false"
+          If TSTAT.S.F00 is true & TSTAT.S.F01 is false"
       command: "writeAttribute"
       attribute: "ControlSequenceOfOperation"
-      PICS: TSTAT.S.F01 && !TSTAT.S.F00
+      PICS: TSTAT.S.F00 && !TSTAT.S.F01
       arguments:
           value: 3
 
     - label: "Step 12: Read it back again to confirm the successful write"
       command: "readAttribute"
       attribute: "ControlSequenceOfOperation"
-      PICS: TSTAT.S.F01 && !TSTAT.S.F00
+      PICS: TSTAT.S.F00 && !TSTAT.S.F01
       response:
           value: 3
 

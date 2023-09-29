@@ -30,10 +30,6 @@ config:
         type: int64u
         defaultValue: "0x0000000000000003"
 
-    payloadValue:
-        type: char_string
-        defaultValue: "MT:-24J0AFN00KA0648G00"
-
 tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -60,16 +56,6 @@ tests:
                 value: "Factory Reset the DUT and enter 'y' after success"
               - name: "expectedValue"
                 value: "y"
-
-    - label: "Recommission the DUT"
-      cluster: "CommissionerCommands"
-      command: "PairWithCode"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
-              - name: "payload"
-                value: payloadValue
 
     - label: "Step 1b: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -449,16 +435,6 @@ tests:
                 value: "Factory Reset the DUT and enter 'y' after success"
               - name: "expectedValue"
                 value: "y"
-
-    - label: "Recommission the DUT"
-      cluster: "CommissionerCommands"
-      command: "PairWithCode"
-      arguments:
-          values:
-              - name: "nodeId"
-                value: nodeId
-              - name: "payload"
-                value: payloadValue
 
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
