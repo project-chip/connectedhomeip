@@ -28,6 +28,9 @@ typedef void (^SubscriptionEstablishedHandler)(void);
 typedef void (^MTRStatusCompletion)(NSError * _Nullable error);
 typedef void (^MTRSubscriptionEstablishedHandler)(void);
 
+MTR_PROVISIONALLY_AVAILABLE
+typedef void (^MTRDiagnosticLogsRetrievedCompletion)(NSError * _Nullable error, NSArray<NSString *> * _Nullable filePathArray);
+
 @class MTRBaseDevice;
 
 NS_ASSUME_NONNULL_BEGIN
