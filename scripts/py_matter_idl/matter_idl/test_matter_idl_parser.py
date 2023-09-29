@@ -29,7 +29,7 @@ import unittest
 from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeInstantiation, AttributeQuality, AttributeStorage,
                                          Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType, DeviceType,
                                          Endpoint, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
-                                         ParseMetaData, ServerClusterInstantiation, Struct, StructQuality, StructTag)
+                                         ParseMetaData, ServerClusterInstantiation, Struct, StructTag)
 
 
 def parseText(txt, skip_meta=True):
