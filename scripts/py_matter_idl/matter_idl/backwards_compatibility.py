@@ -275,8 +275,6 @@ class CompatibilityChecker:
         # assume ok, and then validate
         self.compatible = Compatibility.COMPATIBLE
 
-        self._check_enum_list_compatible("", self._original_idl.enums, self._updated_idl.enums)
-        self._check_struct_list_compatible("", self._original_idl.structs, self._updated_idl.structs)
         self._check_cluster_list_compatible(self._original_idl.clusters, self._updated_idl.clusters)
 
         return self.compatible
