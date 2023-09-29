@@ -6,9 +6,9 @@ Args:
 2. [Matter repository Root]
 """
 
+import os
 import subprocess
 import sys
-import os
 
 SDK_ROOT = sys.argv[1]
 CHIP_ENV_ROOT = sys.argv[2]
