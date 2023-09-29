@@ -204,6 +204,9 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & a
         bool isTestEventTriggersEnabled = IsTestEventTriggerEnabled();
         return aEncoder.Encode(isTestEventTriggersEnabled);
     }
+    case AverageWearCount::Id: {
+        return ReadIfSupported(&DiagnosticDataProvider::GetAverageWearCount, aEncoder);
+    }
     default: {
         break;
     }

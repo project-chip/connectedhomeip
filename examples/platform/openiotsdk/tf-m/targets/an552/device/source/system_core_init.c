@@ -56,7 +56,7 @@ void SystemCoreClockUpdate(void)
 void SystemInit(void)
 {
 #if defined(__VTOR_PRESENT) && (__VTOR_PRESENT == 1U)
-    SCB->VTOR = (uint32_t)(&__VECTOR_TABLE[0]);
+    SCB->VTOR = (uint32_t) (&__VECTOR_TABLE[0]);
 #endif
 
 #if (defined(__FPU_USED) && (__FPU_USED == 1U)) || (defined(__ARM_FEATURE_MVE) && (__ARM_FEATURE_MVE > 0U))

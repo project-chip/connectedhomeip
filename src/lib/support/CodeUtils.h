@@ -28,7 +28,7 @@
 
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 /**

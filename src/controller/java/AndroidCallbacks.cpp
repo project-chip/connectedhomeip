@@ -23,9 +23,9 @@
 #endif
 #include <app/EventLoggingTypes.h>
 #include <jni.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 #include <lib/support/jsontlv/JsonToTlv.h>
@@ -829,10 +829,19 @@ void InvokeCallback::OnResponse(app::CommandSender * apCommandSender, const app:
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to create Java InvokeElement: %s", ErrorStr(err)));
     err = JniReferences::GetInstance().FindMethod(env, mJavaCallbackRef, "onResponse",
                                                   "(Lchip/devicecontroller/model/InvokeElement;J)V", &onResponseMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onError method: %s", ErrorStr(err)));
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onResponse method: %s", ErrorStr(err)));
 
     DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mJavaCallbackRef, onResponseMethod, invokeElementObj, static_cast<jlong>(aStatusIB.mStatus));
+    if (aStatusIB.mClusterStatus.HasValue())
+    {
+        env->CallVoidMethod(mJavaCallbackRef, onResponseMethod, invokeElementObj,
+                            static_cast<jlong>(aStatusIB.mClusterStatus.Value()));
+    }
+    else
+    {
+        env->CallVoidMethod(mJavaCallbackRef, onResponseMethod, invokeElementObj,
+                            static_cast<jlong>(Protocols::InteractionModel::Status::Success));
+    }
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 

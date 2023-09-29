@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 
 #import <Matter/MTRCluster.h>
+#import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceController.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -42,7 +43,7 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
  */
 + (MTRDeviceController *)sharedControllerWithID:(id<NSCopying> _Nullable)controllerID
                                 xpcConnectBlock:(MTRXPCConnectBlock)xpcConnectBlock
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Returns an encoded values object to send over XPC for read, write and command interactions
@@ -79,12 +80,12 @@ typedef void (^MTRValuesHandler)(id _Nullable values, NSError * _Nullable error)
 /**
  * Returns an NSXPCInterface configured for MTRDeviceControllerServerProtocol.
  */
-+ (NSXPCInterface *)xpcInterfaceForServerProtocol API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
++ (NSXPCInterface *)xpcInterfaceForServerProtocol MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 /**
  * Returns an NSXPCInterface configured for MTRDeviceControllerClientProtocol.
  */
-+ (NSXPCInterface *)xpcInterfaceForClientProtocol API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
++ (NSXPCInterface *)xpcInterfaceForClientProtocol MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 @end
 
 /**

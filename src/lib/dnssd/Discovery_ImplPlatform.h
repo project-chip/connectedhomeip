@@ -20,6 +20,7 @@
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/Global.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/dnssd/ResolverProxy.h>
@@ -50,7 +51,7 @@ public:
     CHIP_ERROR UpdateCommissionableInstanceName() override;
 
     // Members that implement Resolver interface.
-    void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mResolverProxy.SetOperationalDelegate(delegate); }
+    void SetOperationalDelegate(OperationalResolveDelegate * delegate) override { mOperationalDelegate = delegate; }
     void SetCommissioningDelegate(CommissioningResolveDelegate * delegate) override
     {
         mResolverProxy.SetCommissioningDelegate(delegate);
@@ -72,9 +73,9 @@ private:
         kInitialized
     };
 
-    DiscoveryImplPlatform();
+    DiscoveryImplPlatform() = default;
 
-    DiscoveryImplPlatform(const DiscoveryImplPlatform &) = delete;
+    DiscoveryImplPlatform(const DiscoveryImplPlatform &)             = delete;
     DiscoveryImplPlatform & operator=(const DiscoveryImplPlatform &) = delete;
 
     CHIP_ERROR InitImpl();
@@ -91,11 +92,16 @@ private:
                               size_t subTypeSize, uint16_t port, Inet::InterfaceId interfaceId, const chip::ByteSpan & mac,
                               DnssdServiceProtocol procotol, PeerId peerId);
 
+    static void HandleNodeIdResolve(void * context, DnssdService * result, const Span<Inet::IPAddress> & addresses,
+                                    CHIP_ERROR error);
+
     State mState = State::kUninitialized;
     uint8_t mCommissionableInstanceName[sizeof(uint64_t)];
     ResolverProxy mResolverProxy;
+    OperationalResolveDelegate * mOperationalDelegate = nullptr;
 
-    static DiscoveryImplPlatform sManager;
+    friend class Global<DiscoveryImplPlatform>;
+    static Global<DiscoveryImplPlatform> sManager;
 };
 
 } // namespace Dnssd

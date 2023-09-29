@@ -59,6 +59,7 @@ pw_python_package("matter_idl") {
   sources = matter_idl_generator_sources
 
   tests = [
+    "matter_idl/test_backwards_compatibility.py",
     "matter_idl/test_matter_idl_parser.py",
     "matter_idl/test_generators.py",
     "matter_idl/test_xml_parser.py",

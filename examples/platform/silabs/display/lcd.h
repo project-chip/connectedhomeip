@@ -33,6 +33,24 @@ class SilabsLCD
 {
 
 public:
+    typedef enum screen
+    {
+        DemoScreen = 0,
+        StatusScreen,
+#ifdef QR_CODE_ENABLED
+        QRCodeScreen,
+#endif
+        InvalidScreen,
+    } Screen_e;
+
+    typedef struct dStatus
+    {
+        uint8_t nbFabric     = 0;
+        bool connected       = false;
+        char networkName[50] = { "TODO" };
+        bool advertising     = false;
+    } DisplayStatus_t;
+
     typedef void (*customUICB)(GLIB_Context_t * context);
     CHIP_ERROR Init(uint8_t * name = nullptr, bool initialState = false);
     void * Context();
@@ -42,10 +60,13 @@ public:
     void WriteDemoUI(bool state);
     void SetCustomUI(customUICB cb);
 
+    void SetScreen(Screen_e screen);
+    void CycleScreens(void);
+    void SetStatus(DisplayStatus_t & status);
+
 #ifdef QR_CODE_ENABLED
     void SetQRCode(uint8_t * str, uint32_t size);
-    void ShowQRCode(bool show, bool forceRefresh = false);
-    void ToggleQRCode(void);
+    void ShowQRCode(bool show);
 #endif
 
 private:
@@ -55,13 +76,15 @@ private:
         bool protocol1 = false; /* data */
     } DemoState_t;
 
-    void WriteQRCode();
     void WriteDemoUI();
+    void WriteStatus();
+
 #ifdef QR_CODE_ENABLED
+    void WriteQRCode();
     void LCDFillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h);
     char mQRCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
-    bool mShowQRCode = true;
 #endif
+
     GLIB_Context_t glibContext;
 
 #ifdef SL_DEMO_NAME
@@ -71,4 +94,7 @@ private:
 #endif
         customUICB customUI = nullptr;
     DemoState_t dState;
+
+    DisplayStatus_t mStatus;
+    uint8_t mCurrentScreen = DemoScreen;
 };

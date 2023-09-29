@@ -160,8 +160,8 @@ CHIP_ERROR FactoryDataProvider::SignWithDeviceAttestationKey(const ByteSpan & me
 
     Crypto::P256ECDSASignature signature;
     Crypto::P256Keypair keypair;
-    VerifyOrReturnError(IsSpanUsable(outSignBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(messageToSign), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!outSignBuffer.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!messageToSign.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(outSignBuffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // In a non-exemplary implementation, the public key is not needed here. It is used here merely because
@@ -209,7 +209,7 @@ CHIP_ERROR FactoryDataProvider::GetSetupDiscriminator(uint16_t & setupDiscrimina
     uint16_t temp          = 0;
 
     ReturnErrorOnFailure(SearchForId(kDiscriminatorId, (uint8_t *) &discriminator, sizeof(discriminator), temp));
-    setupDiscriminator = (uint16_t)(discriminator & 0x0000FFFF);
+    setupDiscriminator = (uint16_t) (discriminator & 0x0000FFFF);
 
     return CHIP_NO_ERROR;
 }

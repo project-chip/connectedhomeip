@@ -26,6 +26,7 @@ from tests_tool import send_raw_command, send_yaml_command
 
 _DEFAULT_EXTENSIONS_DIR = 'scripts/tests/yaml/extensions'
 _DEFAULT_PICS_FILE = 'src/app/tests/suites/certification/ci-pics-values'
+_DEFAULT_SPECIFICATIONS_DIR = 'src/app/zap-templates/zcl/data-model/chip/*.xml'
 
 
 def darwinframeworktool_runner_options(f):
@@ -41,6 +42,8 @@ def darwinframeworktool_runner_options(f):
                      help='Add a delay between each test suite steps.')(f)
     f = click.option('--continueOnFailure', type=bool, default=False, show_default=True,
                      help='Do not stop running the test suite on first error.')(f)
+    f = click.option('--specifications_paths', type=click.Path(), show_default=True, default=_DEFAULT_SPECIFICATIONS_DIR,
+                     help='Path to a set of files containing clusters definitions.')(f)
     f = click.option('--PICS', type=click.Path(exists=True), show_default=True, default=_DEFAULT_PICS_FILE,
                      help='Path to the PICS file to use.')(f)
     f = click.option('--additional_pseudo_clusters_directory', type=click.Path(), show_default=True, default=_DEFAULT_EXTENSIONS_DIR,
@@ -63,14 +66,14 @@ def maybe_update_stop_on_error(ctx):
 @click.argument('commands', nargs=-1)
 @darwinframeworktool_runner_options
 @click.pass_context
-def darwinframeworktool_py(ctx, commands: List[str], server_path: str, server_name: str, server_arguments: str, show_adapter_logs: bool, delay_in_ms: int, continueonfailure: bool, pics: str, additional_pseudo_clusters_directory: str):
+def darwinframeworktool_py(ctx, commands: List[str], server_path: str, server_name: str, server_arguments: str, show_adapter_logs: bool, delay_in_ms: int, continueonfailure: bool, specifications_paths: str, pics: str, additional_pseudo_clusters_directory: str):
     success = False
 
     server_arguments = ctx.params['server_arguments']
     maybe_update_stop_on_error(ctx)
 
     if len(commands) > 1 and commands[0] == 'tests':
-        success = send_yaml_command(darwinframeworktool, commands[1], server_path, server_arguments, show_adapter_logs, pics,
+        success = send_yaml_command(darwinframeworktool, commands[1], server_path, server_arguments, show_adapter_logs, specifications_paths, pics,
                                     additional_pseudo_clusters_directory, commands[2:])
     else:
         if server_path is None and server_name:

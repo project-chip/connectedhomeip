@@ -23,6 +23,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <app/util/generic-callbacks.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/LockTracker.h>
@@ -373,8 +374,8 @@ EmberAfStatus emAfClusterPreAttributeChangedCallback(const app::ConcreteAttribut
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     // Casting and calling a function pointer on the same line results in ignoring the return
     // of the call on gcc-arm-none-eabi-9-2019-q4-major
-    EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback)(
-        emberAfFindClusterFunction(cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
+    EmberAfClusterPreAttributeChangedCallback f = (EmberAfClusterPreAttributeChangedCallback) (emberAfFindClusterFunction(
+        cluster, CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION));
     if (f != nullptr)
     {
         status = f(attributePath, attributeType, size, value);
@@ -1312,7 +1313,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional
                         // At this point, ptr either points to a default value, or is NULL, in which case
                         // it should be treated as if it is pointing to an array of all zeroes.
 
-#if (BIGENDIAN_CPU)
+#if (CHIP_CONFIG_BIG_ENDIAN_TARGET)
                         // The default values for attributes that are less than or equal to
                         // defaultValueSizeForBigEndianNudger in bytes are stored in an
                         // uint32_t.  On big-endian platforms, a pointer to the default value

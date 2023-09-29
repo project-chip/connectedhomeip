@@ -182,7 +182,7 @@ void AmebaWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
     ChipLogProgress(NetworkProvisioning, "Ameba NetworkCommissioningDelegate: SSID: %s", mStagingNetwork.ssid);
 
     err               = ConnectWiFiNetwork(reinterpret_cast<const char *>(mStagingNetwork.ssid), mStagingNetwork.ssidLen,
-                             reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);
+                                           reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);
     mpConnectCallback = callback;
 exit:
     if (err != CHIP_NO_ERROR)

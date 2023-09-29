@@ -25,7 +25,7 @@ import chip.tlv.TlvWriter
 import java.util.Optional
 
 class ContentLauncherClusterParameterStruct(
-  val type: Int,
+  val type: UInt,
   val value: String,
   val externalIDList: Optional<List<ContentLauncherClusterAdditionalInfoStruct>>
 ) {
@@ -37,18 +37,18 @@ class ContentLauncherClusterParameterStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_TYPE), type)
       put(ContextSpecificTag(TAG_VALUE), value)
       if (externalIDList.isPresent) {
         val optexternalIDList = externalIDList.get()
-        startList(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST))
+        startArray(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST))
         for (item in optexternalIDList.iterator()) {
           item.toTlv(AnonymousTag, this)
         }
-        endList()
+        endArray()
       }
       endStructure()
     }
@@ -59,15 +59,15 @@ class ContentLauncherClusterParameterStruct(
     private const val TAG_VALUE = 1
     private const val TAG_EXTERNAL_I_D_LIST = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ContentLauncherClusterParameterStruct {
-      tlvReader.enterStructure(tag)
-      val type = tlvReader.getInt(ContextSpecificTag(TAG_TYPE))
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ContentLauncherClusterParameterStruct {
+      tlvReader.enterStructure(tlvTag)
+      val type = tlvReader.getUInt(ContextSpecificTag(TAG_TYPE))
       val value = tlvReader.getString(ContextSpecificTag(TAG_VALUE))
       val externalIDList =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST))) {
           Optional.of(
             buildList<ContentLauncherClusterAdditionalInfoStruct> {
-              tlvReader.enterList(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST))
+              tlvReader.enterArray(ContextSpecificTag(TAG_EXTERNAL_I_D_LIST))
               while (!tlvReader.isEndOfContainer()) {
                 add(ContentLauncherClusterAdditionalInfoStruct.fromTlv(AnonymousTag, tlvReader))
               }

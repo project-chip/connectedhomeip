@@ -26,8 +26,7 @@
 
 namespace chip {
 namespace DeviceLayer {
-namespace Internal {
-} // namespace Internal
+namespace Internal {} // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
 

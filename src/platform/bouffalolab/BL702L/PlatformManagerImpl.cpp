@@ -68,9 +68,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 
-    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
-    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
-
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
 

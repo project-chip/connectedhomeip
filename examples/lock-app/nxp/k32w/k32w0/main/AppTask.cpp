@@ -20,7 +20,7 @@
 #include "AppEvent.h"
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 
 #include <DeviceInfoProviderImpl.h>
 #include <app/server/OnboardingCodesUtil.h>
@@ -41,9 +41,6 @@
 #include "PWR_Interface.h"
 #include "app_config.h"
 
-#if CHIP_CRYPTO_HSM
-#include <crypto/hsm/CHIPCryptoPALHsm.h>
-#endif
 #ifdef ENABLE_HSM_DEVICE_ATTESTATION
 #include "DeviceAttestationSe05xCredsExample.h"
 #endif
@@ -326,7 +323,7 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 
 void AppTask::KBD_Callback(uint8_t events)
 {
-    eventMask = eventMask | (uint32_t)(1 << events);
+    eventMask = eventMask | (uint32_t) (1 << events);
 
     HandleKeyboard();
 }

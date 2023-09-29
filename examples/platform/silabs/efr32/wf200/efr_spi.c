@@ -247,7 +247,7 @@ sl_status_t sl_wfx_host_spi_transfer_no_cs_assert(sl_wfx_host_bus_transfer_type_
     {
         for (uint8_t * buffer_ptr = header; header_length > 0; --header_length, ++buffer_ptr)
         {
-            MY_USART->TXDATA = (uint32_t)(*buffer_ptr);
+            MY_USART->TXDATA = (uint32_t) (*buffer_ptr);
 
             while (!(MY_USART->STATUS & USART_STATUS_TXC))
             {

@@ -122,10 +122,10 @@ enum tfm_plat_err_t system_reset_cfg(void)
     sysctrl->reset_mask |= ENABLE_CPU0_SYSTEM_RESET_REQUEST;
 
     /* Clear SCB_AIRCR_VECTKEY value */
-    reg_value &= ~(uint32_t)(SCB_AIRCR_VECTKEY_Msk);
+    reg_value &= ~(uint32_t) (SCB_AIRCR_VECTKEY_Msk);
 
     /* Enable system reset request only to the secure world */
-    reg_value |= (uint32_t)(SCB_AIRCR_WRITE_MASK | SCB_AIRCR_SYSRESETREQS_Msk);
+    reg_value |= (uint32_t) (SCB_AIRCR_WRITE_MASK | SCB_AIRCR_SYSRESETREQS_Msk);
 
     SCB->AIRCR = reg_value;
 

@@ -47,8 +47,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/ScopedBuffer.h>
 #include <platform/PlatformManager.h>
 #include <system/SystemClock.h>
@@ -469,7 +469,7 @@ void ServiceEvents(uint32_t aSleepTimeMilliseconds)
 
         if (sRemainingSystemLayerEventDelay == 0)
         {
-#if defined(CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK)
+#if CHIP_DEVICE_LAYER_TARGET_OPEN_IOT_SDK
             // We need to terminate event loop after performance single step.
             // Event loop processing work items until StopEventLoopTask is called.
             // Scheduling StopEventLoop task guarantees correct operation of the loop.

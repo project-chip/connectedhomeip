@@ -42,7 +42,7 @@
 #include <uart.h>
 #endif
 
-#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || defined(CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST)
+#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST
 #include <platform/bouffalolab/common/FactoryDataProvider.h>
 #endif
 
@@ -51,25 +51,25 @@
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #endif
 
-#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <platform/bouffalolab/common/ThreadStackManagerImpl.h>
 #include <utils_list.h>
 #endif
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET || CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#include <bl_route_hook.h>
 #include <lwip/netif.h>
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#if defined(BL602_ENABLE)
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI && BL602_ENABLE
 #include <wifi_mgmr_ext.h>
-#else
-#include <platform/bouffalolab/BL702/WiFiInterface.h>
 #endif
-#else
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI && BL702_ENABLE
+#include <platform/bouffalolab/BL702/wifi_mgmr_portable.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 #include <platform/bouffalolab/BL702/EthernetInterface.h>
 #endif
-#include <bl_route_hook.h>
 #endif
 
 #include <AppTask.h>
@@ -87,13 +87,13 @@ chip::app::Clusters::NetworkCommissioning::Instance
 }
 #endif
 
-static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
-
-#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || defined(CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST)
+#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST
 namespace {
 FactoryDataProvider sFactoryDataProvider;
 }
 #endif
+
+static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
@@ -111,7 +111,9 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
                                                         OTAConfig::InitOTARequestorHandler, nullptr);
         }
         break;
-#else
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
     case DeviceEventType::kInterfaceIpAddressChanged:
         if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
             (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
@@ -128,7 +130,6 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
             chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds32(OTAConfig::kInitOTARequestorDelaySec),
                                                         OTAConfig::InitOTARequestorHandler, nullptr);
         }
-
         break;
 #endif
     case DeviceEventType::kInternetConnectivityChange:
@@ -166,6 +167,11 @@ void ChipEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 
 CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 {
+    chip::RendezvousInformationFlags rendezvousMode(chip::RendezvousInformationFlag::kOnNetwork);
+#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST
+    CHIP_ERROR retFactoryData = sFactoryDataProvider.Init();
+#endif
+
 #if PW_RPC_ENABLED
     PigweedLogger::pw_init();
 #elif CONFIG_ENABLE_CHIP_SHELL
@@ -181,7 +187,7 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(CHIP_BLE_DEVICE_NAME);
 
-#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #if CONFIG_ENABLE_CHIP_SHELL
     cmd_otcli_init();
@@ -196,13 +202,15 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
     ReturnLogErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice));
 #endif
 
-#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     ReturnLogErrorOnFailure(sWiFiNetworkCommissioningInstance.Init());
 #endif
 
     // Initialize device attestation config
-#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || defined(CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST)
-    if (CHIP_NO_ERROR == sFactoryDataProvider.Init())
+#if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE || CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST
+    if (CHIP_NO_ERROR == retFactoryData)
     {
         SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
         SetDeviceAttestationCredentialsProvider(&sFactoryDataProvider);
@@ -233,7 +241,7 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     ChipLogProgress(NotSpecified, "Starting OpenThread task");
     // Start OpenThread task
     ReturnLogErrorOnFailure(ThreadStackMgrImpl().StartThreadTask());
@@ -242,10 +250,9 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
     ConfigurationMgr().LogDeviceConfig();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
-#else
-    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kOnNetwork));
+    rendezvousMode.Set(chip::RendezvousInformationFlag::kBLE);
 #endif
+    PrintOnboardingCodes(rendezvousMode);
 
     PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 

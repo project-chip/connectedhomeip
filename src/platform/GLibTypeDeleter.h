@@ -105,6 +105,12 @@ struct GAutoPtrDeleter<GError>
 };
 
 template <>
+struct GAutoPtrDeleter<GSource>
+{
+    using deleter = GObjectDeleter;
+};
+
+template <>
 struct GAutoPtrDeleter<GVariant>
 {
     using deleter = GVariantDeleter;

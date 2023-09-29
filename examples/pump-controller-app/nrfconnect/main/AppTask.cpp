@@ -30,9 +30,9 @@
 #include <app/util/attribute-storage.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <system/SystemClock.h>
 
 #if CONFIG_CHIP_OTA_REQUESTOR

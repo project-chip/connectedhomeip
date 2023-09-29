@@ -23,11 +23,11 @@
 #include "pw_sys_io_ameba/init.h"
 #include "sys_api.h"
 #include "task.h"
-//#include "esp_log.h"
-//#include "freertos/FreeRTOS.h"
-//#include "freertos/event_groups.h"
-//#include "freertos/semphr.h"
-//#include "freertos/task.h"
+// #include "esp_log.h"
+// #include "freertos/FreeRTOS.h"
+// #include "freertos/event_groups.h"
+// #include "freertos/semphr.h"
+// #include "freertos/task.h"
 #include "pw_log/log.h"
 #include "pw_rpc/server.h"
 #include "pw_sys_io/sys_io.h"
@@ -38,7 +38,7 @@
 #endif // defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
 
 #if defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
-//#include "ScreenManager.h"
+// #include "ScreenManager.h"
 #include "pigweed/rpc_services/Button.h"
 #endif // defined(PW_RPC_BUTTON_SERVICE) && PW_RPC_BUTTON_SERVICE
 

@@ -150,33 +150,33 @@ server cluster Groups = 4 {
 
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
 server cluster OnOff = 6 {
-  enum OnOffDelayedAllOffEffectVariant : ENUM8 {
-    kFadeToOffIn0p8Seconds = 0;
+  enum DelayedAllOffEffectVariantEnum : ENUM8 {
+    kDelayedOffFastFade = 0;
     kNoFade = 1;
-    k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
+    kDelayedOffSlowFade = 2;
   }
 
-  enum OnOffDyingLightEffectVariant : ENUM8 {
-    k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
+  enum DyingLightEffectVariantEnum : ENUM8 {
+    kDyingLightFadeOff = 0;
   }
 
-  enum OnOffEffectIdentifier : ENUM8 {
+  enum EffectIdentifierEnum : ENUM8 {
     kDelayedAllOff = 0;
     kDyingLight = 1;
   }
 
-  enum OnOffStartUpOnOff : ENUM8 {
+  enum StartUpOnOffEnum : ENUM8 {
     kOff = 0;
     kOn = 1;
-    kTogglePreviousOnOff = 2;
+    kToggle = 2;
   }
 
   bitmap Feature : BITMAP32 {
     kLighting = 0x1;
-    kDeadFront = 0x2;
+    kDeadFrontBehavior = 0x2;
   }
 
-  bitmap OnOffControl : BITMAP8 {
+  bitmap OnOffControlBitmap : BITMAP8 {
     kAcceptOnlyWhenOn = 0x1;
   }
 
@@ -184,7 +184,7 @@ server cluster OnOff = 6 {
   readonly attribute boolean globalSceneControl = 16384;
   attribute int16u onTime = 16385;
   attribute int16u offWaitTime = 16386;
-  attribute access(write: manage) nullable OnOffStartUpOnOff startUpOnOff = 16387;
+  attribute access(write: manage) nullable StartUpOnOffEnum startUpOnOff = 16387;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -193,12 +193,12 @@ server cluster OnOff = 6 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct OffWithEffectRequest {
-    OnOffEffectIdentifier effectIdentifier = 0;
+    EffectIdentifierEnum effectIdentifier = 0;
     int8u effectVariant = 1;
   }
 
   request struct OnWithTimedOffRequest {
-    OnOffControl onOffControl = 0;
+    OnOffControlBitmap onOffControl = 0;
     int16u onTime = 1;
     int16u offWaitTime = 2;
   }
@@ -1256,58 +1256,6 @@ server cluster ThreadNetworkDiagnostics = 53 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** This cluster exposes interactions with a switch device, for the purpose of using those interactions by other devices.
-Two types of switch devices are supported: latching switch (e.g. rocker switch) and momentary switch (e.g. push button), distinguished with their feature flags.
-Interactions with the switch device are exposed as attributes (for the latching switch) and as events (for both types of switches). An interested party MAY subscribe to these attributes/events and thus be informed of the interactions, and can perform actions based on this, for example by sending commands to perform an action such as controlling a light or a window shade. */
-server cluster Switch = 59 {
-  bitmap Feature : BITMAP32 {
-    kLatchingSwitch = 0x1;
-    kMomentarySwitch = 0x2;
-    kMomentarySwitchRelease = 0x4;
-    kMomentarySwitchLongPress = 0x8;
-    kMomentarySwitchMultiPress = 0x10;
-  }
-
-  info event SwitchLatched = 0 {
-    INT8U newPosition = 0;
-  }
-
-  info event InitialPress = 1 {
-    INT8U newPosition = 0;
-  }
-
-  info event LongPress = 2 {
-    INT8U newPosition = 0;
-  }
-
-  info event ShortRelease = 3 {
-    INT8U previousPosition = 0;
-  }
-
-  info event LongRelease = 4 {
-    INT8U previousPosition = 0;
-  }
-
-  info event MultiPressOngoing = 5 {
-    INT8U newPosition = 0;
-    INT8U currentNumberOfPressesCounted = 1;
-  }
-
-  info event MultiPressComplete = 6 {
-    INT8U previousPosition = 0;
-    INT8U totalNumberOfPressesCounted = 1;
-  }
-
-  readonly attribute int8u numberOfPositions = 0;
-  readonly attribute int8u currentPosition = 1;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
 server cluster AdministratorCommissioning = 60 {
   enum CommissioningWindowStatusEnum : ENUM8 {
@@ -1856,46 +1804,10 @@ server cluster ColorControl = 768 {
   command StepColorTemperature(StepColorTemperatureRequest): DefaultSuccess = 76;
 }
 
-/** Attributes and commands for configuring occupancy sensing, and reporting occupancy status. */
-server cluster OccupancySensing = 1030 {
-  enum OccupancySensorTypeEnum : ENUM8 {
-    kPIR = 0;
-    kUltrasonic = 1;
-    kPIRAndUltrasonic = 2;
-    kPhysicalContact = 3;
-  }
-
-  bitmap OccupancyBitmap : BITMAP8 {
-    kOccupied = 0x1;
-  }
-
-  bitmap OccupancySensorTypeBitmap : BITMAP8 {
-    kPIR = 0x1;
-    kUltrasonic = 0x2;
-    kPhysicalContact = 0x4;
-  }
-
-  readonly attribute OccupancyBitmap occupancy = 0;
-  readonly attribute OccupancySensorTypeEnum occupancySensorType = 1;
-  readonly attribute OccupancySensorTypeBitmap occupancySensorTypeBitmap = 2;
-  readonly attribute command_id generatedCommandList[] = 65528;
-  readonly attribute command_id acceptedCommandList[] = 65529;
-  readonly attribute event_id eventList[] = 65530;
-  readonly attribute attrib_id attributeList[] = 65531;
-  readonly attribute bitmap32 featureMap = 65532;
-  readonly attribute int16u clusterRevision = 65533;
-}
-
 endpoint 0 {
   device type ma_rootdevice = 22, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
-
-  server cluster Groups {
-    ram      attribute nameSupport;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 4;
-  }
 
   server cluster Descriptor {
     callback attribute deviceTypeList;
@@ -2096,13 +2008,6 @@ endpoint 0 {
     ram      attribute clusterRevision default = 1;
   }
 
-  server cluster Switch {
-    ram      attribute numberOfPositions default = 2;
-    ram      attribute currentPosition;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-  }
-
   server cluster AdministratorCommissioning {
     callback attribute windowStatus default = 0;
     callback attribute adminFabricIndex default = 1;
@@ -2240,14 +2145,6 @@ endpoint 1 {
     ram      attribute startUpColorTemperatureMireds;
     ram      attribute featureMap default = 0x1F;
     ram      attribute clusterRevision default = 6;
-  }
-
-  server cluster OccupancySensing {
-    ram      attribute occupancy;
-    ram      attribute occupancySensorType;
-    ram      attribute occupancySensorTypeBitmap;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
   }
 }
 

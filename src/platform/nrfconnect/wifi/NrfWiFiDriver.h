@@ -25,9 +25,9 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 
-constexpr uint8_t kMaxWiFiNetworks                  = 1;
-constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
-constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 35;
+inline constexpr uint8_t kMaxWiFiNetworks                  = 1;
+inline constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
+inline constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 35;
 
 class NrfWiFiScanResponseIterator : public Iterator<WiFiScanResponse>
 {

@@ -90,13 +90,6 @@ CHIP_ERROR AppTask::Init(void)
 #endif
     InitCommonParts();
 
-    err = ConnectivityMgr().SetBLEDeviceName("TelinkLight");
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("SetBLEDeviceName fail");
-        return err;
-    }
-
     return CHIP_NO_ERROR;
 }
 
@@ -182,7 +175,7 @@ void AppTask::UpdateClusterState(void)
     bool isTurnedOn =
         sAppTask.mPwmRgbRedLed.IsTurnedOn() || sAppTask.mPwmRgbGreenLed.IsTurnedOn() || sAppTask.mPwmRgbBlueLed.IsTurnedOn();
 #else
-    bool isTurnedOn = sAppTask.mPwmRgbBlueLed.IsTurnedOn();
+    bool isTurnedOn  = sAppTask.mPwmRgbBlueLed.IsTurnedOn();
 #endif
     // write the new on/off value
     EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(kExampleEndpointId, isTurnedOn);

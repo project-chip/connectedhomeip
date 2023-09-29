@@ -24,3 +24,4 @@ chip_project_config_include_dirs =
     [ "${chip_root}/examples/java-matter-controller/include" ]
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 chip_stack_lock_tracking = "fatal"
+chip_build_controller_dynamic_server = true

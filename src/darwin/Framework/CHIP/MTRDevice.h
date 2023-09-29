@@ -22,7 +22,6 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class MTRDeviceController;
-@class MTRAsyncCallbackWorkQueue;
 
 typedef NS_ENUM(NSUInteger, MTRDeviceState) {
     MTRDeviceStateUnknown = 0,
@@ -46,7 +45,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * and MTRAsyncCallbackQueue.
  */
 + (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID
-                     controller:(MTRDeviceController *)controller API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+                     controller:(MTRDeviceController *)controller MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * The current state of the device.
@@ -76,7 +75,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * If events are always reported with calendar time, then this property will return nil.
  */
 @property (nonatomic, readonly, nullable)
-    NSDate * estimatedStartTime API_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
+    NSDate * estimatedStartTime MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 /**
  * Set the delegate to receive asynchronous callbacks about the device.
@@ -162,7 +161,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
                               queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Open a commissioning window on the device.
@@ -183,7 +182,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
                                         duration:(NSNumber *)duration
                                            queue:(dispatch_queue_t)queue
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
-    API_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
+    MTR_AVAILABLE(ios(16.2), macos(13.1), watchos(9.2), tvos(16.2));
 
 /**
  * Open a commissioning window on the device, using a random setup passcode.
@@ -200,7 +199,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
                                         duration:(NSNumber *)duration
                                            queue:(dispatch_queue_t)queue
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
-    API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+    MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 @end
 
@@ -245,7 +244,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * This can be used as a hint that now is a good time to send commands to the
  * device, especially if the device is sleepy and might not be active very often.
  */
-- (void)deviceBecameActive:(MTRDevice *)device API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+- (void)deviceBecameActive:(MTRDevice *)device MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 @end
 
