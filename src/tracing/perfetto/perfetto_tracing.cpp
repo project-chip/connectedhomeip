@@ -19,7 +19,7 @@
 #include <tracing/perfetto/perfetto_tracing.h>
 
 #include <lib/address_resolve/TracingStructs.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/StringBuilder.h>
 #include <transport/TracingStructs.h>
 

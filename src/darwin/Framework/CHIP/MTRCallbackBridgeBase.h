@@ -277,7 +277,8 @@ protected:
 
     static void DispatchFailure(void * context, NSError * error) { DispatchCallbackResult(context, error, nil); }
 
-    template <typename ResponseType> static void SetAttestationChallengeIfNeeded(void * context, ResponseType * _Nonnull response)
+    template <typename ResponseType>
+    static void SetAttestationChallengeIfNeeded(void * context, ResponseType * _Nonnull response)
     {
         if constexpr (HaveAttestationChallenge()) {
             auto * self = static_cast<MTRCallbackBridge *>(context);

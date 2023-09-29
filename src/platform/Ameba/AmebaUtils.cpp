@@ -23,8 +23,8 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <chip_porting.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Ameba/AmebaConfig.h>
 #include <platform/Ameba/AmebaUtils.h>
@@ -197,7 +197,7 @@ CHIP_ERROR AmebaUtils::WiFiConnectProvisionedNetwork(void)
     GetWiFiConfig(config);
     ChipLogProgress(DeviceLayer, "Connecting to AP : [%s]", (char *) config->ssid);
     int32_t error  = matter_wifi_connect((char *) config->ssid, RTW_SECURITY_WPA_WPA2_MIXED, (char *) config->password,
-                                        strlen((const char *) config->ssid), strlen((const char *) config->password), 0, nullptr);
+                                         strlen((const char *) config->ssid), strlen((const char *) config->password), 0, nullptr);
     CHIP_ERROR err = MapError(error, AmebaErrorType::kWiFiError);
 
     vPortFree(config);
@@ -208,7 +208,7 @@ CHIP_ERROR AmebaUtils::WiFiConnect(const char * ssid, const char * password)
 {
     ChipLogProgress(DeviceLayer, "Connecting to AP : [%s]", (char *) ssid);
     int32_t error  = matter_wifi_connect((char *) ssid, RTW_SECURITY_WPA_WPA2_MIXED, (char *) password, strlen(ssid),
-                                        strlen(password), 0, nullptr);
+                                         strlen(password), 0, nullptr);
     CHIP_ERROR err = MapError(error, AmebaErrorType::kWiFiError);
     return err;
 }

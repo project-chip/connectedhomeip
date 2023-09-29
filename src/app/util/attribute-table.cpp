@@ -314,7 +314,7 @@ EmberAfStatus emAfReadAttribute(EndpointId endpoint, ClusterId cluster, Attribut
     record.clusterId   = cluster;
     record.attributeId = attributeID;
     status             = emAfReadOrWriteAttribute(&record, &metadata, dataPtr, readLength,
-                                      false); // write?
+                                                  false); // write?
 
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {

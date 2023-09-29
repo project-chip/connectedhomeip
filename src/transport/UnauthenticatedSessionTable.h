@@ -52,10 +52,10 @@ public:
     {}
     ~UnauthenticatedSession() override { VerifyOrDie(GetReferenceCount() == 0); }
 
-    UnauthenticatedSession(const UnauthenticatedSession &) = delete;
+    UnauthenticatedSession(const UnauthenticatedSession &)             = delete;
     UnauthenticatedSession & operator=(const UnauthenticatedSession &) = delete;
     UnauthenticatedSession(UnauthenticatedSession &&)                  = delete;
-    UnauthenticatedSession & operator=(UnauthenticatedSession &&) = delete;
+    UnauthenticatedSession & operator=(UnauthenticatedSession &&)      = delete;
 
     System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
     System::Clock::Timestamp GetLastPeerActivityTime() const { return mLastPeerActivityTime; }

@@ -3495,6 +3495,15 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTROtaSoftwareUpdateProviderClusterQueryImageParams
+@dynamic softwareVersion;
+@dynamic protocolsSupported;
+@dynamic hardwareVersion;
+@dynamic location;
+@dynamic requestorCanConsent;
+@dynamic metadataForProvider;
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 
 @implementation MTROTASoftwareUpdateProviderClusterQueryImageParams (Deprecated)
@@ -3678,6 +3687,16 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTROtaSoftwareUpdateProviderClusterQueryImageResponseParams
+@dynamic status;
+@dynamic delayedActionTime;
+@dynamic imageURI;
+@dynamic softwareVersion;
+@dynamic softwareVersionString;
+@dynamic updateToken;
+@dynamic userConsentNeeded;
+@dynamic metadataForRequestor;
+
+@dynamic timedInvokeTimeoutMs;
 @end
 @implementation MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams
 - (instancetype)init
@@ -3714,6 +3733,11 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTROtaSoftwareUpdateProviderClusterApplyUpdateRequestParams
+@dynamic updateToken;
+@dynamic newVersion;
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams
 - (instancetype)init
@@ -3802,6 +3826,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTROtaSoftwareUpdateProviderClusterApplyUpdateResponseParams
+@dynamic action;
+@dynamic delayedActionTime;
+
+@dynamic timedInvokeTimeoutMs;
 @end
 @implementation MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams
 - (instancetype)init
@@ -3838,6 +3866,11 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTROtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams
+@dynamic updateToken;
+@dynamic softwareVersion;
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams
 - (instancetype)init
@@ -3883,6 +3916,12 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTROtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams
+@dynamic announcementReason;
+@dynamic metadataForNode;
+@dynamic endpoint;
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 
 @implementation MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams (Deprecated)
@@ -5182,6 +5221,12 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTimeSynchronizationClusterSetUtcTimeParams
+@dynamic utcTime;
+@dynamic granularity;
+@dynamic timeSource;
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRTimeSynchronizationClusterSetTrustedTimeSourceParams
 - (instancetype)init
@@ -11038,6 +11083,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRMediaPlaybackClusterStopPlaybackParams
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRMediaPlaybackClusterStartOverParams
 - (instancetype)init
@@ -11777,6 +11825,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRContentLauncherClusterLaunchResponseParams
+@dynamic status;
+@dynamic data;
+
+@dynamic timedInvokeTimeoutMs;
 @end
 @implementation MTRAudioOutputClusterSelectOutputParams
 - (instancetype)init
@@ -12522,6 +12574,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestParams
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRUnitTestingClusterTestSpecificResponseParams
 - (instancetype)init
@@ -12604,6 +12659,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestSpecificResponseParams
+@dynamic returnValue;
+
+@dynamic timedInvokeTimeoutMs;
 @end
 @implementation MTRUnitTestingClusterTestNotHandledParams
 - (instancetype)init
@@ -12634,6 +12692,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestNotHandledParams
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRUnitTestingClusterTestAddArgumentsResponseParams
 - (instancetype)init
@@ -12716,6 +12777,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestAddArgumentsResponseParams
+@dynamic returnValue;
+
+@dynamic timedInvokeTimeoutMs;
 @end
 @implementation MTRUnitTestingClusterTestSpecificParams
 - (instancetype)init
@@ -12746,6 +12810,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestSpecificParams
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRUnitTestingClusterTestSimpleArgumentResponseParams
 - (instancetype)init
@@ -12828,6 +12895,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestSimpleArgumentResponseParams
+@dynamic returnValue;
+
+@dynamic timedInvokeTimeoutMs;
 @end
 @implementation MTRUnitTestingClusterTestUnknownCommandParams
 - (instancetype)init
@@ -12858,6 +12928,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestUnknownCommandParams
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRUnitTestingClusterTestStructArrayArgumentResponseParams
 - (instancetype)init
@@ -13125,6 +13198,14 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestStructArrayArgumentResponseParams
+@dynamic arg1;
+@dynamic arg2;
+@dynamic arg3;
+@dynamic arg4;
+@dynamic arg5;
+@dynamic arg6;
+
+@dynamic timedInvokeTimeoutMs;
 @end
 @implementation MTRUnitTestingClusterTestAddArgumentsParams
 - (instancetype)init
@@ -13161,6 +13242,11 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestAddArgumentsParams
+@dynamic arg1;
+@dynamic arg2;
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRUnitTestingClusterTestListInt8UReverseResponseParams
 - (instancetype)init
@@ -13257,6 +13343,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestListInt8UReverseResponseParams
+@dynamic arg1;
+
+@dynamic timedInvokeTimeoutMs;
 @end
 @implementation MTRUnitTestingClusterTestSimpleArgumentRequestParams
 - (instancetype)init
@@ -13290,6 +13379,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestSimpleArgumentRequestParams
+@dynamic arg1;
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRUnitTestingClusterTestEnumsResponseParams
 - (instancetype)init
@@ -13378,6 +13471,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestEnumsResponseParams
+@dynamic arg1;
+@dynamic arg2;
+
+@dynamic timedInvokeTimeoutMs;
 @end
 @implementation MTRUnitTestingClusterTestStructArrayArgumentRequestParams
 - (instancetype)init
@@ -13426,6 +13523,15 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestStructArrayArgumentRequestParams
+@dynamic arg1;
+@dynamic arg2;
+@dynamic arg3;
+@dynamic arg4;
+@dynamic arg5;
+@dynamic arg6;
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRUnitTestingClusterTestNullableOptionalResponseParams
 - (instancetype)init
@@ -13542,6 +13648,12 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestNullableOptionalResponseParams
+@dynamic wasPresent;
+@dynamic wasNull;
+@dynamic value;
+@dynamic originalValue;
+
+@dynamic timedInvokeTimeoutMs;
 @end
 @implementation MTRUnitTestingClusterTestStructArgumentRequestParams
 - (instancetype)init
@@ -13575,6 +13687,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestStructArgumentRequestParams
+@dynamic arg1;
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRUnitTestingClusterTestComplexNullableOptionalResponseParams
 - (instancetype)init
@@ -13973,6 +14089,36 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestComplexNullableOptionalResponseParams
+@dynamic nullableIntWasNull;
+@dynamic nullableIntValue;
+@dynamic optionalIntWasPresent;
+@dynamic optionalIntValue;
+@dynamic nullableOptionalIntWasPresent;
+@dynamic nullableOptionalIntWasNull;
+@dynamic nullableOptionalIntValue;
+@dynamic nullableStringWasNull;
+@dynamic nullableStringValue;
+@dynamic optionalStringWasPresent;
+@dynamic optionalStringValue;
+@dynamic nullableOptionalStringWasPresent;
+@dynamic nullableOptionalStringWasNull;
+@dynamic nullableOptionalStringValue;
+@dynamic nullableStructWasNull;
+@dynamic nullableStructValue;
+@dynamic optionalStructWasPresent;
+@dynamic optionalStructValue;
+@dynamic nullableOptionalStructWasPresent;
+@dynamic nullableOptionalStructWasNull;
+@dynamic nullableOptionalStructValue;
+@dynamic nullableListWasNull;
+@dynamic nullableListValue;
+@dynamic optionalListWasPresent;
+@dynamic optionalListValue;
+@dynamic nullableOptionalListWasPresent;
+@dynamic nullableOptionalListWasNull;
+@dynamic nullableOptionalListValue;
+
+@dynamic timedInvokeTimeoutMs;
 @end
 @implementation MTRUnitTestingClusterTestNestedStructArgumentRequestParams
 - (instancetype)init
@@ -14006,6 +14152,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestNestedStructArgumentRequestParams
+@dynamic arg1;
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRUnitTestingClusterBooleanResponseParams
 - (instancetype)init
@@ -14088,6 +14238,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterBooleanResponseParams
+@dynamic value;
+
+@dynamic timedInvokeTimeoutMs;
 @end
 @implementation MTRUnitTestingClusterTestListStructArgumentRequestParams
 - (instancetype)init
@@ -14121,6 +14274,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestListStructArgumentRequestParams
+@dynamic arg1;
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRUnitTestingClusterSimpleStructResponseParams
 - (instancetype)init
@@ -14215,6 +14372,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterSimpleStructResponseParams
+@dynamic arg1;
+
+@dynamic timedInvokeTimeoutMs;
 @end
 @implementation MTRUnitTestingClusterTestListInt8UArgumentRequestParams
 - (instancetype)init
@@ -14248,6 +14408,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestListInt8UArgumentRequestParams
+@dynamic arg1;
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRUnitTestingClusterTestEmitTestEventResponseParams
 - (instancetype)init
@@ -14330,6 +14494,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestEmitTestEventResponseParams
+@dynamic value;
+
+@dynamic timedInvokeTimeoutMs;
 @end
 @implementation MTRUnitTestingClusterTestNestedStructListArgumentRequestParams
 - (instancetype)init
@@ -14363,6 +14530,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestNestedStructListArgumentRequestParams
+@dynamic arg1;
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams
 - (instancetype)init
@@ -14445,6 +14616,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestEmitTestFabricScopedEventResponseParams
+@dynamic value;
+
+@dynamic timedInvokeTimeoutMs;
 @end
 @implementation MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams
 - (instancetype)init
@@ -14478,6 +14652,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestListNestedStructListArgumentRequestParams
+@dynamic arg1;
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRUnitTestingClusterTestListInt8UReverseRequestParams
 - (instancetype)init
@@ -14511,6 +14689,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestListInt8UReverseRequestParams
+@dynamic arg1;
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRUnitTestingClusterTestEnumsRequestParams
 - (instancetype)init
@@ -14547,6 +14729,11 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestEnumsRequestParams
+@dynamic arg1;
+@dynamic arg2;
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRUnitTestingClusterTestNullableOptionalRequestParams
 - (instancetype)init
@@ -14580,6 +14767,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestNullableOptionalRequestParams
+@dynamic arg1;
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRUnitTestingClusterTestComplexNullableOptionalRequestParams
 - (instancetype)init
@@ -14646,6 +14837,21 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestComplexNullableOptionalRequestParams
+@dynamic nullableInt;
+@dynamic optionalInt;
+@dynamic nullableOptionalInt;
+@dynamic nullableString;
+@dynamic optionalString;
+@dynamic nullableOptionalString;
+@dynamic nullableStruct;
+@dynamic optionalStruct;
+@dynamic nullableOptionalStruct;
+@dynamic nullableList;
+@dynamic optionalList;
+@dynamic nullableOptionalList;
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRUnitTestingClusterSimpleStructEchoRequestParams
 - (instancetype)init
@@ -14679,6 +14885,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterSimpleStructEchoRequestParams
+@dynamic arg1;
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRUnitTestingClusterTimedInvokeRequestParams
 - (instancetype)init
@@ -14709,6 +14919,9 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTimedInvokeRequestParams
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams
 - (instancetype)init
@@ -14742,6 +14955,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestSimpleOptionalArgumentRequestParams
+@dynamic arg1;
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRUnitTestingClusterTestEmitTestEventRequestParams
 - (instancetype)init
@@ -14781,6 +14998,12 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestEmitTestEventRequestParams
+@dynamic arg1;
+@dynamic arg2;
+@dynamic arg3;
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams
 - (instancetype)init
@@ -14814,6 +15037,10 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation MTRTestClusterClusterTestEmitTestFabricScopedEventRequestParams
+@dynamic arg1;
+
+@dynamic timedInvokeTimeoutMs;
+@dynamic serverSideProcessingTimeout;
 @end
 @implementation MTRSampleMEIClusterPingParams
 - (instancetype)init

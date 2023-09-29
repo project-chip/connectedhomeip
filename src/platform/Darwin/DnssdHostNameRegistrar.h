@@ -46,7 +46,8 @@ namespace Dnssd {
     private:
         bool IsLocalOnly() const { return mInterfaceId == kDNSServiceInterfaceIndexLocalOnly; };
 
-        template <typename T> void RegisterInterfaces(std::vector<std::pair<uint32_t, T>> interfaces, uint16_t type)
+        template <typename T>
+        void RegisterInterfaces(std::vector<std::pair<uint32_t, T>> interfaces, uint16_t type)
         {
             for (auto & interface : interfaces) {
                 auto interfaceId = interface.first;
@@ -55,7 +56,8 @@ namespace Dnssd {
             }
         }
 
-        template <typename T> CHIP_ERROR RegisterInterface(uint32_t interfaceId, const T & interfaceAddress, uint16_t type)
+        template <typename T>
+        CHIP_ERROR RegisterInterface(uint32_t interfaceId, const T & interfaceAddress, uint16_t type)
         {
             auto interfaceAddressLen = sizeof(interfaceAddress);
 
