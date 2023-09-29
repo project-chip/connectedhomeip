@@ -175,8 +175,8 @@ protected:
     ~ThreadStackManager() = default;
 
     // No copy, move or assignment.
-    ThreadStackManager(const ThreadStackManager &)  = delete;
-    ThreadStackManager(const ThreadStackManager &&) = delete;
+    ThreadStackManager(const ThreadStackManager &)             = delete;
+    ThreadStackManager(const ThreadStackManager &&)            = delete;
     ThreadStackManager & operator=(const ThreadStackManager &) = delete;
 };
 

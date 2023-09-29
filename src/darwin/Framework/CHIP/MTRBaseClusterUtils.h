@@ -266,7 +266,8 @@ void MTRReadAttribute(MTRReadParams * _Nonnull params,
 /**
  * Utility functions base clusters use for doing commands.
  */
-template <typename InvokeBridgeType, typename ResponseType> class MTRInvokeCallback : public chip::app::CommandSender::Callback {
+template <typename InvokeBridgeType, typename ResponseType>
+class MTRInvokeCallback : public chip::app::CommandSender::Callback {
 public:
     MTRInvokeCallback(InvokeBridgeType * _Nonnull bridge, typename InvokeBridgeType::SuccessCallbackType _Nonnull onResponse,
         MTRErrorCallback _Nonnull onError)

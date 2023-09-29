@@ -66,7 +66,7 @@ task.h is included from an application file. */
 #endif
 
 /* Block sizes must not get too small. */
-#define heapMINIMUM_BLOCK_SIZE ((size_t)(xHeapStructSize << 1))
+#define heapMINIMUM_BLOCK_SIZE ((size_t) (xHeapStructSize << 1))
 
 /* Assumes 8bit bytes! */
 #define heapBITS_PER_BYTE ((size_t) 8)
@@ -109,7 +109,7 @@ static void prvHeapInit(void);
 /* The size of the structure placed at the beginning of each allocated memory
  * block must by correctly byte aligned. */
 static const size_t xHeapStructSize =
-    (sizeof(BlockLink_t) + ((size_t)(portBYTE_ALIGNMENT - 1))) & ~((size_t) portBYTE_ALIGNMENT_MASK);
+    (sizeof(BlockLink_t) + ((size_t) (portBYTE_ALIGNMENT - 1))) & ~((size_t) portBYTE_ALIGNMENT_MASK);
 
 /* Create a couple of list links to mark the start and end of the list. */
 static BlockLink_t xStart, *pxEnd = NULL;

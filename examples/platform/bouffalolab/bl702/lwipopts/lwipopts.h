@@ -232,7 +232,7 @@ a lot of data that needs to be copied, this should be set high. */
    -----------------------------------
 */
 
-//#define LWIP_DEBUG                      0
+// #define LWIP_DEBUG                      0
 
 /*
    ---------------------------------

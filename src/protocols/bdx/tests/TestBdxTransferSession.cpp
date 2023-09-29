@@ -578,8 +578,8 @@ void TestBadAcceptMessageFields(nlTestSuite * inSuite, void * inContext)
 
     // Verify AcceptTransfer() returns error for choosing unsupported transfer control mode
     TransferSession::TransferAcceptData acceptData2;
-    acceptData2.ControlMode = (driveMode == TransferControlFlags::kReceiverDrive) ? TransferControlFlags::kSenderDrive
-                                                                                  : TransferControlFlags::kReceiverDrive;
+    acceptData2.ControlMode  = (driveMode == TransferControlFlags::kReceiverDrive) ? TransferControlFlags::kSenderDrive
+                                                                                   : TransferControlFlags::kReceiverDrive;
     acceptData2.MaxBlockSize = maxBlockSize;
     acceptData2.StartOffset  = commonOffset;
     acceptData2.Length       = commonLength;
