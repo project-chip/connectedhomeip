@@ -29,6 +29,20 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
     MTRDeviceStateUnreachable = 2
 };
 
+/**
+ * This bitmask is used to specify the type of logs requested from this device.
+ *
+ * The logs types are : End User Support, Network Diag and Crash logs.
+ */
+typedef NS_OPTIONS(NSUInteger, MTRDiagnosticLogTypes) {
+    MTRDiagnosticLogTypeEndUserSupport = 0, // End user support logs are requested
+    MTRDiagnosticLogTypeNetworkDiag = 1 << 0, // Network Diag logs are requested
+    MTRDiagnosticLogTypeCrash = 1 << 1, // Crash logs are requested
+    MTRDiagnosticLogTypesAll = // All the above log types are requested
+    MTRDiagnosticLogTypeEndUserSupport | MTRDiagnosticLogTypeNetworkDiag | MTRDiagnosticLogTypeCrash,
+    MTRDiagnosticLogTypeUnknown = 1 << 2,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 @protocol MTRDeviceDelegate;
 
 @interface MTRDevice : NSObject
@@ -211,11 +225,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * @param queue      The queue on which completion will be called.
  * @param completion The completion that will be called to pass in the file paths for the requested logs.
  */
-- (void)getDiagnosticLogs:(MTRDevice *)device
-                    logTypeBitmask:(uint8_t)logTypeBitmask
-                           timeout:(NSNumber * _Nullable)timeout
-                             clientQueue:(dispatch_queue_t)queue
-                 completionHandler:(MTRDiagnosticLogsRetrievedCompletion)completionHandler MTR_PROVISIONALLY_AVAILABLE;
+- (void)getDiagnosticLogsOfTypes:(MTRDiagnosticLogTypes)types
+                         timeout:(NSTimeInterval * _Nullable)timeout
+                           queue:(dispatch_queue_t)queue
+                      completion:(void (^)(NSError * _Nullable error, NSArray<NSString *> * _Nullable filePathArray))completion MTR_PROVISIONALLY_AVAILABLE;
 
 @end
 
