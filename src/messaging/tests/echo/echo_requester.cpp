@@ -217,6 +217,12 @@ int main(int argc, char * argv[])
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
+    if (gDestAddr.Type() != chip::Inet::IPAddressType::kIPv6)
+    {
+        printf("Echo Server IP address: %s is not of type IPv6\n", argv[1]);
+        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
     InitializeChip();
 
     if (gUseTCP)
@@ -264,6 +270,11 @@ int main(int argc, char * argv[])
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
     gUDPManager.Close();
+
+    if (gUseTCP)
+    {
+        gTCPManager.Disconnect(chip::Transport::PeerAddress::TCP(gDestAddr));
+    }
     gTCPManager.Close();
 
     Shutdown();
