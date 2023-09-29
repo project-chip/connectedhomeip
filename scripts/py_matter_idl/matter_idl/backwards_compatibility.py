@@ -97,7 +97,8 @@ class CompatibilityChecker:
 
     def _check_enum_compatible(self, cluster_name: str, original: Enum, updated: Optional[Enum]):
         if not updated:
-            self._mark_incompatible(f"Enumeration {cluster_name}::{original.name} was deleted")
+            self._mark_incompatible(
+                f"Enumeration {cluster_name}::{original.name} was deleted")
             return
 
         if original.base_type != updated.base_type:
@@ -107,16 +108,19 @@ class CompatibilityChecker:
         # Validate that all old entries exist
         for entry in original.entries:
             # old entry must exist and have identical code
-            existing = [item for item in updated.entries if item.name == entry.name]
+            existing = [
+                item for item in updated.entries if item.name == entry.name]
             if len(existing) == 0:
-                self._mark_incompatible(f"Enumeration {cluster_name}::{original.name} removed entry {entry.name}")
+                self._mark_incompatible(
+                    f"Enumeration {cluster_name}::{original.name} removed entry {entry.name}")
             elif existing[0].code != entry.code:
                 self._mark_incompatible(
                     f"Enumeration {cluster_name}::{original.name} changed code for entry {entry.name} from {entry.code} to {existing[0].code}")
 
     def _check_bitmap_compatible(self, cluster_name: str, original: Bitmap, updated: Optional[Bitmap]):
         if not updated:
-            self._mark_incompatible(f"Bitmap {cluster_name}::{original.name} was deleted")
+            self._mark_incompatible(
+                f"Bitmap {cluster_name}::{original.name} was deleted")
             return
 
         if original.base_type != updated.base_type:
@@ -126,27 +130,33 @@ class CompatibilityChecker:
         # Validate that all old entries exist
         for entry in original.entries:
             # old entry must exist and have identical code
-            existing = [item for item in updated.entries if item.name == entry.name]
+            existing = [
+                item for item in updated.entries if item.name == entry.name]
             if len(existing) == 0:
-                self._mark_incompatible(f"Bitmap {original.name} removed entry {entry.name}")
+                self._mark_incompatible(
+                    f"Bitmap {original.name} removed entry {entry.name}")
             elif existing[0].code != entry.code:
                 self._mark_incompatible(
                     f"Bitmap {original.name} changed code for entry {entry.name} from {entry.code} to {existing[0].code}")
 
     def _check_event_compatible(self, cluster_name: str, event: Event, updated_event: Optional[Event]):
         if not updated_event:
-            self._mark_incompatible(f"Event {cluster_name}::{event.name} was removed")
+            self._mark_incompatible(
+                f"Event {cluster_name}::{event.name} was removed")
             return
 
         if event.code != updated_event.code:
-            self._mark_incompatible(f"Event {cluster_name}::{event.name} code changed from {event.code} to {updated_event.code}")
+            self._mark_incompatible(
+                f"Event {cluster_name}::{event.name} code changed from {event.code} to {updated_event.code}")
 
-        self._check_field_lists_are_the_same(f"Event {cluster_name}::{event.name}", event.fields, updated_event.fields)
+        self._check_field_lists_are_the_same(
+            f"Event {cluster_name}::{event.name}", event.fields, updated_event.fields)
 
     def _check_command_compatible(self, cluster_name: str, command: Command, updated_command: Optional[Command]):
         self.logger.debug(f"  Checking command {cluster_name}::{command.name}")
         if not updated_command:
-            self._mark_incompatible(f"Command {cluster_name}::{command.name} was removed")
+            self._mark_incompatible(
+                f"Command {cluster_name}::{command.name} was removed")
             return
 
         if command.code != updated_command.code:
@@ -168,49 +178,62 @@ class CompatibilityChecker:
     def _check_struct_compatible(self, cluster_name: str, original: Struct, updated: Optional[Struct]):
         self.logger.debug(f"  Checking struct {original.name}")
         if not updated:
-            self._mark_incompatible(f"Struct {cluster_name}::{original.name} has been deleted.")
+            self._mark_incompatible(
+                f"Struct {cluster_name}::{original.name} has been deleted.")
             return
 
-        self._check_field_lists_are_the_same(f"Struct {cluster_name}::{original.name}", original.fields, updated.fields)
+        self._check_field_lists_are_the_same(
+            f"Struct {cluster_name}::{original.name}", original.fields, updated.fields)
 
         if original.tag != updated.tag:
-            self._mark_incompatible(f"Struct {cluster_name}::{original.name} has modified tags")
+            self._mark_incompatible(
+                f"Struct {cluster_name}::{original.name} has modified tags")
 
         if original.code != updated.code:
-            self._mark_incompatible(f"Struct {cluster_name}::{original.name} has modified code (likely resnopse difference)")
+            self._mark_incompatible(
+                f"Struct {cluster_name}::{original.name} has modified code (likely resnopse difference)")
 
         if original.qualities != updated.qualities:
-            self._mark_incompatible(f"Struct {cluster_name}::{original.name} has modified qualities")
+            self._mark_incompatible(
+                f"Struct {cluster_name}::{original.name} has modified qualities")
 
     def _check_attribute_compatible(self, cluster_name: str, original: Attribute, updated: Optional[Attribute]):
-        self.logger.debug(f"  Checking attribute {cluster_name}::{original.definition.name}")
+        self.logger.debug(
+            f"  Checking attribute {cluster_name}::{original.definition.name}")
         if not updated:
-            self._mark_incompatible(f"Attribute {cluster_name}::{original.definition.name} has been deleted.")
+            self._mark_incompatible(
+                f"Attribute {cluster_name}::{original.definition.name} has been deleted.")
             return
 
         if original.definition.code != updated.definition.code:
-            self._mark_incompatible(f"Attribute {cluster_name}::{original.definition.name} changed its code.")
+            self._mark_incompatible(
+                f"Attribute {cluster_name}::{original.definition.name} changed its code.")
 
         if original.definition.data_type != updated.definition.data_type:
-            self._mark_incompatible(f"Attribute {cluster_name}::{original.definition.name} changed its data type.")
+            self._mark_incompatible(
+                f"Attribute {cluster_name}::{original.definition.name} changed its data type.")
 
         if original.definition.is_list != updated.definition.is_list:
-            self._mark_incompatible(f"Attribute {cluster_name}::{original.definition.name} changed its list status.")
+            self._mark_incompatible(
+                f"Attribute {cluster_name}::{original.definition.name} changed its list status.")
 
         if original.definition.qualities != updated.definition.qualities:
             # optional/nullable
-            self._mark_incompatible(f"Attribute {cluster_name}::{original.definition.name} changed its data type qualities.")
+            self._mark_incompatible(
+                f"Attribute {cluster_name}::{original.definition.name} changed its data type qualities.")
 
         if original.qualities != updated.qualities:
             # read/write/subscribe/timed status
-            self._mark_incompatible(f"Attribute {cluster_name}::{original.definition.name} changed its qualities.")
+            self._mark_incompatible(
+                f"Attribute {cluster_name}::{original.definition.name} changed its qualities.")
 
     def _check_enum_list_compatible(self, cluster_name: str, original: List[Enum], updated: List[Enum]):
         updated_enums = group_list_by_name(updated)
 
         for original_enum in original:
             updated_enum = updated_enums.get(original_enum.name)
-            self._check_enum_compatible(cluster_name, original_enum, updated_enum)
+            self._check_enum_compatible(
+                cluster_name, original_enum, updated_enum)
 
     def _check_bitmap_list_compatible(self, cluster_name: str, original: List[Bitmap], updated: List[Bitmap]):
         updated_bitmaps = {}
@@ -219,20 +242,23 @@ class CompatibilityChecker:
 
         for original_bitmap in original:
             updated_bitmap = updated_bitmaps.get(original_bitmap.name)
-            self._check_bitmap_compatible(cluster_name, original_bitmap, updated_bitmap)
+            self._check_bitmap_compatible(
+                cluster_name, original_bitmap, updated_bitmap)
 
     def _check_struct_list_compatible(self, cluster_name: str, original: List[Struct], updated: List[Struct]):
         updated_structs = group_list_by_name(updated)
 
         for struct in original:
-            self._check_struct_compatible(cluster_name, struct, updated_structs.get(struct.name))
+            self._check_struct_compatible(
+                cluster_name, struct, updated_structs.get(struct.name))
 
     def _check_command_list_compatible(self, cluster_name: str, original: List[Command], updated: List[Command]):
         updated_commands = group_list_by_name(updated)
 
         for command in original:
             updated_command = updated_commands.get(command.name)
-            self._check_command_compatible(cluster_name, command, updated_command)
+            self._check_command_compatible(
+                cluster_name, command, updated_command)
 
     def _check_event_list_compatible(self, cluster_name: str, original: List[Event], updated: List[Event]):
         updated_events = group_list_by_name(updated)
@@ -245,37 +271,48 @@ class CompatibilityChecker:
         updated_attributes = group_list(updated, attribute_name)
 
         for attribute in original:
-            self._check_attribute_compatible(cluster_name, attribute, updated_attributes.get(attribute_name(attribute)))
+            self._check_attribute_compatible(
+                cluster_name, attribute, updated_attributes.get(attribute_name(attribute)))
 
     def _check_cluster_list_compatible(self, original: List[Cluster], updated: List[Cluster]):
         updated_clusters = group_list(updated, full_cluster_name)
 
         for original_cluster in original:
-            updated_cluster = updated_clusters.get(full_cluster_name(original_cluster))
+            updated_cluster = updated_clusters.get(
+                full_cluster_name(original_cluster))
             self._check_cluster_compatible(original_cluster, updated_cluster)
 
     def _check_cluster_compatible(self, original_cluster: Cluster, updated_cluster: Optional[Cluster]):
-        self.logger.debug(f"Checking cluster {full_cluster_name(original_cluster)}")
+        self.logger.debug(
+            f"Checking cluster {full_cluster_name(original_cluster)}")
         if not updated_cluster:
-            self._mark_incompatible(f"Cluster {full_cluster_name(original_cluster)} was deleted")
+            self._mark_incompatible(
+                f"Cluster {full_cluster_name(original_cluster)} was deleted")
             return
 
         if original_cluster.code != updated_cluster.code:
             self._mark_incompatible(
                 f"Cluster {full_cluster_name(original_cluster)} has different codes {original_cluster.code} != {updated_cluster.code}")
 
-        self._check_enum_list_compatible(original_cluster.name, original_cluster.enums, updated_cluster.enums)
-        self._check_struct_list_compatible(original_cluster.name, original_cluster.structs, updated_cluster.structs)
-        self._check_bitmap_list_compatible(original_cluster.name, original_cluster.bitmaps, updated_cluster.bitmaps)
-        self._check_command_list_compatible(original_cluster.name, original_cluster.commands, updated_cluster.commands)
-        self._check_event_list_compatible(original_cluster.name, original_cluster.events, updated_cluster.events)
-        self._check_attribute_list_compatible(original_cluster.name, original_cluster.attributes, updated_cluster.attributes)
+        self._check_enum_list_compatible(
+            original_cluster.name, original_cluster.enums, updated_cluster.enums)
+        self._check_struct_list_compatible(
+            original_cluster.name, original_cluster.structs, updated_cluster.structs)
+        self._check_bitmap_list_compatible(
+            original_cluster.name, original_cluster.bitmaps, updated_cluster.bitmaps)
+        self._check_command_list_compatible(
+            original_cluster.name, original_cluster.commands, updated_cluster.commands)
+        self._check_event_list_compatible(
+            original_cluster.name, original_cluster.events, updated_cluster.events)
+        self._check_attribute_list_compatible(
+            original_cluster.name, original_cluster.attributes, updated_cluster.attributes)
 
     def check(self):
         # assume ok, and then validate
         self.compatible = Compatibility.COMPATIBLE
 
-        self._check_cluster_list_compatible(self._original_idl.clusters, self._updated_idl.clusters)
+        self._check_cluster_list_compatible(
+            self._original_idl.clusters, self._updated_idl.clusters)
 
         return self.compatible
 

@@ -271,7 +271,8 @@ class EnumHandler(BaseHandler, IdlPostProcessor):
 
     def FinalizeProcessing(self, idl: Idl):
         if not self._cluster_codes:
-            LOGGER.error("Found enum without a cluster code: %s" % (self._enum.name))
+            LOGGER.error("Found enum without a cluster code: %s" %
+                         (self._enum.name))
             return
         found = set()
         for c in idl.clusters:
@@ -281,7 +282,7 @@ class EnumHandler(BaseHandler, IdlPostProcessor):
 
         if found != self._cluster_codes:
             LOGGER.error('Enum %s could not find its clusters (codes: %r)' %
-                (self._enum.name, self._cluster_codes - found))
+                         (self._enum.name, self._cluster_codes - found))
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)

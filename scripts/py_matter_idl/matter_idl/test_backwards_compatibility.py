@@ -77,10 +77,12 @@ class TestCompatibilityChecks(unittest.TestCase):
         with self.subTest(validate=name):
             # Validate compatibility and that no changes are always compatible
             with self.subTest(direction="Forward"):
-                self._AssumeCompatiblity(old, new, old_idl, new_idl, Compatibility.FORWARD_FAIL not in flags)
+                self._AssumeCompatiblity(
+                    old, new, old_idl, new_idl, Compatibility.FORWARD_FAIL not in flags)
 
             with self.subTest(direction="Backward"):
-                self._AssumeCompatiblity(new, old, new_idl, old_idl, Compatibility.BACKWARD_FAIL not in flags)
+                self._AssumeCompatiblity(
+                    new, old, new_idl, old_idl, Compatibility.BACKWARD_FAIL not in flags)
 
             with self.subTest(direction="NEW-to-NEW"):
                 self._AssumeCompatiblity(new, new, new_idl, new_idl, True)
