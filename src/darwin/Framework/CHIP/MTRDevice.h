@@ -202,18 +202,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
     MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
- * Requests the device to transfer the diagnostic logs and return an array of file path(s) in the completion handler
- * based on the requested log types in the logTypeBitmask.
+ * Requests diagnostic logs of the desired types from the device.
  *
- * Logs can be of types - end user support, network diagnostic and crash logs.
- *
- * @param logTypeBitmask    The log type encoded in a bitmask.
- * @param timeout           The timeout in seconds by which the logs must be retreived. If we exceed the timeout, the completion handler
- *                          will be called with the file path array set to null.
- * @param clientQueue       The client queue that the caller passes in on which the completion handler will be called.
- * @param completionHandler The completion handler that will be called to pass in the file path(s) for the type(s) of logs requested
- *
- *
+ * @param types      The types of logs being requested.
+ * @param timeout    The timeout for getting the logs.  If the timeout expires, completion
+ *                   will be called with whatever logs have been retrieved by that point
+ *                   (which might be none, and might include partial logs).
+ * @param queue      The queue on which completion will be called.
+ * @param completion The completion that will be called to pass in the file paths for the requested logs.
  */
 - (void)getDiagnosticLogs:(MTRDevice *)device
                     logTypeBitmask:(uint8_t)logTypeBitmask
