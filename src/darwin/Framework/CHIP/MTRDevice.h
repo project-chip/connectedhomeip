@@ -32,11 +32,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 /**
  * This bitmask is used to specify the type of logs requested from this device.
  *
- * The logs types are : End User Support, Network Diag and Crash logs.
+ * The logs types are : End User Support, Network Diagnostics and Crash logs.
  */
-typedef NS_OPTIONS(NSUInteger, MTRDiagnosticLogTypes) {
+typedef NS_OPTIONS(NSUInteger, MTRDiagnosticLogType) {
     MTRDiagnosticLogTypeEndUserSupport = 0, // End user support logs are requested
-    MTRDiagnosticLogTypeNetworkDiag = 1 << 0, // Network Diag logs are requested
+    MTRDiagnosticLogTypeNetworkDiagnostics = 1 << 1, // Network Diagnostics logs are requested
     MTRDiagnosticLogTypeCrash = 1 << 1, // Crash logs are requested
     MTRDiagnosticLogTypesAll = // All the above log types are requested
     MTRDiagnosticLogTypeEndUserSupport | MTRDiagnosticLogTypeNetworkDiag | MTRDiagnosticLogTypeCrash,
