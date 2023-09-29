@@ -28,12 +28,12 @@ from matter_yamltests.runner import TestRunner
 
 
 class Runner(TestRunner):
-    def __init__(self, repl_storage_path: str, commission_on_network_dut: bool):
+    def __init__(self, repl_storage_path: str, node_id_to_commission: int = None):
         self._repl_runner = None
         self._chip_stack = None
         self._certificate_authority_manager = None
         self._repl_storage_path = repl_storage_path
-        self._commission_on_network_dut = commission_on_network_dut
+        self._node_id_to_commission = node_id_to_commission
 
     async def start(self):
         chip.native.Init()
@@ -43,13 +43,8 @@ class Runner(TestRunner):
             chip_stack, chip_stack.GetStorageManager())
         certificate_authority_manager.LoadAuthoritiesFromStorage()
 
-        commission_device = False
         if len(certificate_authority_manager.activeCaList) == 0:
-            if self._commission_on_network_dut is False:
-                raise Exception(
-                    'Provided repl storage does not contain certificate. Without commission_on_network_dut, there is no reachable DUT')
             certificate_authority_manager.NewCertificateAuthority()
-            commission_device = True
 
         if len(certificate_authority_manager.activeCaList[0].adminList) == 0:
             certificate_authority_manager.activeCaList[0].NewFabricAdmin(
@@ -58,9 +53,13 @@ class Runner(TestRunner):
         ca_list = certificate_authority_manager.activeCaList
 
         dev_ctrl = ca_list[0].adminList[0].NewController()
-        if commission_device:
-            # These magic values are the defaults expected for YAML tests
-            dev_ctrl.CommissionWithCode('MT:-24J0AFN00KA0648G00', 0x12344321)
+
+        # Unfortunately there is no convenient way to confirm if the provided node_id has
+        # already been commissioned. At this point we blindly trust that we should commission
+        # device with the provided node id.
+        if self._node_id_to_commission is not None:
+            # Magic value is the defaults expected for YAML tests.
+            dev_ctrl.CommissionWithCode('MT:-24J0AFN00KA0648G00', self._node_id_to_commission)
 
         self._chip_stack = chip_stack
         self._certificate_authority_manager = certificate_authority_manager

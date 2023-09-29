@@ -30,8 +30,8 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-#include <lib/core/CHIPCore.h>
-#include <lib/support/CodeUtils.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/core/ErrorStr.h>
 
 namespace chip {
 

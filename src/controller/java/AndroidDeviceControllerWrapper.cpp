@@ -206,6 +206,7 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
         *errInfoOnFailure = err;
         return nullptr;
     }
+    chip::Credentials::SetGroupDataProvider(&wrapper->mGroupDataProvider);
     initParams.groupDataProvider = &wrapper->mGroupDataProvider;
 
     err = wrapper->mOpCertStore.Init(wrapperStorage);
@@ -600,8 +601,8 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
     std::string NetworkingStatusClassName     = "java/lang/Integer";
     std::string NetworkingStatusCtorSignature = "(I)V";
     jint jniNetworkingStatus                  = static_cast<jint>(dataResponse.networkingStatus);
-    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-        NetworkingStatusClassName, NetworkingStatusCtorSignature, jniNetworkingStatus, NetworkingStatus);
+    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(NetworkingStatusClassName, NetworkingStatusCtorSignature,
+                                                               jniNetworkingStatus, NetworkingStatus);
     jobject DebugText;
     if (!dataResponse.debugText.HasValue())
     {
@@ -633,9 +634,8 @@ void AndroidDeviceControllerWrapper::OnScanNetworksSuccess(
             std::string newElement_securityClassName     = "java/lang/Integer";
             std::string newElement_securityCtorSignature = "(I)V";
             jint jniNewElementSecurity                   = static_cast<jint>(entry.security.Raw());
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_securityClassName,
-                                                                       newElement_securityCtorSignature,
-                                                                       jniNewElementSecurity, newElement_security);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                newElement_securityClassName, newElement_securityCtorSignature, jniNewElementSecurity, newElement_security);
             jobject newElement_ssid;
             jbyteArray newElement_ssidByteArray = env->NewByteArray(static_cast<jsize>(entry.ssid.size()));
             env->SetByteArrayRegion(newElement_ssidByteArray, 0, static_cast<jsize>(entry.ssid.size()),

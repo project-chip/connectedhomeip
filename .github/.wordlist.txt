@@ -1043,6 +1043,7 @@ PID
 Pigweed
 PinCode
 pinrequest
+PIXIT
 pkgconfig
 PKI
 plaintext
@@ -1126,6 +1127,7 @@ ReadConfigValue
 readelf
 readfds
 README
+READMEs
 readonly
 readthedocs
 Reag
@@ -1182,6 +1184,7 @@ runArgs
 RUNAS
 RunMain
 runtime
+RVC
 rw
 RXD
 sandboxed
@@ -1277,9 +1280,9 @@ StatusCode
 stderr
 stdout
 sterm
-stmicroelectronics
-stm
 stlink
+stm
+stmicroelectronics
 storagepath
 str
 strcpy
@@ -1352,11 +1355,11 @@ textboxes
 TFT
 ThermostatUserInterfaceConfiguration
 ThIsIsNoTMyReAlGiThUbToKeNSoDoNoTtRy
+thread
 ThreadNetworkDiagnostics
 threadOperationalDataset
 ThreadStackManager
 ThreadStackManagerImpl
-thread
 ths
 Thunderboard
 timedInteractionTimeoutMs
@@ -1562,5 +1565,3 @@ zhengyaohan
 Zigbee
 zigbeealliance
 zigbeethread
-PIXIT
-RVC

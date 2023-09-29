@@ -64,8 +64,8 @@ public:
 class ChipDeviceScanner
 {
 public:
-    ChipDeviceScanner(ChipDeviceScanner &&)      = delete;
-    ChipDeviceScanner(const ChipDeviceScanner &) = delete;
+    ChipDeviceScanner(ChipDeviceScanner &&)                  = delete;
+    ChipDeviceScanner(const ChipDeviceScanner &)             = delete;
     ChipDeviceScanner & operator=(const ChipDeviceScanner &) = delete;
 
     ~ChipDeviceScanner() = default;

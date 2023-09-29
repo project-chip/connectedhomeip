@@ -24,7 +24,7 @@ import chip.tlv.TlvWriter
 import java.util.Optional
 
 class RvcOperationalStateClusterOperationalStateStruct(
-  val operationalStateID: Int,
+  val operationalStateID: UInt,
   val operationalStateLabel: Optional<String>
 ) {
   override fun toString(): String = buildString {
@@ -34,9 +34,9 @@ class RvcOperationalStateClusterOperationalStateStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_OPERATIONAL_STATE_I_D), operationalStateID)
       if (operationalStateLabel.isPresent) {
         val optoperationalStateLabel = operationalStateLabel.get()
@@ -50,9 +50,12 @@ class RvcOperationalStateClusterOperationalStateStruct(
     private const val TAG_OPERATIONAL_STATE_I_D = 0
     private const val TAG_OPERATIONAL_STATE_LABEL = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): RvcOperationalStateClusterOperationalStateStruct {
-      tlvReader.enterStructure(tag)
-      val operationalStateID = tlvReader.getInt(ContextSpecificTag(TAG_OPERATIONAL_STATE_I_D))
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): RvcOperationalStateClusterOperationalStateStruct {
+      tlvReader.enterStructure(tlvTag)
+      val operationalStateID = tlvReader.getUInt(ContextSpecificTag(TAG_OPERATIONAL_STATE_I_D))
       val operationalStateLabel =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL))) {
           Optional.of(tlvReader.getString(ContextSpecificTag(TAG_OPERATIONAL_STATE_LABEL)))

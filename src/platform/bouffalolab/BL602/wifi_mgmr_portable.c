@@ -2,11 +2,13 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <FreeRTOS.h>
 #include <aos/yloop.h>
 #include <bl60x_wifi_driver/wifi_mgmr.h>
 #include <bl60x_wifi_driver/wifi_mgmr_api.h>
 #include <bl60x_wifi_driver/wifi_mgmr_profile.h>
-#include <hal_wifi.h>
+#include <task.h>
+
 #include <supplicant_api.h>
 
 #include <wpa_supplicant/src/utils/common.h>
@@ -163,10 +165,15 @@ static void wifi_event_handler_raw(input_event_t * event, void * private_data)
 
 void wifi_start_firmware_task(void)
 {
-    aos_register_event_filter(EV_WIFI, wifi_event_handler_raw, NULL);
+#define WIFI_STACK_SIZE 1552
+    static StackType_t wifi_fw_stack[WIFI_STACK_SIZE];
+    static StaticTask_t wifi_fw_task;
 
+    aos_register_event_filter(EV_WIFI, wifi_event_handler_raw, NULL);
     netif_add_ext_callback(&netifExtCallback, network_netif_ext_callback);
 
-    hal_wifi_start_firmware_task();
+    bl_pm_init();
+    xTaskCreateStatic(wifi_main, (char *) "fw", WIFI_STACK_SIZE, NULL, 30, wifi_fw_stack, &wifi_fw_task);
+
     aos_post_event(EV_WIFI, CODE_WIFI_ON_INIT_DONE, 0);
 }

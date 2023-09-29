@@ -142,7 +142,10 @@ CHIP_ERROR EncodeKeyUsageExtension(uint16_t keyUsageBits, ASN1Writer & writer)
 
         // KeyUsage extension MUST be marked as critical.
         ASN1_ENCODE_BOOLEAN(true);
-        ASN1_START_OCTET_STRING_ENCAPSULATED { ASN1_ENCODE_BIT_STRING(keyUsageBits); }
+        ASN1_START_OCTET_STRING_ENCAPSULATED
+        {
+            ASN1_ENCODE_BIT_STRING(keyUsageBits);
+        }
         ASN1_END_ENCAPSULATED;
     }
     ASN1_END_SEQUENCE;
@@ -348,7 +351,10 @@ CHIP_ERROR EncodeTBSCert(const X509CertRequestParams & requestParams, const Cryp
 
         ReturnErrorOnFailure(writer.PutInteger(requestParams.SerialNumber));
 
-        ASN1_START_SEQUENCE { ASN1_ENCODE_OBJECT_ID(kOID_SigAlgo_ECDSAWithSHA256); }
+        ASN1_START_SEQUENCE
+        {
+            ASN1_ENCODE_OBJECT_ID(kOID_SigAlgo_ECDSAWithSHA256);
+        }
         ASN1_END_SEQUENCE;
 
         // issuer Name
@@ -389,7 +395,10 @@ CHIP_ERROR NewChipX509Cert(const X509CertRequestParams & requestParams, const Cr
     {
         ReturnErrorOnFailure(EncodeTBSCert(requestParams, subjectPubkey, issuerKeypair.Pubkey(), writer));
 
-        ASN1_START_SEQUENCE { ASN1_ENCODE_OBJECT_ID(kOID_SigAlgo_ECDSAWithSHA256); }
+        ASN1_START_SEQUENCE
+        {
+            ASN1_ENCODE_OBJECT_ID(kOID_SigAlgo_ECDSAWithSHA256);
+        }
         ASN1_END_SEQUENCE;
 
         ReturnErrorOnFailure(EncodeChipECDSASignature(signature, writer));

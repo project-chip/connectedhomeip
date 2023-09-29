@@ -671,7 +671,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         // matches a running controller.
         auto * controllersCopy = [self getRunningControllers];
         for (MTRDeviceController * existing in controllersCopy) {
-            if (existing != controller && [existing.uniqueIdentifier compare:params.uniqueIdentifier] == NSOrderedSame) {
+            if (existing != controller && [existing.uniqueIdentifier isEqual:params.uniqueIdentifier]) {
                 MTR_LOG_ERROR("Already have running controller with uniqueIdentifier %@", existing.uniqueIdentifier);
                 fabricError = CHIP_ERROR_INVALID_ARGUMENT;
                 params = nil;

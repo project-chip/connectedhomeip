@@ -52,7 +52,7 @@ public:
 
     // Non-copyable
     TestOnlyLocalCertificateAuthority(TestOnlyLocalCertificateAuthority const &) = delete;
-    void operator=(TestOnlyLocalCertificateAuthority const &) = delete;
+    void operator=(TestOnlyLocalCertificateAuthority const &)                    = delete;
 
     TestOnlyLocalCertificateAuthority & Init()
     {
@@ -101,10 +101,7 @@ public:
     bool IsSuccess() { return mCurrentStatus == CHIP_NO_ERROR; }
 
     ByteSpan GetNoc() const { return ByteSpan{ mLastNoc.Get(), mLastNoc.AllocatedSize() }; }
-    ByteSpan GetIcac() const
-    {
-        return mIncludeIcac ? ByteSpan{ mLastIcac.Get(), mLastIcac.AllocatedSize() } : ByteSpan{ nullptr, 0 };
-    }
+    ByteSpan GetIcac() const { return mIncludeIcac ? ByteSpan{ mLastIcac.Get(), mLastIcac.AllocatedSize() } : ByteSpan{}; }
     ByteSpan GetRcac() const { return ByteSpan{ mLastRcac.Get(), mLastRcac.AllocatedSize() }; }
 
     TestOnlyLocalCertificateAuthority & GenerateNocChain(FabricId fabricId, NodeId nodeId,

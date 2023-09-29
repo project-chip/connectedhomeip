@@ -233,6 +233,7 @@ static_library("system") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform:platform_buildconfig",
     "${nlassert_root}:nlassert",

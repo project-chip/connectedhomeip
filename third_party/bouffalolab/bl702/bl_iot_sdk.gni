@@ -425,7 +425,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/stage/yloop/src/select.c",
       "${bl_iot_sdk_root}/components/stage/yloop/src/yloop.c",
     ]
-    defines = [ "EF_ENV_CACHE_TABLE_SIZE=32" ]
+    defines = [ "EF_ENV_CACHE_TABLE_SIZE=64" ]
     cflags_c = [ "-Wno-sign-compare" ]
     configs += [
       ":${sdk_target_name}_config_BSP_Driver",
@@ -835,10 +835,7 @@ template("bl_iot_sdk") {
   }
 
   config("${sdk_target_name}_config_lwip") {
-    include_dirs = [
-      "${bl_iot_sdk_root}/components/network/lwip/lwip-port",
-      "${bl_iot_sdk_root}/components/network/lwip/lwip-port/config",
-    ]
+    include_dirs = [ "${bl_iot_sdk_root}/components/network/lwip/lwip-port" ]
 
     include_dirs += [
       "${bl_iot_sdk_root}/components/network/lwip/src/include",
@@ -848,18 +845,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/lwip/lwip-port/hook",
     ]
 
-    defines = [
-      "CFG_ETHERNET_ENABLE=1",
-      "LWIP_IPV6=1",
-      "LWIP_IPV4=1",
-      "LWIP_IPV6_DHCP6=1",
-      "LWIP_IPV6_SCOPES=0",
-      "PBUF_POOL_SIZE=20",
-      "PBUF_POOL_BUFSIZE=1600",
-      "MEMP_NUM_UDP_PCB=8",
-      "LWIP_NETIF_EXT_STATUS_CALLBACK",
-      "LWIP_HOOK_FILENAME=\"bl_route_hook.h\"",
-    ]
+    defines = [ "LWIP_IPV6=1" ]
   }
 
   source_set("${sdk_target_name}_lwip") {
@@ -945,11 +931,30 @@ template("bl_iot_sdk") {
     ]
   }
 
+  config("${sdk_target_name}_config_factory_data") {
+    include_dirs = [ "${bl_iot_sdk_root}/components/network/matter/matter_factory_data/include" ]
+  }
+
+  source_set("${sdk_target_name}_factory_data") {
+    sources = [
+      "${bl_iot_sdk_root}/components/network/matter/matter_factory_data/efuse_slot.c",
+      "${bl_iot_sdk_root}/components/network/matter/matter_factory_data/matter_factory_data.c",
+    ]
+    configs += [
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_freertos",
+      ":${sdk_target_name}_config_BSP_Driver",
+      ":${sdk_target_name}_config_hosal",
+    ]
+    public_configs = [ ":${sdk_target_name}_config_factory_data" ]
+  }
+
   group(sdk_target_name) {
     public_deps = [
       ":${sdk_target_name}_BSP_Driver",
       ":${sdk_target_name}_bl702_freertos",
       ":${sdk_target_name}_ble",
+      ":${sdk_target_name}_factory_data",
       ":${sdk_target_name}_fs",
       ":${sdk_target_name}_hosal",
       ":${sdk_target_name}_libc",

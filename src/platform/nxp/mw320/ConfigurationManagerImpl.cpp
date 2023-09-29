@@ -31,7 +31,7 @@
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #include <platform/nxp/mw320/MW320Config.h>
 
-//#include "core_cm7.h"
+// #include "core_cm7.h"
 
 namespace chip {
 namespace DeviceLayer {

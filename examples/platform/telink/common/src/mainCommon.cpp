@@ -31,10 +31,6 @@
 #include "Rpc.h"
 #endif
 
-#ifdef CONFIG_BOOTLOADER_MCUBOOT
-#include <zephyr/dfu/mcuboot.h>
-#endif /* CONFIG_BOOTLOADER_MCUBOOT */
-
 LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
@@ -142,33 +138,20 @@ int main(void)
         goto exit;
     }
 
-#ifdef CONFIG_CHIP_ENABLE_ICD_SUPPORT
-    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
-#elif CONFIG_OPENTHREAD_MTD
-    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
-#else
+#if defined(CONFIG_CHIP_THREAD_DEVICE_ROLE_ROUTER)
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+#elif defined(CONFIG_CHIP_THREAD_DEVICE_ROLE_END_DEVICE)
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+#elif defined(CONFIG_CHIP_THREAD_DEVICE_ROLE_SLEEPY_END_DEVICE)
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+#else
+#error THREAD_DEVICE_ROLE not selected
 #endif
     if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("SetThreadDeviceType fail");
         goto exit;
     }
-
-#ifdef CONFIG_BOOTLOADER_MCUBOOT
-    if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
-    {
-        int img_confirmation = boot_write_img_confirmed();
-        if (img_confirmation)
-        {
-            LOG_ERR("Image not confirmed %d. Will be reverted!", img_confirmation);
-        }
-        else
-        {
-            LOG_INF("Image confirmed");
-        }
-    }
-#endif /* CONFIG_BOOTLOADER_MCUBOOT */
 
     err = GetAppTask().StartApp();
 
