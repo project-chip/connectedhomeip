@@ -48,7 +48,6 @@ typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 - (nullable id)readAttributeWithEndpointID:(NSNumber *)endpointID
                                  clusterID:(NSNumber *)clusterID
                                attributeID:(NSNumber *)attributeID
-                                    params:(MTRReadParams * _Nullable)params
                                      error:(NSError * __autoreleasing *)error;
 
 @property (nonatomic, readonly) MTRDeviceController * deviceController;

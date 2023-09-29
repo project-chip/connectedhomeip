@@ -66,7 +66,18 @@ NS_ASSUME_NONNULL_BEGIN
 {{availability (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true)}}
 {{/inline}}
 - (NSDictionary<NSString *, id> *)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params {{> availability}};
-- ({{asObjectiveCClass type parent.name stronglyTypedArrays=true}} * _Nullable)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params error:(NSError * __autoreleasing *)error {{availability (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true) minimalRelease="Future"}};
+
+/**
+{{#if isNullable}}
+ * {{asMethodName name}} can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+{{/if}}
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `{{#if isNullable}}nullable {{/if}}{{asObjectiveCClass type parent.name stronglyTypedArrays=true}} *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- ({{asObjectiveCClass type parent.name stronglyTypedArrays=true}} * _Nullable){{asMethodName name}}:(NSError * __autoreleasing *)error {{availability (asUpperCamelCase parent.name preserveAcronyms=true) attribute=(asUpperCamelCase name preserveAcronyms=true) minimalRelease="Future"}}{{#if isNullable}} __attribute__((swift_error(nonnull_error))){{/if}};
 {{#if isWritableAttribute}}
 - (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs {{> availability}};
 - (void)write{{>attribute}}WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params {{> availability}};

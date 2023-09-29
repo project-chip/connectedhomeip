@@ -1367,8 +1367,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  clientQueue:queue
                                reportHandler:^(id _Nullable values, NSError * _Nullable error) {
                                }
-                     subscriptionEstablished:^() {
-                     }];
+                     subscriptionEstablished:^() {}];
     [self waitForExpectations:@[ errorExpectation ] timeout:60];
 }
 
@@ -1421,8 +1420,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  clientQueue:queue
                                reportHandler:^(id _Nullable values, NSError * _Nullable error) {
                                }
-                     subscriptionEstablished:^() {
-                     }];
+                     subscriptionEstablished:^() {}];
     [self waitForExpectations:@[ errorExpectation ] timeout:60];
 }
 
@@ -1511,7 +1509,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertNotNil(untypedDeviceTypeList);
 
     NSError * error;
-    NSArray * typedDeviceTypeList = [descriptorCluster readAttributeDeviceTypeListWithParams:nil error:&error];
+    NSArray * typedDeviceTypeList = [descriptorCluster deviceTypeList:&error];
     XCTAssertNil(error);
     XCTAssertNotNil(typedDeviceTypeList);
 
@@ -1618,8 +1616,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                      clientQueue:queue
                                    reportHandler:^(id _Nullable values, NSError * _Nullable error) {
                                    }
-                         subscriptionEstablished:^() {
-                         }];
+                         subscriptionEstablished:^() {}];
 
     [self waitForExpectations:@[ subscriptionDroppedExpectation ] timeout:60];
 
@@ -1694,8 +1691,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  clientQueue:queue
                                reportHandler:^(id _Nullable values, NSError * _Nullable error) {
                                }
-                     subscriptionEstablished:^() {
-                     }];
+                     subscriptionEstablished:^() {}];
     [self waitForExpectations:@[ errorExpectation ] timeout:60];
 }
 

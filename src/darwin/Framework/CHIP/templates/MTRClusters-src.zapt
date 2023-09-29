@@ -177,9 +177,9 @@ completionHandler
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) params:params];
 }
 
-- ({{asObjectiveCClass type parent.name stronglyTypedArrays=true}} * _Nullable)read{{>attribute}}WithParams:(MTRReadParams * _Nullable)params error:(NSError * __autoreleasing *)error
+- ({{asObjectiveCClass type parent.name stronglyTypedArrays=true}} * _Nullable){{asMethodName name}}:(NSError * __autoreleasing *)error
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) params:params error:error];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDType{{>cluster}}ID) attributeID:@(MTRAttributeIDTypeCluster{{>cluster}}{{>attribute}}ID) error:error];
 }
 
 {{#if isWritableAttribute}}

@@ -999,14 +999,20 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (nullable id)readAttributeWithEndpointID:(NSNumber *)endpointID
                                  clusterID:(NSNumber *)clusterID
                                attributeID:(NSNumber *)attributeID
-                                    params:(MTRReadParams * _Nullable)params
                                      error:(NSError * __autoreleasing *)error
 {
+    if (error) {
+        *error = nil;
+    }
+
     NSDictionary<NSString *, id> * value = [self readAttributeWithEndpointID:endpointID
                                                                    clusterID:clusterID
                                                                  attributeID:attributeID
-                                                                      params:params];
+                                                                      params:nil];
     if (value == nil) {
+        if (error) {
+            *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeAttributeValueUnavailable userInfo:nil];
+        }
         return nil;
     }
 
@@ -1021,6 +1027,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         return nil;
     }
 
+    // Because our responseValue has MTRDataKey, we either errored out (and got nil for
+    // the report) or report.value is the (possibly nil) correct value for the
+    // attribute.
     return report.value;
 }
 

@@ -78,6 +78,12 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
      * TLV-level failures.
      */
     MTRErrorCodeTLVDecodeFailed MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 14,
+    /**
+     * MTRErrorCodeAttributeValueUnavailable means the value for an attribute is
+     * not available.  This could be because the attribute is not supported, or
+     * because we have not yet received the value from the server.
+     */
+    MTRErrorCodeAttributeValueUnavailable MTR_NEWLY_AVAILABLE = 15,
 };
 // clang-format on
 
