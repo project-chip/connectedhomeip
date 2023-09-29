@@ -474,21 +474,18 @@ class MatterIdlTransformer(Transformer):
         return result
 
     def idl(self, items):
-        idl = Idl()
+        clusters = []
+        endpoints = []
 
         for item in items:
-            if type(item) == Enum:
-                idl.enums.append(item)
-            elif type(item) == Struct:
-                idl.structs.append(item)
-            elif type(item) == Cluster:
-                idl.clusters.append(item)
+            if type(item) == Cluster:
+                clusters.append(item)
             elif type(item) == Endpoint:
-                idl.endpoints.append(item)
+                endpoints.append(item)
             else:
                 raise Exception("UNKNOWN idl content item: %r" % item)
 
-        return idl
+        return Idl(clusters=clusters, endpoints=endpoints)
 
     def prefix_doc_comment(self):
         print("TODO: prefix")
