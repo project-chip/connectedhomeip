@@ -18,7 +18,7 @@
 
 #include <app/CASESessionManager.h>
 #include <lib/address_resolve/AddressResolve.h>
-#include <tracing/DurationTimer.h>
+#include <system/DurationTimer.h>
 
 namespace chip {
 
@@ -38,7 +38,8 @@ void CASESessionManager::FindOrEstablishSession(const ScopedNodeId & peerId, Cal
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
 )
 {
-    chip::timing::TimespecTimer timer ( "CASESessionManager: FindOrEstablishSession" );
+    
+    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance( "CASESessionManager: FindOrEstablishSession" );
     timer.start();
 
     ChipLogDetail(CASESessionManager, "FindOrEstablishSession: PeerId = [%d:" ChipLogFormatX64 "]", peerId.GetFabricIndex(),

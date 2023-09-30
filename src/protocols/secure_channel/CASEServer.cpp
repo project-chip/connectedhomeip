@@ -22,7 +22,7 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <transport/SessionManager.h>
-#include <tracing/DurationTimer.h>
+#include <system/DurationTimer.h>
 
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
@@ -124,7 +124,7 @@ exit:
 
 void CASEServer::PrepareForSessionEstablishment(const ScopedNodeId & previouslyEstablishedPeer)
 {
-    chip::timing::TimespecTimer timer ( "Inet: CASE Session establishment" );
+    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance( "Inet: CASE Session establishment" );
     timer.start();
 
     GetSession().Clear();

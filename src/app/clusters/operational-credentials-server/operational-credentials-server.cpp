@@ -49,7 +49,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <string.h>
 #include <tracing/macros.h>
-#include <tracing/DurationTimer.h>
+#include <system/DurationTimer.h>
 
 using namespace chip;
 using namespace ::chip::Transport;
@@ -414,7 +414,7 @@ bool emberAfOperationalCredentialsClusterRemoveFabricCallback(app::CommandHandle
     ChipLogProgress(Zcl, "OpCreds: Received a RemoveFabric Command for FabricIndex 0x%x",
                     static_cast<unsigned>(fabricBeingRemoved));
 
-    chip::timing::TimespecTimer timer ( "OpCreds: RemoveFabric" );
+    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance( "OpCreds: RemoveFabric" );
     timer.start();
 
     if (!IsValidFabricIndex(fabricBeingRemoved))
@@ -482,7 +482,7 @@ bool emberAfOperationalCredentialsClusterUpdateFabricLabelCallback(app::CommandH
 
     ChipLogProgress(Zcl, "OpCreds: Received an UpdateFabricLabel command");
 
-    chip::timing::TimespecTimer timer ( "OpCreds: UpdateFabricLabel" );
+    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance( "OpCreds: UpdateFabricLabel" );
     timer.start();
 
     if (label.size() > 32)
@@ -629,7 +629,7 @@ bool emberAfOperationalCredentialsClusterAddNOCCallback(app::CommandHandler * co
 
     ChipLogProgress(Zcl, "OpCreds: Received an AddNOC command");
 
-    chip::timing::TimespecTimer timer ( "OpCreds: AddNOC" );
+    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance( "OpCreds: AddNOC" );
     timer.start();
 
     VerifyOrExit(NOCValue.size() <= Credentials::kMaxCHIPCertLength, nonDefaultStatus = Status::InvalidCommand);
@@ -793,7 +793,7 @@ bool emberAfOperationalCredentialsClusterUpdateNOCCallback(app::CommandHandler *
 
     ChipLogProgress(Zcl, "OpCreds: Received an UpdateNOC command");
 
-    chip::timing::TimespecTimer timer ( "OpCreds: UpdateNOC" );
+    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance( "OpCreds: UpdateNOC" );
     timer.start();
 
     auto & fabricTable            = Server::GetInstance().GetFabricTable();
@@ -879,7 +879,7 @@ bool emberAfOperationalCredentialsClusterCertificateChainRequestCallback(
     const Commands::CertificateChainRequest::DecodableType & commandData)
 {
 
-    chip::timing::TimespecTimer timer ( "OpCreds: Certificate Chain" );
+    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance( "OpCreds: Certificate Chain" );
     timer.start();
 
     MATTER_TRACE_SCOPE("CertificateChainRequest", "OperationalCredentials");
@@ -933,7 +933,7 @@ bool emberAfOperationalCredentialsClusterAttestationRequestCallback(app::Command
                                                                     const Commands::AttestationRequest::DecodableType & commandData)
 {
 
-    chip::timing::TimespecTimer timer ( "OpCreds: AttestationRequest" );
+    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance( "OpCreds: AttestationRequest" );
     timer.start();
 
     MATTER_TRACE_SCOPE("AttestationRequest", "OperationalCredentials");
@@ -1035,7 +1035,7 @@ bool emberAfOperationalCredentialsClusterCSRRequestCallback(app::CommandHandler 
                                                             const Commands::CSRRequest::DecodableType & commandData)
 {
 
-    chip::timing::TimespecTimer timer ( "OpCreds: CSRRequest" );
+    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance( "OpCreds: CSRRequest" );
     timer.start();
 
     MATTER_TRACE_SCOPE("CSRRequest", "OperationalCredentials");
@@ -1176,7 +1176,7 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
     const Commands::AddTrustedRootCertificate::DecodableType & commandData)
 {
 
-    chip::timing::TimespecTimer timer ( "OpCreds: AddTrustedRootCertificate" );
+    chip::timing::DurationTimer timer = chip::timing::GetDefaultTimingInstance( "OpCreds: AddTrustedRootCertificate" );
     timer.start();
 
     MATTER_TRACE_SCOPE("AddTrustedRootCertificate", "OperationalCredentials");

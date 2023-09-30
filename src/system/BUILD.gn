@@ -216,6 +216,8 @@ static_library("system") {
     "TimeSource.h",
     "WakeEvent.cpp",
     "WakeEvent.h",
+    "DurationTimer.h",
+    "DurationTimer.cpp",
   ]
 
   if (chip_system_layer_impl_config_file == "") {
