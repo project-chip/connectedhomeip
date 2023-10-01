@@ -38,6 +38,7 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/PlatformManager.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -186,31 +187,31 @@ void OnBrowse(dnssd_service_state_e state, dnssd_service_h service, void * data)
     g_source_attach(source, g_main_context_get_thread_default());
     bCtx->mTimeoutSource = source;
 
-    char * type          = nullptr;
-    char * name          = nullptr;
-    char * ifaceName     = nullptr;
+    chip::GAutoPtr<char> type;
+    chip::GAutoPtr<char> name;
+    chip::GAutoPtr<char> ifaceName;
     uint32_t interfaceId = 0;
 
-    ret = dnssd_service_get_type(service, &type);
+    ret = dnssd_service_get_type(service, &MakeUniquePointerReceiver(type).Get());
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_type() failed. ret: %d", ret));
 
-    ret = dnssd_service_get_name(service, &name);
+    ret = dnssd_service_get_name(service, &MakeUniquePointerReceiver(name).Get());
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_name() failed. ret: %d", ret));
 
-    ret = dnssd_service_get_interface(service, &ifaceName);
+    ret = dnssd_service_get_interface(service, &MakeUniquePointerReceiver(ifaceName).Get());
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_interface() failed. ret: %d", ret));
 
-    interfaceId = if_nametoindex(ifaceName);
+    interfaceId = if_nametoindex(ifaceName.get());
     VerifyOrExit(interfaceId > 0, ChipLogError(DeviceLayer, "if_nametoindex() failed. errno: %d", errno);
                  ret = DNSSD_ERROR_OPERATION_FAILED);
 
     if (state == DNSSD_SERVICE_STATE_AVAILABLE)
     {
-        OnBrowseAdd(bCtx, type, name, interfaceId);
+        OnBrowseAdd(bCtx, type.get(), name.get(), interfaceId);
     }
     else
     {
-        OnBrowseRemove(bCtx, type, name, interfaceId);
+        OnBrowseRemove(bCtx, type.get(), name.get(), interfaceId);
     }
 
 exit:
@@ -223,10 +224,6 @@ exit:
         // After this point the context might be no longer valid
         bCtx->mInstance->RemoveContext(bCtx);
     }
-
-    g_free(type);
-    g_free(name);
-    g_free(ifaceName);
 }
 
 CHIP_ERROR BrowseAsync(chip::Dnssd::BrowseContext * bCtx)
@@ -310,46 +307,42 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * userData)
     ChipLogDetail(DeviceLayer, "DNSsd %s", __func__);
     auto rCtx = reinterpret_cast<chip::Dnssd::ResolveContext *>(userData);
 
-    char * name      = nullptr;
-    char * ipv4      = nullptr;
-    char * ipv6      = nullptr;
+    chip::GAutoPtr<char> name;
+    chip::GAutoPtr<char> ipv4;
+    chip::GAutoPtr<char> ipv6;
     int port         = 0;
     char * interface = nullptr;
     chip::Inet::IPAddress ipAddr;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    int ret = dnssd_service_get_name(service, &name);
+    int ret = dnssd_service_get_name(service, &MakeUniquePointerReceiver(name).Get());
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_name() failed. ret: %d", ret));
 
-    chip::Platform::CopyString(rCtx->mResult.mName, name);
-    g_free(name);
+    chip::Platform::CopyString(rCtx->mResult.mName, name.get());
 
-    ret = dnssd_service_get_ip(service, &ipv4, &ipv6);
+    ret = dnssd_service_get_ip(service, &MakeUniquePointerReceiver(ipv4).Get(), &MakeUniquePointerReceiver(ipv6).Get());
     VerifyOrExit(ret == DNSSD_ERROR_NONE, ChipLogError(DeviceLayer, "dnssd_service_get_ip() failed. ret: %d", ret));
 
     // If both IPv4 and IPv6 are set, IPv6 address has higher priority.
-    if (ipv6 != nullptr && strcmp(ipv6, kEmptyAddressIpv6) != 0)
+    if (ipv6.get() != nullptr && strcmp(ipv6.get(), kEmptyAddressIpv6) != 0)
     {
-        if (!chip::Inet::IPAddress::FromString(ipv6, ipAddr) || ipAddr.Type() != chip::Inet::IPAddressType::kIPv6)
+        if (!chip::Inet::IPAddress::FromString(ipv6.get(), ipAddr) || ipAddr.Type() != chip::Inet::IPAddressType::kIPv6)
         {
             ret = DNSSD_ERROR_OPERATION_FAILED;
         }
     }
 #if INET_CONFIG_ENABLE_IPV4
-    else if (ipv4 != nullptr)
+    else if (ipv4.get() != nullptr)
     {
-        if (!chip::Inet::IPAddress::FromString(ipv4, ipAddr) || ipAddr.Type() != chip::Inet::IPAddressType::kIPv4)
+        if (!chip::Inet::IPAddress::FromString(ipv4.get(), ipAddr) || ipAddr.Type() != chip::Inet::IPAddressType::kIPv4)
         {
             ret = DNSSD_ERROR_OPERATION_FAILED;
         }
     }
 #endif
 
-    ChipLogDetail(DeviceLayer, "DNSsd %s: IPv4: %s, IPv6: %s, ret: %d", __func__, StringOrNullMarker(ipv4),
-                  StringOrNullMarker(ipv6), ret);
-
-    g_free(ipv4);
-    g_free(ipv6);
+    ChipLogDetail(DeviceLayer, "DNSsd %s: IPv4: %s, IPv6: %s, ret: %d", __func__, StringOrNullMarker(ipv4.get()),
+                  StringOrNullMarker(ipv6.get()), ret);
 
     VerifyOrExit(ret == DNSSD_ERROR_NONE, );
 
@@ -378,10 +371,9 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * userData)
         // with the NSD internal mutex locked, which is also locked by the
         // dnssd_create_remote_service() function called in the Resolve(), and
         // the Resolve() itself is called with the stack mutex locked.
-        auto * sourceIdle = g_idle_source_new();
-        g_source_set_callback(sourceIdle, OnResolveFinalize, rCtx, NULL);
-        g_source_attach(sourceIdle, g_main_context_get_thread_default());
-        g_source_unref(sourceIdle);
+        chip::GAutoPtr<GSource> sourceIdle(g_idle_source_new());
+        g_source_set_callback(sourceIdle.get(), OnResolveFinalize, rCtx, NULL);
+        g_source_attach(sourceIdle.get(), g_main_context_get_thread_default());
     }
 
     return;

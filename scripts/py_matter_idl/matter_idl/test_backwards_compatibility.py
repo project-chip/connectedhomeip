@@ -77,10 +77,12 @@ class TestCompatibilityChecks(unittest.TestCase):
         with self.subTest(validate=name):
             # Validate compatibility and that no changes are always compatible
             with self.subTest(direction="Forward"):
-                self._AssumeCompatiblity(old, new, old_idl, new_idl, Compatibility.FORWARD_FAIL not in flags)
+                self._AssumeCompatiblity(
+                    old, new, old_idl, new_idl, Compatibility.FORWARD_FAIL not in flags)
 
             with self.subTest(direction="Backward"):
-                self._AssumeCompatiblity(new, old, new_idl, old_idl, Compatibility.BACKWARD_FAIL not in flags)
+                self._AssumeCompatiblity(
+                    new, old, new_idl, old_idl, Compatibility.BACKWARD_FAIL not in flags)
 
             with self.subTest(direction="NEW-to-NEW"):
                 self._AssumeCompatiblity(new, new, new_idl, new_idl, True)
@@ -88,54 +90,40 @@ class TestCompatibilityChecks(unittest.TestCase):
             with self.subTest(direction="OLD-to-OLD"):
                 self._AssumeCompatiblity(old, old, old_idl, old_idl, True)
 
-    def test_top_level_enums_delete(self):
-        self.ValidateUpdate(
-            "delete a top level enum",
-            "enum A: ENUM8{} enum B: ENUM8{}",
-            "enum A: ENUM8{}",
-            Compatibility.FORWARD_FAIL)
-
-    def test_top_level_enums_change(self):
-        self.ValidateUpdate(
-            "change an enum type",
-            "enum A: ENUM8{}",
-            "enum A: ENUM16{}",
-            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
-
-    def test_top_level_enums_add_remove(self):
-        self.ValidateUpdate(
-            "Adding enum values is ok, removing values is not",
-            "enum A: ENUM8 {A = 1; B = 2;}",
-            "enum A: ENUM8 {A = 1; }",
-            Compatibility.FORWARD_FAIL)
-
-    def test_top_level_enums_code(self):
-        self.ValidateUpdate(
-            "Switching enum codes is never ok",
-            "enum A: ENUM8 {A = 1; B = 2; }",
-            "enum A: ENUM8 {A = 1; B = 3; }",
-            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
-
-    def test_basic_clusters_code(self):
-        self.ValidateUpdate(
-            "Switching cluster codes is never ok",
-            "client cluster A = 1 {}",
-            "client cluster A = 2 {}",
-            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
-
-    def test_basic_clusters_remove(self):
-        self.ValidateUpdate(
-            "Removing a cluster is not ok",
-            "client cluster A = 1 {} client cluster B = 2 {}",
-            "client cluster A = 1 {}",
-            Compatibility.FORWARD_FAIL)
-
     def test_basic_clusters_enum(self):
         self.ValidateUpdate(
             "Adding an enum is ok. Also validates code formatting",
             "server cluster A = 16 {}",
             "server cluster A = 0x10 { enum X : ENUM8 {} }",
             Compatibility.BACKWARD_FAIL)
+
+    def test_clusters_enum_add_remove(self):
+        self.ValidateUpdate(
+            "Adding an enum is ok. Also validates code formatting",
+            "server cluster A = 16 { enum X : ENUM8 { A = 1; B = 2; }}",
+            "server cluster A = 16 { enum X : ENUM8 { A = 1; }}",
+            Compatibility.FORWARD_FAIL)
+
+    def test_clusters_enum_code(self):
+        self.ValidateUpdate(
+            "Adding an enum is ok. Also validates code formatting",
+            "server cluster A = 16 { enum X : ENUM8 { A = 1; B = 2; }}",
+            "server cluster A = 16 { enum X : ENUM8 { A = 1; B = 3; }}",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+    def test_clusters_enum_delete(self):
+        self.ValidateUpdate(
+            "Adding an enum is ok. Also validates code formatting",
+            "server cluster A = 16 { enum X : ENUM8 {}}",
+            "server cluster A = 16 { }",
+            Compatibility.FORWARD_FAIL)
+
+    def test_clusters_enum_change(self):
+        self.ValidateUpdate(
+            "Adding an enum is ok. Also validates code formatting",
+            "server cluster A = 16 { enum X : ENUM16 {}}",
+            "server cluster A = 16 { enum X : ENUM8 {}}",
+            Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
 
     def test_basic_clusters_side(self):
         self.ValidateUpdate(

@@ -5,7 +5,7 @@ plugins {
 apply from: "../../../../third_party/android_deps/android_deps.gradle"
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
 
     defaultConfig {
         minSdkVersion 24

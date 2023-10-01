@@ -47,7 +47,7 @@
 @property (nonatomic, strong) MTRAsyncCallbackWorkQueue * workQueue;
 @property (nonatomic, readonly) BOOL enqueued;
 // Called by the queue
-- (void)markedEnqueued;
+- (void)markEnqueued;
 - (void)callReadyHandlerWithContext:(id)context;
 - (void)cancel;
 @end
@@ -85,7 +85,7 @@
         return;
     }
 
-    [item markedEnqueued];
+    [item markEnqueued];
 
     os_unfair_lock_lock(&_lock);
     item.workQueue = self;
@@ -204,7 +204,7 @@
     os_unfair_lock_unlock(&_lock);
 }
 
-- (void)markedEnqueued
+- (void)markEnqueued
 {
     os_unfair_lock_lock(&_lock);
     _enqueued = YES;
