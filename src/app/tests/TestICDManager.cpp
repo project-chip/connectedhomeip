@@ -17,6 +17,7 @@
  */
 #include <app/EventManagement.h>
 #include <app/icd/ICDManager.h>
+#include <app/icd/ICDNotifier.h>
 #include <app/icd/ICDStateObserver.h>
 #include <app/icd/IcdManagementServer.h>
 #include <app/tests/AppTestContext.h>
@@ -124,7 +125,7 @@ public:
         // Events updating the Operation to Active mode can extend the current active mode time by 1 Active mode threshold.
         // Kick an active Threshold just before the end of the Active interval and validate that the active mode is extended.
         AdvanceClockAndRunEventLoop(ctx, IcdManagementServer::GetInstance().GetActiveModeIntervalMs() - 1);
-        ctx->mICDManager.UpdateOperationState(ICDManager::OperationalState::ActiveMode);
+        GetICDNotifier()->NetworkActivity();
         AdvanceClockAndRunEventLoop(ctx, IcdManagementServer::GetInstance().GetActiveModeThresholdMs() / 2);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
         AdvanceClockAndRunEventLoop(ctx, IcdManagementServer::GetInstance().GetActiveModeThresholdMs());
@@ -136,7 +137,7 @@ public:
         TestContext * ctx = static_cast<TestContext *>(aContext);
 
         // Setting a requirement will transition the ICD to active mode.
-        ctx->mICDManager.SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kCommissioningWindowOpen, true);
+        GetICDNotifier()->ActiveRequest(ICDNotify::KeepActiveFlags::kCommissioningWindowOpen, true);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
         // Advance time so active mode interval expires.
         AdvanceClockAndRunEventLoop(ctx, IcdManagementServer::GetInstance().GetActiveModeIntervalMs() + 1);
@@ -144,17 +145,17 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // Remove requirement. we should directly transition to idle mode.
-        ctx->mICDManager.SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kCommissioningWindowOpen, false);
+        GetICDNotifier()->ActiveRequest(ICDNotify::KeepActiveFlags::kCommissioningWindowOpen, false);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
 
-        ctx->mICDManager.SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kFailSafeArmed, true);
+        GetICDNotifier()->ActiveRequest(ICDNotify::KeepActiveFlags::kFailSafeArmed, true);
         // Requirement will transition us to active mode.
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // Advance time, but by less than the active mode interval and remove the requirement.
         // We should stay in active mode.
         AdvanceClockAndRunEventLoop(ctx, IcdManagementServer::GetInstance().GetActiveModeIntervalMs() / 2);
-        ctx->mICDManager.SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kFailSafeArmed, false);
+        GetICDNotifier()->ActiveRequest(ICDNotify::KeepActiveFlags::kFailSafeArmed, false);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // Advance time again, The activemode interval is completed.
@@ -162,8 +163,8 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
 
         // Set two requirements
-        ctx->mICDManager.SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kExpectingMsgResponse, true);
-        ctx->mICDManager.SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kAwaitingMsgAck, true);
+        GetICDNotifier()->ActiveRequest(ICDNotify::KeepActiveFlags::kFailSafeArmed, true);
+        GetICDNotifier()->ActiveRequest(ICDNotify::KeepActiveFlags::kExchangeContextOpen, true);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
         // advance time so the active mode interval expires.
         AdvanceClockAndRunEventLoop(ctx, IcdManagementServer::GetInstance().GetActiveModeIntervalMs() + 1);
@@ -171,10 +172,10 @@ public:
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
 
         // remove 1 requirement. Active mode is maintained
-        ctx->mICDManager.SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kExpectingMsgResponse, false);
+        GetICDNotifier()->ActiveRequest(ICDNotify::KeepActiveFlags::kFailSafeArmed, false);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::ActiveMode);
         // remove the last requirement
-        ctx->mICDManager.SetKeepActiveModeRequirements(ICDManager::KeepActiveFlags::kAwaitingMsgAck, false);
+        GetICDNotifier()->ActiveRequest(ICDNotify::KeepActiveFlags::kExchangeContextOpen, false);
         NL_TEST_ASSERT(aSuite, ctx->mICDManager.mOperationalState == ICDManager::OperationalState::IdleMode);
     }
 };

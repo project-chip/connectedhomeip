@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app/icd/ICDNotifier.h>
 #include <app/icd/ICDStateObserver.h>
 #include <credentials/FabricTable.h>
 #include <lib/support/BitFlags.h>
@@ -33,7 +34,7 @@ class TestICDManager;
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
  */
-class ICDManager
+class ICDManager : public ICDNotify
 {
 public:
     enum class OperationalState : uint8_t
@@ -48,20 +49,12 @@ public:
         LIT, // Long Interval Time ICD
     };
 
-    enum class KeepActiveFlags : uint8_t
-    {
-        kCommissioningWindowOpen = 0x01,
-        kFailSafeArmed           = 0x02,
-        kExpectingMsgResponse    = 0x03,
-        kAwaitingMsgAck          = 0x04,
-    };
-
     ICDManager() {}
     void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, ICDStateObserver * stateObserver);
     void Shutdown();
     void UpdateIcdMode();
     void UpdateOperationState(OperationalState state);
-    void SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state);
+    void SetKeepActiveModeRequirements(ICDNotify::KeepActiveFlags flag, bool state);
     bool IsKeepActive() { return mKeepActiveFlags.HasAny(); }
     ICDMode GetICDMode() { return mICDMode; }
     OperationalState GetOperationalState() { return mOperationalState; }
@@ -69,6 +62,10 @@ public:
     static System::Clock::Milliseconds32 GetSITPollingThreshold() { return kSITPollingThreshold; }
     static System::Clock::Milliseconds32 GetSlowPollingInterval() { return kSlowPollingInterval; }
     static System::Clock::Milliseconds32 GetFastPollingInterval() { return kFastPollingInterval; }
+
+    // Implementation of ICDNotify observer functions.
+    void NotifyNetworkActivity() override;
+    void KeepActiveRequest(ICDNotify::KeepActiveFlags requester, bool set) override;
 
 protected:
     friend class TestICDManager;
@@ -83,6 +80,18 @@ protected:
      */
     static void OnTransitionToIdle(System::Layer * aLayer, void * appState);
 
+    /**
+     * @brief This function locks the ChipStack if the current thread didn't already do so.
+     *
+     *  Use case: Requests or notifications from the ICDNotifier can occur from a thread owning the lock already
+     *  In those cases, we don't lock/unlock as it will cause a deadlock.
+     *
+     * @return True when the ChipStack was locked by this call
+     *         False when the ChipStask was already locked by the running thread
+     */
+    static bool EnsureChipStackLock();
+    static uint8_t OpenExchangeContextCount;
+
 private:
     // SIT ICDs should have a SlowPollingThreshold shorter than or equal to 15s (spec 9.16.1.5)
     static constexpr System::Clock::Milliseconds32 kSITPollingThreshold = System::Clock::Milliseconds32(15000);
@@ -96,7 +105,8 @@ private:
 
     bool SupportsCheckInProtocol();
 
-    BitFlags<KeepActiveFlags> mKeepActiveFlags{ 0 };
+    BitFlags<ICDNotify::KeepActiveFlags> mKeepActiveFlags{ 0 };
+
     OperationalState mOperationalState   = OperationalState::IdleMode;
     ICDMode mICDMode                     = ICDMode::SIT;
     PersistentStorageDelegate * mStorage = nullptr;

@@ -57,5 +57,6 @@ static_library("server") {
     "${chip_root}/src/protocols",
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
+    "${chip_root}/src/app/icd:notifier-srcs"
   ]
 }

@@ -21,6 +21,10 @@ source_set("observer-srcs") {
   sources = [ "ICDStateObserver.h" ]
 }
 
+source_set("notifier-srcs") {
+  sources = [ "ICDNotifier.h" ]
+}
+
 # ICD Manager source-set is broken out of the main source-set to enable unit tests
 # All sources and configurations used by the ICDManager need to go in this source-set
 source_set("manager-srcs") {
@@ -31,6 +35,7 @@ source_set("manager-srcs") {
 
   public_deps = [
     ":cluster-srcs",
+    ":notifier-srcs",
     ":observer-srcs",
     "${chip_root}/src/credentials:credentials",
   ]
@@ -51,17 +56,4 @@ source_set("cluster-srcs") {
     "${chip_root}/src/platform:platform",
     "${chip_root}/src/protocols:im_status",
   ]
-}
-
-# servers-srcs source-set contains all the sources and configurations necessary to build the ICD Server functionality
-# All sources, configurations and dependencies necessary for the ICD Server featureset need to go in this source-set
-#
-# The ICD Server featureset is enabled with the chip_enable_icd_server in the src/app/BUILD.gn file
-source_set("server-srcs") {
-  sources = [
-    "ICDEventManager.cpp",
-    "ICDEventManager.h",
-  ]
-
-  public_deps = [ ":manager-srcs" ]
 }

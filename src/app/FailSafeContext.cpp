@@ -24,6 +24,7 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <app/icd/ICDNotifier.h>
 
 #include "FailSafeContext.h"
 
@@ -55,14 +56,7 @@ void FailSafeContext::SetFailSafeArmed(bool armed)
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     if (IsFailSafeArmed() != armed)
     {
-        DeviceLayer::ChipDeviceEvent event;
-        event.Type                = DeviceLayer::DeviceEventType::kFailSafeStateChanged;
-        event.FailSafeState.armed = armed;
-        CHIP_ERROR err            = DeviceLayer::PlatformMgr().PostEvent(&event);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "Failed to post kFailSafeStateChanged event %" CHIP_ERROR_FORMAT, err.Format());
-        }
+        chip::app::GetICDNotifier()->ActiveRequest(app::ICDNotify::KeepActiveFlags::kFailSafeArmed, armed);
     }
 #endif
     mFailSafeArmed = armed;
