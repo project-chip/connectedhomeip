@@ -45,7 +45,7 @@ const int kIdMaxLength   = chip::Dnssd::kHostNameMaxLength + kPortMaxLength;
 class CastingPlayerAttributes
 {
 public:
-    char id[kIdMaxLength]                                  = {};
+    char id[kIdMaxLength + 1]                              = {};
     char deviceName[chip::Dnssd::kMaxDeviceNameLen + 1]    = {};
     char hostName[chip::Dnssd::kHostNameMaxLength + 1]     = {};
     char instanceName[chip::Dnssd::kHostNameMaxLength + 1] = {};
