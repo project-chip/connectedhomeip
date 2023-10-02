@@ -130,13 +130,12 @@ CHIP_ERROR RvcCleanModeDelegate::Init()
 
 void RvcCleanModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    uint8_t rvcCleanCurrentMode = gRvcCleanModeInstance->GetCurrentMode();
+    uint8_t rvcRunCurrentMode = gRvcRunModeInstance->GetCurrentMode();
 
-    // An example to show how do we block mode change in some circumstance
-    if (rvcCleanCurrentMode == RvcCleanMode::ModeDeepClean)
+    if (rvcRunCurrentMode == RvcRunMode::ModeCleaning)
     {
         response.status = to_underlying(RvcCleanMode::StatusCode::kCleaningInProgress);
-        response.statusText.SetValue(chip::CharSpan::fromCharString("Cannot change the cleaning mode during a deep clean"));
+        response.statusText.SetValue(chip::CharSpan::fromCharString("Cannot change the cleaning mode during a clean"));
         return;
     }
 
