@@ -27,9 +27,9 @@ public:
     Defer(Function && function) : mFunction(std::move(function)) {}
     ~Defer() { mFunction(); }
 
-    Defer(Defer & that) = default;
-    Defer & operator=(Defer & that) = default;
-    Defer(Defer && that)            = default;
+    Defer(Defer & that)              = default;
+    Defer & operator=(Defer & that)  = default;
+    Defer(Defer && that)             = default;
     Defer & operator=(Defer && that) = default;
 
 private:

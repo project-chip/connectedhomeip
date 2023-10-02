@@ -23,7 +23,7 @@
  *
  */
 
-//#include <lib/core/CHIPConfig.h>
+// #include <lib/core/CHIPConfig.h>
 #include "matter_pal.h"
 #include <lib/support/CHIPMem.h>
 #include <platform/PlatformManager.h>

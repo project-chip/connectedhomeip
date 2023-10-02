@@ -259,15 +259,15 @@ constexpr ClusterId validClusters[] = {
     0x0001'FFFD,
     0x0001'FFFE, // end MS
 
-    0xFFFD'FC00, // start MS
-    0xFFFD'FC01,
-    0xFFFD'FFFD,
-    0xFFFD'FFFE, // end MS
+    0xFFF1'FC00, // start MS
+    0xFFF1'FC01,
+    0xFFF1'FFFD,
+    0xFFF1'FFFE, // end MS
 
-    0xFFFE'FC00, // start MS
-    0xFFFE'FC01,
-    0xFFFE'FFFD,
-    0xFFFE'FFFE, // end MS
+    0xFFF4'FC00, // start MS
+    0xFFF4'FC01,
+    0xFFF4'FFFD,
+    0xFFF4'FFFE, // end MS
 };
 // clang-format on
 
@@ -293,6 +293,30 @@ constexpr ClusterId invalidClusters[] = {
     0x0001'FBFF, // end unused
     0x0001'FFFF, // wildcard
 
+    0xFFF4'0000, // start std
+    0xFFF4'0001,
+    0xFFF4'7FFE,
+    0xFFF4'7FFF, // end std
+    0xFFF4'8000, // start unused
+    0xFFF4'8001,
+    0xFFF4'FBFE,
+    0xFFF4'FBFF, // end unused
+    0xFFF4'FFFF, // wildcard
+
+    0xFFFD'0000, // start std
+    0xFFFD'0001,
+    0xFFFD'7FFE,
+    0xFFFD'7FFF, // end std
+    0xFFFD'8000, // start unused
+    0xFFFD'8001,
+    0xFFFD'FBFE,
+    0xFFFD'FBFF, // end unused
+    0xFFFD'FC00, // start MS
+    0xFFFD'FC01,
+    0xFFFD'FFFD,
+    0xFFFD'FFFE, // end MS
+    0xFFFD'FFFF, // wildcard
+
     0xFFFE'0000, // start std
     0xFFFE'0001,
     0xFFFE'7FFE,
@@ -301,6 +325,10 @@ constexpr ClusterId invalidClusters[] = {
     0xFFFE'8001,
     0xFFFE'FBFE,
     0xFFFE'FBFF, // end unused
+    0xFFFE'FC00, // start MS
+    0xFFFE'FC01,
+    0xFFFE'FFFD,
+    0xFFFE'FFFE, // end MS
     0xFFFE'FFFF, // wildcard
 
     0xFFFF'0000, // start std
@@ -751,8 +779,8 @@ constexpr EntryData entryData1[] = {
         .authMode    = AuthMode::kGroup,
         .subjects    = { kGroup2 },
         .targets     = { { .flags = Target::kCluster | Target::kEndpoint, .cluster = kLevelControlCluster, .endpoint = 1 },
-                     { .flags = Target::kCluster, .cluster = kOnOffCluster },
-                     { .flags = Target::kEndpoint, .endpoint = 2 } },
+                         { .flags = Target::kCluster, .cluster = kOnOffCluster },
+                         { .flags = Target::kEndpoint, .endpoint = 2 } },
     },
     {
         .fabricIndex = 1,

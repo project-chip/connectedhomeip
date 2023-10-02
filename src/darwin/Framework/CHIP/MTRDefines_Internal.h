@@ -27,3 +27,23 @@
 #else
 #define MTR_DIRECT_MEMBERS
 #endif
+
+#ifdef DEBUG
+#define MTR_TESTABLE MTR_EXPORT
+#else
+#define MTR_TESTABLE MTR_HIDDEN
+#endif
+
+// clang-format off
+/// Creates a weak shadow copy of the variable `local`
+#define mtr_weakify(local)                                      \
+    __weak typeof(local) _mtr_weak_##local = local
+
+/// Copies the weak shadow copy of `local` created by `mtr_weakify`
+/// back into a strong variable of the same name.
+#define mtr_strongify(local)                                    \
+    _Pragma("clang diagnostic push")                            \
+    _Pragma("clang diagnostic ignored \"-Wshadow\"")            \
+    __strong typeof(local) _Nullable local = _mtr_weak_##local  \
+    _Pragma("clang diagnostic pop")
+// clang-format on

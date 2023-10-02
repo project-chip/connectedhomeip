@@ -18,8 +18,8 @@
 #include <platform/bouffalolab/common/DiagnosticDataProviderImpl.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <platform/bouffalolab/BL702/WiFiInterface.h>
-#endif
+#include <platform/bouffalolab/BL702/wifi_mgmr_portable.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 extern "C" {
 #include <bl_sys.h>
@@ -58,31 +58,31 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(BootReasonType & bootReason
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 {
-    struct bflbwifi_ap_record ap_info;
+    struct bflbwifi_ap_record * pApInfo = wifiInterface_getApInfo();
 
-    if (!wifiInterface_getApInfo(&ap_info))
+    if (NULL == pApInfo)
     {
         ChipLogError(DeviceLayer, "Failed to get ap info.");
         return CHIP_ERROR_INTERNAL;
     }
 
-    return CopySpanToMutableSpan(ByteSpan(ap_info.bssid), BssId);
+    return CopySpanToMutableSpan(ByteSpan(pApInfo->bssid), BssId);
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum & securityType)
 {
     using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
-    struct bflbwifi_ap_record ap_info;
+    struct bflbwifi_ap_record * pApInfo = wifiInterface_getApInfo();
 
-    if (!wifiInterface_getApInfo(&ap_info))
+    if (NULL == pApInfo)
     {
         ChipLogError(DeviceLayer, "Failed to get ap info.");
         return CHIP_ERROR_INTERNAL;
     }
 
-    if (ap_info.auth_mode < (uint8_t)(SecurityTypeEnum::kUnknownEnumValue))
+    if (pApInfo->auth_mode < (uint8_t) (SecurityTypeEnum::kUnknownEnumValue))
     {
-        securityType = (SecurityTypeEnum)(ap_info.auth_mode);
+        securityType = (SecurityTypeEnum) (pApInfo->auth_mode);
     }
     else
     {
@@ -99,30 +99,30 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetwork
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
 {
-    struct bflbwifi_ap_record ap_info;
+    struct bflbwifi_ap_record * pApInfo = wifiInterface_getApInfo();
 
-    if (!wifiInterface_getApInfo(&ap_info))
+    if (NULL == pApInfo)
     {
         ChipLogError(DeviceLayer, "Failed to get ap info.");
         return CHIP_ERROR_INTERNAL;
     }
 
-    channelNumber = ap_info.channel;
+    channelNumber = pApInfo->channel;
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 {
-    struct bflbwifi_ap_record ap_info;
+    struct bflbwifi_ap_record * pApInfo = wifiInterface_getApInfo();
 
-    if (!wifiInterface_getApInfo(&ap_info))
+    if (NULL == pApInfo)
     {
         ChipLogError(DeviceLayer, "Failed to get ap info.");
         return CHIP_ERROR_INTERNAL;
     }
 
-    rssi = ap_info.rssi;
+    rssi = pApInfo->rssi;
 
     return CHIP_NO_ERROR;
 }
@@ -171,6 +171,6 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxC
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
-#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 } // namespace DeviceLayer
 } // namespace chip

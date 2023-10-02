@@ -126,9 +126,7 @@
         "Test_TC_IDM_6_3",
         "Test_TC_IDM_6_4",
         "Test_TC_IDM_7_1",
-        "Test_TC_IDM_8_1",
-        "Test_TC_IDM_10_1",
-        "Test_TC_IDM_11_1"
+        "Test_TC_IDM_8_1"
     ],
     "MediaControl": [
         "Test_TC_LOWPOWER_2_2",

@@ -110,7 +110,7 @@ CHIP_ERROR JNIDACProvider::GetJavaByteByMethod(jmethodID method, const ByteSpan 
     VerifyOrReturnLogError(method != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnLogError(env != nullptr, CHIP_JNI_ERROR_NO_ENV);
 
-    jbyteArray in_buffer_jbyteArray = env->NewByteArray((jsize)(in_buffer.size()));
+    jbyteArray in_buffer_jbyteArray = env->NewByteArray((jsize) (in_buffer.size()));
     env->SetByteArrayRegion(in_buffer_jbyteArray, 0, (int) in_buffer.size(), reinterpret_cast<const jbyte *>(in_buffer.data()));
 
     jbyteArray outArray = (jbyteArray) env->CallObjectMethod(mJNIDACProviderObject, method, in_buffer_jbyteArray);

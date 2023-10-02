@@ -46,22 +46,19 @@
 #define BUILD_MONTH_IS_DEC(_date) ((_date)[0] == 'D')
 
 #define COMPUTE_BUILD_MONTH(_date)                                                                                                 \
-    ((BUILD_MONTH_IS_JAN(_date))                                                                                                   \
-         ? 1                                                                                                                       \
+    ((BUILD_MONTH_IS_JAN(_date))       ? 1                                                                                         \
          : (BUILD_MONTH_IS_FEB(_date)) ? 2                                                                                         \
-                                       : (BUILD_MONTH_IS_MAR(_date)) ? 3                                                           \
-                                                                     : (BUILD_MONTH_IS_APR(_date)) ? 4                             \
-                                                                                                   : (BUILD_MONTH_IS_MAY(_date))   \
-                         ? 5                                                                                                       \
-                         : (BUILD_MONTH_IS_JUN(_date)) ? 6                                                                         \
-                                                       : (BUILD_MONTH_IS_JUL(_date)) ? 7                                           \
-                                                                                     : (BUILD_MONTH_IS_AUG(_date))                 \
-                                     ? 8                                                                                           \
-                                     : (BUILD_MONTH_IS_SEP(_date)) ? 9                                                             \
-                                                                   : (BUILD_MONTH_IS_OCT(_date)) ? 10                              \
-                                                                                                 : (BUILD_MONTH_IS_NOV(_date))     \
-                                                 ? 11                                                                              \
-                                                 : (BUILD_MONTH_IS_DEC(_date)) ? 12 : /* error default */ 99)
+         : (BUILD_MONTH_IS_MAR(_date)) ? 3                                                                                         \
+         : (BUILD_MONTH_IS_APR(_date)) ? 4                                                                                         \
+         : (BUILD_MONTH_IS_MAY(_date)) ? 5                                                                                         \
+         : (BUILD_MONTH_IS_JUN(_date)) ? 6                                                                                         \
+         : (BUILD_MONTH_IS_JUL(_date)) ? 7                                                                                         \
+         : (BUILD_MONTH_IS_AUG(_date)) ? 8                                                                                         \
+         : (BUILD_MONTH_IS_SEP(_date)) ? 9                                                                                         \
+         : (BUILD_MONTH_IS_OCT(_date)) ? 10                                                                                        \
+         : (BUILD_MONTH_IS_NOV(_date)) ? 11                                                                                        \
+         : (BUILD_MONTH_IS_DEC(_date)) ? 12                                                                                        \
+                                       : /* error default */ 99)
 
 #define COMPUTE_BUILD_HOUR(_time) static_cast<uint8_t>(((_time)[0] - '0') * 10 + (_time)[1] - '0')
 #define COMPUTE_BUILD_MIN(_time) static_cast<uint8_t>(((_time)[3] - '0') * 10 + (_time)[4] - '0')

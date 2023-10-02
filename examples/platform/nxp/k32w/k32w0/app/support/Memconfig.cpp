@@ -54,7 +54,7 @@ typedef struct A_BLOCK_LINK
 /* The size of the structure placed at the beginning of each allocated memory
 block must by correctly byte aligned. */
 static const size_t xHeapStructSize =
-    (sizeof(BlockLink_t) + ((size_t)(portBYTE_ALIGNMENT - 1))) & ~((size_t) portBYTE_ALIGNMENT_MASK);
+    (sizeof(BlockLink_t) + ((size_t) (portBYTE_ALIGNMENT - 1))) & ~((size_t) portBYTE_ALIGNMENT_MASK);
 
 /* Gets set to the top bit of an size_t type.  When this bit in the xBlockSize
 member of an BlockLink_t structure is set then the block belongs to the

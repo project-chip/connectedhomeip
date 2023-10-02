@@ -128,7 +128,7 @@ limitations under the License.
     <field name="Running" mask="0x20"/>
     <field name="RemotePressure" mask="0x40"/>
     <field name="RemoteFlow" mask="0x80"/>
-    <field name="remoteTemperature" mask="0x100"/>
+    <field name="RemoteTemperature" mask="0x100"/>
   </bitmap>
 
   <enum name="OperationModeEnum" type="ENUM8">

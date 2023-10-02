@@ -33,7 +33,7 @@ void sl_button_on_change(uint8_t btn, uint8_t btnAction);
 
 uint32_t NVIC_GetIRQEnable(IRQn_Type IRQn)
 {
-    return ((NVIC->ICER[((uint32_t)(IRQn) >> 5)] & (1 << ((uint32_t)(IRQn) &0x1F))) ? 1 : 0);
+    return ((NVIC->ICER[((uint32_t) (IRQn) >> 5)] & (1 << ((uint32_t) (IRQn) &0x1F))) ? 1 : 0);
 }
 
 void rsi_assertion(uint16_t assertion_val, const char * string)

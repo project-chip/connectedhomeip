@@ -25,7 +25,7 @@ config:
     endpoint: 1
     fastMotionDuration:
         type: int16u
-        defaultValue: 3000
+        defaultValue: 5000
     fullMotionDuration:
         type: int16u
         defaultValue: 6000

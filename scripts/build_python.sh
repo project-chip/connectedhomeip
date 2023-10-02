@@ -68,7 +68,6 @@ Input Options:
                                                             src/python_testing scripts.
                                                             Defaults to yes.
   --extra_packages PACKAGES                                 Install extra Python packages from PyPI
-  --include_yamltests                                       Whether to install the matter_yamltests wheel.
   -z --pregen_dir DIRECTORY                                 Directory where generated zap files have been pre-generated.
 "
 }
@@ -129,9 +128,6 @@ while (($#)); do
             extra_packages=$2
             shift
             ;;
-        --include_yamltests)
-            include_yamltests="yes"
-            ;;
         --pregen_dir | -z)
             pregen_dir=$2
             shift
@@ -187,15 +183,6 @@ else
     WHEEL=("$OUTPUT_ROOT"/controller/python/chip*.whl)
 fi
 
-if [ -n "$include_yamltests" ]; then
-    YAMLTESTS_GN_LABEL="//scripts:matter_yamltests_distribution._build_wheel"
-
-    # Add wheels from pw_python_package or pw_python_distribution templates.
-    WHEEL+=(
-        "$(ls -tr "$(wheel_output_dir "$YAMLTESTS_GN_LABEL")"/*.whl | head -n 1)"
-    )
-fi
-
 if [ -n "$extra_packages" ]; then
     WHEEL+=("$extra_packages")
 fi
@@ -217,7 +204,14 @@ if [ -n "$install_virtual_env" ]; then
     "$ENVIRONMENT_ROOT"/bin/pip install --upgrade "${WHEEL[@]}"
 
     if [ "$install_pytest_requirements" = "yes" ]; then
+        YAMLTESTS_GN_LABEL="//scripts:matter_yamltests_distribution._build_wheel"
+        # Add wheels from pw_python_package or pw_python_distribution templates.
+        YAMLTEST_WHEEL=(
+            "$(ls -tr "$(wheel_output_dir "$YAMLTESTS_GN_LABEL")"/*.whl | head -n 1)"
+        )
+
         echo_blue "Installing python test dependencies ..."
+        "$ENVIRONMENT_ROOT"/bin/pip install --upgrade "${YAMLTEST_WHEEL[@]}"
         "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/scripts/tests/requirements.txt"
         "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/src/python_testing/requirements.txt"
     fi

@@ -20,7 +20,6 @@ import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/bouffalolab/common/args.gni")
 
 assert(chip_device_platform == "bl702l")
-assert(chip_enable_factory_data == false)
 
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")

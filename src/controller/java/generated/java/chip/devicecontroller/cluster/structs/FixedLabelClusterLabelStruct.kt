@@ -30,9 +30,9 @@ class FixedLabelClusterLabelStruct(val label: String, val value: String) {
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_LABEL), label)
       put(ContextSpecificTag(TAG_VALUE), value)
       endStructure()
@@ -43,8 +43,8 @@ class FixedLabelClusterLabelStruct(val label: String, val value: String) {
     private const val TAG_LABEL = 0
     private const val TAG_VALUE = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): FixedLabelClusterLabelStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): FixedLabelClusterLabelStruct {
+      tlvReader.enterStructure(tlvTag)
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
       val value = tlvReader.getString(ContextSpecificTag(TAG_VALUE))
 

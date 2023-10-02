@@ -3154,6 +3154,17 @@ public class ClusterReadMapping {
           readGeneralDiagnosticsTestEventTriggersEnabledCommandParams
         );
         result.put("readTestEventTriggersEnabledAttribute", readGeneralDiagnosticsTestEventTriggersEnabledAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readGeneralDiagnosticsAverageWearCountCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readGeneralDiagnosticsAverageWearCountAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.GeneralDiagnosticsCluster) cluster).readAverageWearCountAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readGeneralDiagnosticsAverageWearCountCommandParams
+        );
+        result.put("readAverageWearCountAttribute", readGeneralDiagnosticsAverageWearCountAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readGeneralDiagnosticsGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readGeneralDiagnosticsGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

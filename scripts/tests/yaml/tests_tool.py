@@ -26,8 +26,8 @@ from tests_logger import TestColoredLogPrinter, WebSocketRunnerLogger
 
 
 @click.pass_context
-def send_yaml_command(ctx, test_tool, test_name: str, server_path: str, server_arguments: str, show_adapter_logs: bool, pics: str, additional_pseudo_clusters_directory: str, commands: List[str]):
-    kwargs = {'test_name': test_name, 'show_adapter_logs': show_adapter_logs, 'pics': pics,
+def send_yaml_command(ctx, test_tool, test_name: str, server_path: str, server_arguments: str, show_adapter_logs: bool, specifications_paths: str, pics: str, additional_pseudo_clusters_directory: str, commands: List[str]):
+    kwargs = {'test_name': test_name, 'show_adapter_logs': show_adapter_logs, 'specifications_paths': specifications_paths, 'pics': pics,
               'additional_pseudo_clusters_directory': additional_pseudo_clusters_directory}
 
     index = 0
@@ -37,6 +37,7 @@ def send_yaml_command(ctx, test_tool, test_name: str, server_path: str, server_a
     ctx.invoke(runner_base, **kwargs)
 
     del ctx.params['commands']
+    del ctx.params['specifications_paths']
     del ctx.params['pics']
     del ctx.params['additional_pseudo_clusters_directory']
 

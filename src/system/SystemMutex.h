@@ -148,7 +148,7 @@ private:
     k_mutex mZephyrMutex;
 #endif // CHIP_SYSTEM_CONFIG_ZEPHYR_LOCKING
 
-    Mutex(const Mutex &) = delete;
+    Mutex(const Mutex &)             = delete;
     Mutex & operator=(const Mutex &) = delete;
 };
 

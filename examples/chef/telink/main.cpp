@@ -76,10 +76,14 @@ int main()
         return 1;
     }
 
-#ifdef CONFIG_OPENTHREAD_MTD
-    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
-#else
+#if defined(CONFIG_CHIP_THREAD_DEVICE_ROLE_ROUTER)
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+#elif defined(CONFIG_CHIP_THREAD_DEVICE_ROLE_END_DEVICE)
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+#elif defined(CONFIG_CHIP_THREAD_DEVICE_ROLE_SLEEPY_END_DEVICE)
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+#else
+#error THREAD_DEVICE_ROLE not selected
 #endif
     if (err != CHIP_NO_ERROR)
     {

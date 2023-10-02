@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      Source implementation of an input / output stream for bl702 targets.
+ *      Source implementation of an input / output stream for Bouffalo Lab targets.
  */
 
 #include <lib/shell/Engine.h>
@@ -31,35 +31,34 @@ namespace chip {
 namespace Shell {
 namespace {
 
-int streamer_bl702_init(streamer_t * streamer)
+int streamer_iot_sdk_init(streamer_t * streamer)
 {
     (void) streamer;
-    // uartInit();
     return 0;
 }
 
-ssize_t streamer_bl702_read(streamer_t * streamer, char * buffer, size_t length)
+ssize_t streamer_iot_sdk_read(streamer_t * streamer, char * buffer, size_t length)
 {
     (void) streamer;
     return (ssize_t) uartRead(buffer, (uint16_t) length);
 }
 
-ssize_t streamer_bl702_write(streamer_t * streamer, const char * buffer, size_t length)
+ssize_t streamer_iot_sdk_write(streamer_t * streamer, const char * buffer, size_t length)
 {
     (void) streamer;
     return uartWrite(buffer, (uint16_t) length);
 }
 
-static streamer_t streamer_bl702 = {
-    .init_cb  = streamer_bl702_init,
-    .read_cb  = streamer_bl702_read,
-    .write_cb = streamer_bl702_write,
+static streamer_t streamer_iot_sdk = {
+    .init_cb  = streamer_iot_sdk_init,
+    .read_cb  = streamer_iot_sdk_read,
+    .write_cb = streamer_iot_sdk_write,
 };
-} // namespace
 
+} // namespace
 streamer_t * streamer_get(void)
 {
-    return &streamer_bl702;
+    return &streamer_iot_sdk;
 }
 
 } // namespace Shell

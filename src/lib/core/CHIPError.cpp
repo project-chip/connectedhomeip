@@ -23,8 +23,8 @@
 
 #include <stddef.h>
 
-#include <lib/core/CHIPCore.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/CHIPConfig.h>
+#include <lib/core/ErrorStr.h>
 
 namespace chip {
 

@@ -745,7 +745,7 @@ tests:
     - label:
           "Step 10: Verify that the public Key extracted NOCValue of the AddNOC
           matches the Node Operational Public Key extracted from CSRResponse"
-      verifiaction: |
+      verification: |
           Not verifiable (out of scope)
       disabled: true
 

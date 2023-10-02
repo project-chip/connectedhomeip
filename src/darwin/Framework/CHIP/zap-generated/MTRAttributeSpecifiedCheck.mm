@@ -1071,6 +1071,9 @@ static BOOL AttributeIsSpecifiedInGeneralDiagnosticsCluster(AttributeId aAttribu
     case Attributes::TestEventTriggersEnabled::Id: {
         return YES;
     }
+    case Attributes::AverageWearCount::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

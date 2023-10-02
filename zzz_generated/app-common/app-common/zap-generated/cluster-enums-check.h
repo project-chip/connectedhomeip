@@ -68,33 +68,33 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Identify::IdentifyTypeE
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::OnOffDelayedAllOffEffectVariant val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::DelayedAllOffEffectVariantEnum val)
 {
-    using EnumType = OnOff::OnOffDelayedAllOffEffectVariant;
+    using EnumType = OnOff::DelayedAllOffEffectVariantEnum;
     switch (val)
     {
-    case EnumType::kFadeToOffIn0p8Seconds:
+    case EnumType::kDelayedOffFastFade:
     case EnumType::kNoFade:
-    case EnumType::k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds:
+    case EnumType::kDelayedOffSlowFade:
         return val;
     default:
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::OnOffDyingLightEffectVariant val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::DyingLightEffectVariantEnum val)
 {
-    using EnumType = OnOff::OnOffDyingLightEffectVariant;
+    using EnumType = OnOff::DyingLightEffectVariantEnum;
     switch (val)
     {
-    case EnumType::k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second:
+    case EnumType::kDyingLightFadeOff:
         return val;
     default:
         return static_cast<EnumType>(1);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::OnOffEffectIdentifier val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::EffectIdentifierEnum val)
 {
-    using EnumType = OnOff::OnOffEffectIdentifier;
+    using EnumType = OnOff::EffectIdentifierEnum;
     switch (val)
     {
     case EnumType::kDelayedAllOff:
@@ -104,14 +104,14 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::OnOffEffectIdent
         return static_cast<EnumType>(2);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::OnOffStartUpOnOff val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OnOff::StartUpOnOffEnum val)
 {
-    using EnumType = OnOff::OnOffStartUpOnOff;
+    using EnumType = OnOff::StartUpOnOffEnum;
     switch (val)
     {
     case EnumType::kOff:
     case EnumType::kOn:
-    case EnumType::kTogglePreviousOnOff:
+    case EnumType::kToggle:
         return val;
     default:
         return static_cast<EnumType>(3);

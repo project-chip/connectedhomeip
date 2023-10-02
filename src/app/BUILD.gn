@@ -14,9 +14,8 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
-import("${chip_root}/src/platform/device.gni")
-
 import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/platform/device.gni")
 import("common_flags.gni")
 import("icd/icd.gni")
 
@@ -206,6 +205,21 @@ static_library("app") {
     sources += [
       "SimpleSubscriptionResumptionStorage.cpp",
       "SimpleSubscriptionResumptionStorage.h",
+    ]
+  }
+
+  if (chip_build_controller_dynamic_server) {
+    defines = [
+      "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
+      "CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=1",
+    ]
+    sources += [
+      "clusters/ota-provider/ota-provider.cpp",
+      "dynamic_server/AccessControl.cpp",
+      "dynamic_server/AccessControl.h",
+      "dynamic_server/DynamicDispatcher.cpp",
+      "util/privilege-storage.cpp",
+      "util/privilege-storage.h",
     ]
   }
 

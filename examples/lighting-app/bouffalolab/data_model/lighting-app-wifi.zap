@@ -219,7 +219,7 @@
           "mfgCode": null,
           "define": "GROUPS_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "AddGroupResponse",
@@ -4684,7 +4684,7 @@
           "mfgCode": null,
           "define": "SWITCH_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "NumberOfPositions",
@@ -6188,7 +6188,7 @@
               "code": 16387,
               "mfgCode": null,
               "side": "server",
-              "type": "OnOffStartUpOnOff",
+              "type": "StartUpOnOffEnum",
               "included": 1,
               "storageOption": "NVM",
               "singleton": 0,
@@ -8277,7 +8277,7 @@
           "mfgCode": null,
           "define": "OCCUPANCY_SENSING_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "attributes": [
             {
               "name": "Occupancy",

@@ -50,7 +50,7 @@ tests:
           saveAs: CurrentMaxMeasured
           constraints:
               type: int16u
-              minValue: CurrentMinMeasured
+              minValue: CurrentMinMeasured + 1
               maxValue: 10000
 
     - label: "Step 4: TH reads the MeasuredValue attribute from the DUT"

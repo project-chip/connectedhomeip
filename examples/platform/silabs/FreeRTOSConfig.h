@@ -223,18 +223,24 @@ See http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html. */
 #define configSUPPORT_STATIC_ALLOCATION (1)
 #define configSUPPORT_DYNAMIC_ALLOCATION (1)
 
+#ifdef PW_RPC_ENABLED
+#define EXTRA_HEAP_k 10
+#else
+#define EXTRA_HEAP_k 0
+#endif
+
 #ifndef configTOTAL_HEAP_SIZE
 #ifdef SL_WIFI
 #ifdef DIC_ENABLE
-#define configTOTAL_HEAP_SIZE ((size_t)(68 * 1024))
+#define configTOTAL_HEAP_SIZE ((size_t) ((68 + EXTRA_HEAP_k) * 1024))
 #else
-#define configTOTAL_HEAP_SIZE ((size_t)(42 * 1024))
+#define configTOTAL_HEAP_SIZE ((size_t) ((42 + EXTRA_HEAP_k) * 1024))
 #endif // DIC
 #else  // SL_WIFI
 #if SL_CONFIG_OPENTHREAD_LIB == 1
-#define configTOTAL_HEAP_SIZE ((size_t)(40 * 1024))
+#define configTOTAL_HEAP_SIZE ((size_t) ((40 + EXTRA_HEAP_k) * 1024))
 #else
-#define configTOTAL_HEAP_SIZE ((size_t)(38 * 1024))
+#define configTOTAL_HEAP_SIZE ((size_t) ((38 + EXTRA_HEAP_k) * 1024))
 #endif // SL_CONFIG_OPENTHREAD_LIB
 #endif // configTOTAL_HEAP_SIZE
 #endif // configTOTAL_HEAP_SIZE
