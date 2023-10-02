@@ -30,7 +30,6 @@
 
 #include <mbedtls/ecp.h>
 #include <mbedtls/oid.h>
-#include <mbedtls/version.h>
 #include <mbedtls/x509.h>
 #include <mbedtls/x509_csr.h>
 
@@ -40,19 +39,6 @@
 
 namespace chip {
 namespace Crypto {
-
-// In mbedTLS 3.0.0 direct access to structure fields was replaced with using MBEDTLS_PRIVATE macro.
-#if (MBEDTLS_VERSION_NUMBER >= 0x03000000)
-#define CHIP_CRYPTO_PAL_PRIVATE(x) MBEDTLS_PRIVATE(x)
-#else
-#define CHIP_CRYPTO_PAL_PRIVATE(x) x
-#endif
-
-#if (MBEDTLS_VERSION_NUMBER >= 0x03000000 && MBEDTLS_VERSION_NUMBER < 0x03010000)
-#define CHIP_CRYPTO_PAL_PRIVATE_X509(x) MBEDTLS_PRIVATE(x)
-#else
-#define CHIP_CRYPTO_PAL_PRIVATE_X509(x) x
-#endif
 
 CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_length, P256PublicKey & pubkey)
 {

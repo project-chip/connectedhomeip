@@ -55,19 +55,6 @@
 namespace chip {
 namespace Crypto {
 
-// In mbedTLS 3.0.0 direct access to structure fields was replaced with using MBEDTLS_PRIVATE macro.
-#if (MBEDTLS_VERSION_NUMBER >= 0x03000000)
-#define CHIP_CRYPTO_PAL_PRIVATE(x) MBEDTLS_PRIVATE(x)
-#else
-#define CHIP_CRYPTO_PAL_PRIVATE(x) x
-#endif
-
-#if (MBEDTLS_VERSION_NUMBER >= 0x03000000 && MBEDTLS_VERSION_NUMBER < 0x03010000)
-#define CHIP_CRYPTO_PAL_PRIVATE_X509(x) MBEDTLS_PRIVATE(x)
-#else
-#define CHIP_CRYPTO_PAL_PRIVATE_X509(x) x
-#endif
-
 typedef struct
 {
     bool mInitialized;
