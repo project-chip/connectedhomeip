@@ -60,46 +60,6 @@ jobs:
               with:
                 platform: android
 
-            - name: Build Android arm-chip-tool
-              run: |
-                  df -h
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target android-arm-chip-tool build"
-            - name: Clean out build output
-              run:  git clean -dfx -e .environment -e build_overrides
-            - name: Build Android arm-tv-casting-app
-              run: |
-                  df -h
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target android-arm-tv-casting-app build"
-            - name: Clean out build output
-              run: |
-                  df -h
-                  git clean -dfx -e .environment -e build_overrides
-                  df -h
-                  git clean -dfx
-                  df -h
-            - name: Build Android arm-tv-server
-              run: |
-                  df -h
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target android-arm-tv-server build"
-            - name: Clean out build output
-              run: git clean -dfx -e .environment -e build_overrides
-            - name: Build Android arm64-tv-casting-app
-              run: |
-                  df -h
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target android-arm64-tv-casting-app build"
-            - name: Clean out build output
-              run: git clean -dfx -e .environment -e build_overrides
-            - name: Build Android arm64-tv-server
-              run: |
-                  df -h
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target android-arm64-tv-server build"
-            - name: Clean out build output
-              run: git clean -dfx -e .environment -e build_overrides
             - name: Build Android arm64-chip-tool
               run: |
                   df -h
@@ -110,7 +70,49 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "ninja -C out/android-arm64-chip-tool build/chip/java/tests:java_build_test"
             - name: Clean out build output
-              run: git clean -dfx -e .environment -e build_overrides
+              run: |
+                  df -h
+                  git clean -dfx -e .environment -e build_overrides
+                  rm -rf /__w/_temp
+                  df -h
+            - name: Build Android arm-chip-tool
+              run: |
+                  df -h
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target android-arm-chip-tool build"
+            - name: Clean out build output
+              run: |
+                  git clean -dfx 
+            - name: Build Android arm-tv-casting-app
+              run: |
+                  df -h
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target android-arm-tv-casting-app build"
+            - name: Clean out build output
+              run: |
+                  df -h
+                  git clean -dfx 
+            - name: Build Android arm-tv-server
+              run: |
+                  df -h
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target android-arm-tv-server build"
+            - name: Clean out build output
+              run: git clean -dfx 
+            - name: Build Android arm64-tv-casting-app
+              run: |
+                  df -h
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target android-arm64-tv-casting-app build"
+            - name: Clean out build output
+              run: git clean -dfx 
+            - name: Build Android arm64-tv-server
+              run: |
+                  df -h
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target android-arm64-tv-server build"
+            - name: Clean out build output
+              run: git clean -dfx 
             # - name: Build Android Studio build (arm64 only)
             #   run: |
             #     ./scripts/run_in_build_env.sh \
