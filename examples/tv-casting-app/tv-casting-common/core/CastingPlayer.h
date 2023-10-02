@@ -41,7 +41,7 @@ using DisconnectCallback = std::function<void(void)>;
 
 const int kPortMaxLength = 5; // port is uint16_t
 // +1 for the : between the hostname and the port.
-const int kIdMaxLength   = chip::Dnssd::kHostNameMaxLength + kPortMaxLength + 1;
+const int kIdMaxLength = chip::Dnssd::kHostNameMaxLength + kPortMaxLength + 1;
 
 class CastingPlayerAttributes
 {
