@@ -171,8 +171,7 @@
     "cmake.configureOnOpen": false,
     "search.followSymlinks": false,
     "[python]": {
-        "editor.defaultFormatter": "ms-python.python"
+        "editor.defaultFormatter": "ms-python.autopep8"
     },
-    "python.formatting.provider": "none",
-    "cmake.sourceDirectory": "/home/apoth/GitHub/connectedhomeip/config/nrfconnect/chip-module"
+    "python.formatting.provider": "none"
 }
