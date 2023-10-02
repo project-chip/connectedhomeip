@@ -130,12 +130,13 @@ CHIP_ERROR RvcCleanModeDelegate::Init()
 
 void RvcCleanModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    uint8_t rvcRunCurrentMode = gRvcRunModeInstance->GetCurrentMode();
+    uint8_t rvcCleanCurrentMode = gRvcCleanModeInstance->GetCurrentMode();
 
-    if (rvcRunCurrentMode == RvcRunMode::ModeCleaning)
+    // An example to show how do we block mode change in some circumstance
+    if (rvcCleanCurrentMode == RvcCleanMode::ModeDeepClean)
     {
         response.status = to_underlying(RvcCleanMode::StatusCode::kCleaningInProgress);
-        response.statusText.SetValue(chip::CharSpan::fromCharString("Cannot change the cleaning mode during a clean"));
+        response.statusText.SetValue(chip::CharSpan::fromCharString("Cannot change the cleaning mode during a deep clean"));
         return;
     }
 
@@ -207,4 +208,4 @@ void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
         new ModeBase::Instance(gRvcCleanModeDelegate, 0x1, RvcCleanMode::Id, chip::to_underlying(RvcCleanMode::Feature::kOnOff));
     gRvcCleanModeInstance->Init();
 }
-#endif // ZCL_USING_RVC_RUN_MODE_CLUSTER_SERVER
+#endif // ZCL_USING_RVC_CLEAN_MODE_CLUSTER_SERVER

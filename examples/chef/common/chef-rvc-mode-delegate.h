@@ -49,10 +49,9 @@ private:
         detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Cleaning"),
                                                  .mode     = ModeCleaning,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsCleaning) },
-        detail::Structs::ModeOptionStruct::Type{
-            .label    = CharSpan::fromCharString("Mapping"),
-            .mode     = ModeMapping,
-            .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsIdle) }, // todo set to no mode tags
+        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Mapping"),
+                                                 .mode     = ModeMapping,
+                                                 .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsIdle) },
     };
 
     CHIP_ERROR Init() override;
