@@ -247,15 +247,6 @@ config MBEDTLS_USER_CONFIG_ENABLE
 config MBEDTLS_USER_CONFIG_FILE
     default "telink-mbedtls-config.h"
 
-config MBEDTLS_ENABLE_HEAP
-    default y
-
-# TBD: Something wrong with this heap. Need to be investigated. Cirrently just set minimal size
-config MBEDTLS_HEAP_SIZE
-    default 0
-
-config OPENTHREAD_EXTERNAL_HEAP
-    default y
 
 # getopt version
 config GETOPT_LONG
