@@ -13,7 +13,7 @@
 # limitations under the License.
 # Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
-name: 223.2.1. [TC-REFALM-2.1] Attributes with DUT as Server
+name: 222.2.1. [TC-REFALM-2.1] Attributes with DUT as Server
 
 PICS:
     - REFALM.S
@@ -24,6 +24,11 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Note"
+      verification: |
+          This is a simulated example log for instructional purposes only. In real scenarios, the actual log may vary depending on the feature implementation in Reference App.
+      disabled: true
+
     - label:
           "Step 1: Commission DUT to TH (can be skipped if done in a preceding
           test)"
@@ -35,7 +40,7 @@ tests:
           "Step 2: Ensure that the door alarm is not locally suppressed and the
           door is closed"
       verification: |
-
+          Ensure that the door alarm is not locally suppressed and the door is closed
       disabled: true
 
     - label: "Step 3: TH reads from the DUT the Mask attribute"

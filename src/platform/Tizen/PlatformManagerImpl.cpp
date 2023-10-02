@@ -37,6 +37,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/DeviceInstanceInfoProvider.h>
+#include <platform/GLibTypeDeleter.h>
 #include <platform/Tizen/DeviceInstanceInfoProviderImpl.h>
 
 #include "PosixConfig.h"
@@ -92,9 +93,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 
         GLibMatterContextInvokeData invokeData{};
 
-        auto * idleSource = g_idle_source_new();
+        GAutoPtr<GSource> idleSource(g_idle_source_new());
         g_source_set_callback(
-            idleSource,
+            idleSource.get(),
             [](void * userData_) {
                 auto * data = reinterpret_cast<GLibMatterContextInvokeData *>(userData_);
                 std::unique_lock<std::mutex> lock(data->mDoneMutex);
@@ -103,8 +104,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
                 return G_SOURCE_REMOVE;
             },
             &invokeData, nullptr);
-        g_source_attach(idleSource, g_main_loop_get_context(mGLibMainLoop));
-        g_source_unref(idleSource);
+        g_source_attach(idleSource.get(), g_main_loop_get_context(mGLibMainLoop));
 
         std::unique_lock<std::mutex> lock(invokeData.mDoneMutex);
         invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });

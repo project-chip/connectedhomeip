@@ -266,9 +266,6 @@ class Endpoint:
 
 @dataclass
 class Idl:
-    # Enums and structs represent globally used items
-    enums: List[Enum] = field(default_factory=list)
-    structs: List[Struct] = field(default_factory=list)
     clusters: List[Cluster] = field(default_factory=list)
     endpoints: List[Endpoint] = field(default_factory=list)
 
