@@ -670,7 +670,7 @@ protected:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 private:
-    PacketBufferHandle(const PacketBufferHandle &) = delete;
+    PacketBufferHandle(const PacketBufferHandle &)             = delete;
     PacketBufferHandle & operator=(const PacketBufferHandle &) = delete;
 
     // The caller's ownership is transferred to this.

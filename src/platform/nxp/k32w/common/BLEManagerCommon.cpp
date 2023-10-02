@@ -665,14 +665,14 @@ CHIP_ERROR BLEManagerCommon::ConfigureAdvertisingData(void)
     {
         advInterval = CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MAX;
     }
-    advInterval = (uint16_t)(advInterval * 0.625F);
+    advInterval = (uint16_t) (advInterval * 0.625F);
 
     adv_params.minInterval = adv_params.maxInterval = advInterval;
     adv_params.advertisingType                      = gAdvConnectableUndirected_c;
     adv_params.ownAddressType                       = gBleAddrTypeRandom_c;
     adv_params.peerAddressType                      = gBleAddrTypePublic_c;
     memset(adv_params.peerAddress, 0, gcBleDeviceAddressSize_c);
-    adv_params.channelMap   = (gapAdvertisingChannelMapFlags_t)(gAdvChanMapFlag37_c | gAdvChanMapFlag38_c | gAdvChanMapFlag39_c);
+    adv_params.channelMap   = (gapAdvertisingChannelMapFlags_t) (gAdvChanMapFlag37_c | gAdvChanMapFlag38_c | gAdvChanMapFlag39_c);
     adv_params.filterPolicy = gProcessAll_c;
 
     err = blekw_start_advertising(&adv_params, &adv, &scanRsp);

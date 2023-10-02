@@ -29,7 +29,7 @@ public:
     AutoFreeBuffer(size_t n) { mBuffer = malloc(n); }
     ~AutoFreeBuffer() { free(mBuffer); }
 
-    AutoFreeBuffer(const AutoFreeBuffer &) = delete;
+    AutoFreeBuffer(const AutoFreeBuffer &)             = delete;
     AutoFreeBuffer & operator=(const AutoFreeBuffer &) = delete;
 
     void * Buffer() { return mBuffer; }

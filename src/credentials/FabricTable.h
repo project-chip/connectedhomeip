@@ -75,7 +75,7 @@ public:
     ~FabricInfo() { Reset(); }
 
     // Non-copyable
-    FabricInfo(FabricInfo const &) = delete;
+    FabricInfo(FabricInfo const &)     = delete;
     void operator=(FabricInfo const &) = delete;
 
     // Returns a span into our internal storage.
@@ -274,7 +274,7 @@ public:
             Advance();
         }
     }
-    ConstFabricIterator(const ConstFabricIterator &) = default;
+    ConstFabricIterator(const ConstFabricIterator &)             = default;
     ConstFabricIterator & operator=(const ConstFabricIterator &) = default;
 
     ConstFabricIterator & operator++() { return Advance(); }
@@ -401,7 +401,7 @@ public:
     ~FabricTable() = default;
 
     // Non-copyable
-    FabricTable(FabricTable const &) = delete;
+    FabricTable(FabricTable const &)    = delete;
     void operator=(FabricTable const &) = delete;
 
     enum class AdvertiseIdentity : uint8_t

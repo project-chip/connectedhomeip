@@ -109,8 +109,8 @@ struct uart_cmsdk_dev_t UART5_CMSDK_DEV_NS                      = { &(UART5_CMSD
 /* SSE-300 PPC driver structures */
 #ifdef PPC_SSE300_MAIN0_S
 static struct ppc_sse300_dev_cfg_t PPC_SSE300_MAIN0_CFG_S   = { .sacfg_base  = SSE300_SACFG_BASE_S,
-                                                              .nsacfg_base = SSE300_NSACFG_BASE_NS,
-                                                              .ppc_name    = PPC_SSE300_MAIN0 };
+                                                                .nsacfg_base = SSE300_NSACFG_BASE_NS,
+                                                                .ppc_name    = PPC_SSE300_MAIN0 };
 static struct ppc_sse300_dev_data_t PPC_SSE300_MAIN0_DATA_S = {
     .sacfg_ns_ppc = 0, .sacfg_sp_ppc = 0, .nsacfg_nsp_ppc = 0, .int_bit_mask = 0, .is_initialized = false
 };
@@ -119,8 +119,8 @@ struct ppc_sse300_dev_t PPC_SSE300_MAIN0_DEV_S = { &PPC_SSE300_MAIN0_CFG_S, &PPC
 
 #ifdef PPC_SSE300_MAIN_EXP0_S
 static struct ppc_sse300_dev_cfg_t PPC_SSE300_MAIN_EXP0_CFG_S   = { .sacfg_base  = SSE300_SACFG_BASE_S,
-                                                                  .nsacfg_base = SSE300_NSACFG_BASE_NS,
-                                                                  .ppc_name    = PPC_SSE300_MAIN_EXP0 };
+                                                                    .nsacfg_base = SSE300_NSACFG_BASE_NS,
+                                                                    .ppc_name    = PPC_SSE300_MAIN_EXP0 };
 static struct ppc_sse300_dev_data_t PPC_SSE300_MAIN_EXP0_DATA_S = {
     .sacfg_ns_ppc = 0, .sacfg_sp_ppc = 0, .nsacfg_nsp_ppc = 0, .int_bit_mask = 0, .is_initialized = false
 };
@@ -129,8 +129,8 @@ struct ppc_sse300_dev_t PPC_SSE300_MAIN_EXP0_DEV_S = { &PPC_SSE300_MAIN_EXP0_CFG
 
 #ifdef PPC_SSE300_MAIN_EXP1_S
 static struct ppc_sse300_dev_cfg_t PPC_SSE300_MAIN_EXP1_CFG_S   = { .sacfg_base  = SSE300_SACFG_BASE_S,
-                                                                  .nsacfg_base = SSE300_NSACFG_BASE_NS,
-                                                                  .ppc_name    = PPC_SSE300_MAIN_EXP1 };
+                                                                    .nsacfg_base = SSE300_NSACFG_BASE_NS,
+                                                                    .ppc_name    = PPC_SSE300_MAIN_EXP1 };
 static struct ppc_sse300_dev_data_t PPC_SSE300_MAIN_EXP1_DATA_S = {
     .sacfg_ns_ppc = 0, .sacfg_sp_ppc = 0, .nsacfg_nsp_ppc = 0, .int_bit_mask = 0, .is_initialized = false
 };
@@ -139,8 +139,8 @@ struct ppc_sse300_dev_t PPC_SSE300_MAIN_EXP1_DEV_S = { &PPC_SSE300_MAIN_EXP1_CFG
 
 #ifdef PPC_SSE300_MAIN_EXP2_S
 static struct ppc_sse300_dev_cfg_t PPC_SSE300_MAIN_EXP2_CFG_S   = { .sacfg_base  = SSE300_SACFG_BASE_S,
-                                                                  .nsacfg_base = SSE300_NSACFG_BASE_NS,
-                                                                  .ppc_name    = PPC_SSE300_MAIN_EXP2 };
+                                                                    .nsacfg_base = SSE300_NSACFG_BASE_NS,
+                                                                    .ppc_name    = PPC_SSE300_MAIN_EXP2 };
 static struct ppc_sse300_dev_data_t PPC_SSE300_MAIN_EXP2_DATA_S = {
     .sacfg_ns_ppc = 0, .sacfg_sp_ppc = 0, .nsacfg_nsp_ppc = 0, .int_bit_mask = 0, .is_initialized = false
 };
@@ -149,8 +149,8 @@ struct ppc_sse300_dev_t PPC_SSE300_MAIN_EXP2_DEV_S = { &PPC_SSE300_MAIN_EXP2_CFG
 
 #ifdef PPC_SSE300_MAIN_EXP3_S
 static struct ppc_sse300_dev_cfg_t PPC_SSE300_MAIN_EXP3_CFG_S   = { .sacfg_base  = SSE300_SACFG_BASE_S,
-                                                                  .nsacfg_base = SSE300_NSACFG_BASE_NS,
-                                                                  .ppc_name    = PPC_SSE300_MAIN_EXP3 };
+                                                                    .nsacfg_base = SSE300_NSACFG_BASE_NS,
+                                                                    .ppc_name    = PPC_SSE300_MAIN_EXP3 };
 static struct ppc_sse300_dev_data_t PPC_SSE300_MAIN_EXP3_DATA_S = {
     .sacfg_ns_ppc = 0, .sacfg_sp_ppc = 0, .nsacfg_nsp_ppc = 0, .int_bit_mask = 0, .is_initialized = false
 };
@@ -159,8 +159,8 @@ struct ppc_sse300_dev_t PPC_SSE300_MAIN_EXP3_DEV_S = { &PPC_SSE300_MAIN_EXP3_CFG
 
 #ifdef PPC_SSE300_PERIPH0_S
 static struct ppc_sse300_dev_cfg_t PPC_SSE300_PERIPH0_CFG_S   = { .sacfg_base  = SSE300_SACFG_BASE_S,
-                                                                .nsacfg_base = SSE300_NSACFG_BASE_NS,
-                                                                .ppc_name    = PPC_SSE300_PERIPH0 };
+                                                                  .nsacfg_base = SSE300_NSACFG_BASE_NS,
+                                                                  .ppc_name    = PPC_SSE300_PERIPH0 };
 static struct ppc_sse300_dev_data_t PPC_SSE300_PERIPH0_DATA_S = {
     .sacfg_ns_ppc = 0, .sacfg_sp_ppc = 0, .nsacfg_nsp_ppc = 0, .int_bit_mask = 0, .is_initialized = false
 };
@@ -169,8 +169,8 @@ struct ppc_sse300_dev_t PPC_SSE300_PERIPH0_DEV_S = { &PPC_SSE300_PERIPH0_CFG_S, 
 
 #ifdef PPC_SSE300_PERIPH1_S
 static struct ppc_sse300_dev_cfg_t PPC_SSE300_PERIPH1_CFG_S   = { .sacfg_base  = SSE300_SACFG_BASE_S,
-                                                                .nsacfg_base = SSE300_NSACFG_BASE_NS,
-                                                                .ppc_name    = PPC_SSE300_PERIPH1 };
+                                                                  .nsacfg_base = SSE300_NSACFG_BASE_NS,
+                                                                  .ppc_name    = PPC_SSE300_PERIPH1 };
 static struct ppc_sse300_dev_data_t PPC_SSE300_PERIPH1_DATA_S = {
     .sacfg_ns_ppc = 0, .sacfg_sp_ppc = 0, .nsacfg_nsp_ppc = 0, .int_bit_mask = 0, .is_initialized = false
 };
@@ -179,8 +179,8 @@ struct ppc_sse300_dev_t PPC_SSE300_PERIPH1_DEV_S = { &PPC_SSE300_PERIPH1_CFG_S, 
 
 #ifdef PPC_SSE300_PERIPH_EXP0_S
 static struct ppc_sse300_dev_cfg_t PPC_SSE300_PERIPH_EXP0_CFG_S   = { .sacfg_base  = SSE300_SACFG_BASE_S,
-                                                                    .nsacfg_base = SSE300_NSACFG_BASE_NS,
-                                                                    .ppc_name    = PPC_SSE300_PERIPH_EXP0 };
+                                                                      .nsacfg_base = SSE300_NSACFG_BASE_NS,
+                                                                      .ppc_name    = PPC_SSE300_PERIPH_EXP0 };
 static struct ppc_sse300_dev_data_t PPC_SSE300_PERIPH_EXP0_DATA_S = {
     .sacfg_ns_ppc = 0, .sacfg_sp_ppc = 0, .nsacfg_nsp_ppc = 0, .int_bit_mask = 0, .is_initialized = false
 };
@@ -189,8 +189,8 @@ struct ppc_sse300_dev_t PPC_SSE300_PERIPH_EXP0_DEV_S = { &PPC_SSE300_PERIPH_EXP0
 
 #ifdef PPC_SSE300_PERIPH_EXP1_S
 static struct ppc_sse300_dev_cfg_t PPC_SSE300_PERIPH_EXP1_CFG_S   = { .sacfg_base  = SSE300_SACFG_BASE_S,
-                                                                    .nsacfg_base = SSE300_NSACFG_BASE_NS,
-                                                                    .ppc_name    = PPC_SSE300_PERIPH_EXP1 };
+                                                                      .nsacfg_base = SSE300_NSACFG_BASE_NS,
+                                                                      .ppc_name    = PPC_SSE300_PERIPH_EXP1 };
 static struct ppc_sse300_dev_data_t PPC_SSE300_PERIPH_EXP1_DATA_S = {
     .sacfg_ns_ppc = 0, .sacfg_sp_ppc = 0, .nsacfg_nsp_ppc = 0, .int_bit_mask = 0, .is_initialized = false
 };
@@ -199,8 +199,8 @@ struct ppc_sse300_dev_t PPC_SSE300_PERIPH_EXP1_DEV_S = { &PPC_SSE300_PERIPH_EXP1
 
 #ifdef PPC_SSE300_PERIPH_EXP2_S
 static struct ppc_sse300_dev_cfg_t PPC_SSE300_PERIPH_EXP2_CFG_S   = { .sacfg_base  = SSE300_SACFG_BASE_S,
-                                                                    .nsacfg_base = SSE300_NSACFG_BASE_NS,
-                                                                    .ppc_name    = PPC_SSE300_PERIPH_EXP2 };
+                                                                      .nsacfg_base = SSE300_NSACFG_BASE_NS,
+                                                                      .ppc_name    = PPC_SSE300_PERIPH_EXP2 };
 static struct ppc_sse300_dev_data_t PPC_SSE300_PERIPH_EXP2_DATA_S = {
     .sacfg_ns_ppc = 0, .sacfg_sp_ppc = 0, .nsacfg_nsp_ppc = 0, .int_bit_mask = 0, .is_initialized = false
 };
@@ -209,8 +209,8 @@ struct ppc_sse300_dev_t PPC_SSE300_PERIPH_EXP2_DEV_S = { &PPC_SSE300_PERIPH_EXP2
 
 #ifdef PPC_SSE300_PERIPH_EXP3_S
 static struct ppc_sse300_dev_cfg_t PPC_SSE300_PERIPH_EXP3_CFG_S   = { .sacfg_base  = SSE300_SACFG_BASE_S,
-                                                                    .nsacfg_base = SSE300_NSACFG_BASE_NS,
-                                                                    .ppc_name    = PPC_SSE300_PERIPH_EXP3 };
+                                                                      .nsacfg_base = SSE300_NSACFG_BASE_NS,
+                                                                      .ppc_name    = PPC_SSE300_PERIPH_EXP3 };
 static struct ppc_sse300_dev_data_t PPC_SSE300_PERIPH_EXP3_DATA_S = {
     .sacfg_ns_ppc = 0, .sacfg_sp_ppc = 0, .nsacfg_nsp_ppc = 0, .int_bit_mask = 0, .is_initialized = false
 };
@@ -242,7 +242,7 @@ static const struct syscounter_armv8_m_cntrl_dev_cfg_t SYSCOUNTER_CNTRL_ARMV8_M_
 };
 static struct syscounter_armv8_m_cntrl_dev_data_t SYSCOUNTER_CNTRL_ARMV8_M_DEV_DATA_S = { .is_initialized = false };
 struct syscounter_armv8_m_cntrl_dev_t SYSCOUNTER_CNTRL_ARMV8_M_DEV_S                  = { &(SYSCOUNTER_CNTRL_ARMV8_M_DEV_CFG_S),
-                                                                         &(SYSCOUNTER_CNTRL_ARMV8_M_DEV_DATA_S) };
+                                                                                          &(SYSCOUNTER_CNTRL_ARMV8_M_DEV_DATA_S) };
 #endif
 
 #ifdef SYSCOUNTER_READ_ARMV8_M_S

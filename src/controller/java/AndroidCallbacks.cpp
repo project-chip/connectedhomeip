@@ -23,9 +23,9 @@
 #endif
 #include <app/EventLoggingTypes.h>
 #include <jni.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 #include <lib/support/jsontlv/JsonToTlv.h>

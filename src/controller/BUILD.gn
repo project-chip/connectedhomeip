@@ -18,6 +18,12 @@ import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/python.gni")
 
+source_set("nodatamodel") {
+  sources = [ "EmptyDataModelHandler.cpp" ]
+
+  public_deps = [ "${chip_root}/src/app" ]
+}
+
 static_library("controller") {
   output_name = "libChipController"
 
@@ -39,7 +45,6 @@ static_library("controller") {
       "CommissioningDelegate.cpp",
       "DeviceDiscoveryDelegate.h",
       "DevicePairingDelegate.h",
-      "EmptyDataModelHandler.cpp",
       "ExampleOperationalCredentialsIssuer.cpp",
       "ExampleOperationalCredentialsIssuer.h",
       "SetUpCodePairer.cpp",
