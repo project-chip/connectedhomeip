@@ -448,25 +448,9 @@ CHIP_ERROR add_entropy_source(entropy_source fn_source, void * p_source, size_t 
     EntropyContext * const entropy_ctxt = get_entropy_context();
     VerifyOrReturnError(entropy_ctxt != nullptr, CHIP_ERROR_INTERNAL);
 
-#if (MBEDTLS_ALLOW_PRIVATE_ACCESS + 0) == 1
-    // NOTE: This check is needed mostly for unit tests, where we might run
-    //       init/shutdown multiple times, however, mbedTLS does not provide
-    //       API to remove entropy source from the pool.
-    for (int i = 0; i < entropy_ctxt->mEntropy.source_count; i++)
-    {
-        const auto & source = entropy_ctxt->mEntropy.source[i];
-        if (source.f_source == fn_source && source.p_source == p_source && source.threshold == threshold &&
-            source.strong == MBEDTLS_ENTROPY_SOURCE_STRONG)
-        {
-            return CHIP_NO_ERROR;
-        }
-    }
-#endif
-
     const int result =
         mbedtls_entropy_add_source(&entropy_ctxt->mEntropy, fn_source, p_source, threshold, MBEDTLS_ENTROPY_SOURCE_STRONG);
     VerifyOrReturnError(result == 0, CHIP_ERROR_INTERNAL);
-
     return CHIP_NO_ERROR;
 }
 
