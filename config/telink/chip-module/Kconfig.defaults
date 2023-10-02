@@ -143,6 +143,10 @@ config B9X_BLE_CTRL_MASTER_MAX_NUM
 config B9X_BLE_CTRL_SLAVE_MAX_NUM
     default 1
 
+config B9X_BLE_CTRL_RF_POWER
+    default 3 if PM 
+    default 9
+
 choice B9X_BLE_CTRL_MAC_TYPE
     default B9X_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
 endchoice
@@ -219,6 +223,10 @@ config OPENTHREAD_SLAAC
 
 config OPENTHREAD_MANUAL_START
     default y
+
+config OPENTHREAD_DEFAULT_TX_POWER
+    default 3 if PM
+    default 9
 
 config NET_TX_STACK_SIZE
     default 554 if PM
