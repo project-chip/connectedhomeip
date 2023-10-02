@@ -188,7 +188,7 @@ struct BluezConnection
 struct ConnectionDataBundle
 {
     BluezConnection * mpConn;
-    GAutoPtr<GVariant> mpVal;
+    GVariant * mpVal;
 };
 
 } // namespace Internal

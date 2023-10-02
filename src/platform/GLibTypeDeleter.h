@@ -92,6 +92,12 @@ struct GAutoPtrDeleter<char>
 };
 
 template <>
+struct GAutoPtrDeleter<const char *>
+{
+    using deleter = GFree;
+};
+
+template <>
 struct GAutoPtrDeleter<GBytes>
 {
     using deleter = GBytesDeleter;

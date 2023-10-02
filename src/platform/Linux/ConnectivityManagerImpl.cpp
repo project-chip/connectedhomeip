@@ -1557,11 +1557,11 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
         {
             return 0;
         }
-        const gchar ** keyMgmts        = g_variant_get_strv(keyMgmt.get(), nullptr);
-        const gchar ** keyMgmtsForFree = keyMgmts;
-        uint8_t res                    = 0;
-        for (const gchar * keyMgmtVal = (keyMgmts != nullptr ? *keyMgmts : nullptr); keyMgmtVal != nullptr;
-             keyMgmtVal               = *(++keyMgmts))
+        GAutoPtr<const char *> keyMgmts(g_variant_get_strv(keyMgmt.get(), nullptr));
+        const gchar ** keyMgmtsHendle = keyMgmts.get();
+        uint8_t res                   = 0;
+        for (const gchar * keyMgmtVal = (keyMgmtsHendle != nullptr ? *keyMgmtsHendle : nullptr); keyMgmtVal != nullptr;
+             keyMgmtVal               = *(++keyMgmtsHendle))
         {
             if (g_strcasecmp(keyMgmtVal, "wpa-psk") == 0 || g_strcasecmp(keyMgmtVal, "wpa-none") == 0)
             {
@@ -1572,7 +1572,7 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
                 res |= (kEAP);
             }
         }
-        g_free(keyMgmtsForFree);
+
         return res;
     };
     auto IsNetworkWPA2PSK = [](GVariant * rsn) -> uint8_t {
@@ -1585,11 +1585,11 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
         {
             return 0;
         }
-        const gchar ** keyMgmts        = g_variant_get_strv(keyMgmt.get(), nullptr);
-        const gchar ** keyMgmtsForFree = keyMgmts;
-        uint8_t res                    = 0;
-        for (const gchar * keyMgmtVal = (keyMgmts != nullptr ? *keyMgmts : nullptr); keyMgmtVal != nullptr;
-             keyMgmtVal               = *(++keyMgmts))
+        GAutoPtr<const char *> keyMgmts(g_variant_get_strv(keyMgmt.get(), nullptr));
+        const gchar ** keyMgmtsHendle = keyMgmts.get();
+        uint8_t res                   = 0;
+        for (const gchar * keyMgmtVal = (keyMgmtsHendle != nullptr ? *keyMgmtsHendle : nullptr); keyMgmtVal != nullptr;
+             keyMgmtVal               = *(++keyMgmtsHendle))
         {
             if (g_strcasecmp(keyMgmtVal, "wpa-psk") == 0 || g_strcasecmp(keyMgmtVal, "wpa-psk-sha256") == 0 ||
                 g_strcasecmp(keyMgmtVal, "wpa-ft-psk") == 0)
@@ -1608,7 +1608,7 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
                 res |= (1 << 4); // SecurityType::WPA3_PERSONAL
             }
         }
-        g_free(keyMgmtsForFree);
+
         return res;
     };
     auto GetNetworkSecurityType = [IsNetworkWPAPSK, IsNetworkWPA2PSK](WpaFiW1Wpa_supplicant1BSSProxy * proxy) -> uint8_t {
