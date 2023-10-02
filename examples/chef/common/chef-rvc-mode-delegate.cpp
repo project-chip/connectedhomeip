@@ -115,7 +115,6 @@ void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
         new ModeBase::Instance(gRvcRunModeDelegate, 0x1, RvcRunMode::Id, chip::to_underlying(RvcRunMode::Feature::kOnOff));
     gRvcRunModeInstance->Init();
 }
-#endif // ZCL_USING_RVC_RUN_MODE_CLUSTER_SERVER
 
 #ifdef ZCL_USING_RVC_CLEAN_MODE_CLUSTER_SERVER
 #include <chef-rvc-mode-delegate.h>
@@ -208,3 +207,4 @@ void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
     gRvcCleanModeInstance->Init();
 }
 #endif // ZCL_USING_RVC_CLEAN_MODE_CLUSTER_SERVER
+#endif // ZCL_USING_RVC_RUN_MODE_CLUSTER_SERVER
