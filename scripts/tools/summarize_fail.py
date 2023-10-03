@@ -105,7 +105,10 @@ def main():
             pass_rate[workflow] = [0.0]
     pass_rate = pd.DataFrame.from_dict(pass_rate, 'index', columns=["Pass Rate"]).sort_values("Pass Rate")
     print("Recent Pass Rate of Each Workflow:")
-    print(pass_rate.to_string())
+    pass_rate_string = pass_rate.to_string()
+    with open("docs/daily_pass_percentage.md", "w") as pass_rate_file:
+        pass_rate_file.write(pass_rate_string)
+    print(pass_rate_string)
     pass_rate.to_csv("workflow_pass_rate.csv")
 
 
