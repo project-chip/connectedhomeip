@@ -75,7 +75,6 @@
 #include <system/TLVPacketBufferBackingStore.h>
 
 #include "BluezObjectIterator.h"
-#include "BluezObjectList.h"
 #include "Helper.h"
 
 using namespace ::nl;
@@ -89,20 +88,6 @@ namespace Internal {
 constexpr uint16_t kMaxConnectRetries = 4;
 
 static BluezConnection * GetBluezConnectionViaDevice(BluezEndpoint * apEndpoint);
-
-namespace {
-
-class BluezEndpointObjectList : public BluezObjectList
-{
-public:
-    explicit BluezEndpointObjectList(BluezEndpoint * apEndpoint)
-    {
-        VerifyOrReturn(apEndpoint != nullptr, ChipLogError(DeviceLayer, "apEndpoint is NULL in %s", __func__));
-        Initialize(apEndpoint->mpObjMgr);
-    }
-};
-
-} // namespace
 
 static gboolean BluezAdvertisingRelease(BluezLEAdvertisement1 * aAdv, GDBusMethodInvocation * aInvocation, gpointer apClosure)
 {
