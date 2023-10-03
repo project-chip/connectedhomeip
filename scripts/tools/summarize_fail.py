@@ -9,7 +9,7 @@ from slugify import slugify
 
 yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
 
-with open("build_fail_defs.yaml", "r") as fail_defs:
+with open("scripts/tools/build_fail_defs.yaml", "r") as fail_defs:
     try:
         error_catalog = yaml.safe_load(fail_defs)
     except Exception:
