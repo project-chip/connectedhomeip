@@ -73,7 +73,7 @@ def main():
     frequency.to_csv("recent_workflow_fails_frequency.csv")
 
     logging.info("Gathering recent runs information into all_run_list.json.")
-    subprocess.run(f"gh run list -R project-chip/connectedhomeip -b master -L 500 --created {yesterday} --json databaseId,displayTitle,startedAt,workflowName > all_run_list.json", shell=True)
+    subprocess.run(f"gh run list -R project-chip/connectedhomeip -b master -L 500 --created {yesterday} --json workflowName > all_run_list.json", shell=True)
 
     logging.info("Reading all_run_list.json into a DataFrame.")
     all_df = pd.read_json("all_run_list.json")
