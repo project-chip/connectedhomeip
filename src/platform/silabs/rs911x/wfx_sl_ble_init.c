@@ -150,6 +150,23 @@ void rsi_ble_on_event_indication_confirmation(uint16_t resp_status, rsi_ble_set_
 
 /*==============================================*/
 /**
+ * @fn         rsi_ble_on_read_req_event
+ * @brief      its invoked when read events are received.
+ * @param[in]  event_id, it indicates write/notification event id.
+ * @param[in]  rsi_ble_read, read event parameters.
+ * @return     none.
+ * @section description
+ * This callback function is invoked when read events are received
+ */
+static void rsi_ble_on_read_req_event(uint16_t event_id, rsi_ble_read_req_t *rsi_ble_read_req)
+{
+  event_msg.event_id = event_id;
+  memcpy(&event_msg.rsi_ble_read_req, rsi_ble_read_req, sizeof(rsi_ble_read_req_t));
+  rsi_ble_app_set_event(RSI_BLE_EVENT_GATT_RD);
+}
+
+/*==============================================*/
+/**s
  * @fn         rsi_ble_app_get_event
  * @brief      returns the first set event based on priority
  * @param[in]  none.
@@ -337,6 +354,8 @@ void rsi_ble_add_char_val_att(void * serv_handler, uint16_t handle, uuid_t att_t
 
     return;
 }
+
+
 
 /*==============================================*/
 /**
