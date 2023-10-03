@@ -257,7 +257,12 @@ void ICDManager::OnTransitionToIdle(System::Layer * aLayer, void * appState)
 bool ICDManager::EnsureChipStackLock()
 {
     // TODO implement platform agnostic lock creation/mechanism that can be used for ICD without locking the chip stack
-    bool requireLock = !DeviceLayer::PlatformMgr().IsChipStackLockedByCurrentThread();
+    bool requireLock = false;
+
+#if CHIP_STACK_LOCK_TRACKING_ENABLED
+    requireLock = !DeviceLayer::PlatformMgr().IsChipStackLockedByCurrentThread();
+#endif
+
     if (requireLock)
     {
         DeviceLayer::PlatformMgr().LockChipStack();
