@@ -23,7 +23,7 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Step 1: TH commissions DUT using admin node ID N1"
+    - label: "Step 1: TH1 commissions DUT using admin node ID N1"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       arguments:
@@ -40,7 +40,7 @@ tests:
                 saveAs: CommissionerNodeId
 
     - label:
-          "Step 2: TH reads DUT Endpoint 0 OperationalCredentials cluster
+          "Step 2: TH1 reads DUT Endpoint 0 OperationalCredentials cluster
           CurrentFabricIndex attribute"
       command: "readAttribute"
       cluster: "Operational Credentials"
@@ -49,7 +49,7 @@ tests:
           saveAs: CurrentFabricIndexValue
 
     - label:
-          "Step 3: TH reads DUT Endpoint 0 AccessControl cluster
+          "Step 3: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlEntryChanged event"
       PICS: ACL.S.E00
       command: "readEvent"
@@ -73,10 +73,10 @@ tests:
               }
 
     - label:
-          "Step 4: TH writes DUT Endpoint 0 AccessControl cluster ACL attribute,
-          value is list of AccessControlEntryStruct containing 2 elements
-          1.struct Privilege field: Administer (5) AuthMode field: CASE (2)
-          Subjects field: [N1] Targets field: null 2struct Privilege field:
+          "Step 4: TH1 writes DUT Endpoint 0 AccessControl cluster ACL
+          attribute, value is list of AccessControlEntryStruct containing 2
+          elements 1.struct Privilege field: Administer (5) AuthMode field: CASE
+          (2) Subjects field: [N1] Targets field: null 2struct Privilege field:
           Operate (3) AuthMode field: Group (3) Subjects field: null Targets
           field: null"
       PICS: ACL.S.E00
@@ -102,7 +102,7 @@ tests:
               ]
 
     - label:
-          "Step 5: TH reads DUT Endpoint 0 AccessControl cluster
+          "Step 5: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlEntryChanged event"
       PICS: ACL.S.E00
       command: "readEvent"
@@ -159,13 +159,13 @@ tests:
                       }
 
     - label:
-          "Step 6: TH writes DUT Endpoint 0 AccessControl cluster ACL attribute,
-          value is list of AccessControlEntryStruct containing 2 elements. The
-          first item is valid, the second item is invalid due to group ID 0
-          being used, which is illegal. 1.struct Privilege field: Administer (5)
-          AuthMode field: CASE (2) Subjects field: [N1] Targets field: null
-          2.struct Privilege field: Operate (3) AuthMode field: Group (3)
-          Subjects field: [0] Targets field: null"
+          "Step 6: TH1 writes DUT Endpoint 0 AccessControl cluster ACL
+          attribute, value is list of AccessControlEntryStruct containing 2
+          elements. The first item is valid, the second item is invalid due to
+          group ID 0 being used, which is illegal. 1.struct Privilege field:
+          Administer (5) AuthMode field: CASE (2) Subjects field: [N1] Targets
+          field: null 2.struct Privilege field: Operate (3) AuthMode field:
+          Group (3) Subjects field: [0] Targets field: null"
       PICS: ACL.S.E00
       command: "writeAttribute"
       attribute: "ACL"
@@ -191,7 +191,7 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label:
-          "Step 7: TH reads DUT Endpoint 0 AccessControl cluster
+          "Step 7: TH1 reads DUT Endpoint 0 AccessControl cluster
           AccessControlEntryChanged event"
       PICS: ACL.S.E00
       command: "readEvent"

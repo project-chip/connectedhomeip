@@ -51,11 +51,11 @@ The steps to start a casting session are:
 1. [Discover](#discover-casting-players) `CastingPlayer` devices using Matter
    Commissioner discovery.
 1. [Connect](#connect-to-a-casting-player) to the `CastingPlayer` to discover
-   available endpoints. By connecting, the 'CastingClient' will send a User
-   Directed Commissioning (UDC) request to the 'CastingPlayer' device in order
-   to make a Matter commissioning request. The 'CastingPlayer' will then obtain
-   the appropriate user consent to allow a connection from this 'CastingClient'
-   and obtain the setup code needed to commission the 'CastingClient'. The setup
+   available endpoints. By connecting, the `CastingClient` will send a User
+   Directed Commissioning (UDC) request to the `CastingPlayer` device in order
+   to make a Matter commissioning request. The `CastingPlayer` will then obtain
+   the appropriate user consent to allow a connection from this `CastingClient`
+   and obtain the setup code needed to commission the `CastingClient`. The setup
    code will typically come from a corresponding TV content app or be input by
    the user.
 1. [Select](#select-an-endpoint-on-the-casting-player) an available `Endpoint`
@@ -82,7 +82,7 @@ _{Complete Initialization examples: [Linux](linux/simple-app.cpp) |
 | [iOS](darwin/TvCasting/TvCasting/MTRInitializationExample.swift)}_
 
 A Casting Client must first initialize the Matter SDK and define the following
-"DataProvider" objects for the the Matter Casting library to use throughout the
+`DataProvider` objects for the the Matter Casting library to use throughout the
 client's lifecycle:
 
 1.  **Rotating Device Identifier** - Refer to the Matter specification for
@@ -91,10 +91,10 @@ client's lifecycle:
     Then, instantiate a `DataProvider` object as described below.
 
     On Linux, define a `RotatingDeviceIdUniqueIdProvider` to provide the Casting
-    Client's RotatingDeviceIdUniqueId, by implementing a
+    Client's `RotatingDeviceIdUniqueId`, by implementing a
     `matter:casting::support::MutableByteSpanDataProvider`:
 
-    ```c++
+    ```c
     class RotatingDeviceIdUniqueIdProvider : public MutableByteSpanDataProvider {
     private:
         chip::MutableByteSpan rotatingDeviceIdUniqueIdSpan;
@@ -114,7 +114,7 @@ client's lifecycle:
     ```
 
     On Android, define a `rotatingDeviceIdUniqueIdProvider` to provide the
-    Casting Client's RotatingDeviceIdUniqueId, by implementing a
+    Casting Client's `RotatingDeviceIdUniqueId`, by implementing a
     `com.matter.casting.support.DataSource`:
 
     ```java
@@ -146,16 +146,16 @@ client's lifecycle:
     ```
 
 2.  **Commissioning Data** - This object contains the passcode, discriminator,
-    etc which identify the app and are provided to the CastingPlayer during the
-    commissioning process. Refer to the Matter specification's
+    etc which identify the app and are provided to the `CastingPlayer` during
+    the commissioning process. Refer to the Matter specification's
     [Onboarding Payload](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/qr_code/OnboardingPayload.adoc#ref_OnboardingPayload)
     section for details on commissioning data.
 
     On Linux, define a function `InitCommissionableDataProvider` to initialize
     initialize a `LinuxCommissionableDataProvider` that can provide the required
-    values to the CastingApp.
+    values to the `CastingApp`.
 
-    ```c++
+    ```c
     CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, LinuxDeviceOptions & options) {
         chip::Optional<uint32_t> setupPasscode;
 
@@ -179,7 +179,7 @@ client's lifecycle:
     ```
 
     On Android, define a `commissioningDataProvider` that can provide the
-    required values to the CastingApp.
+    required values to the `CastingApp`.
 
     ```java
     private static final DataProvider<CommissionableData> commissionableDataProvider =
@@ -270,7 +270,7 @@ client's lifecycle:
     `castingAppDidReceiveRequestForDeviceAttestationCredentials` and
     `didReceiveRequestToSignCertificateRequest` to the
     `MTRAppParametersDataSource` class defined above, that can return
-    MTRDeviceAttestationCredentials and sign messages for the Casting Client,
+    `MTRDeviceAttestationCredentials` and sign messages for the Casting Client,
     respectively.
 
     ```objectivec
@@ -312,12 +312,12 @@ initialize the Casting App as described below. Note: When you initialize the
 Casting client, make sure your code initializes it only once, before it starts a
 Matter casting session.
 
-On Linux, create an AppParameters object using the
+On Linux, create an `AppParameters` object using the
 `RotatingDeviceIdUniqueIdProvider`, `LinuxCommissionableDataProvider`,
 `CommonCaseDeviceServerInitParamsProvider`, `ExampleDACProvider` and
 `DefaultDACVerifier`, and call `CastingApp::GetInstance()->Initialize` with it.
 
-```c++
+```c
 LinuxCommissionableDataProvider gCommissionableDataProvider;
 int main(int argc, char * argv[]) {
     // Create AppParameters that need to be passed to CastingApp.Initialize()
@@ -351,7 +351,7 @@ int main(int argc, char * argv[]) {
 }
 ```
 
-On Android, create an AppParameters object using the
+On Android, create an `AppParameters` object using the
 `rotatingDeviceIdUniqueIdProvider`, `commissioningDataProvider`, `dacProvider`
 and `DataProvider<ConfigurationManager>`, and call
 `CastingApp.getInstance().initialize` with it.
@@ -408,13 +408,13 @@ func initialize() -> MatterError {
 _{Complete Discovery examples: [Linux](linux/simple-app.cpp)}_
 
 The Casting Client discovers `CastingPlayers` using Matter Commissioner
-discovery over DNS-SD by listening for CastingPlayer events as they are
+discovery over DNS-SD by listening for `CastingPlayer` events as they are
 discovered, updated, or lost from the network.
 
 On Linux, define a `DiscoveryDelegateImpl` that implements the
 `matter::casting::core::DiscoveryDelegate`.
 
-```c++
+```c
 class DiscoveryDelegateImpl : public DiscoveryDelegate {
 private:
     int commissionersCount = 0;
@@ -439,11 +439,11 @@ public:
 Finally, register these listeners and start discovery.
 
 On Linux, register an instance of the `DiscoveryDelegateImpl` with
-`matter::casting::core::CastingPlayerDiscovery` by calling SetDelegate on its
+`matter::casting::core::CastingPlayerDiscovery` by calling `SetDelegate` on its
 singleton instance. Then, call `StartDiscovery` by optionally specifying the
 `kTargetPlayerDeviceType` to filter results by.
 
-```c++
+```c
 DiscoveryDelegateImpl delegate;
 CastingPlayerDiscovery::GetInstance()->SetDelegate(&delegate);
 VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,

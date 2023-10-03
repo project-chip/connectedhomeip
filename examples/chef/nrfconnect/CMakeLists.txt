@@ -92,6 +92,8 @@ target_sources(app PRIVATE
     ${CHEF}/nrfconnect/main.cpp
     ${CHEF}/common/stubs.cpp
     ${CHEF}/common/chef-channel-manager.cpp
+    ${CHEF}/common/chef-air-quality.cpp
+    ${CHEF}/common/chef-concentration-measurement.cpp
 )
 
 message(STATUS ${CHEF}/devices/${SAMPLE_NAME}.zap)
