@@ -20,7 +20,7 @@
 #include "AppTask.h"
 #include "AppEvent.h"
 #include <app/server/Server.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 
 #include <DeviceInfoProviderImpl.h>
 #include <app/server/OnboardingCodesUtil.h>

@@ -20,7 +20,7 @@
 #include "AppEvent.h"
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 
 #include <app/server/OnboardingCodesUtil.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
