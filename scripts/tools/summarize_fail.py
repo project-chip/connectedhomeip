@@ -79,6 +79,7 @@ def main():
     all_df = pd.read_json("all_run_list.json")
 
     logging.info("Gathering pass/fail rate info.")
+    all_df.columns = ["Workflow"]
     all_df.apply(lambda row: pass_fail_rate(row["Workflow"]), axis=1)
 
     logging.info("Conducting fail information parsing.")
