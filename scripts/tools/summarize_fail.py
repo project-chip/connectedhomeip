@@ -2,40 +2,18 @@ import logging
 import os
 import subprocess
 import datetime
+import yaml
 
 import pandas as pd
 from slugify import slugify
 
 yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
 
-error_catalog = {
-    "CodeQL": {
-        "No space left on device": {
-            "short": "Ran out of space",
-            "detail": "Exception with signature \"No space left on device\""
-        },
-        "Check that the disk containing the database directory has ample free space.": {
-            "short": "Ran out of space",
-            "detail": "Fatal internal error with message indicating that disk space most likely ran out"
-        }
-    },
-    "Build example": {
-        "Could not find a version that satisfies the requirement": {
-            "short": "Requirements issue",
-            "detail": "Unable to install a requirements in Python requirements.txt"
-        },
-        "No module named": {
-            "short": "Missing module",
-            "detail": "Expected module was missing"
-        }
-    },
-    "Full builds": {
-        "No space left on device": {
-            "short": "Ran out of space",
-            "detail": "Exception with signature \"No space left on device\""
-        }
-    }
-}
+with open("build_fail_defs.yaml", "r") as fail_defs:
+    try:
+        error_catalog = yaml.safe_load(fail_defs)
+    except Exception:
+        logging.exception(f"Could not load fail definition file.")
 
 
 def process_fail(id, pr, start_time, workflow):
