@@ -96,12 +96,19 @@ class BouffaloDevice final : public Device
 public:
     pw::Status Reboot(const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
     {
-        if (!mRebootTimer)
+        if (mRebootTimer)
         {
-            mRebootTimer =
-                xTimerCreateStatic("Reboot", kRebootTimerPeriodTicks, false, nullptr, RebootHandler, &mRebootTimerBuffer);
-            xTimerStart(mRebootTimer, 0);
+            return pw::OkStatus();
         }
+
+        TickType_t delayMs = kRebootTimerPeriodMs;
+        if (request.delay_ms != 0) {
+            delayMs = request.delay_ms;
+        } else {
+            ChipLogProgress(NotSpecified, "Did not receive a reboot delay. Defaulting to %d ms", static_cast<int>(kRebootTimerPeriodMs));
+        }
+        mRebootTimer = xTimerCreateStatic("Reboot", pdMS_TO_TICKS(delayMs), false, nullptr, RebootHandler, &mRebootTimerBuffer);
+        xTimerStart(mRebootTimer, 0);
         return pw::OkStatus();
     }
 
@@ -117,7 +124,7 @@ public:
     }
 
 private:
-    static constexpr TickType_t kRebootTimerPeriodTicks = 1000;
+    static constexpr uint32_t kRebootTimerPeriodMs = 1000;
     TimerHandle_t mRebootTimer;
     StaticTimer_t mRebootTimerBuffer;
 
