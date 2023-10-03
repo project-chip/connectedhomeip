@@ -132,7 +132,7 @@ public:
 
 private:
     static constexpr uint32_t kRebootTimerPeriodMs = 1000;
-    TimerHandle_t mRebootTimer;
+    TimerHandle_t mRebootTimer = 0;
     StaticTimer_t mRebootTimerBuffer;
 
     static void RebootHandler(TimerHandle_t) { bl_sys_reset_por(); }
