@@ -94,11 +94,11 @@ public:
 class BouffaloDevice final : public Device
 {
 public:
-    pw::Status Reboot(const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
+    pw::Status Reboot(const chip_rpc_RebootRequest & request, pw_protobuf_Empty & response) override
     {
         if (mRebootTimer)
         {
-            return pw::OkStatus();
+            return pw::Status::Unavailable();
         }
 
         TickType_t delayMs = kRebootTimerPeriodMs;
@@ -118,12 +118,15 @@ public:
 
     pw::Status FactoryReset(const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
     {
-        if (!mRebootTimer)
+        if (mRebootTimer)
         {
-            mRebootTimer = xTimerCreateStatic("FactoryReset", kRebootTimerPeriodTicks, false, nullptr, FactoryResetHandler,
-                                              &mRebootTimerBuffer);
-            xTimerStart(mRebootTimer, 0);
+            return pw::Status::Unavailable();
         }
+
+        // Notice: reboot delay not configurable here
+        mRebootTimer = xTimerCreateStatic("FactoryReset", pdMS_TO_TICKS(kRebootTimerPeriodMs), false, nullptr, FactoryResetHandler,
+                                          &mRebootTimerBuffer);
+        xTimerStart(mRebootTimer, 0);
         return pw::OkStatus();
     }
 
