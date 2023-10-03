@@ -27,8 +27,8 @@ declare_args() {
 
 group("esp32") {
   deps = [
+    "${chip_root}/src/lib",
     matter_trace_config,
-    "${chip_root}/src/lib"
   ]
 
   if (chip_build_pw_rpc_lib) {

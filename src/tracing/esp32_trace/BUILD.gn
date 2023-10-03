@@ -36,4 +36,3 @@ source_set("esp32_trace_tracing") {
   public_configs = [ ":tracing" ]
   deps = [ ":backend" ]
 }
-
