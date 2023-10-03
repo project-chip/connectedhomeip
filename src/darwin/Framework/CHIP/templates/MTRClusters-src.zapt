@@ -11,7 +11,9 @@
 #import "MTRCommandPayloadsObjc.h"
 #import "MTRLogging_Internal.h"
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <platform/CHIPDeviceLayer.h>
+
 #include <type_traits>
 
 using chip::Callback::Callback;
@@ -54,20 +56,6 @@ MTR{{compatClusterNameRemapping parent.name}}Cluster{{compatCommandNameRemapping
 MTR{{cluster}}Cluster{{command}}Params
 {{/unless}}
 {{/inline}}
-{{#*inline "clusterId"}}
-{{#unless (isSupported cluster command=command)}}
-{{asMEI ../manufacturerCode ../code}}
-{{else}}
-MTRClusterIDType{{cluster}}ID
-{{/unless}}
-{{/inline}}
-{{#*inline "commandId"}}
-{{#unless (isSupported cluster command=command)}}
-{{asMEI manufacturerCode code}}
-{{else}}
-MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
-{{/unless}}
-{{/inline}}
 {{#unless hasArguments}}
 - (void){{asLowerCamelCase name}}WithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:({{>command_completion_type command=.}})completion
 {
@@ -95,9 +83,10 @@ MTRCommandIDTypeCluster{{cluster}}Command{{command}}ID
     }
     {{/if}}
 
+    using RequestType = {{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@({{> clusterId}})
-                                         commandID:@({{> commandId}})
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs

@@ -31,6 +31,7 @@
 #import "MTRSetupPayload_Internal.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
+#import "zap-generated/MTRCommandPayloads_Internal.h"
 
 #include "app/ConcreteAttributePath.h"
 #include "app/ConcreteCommandPath.h"
@@ -1306,6 +1307,54 @@ exit:
             return CHIP_NO_ERROR;
         });
     std::move(*bridge).DispatchAction(self);
+}
+
+- (void)_invokeKnownCommandWithEndpointID:(NSNumber *)endpointID
+                                clusterID:(NSNumber *)clusterID
+                                commandID:(NSNumber *)commandID
+                           commandPayload:(id)commandPayload
+                       timedInvokeTimeout:(NSNumber * _Nullable)timeout
+              serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                            responseClass:(Class _Nullable)responseClass
+                                    queue:(dispatch_queue_t)queue
+                               completion:(void (^)(id _Nullable response, NSError * _Nullable error))completion
+{
+    if (![commandPayload respondsToSelector:@selector(_encodeAsDataValue:)]) {
+        dispatch_async(queue, ^{
+            completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+        });
+        return;
+    }
+
+    NSError * encodingError;
+    auto * commandFields = [commandPayload _encodeAsDataValue:&encodingError];
+    if (commandFields == nil) {
+        dispatch_async(queue, ^{
+            completion(nil, encodingError);
+        });
+        return;
+    }
+
+    auto responseHandler = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        id _Nullable response = nil;
+        if (error == nil) {
+            if (values.count != 1) {
+                error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:nil];
+            } else if (responseClass != nil) {
+                response = [[responseClass alloc] initWithResponseValue:values[0] error:&error];
+            }
+        }
+        completion(response, error);
+    };
+
+    [self _invokeCommandWithEndpointID:endpointID
+                             clusterID:clusterID
+                             commandID:commandID
+                         commandFields:commandFields
+                    timedInvokeTimeout:timeout
+           serverSideProcessingTimeout:serverSideProcessingTimeout
+                                 queue:queue
+                            completion:responseHandler];
 }
 
 - (void)subscribeToAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
