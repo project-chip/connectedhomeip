@@ -42,22 +42,86 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (void)triggerEffectWithParams:(MTRIdentifyClusterTriggerEffectParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeIdentifyTimeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)identifyTime:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeIdentifyTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeIdentifyTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeIdentifyTypeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)identifyType:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -90,17 +154,73 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeNameSupportWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nameSupport:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -135,31 +255,145 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeSceneCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)sceneCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentSceneWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentScene:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentGroupWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentGroup:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeSceneValidWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)sceneValid:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeNameSupportWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nameSupport:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeLastConfiguredByWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * lastConfiguredBy can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)lastConfiguredBy:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeSceneTableSizeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)sceneTableSize:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRemainingCapacityWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)remainingCapacity:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -198,31 +432,121 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeOnOffWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)onOff:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGlobalSceneControlWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)globalSceneControl:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeOnTimeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)onTime:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeOnTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeOnTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeOffWaitTimeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)offWaitTime:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeOffWaitTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeOffWaitTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeStartUpOnOffWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * startUpOnOff can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)startUpOnOff:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeStartUpOnOffWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeStartUpOnOffWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -246,21 +570,85 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeSwitchTypeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)switchType:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeSwitchActionsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)switchActions:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeSwitchActionsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeSwitchActionsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -294,57 +682,229 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentLevelWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * currentLevel can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentLevel:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeRemainingTimeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)remainingTime:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMinLevelWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minLevel:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMaxLevelWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxLevel:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentFrequencyWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentFrequency:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMinFrequencyWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minFrequency:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxFrequencyWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxFrequency:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeOptionsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)options:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeOptionsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeOptionsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeOnOffTransitionTimeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)onOffTransitionTime:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeOnOffTransitionTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeOnOffTransitionTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeOnLevelWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * onLevel can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)onLevel:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeOnLevelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeOnLevelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeOnTransitionTimeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * onTransitionTime can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)onTransitionTime:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeOnTransitionTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeOnTransitionTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeOffTransitionTimeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * offTransitionTime can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)offTransitionTime:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeOffTransitionTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeOffTransitionTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeDefaultMoveRateWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * defaultMoveRate can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)defaultMoveRate:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeDefaultMoveRateWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeDefaultMoveRateWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeStartUpCurrentLevelWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * startUpCurrentLevel can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)startUpCurrentLevel:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeStartUpCurrentLevelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeStartUpCurrentLevelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -367,46 +927,166 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeActiveTextWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)activeText:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeActiveTextWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeActiveTextWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)description:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeDescriptionWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeDescriptionWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeInactiveTextWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)inactiveText:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeInactiveTextWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeInactiveTextWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeOutOfServiceWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)outOfService:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeOutOfServiceWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeOutOfServiceWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributePolarityWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)polarity:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributePresentValueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)presentValue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributePresentValueWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributePresentValueWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeReliabilityWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)reliability:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeReliabilityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeReliabilityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeStatusFlagsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)statusFlags:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeApplicationTypeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)applicationType:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -430,15 +1110,63 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -462,25 +1190,113 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeDeviceTypeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRDescriptorClusterDeviceTypeStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRDescriptorClusterDeviceTypeStruct *> * _Nullable)deviceTypeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeServerListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)serverList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeClientListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)clientList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributePartsListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)partsList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeTagListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRDescriptorClusterSemanticTagStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRDescriptorClusterSemanticTagStruct *> * _Nullable)tagList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -503,20 +1319,76 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeBindingWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRBindingClusterTargetStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRBindingClusterTargetStruct *> * _Nullable)binding:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeBindingWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeBindingWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -542,30 +1414,118 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeACLWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRAccessControlClusterAccessControlEntryStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRAccessControlClusterAccessControlEntryStruct *> * _Nullable)acl:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeACLWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeACLWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeExtensionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRAccessControlClusterAccessControlExtensionStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRAccessControlClusterAccessControlExtensionStruct *> * _Nullable)extension:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeExtensionWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeExtensionWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeSubjectsPerAccessControlEntryWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)subjectsPerAccessControlEntry:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeTargetsPerAccessControlEntryWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)targetsPerAccessControlEntry:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAccessControlEntriesPerFabricWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)accessControlEntriesPerFabric:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -602,21 +1562,93 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeActionListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRActionsClusterActionStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRActionsClusterActionStruct *> * _Nullable)actionList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEndpointListsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRActionsClusterEndpointListStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRActionsClusterEndpointListStruct *> * _Nullable)endpointLists:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeSetupURLWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)setupURL:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -642,63 +1674,279 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 
 - (NSDictionary<NSString *, id> *)readAttributeDataModelRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)dataModelRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeVendorNameWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)vendorName:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeVendorIDWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)vendorID:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeProductNameWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)productName:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeProductIDWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)productID:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeNodeLabelWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)nodeLabel:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeNodeLabelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNodeLabelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeLocationWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)location:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeLocationWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeLocationWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeHardwareVersionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)hardwareVersion:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeHardwareVersionStringWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)hardwareVersionString:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeSoftwareVersionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)softwareVersion:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeSoftwareVersionStringWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)softwareVersionString:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeManufacturingDateWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)manufacturingDate:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributePartNumberWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)partNumber:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeProductURLWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)productURL:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeProductLabelWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)productLabel:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeSerialNumberWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)serialNumber:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeLocalConfigDisabledWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)localConfigDisabled:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeLocalConfigDisabledWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeLocalConfigDisabledWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeReachableWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)reachable:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeUniqueIDWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)uniqueID:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeCapabilityMinimaWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `MTRBasicInformationClusterCapabilityMinimaStruct *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (MTRBasicInformationClusterCapabilityMinimaStruct * _Nullable)capabilityMinima:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeProductAppearanceWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `MTRBasicInformationClusterProductAppearanceStruct *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (MTRBasicInformationClusterProductAppearanceStruct * _Nullable)productAppearance:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -726,15 +1974,63 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -759,26 +2055,108 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 - (void)announceOTAProviderWithParams:(MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeDefaultOTAProvidersWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTROTASoftwareUpdateRequestorClusterProviderLocation *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTROTASoftwareUpdateRequestorClusterProviderLocation *> * _Nullable)defaultOTAProviders:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeDefaultOTAProvidersWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeDefaultOTAProvidersWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeUpdatePossibleWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)updatePossible:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeUpdateStateWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)updateState:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeUpdateStateProgressWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * updateStateProgress can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)updateStateProgress:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -804,22 +2182,86 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeActiveLocaleWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)activeLocale:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeActiveLocaleWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeActiveLocaleWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedLocalesWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSString *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSString *> * _Nullable)supportedLocales:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -845,26 +2287,98 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeHourFormatWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)hourFormat:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeHourFormatWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeHourFormatWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeActiveCalendarTypeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)activeCalendarType:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeActiveCalendarTypeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeActiveCalendarTypeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedCalendarTypesWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)supportedCalendarTypes:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -890,20 +2404,76 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeTemperatureUnitWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)temperatureUnit:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeTemperatureUnitWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeTemperatureUnitWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -927,17 +2497,73 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeSourcesWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)sources:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -961,79 +2587,399 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeStatusWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)status:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeOrderWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)order:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)description:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeWiredAssessedInputVoltageWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * wiredAssessedInputVoltage can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)wiredAssessedInputVoltage:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeWiredAssessedInputFrequencyWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * wiredAssessedInputFrequency can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)wiredAssessedInputFrequency:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeWiredCurrentTypeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)wiredCurrentType:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeWiredAssessedCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * wiredAssessedCurrent can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)wiredAssessedCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeWiredNominalVoltageWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)wiredNominalVoltage:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeWiredMaximumCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)wiredMaximumCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeWiredPresentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)wiredPresent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeActiveWiredFaultsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)activeWiredFaults:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeBatVoltageWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * batVoltage can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)batVoltage:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeBatPercentRemainingWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * batPercentRemaining can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)batPercentRemaining:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeBatTimeRemainingWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * batTimeRemaining can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)batTimeRemaining:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeBatChargeLevelWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)batChargeLevel:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeBatReplacementNeededWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)batReplacementNeeded:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeBatReplaceabilityWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)batReplaceability:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeBatPresentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)batPresent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeActiveBatFaultsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)activeBatFaults:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeBatReplacementDescriptionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)batReplacementDescription:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeBatCommonDesignationWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)batCommonDesignation:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeBatANSIDesignationWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)batANSIDesignation:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeBatIECDesignationWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)batIECDesignation:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeBatApprovedChemistryWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)batApprovedChemistry:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeBatCapacityWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)batCapacity:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeBatQuantityWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)batQuantity:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeBatChargeStateWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)batChargeState:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeBatTimeToFullChargeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * batTimeToFullCharge can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)batTimeToFullCharge:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeBatFunctionalWhileChargingWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)batFunctionalWhileCharging:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeBatChargingCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * batChargingCurrent can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)batChargingCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeActiveBatChargeFaultsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)activeBatChargeFaults:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEndpointListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)endpointList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -1062,28 +3008,116 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
     MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeBreadcrumbWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)breadcrumb:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeBreadcrumbWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeBreadcrumbWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeBasicCommissioningInfoWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `MTRGeneralCommissioningClusterBasicCommissioningInfo *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (MTRGeneralCommissioningClusterBasicCommissioningInfo * _Nullable)basicCommissioningInfo:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRegulatoryConfigWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)regulatoryConfig:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeLocationCapabilityWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)locationCapability:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeSupportsConcurrentConnectionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)supportsConcurrentConnection:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -1114,33 +3148,151 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxNetworksWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxNetworks:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeNetworksWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRNetworkCommissioningClusterNetworkInfoStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRNetworkCommissioningClusterNetworkInfoStruct *> * _Nullable)networks:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeScanMaxTimeSecondsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)scanMaxTimeSeconds:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeConnectMaxTimeSecondsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)connectMaxTimeSeconds:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeInterfaceEnabledWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)interfaceEnabled:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeInterfaceEnabledWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeInterfaceEnabledWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeLastNetworkingStatusWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * lastNetworkingStatus can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)lastNetworkingStatus:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeLastNetworkIDWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * lastNetworkID can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSData *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSData * _Nullable)lastNetworkID:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeLastConnectErrorValueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * lastConnectErrorValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)lastConnectErrorValue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -1166,15 +3318,63 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -1200,35 +3400,163 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeNetworkInterfacesWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRGeneralDiagnosticsClusterNetworkInterface *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRGeneralDiagnosticsClusterNetworkInterface *> * _Nullable)networkInterfaces:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRebootCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rebootCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeUpTimeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)upTime:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeTotalOperationalHoursWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)totalOperationalHours:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeBootReasonWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)bootReason:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeActiveHardwareFaultsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)activeHardwareFaults:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeActiveRadioFaultsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)activeRadioFaults:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeActiveNetworkFaultsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)activeNetworkFaults:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeTestEventTriggersEnabledWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)testEventTriggersEnabled:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAverageWearCountWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageWearCount:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -1256,23 +3584,103 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeThreadMetricsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRSoftwareDiagnosticsClusterThreadMetricsStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRSoftwareDiagnosticsClusterThreadMetricsStruct *> * _Nullable)threadMetrics:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentHeapFreeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentHeapFree:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentHeapUsedWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentHeapUsed:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentHeapHighWatermarkWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentHeapHighWatermark:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -1300,141 +3708,727 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeChannelWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * channel can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)channel:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeRoutingRoleWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * routingRole can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)routingRole:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeNetworkNameWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * networkName can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)networkName:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributePanIdWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * panId can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)panId:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeExtendedPanIdWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * extendedPanId can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)extendedPanId:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMeshLocalPrefixWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * meshLocalPrefix can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSData *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSData * _Nullable)meshLocalPrefix:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeOverrunCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)overrunCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeNeighborTableWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRThreadNetworkDiagnosticsClusterNeighborTableStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRThreadNetworkDiagnosticsClusterNeighborTableStruct *> * _Nullable)neighborTable:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRouteTableWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRThreadNetworkDiagnosticsClusterRouteTableStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRThreadNetworkDiagnosticsClusterRouteTableStruct *> * _Nullable)routeTable:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributePartitionIdWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * partitionId can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)partitionId:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeWeightingWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * weighting can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)weighting:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeDataVersionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * dataVersion can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)dataVersion:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeStableDataVersionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * stableDataVersion can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)stableDataVersion:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeLeaderRouterIdWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * leaderRouterId can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)leaderRouterId:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeDetachedRoleCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)detachedRoleCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeChildRoleCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)childRoleCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRouterRoleCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)routerRoleCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeLeaderRoleCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)leaderRoleCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttachAttemptCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)attachAttemptCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributePartitionIdChangeCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)partitionIdChangeCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeBetterPartitionAttachAttemptCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)betterPartitionAttachAttemptCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeParentChangeCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)parentChangeCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeTxTotalCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)txTotalCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeTxUnicastCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)txUnicastCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeTxBroadcastCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)txBroadcastCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeTxAckRequestedCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)txAckRequestedCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeTxAckedCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)txAckedCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeTxNoAckRequestedCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)txNoAckRequestedCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeTxDataCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)txDataCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeTxDataPollCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)txDataPollCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeTxBeaconCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)txBeaconCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeTxBeaconRequestCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)txBeaconRequestCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeTxOtherCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)txOtherCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeTxRetryCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)txRetryCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeTxDirectMaxRetryExpiryCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)txDirectMaxRetryExpiryCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeTxIndirectMaxRetryExpiryCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)txIndirectMaxRetryExpiryCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeTxErrCcaCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)txErrCcaCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeTxErrAbortCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)txErrAbortCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeTxErrBusyChannelCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)txErrBusyChannelCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRxTotalCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rxTotalCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRxUnicastCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rxUnicastCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRxBroadcastCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rxBroadcastCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRxDataCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rxDataCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRxDataPollCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rxDataPollCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRxBeaconCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rxBeaconCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRxBeaconRequestCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rxBeaconRequestCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRxOtherCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rxOtherCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRxAddressFilteredCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rxAddressFilteredCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRxDestAddrFilteredCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rxDestAddrFilteredCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRxDuplicatedCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rxDuplicatedCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRxErrNoFrameCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rxErrNoFrameCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRxErrUnknownNeighborCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rxErrUnknownNeighborCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRxErrInvalidSrcAddrCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rxErrInvalidSrcAddrCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRxErrSecCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rxErrSecCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRxErrFcsCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rxErrFcsCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRxErrOtherCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rxErrOtherCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeActiveTimestampWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * activeTimestamp can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)activeTimestamp:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributePendingTimestampWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * pendingTimestamp can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)pendingTimestamp:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeDelayWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * delay can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)delay:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeSecurityPolicyWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * securityPolicy can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable MTRThreadNetworkDiagnosticsClusterSecurityPolicy *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (MTRThreadNetworkDiagnosticsClusterSecurityPolicy * _Nullable)securityPolicy:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeChannelPage0MaskWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * channelPage0Mask can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSData *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSData * _Nullable)channelPage0Mask:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeOperationalDatasetComponentsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * operationalDatasetComponents can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable MTRThreadNetworkDiagnosticsClusterOperationalDatasetComponents *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (MTRThreadNetworkDiagnosticsClusterOperationalDatasetComponents * _Nullable)operationalDatasetComponents:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeActiveNetworkFaultsListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)activeNetworkFaultsList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -1462,41 +4456,219 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeBSSIDWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * bssid can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSData *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSData * _Nullable)bssid:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeSecurityTypeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * securityType can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)securityType:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeWiFiVersionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * wiFiVersion can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)wiFiVersion:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeChannelNumberWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * channelNumber can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)channelNumber:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeRSSIWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * rssi can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rssi:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeBeaconLostCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * beaconLostCount can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)beaconLostCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeBeaconRxCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * beaconRxCount can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)beaconRxCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributePacketMulticastRxCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * packetMulticastRxCount can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)packetMulticastRxCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributePacketMulticastTxCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * packetMulticastTxCount can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)packetMulticastTxCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributePacketUnicastRxCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * packetUnicastRxCount can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)packetUnicastRxCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributePacketUnicastTxCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * packetUnicastTxCount can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)packetUnicastTxCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentMaxRateWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * currentMaxRate can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentMaxRate:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeOverrunCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * overrunCount can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)overrunCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -1524,33 +4696,159 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributePHYRateWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * phyRate can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)phyRate:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeFullDuplexWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * fullDuplex can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)fullDuplex:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributePacketRxCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)packetRxCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributePacketTxCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)packetTxCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeTxErrCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)txErrCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeCollisionCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)collisionCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeOverrunCountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)overrunCount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeCarrierDetectWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * carrierDetect can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)carrierDetect:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeTimeSinceResetWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)timeSinceReset:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -1580,41 +4878,201 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeUTCTimeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * utcTime can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)utcTime:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeGranularityWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)granularity:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeTimeSourceWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)timeSource:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeTrustedTimeSourceWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * trustedTimeSource can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable MTRTimeSynchronizationClusterTrustedTimeSourceStruct *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (MTRTimeSynchronizationClusterTrustedTimeSourceStruct * _Nullable)trustedTimeSource:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeDefaultNTPWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * defaultNTP can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)defaultNTP:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeTimeZoneWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRTimeSynchronizationClusterTimeZoneStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRTimeSynchronizationClusterTimeZoneStruct *> * _Nullable)timeZone:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeDSTOffsetWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRTimeSynchronizationClusterDSTOffsetStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRTimeSynchronizationClusterDSTOffsetStruct *> * _Nullable)dstOffset:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeLocalTimeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * localTime can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)localTime:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeTimeZoneDatabaseWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)timeZoneDatabase:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeNTPServerAvailableWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)ntpServerAvailable:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeTimeZoneListMaxSizeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)timeZoneListMaxSize:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeDSTOffsetListMaxSizeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)dstOffsetListMaxSize:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportsDNSResolveWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)supportsDNSResolve:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -1641,49 +5099,225 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 
 - (NSDictionary<NSString *, id> *)readAttributeVendorNameWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)vendorName:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeVendorIDWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)vendorID:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeProductNameWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)productName:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeNodeLabelWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)nodeLabel:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeNodeLabelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNodeLabelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeHardwareVersionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)hardwareVersion:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeHardwareVersionStringWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)hardwareVersionString:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeSoftwareVersionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)softwareVersion:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeSoftwareVersionStringWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)softwareVersionString:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeManufacturingDateWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)manufacturingDate:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributePartNumberWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)partNumber:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeProductURLWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)productURL:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeProductLabelWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)productLabel:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeSerialNumberWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)serialNumber:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeReachableWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)reachable:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeUniqueIDWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)uniqueID:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeProductAppearanceWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `MTRBridgedDeviceBasicInformationClusterProductAppearanceStruct *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (MTRBridgedDeviceBasicInformationClusterProductAppearanceStruct * _Nullable)productAppearance:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -1709,21 +5343,93 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfPositionsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)numberOfPositions:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentPositionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentPosition:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMultiPressMaxWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)multiPressMax:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -1753,21 +5459,97 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeWindowStatusWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)windowStatus:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAdminFabricIndexWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * adminFabricIndex can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)adminFabricIndex:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeAdminVendorIdWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * adminVendorId can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)adminVendorId:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -1800,27 +5582,123 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeNOCsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTROperationalCredentialsClusterNOCStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTROperationalCredentialsClusterNOCStruct *> * _Nullable)noCs:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFabricsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTROperationalCredentialsClusterFabricDescriptorStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTROperationalCredentialsClusterFabricDescriptorStruct *> * _Nullable)fabrics:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedFabricsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)supportedFabrics:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeCommissionedFabricsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)commissionedFabrics:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeTrustedRootCertificatesWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSData *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSData *> * _Nullable)trustedRootCertificates:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentFabricIndexWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentFabricIndex:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -1850,26 +5728,106 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
     MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 - (NSDictionary<NSString *, id> *)readAttributeGroupKeyMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRGroupKeyManagementClusterGroupKeyMapStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRGroupKeyManagementClusterGroupKeyMapStruct *> * _Nullable)groupKeyMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeGroupKeyMapWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeGroupKeyMapWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeGroupTableWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRGroupKeyManagementClusterGroupInfoMapStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRGroupKeyManagementClusterGroupInfoMapStruct *> * _Nullable)groupTable:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMaxGroupsPerFabricWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxGroupsPerFabric:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxGroupKeysPerFabricWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxGroupKeysPerFabric:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -1894,17 +5852,73 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeLabelListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRFixedLabelClusterLabelStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRFixedLabelClusterLabelStruct *> * _Nullable)labelList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -1927,20 +5941,76 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeLabelListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRUserLabelClusterLabelStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRUserLabelClusterLabelStruct *> * _Nullable)labelList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeLabelListWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeLabelListWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -1964,17 +6034,73 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeStateValueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)stateValue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -2004,27 +6130,123 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeIdleModeIntervalWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)idleModeInterval:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeActiveModeIntervalWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)activeModeInterval:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeActiveModeThresholdWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)activeModeThreshold:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRegisteredClientsWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRICDManagementClusterMonitoringRegistrationStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRICDManagementClusterMonitoringRegistrationStruct *> * _Nullable)registeredClients:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeICDCounterWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)icdCounter:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClientsSupportedPerFabricWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clientsSupportedPerFabric:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -2050,31 +6272,133 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)description:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeStandardNamespaceWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * standardNamespace can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)standardNamespace:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRModeSelectClusterModeOptionStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRModeSelectClusterModeOptionStruct *> * _Nullable)supportedModes:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentMode:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeStartUpModeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * startUpMode can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)startUpMode:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeOnModeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * onMode can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)onMode:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -2100,27 +6424,111 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRLaundryWasherModeClusterModeOptionStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRLaundryWasherModeClusterModeOptionStruct *> * _Nullable)supportedModes:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentMode:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeStartUpModeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * startUpMode can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)startUpMode:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeOnModeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * onMode can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)onMode:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -2146,27 +6554,111 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRRefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRRefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct *> * _Nullable)supportedModes:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentMode:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeStartUpModeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * startUpMode can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)startUpMode:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeOnModeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * onMode can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)onMode:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -2190,27 +6682,109 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeSpinSpeedsWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSString *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSString *> * _Nullable)spinSpeeds:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeSpinSpeedCurrentWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * spinSpeedCurrent can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)spinSpeedCurrent:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeSpinSpeedCurrentWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeSpinSpeedCurrentWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfRinsesWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)numberOfRinses:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeNumberOfRinsesWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeNumberOfRinsesWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedRinsesWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)supportedRinses:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -2236,27 +6810,111 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRRVCRunModeClusterModeOptionStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRRVCRunModeClusterModeOptionStruct *> * _Nullable)supportedModes:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentMode:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeStartUpModeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * startUpMode can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)startUpMode:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeOnModeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * onMode can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)onMode:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -2282,27 +6940,111 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRRVCCleanModeClusterModeOptionStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRRVCCleanModeClusterModeOptionStruct *> * _Nullable)supportedModes:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentMode:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeStartUpModeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * startUpMode can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)startUpMode:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeOnModeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * onMode can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)onMode:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -2328,27 +7070,123 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeTemperatureSetpointWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)temperatureSetpoint:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMinTemperatureWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minTemperature:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxTemperatureWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxTemperature:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeStepWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)step:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeSelectedTemperatureLevelWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)selectedTemperatureLevel:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeSupportedTemperatureLevelsWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSString *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSString *> * _Nullable)supportedTemperatureLevels:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -2372,21 +7210,93 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeMaskWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)mask:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeStateWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)state:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)supported:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -2412,27 +7322,111 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRDishwasherModeClusterModeOptionStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRDishwasherModeClusterModeOptionStruct *> * _Nullable)supportedModes:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentModeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentMode:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeStartUpModeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * startUpMode can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)startUpMode:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeStartUpModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeOnModeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * onMode can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)onMode:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeOnModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -2456,17 +7450,73 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeAirQualityWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)airQuality:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -2494,43 +7544,195 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeExpressedStateWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)expressedState:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeSmokeStateWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)smokeState:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeCOStateWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)coState:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeBatteryAlertWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)batteryAlert:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeDeviceMutedWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)deviceMuted:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeTestInProgressWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)testInProgress:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeHardwareFaultAlertWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)hardwareFaultAlert:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEndOfServiceAlertWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)endOfServiceAlert:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeInterconnectSmokeAlarmWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)interconnectSmokeAlarm:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeInterconnectCOAlarmWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)interconnectCOAlarm:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeContaminationStateWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)contaminationState:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeSmokeSensitivityLevelWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)smokeSensitivityLevel:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeSmokeSensitivityLevelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeSmokeSensitivityLevelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeExpiryDateWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)expiryDate:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -2557,23 +7759,103 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeMaskWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)mask:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeLatchWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)latch:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeStateWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)state:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeSupportedWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)supported:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -2610,27 +7892,129 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributePhaseListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * phaseList can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSArray<NSString *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSString *> * _Nullable)phaseList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentPhaseWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * currentPhase can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentPhase:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeCountdownTimeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * countdownTime can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)countdownTime:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeOperationalStateListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTROperationalStateClusterOperationalStateStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTROperationalStateClusterOperationalStateStruct *> * _Nullable)operationalStateList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeOperationalStateWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)operationalState:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeOperationalErrorWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `MTROperationalStateClusterErrorStateStruct *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (MTROperationalStateClusterErrorStateStruct * _Nullable)operationalError:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -2667,27 +8051,129 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributePhaseListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * phaseList can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSArray<NSString *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSString *> * _Nullable)phaseList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentPhaseWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * currentPhase can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentPhase:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeCountdownTimeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * countdownTime can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)countdownTime:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeOperationalStateListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRRVCOperationalStateClusterOperationalStateStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRRVCOperationalStateClusterOperationalStateStruct *> * _Nullable)operationalStateList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeOperationalStateWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)operationalState:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeOperationalErrorWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `MTRRVCOperationalStateClusterErrorStateStruct *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (MTRRVCOperationalStateClusterErrorStateStruct * _Nullable)operationalError:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -2715,29 +8201,127 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeConditionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)condition:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeDegradationDirectionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)degradationDirection:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeChangeIndicationWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)changeIndication:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeInPlaceIndicatorWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)inPlaceIndicator:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeLastChangedTimeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * lastChangedTime can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)lastChangedTime:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeLastChangedTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeLastChangedTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeReplacementProductListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRHEPAFilterMonitoringClusterReplacementProductStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRHEPAFilterMonitoringClusterReplacementProductStruct *> * _Nullable)replacementProductList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -2765,29 +8349,127 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeConditionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)condition:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeDegradationDirectionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)degradationDirection:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeChangeIndicationWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)changeIndication:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeInPlaceIndicatorWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)inPlaceIndicator:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeLastChangedTimeWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * lastChangedTime can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)lastChangedTime:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeLastChangedTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeLastChangedTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeReplacementProductListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRActivatedCarbonFilterMonitoringClusterReplacementProductStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRActivatedCarbonFilterMonitoringClusterReplacementProductStruct *> * _Nullable)replacementProductList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -2831,123 +8513,463 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeLockStateWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * lockState can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)lockState:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeLockTypeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)lockType:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeActuatorEnabledWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)actuatorEnabled:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeDoorStateWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * doorState can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)doorState:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeDoorOpenEventsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)doorOpenEvents:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeDoorOpenEventsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeDoorOpenEventsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeDoorClosedEventsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)doorClosedEvents:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeDoorClosedEventsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeDoorClosedEventsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeOpenPeriodWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)openPeriod:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeOpenPeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeOpenPeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfTotalUsersSupportedWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)numberOfTotalUsersSupported:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfPINUsersSupportedWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)numberOfPINUsersSupported:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfRFIDUsersSupportedWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)numberOfRFIDUsersSupported:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfWeekDaySchedulesSupportedPerUserWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)numberOfWeekDaySchedulesSupportedPerUser:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfYearDaySchedulesSupportedPerUserWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)numberOfYearDaySchedulesSupportedPerUser:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfHolidaySchedulesSupportedWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)numberOfHolidaySchedulesSupported:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxPINCodeLengthWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxPINCodeLength:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMinPINCodeLengthWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minPINCodeLength:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxRFIDCodeLengthWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxRFIDCodeLength:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMinRFIDCodeLengthWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minRFIDCodeLength:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeCredentialRulesSupportWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)credentialRulesSupport:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfCredentialsSupportedPerUserWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)numberOfCredentialsSupportedPerUser:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeLanguageWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)language:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeLanguageWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeLanguageWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeLEDSettingsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)ledSettings:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeLEDSettingsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeLEDSettingsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeAutoRelockTimeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)autoRelockTime:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeAutoRelockTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeAutoRelockTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeSoundVolumeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)soundVolume:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeSoundVolumeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeSoundVolumeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeOperatingModeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)operatingMode:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeOperatingModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeOperatingModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedOperatingModesWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)supportedOperatingModes:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeDefaultConfigurationRegisterWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)defaultConfigurationRegister:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEnableLocalProgrammingWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)enableLocalProgramming:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeEnableLocalProgrammingWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeEnableLocalProgrammingWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeEnableOneTouchLockingWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)enableOneTouchLocking:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeEnableOneTouchLockingWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeEnableOneTouchLockingWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeEnableInsideStatusLEDWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)enableInsideStatusLED:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeEnableInsideStatusLEDWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeEnableInsideStatusLEDWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeEnablePrivacyModeButtonWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)enablePrivacyModeButton:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeEnablePrivacyModeButtonWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeEnablePrivacyModeButtonWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeLocalProgrammingFeaturesWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)localProgrammingFeatures:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeLocalProgrammingFeaturesWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeLocalProgrammingFeaturesWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeWrongCodeEntryLimitWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)wrongCodeEntryLimit:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeWrongCodeEntryLimitWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeWrongCodeEntryLimitWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeUserCodeTemporaryDisableTimeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)userCodeTemporaryDisableTime:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeUserCodeTemporaryDisableTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeUserCodeTemporaryDisableTimeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeSendPINOverTheAirWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)sendPINOverTheAir:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeSendPINOverTheAirWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeSendPINOverTheAirWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeRequirePINforRemoteOperationWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)requirePINforRemoteOperation:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeRequirePINforRemoteOperationWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeRequirePINforRemoteOperationWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeExpiringUserTimeoutWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)expiringUserTimeout:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeExpiringUserTimeoutWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeExpiringUserTimeoutWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -2985,61 +9007,301 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeTypeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)type:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributePhysicalClosedLimitLiftWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)physicalClosedLimitLift:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributePhysicalClosedLimitTiltWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)physicalClosedLimitTilt:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentPositionLiftWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * currentPositionLift can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentPositionLift:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentPositionTiltWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * currentPositionTilt can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentPositionTilt:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfActuationsLiftWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)numberOfActuationsLift:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfActuationsTiltWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)numberOfActuationsTilt:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeConfigStatusWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)configStatus:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentPositionLiftPercentageWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * currentPositionLiftPercentage can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentPositionLiftPercentage:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentPositionTiltPercentageWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * currentPositionTiltPercentage can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentPositionTiltPercentage:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeOperationalStatusWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)operationalStatus:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeTargetPositionLiftPercent100thsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * targetPositionLiftPercent100ths can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)targetPositionLiftPercent100ths:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeTargetPositionTiltPercent100thsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * targetPositionTiltPercent100ths can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)targetPositionTiltPercent100ths:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeEndProductTypeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)endProductType:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentPositionLiftPercent100thsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * currentPositionLiftPercent100ths can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentPositionLiftPercent100ths:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentPositionTiltPercent100thsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * currentPositionTiltPercent100ths can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentPositionTiltPercent100ths:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeInstalledOpenLimitLiftWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)installedOpenLimitLift:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeInstalledClosedLimitLiftWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)installedClosedLimitLift:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeInstalledOpenLimitTiltWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)installedOpenLimitTilt:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeInstalledClosedLimitTiltWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)installedClosedLimitTilt:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeModeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)mode:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeSafetyStatusWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)safetyStatus:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -3068,47 +9330,175 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeBarrierMovingStateWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)barrierMovingState:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeBarrierSafetyStatusWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)barrierSafetyStatus:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeBarrierCapabilitiesWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)barrierCapabilities:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeBarrierOpenEventsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)barrierOpenEvents:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeBarrierOpenEventsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeBarrierOpenEventsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeBarrierCloseEventsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)barrierCloseEvents:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeBarrierCloseEventsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeBarrierCloseEventsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeBarrierCommandOpenEventsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)barrierCommandOpenEvents:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeBarrierCommandOpenEventsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeBarrierCommandOpenEventsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeBarrierCommandCloseEventsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)barrierCommandCloseEvents:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeBarrierCommandCloseEventsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeBarrierCommandCloseEventsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeBarrierOpenPeriodWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)barrierOpenPeriod:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeBarrierOpenPeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeBarrierOpenPeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeBarrierClosePeriodWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)barrierClosePeriod:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeBarrierClosePeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeBarrierClosePeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeBarrierPositionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)barrierPosition:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -3132,69 +9522,337 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxPressureWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * maxPressure can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxPressure:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMaxSpeedWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * maxSpeed can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxSpeed:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxFlowWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * maxFlow can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxFlow:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMinConstPressureWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * minConstPressure can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minConstPressure:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxConstPressureWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * maxConstPressure can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxConstPressure:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMinCompPressureWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * minCompPressure can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minCompPressure:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxCompPressureWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * maxCompPressure can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxCompPressure:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMinConstSpeedWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * minConstSpeed can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minConstSpeed:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxConstSpeedWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * maxConstSpeed can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxConstSpeed:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMinConstFlowWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * minConstFlow can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minConstFlow:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxConstFlowWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * maxConstFlow can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxConstFlow:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMinConstTempWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * minConstTemp can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minConstTemp:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxConstTempWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * maxConstTemp can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxConstTemp:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributePumpStatusWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)pumpStatus:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEffectiveOperationModeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)effectiveOperationMode:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEffectiveControlModeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)effectiveControlMode:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeCapacityWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * capacity can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)capacity:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeSpeedWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * speed can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)speed:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeLifetimeRunningHoursWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * lifetimeRunningHours can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)lifetimeRunningHours:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeLifetimeRunningHoursWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeLifetimeRunningHoursWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributePowerWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * power can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)power:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeLifetimeEnergyConsumedWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * lifetimeEnergyConsumed can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)lifetimeEnergyConsumed:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeLifetimeEnergyConsumedWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeLifetimeEnergyConsumedWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeOperationModeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)operationMode:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeOperationModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeOperationModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeControlModeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)controlMode:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeControlModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeControlModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -3225,167 +9883,629 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeLocalTemperatureWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * localTemperature can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)localTemperature:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeOutdoorTemperatureWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * outdoorTemperature can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)outdoorTemperature:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeOccupancyWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)occupancy:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAbsMinHeatSetpointLimitWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)absMinHeatSetpointLimit:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAbsMaxHeatSetpointLimitWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)absMaxHeatSetpointLimit:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAbsMinCoolSetpointLimitWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)absMinCoolSetpointLimit:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAbsMaxCoolSetpointLimitWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)absMaxCoolSetpointLimit:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributePICoolingDemandWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)piCoolingDemand:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributePIHeatingDemandWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)piHeatingDemand:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeHVACSystemTypeConfigurationWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)hvacSystemTypeConfiguration:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeHVACSystemTypeConfigurationWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeHVACSystemTypeConfigurationWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeLocalTemperatureCalibrationWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)localTemperatureCalibration:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeLocalTemperatureCalibrationWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeLocalTemperatureCalibrationWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeOccupiedCoolingSetpointWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)occupiedCoolingSetpoint:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeOccupiedCoolingSetpointWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeOccupiedCoolingSetpointWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeOccupiedHeatingSetpointWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)occupiedHeatingSetpoint:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeOccupiedHeatingSetpointWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeOccupiedHeatingSetpointWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeUnoccupiedCoolingSetpointWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)unoccupiedCoolingSetpoint:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeUnoccupiedCoolingSetpointWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeUnoccupiedCoolingSetpointWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeUnoccupiedHeatingSetpointWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)unoccupiedHeatingSetpoint:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeUnoccupiedHeatingSetpointWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeUnoccupiedHeatingSetpointWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeMinHeatSetpointLimitWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minHeatSetpointLimit:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeMinHeatSetpointLimitWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeMinHeatSetpointLimitWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxHeatSetpointLimitWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxHeatSetpointLimit:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeMaxHeatSetpointLimitWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeMaxHeatSetpointLimitWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeMinCoolSetpointLimitWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minCoolSetpointLimit:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeMinCoolSetpointLimitWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeMinCoolSetpointLimitWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxCoolSetpointLimitWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxCoolSetpointLimit:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeMaxCoolSetpointLimitWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeMaxCoolSetpointLimitWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeMinSetpointDeadBandWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minSetpointDeadBand:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeMinSetpointDeadBandWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeMinSetpointDeadBandWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeRemoteSensingWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)remoteSensing:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeRemoteSensingWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeRemoteSensingWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeControlSequenceOfOperationWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)controlSequenceOfOperation:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeControlSequenceOfOperationWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeControlSequenceOfOperationWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeSystemModeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)systemMode:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeSystemModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeSystemModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeThermostatRunningModeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)thermostatRunningMode:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeStartOfWeekWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)startOfWeek:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfWeeklyTransitionsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)numberOfWeeklyTransitions:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfDailyTransitionsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)numberOfDailyTransitions:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeTemperatureSetpointHoldWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)temperatureSetpointHold:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeTemperatureSetpointHoldWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeTemperatureSetpointHoldWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeTemperatureSetpointHoldDurationWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * temperatureSetpointHoldDuration can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)temperatureSetpointHoldDuration:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeTemperatureSetpointHoldDurationWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeTemperatureSetpointHoldDurationWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeThermostatProgrammingOperationModeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)thermostatProgrammingOperationMode:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeThermostatProgrammingOperationModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeThermostatProgrammingOperationModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeThermostatRunningStateWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)thermostatRunningState:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeSetpointChangeSourceWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)setpointChangeSource:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeSetpointChangeAmountWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * setpointChangeAmount can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)setpointChangeAmount:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeSetpointChangeSourceTimestampWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)setpointChangeSourceTimestamp:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeOccupiedSetbackWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * occupiedSetback can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)occupiedSetback:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeOccupiedSetbackWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeOccupiedSetbackWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeOccupiedSetbackMinWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * occupiedSetbackMin can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)occupiedSetbackMin:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeOccupiedSetbackMaxWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * occupiedSetbackMax can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)occupiedSetbackMax:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeUnoccupiedSetbackWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * unoccupiedSetback can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)unoccupiedSetback:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeUnoccupiedSetbackWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeUnoccupiedSetbackWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeUnoccupiedSetbackMinWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * unoccupiedSetbackMin can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)unoccupiedSetbackMin:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeUnoccupiedSetbackMaxWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * unoccupiedSetbackMax can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)unoccupiedSetbackMax:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeEmergencyHeatDeltaWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)emergencyHeatDelta:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeEmergencyHeatDeltaWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeEmergencyHeatDeltaWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeACTypeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acType:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeACTypeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeACTypeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeACCapacityWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acCapacity:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeACCapacityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeACCapacityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeACRefrigerantTypeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acRefrigerantType:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeACRefrigerantTypeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeACRefrigerantTypeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeACCompressorTypeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acCompressorType:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeACCompressorTypeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeACCompressorTypeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeACErrorCodeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acErrorCode:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeACErrorCodeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeACErrorCodeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeACLouverPositionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acLouverPosition:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeACLouverPositionWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeACLouverPositionWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeACCoilTemperatureWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * acCoilTemperature can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acCoilTemperature:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeACCapacityformatWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acCapacityformat:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeACCapacityformatWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeACCapacityformatWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -3410,54 +10530,202 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 - (void)stepWithParams:(MTRFanControlClusterStepParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFanModeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)fanMode:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeFanModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeFanModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeFanModeSequenceWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)fanModeSequence:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeFanModeSequenceWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeFanModeSequenceWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributePercentSettingWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * percentSetting can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)percentSetting:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributePercentSettingWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributePercentSettingWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributePercentCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)percentCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeSpeedMaxWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)speedMax:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeSpeedSettingWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * speedSetting can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)speedSetting:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeSpeedSettingWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeSpeedSettingWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeSpeedCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)speedCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRockSupportWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rockSupport:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRockSettingWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rockSetting:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeRockSettingWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeRockSettingWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeWindSupportWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)windSupport:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeWindSettingWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)windSetting:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeWindSettingWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeWindSettingWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeAirflowDirectionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)airflowDirection:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeAirflowDirectionWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeAirflowDirectionWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -3480,28 +10748,100 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeTemperatureDisplayModeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)temperatureDisplayMode:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeTemperatureDisplayModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeTemperatureDisplayModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeKeypadLockoutWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)keypadLockout:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeKeypadLockoutWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeKeypadLockoutWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeScheduleProgrammingVisibilityWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)scheduleProgrammingVisibility:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeScheduleProgrammingVisibilityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeScheduleProgrammingVisibilityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -3545,145 +10885,631 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentHueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentHue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentSaturationWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentSaturation:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRemainingTimeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)remainingTime:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentXWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentX:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentYWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentY:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeDriftCompensationWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)driftCompensation:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeCompensationTextWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)compensationText:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeColorTemperatureMiredsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)colorTemperatureMireds:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeColorModeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)colorMode:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeOptionsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)options:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeOptionsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeOptionsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeNumberOfPrimariesWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * numberOfPrimaries can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)numberOfPrimaries:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributePrimary1XWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)primary1X:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary1YWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)primary1Y:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributePrimary1IntensityWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * primary1Intensity can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)primary1Intensity:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary2XWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)primary2X:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributePrimary2YWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)primary2Y:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary2IntensityWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * primary2Intensity can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)primary2Intensity:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributePrimary3XWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)primary3X:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary3YWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)primary3Y:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributePrimary3IntensityWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * primary3Intensity can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)primary3Intensity:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary4XWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)primary4X:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributePrimary4YWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)primary4Y:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary4IntensityWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * primary4Intensity can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)primary4Intensity:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributePrimary5XWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)primary5X:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary5YWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)primary5Y:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributePrimary5IntensityWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * primary5Intensity can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)primary5Intensity:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary6XWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)primary6X:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributePrimary6YWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)primary6Y:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributePrimary6IntensityWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * primary6Intensity can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)primary6Intensity:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeWhitePointXWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)whitePointX:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeWhitePointXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeWhitePointXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeWhitePointYWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)whitePointY:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeWhitePointYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeWhitePointYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeColorPointRXWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)colorPointRX:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeColorPointRXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeColorPointRXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeColorPointRYWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)colorPointRY:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeColorPointRYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeColorPointRYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeColorPointRIntensityWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * colorPointRIntensity can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)colorPointRIntensity:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeColorPointRIntensityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeColorPointRIntensityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeColorPointGXWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)colorPointGX:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeColorPointGXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeColorPointGXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeColorPointGYWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)colorPointGY:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeColorPointGYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeColorPointGYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeColorPointGIntensityWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * colorPointGIntensity can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)colorPointGIntensity:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeColorPointGIntensityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeColorPointGIntensityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeColorPointBXWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)colorPointBX:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeColorPointBXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeColorPointBXWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeColorPointBYWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)colorPointBY:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeColorPointBYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeColorPointBYWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeColorPointBIntensityWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * colorPointBIntensity can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)colorPointBIntensity:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeColorPointBIntensityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeColorPointBIntensityWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeEnhancedCurrentHueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)enhancedCurrentHue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEnhancedColorModeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)enhancedColorMode:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeColorLoopActiveWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)colorLoopActive:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeColorLoopDirectionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)colorLoopDirection:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeColorLoopTimeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)colorLoopTime:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeColorLoopStartEnhancedHueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)colorLoopStartEnhancedHue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeColorLoopStoredEnhancedHueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)colorLoopStoredEnhancedHue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeColorCapabilitiesWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)colorCapabilities:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeColorTempPhysicalMinMiredsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)colorTempPhysicalMinMireds:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeColorTempPhysicalMaxMiredsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)colorTempPhysicalMaxMireds:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeCoupleColorTempToLevelMinMiredsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)coupleColorTempToLevelMinMireds:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeStartUpColorTemperatureMiredsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * startUpColorTemperatureMireds can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)startUpColorTemperatureMireds:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeStartUpColorTemperatureMiredsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeStartUpColorTemperatureMiredsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -3707,63 +11533,233 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributePhysicalMinLevelWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)physicalMinLevel:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributePhysicalMaxLevelWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)physicalMaxLevel:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeBallastStatusWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)ballastStatus:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMinLevelWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minLevel:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeMinLevelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeMinLevelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxLevelWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxLevel:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeMaxLevelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeMaxLevelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeIntrinsicBallastFactorWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * intrinsicBallastFactor can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)intrinsicBallastFactor:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeIntrinsicBallastFactorWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeIntrinsicBallastFactorWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeBallastFactorAdjustmentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * ballastFactorAdjustment can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)ballastFactorAdjustment:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeBallastFactorAdjustmentWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeBallastFactorAdjustmentWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeLampQuantityWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)lampQuantity:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeLampTypeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)lampType:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeLampTypeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeLampTypeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeLampManufacturerWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)lampManufacturer:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeLampManufacturerWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeLampManufacturerWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeLampRatedHoursWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * lampRatedHours can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)lampRatedHours:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeLampRatedHoursWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeLampRatedHoursWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeLampBurnHoursWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * lampBurnHours can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)lampBurnHours:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeLampBurnHoursWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeLampBurnHoursWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeLampAlarmModeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)lampAlarmMode:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeLampAlarmModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeLampAlarmModeWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeLampBurnHoursTripPointWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * lampBurnHoursTripPoint can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)lampBurnHoursTripPoint:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeLampBurnHoursTripPointWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeLampBurnHoursTripPointWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -3787,25 +11783,121 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * measuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measuredValue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * minMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minMeasuredValue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * maxMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxMeasuredValue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeToleranceWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)tolerance:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeLightSensorTypeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * lightSensorType can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)lightSensorType:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -3829,23 +11921,109 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * measuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measuredValue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * minMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minMeasuredValue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * maxMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxMeasuredValue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeToleranceWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)tolerance:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -3869,33 +12047,165 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * measuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measuredValue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * minMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minMeasuredValue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * maxMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxMeasuredValue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeToleranceWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)tolerance:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeScaledValueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * scaledValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)scaledValue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMinScaledValueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * minScaledValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minScaledValue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxScaledValueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * maxScaledValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxScaledValue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeScaledToleranceWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)scaledTolerance:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeScaleWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)scale:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -3919,23 +12229,109 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * measuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measuredValue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * minMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minMeasuredValue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * maxMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxMeasuredValue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeToleranceWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)tolerance:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -3959,23 +12355,109 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * measuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measuredValue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * minMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minMeasuredValue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * maxMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxMeasuredValue:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeToleranceWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)tolerance:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -3999,57 +12481,201 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeOccupancyWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)occupancy:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeOccupancySensorTypeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)occupancySensorType:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeOccupancySensorTypeBitmapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)occupancySensorTypeBitmap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributePIROccupiedToUnoccupiedDelayWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)pirOccupiedToUnoccupiedDelay:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributePIROccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributePIROccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributePIRUnoccupiedToOccupiedDelayWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)pirUnoccupiedToOccupiedDelay:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributePIRUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributePIRUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributePIRUnoccupiedToOccupiedThresholdWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)pirUnoccupiedToOccupiedThreshold:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributePIRUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributePIRUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeUltrasonicOccupiedToUnoccupiedDelayWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)ultrasonicOccupiedToUnoccupiedDelay:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeUltrasonicOccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeUltrasonicOccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeUltrasonicUnoccupiedToOccupiedDelayWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)ultrasonicUnoccupiedToOccupiedDelay:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeUltrasonicUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeUltrasonicUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeUltrasonicUnoccupiedToOccupiedThresholdWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)ultrasonicUnoccupiedToOccupiedThreshold:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeUltrasonicUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeUltrasonicUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributePhysicalContactOccupiedToUnoccupiedDelayWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)physicalContactOccupiedToUnoccupiedDelay:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributePhysicalContactOccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributePhysicalContactOccupiedToUnoccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributePhysicalContactUnoccupiedToOccupiedDelayWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)physicalContactUnoccupiedToOccupiedDelay:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributePhysicalContactUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributePhysicalContactUnoccupiedToOccupiedDelayWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributePhysicalContactUnoccupiedToOccupiedThresholdWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)physicalContactUnoccupiedToOccupiedThreshold:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributePhysicalContactUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributePhysicalContactUnoccupiedToOccupiedThresholdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -4073,37 +12699,183 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * measuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * minMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * maxMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * peakMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)peakMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)peakMeasuredValueWindow:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * averageMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageMeasuredValueWindow:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)uncertainty:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measurementUnit:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measurementMedium:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)levelValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -4127,37 +12899,183 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * measuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * minMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * maxMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * peakMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)peakMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)peakMeasuredValueWindow:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * averageMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageMeasuredValueWindow:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)uncertainty:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measurementUnit:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measurementMedium:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)levelValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -4181,37 +13099,183 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * measuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * minMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * maxMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * peakMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)peakMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)peakMeasuredValueWindow:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * averageMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageMeasuredValueWindow:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)uncertainty:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measurementUnit:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measurementMedium:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)levelValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -4235,37 +13299,183 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * measuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * minMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * maxMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * peakMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)peakMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)peakMeasuredValueWindow:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * averageMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageMeasuredValueWindow:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)uncertainty:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measurementUnit:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measurementMedium:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)levelValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -4289,37 +13499,183 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * measuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * minMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * maxMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * peakMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)peakMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)peakMeasuredValueWindow:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * averageMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageMeasuredValueWindow:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)uncertainty:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measurementUnit:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measurementMedium:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)levelValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -4343,37 +13699,183 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * measuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * minMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * maxMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * peakMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)peakMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)peakMeasuredValueWindow:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * averageMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageMeasuredValueWindow:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)uncertainty:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measurementUnit:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measurementMedium:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)levelValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -4397,37 +13899,183 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * measuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * minMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * maxMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * peakMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)peakMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)peakMeasuredValueWindow:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * averageMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageMeasuredValueWindow:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)uncertainty:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measurementUnit:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measurementMedium:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)levelValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -4451,37 +14099,183 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * measuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * minMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * maxMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * peakMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)peakMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)peakMeasuredValueWindow:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * averageMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageMeasuredValueWindow:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)uncertainty:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measurementUnit:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measurementMedium:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)levelValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -4505,37 +14299,183 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * measuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * minMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * maxMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * peakMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)peakMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)peakMeasuredValueWindow:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * averageMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageMeasuredValueWindow:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)uncertainty:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measurementUnit:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measurementMedium:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)levelValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -4559,37 +14499,183 @@ MTR_PROVISIONALLY_AVAILABLE
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * measuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeMinMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * minMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)minMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * maxMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)maxMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * peakMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)peakMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributePeakMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)peakMeasuredValueWindow:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * averageMeasuredValue can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageMeasuredValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageMeasuredValueWindowWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageMeasuredValueWindow:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeUncertaintyWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)uncertainty:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementUnitWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measurementUnit:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementMediumWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measurementMedium:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeLevelValueWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)levelValue:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -4613,17 +14699,73 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 
 - (NSDictionary<NSString *, id> *)readAttributeMACAddressWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)macAddress:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -4651,21 +14793,97 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeChannelListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRChannelClusterChannelInfoStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRChannelClusterChannelInfoStruct *> * _Nullable)channelList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeLineupWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * lineup can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable MTRChannelClusterLineupInfoStruct *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (MTRChannelClusterLineupInfoStruct * _Nullable)lineup:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentChannelWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * currentChannel can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable MTRChannelClusterChannelInfoStruct *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (MTRChannelClusterChannelInfoStruct * _Nullable)currentChannel:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -4691,19 +14909,83 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeTargetListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRTargetNavigatorClusterTargetInfoStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRTargetNavigatorClusterTargetInfoStruct *> * _Nullable)targetList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentTargetWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentTarget:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -4755,29 +15037,143 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentStateWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentState:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeStartTimeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * startTime can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)startTime:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeDurationWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * duration can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)duration:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeSampledPositionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * sampledPosition can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable MTRMediaPlaybackClusterPlaybackPositionStruct *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (MTRMediaPlaybackClusterPlaybackPositionStruct * _Nullable)sampledPosition:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributePlaybackSpeedWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)playbackSpeed:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeSeekRangeEndWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * seekRangeEnd can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)seekRangeEnd:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 
 - (NSDictionary<NSString *, id> *)readAttributeSeekRangeStartWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * seekRangeStart can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)seekRangeStart:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
+
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -4810,19 +15206,83 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeInputListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRMediaInputClusterInputInfoStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRMediaInputClusterInputInfoStruct *> * _Nullable)inputList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentInputWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentInput:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -4850,15 +15310,63 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -4884,15 +15392,63 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -4919,21 +15475,85 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptHeaderWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSString *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSString *> * _Nullable)acceptHeader:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeSupportedStreamingProtocolsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)supportedStreamingProtocols:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeSupportedStreamingProtocolsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeSupportedStreamingProtocolsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -4960,19 +15580,83 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeOutputListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRAudioOutputClusterOutputInfoStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRAudioOutputClusterOutputInfoStruct *> * _Nullable)outputList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentOutputWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentOutput:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -5000,21 +15684,87 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeCatalogListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)catalogList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentAppWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * currentApp can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable MTRApplicationLauncherClusterApplicationEPStruct *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (MTRApplicationLauncherClusterApplicationEPStruct * _Nullable)currentApp:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeCurrentAppWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeCurrentAppWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -5038,31 +15788,143 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeVendorNameWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)vendorName:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeVendorIDWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)vendorID:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeApplicationNameWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)applicationName:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeProductIDWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)productID:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeApplicationWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `MTRApplicationBasicClusterApplicationStruct *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (MTRApplicationBasicClusterApplicationStruct * _Nullable)application:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeStatusWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)status:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeApplicationVersionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)applicationVersion:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAllowedVendorListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)allowedVendorList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -5092,15 +15954,63 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -5129,287 +16039,1359 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementTypeWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measurementType:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeDcVoltageWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)dcVoltage:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeDcVoltageMinWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)dcVoltageMin:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeDcVoltageMaxWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)dcVoltageMax:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeDcCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)dcCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeDcCurrentMinWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)dcCurrentMin:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeDcCurrentMaxWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)dcCurrentMax:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeDcPowerWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)dcPower:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeDcPowerMinWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)dcPowerMin:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeDcPowerMaxWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)dcPowerMax:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeDcVoltageMultiplierWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)dcVoltageMultiplier:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeDcVoltageDivisorWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)dcVoltageDivisor:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeDcCurrentMultiplierWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)dcCurrentMultiplier:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeDcCurrentDivisorWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)dcCurrentDivisor:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeDcPowerMultiplierWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)dcPowerMultiplier:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeDcPowerDivisorWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)dcPowerDivisor:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcFrequencyWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acFrequency:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcFrequencyMinWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acFrequencyMin:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcFrequencyMaxWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acFrequencyMax:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeNeutralCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)neutralCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeTotalActivePowerWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)totalActivePower:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeTotalReactivePowerWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)totalReactivePower:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeTotalApparentPowerWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)totalApparentPower:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMeasured1stHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measured1stHarmonicCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasured3rdHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measured3rdHarmonicCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMeasured5thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measured5thHarmonicCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasured7thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measured7thHarmonicCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMeasured9thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measured9thHarmonicCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasured11thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measured11thHarmonicCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredPhase1stHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measuredPhase1stHarmonicCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredPhase3rdHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measuredPhase3rdHarmonicCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredPhase5thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measuredPhase5thHarmonicCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredPhase7thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measuredPhase7thHarmonicCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredPhase9thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measuredPhase9thHarmonicCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasuredPhase11thHarmonicCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)measuredPhase11thHarmonicCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcFrequencyMultiplierWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acFrequencyMultiplier:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcFrequencyDivisorWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acFrequencyDivisor:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributePowerMultiplierWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)powerMultiplier:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributePowerDivisorWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)powerDivisor:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeHarmonicCurrentMultiplierWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)harmonicCurrentMultiplier:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributePhaseHarmonicCurrentMultiplierWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)phaseHarmonicCurrentMultiplier:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeInstantaneousVoltageWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)instantaneousVoltage:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeInstantaneousLineCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)instantaneousLineCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeInstantaneousActiveCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)instantaneousActiveCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeInstantaneousReactiveCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)instantaneousReactiveCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeInstantaneousPowerWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)instantaneousPower:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsVoltage:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageMinWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsVoltageMin:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageMaxWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsVoltageMax:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRmsCurrentWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsCurrent:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsCurrentMinWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsCurrentMin:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRmsCurrentMaxWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsCurrentMax:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeActivePowerWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)activePower:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeActivePowerMinWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)activePowerMin:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeActivePowerMaxWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)activePowerMax:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeReactivePowerWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)reactivePower:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeApparentPowerWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)apparentPower:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributePowerFactorWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)powerFactor:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAverageRmsVoltageMeasurementPeriodWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageRmsVoltageMeasurementPeriod:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeAverageRmsVoltageMeasurementPeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeAverageRmsVoltageMeasurementPeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageRmsUnderVoltageCounterWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageRmsUnderVoltageCounter:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeAverageRmsUnderVoltageCounterWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeAverageRmsUnderVoltageCounterWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsExtremeOverVoltagePeriodWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsExtremeOverVoltagePeriod:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeRmsExtremeOverVoltagePeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeRmsExtremeOverVoltagePeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsExtremeUnderVoltagePeriodWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsExtremeUnderVoltagePeriod:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeRmsExtremeUnderVoltagePeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeRmsExtremeUnderVoltagePeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageSagPeriodWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsVoltageSagPeriod:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeRmsVoltageSagPeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeRmsVoltageSagPeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageSwellPeriodWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsVoltageSwellPeriod:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeRmsVoltageSwellPeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeRmsVoltageSwellPeriodWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeAcVoltageMultiplierWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acVoltageMultiplier:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcVoltageDivisorWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acVoltageDivisor:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcCurrentMultiplierWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acCurrentMultiplier:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcCurrentDivisorWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acCurrentDivisor:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcPowerMultiplierWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acPowerMultiplier:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcPowerDivisorWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acPowerDivisor:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeOverloadAlarmsMaskWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)overloadAlarmsMask:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeOverloadAlarmsMaskWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeOverloadAlarmsMaskWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeVoltageOverloadWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)voltageOverload:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeCurrentOverloadWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)currentOverload:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcOverloadAlarmsMaskWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acOverloadAlarmsMask:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeAcOverloadAlarmsMaskWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 - (void)writeAttributeAcOverloadAlarmsMaskWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 - (NSDictionary<NSString *, id> *)readAttributeAcVoltageOverloadWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acVoltageOverload:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcCurrentOverloadWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acCurrentOverload:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAcActivePowerOverloadWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acActivePowerOverload:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcReactivePowerOverloadWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)acReactivePowerOverload:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageRmsOverVoltageWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageRmsOverVoltage:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAverageRmsUnderVoltageWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageRmsUnderVoltage:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsExtremeOverVoltageWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsExtremeOverVoltage:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRmsExtremeUnderVoltageWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsExtremeUnderVoltage:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageSagWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsVoltageSag:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageSwellWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsVoltageSwell:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeLineCurrentPhaseBWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)lineCurrentPhaseB:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeActiveCurrentPhaseBWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)activeCurrentPhaseB:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeReactiveCurrentPhaseBWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)reactiveCurrentPhaseB:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltagePhaseBWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsVoltagePhaseB:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageMinPhaseBWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsVoltageMinPhaseB:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageMaxPhaseBWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsVoltageMaxPhaseB:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsCurrentPhaseBWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsCurrentPhaseB:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRmsCurrentMinPhaseBWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsCurrentMinPhaseB:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsCurrentMaxPhaseBWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsCurrentMaxPhaseB:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeActivePowerPhaseBWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)activePowerPhaseB:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeActivePowerMinPhaseBWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)activePowerMinPhaseB:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeActivePowerMaxPhaseBWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)activePowerMaxPhaseB:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeReactivePowerPhaseBWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)reactivePowerPhaseB:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeApparentPowerPhaseBWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)apparentPowerPhaseB:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributePowerFactorPhaseBWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)powerFactorPhaseB:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAverageRmsVoltageMeasurementPeriodPhaseBWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageRmsVoltageMeasurementPeriodPhaseB:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageRmsOverVoltageCounterPhaseBWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageRmsOverVoltageCounterPhaseB:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAverageRmsUnderVoltageCounterPhaseBWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageRmsUnderVoltageCounterPhaseB:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsExtremeOverVoltagePeriodPhaseBWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsExtremeOverVoltagePeriodPhaseB:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRmsExtremeUnderVoltagePeriodPhaseBWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsExtremeUnderVoltagePeriodPhaseB:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageSagPeriodPhaseBWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsVoltageSagPeriodPhaseB:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageSwellPeriodPhaseBWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsVoltageSwellPeriodPhaseB:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeLineCurrentPhaseCWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)lineCurrentPhaseC:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeActiveCurrentPhaseCWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)activeCurrentPhaseC:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeReactiveCurrentPhaseCWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)reactiveCurrentPhaseC:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltagePhaseCWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsVoltagePhaseC:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageMinPhaseCWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsVoltageMinPhaseC:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageMaxPhaseCWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsVoltageMaxPhaseC:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsCurrentPhaseCWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsCurrentPhaseC:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRmsCurrentMinPhaseCWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsCurrentMinPhaseC:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsCurrentMaxPhaseCWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsCurrentMaxPhaseC:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeActivePowerPhaseCWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)activePowerPhaseC:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeActivePowerMinPhaseCWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)activePowerMinPhaseC:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeActivePowerMaxPhaseCWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)activePowerMaxPhaseC:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeReactivePowerPhaseCWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)reactivePowerPhaseC:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeApparentPowerPhaseCWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)apparentPowerPhaseC:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributePowerFactorPhaseCWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)powerFactorPhaseC:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAverageRmsVoltageMeasurementPeriodPhaseCWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageRmsVoltageMeasurementPeriodPhaseC:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeAverageRmsOverVoltageCounterPhaseCWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageRmsOverVoltageCounterPhaseC:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAverageRmsUnderVoltageCounterPhaseCWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)averageRmsUnderVoltageCounterPhaseC:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsExtremeOverVoltagePeriodPhaseCWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsExtremeOverVoltagePeriodPhaseC:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRmsExtremeUnderVoltagePeriodPhaseCWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsExtremeUnderVoltagePeriodPhaseC:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageSagPeriodPhaseCWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsVoltageSagPeriodPhaseC:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeRmsVoltageSwellPeriodPhaseCWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rmsVoltageSwellPeriodPhaseC:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -5465,344 +17447,1114 @@ MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 - (void)testEmitTestFabricScopedEventRequestWithParams:(MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeBooleanWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)boolean:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeBooleanWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeBooleanWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeBitmap8WithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)bitmap8:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeBitmap8WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeBitmap8WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeBitmap16WithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)bitmap16:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeBitmap16WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeBitmap16WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeBitmap32WithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)bitmap32:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeBitmap32WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeBitmap32WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeBitmap64WithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)bitmap64:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeBitmap64WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeBitmap64WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeInt8uWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)int8u:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeInt16uWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)int16u:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeInt16uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeInt16uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeInt24uWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)int24u:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeInt24uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeInt24uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeInt32uWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)int32u:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeInt32uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeInt32uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeInt40uWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)int40u:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeInt40uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeInt40uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeInt48uWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)int48u:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeInt48uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeInt48uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeInt56uWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)int56u:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeInt56uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeInt56uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeInt64uWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)int64u:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeInt64uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeInt64uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeInt8sWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)int8s:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeInt8sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeInt8sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeInt16sWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)int16s:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeInt16sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeInt16sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeInt24sWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)int24s:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeInt24sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeInt24sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeInt32sWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)int32s:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeInt32sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeInt32sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeInt40sWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)int40s:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeInt40sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeInt40sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeInt48sWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)int48s:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeInt48sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeInt48sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeInt56sWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)int56s:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeInt56sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeInt56sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeInt64sWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)int64s:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeInt64sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeInt64sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeEnum8WithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)enum8:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeEnum8WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeEnum8WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeEnum16WithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)enum16:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeEnum16WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeEnum16WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeFloatSingleWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)floatSingle:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeFloatSingleWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeFloatSingleWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeFloatDoubleWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)floatDouble:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeFloatDoubleWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeFloatDoubleWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeOctetStringWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSData *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSData * _Nullable)octetString:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeOctetStringWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeOctetStringWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeListInt8uWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)listInt8u:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeListInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeListInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeListOctetStringWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSData *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSData *> * _Nullable)listOctetString:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeListOctetStringWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeListOctetStringWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeListStructOctetStringWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRUnitTestingClusterTestListStructOctet *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRUnitTestingClusterTestListStructOctet *> * _Nullable)listStructOctetString:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeListStructOctetStringWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeListStructOctetStringWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeLongOctetStringWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSData *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSData * _Nullable)longOctetString:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeLongOctetStringWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeLongOctetStringWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeCharStringWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)charString:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeCharStringWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeCharStringWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeLongCharStringWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)longCharString:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeLongCharStringWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeLongCharStringWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeEpochUsWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)epochUs:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeEpochUsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeEpochUsWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeEpochSWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)epochS:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeEpochSWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeEpochSWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeVendorIdWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)vendorId:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeVendorIdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeVendorIdWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeListNullablesAndOptionalsStructWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRUnitTestingClusterNullablesAndOptionalsStruct *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRUnitTestingClusterNullablesAndOptionalsStruct *> * _Nullable)listNullablesAndOptionalsStruct:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeListNullablesAndOptionalsStructWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeListNullablesAndOptionalsStructWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeEnumAttrWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)enumAttr:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeEnumAttrWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeEnumAttrWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeStructAttrWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `MTRUnitTestingClusterSimpleStruct *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (MTRUnitTestingClusterSimpleStruct * _Nullable)structAttr:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeStructAttrWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeStructAttrWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeRangeRestrictedInt8uWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rangeRestrictedInt8u:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeRangeRestrictedInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeRangeRestrictedInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeRangeRestrictedInt8sWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rangeRestrictedInt8s:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeRangeRestrictedInt8sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeRangeRestrictedInt8sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeRangeRestrictedInt16uWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rangeRestrictedInt16u:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeRangeRestrictedInt16uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeRangeRestrictedInt16uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeRangeRestrictedInt16sWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)rangeRestrictedInt16s:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeRangeRestrictedInt16sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeRangeRestrictedInt16sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeListLongOctetStringWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSData *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSData *> * _Nullable)listLongOctetString:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeListLongOctetStringWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeListLongOctetStringWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeListFabricScopedWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<MTRUnitTestingClusterTestFabricScoped *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<MTRUnitTestingClusterTestFabricScoped *> * _Nullable)listFabricScoped:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeListFabricScopedWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeListFabricScopedWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeTimedWriteBooleanWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)timedWriteBoolean:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeTimedWriteBooleanWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeTimedWriteBooleanWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneralErrorBooleanWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)generalErrorBoolean:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeGeneralErrorBooleanWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeGeneralErrorBooleanWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeClusterErrorBooleanWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterErrorBoolean:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeClusterErrorBooleanWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeClusterErrorBooleanWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeUnsupportedWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)unsupported:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeUnsupportedWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeUnsupportedWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableBooleanWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableBoolean can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableBoolean:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableBooleanWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableBooleanWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableBitmap8WithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableBitmap8 can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableBitmap8:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableBitmap8WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableBitmap8WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableBitmap16WithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableBitmap16 can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableBitmap16:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableBitmap16WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableBitmap16WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableBitmap32WithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableBitmap32 can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableBitmap32:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableBitmap32WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableBitmap32WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableBitmap64WithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableBitmap64 can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableBitmap64:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableBitmap64WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableBitmap64WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt8uWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableInt8u can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableInt8u:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt16uWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableInt16u can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableInt16u:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableInt16uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableInt16uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt24uWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableInt24u can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableInt24u:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableInt24uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableInt24uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt32uWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableInt32u can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableInt32u:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableInt32uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableInt32uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt40uWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableInt40u can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableInt40u:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableInt40uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableInt40uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt48uWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableInt48u can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableInt48u:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableInt48uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableInt48uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt56uWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableInt56u can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableInt56u:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableInt56uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableInt56uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt64uWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableInt64u can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableInt64u:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableInt64uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableInt64uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt8sWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableInt8s can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableInt8s:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableInt8sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableInt8sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt16sWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableInt16s can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableInt16s:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableInt16sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableInt16sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt24sWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableInt24s can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableInt24s:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableInt24sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableInt24sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt32sWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableInt32s can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableInt32s:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableInt32sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableInt32sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt40sWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableInt40s can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableInt40s:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableInt40sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableInt40sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt48sWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableInt48s can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableInt48s:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableInt48sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableInt48sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt56sWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableInt56s can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableInt56s:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableInt56sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableInt56sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableInt64sWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableInt64s can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableInt64s:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableInt64sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableInt64sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableEnum8WithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableEnum8 can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableEnum8:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableEnum8WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableEnum8WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableEnum16WithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableEnum16 can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableEnum16:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableEnum16WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableEnum16WithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableFloatSingleWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableFloatSingle can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableFloatSingle:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableFloatSingleWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableFloatSingleWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableFloatDoubleWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableFloatDouble can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableFloatDouble:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableFloatDoubleWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableFloatDoubleWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableOctetStringWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableOctetString can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSData *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSData * _Nullable)nullableOctetString:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableOctetStringWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableOctetStringWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableCharStringWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableCharString can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSString *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSString * _Nullable)nullableCharString:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableCharStringWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableCharStringWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableEnumAttrWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableEnumAttr can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableEnumAttr:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableEnumAttrWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableEnumAttrWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableStructWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableStruct can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable MTRUnitTestingClusterSimpleStruct *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (MTRUnitTestingClusterSimpleStruct * _Nullable)nullableStruct:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableStructWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableStructWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableRangeRestrictedInt8uWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableRangeRestrictedInt8u can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableRangeRestrictedInt8u:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableRangeRestrictedInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableRangeRestrictedInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableRangeRestrictedInt8sWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableRangeRestrictedInt8s can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableRangeRestrictedInt8s:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableRangeRestrictedInt8sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableRangeRestrictedInt8sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableRangeRestrictedInt16uWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableRangeRestrictedInt16u can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableRangeRestrictedInt16u:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableRangeRestrictedInt16uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableRangeRestrictedInt16uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeNullableRangeRestrictedInt16sWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * nullableRangeRestrictedInt16s can return nil and set *error to nil.  This indicates that the value of the attribute is available and is null.
+ *
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `nullable NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)nullableRangeRestrictedInt16s:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE __attribute__((swift_error(nonnull_error)));
 - (void)writeAttributeNullableRangeRestrictedInt16sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeNullableRangeRestrictedInt16sWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeWriteOnlyInt8uWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)writeOnlyInt8u:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 - (void)writeAttributeWriteOnlyInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)writeAttributeWriteOnlyInt8uWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_NEWLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -5830,20 +18582,76 @@ MTR_PROVISIONALLY_AVAILABLE
 - (void)addArgumentsWithParams:(MTRSampleMEIClusterAddArgumentsParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRSampleMEIClusterAddArgumentsResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFlipFlopWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)flipFlop:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeFlipFlopWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeFlipFlopWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)generatedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)acceptedCommandList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeEventListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)eventList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSArray<NSNumber *> *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSArray<NSNumber *> * _Nullable)attributeList:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> *)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)featureMap:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
+
 - (NSDictionary<NSString *, id> *)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * If the attribute value is not available, an MTRErrorCodeAttributeValueUnavailable error will be returned.
+ *
+ * If the attribute value canot be decoded to `NSNumber *`,
+ * an MTRErrorCodeSchemaMismatch error will be returned.
+ */
+- (NSNumber * _Nullable)clusterRevision:(NSError * __autoreleasing *)error MTR_PROVISIONALLY_AVAILABLE;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;

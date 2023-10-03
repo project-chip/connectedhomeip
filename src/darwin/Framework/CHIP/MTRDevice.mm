@@ -996,6 +996,43 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return attributeValueToReturn;
 }
 
+- (nullable id)readAttributeWithEndpointID:(NSNumber *)endpointID
+                                 clusterID:(NSNumber *)clusterID
+                               attributeID:(NSNumber *)attributeID
+                                     error:(NSError * __autoreleasing *)error
+{
+    if (error) {
+        *error = nil;
+    }
+
+    NSDictionary<NSString *, id> * value = [self readAttributeWithEndpointID:endpointID
+                                                                   clusterID:clusterID
+                                                                 attributeID:attributeID
+                                                                      params:nil];
+    if (value == nil) {
+        if (error) {
+            *error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeAttributeValueUnavailable userInfo:nil];
+        }
+        return nil;
+    }
+
+    auto * path = [MTRAttributePath attributePathWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID];
+    auto * responseValue = @{
+        MTRAttributePathKey : path,
+        MTRDataKey : value,
+    };
+
+    auto * report = [[MTRAttributeReport alloc] initWithResponseValue:responseValue error:error];
+    if (report == nil) {
+        return nil;
+    }
+
+    // Because our responseValue has MTRDataKey, we either errored out (and got nil for
+    // the report) or report.value is the (possibly nil) correct value for the
+    // attribute.
+    return report.value;
+}
+
 - (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
                          attributeID:(NSNumber *)attributeID
