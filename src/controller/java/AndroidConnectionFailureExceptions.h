@@ -25,8 +25,8 @@ namespace chip {
 class AndroidConnectionFailureExceptions
 {
 public:
-    AndroidConnectionFailureExceptions(const AndroidConnectionFailureExceptions &)  = delete;
-    AndroidConnectionFailureExceptions(const AndroidConnectionFailureExceptions &&) = delete;
+    AndroidConnectionFailureExceptions(const AndroidConnectionFailureExceptions &)             = delete;
+    AndroidConnectionFailureExceptions(const AndroidConnectionFailureExceptions &&)            = delete;
     AndroidConnectionFailureExceptions & operator=(const AndroidConnectionFailureExceptions &) = delete;
 
     static AndroidConnectionFailureExceptions & GetInstance()
@@ -39,7 +39,7 @@ public:
      * Creates a Java ConnectionFailureException object in outEx.
      */
     CHIP_ERROR CreateAndroidConnectionFailureException(JNIEnv * env, const char * message, uint32_t errorCode,
-                                                       OperationalSessionSetup::State state, jthrowable & outEx);
+                                                       SessionState state, jthrowable & outEx);
 
 private:
     AndroidConnectionFailureExceptions() {}

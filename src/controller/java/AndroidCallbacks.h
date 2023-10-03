@@ -41,7 +41,7 @@ struct GetConnectedDeviceCallback
     static void OnDeviceConnectionFailureFn(void * context, const OperationalSessionSetup::ConnnectionFailureInfo & failureInfo);
 
     Callback::Callback<OnDeviceConnected> mOnSuccess;
-    Callback::Callback<OperationalSessionSetup::OnExtendedSetupFailure> mOnFailure;
+    Callback::Callback<OperationalSessionSetup::OnSetupFailure> mOnFailure;
     jobject mWrapperCallbackRef = nullptr;
     jobject mJavaCallbackRef    = nullptr;
 };

@@ -187,7 +187,7 @@ void PairingSession::Clear()
     mSessionManager = nullptr;
 }
 
-void PairingSession::NotifySessionEstablishmentError(CHIP_ERROR error)
+void PairingSession::NotifySessionEstablishmentError(CHIP_ERROR error, SessionState state)
 {
     if (mDelegate == nullptr)
     {
@@ -197,7 +197,7 @@ void PairingSession::NotifySessionEstablishmentError(CHIP_ERROR error)
 
     auto * delegate = mDelegate;
     mDelegate       = nullptr;
-    delegate->OnSessionEstablishmentError(error);
+    delegate->OnSessionEstablishmentError(error, state);
 }
 
 void PairingSession::OnSessionReleased()

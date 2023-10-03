@@ -232,15 +232,15 @@ public:
      */
     CHIP_ERROR GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
                                   chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure,
-                                  chip::Callback::Callback<OperationalSessionSetup::OnExtendedSetupFailure> * onExtendedConnectionFailure)
+                                  chip::Callback::Callback<OperationalSessionSetup::OnSetupFailure> * onSetupFailure)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
-        // Ensure that only one of onFailure and onExtendedConnectionFailure is provided.
-        VerifyOrReturnError(!(onFailure && onExtendedConnectionFailure), CHIP_ERROR_INVALID_ARGUMENT);
+        // Ensure that only one of onFailure and onSetupFailure is provided.
+        VerifyOrReturnError(!(onFailure && onSetupFailure), CHIP_ERROR_INVALID_ARGUMENT);
 
         mSystemState->CASESessionMgr()->FindOrEstablishSession(ScopedNodeId(peerNodeId, GetFabricIndex()), onConnection, onFailure,
-                                                               onExtendedConnectionFailure);
+                                                               onSetupFailure);
         return CHIP_NO_ERROR;
     }
 
@@ -250,8 +250,9 @@ public:
         return GetConnectedDevice(peerNodeId, onConnection, onFailure, nullptr);
     }
 
-    CHIP_ERROR GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                  chip::Callback::Callback<OperationalSessionSetup::OnExtendedSetupFailure> * onExtendedDeviceConnectionFailure)
+    CHIP_ERROR
+    GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
+                       chip::Callback::Callback<OperationalSessionSetup::OnSetupFailure> * onExtendedDeviceConnectionFailure)
     {
         return GetConnectedDevice(peerNodeId, onConnection, nullptr, onExtendedDeviceConnectionFailure);
     }

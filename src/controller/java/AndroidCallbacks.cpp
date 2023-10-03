@@ -157,7 +157,8 @@ void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, Messaging::
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
-void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, const OperationalSessionSetup::ConnnectionFailureInfo & failureInfo)
+void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context,
+                                                             const OperationalSessionSetup::ConnnectionFailureInfo & failureInfo)
 {
     JNIEnv * env         = JniReferences::GetInstance().GetEnvForCurrentThread();
     auto * self          = static_cast<GetConnectedDeviceCallback *>(context);

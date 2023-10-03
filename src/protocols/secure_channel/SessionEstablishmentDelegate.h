@@ -25,12 +25,26 @@
 
 #pragma once
 
+#include <protocols/secure_channel/PairingSession.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/Session.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
 
 namespace chip {
+
+enum class SessionState : uint8_t
+{
+    kUndefined              = 0,
+    kSentPBKDFParamRequest  = 1,
+    kSentPBKDFParamResponse = 2,
+    kSentPake1              = 3,
+    kSentPake2              = 4,
+    kSentPake3              = 5,
+    kSentSigma1             = 6,
+    kSentSigma2             = 7,
+    kSentSigma3             = 8,
+};
 
 class DLL_EXPORT SessionEstablishmentDelegate
 {
@@ -41,6 +55,13 @@ public:
      *   OnSessionEstablished is called.
      */
     virtual void OnSessionEstablishmentError(CHIP_ERROR error) {}
+
+    /**
+     *   Called when session establishment fails with an error and state at the
+     *   failure. This will be called at most once per session establishment and
+     *   will not be called if OnSessionEstablished is called.
+     */
+    virtual void OnSessionEstablishmentError(CHIP_ERROR error, SessionState state) { OnSessionEstablishmentError(error); }
 
     /**
      *   Called on start of session establishment process

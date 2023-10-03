@@ -216,10 +216,13 @@ protected:
     void Clear();
 
     /**
-     * Notify our delegate about a session establishment error, if we have not
-     * notified it of an error or success before.
+     * Notify our delegate about a session establishment error if we have not
+     * already notified it of an error or success for the given session state.
+     *
+     * @param error The error code to report.
+     * @param state The state of the session, defaults to State::kUndefined.
      */
-    void NotifySessionEstablishmentError(CHIP_ERROR error);
+    void NotifySessionEstablishmentError(CHIP_ERROR error, SessionState state = SessionState::kUndefined);
 
 protected:
     CryptoContext::SessionRole mRole;
