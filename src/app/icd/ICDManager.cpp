@@ -266,18 +266,18 @@ bool ICDManager::EnsureChipStackLock()
 }
 
 /* ICDNotify observer functions. */
-void ICDManager::KeepActiveRequest(KeepActiveFlags requester, bool set)
+void ICDManager::KeepActiveRequest(KeepActiveFlags request, bool set)
 {
     bool requiresUnlock = this->EnsureChipStackLock();
 
-    if (requester == KeepActiveFlags::kExchangeContextOpen)
+    if (request == KeepActiveFlags::kExchangeContextOpen)
     {
         // There can be multiple open exchange context at the same time.
         // Keep track of the requests count.
         if (set)
         {
             this->OpenExchangeContextCount++;
-            this->SetKeepActiveModeRequirements(requester, set);
+            this->SetKeepActiveModeRequirements(request, set);
         }
         else
         {
@@ -292,14 +292,14 @@ void ICDManager::KeepActiveRequest(KeepActiveFlags requester, bool set)
 
             if (this->OpenExchangeContextCount == 0)
             {
-                this->SetKeepActiveModeRequirements(requester, set);
+                this->SetKeepActiveModeRequirements(request, set);
             }
         }
     }
     else /* kCommissioningWindowOpen, kFailSafeArmed */
     {
-        // Only 1 requester per type - apply request directly
-        this->SetKeepActiveModeRequirements(requester, set);
+        // Only 1 request per type - apply request directly
+        this->SetKeepActiveModeRequirements(request, set);
     }
 
     if (requiresUnlock)

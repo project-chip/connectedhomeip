@@ -17,12 +17,8 @@
 #pragma once
 
 #include <app/AppConfig.h>
-#include <stdio.h>
-#include <stdlib.h>
-// #include <lib/support/Pool.h>
-#include <algorithm>
 #include <cstdint>
-#include <vector>
+#include <cstring>
 
 #ifndef ICD_MAX_NOTIFICATION_SUBSCRIBERS
 #define ICD_MAX_NOTIFICATION_SUBSCRIBERS 1
@@ -44,59 +40,64 @@ public:
     };
 
     virtual ~ICDNotify() {}
-    virtual void NotifyNetworkActivity()                                = 0;
-    virtual void KeepActiveRequest(KeepActiveFlags requester, bool set) = 0;
+    virtual void NotifyNetworkActivity()                              = 0;
+    virtual void KeepActiveRequest(KeepActiveFlags request, bool set) = 0;
 };
 
 class ICDNotifier
 {
 public:
-    ~ICDNotifier()
-    {
-        //    mSubscribersPool.ReleaseAll();
-    }
+    ICDNotifier() { memset(subscribers, 0, sizeof(subscribers)); }
+    ~ICDNotifier() { memset(subscribers, 0, sizeof(subscribers)); }
 
     void Subscribe(ICDNotify * subscriber)
     {
-        // subscriber = mSubscribersPool.CreateObject();
-        subscribers.push_back(subscriber);
+        for (auto & sub : subscribers)
+        {
+            if (sub == nullptr)
+            {
+                sub = subscriber;
+                break;
+            }
+        }
     }
 
     void Unsubscribe(ICDNotify * subscriber)
     {
-        // mSubscribersPool.ReleaseObject(subscriber);
-        subscribers.erase(std::remove(subscribers.begin(), subscribers.end(), subscriber), subscribers.end());
+        for (auto & sub : subscribers)
+        {
+            if (sub == subscriber)
+            {
+                sub = nullptr;
+                break;
+            }
+        }
     }
 
     void NetworkActivity() const
     {
-        // mSubscribersPool.ForEachActiveObject([](ICDNotify * subscriber) {
-        //     subscriber->NotifyNetworkActivity();
-        //     return Loop::Continue;
-        // });
-        for (ICDNotify * subscriber : subscribers)
+        for (auto subscriber : subscribers)
         {
-            subscriber->NotifyNetworkActivity();
+            if (subscriber != nullptr)
+            {
+                subscriber->NotifyNetworkActivity();
+            }
         }
     }
 
-    void ActiveRequest(ICDNotify::KeepActiveFlags requester, bool set) const
+    void ActiveRequest(ICDNotify::KeepActiveFlags request, bool set) const
     {
-        // mSubscribersPool.ForEachActiveObject([requester,set](ICDNotify * subscriber) {
-
-        //     subscriber->KeepActiveRequest(requester, set);
-        //     return Loop::Continue;
-        // });
-
-        for (ICDNotify * subscriber : subscribers)
+        for (auto subscriber : subscribers)
         {
-            subscriber->KeepActiveRequest(requester, set);
+            if (subscriber != nullptr)
+            {
+                subscriber->KeepActiveRequest(request, set);
+            }
         }
     }
 
 private:
-    // ObjectPool<ICDNotify, ICD_MAX_NOTIFICATION_SUBSCRIBERS> mSubscribersPool;
-    std::vector<ICDNotify *> subscribers;
+    ICDNotify * subscribers[ICD_MAX_NOTIFICATION_SUBSCRIBERS];
 };
 
 ICDNotifier * GetICDNotifier();

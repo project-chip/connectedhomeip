@@ -65,7 +65,7 @@ public:
 
     // Implementation of ICDNotify observer functions.
     void NotifyNetworkActivity() override;
-    void KeepActiveRequest(ICDNotify::KeepActiveFlags requester, bool set) override;
+    void KeepActiveRequest(ICDNotify::KeepActiveFlags request, bool set) override;
 
 protected:
     friend class TestICDManager;
