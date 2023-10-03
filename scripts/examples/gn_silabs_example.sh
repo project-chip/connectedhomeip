@@ -214,10 +214,6 @@ else
             #   optArgs+="openthread_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/openthread\" openthread_efr32_root=\"//third_party/connectedhomeip/third_party/openthread/ot-efr32/src/src\""
             #    shift
             #    ;;
-            --report_on_active)
-                optArgs+="chip_report_on_active_mode=true "
-                shift
-                ;;
             --release)
                 optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false "
                 shift
