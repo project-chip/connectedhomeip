@@ -261,7 +261,7 @@ if (CONFIG_SEC_CERT_DAC_PROVIDER)
 endif()
 
 if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
-  chip_gn_arg_append("matter_trace_config" "\"//third_party/connectedhomeip/third_party/src/tracing/esp32_trace:esp32_trace_tracing\"")
+  chip_gn_arg_append("matter_trace_config" "\"${CHIP_ROOT}/src/tracing/esp32_trace:esp32_trace_tracing\"")
 endif()
 
 if (CONFIG_USE_ESP32_ECDSA_PERIPHERAL)
@@ -318,7 +318,11 @@ set(GN_ROOT_TARGET ${CHIP_ROOT}/config/esp32)
 set(chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libCHIP.a")
 
 if(CONFIG_ENABLE_PW_RPC)
-    list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libPwRpc.a")
+  list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libPwRpc.a")
+endif()
+
+if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
+  list(APPEND chip_libraries "${CMAKE_CURRENT_BINARY_DIR}/lib/libEsp32TracingBackend.a")
 endif()
 
 # When using the pregenerated files, there is a edge case where an error appears for

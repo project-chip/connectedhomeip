@@ -20,12 +20,20 @@ config("tracing") {
   include_dirs = [ "include" ]
 }
 
-source_set("esp32_trace_tracing") {
-  public = [ "include/matter/tracing/macros_impl.h" ]
+static_library("backend") {
+  output_name = "libEsp32TracingBackend"
+  output_dir = "${root_out_dir}/lib"
+
   sources = [
     "esp32_tracing.cpp",
     "esp32_tracing.h",
   ]
   public_deps = [ "${chip_root}/src/tracing" ]
-  public_configs = [ ":tracing" ]
 }
+
+source_set("esp32_trace_tracing") {
+  public = [ "include/matter/tracing/macros_impl.h" ]
+  public_configs = [ ":tracing" ]
+  deps = [ ":backend" ]
+}
+
