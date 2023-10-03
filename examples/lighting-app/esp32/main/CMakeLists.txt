@@ -75,9 +75,6 @@ endif()
 
 
 if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
-  # FIXME:
-  # need GN argument
-  #    matter_trace_config = "${chip_root}/src/tracing/esp32_trace:esp32_trace_tracing"
   list(APPEND PRIV_INCLUDE_DIRS_LIST "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/tracing/esp32_trace/include")
 endif()
 
