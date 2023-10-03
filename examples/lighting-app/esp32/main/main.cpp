@@ -60,7 +60,7 @@
 
 #if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
 #include <esp_insights.h>
-#include <matter/tracing/esp32_tracing.h>
+#include <tracing/esp32_trace/esp32_tracing.h>
 #include <tracing/registry.h>
 #endif
 
