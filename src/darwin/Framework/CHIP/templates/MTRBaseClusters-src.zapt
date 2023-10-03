@@ -11,6 +11,8 @@
 #import "MTRCommandPayloadsObjc.h"
 #import "MTRDevice_Internal.h"
 #import "MTRStructsObjc.h"
+#import "NSStringSpanConversion.h"
+#import "NSDataSpanConversion.h"
 
 #include <controller/CHIPCluster.h>
 #include <lib/support/CHIPListUtils.h>

@@ -97,6 +97,20 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
                                                   clusterID:(chip::ClusterId)clusterID
                                                   commandID:(chip::CommandId)commandID
                                                       error:(NSError * __autoreleasing *)error;
+
+/**
+ * Like the public invokeCommandWithEndpointID but allows passing through a
+ * serverSideProcessingTimeout.
+ */
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(id)commandFields
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion;
+
 @end
 
 @interface MTRClusterPath ()
@@ -140,6 +154,6 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
 
 // Exported utility function
 // Convert TLV data into data-value dictionary as described in MTRDeviceResponseHandler
-id _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data);
+NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data);
 
 NS_ASSUME_NONNULL_END
