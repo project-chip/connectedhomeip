@@ -92,7 +92,7 @@ public:
 class Efr32Device final : public Device
 {
 public:
-    pw::Status Reboot(const pw_protobuf_Empty & request, pw_protobuf_Empty & response) override
+    pw::Status Reboot(const chip_rpc_RebootRequest & request, pw_protobuf_Empty & response) override
     {
         TickType_t delayMs = kRebootTimerPeriodMs;
         if (request.delay_ms != 0) {
