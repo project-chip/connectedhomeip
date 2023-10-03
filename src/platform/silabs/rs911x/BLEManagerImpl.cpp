@@ -148,16 +148,12 @@ void sl_ble_event_handling_task(void)
         }
         break;
         case RSI_BLE_EVENT_GATT_RD: {
-            // event invokes when write/notification events received
-            BLEMgrImpl().UpdateMtu(event_msg.rsi_ble_mtu);
-            // clear the served event
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-            if (evt->data.evt_gatt_server_user_read_request.characteristic == gattdb_CHIPoBLEChar_C3)
-            {
-                BLEMgrImpl().HandleC3ReadRequest(evt);
-            }
+        if (event_msg.rsi_ble_read_req->type == 0) {
+             BLEMgrImpl().HandleC3ReadRequest(event_msg.rsi_ble_read_req);
+        }
 #endif // CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-
+            // clear the served event
             rsi_ble_app_clear_event(RSI_BLE_EVENT_GATT_RD);
         }
         break;
@@ -997,10 +993,10 @@ exit:
     return err;
 }
 
-void BLEManagerImpl::HandleC3ReadRequest(volatile rsi_ble_read_req_t * rsi_ble_read_req) {
-  ret = rsi_ble_gatt_read_response(rsi_ble_read_req.dev_addr,
+void BLEManagerImpl::HandleC3ReadRequest(rsi_ble_read_req_t * rsi_ble_read_req) {
+  sl_status_t ret = rsi_ble_gatt_read_response(rsi_ble_read_req->dev_addr,
                                     GATT_READ_RESP,
-                                    rsi_ble_read_req.handle,
+                                    rsi_ble_read_req->handle,
                                     GATT_READ_ZERO_OFFSET,
                                     sInstance.c3AdditionalDataBufferHandle->DataLength(),
                                     sInstance.c3AdditionalDataBufferHandle->Start());
