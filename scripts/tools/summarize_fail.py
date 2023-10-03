@@ -81,7 +81,7 @@ def main():
 
     logging.info(f"Listing recent fails from {yesterday}.")
     df.columns = ["ID", "Pull Request", "Start Time", "Workflow"]
-    print("Recent Fails:")
+    print(f"Recent Fails From {yesterday}:")
     print(df.to_string(columns=["Pull Request", "Workflow"], index=False))
     print()
     df.to_csv("recent_fails.csv", index=False)
