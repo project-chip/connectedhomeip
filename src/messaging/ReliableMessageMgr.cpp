@@ -38,7 +38,7 @@
 #include <platform/ConnectivityManager.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDManager.h> // nogncheck
+#include <app/icd/ICDManager.h>  // nogncheck
 #include <app/icd/ICDNotifier.h> // nogncheck
 #endif
 

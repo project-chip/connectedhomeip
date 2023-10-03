@@ -20,11 +20,11 @@
  *          Provides the implementation of the FailSafeContext object.
  */
 
+#include <app/icd/ICDNotifier.h>
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <app/icd/ICDNotifier.h>
 
 #include "FailSafeContext.h"
 
