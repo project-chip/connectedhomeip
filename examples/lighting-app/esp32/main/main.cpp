@@ -18,10 +18,10 @@
 #include "DeviceCallbacks.h"
 
 #include "AppTask.h"
+#include "esp_log.h"
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
 #include <common/Esp32ThreadInit.h>
-#include "esp_log.h"
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "spi_flash_mmap.h"
 #else
@@ -127,7 +127,7 @@ static void InitServer(intptr_t context)
         ESP_LOGE(TAG, "Failed to initialize ESP Insights, err:0x%x", ret);
     }
 
-    static  Tracing::Insights::ESP32Backend backend;
+    static Tracing::Insights::ESP32Backend backend;
     Tracing::Register(backend);
 #endif
 }
@@ -182,7 +182,6 @@ extern "C" void app_main()
     SetDeviceInstanceInfoProvider(&sFactoryDataProvider);
 #endif
 #endif
-
 
     SetDeviceAttestationCredentialsProvider(get_dac_provider());
     ESPOpenThreadInit();

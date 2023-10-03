@@ -261,7 +261,7 @@ if (CONFIG_SEC_CERT_DAC_PROVIDER)
 endif()
 
 if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
-    chip_gn_arg_append("matter_enable_esp_insights_trace"                    "true")
+  chip_gn_arg_append("matter_trace_config" "\"//third_party/connectedhomeip/third_party/src/tracing/esp32_trace:esp32_trace_tracing\"")
 endif()
 
 if (CONFIG_USE_ESP32_ECDSA_PERIPHERAL)
@@ -370,10 +370,6 @@ target_include_directories(${COMPONENT_LIB} INTERFACE
     "${CHIP_ROOT}/config/esp32/${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}"
     "${CHIP_ROOT}/config/esp32/${CONFIG_CHIP_EXTERNAL_PLATFORM_DIR}/../../"
 )
-
-if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
-    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
-endif()
 
 idf_component_get_property(mbedtls_lib mbedtls COMPONENT_LIB)
 

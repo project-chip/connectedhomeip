@@ -73,6 +73,14 @@ if(${IDF_TARGET} STREQUAL "esp32")
     list(APPEND PRIV_REQUIRES_LIST spidriver screen-framework)
 endif()
 
+
+if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
+  # FIXME:
+  # need GN argument
+  #    matter_trace_config = "${chip_root}/src/tracing/esp32_trace:esp32_trace_tracing"
+  list(APPEND PRIV_INCLUDE_DIRS_LIST "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/tracing/esp32_trace/include")
+endif()
+
 if (CONFIG_ENABLE_PW_RPC)
 # Append additional directories for RPC build
 set(PRIV_INCLUDE_DIRS_LIST  "${PRIV_INCLUDE_DIRS_LIST}"

@@ -49,4 +49,3 @@ private:
 #define _MACRO_CONCAT(a, b) _CONCAT_IMPL(a, b)
 
 #define MATTER_TRACE_SCOPE(label, group) ::chip::Tracing::Insights::Scoped _MACRO_CONCAT(_trace_scope, __COUNTER__)(label, group)
-

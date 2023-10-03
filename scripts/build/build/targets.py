@@ -206,6 +206,7 @@ def BuildEsp32Target():
 
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('ipv6only', enable_ipv4=False)
+    target.AppendModifier('tracing', enable_insights_trace=True)
 
     return target
 

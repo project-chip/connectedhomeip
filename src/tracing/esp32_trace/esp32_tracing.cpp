@@ -16,11 +16,11 @@
  *    limitations under the License.
  */
 
-#include <esp_log.h>
-#include <tracing/backend.h>
 #include "esp32_tracing.h"
-#include <memory>
 #include <esp_insights.h>
+#include <esp_log.h>
+#include <memory>
+#include <tracing/backend.h>
 namespace chip {
 namespace Tracing {
 namespace Insights {
@@ -37,17 +37,17 @@ void ESP32Backend::LogMessageSend(MessageSendInfo & info)
 
 void ESP32Backend::LogNodeLookup(NodeLookupInfo & info)
 {
-   ESP_LOGI("Data_Log", "Node Lookup");
+    ESP_LOGI("Data_Log", "Node Lookup");
 }
 
 void ESP32Backend::LogNodeDiscovered(NodeDiscoveredInfo & info)
 {
-   ESP_LOGI("Data_Log", "Log Node Discovered");
+    ESP_LOGI("Data_Log", "Log Node Discovered");
 }
 
 void ESP32Backend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info)
 {
-   ESP_LOGI("Data_Log", "Log Node Discovery Failed");
+    ESP_LOGI("Data_Log", "Log Node Discovery Failed");
 }
 
 void ESP32Backend::TraceBegin(const char * label, const char * group)
@@ -64,7 +64,7 @@ void ESP32Backend::TraceInstant(const char * label, const char * group)
 {
     ESP_DIAG_EVENT("Trc", "Instant : %s -%s", label, group);
 }
-}
 } // namespace Insights
 } // namespace Tracing
+} // namespace chip
 // namespace chip
