@@ -103,7 +103,7 @@ def main():
             pass_rate[workflow] = [info.value_counts(normalize=True).mul(100).round()["success"]]
         except Exception:
             pass_rate[workflow] = [0.0]
-    pass_rate = pd.DataFrame.from_dict(pass_rate, 'index', columns=["Pass Rate"])
+    pass_rate = pd.DataFrame.from_dict(pass_rate, 'index', columns=["Pass Rate"]).sort_values("Pass Rate")
     print("Recent Pass Rate of Each Workflow:")
     print(pass_rate.to_string())
     pass_rate.to_csv("workflow_pass_rate.csv")
