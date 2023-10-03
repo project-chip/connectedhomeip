@@ -43,6 +43,6 @@ jobs:
             failure_cause_summary.csv
             workflow_fail_rate.csv
             recent_fails_logs
-            workflow_fail_rate
+            workflow_pass_rate
           retention-days: 5
         
