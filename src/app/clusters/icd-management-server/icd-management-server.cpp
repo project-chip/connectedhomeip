@@ -126,7 +126,6 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadRegisteredClients(EndpointId endpoi
 
                 Structs::MonitoringRegistrationStruct::Type s{ .checkInNodeID    = e.checkInNodeID,
                                                                .monitoredSubject = e.monitoredSubject,
-                                                               .key              = e.key,
                                                                .fabricIndex      = e.fabricIndex };
                 ReturnErrorOnFailure(subEncoder.Encode(s));
             }
