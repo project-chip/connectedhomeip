@@ -25,6 +25,7 @@ jobs:
   list_workflows:
     name: Summarize Recent Workflow Failures
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
       - uses: actions/checkout@v3
       - run: pip install pandas python-slugify pyyaml
