@@ -72,7 +72,7 @@ def process_fail(id, pr, start_time, workflow):
 
 def main():
     logging.info("Gathering recent fails information into run_list.json.")
-    subprocess.run(f"gh run list -R project-chip/connectedhomeip -b master -s failure -L 100 --created {datetime.timedelta(days=1)..strftime('%Y-%m-%d')} --json databaseId,displayTitle,startedAt,workflowName > run_list.json", shell=True)
+    subprocess.run(f"gh run list -R project-chip/connectedhomeip -b master -s failure -L 100 --created {datetime.timedelta(days=1).strftime('%Y-%m-%d')} --json databaseId,displayTitle,startedAt,workflowName > run_list.json", shell=True)
 
     logging.info("Reading run_list.json into a DataFrame.")
     df = pd.read_json("run_list.json")
