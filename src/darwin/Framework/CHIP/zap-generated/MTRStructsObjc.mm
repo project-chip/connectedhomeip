@@ -2839,8 +2839,6 @@ NS_ASSUME_NONNULL_BEGIN
 
         _monitoredSubject = @(0);
 
-        _key = [NSData data];
-
         _fabricIndex = @(0);
     }
     return self;
@@ -2852,7 +2850,6 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.checkInNodeID = self.checkInNodeID;
     other.monitoredSubject = self.monitoredSubject;
-    other.key = self.key;
     other.fabricIndex = self.fabricIndex;
 
     return other;
@@ -2860,7 +2857,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: checkInNodeID:%@; monitoredSubject:%@; key:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _checkInNodeID, _monitoredSubject, [_key base64EncodedStringWithOptions:0], _fabricIndex];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: checkInNodeID:%@; monitoredSubject:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _checkInNodeID, _monitoredSubject, _fabricIndex];
     return descriptionString;
 }
 
