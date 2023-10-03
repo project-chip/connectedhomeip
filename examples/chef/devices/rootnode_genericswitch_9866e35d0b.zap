@@ -5520,7 +5520,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -5536,7 +5536,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -5716,7 +5716,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -5732,7 +5732,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -5748,7 +5748,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -5955,7 +5955,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "int8u",
-              "included": 1,
+              "included": 0,
               "storageOption": "NVM",
               "singleton": 0,
               "bounded": 0,
