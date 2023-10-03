@@ -102,7 +102,7 @@ def main():
         try:
             pass_rate[workflow] = [info.value_counts(normalize=True).mul(100).round()["success"]]
         except Exception:
-            pass_rate[workflow] = 0.0
+            pass_rate[workflow] = [0.0]
     pass_rate = pd.DataFrame.from_dict(pass_rate, 'index', columns=["Pass Rate"])
     print("Recent Pass Rate of Each Workflow:")
     print(pass_rate.to_string())
