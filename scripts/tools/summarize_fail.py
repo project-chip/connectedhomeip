@@ -51,11 +51,11 @@ def process_fail(id, pr, start_time, workflow):
 
 
 def main():
-    logging.info("Gathering recent fails information into run_list.json.")
-    subprocess.run(f"gh run list -R project-chip/connectedhomeip -b master -s failure -L 500 --created {yesterday} --json databaseId,displayTitle,startedAt,workflowName > run_list.json", shell=True)
+    logging.info("Gathering recent fails information into fail_run_list.json.")
+    subprocess.run(f"gh run list -R project-chip/connectedhomeip -b master -s failure -L 500 --created {yesterday} --json databaseId,displayTitle,startedAt,workflowName > fail_run_list.json", shell=True)
 
-    logging.info("Reading run_list.json into a DataFrame.")
-    df = pd.read_json("run_list.json")
+    logging.info("Reading fail_run_list.json into a DataFrame.")
+    df = pd.read_json("fail_run_list.json")
 
     logging.info(f"Listing recent fails from {yesterday}.")
     df.columns = ["ID", "Pull Request", "Start Time", "Workflow"]
