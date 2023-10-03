@@ -67,9 +67,12 @@ public:
     {
         Clock::Timeout delay;
 
-        if (request.delay_ms != 0) {
+        if (request.delay_ms != 0)
+        {
             delay = System::Clock::Milliseconds64(request.delay_ms);
-        } else {
+        }
+        else
+        {
             delay = System::Clock::Seconds32(1);
             ChipLogProgress(NotSpecified, "Did not receive a reboot delay. Defaulting to 1s");
         }
@@ -82,10 +85,9 @@ public:
         TriggerOTAQuery();
         return pw::OkStatus();
     }
+
 private:
-    static void RebootImpl(System::Layer *, void *) {
-        qvCHIP_ResetSystem();
-    }
+    static void RebootImpl(System::Layer *, void *) { qvCHIP_ResetSystem(); }
 };
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 

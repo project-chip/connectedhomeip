@@ -115,10 +115,14 @@ public:
     pw::Status Reboot(const chip_rpc_RebootRequest & request, pw_protobuf_Empty & response) override
     {
         TickType_t delayMs = kRebootTimerPeriodMs;
-        if (request.delay_ms != 0) {
+        if (request.delay_ms != 0)
+        {
             delayMs = request.delay_ms;
-        } else {
-            ChipLogProgress(NotSpecified, "Did not receive a reboot delay. Defaulting to %d ms", static_cast<int>(kRebootTimerPeriodMs));
+        }
+        else
+        {
+            ChipLogProgress(NotSpecified, "Did not receive a reboot delay. Defaulting to %d ms",
+                            static_cast<int>(kRebootTimerPeriodMs));
         }
         mRebootTimer = xTimerCreateStatic("Reboot", pdMS_TO_TICKS(delayMs), false, nullptr, RebootHandler, &mRebootTimerBuffer);
 
@@ -131,9 +135,7 @@ private:
     TimerHandle_t mRebootTimer;
     StaticTimer_t mRebootTimerBuffer;
 
-    static void RebootHandler(TimerHandle_t) {
-        esp_restart();
-    }
+    static void RebootHandler(TimerHandle_t) { esp_restart(); }
 };
 #endif // defined(PW_RPC_DEVICE_SERVICE) && PW_RPC_DEVICE_SERVICE
 

@@ -99,9 +99,12 @@ public:
     pw::Status Reboot(const chip_rpc_RebootRequest & request, pw_protobuf_Empty & response) override
     {
         k_timeout_t delay;
-        if (request.delay_ms != 0) {
+        if (request.delay_ms != 0)
+        {
             delay = K_MSEC(request.delay_ms);
-        } else {
+        }
+        else
+        {
             ChipLogProgress(NotSpecified, "Did not receive a reboot delay. Defaulting to 1s");
             delay = K_SECONDS(1);
         }

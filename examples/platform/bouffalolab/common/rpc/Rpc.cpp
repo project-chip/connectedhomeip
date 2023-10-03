@@ -102,10 +102,14 @@ public:
         }
 
         TickType_t delayMs = kRebootTimerPeriodMs;
-        if (request.delay_ms != 0) {
+        if (request.delay_ms != 0)
+        {
             delayMs = request.delay_ms;
-        } else {
-            ChipLogProgress(NotSpecified, "Did not receive a reboot delay. Defaulting to %d ms", static_cast<int>(kRebootTimerPeriodMs));
+        }
+        else
+        {
+            ChipLogProgress(NotSpecified, "Did not receive a reboot delay. Defaulting to %d ms",
+                            static_cast<int>(kRebootTimerPeriodMs));
         }
         mRebootTimer = xTimerCreateStatic("Reboot", pdMS_TO_TICKS(delayMs), false, nullptr, RebootHandler, &mRebootTimerBuffer);
         xTimerStart(mRebootTimer, 0);
