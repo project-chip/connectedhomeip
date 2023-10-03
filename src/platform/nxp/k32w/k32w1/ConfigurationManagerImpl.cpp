@@ -31,7 +31,7 @@
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #include <platform/nxp/k32w/k32w1/K32W1Config.h>
 
-//#include <openthread/platform/misc.h>
+// #include <openthread/platform/misc.h>
 #include "fsl_cmc.h"
 #include "fsl_device_registers.h"
 

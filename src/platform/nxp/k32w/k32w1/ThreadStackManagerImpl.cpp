@@ -96,7 +96,7 @@ extern "C" void otTaskletsSignalPending(otInstance * p_instance)
 
 extern "C" void * pvPortCallocRtos(size_t num, size_t size)
 {
-    size_t totalAllocSize = (size_t)(num * size);
+    size_t totalAllocSize = (size_t) (num * size);
 
     if (size && totalAllocSize / size != num)
         return nullptr;

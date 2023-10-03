@@ -99,7 +99,7 @@ public:
 
     // Non-copyable
     K32W1PersistentStorageOpKeystore(K32W1PersistentStorageOpKeystore const &) = delete;
-    void operator=(K32W1PersistentStorageOpKeystore const &) = delete;
+    void operator=(K32W1PersistentStorageOpKeystore const &)                   = delete;
 
     /**
      * @brief Initialize the Operational Keystore to map to a given storage delegate.

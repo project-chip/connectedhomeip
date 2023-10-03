@@ -36,8 +36,8 @@
 #endif
 
 #if (defined(K32W_LOG_ENABLED) && (K32W_LOG_ENABLED > 0))
-//#include "fsl_component_log.h"
-//#include "fsl_component_log_backend_debugconsole.h"
+// #include "fsl_component_log.h"
+// #include "fsl_component_log_backend_debugconsole.h"
 #endif
 #include "FreeRTOS.h"
 #include "FunctionLib.h"
