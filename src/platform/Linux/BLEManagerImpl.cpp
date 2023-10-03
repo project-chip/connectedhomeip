@@ -65,7 +65,7 @@ void HandleConnectTimeout(chip::System::Layer *, void * apEndpoint)
 {
     assert(apEndpoint != nullptr);
 
-    CancelConnect(static_cast<BluezEndpoint *>(apEndpoint));
+    static_cast<BluezEndpoint *>(apEndpoint)->CancelConnect();
     BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_TIMEOUT);
 }
 
@@ -106,7 +106,7 @@ void BLEManagerImpl::_Shutdown()
     // Stop advertising and free resources.
     mBLEAdvertisement.Shutdown();
     // Release BLE connection resources (unregister from BlueZ).
-    ShutdownBluezBleLayer(mpEndpoint);
+    mEndpoint.reset();
     mFlags.Clear(Flags::kBluezBLELayerInitialized);
 }
 
@@ -571,16 +571,16 @@ void BLEManagerImpl::DriveBLEState()
     // Initializes the Bluez BLE layer if needed.
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kBluezBLELayerInitialized))
     {
-        err = InitBluezBleLayer(mAdapterId, mIsCentral, nullptr, mDeviceName, mpEndpoint);
-        SuccessOrExit(err);
+        mEndpoint = Platform::MakeUnique<BluezEndpoint>(mAdapterId, mIsCentral);
+        VerifyOrExit(mEndpoint, ChipLogError(DeviceLayer, "FAIL: memory allocation in %s", __func__));
+        SuccessOrExit(err = mEndpoint->Init(nullptr, mDeviceName));
         mFlags.Set(Flags::kBluezBLELayerInitialized);
     }
 
     // Register the CHIPoBLE application with the Bluez BLE layer if needed.
     if (!mIsCentral && mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kAppRegistered))
     {
-        err = BluezGattsAppRegister(mpEndpoint);
-        SuccessOrExit(err);
+        SuccessOrExit(err = mEndpoint->BluezGattAppRegister());
         mFlags.Set(Flags::kControlOpInProgress);
         ExitNow();
     }
@@ -597,7 +597,7 @@ void BLEManagerImpl::DriveBLEState()
             // Configure advertising data if it hasn't been done yet.
             if (!mFlags.Has(Flags::kAdvertisingConfigured))
             {
-                err = mBLEAdvertisement.Init(mpEndpoint, mBLEAdvType, mpBLEAdvUUID, mBLEAdvDurationMs);
+                err = mBLEAdvertisement.Init(mEndpoint.get(), mBLEAdvType, mpBLEAdvUUID, mBLEAdvDurationMs);
                 SuccessOrExit(err);
                 mFlags.Set(Flags::kAdvertisingConfigured);
             }
@@ -653,14 +653,14 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
         return;
     }
 
-    if (mpEndpoint == nullptr)
+    if (!mEndpoint)
     {
         BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
         ChipLogError(Ble, "BLE Layer is not yet initialized");
         return;
     }
 
-    if (mpEndpoint->mpAdapter == nullptr)
+    if (mEndpoint->mpAdapter == nullptr)
     {
         BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
         ChipLogError(Ble, "No adapter available for new connection establishment");
@@ -669,7 +669,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
 
     mBLEScanConfig.mBleScanState = scanType;
 
-    CHIP_ERROR err = mDeviceScanner.Init(mpEndpoint->mpAdapter, this);
+    CHIP_ERROR err = mDeviceScanner.Init(mEndpoint->mpAdapter, this);
     if (err != CHIP_NO_ERROR)
     {
         mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
@@ -691,7 +691,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
 void BLEManagerImpl::CleanScanConfig()
 {
     if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
-        DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimeout, mpEndpoint);
+        DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimeout, mEndpoint.get());
 
     mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
 }
@@ -713,7 +713,7 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const S
 CHIP_ERROR BLEManagerImpl::CancelConnection()
 {
     if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
-        CancelConnect(mpEndpoint);
+        mEndpoint->CancelConnect();
     // If in discovery mode, stop scan.
     else if (mBLEScanConfig.mBleScanState != BleScanState::kNotScanning)
         mDeviceScanner.StopScan();
@@ -777,12 +777,12 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 & device, const chip::Ble::Chi
     mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimeout, mpEndpoint);
+    DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimeout, mEndpoint.get());
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     mDeviceScanner.StopScan();
 
-    ConnectDevice(device, mpEndpoint);
+    mEndpoint->ConnectDevice(device);
 }
 
 void BLEManagerImpl::OnScanComplete()

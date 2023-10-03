@@ -60,17 +60,31 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-struct BluezEndpoint
+class BluezEndpoint
 {
-    char * mpOwningName; // Bus owning name
+public:
+    BluezEndpoint(uint32_t aAdapterId, bool aIsCentral);
+    ~BluezEndpoint();
+
+    CHIP_ERROR Init(const char * apBleAddr, const char * apBleName);
+    void Shutdown();
+
+    CHIP_ERROR BluezGattAppRegister();
+
+    CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice);
+    void CancelConnect();
+
+public:
+    // Bus owning name
+    char * mpOwningName = nullptr;
 
     // Adapter properties
-    char * mpAdapterName;
-    char * mpAdapterAddr;
+    char * mpAdapterName = nullptr;
+    char * mpAdapterAddr = nullptr;
 
     // Paths for objects published by this service
-    char * mpRootPath;
-    char * mpServicePath;
+    char * mpRootPath    = nullptr;
+    char * mpServicePath = nullptr;
 
     // Objects (interfaces) subscribed to by this service
     GDBusObjectManager * mpObjMgr = nullptr;
@@ -78,28 +92,20 @@ struct BluezEndpoint
     BluezDevice1 * mpDevice       = nullptr;
 
     // Objects (interfaces) published by this service
-    GDBusObjectManagerServer * mpRoot;
-    BluezGattService1 * mpService;
-    BluezGattCharacteristic1 * mpC1;
-    BluezGattCharacteristic1 * mpC2;
+    GDBusObjectManagerServer * mpRoot = nullptr;
+    BluezGattService1 * mpService     = nullptr;
+    BluezGattCharacteristic1 * mpC1   = nullptr;
+    BluezGattCharacteristic1 * mpC2   = nullptr;
     // additional data characteristics
-    BluezGattCharacteristic1 * mpC3;
+    BluezGattCharacteristic1 * mpC3 = nullptr;
 
     // map device path to the connection
-    GHashTable * mpConnMap;
-    uint32_t mAdapterId;
-    bool mIsCentral;
-    char * mpPeerDevicePath;
+    GHashTable * mpConnMap              = nullptr;
+    uint32_t mAdapterId                 = 0;
+    bool mIsCentral                     = false;
+    char * mpPeerDevicePath             = nullptr;
     GCancellable * mpConnectCancellable = nullptr;
 };
-
-CHIP_ERROR InitBluezBleLayer(uint32_t aAdapterId, bool aIsCentral, const char * apBleAddr, const char * apBleName,
-                             BluezEndpoint *& apEndpoint);
-CHIP_ERROR ShutdownBluezBleLayer(BluezEndpoint * apEndpoint);
-CHIP_ERROR BluezGattsAppRegister(BluezEndpoint * apEndpoint);
-
-CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice, BluezEndpoint * apEndpoint);
-void CancelConnect(BluezEndpoint * apEndpoint);
 
 } // namespace Internal
 } // namespace DeviceLayer

@@ -500,40 +500,6 @@ static BluezConnection * GetBluezConnectionViaDevice(BluezEndpoint * apEndpoint)
     return retval;
 }
 
-static void EndpointCleanup(BluezEndpoint * apEndpoint)
-{
-    if (apEndpoint != nullptr)
-    {
-        g_free(apEndpoint->mpOwningName);
-        g_free(apEndpoint->mpAdapterName);
-        g_free(apEndpoint->mpAdapterAddr);
-        g_free(apEndpoint->mpRootPath);
-        g_free(apEndpoint->mpServicePath);
-        if (apEndpoint->mpObjMgr != nullptr)
-            g_object_unref(apEndpoint->mpObjMgr);
-        if (apEndpoint->mpAdapter != nullptr)
-            g_object_unref(apEndpoint->mpAdapter);
-        if (apEndpoint->mpDevice != nullptr)
-            g_object_unref(apEndpoint->mpDevice);
-        if (apEndpoint->mpRoot != nullptr)
-            g_object_unref(apEndpoint->mpRoot);
-        if (apEndpoint->mpService != nullptr)
-            g_object_unref(apEndpoint->mpService);
-        if (apEndpoint->mpC1 != nullptr)
-            g_object_unref(apEndpoint->mpC1);
-        if (apEndpoint->mpC2 != nullptr)
-            g_object_unref(apEndpoint->mpC2);
-        if (apEndpoint->mpC3 != nullptr)
-            g_object_unref(apEndpoint->mpC3);
-        if (apEndpoint->mpConnMap != nullptr)
-            g_hash_table_destroy(apEndpoint->mpConnMap);
-        g_free(apEndpoint->mpPeerDevicePath);
-        if (apEndpoint->mpConnectCancellable != nullptr)
-            g_object_unref(apEndpoint->mpConnectCancellable);
-        g_free(apEndpoint);
-    }
-}
-
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * characteristic)
 {
@@ -682,66 +648,84 @@ static CHIP_ERROR StartupEndpointBindings(BluezEndpoint * endpoint)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BluezGattsAppRegister(BluezEndpoint * apEndpoint)
+BluezEndpoint::BluezEndpoint(uint32_t aAdapterId, bool aIsCentral) : mAdapterId(aAdapterId), mIsCentral(aIsCentral)
 {
-    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(BluezPeripheralRegisterApp, apEndpoint);
+    mpConnMap = g_hash_table_new(g_str_hash, g_str_equal);
+}
+
+BluezEndpoint::~BluezEndpoint()
+{
+    Shutdown();
+    g_free(mpOwningName);
+    g_free(mpAdapterName);
+    g_free(mpAdapterAddr);
+    g_free(mpRootPath);
+    g_free(mpServicePath);
+    if (mpConnMap != nullptr)
+        g_hash_table_destroy(mpConnMap);
+    g_free(mpPeerDevicePath);
+    if (mpConnectCancellable != nullptr)
+        g_object_unref(mpConnectCancellable);
+}
+
+CHIP_ERROR BluezEndpoint::BluezGattAppRegister()
+{
+    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(BluezPeripheralRegisterApp, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(Ble, "Failed to schedule BluezPeripheralRegisterApp() on CHIPoBluez thread"));
     return err;
 }
 
-CHIP_ERROR InitBluezBleLayer(uint32_t aAdapterId, bool aIsCentral, const char * apBleAddr, const char * apBleName,
-                             BluezEndpoint *& apEndpoint)
+CHIP_ERROR BluezEndpoint::Init(const char * apBleAddr, const char * apBleName)
 {
-    BluezEndpoint * endpoint = g_new0(BluezEndpoint, 1);
-    CHIP_ERROR err           = CHIP_NO_ERROR;
+    CHIP_ERROR err;
 
     if (apBleAddr != nullptr)
-        endpoint->mpAdapterAddr = g_strdup(apBleAddr);
+        mpAdapterAddr = g_strdup(apBleAddr);
 
-    endpoint->mpConnMap  = g_hash_table_new(g_str_hash, g_str_equal);
-    endpoint->mAdapterId = aAdapterId;
-    endpoint->mIsCentral = aIsCentral;
-
-    if (!aIsCentral)
+    if (!mIsCentral)
     {
-        endpoint->mpAdapterName = g_strdup(apBleName);
+        mpAdapterName = g_strdup(apBleName);
     }
     else
     {
-        endpoint->mpConnectCancellable = g_cancellable_new();
+        mpConnectCancellable = g_cancellable_new();
     }
 
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(StartupEndpointBindings, endpoint);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to schedule endpoint initialization"));
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(StartupEndpointBindings, this);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to schedule endpoint initialization"));
 
-exit:
-    if (err == CHIP_NO_ERROR)
-    {
-        apEndpoint = endpoint;
-        ChipLogDetail(DeviceLayer, "PlatformBlueZInit init success");
-    }
-    else
-    {
-        EndpointCleanup(endpoint);
-    }
-
-    return err;
+    ChipLogDetail(DeviceLayer, "PlatformBlueZInit init success");
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ShutdownBluezBleLayer(BluezEndpoint * apEndpoint)
+void BluezEndpoint::Shutdown()
 {
-    VerifyOrReturnError(apEndpoint != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     // Run endpoint cleanup on the CHIPoBluez thread. This is necessary because the
     // cleanup function releases the D-Bus manager client object, which handles D-Bus
     // signals. Otherwise, we will face race condition when the D-Bus signal is in
     // the middle of being processed when the cleanup function is called.
-    return PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](BluezEndpoint * endpoint) {
-            EndpointCleanup(endpoint);
+    PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](BluezEndpoint * self) {
+            if (self->mpObjMgr != nullptr)
+                g_object_unref(self->mpObjMgr);
+            if (self->mpAdapter != nullptr)
+                g_object_unref(self->mpAdapter);
+            if (self->mpDevice != nullptr)
+                g_object_unref(self->mpDevice);
+            if (self->mpRoot != nullptr)
+                g_object_unref(self->mpRoot);
+            if (self->mpService != nullptr)
+                g_object_unref(self->mpService);
+            if (self->mpC1 != nullptr)
+                g_object_unref(self->mpC1);
+            if (self->mpC2 != nullptr)
+                g_object_unref(self->mpC2);
+            if (self->mpC3 != nullptr)
+                g_object_unref(self->mpC3);
             return CHIP_NO_ERROR;
         },
-        apEndpoint);
+        this);
 }
 
 // ConnectDevice callbacks
@@ -809,9 +793,9 @@ static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice, BluezEndpoint * apEndpoint)
+CHIP_ERROR BluezEndpoint::ConnectDevice(BluezDevice1 & aDevice)
 {
-    auto params = chip::Platform::New<ConnectParams>(&aDevice, apEndpoint);
+    auto params = chip::Platform::New<ConnectParams>(&aDevice, this);
     VerifyOrReturnError(params != nullptr, CHIP_ERROR_NO_MEMORY);
 
     if (PlatformMgrImpl().GLibMatterContextInvokeSync(ConnectDeviceImpl, params) != CHIP_NO_ERROR)
@@ -824,10 +808,10 @@ CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice, BluezEndpoint * apEndpoint)
     return CHIP_NO_ERROR;
 }
 
-void CancelConnect(BluezEndpoint * apEndpoint)
+void BluezEndpoint::CancelConnect()
 {
-    assert(apEndpoint->mpConnectCancellable != nullptr);
-    g_cancellable_cancel(apEndpoint->mpConnectCancellable);
+    assert(mpConnectCancellable != nullptr);
+    g_cancellable_cancel(mpConnectCancellable);
 }
 
 } // namespace Internal

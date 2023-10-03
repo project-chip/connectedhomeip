@@ -27,6 +27,7 @@
 #include <string>
 
 #include <ble/BleLayer.h>
+#include <lib/support/CHIPMem.h>
 #include <platform/internal/BLEManager.h>
 
 #include "bluez/BluezAdvertisement.h"
@@ -185,8 +186,8 @@ private:
 
     uint32_t mAdapterId = 0;
     char mDeviceName[kMaxDeviceNameLength + 1];
-    bool mIsCentral            = false;
-    BluezEndpoint * mpEndpoint = nullptr;
+    bool mIsCentral = false;
+    Platform::UniquePtr<BluezEndpoint> mEndpoint;
 
     BluezAdvertisement mBLEAdvertisement;
     ChipAdvType mBLEAdvType    = ChipAdvType::BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_SCANNABLE;
