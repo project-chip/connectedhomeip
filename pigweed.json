@@ -75,19 +75,6 @@
       "version_file": ".versions/clang.cipd_version"
     },
     {
-      "path": "fuchsia/third_party/rust/${platform}",
-      "platforms": [
-        "linux-amd64",
-        "linux-arm64",
-        "mac-amd64"
-      ],
-      "subdir": "rust",
-      "tags": [
-        "git_revision:b7b7f2716ee1655a696d3d64c3e12638d0dd19c0"
-      ],
-      "version_file": ".versions/rust.cipd_version"
-    },
-    {
       "path": "infra/3pp/tools/openocd/${platform}",
       "platforms": [
         "linux-amd64",
