@@ -53,11 +53,8 @@ jobs:
               # We do not need pigweed cross compile here because we use android NDK
               # compilers, so removing rust and arm compilers saves 2.5GB
               run: |
-                du -sh .environment/cipd/packages/pigweed/rust \
-                       .environment/cipd/packages/arm
-
-                rm -rf .environment/cipd/packages/pigweed/rust \
-                       .environment/cipd/packages/arm
+                du -sh .environment/cipd/packages/arm
+                rm -rf .environment/cipd/packages/arm
 
             - name: Build Android CHIPTool and CHIPTest (ARM64)
               run: |
