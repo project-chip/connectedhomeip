@@ -6,6 +6,8 @@ import datetime
 import pandas as pd
 from slugify import slugify
 
+yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+
 error_catalog = {
     "CodeQL": {
         "No space left on device": {
@@ -63,7 +65,7 @@ def process_fail(id, pr, start_time, workflow):
     if not os.path.exists(workflow_fail_rate_output_path):
         os.makedirs(workflow_fail_rate_output_path)
         subprocess.run(
-            f"gh run list -R project-chip/connectedhomeip -b master -w '{workflow}' -L 100 --created {(datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')} --json conclusion > {workflow_fail_rate_output_path}/run_list.json", shell=True)
+            f"gh run list -R project-chip/connectedhomeip -b master -w '{workflow}' -L 100 --created {yesterday} --json conclusion > {workflow_fail_rate_output_path}/run_list.json", shell=True)
     else:
         logging.info("This workflow has already been processed.")
 
@@ -72,12 +74,12 @@ def process_fail(id, pr, start_time, workflow):
 
 def main():
     logging.info("Gathering recent fails information into run_list.json.")
-    subprocess.run(f"gh run list -R project-chip/connectedhomeip -b master -s failure -L 100 --created {(datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')} --json databaseId,displayTitle,startedAt,workflowName > run_list.json", shell=True)
+    subprocess.run(f"gh run list -R project-chip/connectedhomeip -b master -s failure -L 100 --created {yesterday} --json databaseId,displayTitle,startedAt,workflowName > run_list.json", shell=True)
 
     logging.info("Reading run_list.json into a DataFrame.")
     df = pd.read_json("run_list.json")
 
-    logging.info("Listing recent fails.")
+    logging.info(f"Listing recent fails from {yesterday}.")
     df.columns = ["ID", "Pull Request", "Start Time", "Workflow"]
     print("Recent Fails:")
     print(df.to_string(columns=["Pull Request", "Workflow"], index=False))
