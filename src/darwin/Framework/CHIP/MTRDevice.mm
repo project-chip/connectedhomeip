@@ -29,6 +29,7 @@
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "zap-generated/MTRCommandPayloads_Internal.h"
 
 #include "lib/core/CHIPError.h"
 #include "lib/core/DataModelTypes.h"
@@ -1057,15 +1058,42 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                               queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
 {
+    // We don't have a way to communicate a non-default invoke timeout
+    // here for now.
+    // TODO: https://github.com/project-chip/connectedhomeip/issues/24563
+
+    [self _invokeCommandWithEndpointID:endpointID
+                             clusterID:clusterID
+                             commandID:commandID
+                         commandFields:commandFields
+                        expectedValues:expectedValues
+                 expectedValueInterval:expectedValueInterval
+                    timedInvokeTimeout:timeout
+           serverSideProcessingTimeout:nil
+                                 queue:queue
+                            completion:completion];
+}
+
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(id)commandFields
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
+{
     NSString * logPrefix = [NSString stringWithFormat:@"%@ command %@ %@ %@", self, endpointID, clusterID, commandID];
-    if (timeout) {
-        timeout = MTRClampedNumber(timeout, @(1), @(UINT16_MAX));
-    }
     if (!expectedValueInterval || ([expectedValueInterval compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
         expectedValueInterval = MTRClampedNumber(expectedValueInterval, @(1), @(UINT32_MAX));
     }
+
+    serverSideProcessingTimeout = [serverSideProcessingTimeout copy];
+    timeout = [timeout copy];
 
     uint64_t expectedValueID = 0;
     NSMutableArray<MTRAttributePath *> * attributePaths = nil;
@@ -1087,28 +1115,81 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, self->_asyncWorkQueue);
         MTRBaseDevice * baseDevice = [self newBaseDevice];
         [baseDevice
-            invokeCommandWithEndpointID:endpointID
-                              clusterID:clusterID
-                              commandID:commandID
-                          commandFields:commandFields
-                     timedInvokeTimeout:timeout
-                                  queue:self.queue
-                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                                 // Log the data at the INFO level (not usually persisted permanently),
-                                 // but make sure we log the work completion at the DEFAULT level.
-                                 MTR_LOG_INFO("%@ received response: %@ error: %@", logPrefix, values, error);
-                                 dispatch_async(queue, ^{
-                                     completion(values, error);
-                                 });
-                                 if (error && expectedValues) {
-                                     [self removeExpectedValuesForAttributePaths:attributePaths expectedValueID:expectedValueID];
-                                 }
-                                 MTR_LOG_DEFAULT("%@ endWork", logPrefix);
-                                 workCompletion(MTRAsyncWorkComplete);
-                             }];
+            _invokeCommandWithEndpointID:endpointID
+                               clusterID:clusterID
+                               commandID:commandID
+                           commandFields:commandFields
+                      timedInvokeTimeout:timeout
+             serverSideProcessingTimeout:serverSideProcessingTimeout
+                                   queue:self.queue
+                              completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                  // Log the data at the INFO level (not usually persisted permanently),
+                                  // but make sure we log the work completion at the DEFAULT level.
+                                  MTR_LOG_INFO("%@ received response: %@ error: %@", logPrefix, values, error);
+                                  dispatch_async(queue, ^{
+                                      completion(values, error);
+                                  });
+                                  if (error && expectedValues) {
+                                      [self removeExpectedValuesForAttributePaths:attributePaths expectedValueID:expectedValueID];
+                                  }
+                                  MTR_LOG_DEFAULT("%@ endWork", logPrefix);
+                                  workCompletion(MTRAsyncWorkComplete);
+                              }];
     }];
     MTR_LOG_DEFAULT("%@ enqueueWorkItem %@", logPrefix, _asyncWorkQueue);
     [_asyncWorkQueue enqueueWorkItem:workItem];
+}
+
+- (void)_invokeKnownCommandWithEndpointID:(NSNumber *)endpointID
+                                clusterID:(NSNumber *)clusterID
+                                commandID:(NSNumber *)commandID
+                           commandPayload:(id)commandPayload
+                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+                    expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                       timedInvokeTimeout:(NSNumber * _Nullable)timeout
+              serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                            responseClass:(Class _Nullable)responseClass
+                                    queue:(dispatch_queue_t)queue
+                               completion:(void (^)(id _Nullable response, NSError * _Nullable error))completion
+{
+    if (![commandPayload respondsToSelector:@selector(_encodeAsDataValue:)]) {
+        dispatch_async(queue, ^{
+            completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+        });
+        return;
+    }
+
+    NSError * encodingError;
+    auto * commandFields = [commandPayload _encodeAsDataValue:&encodingError];
+    if (commandFields == nil) {
+        dispatch_async(queue, ^{
+            completion(nil, encodingError);
+        });
+        return;
+    }
+
+    auto responseHandler = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        id _Nullable response = nil;
+        if (error == nil) {
+            if (values.count != 1) {
+                error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:nil];
+            } else if (responseClass != nil) {
+                response = [[responseClass alloc] initWithResponseValue:values[0] error:&error];
+            }
+        }
+        completion(response, error);
+    };
+
+    [self _invokeCommandWithEndpointID:endpointID
+                             clusterID:clusterID
+                             commandID:commandID
+                         commandFields:commandFields
+                        expectedValues:expectedValues
+                 expectedValueInterval:expectedValueInterval
+                    timedInvokeTimeout:timeout
+           serverSideProcessingTimeout:serverSideProcessingTimeout
+                                 queue:queue
+                            completion:responseHandler];
 }
 
 - (void)openCommissioningWindowWithSetupPasscode:(NSNumber *)setupPasscode

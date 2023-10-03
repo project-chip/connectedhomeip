@@ -475,7 +475,7 @@ public:
 }
 
 // Convert TLV data into data-value dictionary as described in MTRDeviceResponseHandler
-id _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data)
+NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data)
 {
     chip::TLV::TLVType dataTLVType = data->GetType();
     switch (dataTLVType) {
@@ -1209,13 +1209,44 @@ exit:
                               queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
 {
+    // We don't have a way to communicate a non-default invoke timeout
+    // here for now.
+    // TODO: https://github.com/project-chip/connectedhomeip/issues/24563
+    [self _invokeCommandWithEndpointID:endpointID
+                             clusterID:clusterID
+                             commandID:commandID
+                         commandFields:commandFields
+                    timedInvokeTimeout:timeoutMs
+           serverSideProcessingTimeout:nil
+                                 queue:queue
+                            completion:completion];
+}
+
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(id)commandFields
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
+{
     endpointID = (endpointID == nil) ? nil : [endpointID copy];
     clusterID = (clusterID == nil) ? nil : [clusterID copy];
     commandID = (commandID == nil) ? nil : [commandID copy];
     // TODO: This is not going to deep-copy the NSArray instances in
     // commandFields.  We need to do something smarter here.
     commandFields = (commandFields == nil) ? nil : [commandFields copy];
-    timeoutMs = (timeoutMs == nil) ? nil : [timeoutMs copy];
+
+    serverSideProcessingTimeout = [serverSideProcessingTimeout copy];
+    if (serverSideProcessingTimeout != nil) {
+        serverSideProcessingTimeout = MTRClampedNumber(serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+    }
+
+    timeoutMs = [timeoutMs copy];
+    if (timeoutMs != nil) {
+        timeoutMs = MTRClampedNumber(timeoutMs, @(1), @(UINT16_MAX));
+    }
 
     auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, MTRDataValueDictionaryCallback successCb,
@@ -1261,10 +1292,14 @@ exit:
             ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, MTRDataValueDictionaryDecodableType(commandFields),
                 (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue])));
 
-            // We don't have a way to communicate a non-default invoke timeout
-            // here for now.
-            // TODO: https://github.com/project-chip/connectedhomeip/issues/24563
-            ReturnErrorOnFailure(commandSender->SendCommandRequest(session, NullOptional));
+            Optional<System::Clock::Timeout> invokeTimeout;
+            if (serverSideProcessingTimeout != nil) {
+                // Clamp to a number of seconds that will not overflow 32-bit
+                // int when converted to ms.
+                auto serverTimeoutInSeconds = System::Clock::Seconds16(serverSideProcessingTimeout.unsignedShortValue);
+                invokeTimeout.SetValue(session->ComputeRoundTripTimeout(serverTimeoutInSeconds));
+            }
+            ReturnErrorOnFailure(commandSender->SendCommandRequest(session, invokeTimeout));
 
             decoder.release();
             commandSender.release();
