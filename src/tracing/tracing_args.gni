@@ -45,7 +45,6 @@ declare_args() {
   # set up.
   #
   matter_trace_config = ""
-  matter_enable_esp_insights_trace = false
 }
 
 if (current_os == "android") {
@@ -54,9 +53,6 @@ if (current_os == "android") {
 
 if (current_os == "linux" || current_os == "android") {
   matter_trace_config = "${chip_root}/src/tracing/perfetto:perfetto_tracing"
-} else if (chip_device_platform == "esp32") {
-  matter_trace_config =
-      "${chip_root}/src/tracing/esp32_trace:esp32_trace_tracing"
 } else {
   matter_trace_config = "${chip_root}/src/tracing/none"
 }
