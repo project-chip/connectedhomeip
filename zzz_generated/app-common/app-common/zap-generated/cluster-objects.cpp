@@ -93,7 +93,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -136,7 +136,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -182,7 +182,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -225,7 +225,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -271,7 +271,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -313,7 +313,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -359,7 +359,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -394,7 +394,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -468,7 +468,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -507,7 +507,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -545,7 +545,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -581,7 +581,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -623,7 +623,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -658,7 +658,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -696,7 +696,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -731,7 +731,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -768,7 +768,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -791,7 +791,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -863,7 +863,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -905,7 +905,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -952,7 +952,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1004,7 +1004,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1047,7 +1047,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1090,7 +1090,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1145,7 +1145,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1185,7 +1185,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1227,7 +1227,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1262,7 +1262,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1301,7 +1301,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1341,7 +1341,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1385,7 +1385,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1427,7 +1427,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1464,7 +1464,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1514,7 +1514,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1566,7 +1566,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1609,7 +1609,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1652,7 +1652,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1710,7 +1710,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1762,7 +1762,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1850,7 +1850,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1871,7 +1871,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1892,7 +1892,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1915,7 +1915,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1952,7 +1952,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -1976,7 +1976,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -2096,7 +2096,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -2145,7 +2145,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -2195,7 +2195,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -2246,7 +2246,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -2287,7 +2287,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -2336,7 +2336,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -2386,7 +2386,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -2437,7 +2437,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -2475,7 +2475,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -2647,7 +2647,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -2691,7 +2691,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -2799,7 +2799,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -2888,7 +2888,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -2963,7 +2963,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -3034,7 +3034,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -3116,7 +3116,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -3171,7 +3171,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -3233,7 +3233,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -3293,7 +3293,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -3345,7 +3345,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -3385,7 +3385,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -3428,7 +3428,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -3468,7 +3468,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -3511,7 +3511,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -3550,7 +3550,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -3590,7 +3590,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -3633,7 +3633,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -3672,7 +3672,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -3712,7 +3712,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -3755,7 +3755,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -3795,7 +3795,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -3871,7 +3871,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -3917,7 +3917,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -3971,7 +3971,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -4013,7 +4013,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -4055,7 +4055,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -4145,7 +4145,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -4179,7 +4179,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -4208,7 +4208,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -4243,7 +4243,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -4291,7 +4291,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -4360,7 +4360,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -4423,7 +4423,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -4462,7 +4462,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -4501,7 +4501,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -4585,7 +4585,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -4636,7 +4636,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -4723,7 +4723,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -4771,7 +4771,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -4813,7 +4813,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -5001,7 +5001,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -5043,7 +5043,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -5085,7 +5085,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -5218,7 +5218,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -5258,7 +5258,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -5298,7 +5298,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -5346,7 +5346,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -5390,7 +5390,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -5429,7 +5429,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -5469,7 +5469,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -5512,7 +5512,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -5549,7 +5549,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -5572,7 +5572,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -5652,7 +5652,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -5700,7 +5700,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -5770,7 +5770,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -5830,7 +5830,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -5871,7 +5871,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -5919,7 +5919,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -5962,7 +5962,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -6001,7 +6001,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -6041,7 +6041,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -6084,7 +6084,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -6124,7 +6124,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -6168,7 +6168,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -6259,7 +6259,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -6304,7 +6304,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -6390,7 +6390,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -6458,7 +6458,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -6543,7 +6543,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -6583,7 +6583,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -6623,7 +6623,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -6662,7 +6662,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -6707,7 +6707,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -6761,7 +6761,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -6819,7 +6819,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -6881,7 +6881,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -6981,7 +6981,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -7071,7 +7071,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -7145,7 +7145,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -7187,7 +7187,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -7361,7 +7361,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -7397,7 +7397,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -7441,7 +7441,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -7515,7 +7515,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -7551,7 +7551,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -7590,7 +7590,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -7630,7 +7630,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -7703,7 +7703,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -7749,7 +7749,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -7792,7 +7792,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -7839,7 +7839,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -7888,7 +7888,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -7930,7 +7930,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -7964,7 +7964,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -7998,7 +7998,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -8032,7 +8032,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -8066,7 +8066,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -8151,7 +8151,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -8180,7 +8180,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -8216,7 +8216,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -8254,7 +8254,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -8282,7 +8282,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -8318,7 +8318,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -8418,7 +8418,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -8452,7 +8452,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -8480,7 +8480,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -8509,7 +8509,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -8581,7 +8581,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -8616,7 +8616,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -8651,7 +8651,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -8686,7 +8686,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -8721,7 +8721,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -8758,7 +8758,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -8799,7 +8799,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -8848,7 +8848,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -8898,7 +8898,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -8931,7 +8931,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9008,7 +9008,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9087,7 +9087,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9134,7 +9134,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9169,7 +9169,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9207,7 +9207,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9241,7 +9241,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9276,7 +9276,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9315,7 +9315,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9357,7 +9357,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9408,7 +9408,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9448,7 +9448,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9490,7 +9490,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9524,7 +9524,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9558,7 +9558,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9651,7 +9651,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9715,7 +9715,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9767,7 +9767,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9834,7 +9834,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9868,7 +9868,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9902,7 +9902,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9936,7 +9936,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9969,7 +9969,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -9991,7 +9991,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -10247,7 +10247,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -10314,7 +10314,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -10368,7 +10368,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -10414,7 +10414,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -10449,7 +10449,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -10486,7 +10486,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -10552,7 +10552,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -10595,7 +10595,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -10642,7 +10642,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -10720,7 +10720,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -10755,7 +10755,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -10833,7 +10833,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -10868,7 +10868,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -10984,7 +10984,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -11019,7 +11019,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -11097,7 +11097,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -11132,7 +11132,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -11210,7 +11210,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -11325,7 +11325,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -11379,7 +11379,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -11414,7 +11414,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -11522,7 +11522,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -11596,7 +11596,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -11631,7 +11631,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -11666,7 +11666,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -11700,7 +11700,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -11728,7 +11728,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -11756,7 +11756,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -11784,7 +11784,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -11812,7 +11812,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -11841,7 +11841,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -11876,7 +11876,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -11910,7 +11910,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -11945,7 +11945,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -11979,7 +11979,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12050,7 +12050,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12103,7 +12103,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12124,7 +12124,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12145,7 +12145,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12166,7 +12166,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12188,7 +12188,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12260,7 +12260,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12297,7 +12297,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12346,7 +12346,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12367,7 +12367,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12388,7 +12388,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12409,7 +12409,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12431,7 +12431,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12503,7 +12503,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12540,7 +12540,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12590,7 +12590,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12632,7 +12632,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12698,7 +12698,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12740,7 +12740,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12806,7 +12806,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12849,7 +12849,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12883,7 +12883,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12918,7 +12918,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -12962,7 +12962,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -13021,7 +13021,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -13066,7 +13066,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -13129,7 +13129,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -13170,7 +13170,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -13217,7 +13217,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -13259,7 +13259,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -13310,7 +13310,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -13351,7 +13351,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -13397,7 +13397,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -13435,7 +13435,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -13485,7 +13485,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -13525,7 +13525,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -13583,7 +13583,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -13626,7 +13626,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -13696,7 +13696,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -13735,7 +13735,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -13791,7 +13791,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -13833,7 +13833,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -13871,7 +13871,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -13921,7 +13921,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -13955,7 +13955,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -14087,7 +14087,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -14122,7 +14122,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -14162,7 +14162,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -14223,7 +14223,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -14288,7 +14288,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -14352,7 +14352,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -14373,7 +14373,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -14394,7 +14394,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -14416,7 +14416,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -14450,7 +14450,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -14484,7 +14484,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -14518,7 +14518,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -14627,7 +14627,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -14660,7 +14660,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -14803,7 +14803,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -14831,7 +14831,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -14859,7 +14859,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -14887,7 +14887,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -14915,7 +14915,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -14943,7 +14943,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -14971,7 +14971,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -14999,7 +14999,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -15027,7 +15027,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -15055,7 +15055,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -15083,7 +15083,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -15111,7 +15111,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -15139,7 +15139,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -15167,7 +15167,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -15195,7 +15195,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -15223,7 +15223,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -15251,7 +15251,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -15288,7 +15288,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -15336,7 +15336,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -15378,7 +15378,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -15428,7 +15428,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -15475,7 +15475,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -15512,7 +15512,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -15665,7 +15665,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -15802,7 +15802,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -15855,7 +15855,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -15905,7 +15905,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -15958,7 +15958,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -16007,7 +16007,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -16057,7 +16057,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -16111,7 +16111,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -16165,7 +16165,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -16218,7 +16218,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -16268,7 +16268,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -16321,7 +16321,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -16371,7 +16371,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -16424,7 +16424,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -16474,7 +16474,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -16528,7 +16528,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -16584,7 +16584,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -16643,7 +16643,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -16688,7 +16688,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -16750,7 +16750,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -17813,7 +17813,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -17869,7 +17869,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -17920,7 +17920,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -17955,7 +17955,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -17994,7 +17994,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18032,7 +18032,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18104,7 +18104,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18148,7 +18148,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18187,7 +18187,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18261,7 +18261,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18303,7 +18303,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18324,7 +18324,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18345,7 +18345,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18366,7 +18366,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18387,7 +18387,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18408,7 +18408,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18429,7 +18429,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18450,7 +18450,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18473,7 +18473,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18508,7 +18508,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18543,7 +18543,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18581,7 +18581,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18663,7 +18663,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18714,7 +18714,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18747,7 +18747,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18768,7 +18768,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18791,7 +18791,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18863,7 +18863,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18916,7 +18916,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -18950,7 +18950,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -19017,7 +19017,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -19063,7 +19063,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -19106,7 +19106,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -19151,7 +19151,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -19190,7 +19190,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -19240,7 +19240,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -19301,7 +19301,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -19345,7 +19345,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -19388,7 +19388,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -19463,7 +19463,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -19510,7 +19510,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -19545,7 +19545,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -19619,7 +19619,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -19663,7 +19663,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -19701,7 +19701,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -19735,7 +19735,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -19770,7 +19770,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -19890,7 +19890,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -19924,7 +19924,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -19959,7 +19959,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -19996,7 +19996,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -20052,7 +20052,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -20097,7 +20097,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -20125,7 +20125,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -20181,7 +20181,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -20517,7 +20517,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -20629,7 +20629,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -20705,7 +20705,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -20788,7 +20788,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -20839,7 +20839,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -20900,7 +20900,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -20938,7 +20938,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -20980,7 +20980,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21002,7 +21002,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21035,7 +21035,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21057,7 +21057,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21090,7 +21090,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21112,7 +21112,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21145,7 +21145,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21172,7 +21172,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21227,7 +21227,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21265,7 +21265,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21299,7 +21299,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21334,7 +21334,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21377,7 +21377,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21434,7 +21434,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21480,7 +21480,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21552,7 +21552,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21694,7 +21694,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21728,7 +21728,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21762,7 +21762,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21796,7 +21796,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21830,7 +21830,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21864,7 +21864,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21898,7 +21898,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21932,7 +21932,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -21966,7 +21966,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -22000,7 +22000,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -22035,7 +22035,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -22073,7 +22073,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -22118,7 +22118,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -22196,7 +22196,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -22229,7 +22229,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -22251,7 +22251,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -22287,7 +22287,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -22329,7 +22329,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -22558,7 +22558,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -22613,7 +22613,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -22658,7 +22658,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -22710,7 +22710,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -22782,7 +22782,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -22804,7 +22804,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);
@@ -22839,7 +22839,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
-        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        auto __element = __iterator.Next();
         if (std::holds_alternative<CHIP_ERROR>(__element))
         {
             return std::get<CHIP_ERROR>(__element);

@@ -103,6 +103,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
         const uint8_t __context_tag = std::get<uint8_t>(__element);
         {{/first~}}
 
+        {{! NOTE: using if/else instead of switch because it seems to generate smaller code. ~}}
         if (__context_tag == to_underlying(Fields::k{{asUpperCamelCase label}}))
         {
             err = DataModel::Decode(reader, {{asLowerCamelCase label}});
@@ -163,6 +164,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         {{#zcl_event_fields}}
+        {{! NOTE: using if/else instead of switch because it seems to generate smaller code. ~}}
         if (__context_tag == to_underlying(Fields::k{{asUpperCamelCase name}}))
         {
             err = DataModel::Decode(reader, {{asLowerCamelCase name}});
