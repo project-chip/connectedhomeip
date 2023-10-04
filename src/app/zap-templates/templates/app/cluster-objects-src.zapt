@@ -97,12 +97,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
         }
 
         {{#zcl_command_arguments~}}
-
         {{#first}}
         CHIP_ERROR err = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
-        {{/first~}}
 
+        {{/first~}}
         {{! NOTE: using if/else instead of switch because it seems to generate smaller code. ~}}
         if (__context_tag == to_underlying(Fields::k{{asUpperCamelCase label}}))
         {
@@ -160,21 +159,25 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
            return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
         {{#zcl_event_fields}}
+        {{#first}}
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        {{/first~}}
         {{! NOTE: using if/else instead of switch because it seems to generate smaller code. ~}}
         if (__context_tag == to_underlying(Fields::k{{asUpperCamelCase name}}))
         {
             err = DataModel::Decode(reader, {{asLowerCamelCase name}});
         }
         else
-        {{/zcl_event_fields}}
+        {{#last}}
         {
         }
 
         ReturnErrorOnFailure(err);
+        {{/last}}
+        {{/zcl_event_fields}}
     }
 }
 } // namespace {{asUpperCamelCase name}}.

@@ -99,8 +99,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kMfgCode))
         {
@@ -142,8 +142,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kLabel))
         {
@@ -188,8 +188,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kCatalogVendorID))
         {
@@ -231,8 +231,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kErrorStateID))
         {
@@ -277,8 +277,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kLabel))
         {
@@ -319,8 +319,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kOperationalStateID))
         {
@@ -367,6 +367,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kIdentifyTime))
         {
             err = DataModel::Decode(reader, identifyTime);
@@ -402,6 +403,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kEffectIdentifier))
         {
             err = DataModel::Decode(reader, effectIdentifier);
@@ -476,6 +478,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
             err = DataModel::Decode(reader, groupID);
@@ -515,6 +518,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -553,6 +557,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
             err = DataModel::Decode(reader, groupID);
@@ -589,6 +594,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -631,6 +637,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupList))
         {
             err = DataModel::Decode(reader, groupList);
@@ -666,6 +673,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCapacity))
         {
             err = DataModel::Decode(reader, capacity);
@@ -704,6 +712,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
             err = DataModel::Decode(reader, groupID);
@@ -739,6 +748,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -799,6 +809,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
             err = DataModel::Decode(reader, groupID);
@@ -869,8 +880,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kAttributeID))
         {
@@ -911,8 +922,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kClusterID))
         {
@@ -960,6 +971,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
             err = DataModel::Decode(reader, groupID);
@@ -1012,6 +1024,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -1055,6 +1068,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
             err = DataModel::Decode(reader, groupID);
@@ -1098,6 +1112,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -1153,6 +1168,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
             err = DataModel::Decode(reader, groupID);
@@ -1193,6 +1209,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -1235,6 +1252,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
             err = DataModel::Decode(reader, groupID);
@@ -1270,6 +1288,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -1309,6 +1328,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
             err = DataModel::Decode(reader, groupID);
@@ -1349,6 +1369,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -1393,6 +1414,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
             err = DataModel::Decode(reader, groupID);
@@ -1435,6 +1457,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
             err = DataModel::Decode(reader, groupID);
@@ -1472,6 +1495,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -1522,6 +1546,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
             err = DataModel::Decode(reader, groupID);
@@ -1574,6 +1599,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -1617,6 +1643,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
             err = DataModel::Decode(reader, groupID);
@@ -1660,6 +1687,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -1718,6 +1746,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMode))
         {
             err = DataModel::Decode(reader, mode);
@@ -1770,6 +1799,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -1923,6 +1953,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kEffectIdentifier))
         {
             err = DataModel::Decode(reader, effectIdentifier);
@@ -1984,6 +2015,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kOnOffControl))
         {
             err = DataModel::Decode(reader, onOffControl);
@@ -2104,6 +2136,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kLevel))
         {
             err = DataModel::Decode(reader, level);
@@ -2153,6 +2186,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMoveMode))
         {
             err = DataModel::Decode(reader, moveMode);
@@ -2203,6 +2237,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStepMode))
         {
             err = DataModel::Decode(reader, stepMode);
@@ -2254,6 +2289,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
             err = DataModel::Decode(reader, optionsMask);
@@ -2295,6 +2331,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kLevel))
         {
             err = DataModel::Decode(reader, level);
@@ -2344,6 +2381,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMoveMode))
         {
             err = DataModel::Decode(reader, moveMode);
@@ -2394,6 +2432,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStepMode))
         {
             err = DataModel::Decode(reader, stepMode);
@@ -2445,6 +2484,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
             err = DataModel::Decode(reader, optionsMask);
@@ -2483,6 +2523,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kFrequency))
         {
             err = DataModel::Decode(reader, frequency);
@@ -2653,8 +2694,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kDeviceType))
         {
@@ -2697,8 +2738,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kMfgCode))
         {
@@ -2805,8 +2846,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kNode))
         {
@@ -2894,8 +2935,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kCluster))
         {
@@ -2969,8 +3010,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kPrivilege))
         {
@@ -3040,8 +3081,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kData))
         {
@@ -3122,8 +3163,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kAdminNodeID))
         {
@@ -3177,8 +3218,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kAdminNodeID))
         {
@@ -3239,8 +3280,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kActionID))
         {
@@ -3299,8 +3340,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kEndpointListID))
         {
@@ -3353,6 +3394,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
             err = DataModel::Decode(reader, actionID);
@@ -3393,6 +3435,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
             err = DataModel::Decode(reader, actionID);
@@ -3436,6 +3479,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
             err = DataModel::Decode(reader, actionID);
@@ -3476,6 +3520,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
             err = DataModel::Decode(reader, actionID);
@@ -3519,6 +3564,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
             err = DataModel::Decode(reader, actionID);
@@ -3558,6 +3604,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
             err = DataModel::Decode(reader, actionID);
@@ -3598,6 +3645,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
             err = DataModel::Decode(reader, actionID);
@@ -3641,6 +3689,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
             err = DataModel::Decode(reader, actionID);
@@ -3680,6 +3729,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
             err = DataModel::Decode(reader, actionID);
@@ -3720,6 +3770,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
             err = DataModel::Decode(reader, actionID);
@@ -3763,6 +3814,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
             err = DataModel::Decode(reader, actionID);
@@ -3803,6 +3855,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
             err = DataModel::Decode(reader, actionID);
@@ -3877,8 +3930,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kActionID))
         {
@@ -3923,8 +3976,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kActionID))
         {
@@ -3977,8 +4030,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kCaseSessionsPerFabric))
         {
@@ -4019,8 +4072,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kFinish))
         {
@@ -4151,8 +4204,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kSoftwareVersion))
         {
@@ -4184,13 +4237,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ShutDown.
@@ -4214,8 +4260,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
@@ -4249,8 +4295,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kReachableNewValue))
         {
@@ -4299,6 +4345,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kVendorID))
         {
             err = DataModel::Decode(reader, vendorID);
@@ -4368,6 +4415,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -4431,6 +4479,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kUpdateToken))
         {
             err = DataModel::Decode(reader, updateToken);
@@ -4470,6 +4519,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kAction))
         {
             err = DataModel::Decode(reader, action);
@@ -4509,6 +4559,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kUpdateToken))
         {
             err = DataModel::Decode(reader, updateToken);
@@ -4591,8 +4642,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kProviderNodeID))
         {
@@ -4644,6 +4695,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kProviderNodeID))
         {
             err = DataModel::Decode(reader, providerNodeID);
@@ -4729,8 +4781,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kPreviousState))
         {
@@ -4777,8 +4829,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kSoftwareVersion))
         {
@@ -4819,8 +4871,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kSoftwareVersion))
         {
@@ -5007,8 +5059,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kCurrent))
         {
@@ -5049,8 +5101,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kCurrent))
         {
@@ -5091,8 +5143,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kCurrent))
         {
@@ -5224,8 +5276,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kCurrent))
         {
@@ -5264,8 +5316,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kCurrent))
         {
@@ -5304,8 +5356,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kCurrent))
         {
@@ -5352,8 +5404,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kFailSafeExpiryLengthSeconds))
         {
@@ -5398,6 +5450,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kExpiryLengthSeconds))
         {
             err = DataModel::Decode(reader, expiryLengthSeconds);
@@ -5437,6 +5490,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kErrorCode))
         {
             err = DataModel::Decode(reader, errorCode);
@@ -5477,6 +5531,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNewRegulatoryConfig))
         {
             err = DataModel::Decode(reader, newRegulatoryConfig);
@@ -5520,6 +5575,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kErrorCode))
         {
             err = DataModel::Decode(reader, errorCode);
@@ -5580,6 +5636,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kErrorCode))
         {
             err = DataModel::Decode(reader, errorCode);
@@ -5658,8 +5715,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kNetworkID))
         {
@@ -5706,8 +5763,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kPanId))
         {
@@ -5776,8 +5833,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kSecurity))
         {
@@ -5838,6 +5895,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kSsid))
         {
             err = DataModel::Decode(reader, ssid);
@@ -5879,6 +5937,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNetworkingStatus))
         {
             err = DataModel::Decode(reader, networkingStatus);
@@ -5927,6 +5986,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kSsid))
         {
             err = DataModel::Decode(reader, ssid);
@@ -5970,6 +6030,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kOperationalDataset))
         {
             err = DataModel::Decode(reader, operationalDataset);
@@ -6009,6 +6070,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNetworkID))
         {
             err = DataModel::Decode(reader, networkID);
@@ -6049,6 +6111,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNetworkingStatus))
         {
             err = DataModel::Decode(reader, networkingStatus);
@@ -6092,6 +6155,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNetworkID))
         {
             err = DataModel::Decode(reader, networkID);
@@ -6132,6 +6196,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNetworkingStatus))
         {
             err = DataModel::Decode(reader, networkingStatus);
@@ -6176,6 +6241,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNetworkID))
         {
             err = DataModel::Decode(reader, networkID);
@@ -6267,6 +6333,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kIntent))
         {
             err = DataModel::Decode(reader, intent);
@@ -6312,6 +6379,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -6396,8 +6464,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kName))
         {
@@ -6466,6 +6534,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kEnableKey))
         {
             err = DataModel::Decode(reader, enableKey);
@@ -6549,8 +6618,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kCurrent))
         {
@@ -6589,8 +6658,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kCurrent))
         {
@@ -6629,8 +6698,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kCurrent))
         {
@@ -6668,8 +6737,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kBootReason))
         {
@@ -6713,8 +6782,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kId))
         {
@@ -6825,8 +6894,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kId))
         {
@@ -6887,8 +6956,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kExtAddress))
         {
@@ -6987,8 +7056,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kActiveTimestampPresent))
         {
@@ -7077,8 +7146,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kExtAddress))
         {
@@ -7151,8 +7220,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kRotationTime))
         {
@@ -7367,8 +7436,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kConnectionStatus))
         {
@@ -7403,8 +7472,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kCurrent))
         {
@@ -7521,8 +7590,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kReasonCode))
         {
@@ -7557,8 +7626,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kAssociationFailure))
         {
@@ -7596,8 +7665,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kConnectionStatus))
         {
@@ -7709,8 +7778,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kOffset))
         {
@@ -7755,8 +7824,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kNodeID))
         {
@@ -7798,8 +7867,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kOffset))
         {
@@ -7845,8 +7914,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
@@ -7896,6 +7965,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kUTCTime))
         {
             err = DataModel::Decode(reader, UTCTime);
@@ -7938,6 +8008,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kTrustedTimeSource))
         {
             err = DataModel::Decode(reader, trustedTimeSource);
@@ -7972,6 +8043,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kTimeZone))
         {
             err = DataModel::Decode(reader, timeZone);
@@ -8006,6 +8078,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kDSTOffsetRequired))
         {
             err = DataModel::Decode(reader, DSTOffsetRequired);
@@ -8040,6 +8113,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kDSTOffset))
         {
             err = DataModel::Decode(reader, DSTOffset);
@@ -8074,6 +8148,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kDefaultNTP))
         {
             err = DataModel::Decode(reader, defaultNTP);
@@ -8156,13 +8231,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace DSTTableEmpty.
@@ -8186,8 +8254,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kDSTOffsetActive))
         {
@@ -8222,8 +8290,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kOffset))
         {
@@ -8259,13 +8327,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TimeFailure.
@@ -8287,13 +8348,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace MissingTrustedTimeSource.
@@ -8324,8 +8378,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kFinish))
         {
@@ -8424,8 +8478,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kSoftwareVersion))
         {
@@ -8457,13 +8511,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ShutDown.
@@ -8485,13 +8532,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Leave.
@@ -8515,8 +8555,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kReachableNewValue))
         {
@@ -8587,8 +8627,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kNewPosition))
         {
@@ -8622,8 +8662,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kNewPosition))
         {
@@ -8657,8 +8697,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kNewPosition))
         {
@@ -8692,8 +8732,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kPreviousPosition))
         {
@@ -8727,8 +8767,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kPreviousPosition))
         {
@@ -8764,8 +8804,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kNewPosition))
         {
@@ -8805,8 +8845,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kPreviousPosition))
         {
@@ -8856,6 +8896,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCommissioningTimeout))
         {
             err = DataModel::Decode(reader, commissioningTimeout);
@@ -8906,6 +8947,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCommissioningTimeout))
         {
             err = DataModel::Decode(reader, commissioningTimeout);
@@ -9014,8 +9056,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kRootPublicKey))
         {
@@ -9093,8 +9135,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kNoc))
         {
@@ -9142,6 +9184,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kAttestationNonce))
         {
             err = DataModel::Decode(reader, attestationNonce);
@@ -9177,6 +9220,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kAttestationElements))
         {
             err = DataModel::Decode(reader, attestationElements);
@@ -9215,6 +9259,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCertificateType))
         {
             err = DataModel::Decode(reader, certificateType);
@@ -9249,6 +9294,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCertificate))
         {
             err = DataModel::Decode(reader, certificate);
@@ -9284,6 +9330,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCSRNonce))
         {
             err = DataModel::Decode(reader, CSRNonce);
@@ -9323,6 +9370,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNOCSRElements))
         {
             err = DataModel::Decode(reader, NOCSRElements);
@@ -9365,6 +9413,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNOCValue))
         {
             err = DataModel::Decode(reader, NOCValue);
@@ -9416,6 +9465,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNOCValue))
         {
             err = DataModel::Decode(reader, NOCValue);
@@ -9456,6 +9506,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatusCode))
         {
             err = DataModel::Decode(reader, statusCode);
@@ -9498,6 +9549,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kLabel))
         {
             err = DataModel::Decode(reader, label);
@@ -9532,6 +9584,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
             err = DataModel::Decode(reader, fabricIndex);
@@ -9566,6 +9619,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kRootCACertificate))
         {
             err = DataModel::Decode(reader, rootCACertificate);
@@ -9657,8 +9711,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kGroupId))
         {
@@ -9721,8 +9775,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kGroupId))
         {
@@ -9773,8 +9827,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kGroupKeySetID))
         {
@@ -9842,6 +9896,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupKeySet))
         {
             err = DataModel::Decode(reader, groupKeySet);
@@ -9876,6 +9931,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupKeySetID))
         {
             err = DataModel::Decode(reader, groupKeySetID);
@@ -9910,6 +9966,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupKeySet))
         {
             err = DataModel::Decode(reader, groupKeySet);
@@ -9944,6 +10001,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupKeySetID))
         {
             err = DataModel::Decode(reader, groupKeySetID);
@@ -9999,6 +10057,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupKeySetIDs))
         {
             err = DataModel::Decode(reader, groupKeySetIDs);
@@ -10253,8 +10312,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kStateValue))
         {
@@ -10320,8 +10379,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kCheckInNodeID))
         {
@@ -10376,6 +10435,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCheckInNodeID))
         {
             err = DataModel::Decode(reader, checkInNodeID);
@@ -10422,6 +10482,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kICDCounter))
         {
             err = DataModel::Decode(reader, ICDCounter);
@@ -10457,6 +10518,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCheckInNodeID))
         {
             err = DataModel::Decode(reader, checkInNodeID);
@@ -10558,8 +10620,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kMfgCode))
         {
@@ -10601,8 +10663,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kLabel))
         {
@@ -10650,6 +10712,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNewMode))
         {
             err = DataModel::Decode(reader, newMode);
@@ -10728,6 +10791,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNewMode))
         {
             err = DataModel::Decode(reader, newMode);
@@ -10763,6 +10827,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -10841,6 +10906,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNewMode))
         {
             err = DataModel::Decode(reader, newMode);
@@ -10876,6 +10942,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -10992,6 +11059,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNewMode))
         {
             err = DataModel::Decode(reader, newMode);
@@ -11027,6 +11095,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -11105,6 +11174,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNewMode))
         {
             err = DataModel::Decode(reader, newMode);
@@ -11140,6 +11210,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -11218,6 +11289,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kTargetTemperature))
         {
             err = DataModel::Decode(reader, targetTemperature);
@@ -11331,8 +11403,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kActive))
         {
@@ -11387,6 +11459,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNewMode))
         {
             err = DataModel::Decode(reader, newMode);
@@ -11422,6 +11495,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -11602,8 +11676,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kAlarmSeverityLevel))
         {
@@ -11637,8 +11711,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kAlarmSeverityLevel))
         {
@@ -11672,8 +11746,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kAlarmSeverityLevel))
         {
@@ -11705,13 +11779,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace HardwareFault.
@@ -11733,13 +11800,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace EndOfService.
@@ -11761,13 +11821,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SelfTestComplete.
@@ -11789,13 +11842,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AlarmMuted.
@@ -11817,13 +11863,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace MuteEnded.
@@ -11847,8 +11886,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kAlarmSeverityLevel))
         {
@@ -11882,8 +11921,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kAlarmSeverityLevel))
         {
@@ -11915,13 +11954,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AllClear.
@@ -11953,6 +11985,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kAlarms))
         {
             err = DataModel::Decode(reader, alarms);
@@ -11987,6 +12020,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMask))
         {
             err = DataModel::Decode(reader, mask);
@@ -12056,8 +12090,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kActive))
         {
@@ -12196,6 +12230,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCommandResponseState))
         {
             err = DataModel::Decode(reader, commandResponseState);
@@ -12266,8 +12301,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kErrorState))
         {
@@ -12303,8 +12338,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kCompletionErrorCode))
         {
@@ -12439,6 +12474,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCommandResponseState))
         {
             err = DataModel::Decode(reader, commandResponseState);
@@ -12509,8 +12545,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kErrorState))
         {
@@ -12546,8 +12582,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kCompletionErrorCode))
         {
@@ -12596,8 +12632,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kProductIdentifierType))
         {
@@ -12704,8 +12740,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kProductIdentifierType))
         {
@@ -12812,8 +12848,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kCredentialType))
         {
@@ -12857,6 +12893,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kPINCode))
         {
             err = DataModel::Decode(reader, PINCode);
@@ -12891,6 +12928,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kPINCode))
         {
             err = DataModel::Decode(reader, PINCode);
@@ -12926,6 +12964,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kTimeout))
         {
             err = DataModel::Decode(reader, timeout);
@@ -12970,6 +13009,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kWeekDayIndex))
         {
             err = DataModel::Decode(reader, weekDayIndex);
@@ -13029,6 +13069,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kWeekDayIndex))
         {
             err = DataModel::Decode(reader, weekDayIndex);
@@ -13074,6 +13115,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kWeekDayIndex))
         {
             err = DataModel::Decode(reader, weekDayIndex);
@@ -13137,6 +13179,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kWeekDayIndex))
         {
             err = DataModel::Decode(reader, weekDayIndex);
@@ -13178,6 +13221,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kYearDayIndex))
         {
             err = DataModel::Decode(reader, yearDayIndex);
@@ -13225,6 +13269,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kYearDayIndex))
         {
             err = DataModel::Decode(reader, yearDayIndex);
@@ -13267,6 +13312,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kYearDayIndex))
         {
             err = DataModel::Decode(reader, yearDayIndex);
@@ -13318,6 +13364,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kYearDayIndex))
         {
             err = DataModel::Decode(reader, yearDayIndex);
@@ -13359,6 +13406,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kHolidayIndex))
         {
             err = DataModel::Decode(reader, holidayIndex);
@@ -13405,6 +13453,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kHolidayIndex))
         {
             err = DataModel::Decode(reader, holidayIndex);
@@ -13443,6 +13492,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kHolidayIndex))
         {
             err = DataModel::Decode(reader, holidayIndex);
@@ -13493,6 +13543,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kHolidayIndex))
         {
             err = DataModel::Decode(reader, holidayIndex);
@@ -13533,6 +13584,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kOperationType))
         {
             err = DataModel::Decode(reader, operationType);
@@ -13591,6 +13643,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kUserIndex))
         {
             err = DataModel::Decode(reader, userIndex);
@@ -13634,6 +13687,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kUserIndex))
         {
             err = DataModel::Decode(reader, userIndex);
@@ -13704,6 +13758,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kUserIndex))
         {
             err = DataModel::Decode(reader, userIndex);
@@ -13743,6 +13798,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kOperationType))
         {
             err = DataModel::Decode(reader, operationType);
@@ -13799,6 +13855,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -13841,6 +13898,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCredential))
         {
             err = DataModel::Decode(reader, credential);
@@ -13879,6 +13937,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCredentialExists))
         {
             err = DataModel::Decode(reader, credentialExists);
@@ -13929,6 +13988,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCredential))
         {
             err = DataModel::Decode(reader, credential);
@@ -13963,6 +14023,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kPINCode))
         {
             err = DataModel::Decode(reader, PINCode);
@@ -14093,8 +14154,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kAlarmCode))
         {
@@ -14128,8 +14189,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kDoorState))
         {
@@ -14168,8 +14229,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kLockOperationType))
         {
@@ -14229,8 +14290,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kLockOperationType))
         {
@@ -14294,8 +14355,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kLockDataType))
         {
@@ -14424,6 +14485,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kLiftValue))
         {
             err = DataModel::Decode(reader, liftValue);
@@ -14458,6 +14520,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kLiftPercent100thsValue))
         {
             err = DataModel::Decode(reader, liftPercent100thsValue);
@@ -14492,6 +14555,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kTiltValue))
         {
             err = DataModel::Decode(reader, tiltValue);
@@ -14526,6 +14590,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kTiltPercent100thsValue))
         {
             err = DataModel::Decode(reader, tiltPercent100thsValue);
@@ -14635,6 +14700,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kPercentOpen))
         {
             err = DataModel::Decode(reader, percentOpen);
@@ -14808,13 +14874,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SupplyVoltageLow.
@@ -14836,13 +14895,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SupplyVoltageHigh.
@@ -14864,13 +14916,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace PowerMissingPhase.
@@ -14892,13 +14937,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SystemPressureLow.
@@ -14920,13 +14958,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SystemPressureHigh.
@@ -14948,13 +14979,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace DryRunning.
@@ -14976,13 +15000,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace MotorTemperatureHigh.
@@ -15004,13 +15021,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace PumpMotorFatalFailure.
@@ -15032,13 +15042,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ElectronicTemperatureHigh.
@@ -15060,13 +15063,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace PumpBlocked.
@@ -15088,13 +15084,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SensorFailure.
@@ -15116,13 +15105,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ElectronicNonFatalFailure.
@@ -15144,13 +15126,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ElectronicFatalFailure.
@@ -15172,13 +15147,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GeneralFault.
@@ -15200,13 +15168,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Leakage.
@@ -15228,13 +15189,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AirDetection.
@@ -15256,13 +15210,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             return std::get<CHIP_ERROR>(__element);
         }
-
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
-
-        {}
-
-        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TurbineOperation.
@@ -15294,8 +15241,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
@@ -15344,6 +15291,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMode))
         {
             err = DataModel::Decode(reader, mode);
@@ -15386,6 +15334,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNumberOfTransitionsForSequence))
         {
             err = DataModel::Decode(reader, numberOfTransitionsForSequence);
@@ -15436,6 +15385,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNumberOfTransitionsForSequence))
         {
             err = DataModel::Decode(reader, numberOfTransitionsForSequence);
@@ -15483,6 +15433,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kDaysToReturn))
         {
             err = DataModel::Decode(reader, daysToReturn);
@@ -15673,6 +15624,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kDirection))
         {
             err = DataModel::Decode(reader, direction);
@@ -15810,6 +15762,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kHue))
         {
             err = DataModel::Decode(reader, hue);
@@ -15863,6 +15816,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMoveMode))
         {
             err = DataModel::Decode(reader, moveMode);
@@ -15913,6 +15867,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStepMode))
         {
             err = DataModel::Decode(reader, stepMode);
@@ -15966,6 +15921,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kSaturation))
         {
             err = DataModel::Decode(reader, saturation);
@@ -16015,6 +15971,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMoveMode))
         {
             err = DataModel::Decode(reader, moveMode);
@@ -16065,6 +16022,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStepMode))
         {
             err = DataModel::Decode(reader, stepMode);
@@ -16119,6 +16077,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kHue))
         {
             err = DataModel::Decode(reader, hue);
@@ -16173,6 +16132,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kColorX))
         {
             err = DataModel::Decode(reader, colorX);
@@ -16226,6 +16186,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kRateX))
         {
             err = DataModel::Decode(reader, rateX);
@@ -16276,6 +16237,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStepX))
         {
             err = DataModel::Decode(reader, stepX);
@@ -16329,6 +16291,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kColorTemperatureMireds))
         {
             err = DataModel::Decode(reader, colorTemperatureMireds);
@@ -16379,6 +16342,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kEnhancedHue))
         {
             err = DataModel::Decode(reader, enhancedHue);
@@ -16432,6 +16396,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMoveMode))
         {
             err = DataModel::Decode(reader, moveMode);
@@ -16482,6 +16447,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStepMode))
         {
             err = DataModel::Decode(reader, stepMode);
@@ -16536,6 +16502,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kEnhancedHue))
         {
             err = DataModel::Decode(reader, enhancedHue);
@@ -16592,6 +16559,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kUpdateFlags))
         {
             err = DataModel::Decode(reader, updateFlags);
@@ -16651,6 +16619,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
             err = DataModel::Decode(reader, optionsMask);
@@ -16696,6 +16665,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMoveMode))
         {
             err = DataModel::Decode(reader, moveMode);
@@ -16758,6 +16728,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStepMode))
         {
             err = DataModel::Decode(reader, stepMode);
@@ -17819,8 +17790,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kMajorNumber))
         {
@@ -17875,8 +17846,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kOperatorName))
         {
@@ -17928,6 +17899,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMatch))
         {
             err = DataModel::Decode(reader, match);
@@ -17963,6 +17935,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -18002,6 +17975,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMajorNumber))
         {
             err = DataModel::Decode(reader, majorNumber);
@@ -18040,6 +18014,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCount))
         {
             err = DataModel::Decode(reader, count);
@@ -18110,8 +18085,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kIdentifier))
         {
@@ -18156,6 +18131,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kTarget))
         {
             err = DataModel::Decode(reader, target);
@@ -18195,6 +18171,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -18267,8 +18244,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kUpdatedAt))
         {
@@ -18481,6 +18458,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kDeltaPositionMilliseconds))
         {
             err = DataModel::Decode(reader, deltaPositionMilliseconds);
@@ -18516,6 +18494,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kDeltaPositionMilliseconds))
         {
             err = DataModel::Decode(reader, deltaPositionMilliseconds);
@@ -18551,6 +18530,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -18589,6 +18569,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kPosition))
         {
             err = DataModel::Decode(reader, position);
@@ -18669,8 +18650,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kIndex))
         {
@@ -18722,6 +18703,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kIndex))
         {
             err = DataModel::Decode(reader, index);
@@ -18799,6 +18781,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kIndex))
         {
             err = DataModel::Decode(reader, index);
@@ -18924,6 +18907,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kKeyCode))
         {
             err = DataModel::Decode(reader, keyCode);
@@ -18958,6 +18942,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -19023,8 +19008,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kWidth))
         {
@@ -19069,8 +19054,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kName))
         {
@@ -19112,8 +19097,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kType))
         {
@@ -19157,8 +19142,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kParameterList))
         {
@@ -19196,8 +19181,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kImageURL))
         {
@@ -19246,8 +19231,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kProviderName))
         {
@@ -19309,6 +19294,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kSearch))
         {
             err = DataModel::Decode(reader, search);
@@ -19353,6 +19339,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kContentURL))
         {
             err = DataModel::Decode(reader, contentURL);
@@ -19396,6 +19383,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -19469,8 +19457,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kIndex))
         {
@@ -19518,6 +19506,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kIndex))
         {
             err = DataModel::Decode(reader, index);
@@ -19553,6 +19542,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kIndex))
         {
             err = DataModel::Decode(reader, index);
@@ -19625,8 +19615,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kApplication))
         {
@@ -19671,6 +19661,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kApplication))
         {
             err = DataModel::Decode(reader, application);
@@ -19709,6 +19700,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kApplication))
         {
             err = DataModel::Decode(reader, application);
@@ -19743,6 +19735,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kApplication))
         {
             err = DataModel::Decode(reader, application);
@@ -19778,6 +19771,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
             err = DataModel::Decode(reader, status);
@@ -19898,6 +19892,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kTempAccountIdentifier))
         {
             err = DataModel::Decode(reader, tempAccountIdentifier);
@@ -19932,6 +19927,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kSetupPIN))
         {
             err = DataModel::Decode(reader, setupPIN);
@@ -19967,6 +19963,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kTempAccountIdentifier))
         {
             err = DataModel::Decode(reader, tempAccountIdentifier);
@@ -20060,6 +20057,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kProfileCount))
         {
             err = DataModel::Decode(reader, profileCount);
@@ -20133,6 +20131,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStartTime))
         {
             err = DataModel::Decode(reader, startTime);
@@ -20189,6 +20188,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kAttributeId))
         {
             err = DataModel::Decode(reader, attributeId);
@@ -20523,8 +20523,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kA))
         {
@@ -20635,8 +20635,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kFabricSensitiveInt8u))
         {
@@ -20711,8 +20711,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kNullableInt))
         {
@@ -20794,8 +20794,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kA))
         {
@@ -20845,8 +20845,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kA))
         {
@@ -20906,8 +20906,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kA))
         {
@@ -20944,8 +20944,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kMember1))
         {
@@ -21010,6 +21010,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kReturnValue))
         {
             err = DataModel::Decode(reader, returnValue);
@@ -21065,6 +21066,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kReturnValue))
         {
             err = DataModel::Decode(reader, returnValue);
@@ -21120,6 +21122,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kReturnValue))
         {
             err = DataModel::Decode(reader, returnValue);
@@ -21180,6 +21183,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
             err = DataModel::Decode(reader, arg1);
@@ -21235,6 +21239,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
             err = DataModel::Decode(reader, arg1);
@@ -21273,6 +21278,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
             err = DataModel::Decode(reader, arg1);
@@ -21307,6 +21313,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
             err = DataModel::Decode(reader, arg1);
@@ -21342,6 +21349,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
             err = DataModel::Decode(reader, arg1);
@@ -21385,6 +21393,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
             err = DataModel::Decode(reader, arg1);
@@ -21442,6 +21451,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kWasPresent))
         {
             err = DataModel::Decode(reader, wasPresent);
@@ -21488,6 +21498,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
             err = DataModel::Decode(reader, arg1);
@@ -21560,6 +21571,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNullableIntWasNull))
         {
             err = DataModel::Decode(reader, nullableIntWasNull);
@@ -21702,6 +21714,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
             err = DataModel::Decode(reader, arg1);
@@ -21736,6 +21749,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kValue))
         {
             err = DataModel::Decode(reader, value);
@@ -21770,6 +21784,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
             err = DataModel::Decode(reader, arg1);
@@ -21804,6 +21819,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
             err = DataModel::Decode(reader, arg1);
@@ -21838,6 +21854,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
             err = DataModel::Decode(reader, arg1);
@@ -21872,6 +21889,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kValue))
         {
             err = DataModel::Decode(reader, value);
@@ -21906,6 +21924,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
             err = DataModel::Decode(reader, arg1);
@@ -21940,6 +21959,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kValue))
         {
             err = DataModel::Decode(reader, value);
@@ -21974,6 +21994,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
             err = DataModel::Decode(reader, arg1);
@@ -22008,6 +22029,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
             err = DataModel::Decode(reader, arg1);
@@ -22043,6 +22065,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
             err = DataModel::Decode(reader, arg1);
@@ -22081,6 +22104,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
             err = DataModel::Decode(reader, arg1);
@@ -22126,6 +22150,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNullableInt))
         {
             err = DataModel::Decode(reader, nullableInt);
@@ -22204,6 +22229,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
             err = DataModel::Decode(reader, arg1);
@@ -22259,6 +22285,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
             err = DataModel::Decode(reader, arg1);
@@ -22295,6 +22322,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
             err = DataModel::Decode(reader, arg1);
@@ -22337,6 +22365,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
             err = DataModel::Decode(reader, arg1);
@@ -22564,8 +22593,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kArg1))
         {
@@ -22619,8 +22648,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
-        CHIP_ERROR err                               = CHIP_NO_ERROR;
-        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
 
         if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
@@ -22666,6 +22695,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kType))
         {
             err = DataModel::Decode(reader, type);
@@ -22718,6 +22748,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kType))
         {
             err = DataModel::Decode(reader, type);
@@ -22812,6 +22843,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kReturnValue))
         {
             err = DataModel::Decode(reader, returnValue);
@@ -22847,6 +22879,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
         CHIP_ERROR err              = CHIP_NO_ERROR;
         const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
             err = DataModel::Decode(reader, arg1);
