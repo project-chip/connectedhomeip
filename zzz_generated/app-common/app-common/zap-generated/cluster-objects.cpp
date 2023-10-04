@@ -96,18 +96,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMfgCode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, mfgCode));
+            err = DataModel::Decode(reader, mfgCode);
         }
         else if (__context_tag == to_underlying(Fields::kValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, value));
+            err = DataModel::Decode(reader, value);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -135,22 +139,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kLabel))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, label));
+            err = DataModel::Decode(reader, label);
         }
         else if (__context_tag == to_underlying(Fields::kMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, mode));
+            err = DataModel::Decode(reader, mode);
         }
         else if (__context_tag == to_underlying(Fields::kModeTags))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, modeTags));
+            err = DataModel::Decode(reader, modeTags);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -177,18 +185,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCatalogVendorID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, catalogVendorID));
+            err = DataModel::Decode(reader, catalogVendorID);
         }
         else if (__context_tag == to_underlying(Fields::kApplicationID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, applicationID));
+            err = DataModel::Decode(reader, applicationID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -216,22 +228,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kErrorStateID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, errorStateID));
+            err = DataModel::Decode(reader, errorStateID);
         }
         else if (__context_tag == to_underlying(Fields::kErrorStateLabel))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, errorStateLabel));
+            err = DataModel::Decode(reader, errorStateLabel);
         }
         else if (__context_tag == to_underlying(Fields::kErrorStateDetails))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, errorStateDetails));
+            err = DataModel::Decode(reader, errorStateDetails);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -258,18 +274,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kLabel))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, label));
+            err = DataModel::Decode(reader, label);
         }
         else if (__context_tag == to_underlying(Fields::kValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, value));
+            err = DataModel::Decode(reader, value);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -296,18 +316,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kOperationalStateID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, operationalStateID));
+            err = DataModel::Decode(reader, operationalStateID);
         }
         else if (__context_tag == to_underlying(Fields::kOperationalStateLabel))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, operationalStateLabel));
+            err = DataModel::Decode(reader, operationalStateLabel);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -339,14 +363,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kIdentifyTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, identifyTime));
+            err = DataModel::Decode(reader, identifyTime);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Identify.
@@ -372,18 +400,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kEffectIdentifier))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, effectIdentifier));
+            err = DataModel::Decode(reader, effectIdentifier);
         }
         else if (__context_tag == to_underlying(Fields::kEffectVariant))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, effectVariant));
+            err = DataModel::Decode(reader, effectVariant);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TriggerEffect.
@@ -454,18 +486,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kGroupName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupName));
+            err = DataModel::Decode(reader, groupName);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AddGroup.
@@ -491,18 +527,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AddGroupResponse.
@@ -527,14 +567,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ViewGroup.
@@ -561,22 +605,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kGroupName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupName));
+            err = DataModel::Decode(reader, groupName);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ViewGroupResponse.
@@ -601,14 +649,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupList))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupList));
+            err = DataModel::Decode(reader, groupList);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetGroupMembership.
@@ -634,18 +686,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCapacity))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, capacity));
+            err = DataModel::Decode(reader, capacity);
         }
         else if (__context_tag == to_underlying(Fields::kGroupList))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupList));
+            err = DataModel::Decode(reader, groupList);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetGroupMembershipResponse.
@@ -670,14 +726,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace RemoveGroup.
@@ -703,18 +763,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace RemoveGroupResponse.
@@ -738,8 +802,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace RemoveAllGroups.
@@ -765,18 +833,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kGroupName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupName));
+            err = DataModel::Decode(reader, groupName);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AddGroupIfIdentifying.
@@ -843,18 +915,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kAttributeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, attributeID));
+            err = DataModel::Decode(reader, attributeID);
         }
         else if (__context_tag == to_underlying(Fields::kAttributeValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, attributeValue));
+            err = DataModel::Decode(reader, attributeValue);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -881,18 +957,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kClusterID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, clusterID));
+            err = DataModel::Decode(reader, clusterID);
         }
         else if (__context_tag == to_underlying(Fields::kAttributeValueList))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, attributeValueList));
+            err = DataModel::Decode(reader, attributeValueList);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -925,30 +1005,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kSceneID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
+            err = DataModel::Decode(reader, sceneID);
         }
         else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kSceneName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneName));
+            err = DataModel::Decode(reader, sceneName);
         }
         else if (__context_tag == to_underlying(Fields::kExtensionFieldSets))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, extensionFieldSets));
+            err = DataModel::Decode(reader, extensionFieldSets);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AddScene.
@@ -975,22 +1059,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kSceneID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
+            err = DataModel::Decode(reader, sceneID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AddSceneResponse.
@@ -1016,18 +1104,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kSceneID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
+            err = DataModel::Decode(reader, sceneID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ViewScene.
@@ -1057,34 +1149,38 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kSceneID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
+            err = DataModel::Decode(reader, sceneID);
         }
         else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kSceneName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneName));
+            err = DataModel::Decode(reader, sceneName);
         }
         else if (__context_tag == to_underlying(Fields::kExtensionFieldSets))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, extensionFieldSets));
+            err = DataModel::Decode(reader, extensionFieldSets);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ViewSceneResponse.
@@ -1110,18 +1206,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kSceneID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
+            err = DataModel::Decode(reader, sceneID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace RemoveScene.
@@ -1148,22 +1248,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kSceneID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
+            err = DataModel::Decode(reader, sceneID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace RemoveSceneResponse.
@@ -1188,14 +1292,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace RemoveAllScenes.
@@ -1221,18 +1329,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace RemoveAllScenesResponse.
@@ -1258,18 +1370,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kSceneID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
+            err = DataModel::Decode(reader, sceneID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace StoreScene.
@@ -1296,22 +1412,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kSceneID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
+            err = DataModel::Decode(reader, sceneID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace StoreSceneResponse.
@@ -1338,22 +1458,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kSceneID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
+            err = DataModel::Decode(reader, sceneID);
         }
         else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace RecallScene.
@@ -1378,14 +1502,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetSceneMembership.
@@ -1413,26 +1541,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kCapacity))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, capacity));
+            err = DataModel::Decode(reader, capacity);
         }
         else if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kSceneList))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneList));
+            err = DataModel::Decode(reader, sceneList);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetSceneMembershipResponse.
@@ -1461,30 +1593,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kSceneID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
+            err = DataModel::Decode(reader, sceneID);
         }
         else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kSceneName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneName));
+            err = DataModel::Decode(reader, sceneName);
         }
         else if (__context_tag == to_underlying(Fields::kExtensionFieldSets))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, extensionFieldSets));
+            err = DataModel::Decode(reader, extensionFieldSets);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace EnhancedAddScene.
@@ -1511,22 +1647,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kSceneID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
+            err = DataModel::Decode(reader, sceneID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace EnhancedAddSceneResponse.
@@ -1552,18 +1692,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kSceneID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
+            err = DataModel::Decode(reader, sceneID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace EnhancedViewScene.
@@ -1593,34 +1737,38 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kGroupID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
+            err = DataModel::Decode(reader, groupID);
         }
         else if (__context_tag == to_underlying(Fields::kSceneID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
+            err = DataModel::Decode(reader, sceneID);
         }
         else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kSceneName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneName));
+            err = DataModel::Decode(reader, sceneName);
         }
         else if (__context_tag == to_underlying(Fields::kExtensionFieldSets))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, extensionFieldSets));
+            err = DataModel::Decode(reader, extensionFieldSets);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace EnhancedViewSceneResponse.
@@ -1649,30 +1797,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, mode));
+            err = DataModel::Decode(reader, mode);
         }
         else if (__context_tag == to_underlying(Fields::kGroupIdentifierFrom))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupIdentifierFrom));
+            err = DataModel::Decode(reader, groupIdentifierFrom);
         }
         else if (__context_tag == to_underlying(Fields::kSceneIdentifierFrom))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneIdentifierFrom));
+            err = DataModel::Decode(reader, sceneIdentifierFrom);
         }
         else if (__context_tag == to_underlying(Fields::kGroupIdentifierTo))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupIdentifierTo));
+            err = DataModel::Decode(reader, groupIdentifierTo);
         }
         else if (__context_tag == to_underlying(Fields::kSceneIdentifierTo))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneIdentifierTo));
+            err = DataModel::Decode(reader, sceneIdentifierTo);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace CopyScene.
@@ -1699,22 +1851,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kGroupIdentifierFrom))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupIdentifierFrom));
+            err = DataModel::Decode(reader, groupIdentifierFrom);
         }
         else if (__context_tag == to_underlying(Fields::kSceneIdentifierFrom))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sceneIdentifierFrom));
+            err = DataModel::Decode(reader, sceneIdentifierFrom);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace CopySceneResponse.
@@ -1801,8 +1957,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Off.
@@ -1826,8 +1986,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace On.
@@ -1851,8 +2015,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Toggle.
@@ -1878,18 +2046,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kEffectIdentifier))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, effectIdentifier));
+            err = DataModel::Decode(reader, effectIdentifier);
         }
         else if (__context_tag == to_underlying(Fields::kEffectVariant))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, effectVariant));
+            err = DataModel::Decode(reader, effectVariant);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace OffWithEffect.
@@ -1913,8 +2085,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace OnWithRecallGlobalScene.
@@ -1941,22 +2117,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kOnOffControl))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, onOffControl));
+            err = DataModel::Decode(reader, onOffControl);
         }
         else if (__context_tag == to_underlying(Fields::kOnTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, onTime));
+            err = DataModel::Decode(reader, onTime);
         }
         else if (__context_tag == to_underlying(Fields::kOffWaitTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, offWaitTime));
+            err = DataModel::Decode(reader, offWaitTime);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace OnWithTimedOff.
@@ -2082,26 +2262,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kLevel))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, level));
+            err = DataModel::Decode(reader, level);
         }
         else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace MoveToLevel.
@@ -2129,26 +2313,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMoveMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, moveMode));
+            err = DataModel::Decode(reader, moveMode);
         }
         else if (__context_tag == to_underlying(Fields::kRate))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, rate));
+            err = DataModel::Decode(reader, rate);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Move.
@@ -2177,30 +2365,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStepMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, stepMode));
+            err = DataModel::Decode(reader, stepMode);
         }
         else if (__context_tag == to_underlying(Fields::kStepSize))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, stepSize));
+            err = DataModel::Decode(reader, stepSize);
         }
         else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Step.
@@ -2226,18 +2418,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Stop.
@@ -2265,26 +2461,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kLevel))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, level));
+            err = DataModel::Decode(reader, level);
         }
         else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace MoveToLevelWithOnOff.
@@ -2312,26 +2512,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMoveMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, moveMode));
+            err = DataModel::Decode(reader, moveMode);
         }
         else if (__context_tag == to_underlying(Fields::kRate))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, rate));
+            err = DataModel::Decode(reader, rate);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace MoveWithOnOff.
@@ -2360,30 +2564,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStepMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, stepMode));
+            err = DataModel::Decode(reader, stepMode);
         }
         else if (__context_tag == to_underlying(Fields::kStepSize))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, stepSize));
+            err = DataModel::Decode(reader, stepSize);
         }
         else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace StepWithOnOff.
@@ -2409,18 +2617,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace StopWithOnOff.
@@ -2445,14 +2657,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kFrequency))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, frequency));
+            err = DataModel::Decode(reader, frequency);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace MoveToClosestFrequency.
@@ -2661,18 +2877,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kDeviceType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, deviceType));
+            err = DataModel::Decode(reader, deviceType);
         }
         else if (__context_tag == to_underlying(Fields::kRevision))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, revision));
+            err = DataModel::Decode(reader, revision);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -2701,26 +2921,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMfgCode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, mfgCode));
+            err = DataModel::Decode(reader, mfgCode);
         }
         else if (__context_tag == to_underlying(Fields::kNamespaceID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, namespaceID));
+            err = DataModel::Decode(reader, namespaceID);
         }
         else if (__context_tag == to_underlying(Fields::kTag))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, tag));
+            err = DataModel::Decode(reader, tag);
         }
         else if (__context_tag == to_underlying(Fields::kLabel))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, label));
+            err = DataModel::Decode(reader, label);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -2818,30 +3042,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, node));
+            err = DataModel::Decode(reader, node);
         }
         else if (__context_tag == to_underlying(Fields::kGroup))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, group));
+            err = DataModel::Decode(reader, group);
         }
         else if (__context_tag == to_underlying(Fields::kEndpoint))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, endpoint));
+            err = DataModel::Decode(reader, endpoint);
         }
         else if (__context_tag == to_underlying(Fields::kCluster))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, cluster));
+            err = DataModel::Decode(reader, cluster);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -2912,22 +3140,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCluster))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, cluster));
+            err = DataModel::Decode(reader, cluster);
         }
         else if (__context_tag == to_underlying(Fields::kEndpoint))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, endpoint));
+            err = DataModel::Decode(reader, endpoint);
         }
         else if (__context_tag == to_underlying(Fields::kDeviceType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, deviceType));
+            err = DataModel::Decode(reader, deviceType);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -2983,30 +3215,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kPrivilege))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, privilege));
+            err = DataModel::Decode(reader, privilege);
         }
         else if (__context_tag == to_underlying(Fields::kAuthMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, authMode));
+            err = DataModel::Decode(reader, authMode);
         }
         else if (__context_tag == to_underlying(Fields::kSubjects))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, subjects));
+            err = DataModel::Decode(reader, subjects);
         }
         else if (__context_tag == to_underlying(Fields::kTargets))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, targets));
+            err = DataModel::Decode(reader, targets);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -3050,18 +3286,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kData))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, data));
+            err = DataModel::Decode(reader, data);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -3142,30 +3382,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kAdminNodeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, adminNodeID));
+            err = DataModel::Decode(reader, adminNodeID);
         }
         else if (__context_tag == to_underlying(Fields::kAdminPasscodeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, adminPasscodeID));
+            err = DataModel::Decode(reader, adminPasscodeID);
         }
         else if (__context_tag == to_underlying(Fields::kChangeType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, changeType));
+            err = DataModel::Decode(reader, changeType);
         }
         else if (__context_tag == to_underlying(Fields::kLatestValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, latestValue));
+            err = DataModel::Decode(reader, latestValue);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AccessControlEntryChanged.
@@ -3194,30 +3438,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kAdminNodeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, adminNodeID));
+            err = DataModel::Decode(reader, adminNodeID);
         }
         else if (__context_tag == to_underlying(Fields::kAdminPasscodeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, adminPasscodeID));
+            err = DataModel::Decode(reader, adminPasscodeID);
         }
         else if (__context_tag == to_underlying(Fields::kChangeType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, changeType));
+            err = DataModel::Decode(reader, changeType);
         }
         else if (__context_tag == to_underlying(Fields::kLatestValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, latestValue));
+            err = DataModel::Decode(reader, latestValue);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AccessControlExtensionChanged.
@@ -3252,34 +3500,38 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
+            err = DataModel::Decode(reader, actionID);
         }
         else if (__context_tag == to_underlying(Fields::kName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, name));
+            err = DataModel::Decode(reader, name);
         }
         else if (__context_tag == to_underlying(Fields::kType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, type));
+            err = DataModel::Decode(reader, type);
         }
         else if (__context_tag == to_underlying(Fields::kEndpointListID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, endpointListID));
+            err = DataModel::Decode(reader, endpointListID);
         }
         else if (__context_tag == to_underlying(Fields::kSupportedCommands))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, supportedCommands));
+            err = DataModel::Decode(reader, supportedCommands);
         }
         else if (__context_tag == to_underlying(Fields::kState))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, state));
+            err = DataModel::Decode(reader, state);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -3308,26 +3560,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kEndpointListID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, endpointListID));
+            err = DataModel::Decode(reader, endpointListID);
         }
         else if (__context_tag == to_underlying(Fields::kName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, name));
+            err = DataModel::Decode(reader, name);
         }
         else if (__context_tag == to_underlying(Fields::kType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, type));
+            err = DataModel::Decode(reader, type);
         }
         else if (__context_tag == to_underlying(Fields::kEndpoints))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, endpoints));
+            err = DataModel::Decode(reader, endpoints);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -3357,18 +3613,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
+            err = DataModel::Decode(reader, actionID);
         }
         else if (__context_tag == to_underlying(Fields::kInvokeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
+            err = DataModel::Decode(reader, invokeID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace InstantAction.
@@ -3395,22 +3655,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
+            err = DataModel::Decode(reader, actionID);
         }
         else if (__context_tag == to_underlying(Fields::kInvokeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
+            err = DataModel::Decode(reader, invokeID);
         }
         else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace InstantActionWithTransition.
@@ -3436,18 +3700,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
+            err = DataModel::Decode(reader, actionID);
         }
         else if (__context_tag == to_underlying(Fields::kInvokeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
+            err = DataModel::Decode(reader, invokeID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace StartAction.
@@ -3474,22 +3742,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
+            err = DataModel::Decode(reader, actionID);
         }
         else if (__context_tag == to_underlying(Fields::kInvokeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
+            err = DataModel::Decode(reader, invokeID);
         }
         else if (__context_tag == to_underlying(Fields::kDuration))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, duration));
+            err = DataModel::Decode(reader, duration);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace StartActionWithDuration.
@@ -3515,18 +3787,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
+            err = DataModel::Decode(reader, actionID);
         }
         else if (__context_tag == to_underlying(Fields::kInvokeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
+            err = DataModel::Decode(reader, invokeID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace StopAction.
@@ -3552,18 +3828,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
+            err = DataModel::Decode(reader, actionID);
         }
         else if (__context_tag == to_underlying(Fields::kInvokeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
+            err = DataModel::Decode(reader, invokeID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace PauseAction.
@@ -3590,22 +3870,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
+            err = DataModel::Decode(reader, actionID);
         }
         else if (__context_tag == to_underlying(Fields::kInvokeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
+            err = DataModel::Decode(reader, invokeID);
         }
         else if (__context_tag == to_underlying(Fields::kDuration))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, duration));
+            err = DataModel::Decode(reader, duration);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace PauseActionWithDuration.
@@ -3631,18 +3915,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
+            err = DataModel::Decode(reader, actionID);
         }
         else if (__context_tag == to_underlying(Fields::kInvokeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
+            err = DataModel::Decode(reader, invokeID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ResumeAction.
@@ -3668,18 +3956,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
+            err = DataModel::Decode(reader, actionID);
         }
         else if (__context_tag == to_underlying(Fields::kInvokeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
+            err = DataModel::Decode(reader, invokeID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace EnableAction.
@@ -3706,22 +3998,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
+            err = DataModel::Decode(reader, actionID);
         }
         else if (__context_tag == to_underlying(Fields::kInvokeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
+            err = DataModel::Decode(reader, invokeID);
         }
         else if (__context_tag == to_underlying(Fields::kDuration))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, duration));
+            err = DataModel::Decode(reader, duration);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace EnableActionWithDuration.
@@ -3747,18 +4043,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
+            err = DataModel::Decode(reader, actionID);
         }
         else if (__context_tag == to_underlying(Fields::kInvokeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
+            err = DataModel::Decode(reader, invokeID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace DisableAction.
@@ -3785,22 +4085,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
+            err = DataModel::Decode(reader, actionID);
         }
         else if (__context_tag == to_underlying(Fields::kInvokeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
+            err = DataModel::Decode(reader, invokeID);
         }
         else if (__context_tag == to_underlying(Fields::kDuration))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, duration));
+            err = DataModel::Decode(reader, duration);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace DisableActionWithDuration.
@@ -3870,22 +4174,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
+            err = DataModel::Decode(reader, actionID);
         }
         else if (__context_tag == to_underlying(Fields::kInvokeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
+            err = DataModel::Decode(reader, invokeID);
         }
         else if (__context_tag == to_underlying(Fields::kNewState))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, newState));
+            err = DataModel::Decode(reader, newState);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace StateChanged.
@@ -3913,26 +4221,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActionID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
+            err = DataModel::Decode(reader, actionID);
         }
         else if (__context_tag == to_underlying(Fields::kInvokeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
+            err = DataModel::Decode(reader, invokeID);
         }
         else if (__context_tag == to_underlying(Fields::kNewState))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, newState));
+            err = DataModel::Decode(reader, newState);
         }
         else if (__context_tag == to_underlying(Fields::kError))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, error));
+            err = DataModel::Decode(reader, error);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ActionFailed.
@@ -3963,18 +4275,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCaseSessionsPerFabric))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, caseSessionsPerFabric));
+            err = DataModel::Decode(reader, caseSessionsPerFabric);
         }
         else if (__context_tag == to_underlying(Fields::kSubscriptionsPerFabric))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, subscriptionsPerFabric));
+            err = DataModel::Decode(reader, subscriptionsPerFabric);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -4001,18 +4317,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kFinish))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, finish));
+            err = DataModel::Decode(reader, finish);
         }
         else if (__context_tag == to_underlying(Fields::kPrimaryColor))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, primaryColor));
+            err = DataModel::Decode(reader, primaryColor);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -4040,8 +4360,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace MfgSpecificPing.
@@ -4163,14 +4487,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kSoftwareVersion))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
+            err = DataModel::Decode(reader, softwareVersion);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace StartUp.
@@ -4194,8 +4522,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ShutDown.
@@ -4220,14 +4552,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Leave.
@@ -4252,14 +4588,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kReachableNewValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, reachableNewValue));
+            err = DataModel::Decode(reader, reachableNewValue);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ReachableChanged.
@@ -4297,42 +4637,46 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kVendorID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, vendorID));
+            err = DataModel::Decode(reader, vendorID);
         }
         else if (__context_tag == to_underlying(Fields::kProductID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, productID));
+            err = DataModel::Decode(reader, productID);
         }
         else if (__context_tag == to_underlying(Fields::kSoftwareVersion))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
+            err = DataModel::Decode(reader, softwareVersion);
         }
         else if (__context_tag == to_underlying(Fields::kProtocolsSupported))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, protocolsSupported));
+            err = DataModel::Decode(reader, protocolsSupported);
         }
         else if (__context_tag == to_underlying(Fields::kHardwareVersion))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, hardwareVersion));
+            err = DataModel::Decode(reader, hardwareVersion);
         }
         else if (__context_tag == to_underlying(Fields::kLocation))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, location));
+            err = DataModel::Decode(reader, location);
         }
         else if (__context_tag == to_underlying(Fields::kRequestorCanConsent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, requestorCanConsent));
+            err = DataModel::Decode(reader, requestorCanConsent);
         }
         else if (__context_tag == to_underlying(Fields::kMetadataForProvider))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, metadataForProvider));
+            err = DataModel::Decode(reader, metadataForProvider);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace QueryImage.
@@ -4364,42 +4708,46 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kDelayedActionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, delayedActionTime));
+            err = DataModel::Decode(reader, delayedActionTime);
         }
         else if (__context_tag == to_underlying(Fields::kImageURI))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, imageURI));
+            err = DataModel::Decode(reader, imageURI);
         }
         else if (__context_tag == to_underlying(Fields::kSoftwareVersion))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
+            err = DataModel::Decode(reader, softwareVersion);
         }
         else if (__context_tag == to_underlying(Fields::kSoftwareVersionString))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersionString));
+            err = DataModel::Decode(reader, softwareVersionString);
         }
         else if (__context_tag == to_underlying(Fields::kUpdateToken))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, updateToken));
+            err = DataModel::Decode(reader, updateToken);
         }
         else if (__context_tag == to_underlying(Fields::kUserConsentNeeded))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userConsentNeeded));
+            err = DataModel::Decode(reader, userConsentNeeded);
         }
         else if (__context_tag == to_underlying(Fields::kMetadataForRequestor))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, metadataForRequestor));
+            err = DataModel::Decode(reader, metadataForRequestor);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace QueryImageResponse.
@@ -4425,18 +4773,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kUpdateToken))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, updateToken));
+            err = DataModel::Decode(reader, updateToken);
         }
         else if (__context_tag == to_underlying(Fields::kNewVersion))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, newVersion));
+            err = DataModel::Decode(reader, newVersion);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ApplyUpdateRequest.
@@ -4462,18 +4814,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kAction))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, action));
+            err = DataModel::Decode(reader, action);
         }
         else if (__context_tag == to_underlying(Fields::kDelayedActionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, delayedActionTime));
+            err = DataModel::Decode(reader, delayedActionTime);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ApplyUpdateResponse.
@@ -4499,18 +4855,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kUpdateToken))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, updateToken));
+            err = DataModel::Decode(reader, updateToken);
         }
         else if (__context_tag == to_underlying(Fields::kSoftwareVersion))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
+            err = DataModel::Decode(reader, softwareVersion);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace NotifyUpdateApplied.
@@ -4588,22 +4948,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kProviderNodeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, providerNodeID));
+            err = DataModel::Decode(reader, providerNodeID);
         }
         else if (__context_tag == to_underlying(Fields::kEndpoint))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, endpoint));
+            err = DataModel::Decode(reader, endpoint);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -4636,30 +5000,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kProviderNodeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, providerNodeID));
+            err = DataModel::Decode(reader, providerNodeID);
         }
         else if (__context_tag == to_underlying(Fields::kVendorID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, vendorID));
+            err = DataModel::Decode(reader, vendorID);
         }
         else if (__context_tag == to_underlying(Fields::kAnnouncementReason))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, announcementReason));
+            err = DataModel::Decode(reader, announcementReason);
         }
         else if (__context_tag == to_underlying(Fields::kMetadataForNode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, metadataForNode));
+            err = DataModel::Decode(reader, metadataForNode);
         }
         else if (__context_tag == to_underlying(Fields::kEndpoint))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, endpoint));
+            err = DataModel::Decode(reader, endpoint);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AnnounceOTAProvider.
@@ -4733,26 +5101,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kPreviousState))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, previousState));
+            err = DataModel::Decode(reader, previousState);
         }
         else if (__context_tag == to_underlying(Fields::kNewState))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, newState));
+            err = DataModel::Decode(reader, newState);
         }
         else if (__context_tag == to_underlying(Fields::kReason))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, reason));
+            err = DataModel::Decode(reader, reason);
         }
         else if (__context_tag == to_underlying(Fields::kTargetSoftwareVersion))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, targetSoftwareVersion));
+            err = DataModel::Decode(reader, targetSoftwareVersion);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace StateTransition.
@@ -4778,18 +5150,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kSoftwareVersion))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
+            err = DataModel::Decode(reader, softwareVersion);
         }
         else if (__context_tag == to_underlying(Fields::kProductID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, productID));
+            err = DataModel::Decode(reader, productID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace VersionApplied.
@@ -4817,26 +5193,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kSoftwareVersion))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
+            err = DataModel::Decode(reader, softwareVersion);
         }
         else if (__context_tag == to_underlying(Fields::kBytesDownloaded))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, bytesDownloaded));
+            err = DataModel::Decode(reader, bytesDownloaded);
         }
         else if (__context_tag == to_underlying(Fields::kProgressPercent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, progressPercent));
+            err = DataModel::Decode(reader, progressPercent);
         }
         else if (__context_tag == to_underlying(Fields::kPlatformCode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, platformCode));
+            err = DataModel::Decode(reader, platformCode);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace DownloadError.
@@ -5040,18 +5420,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCurrent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, current));
+            err = DataModel::Decode(reader, current);
         }
         else if (__context_tag == to_underlying(Fields::kPrevious))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, previous));
+            err = DataModel::Decode(reader, previous);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -5078,18 +5462,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCurrent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, current));
+            err = DataModel::Decode(reader, current);
         }
         else if (__context_tag == to_underlying(Fields::kPrevious))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, previous));
+            err = DataModel::Decode(reader, previous);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -5116,18 +5504,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCurrent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, current));
+            err = DataModel::Decode(reader, current);
         }
         else if (__context_tag == to_underlying(Fields::kPrevious))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, previous));
+            err = DataModel::Decode(reader, previous);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -5286,18 +5678,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCurrent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, current));
+            err = DataModel::Decode(reader, current);
         }
         else if (__context_tag == to_underlying(Fields::kPrevious))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, previous));
+            err = DataModel::Decode(reader, previous);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace WiredFaultChange.
@@ -5323,18 +5719,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCurrent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, current));
+            err = DataModel::Decode(reader, current);
         }
         else if (__context_tag == to_underlying(Fields::kPrevious))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, previous));
+            err = DataModel::Decode(reader, previous);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace BatFaultChange.
@@ -5360,18 +5760,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCurrent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, current));
+            err = DataModel::Decode(reader, current);
         }
         else if (__context_tag == to_underlying(Fields::kPrevious))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, previous));
+            err = DataModel::Decode(reader, previous);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace BatChargeFaultChange.
@@ -5404,18 +5808,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kFailSafeExpiryLengthSeconds))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, failSafeExpiryLengthSeconds));
+            err = DataModel::Decode(reader, failSafeExpiryLengthSeconds);
         }
         else if (__context_tag == to_underlying(Fields::kMaxCumulativeFailsafeSeconds))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, maxCumulativeFailsafeSeconds));
+            err = DataModel::Decode(reader, maxCumulativeFailsafeSeconds);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -5445,18 +5853,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kExpiryLengthSeconds))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, expiryLengthSeconds));
+            err = DataModel::Decode(reader, expiryLengthSeconds);
         }
         else if (__context_tag == to_underlying(Fields::kBreadcrumb))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, breadcrumb));
+            err = DataModel::Decode(reader, breadcrumb);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ArmFailSafe.
@@ -5482,18 +5894,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kErrorCode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, errorCode));
+            err = DataModel::Decode(reader, errorCode);
         }
         else if (__context_tag == to_underlying(Fields::kDebugText))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, debugText));
+            err = DataModel::Decode(reader, debugText);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ArmFailSafeResponse.
@@ -5520,22 +5936,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNewRegulatoryConfig))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, newRegulatoryConfig));
+            err = DataModel::Decode(reader, newRegulatoryConfig);
         }
         else if (__context_tag == to_underlying(Fields::kCountryCode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, countryCode));
+            err = DataModel::Decode(reader, countryCode);
         }
         else if (__context_tag == to_underlying(Fields::kBreadcrumb))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, breadcrumb));
+            err = DataModel::Decode(reader, breadcrumb);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetRegulatoryConfig.
@@ -5561,18 +5981,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kErrorCode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, errorCode));
+            err = DataModel::Decode(reader, errorCode);
         }
         else if (__context_tag == to_underlying(Fields::kDebugText))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, debugText));
+            err = DataModel::Decode(reader, debugText);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetRegulatoryConfigResponse.
@@ -5596,8 +6020,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace CommissioningComplete.
@@ -5623,18 +6051,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kErrorCode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, errorCode));
+            err = DataModel::Decode(reader, errorCode);
         }
         else if (__context_tag == to_underlying(Fields::kDebugText))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, debugText));
+            err = DataModel::Decode(reader, debugText);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace CommissioningCompleteResponse.
@@ -5713,18 +6145,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNetworkID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, networkID));
+            err = DataModel::Decode(reader, networkID);
         }
         else if (__context_tag == to_underlying(Fields::kConnected))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, connected));
+            err = DataModel::Decode(reader, connected);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -5757,42 +6193,46 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kPanId))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, panId));
+            err = DataModel::Decode(reader, panId);
         }
         else if (__context_tag == to_underlying(Fields::kExtendedPanId))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, extendedPanId));
+            err = DataModel::Decode(reader, extendedPanId);
         }
         else if (__context_tag == to_underlying(Fields::kNetworkName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, networkName));
+            err = DataModel::Decode(reader, networkName);
         }
         else if (__context_tag == to_underlying(Fields::kChannel))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, channel));
+            err = DataModel::Decode(reader, channel);
         }
         else if (__context_tag == to_underlying(Fields::kVersion))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, version));
+            err = DataModel::Decode(reader, version);
         }
         else if (__context_tag == to_underlying(Fields::kExtendedAddress))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, extendedAddress));
+            err = DataModel::Decode(reader, extendedAddress);
         }
         else if (__context_tag == to_underlying(Fields::kRssi))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, rssi));
+            err = DataModel::Decode(reader, rssi);
         }
         else if (__context_tag == to_underlying(Fields::kLqi))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, lqi));
+            err = DataModel::Decode(reader, lqi);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -5823,34 +6263,38 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kSecurity))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, security));
+            err = DataModel::Decode(reader, security);
         }
         else if (__context_tag == to_underlying(Fields::kSsid))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, ssid));
+            err = DataModel::Decode(reader, ssid);
         }
         else if (__context_tag == to_underlying(Fields::kBssid))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, bssid));
+            err = DataModel::Decode(reader, bssid);
         }
         else if (__context_tag == to_underlying(Fields::kChannel))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, channel));
+            err = DataModel::Decode(reader, channel);
         }
         else if (__context_tag == to_underlying(Fields::kWiFiBand))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, wiFiBand));
+            err = DataModel::Decode(reader, wiFiBand);
         }
         else if (__context_tag == to_underlying(Fields::kRssi))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, rssi));
+            err = DataModel::Decode(reader, rssi);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -5880,18 +6324,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kSsid))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, ssid));
+            err = DataModel::Decode(reader, ssid);
         }
         else if (__context_tag == to_underlying(Fields::kBreadcrumb))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, breadcrumb));
+            err = DataModel::Decode(reader, breadcrumb);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ScanNetworks.
@@ -5919,26 +6367,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNetworkingStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, networkingStatus));
+            err = DataModel::Decode(reader, networkingStatus);
         }
         else if (__context_tag == to_underlying(Fields::kDebugText))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, debugText));
+            err = DataModel::Decode(reader, debugText);
         }
         else if (__context_tag == to_underlying(Fields::kWiFiScanResults))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, wiFiScanResults));
+            err = DataModel::Decode(reader, wiFiScanResults);
         }
         else if (__context_tag == to_underlying(Fields::kThreadScanResults))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, threadScanResults));
+            err = DataModel::Decode(reader, threadScanResults);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ScanNetworksResponse.
@@ -5965,22 +6417,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kSsid))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, ssid));
+            err = DataModel::Decode(reader, ssid);
         }
         else if (__context_tag == to_underlying(Fields::kCredentials))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, credentials));
+            err = DataModel::Decode(reader, credentials);
         }
         else if (__context_tag == to_underlying(Fields::kBreadcrumb))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, breadcrumb));
+            err = DataModel::Decode(reader, breadcrumb);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AddOrUpdateWiFiNetwork.
@@ -6006,18 +6462,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kOperationalDataset))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, operationalDataset));
+            err = DataModel::Decode(reader, operationalDataset);
         }
         else if (__context_tag == to_underlying(Fields::kBreadcrumb))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, breadcrumb));
+            err = DataModel::Decode(reader, breadcrumb);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AddOrUpdateThreadNetwork.
@@ -6043,18 +6503,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNetworkID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, networkID));
+            err = DataModel::Decode(reader, networkID);
         }
         else if (__context_tag == to_underlying(Fields::kBreadcrumb))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, breadcrumb));
+            err = DataModel::Decode(reader, breadcrumb);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace RemoveNetwork.
@@ -6081,22 +6545,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNetworkingStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, networkingStatus));
+            err = DataModel::Decode(reader, networkingStatus);
         }
         else if (__context_tag == to_underlying(Fields::kDebugText))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, debugText));
+            err = DataModel::Decode(reader, debugText);
         }
         else if (__context_tag == to_underlying(Fields::kNetworkIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, networkIndex));
+            err = DataModel::Decode(reader, networkIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace NetworkConfigResponse.
@@ -6122,18 +6590,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNetworkID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, networkID));
+            err = DataModel::Decode(reader, networkID);
         }
         else if (__context_tag == to_underlying(Fields::kBreadcrumb))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, breadcrumb));
+            err = DataModel::Decode(reader, breadcrumb);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ConnectNetwork.
@@ -6160,22 +6632,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNetworkingStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, networkingStatus));
+            err = DataModel::Decode(reader, networkingStatus);
         }
         else if (__context_tag == to_underlying(Fields::kDebugText))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, debugText));
+            err = DataModel::Decode(reader, debugText);
         }
         else if (__context_tag == to_underlying(Fields::kErrorValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, errorValue));
+            err = DataModel::Decode(reader, errorValue);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ConnectNetworkResponse.
@@ -6202,22 +6678,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNetworkID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, networkID));
+            err = DataModel::Decode(reader, networkID);
         }
         else if (__context_tag == to_underlying(Fields::kNetworkIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, networkIndex));
+            err = DataModel::Decode(reader, networkIndex);
         }
         else if (__context_tag == to_underlying(Fields::kBreadcrumb))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, breadcrumb));
+            err = DataModel::Decode(reader, breadcrumb);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ReorderNetwork.
@@ -6307,22 +6787,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kIntent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, intent));
+            err = DataModel::Decode(reader, intent);
         }
         else if (__context_tag == to_underlying(Fields::kRequestedProtocol))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, requestedProtocol));
+            err = DataModel::Decode(reader, requestedProtocol);
         }
         else if (__context_tag == to_underlying(Fields::kTransferFileDesignator))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transferFileDesignator));
+            err = DataModel::Decode(reader, transferFileDesignator);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace RetrieveLogsRequest.
@@ -6350,26 +6834,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kLogContent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, logContent));
+            err = DataModel::Decode(reader, logContent);
         }
         else if (__context_tag == to_underlying(Fields::kUTCTimeStamp))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, UTCTimeStamp));
+            err = DataModel::Decode(reader, UTCTimeStamp);
         }
         else if (__context_tag == to_underlying(Fields::kTimeSinceBoot))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, timeSinceBoot));
+            err = DataModel::Decode(reader, timeSinceBoot);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace RetrieveLogsResponse.
@@ -6441,42 +6929,46 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, name));
+            err = DataModel::Decode(reader, name);
         }
         else if (__context_tag == to_underlying(Fields::kIsOperational))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, isOperational));
+            err = DataModel::Decode(reader, isOperational);
         }
         else if (__context_tag == to_underlying(Fields::kOffPremiseServicesReachableIPv4))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, offPremiseServicesReachableIPv4));
+            err = DataModel::Decode(reader, offPremiseServicesReachableIPv4);
         }
         else if (__context_tag == to_underlying(Fields::kOffPremiseServicesReachableIPv6))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, offPremiseServicesReachableIPv6));
+            err = DataModel::Decode(reader, offPremiseServicesReachableIPv6);
         }
         else if (__context_tag == to_underlying(Fields::kHardwareAddress))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, hardwareAddress));
+            err = DataModel::Decode(reader, hardwareAddress);
         }
         else if (__context_tag == to_underlying(Fields::kIPv4Addresses))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, IPv4Addresses));
+            err = DataModel::Decode(reader, IPv4Addresses);
         }
         else if (__context_tag == to_underlying(Fields::kIPv6Addresses))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, IPv6Addresses));
+            err = DataModel::Decode(reader, IPv6Addresses);
         }
         else if (__context_tag == to_underlying(Fields::kType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, type));
+            err = DataModel::Decode(reader, type);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -6506,18 +6998,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kEnableKey))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, enableKey));
+            err = DataModel::Decode(reader, enableKey);
         }
         else if (__context_tag == to_underlying(Fields::kEventTrigger))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, eventTrigger));
+            err = DataModel::Decode(reader, eventTrigger);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestEventTrigger.
@@ -6607,18 +7103,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCurrent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, current));
+            err = DataModel::Decode(reader, current);
         }
         else if (__context_tag == to_underlying(Fields::kPrevious))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, previous));
+            err = DataModel::Decode(reader, previous);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace HardwareFaultChange.
@@ -6644,18 +7144,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCurrent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, current));
+            err = DataModel::Decode(reader, current);
         }
         else if (__context_tag == to_underlying(Fields::kPrevious))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, previous));
+            err = DataModel::Decode(reader, previous);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace RadioFaultChange.
@@ -6681,18 +7185,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCurrent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, current));
+            err = DataModel::Decode(reader, current);
         }
         else if (__context_tag == to_underlying(Fields::kPrevious))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, previous));
+            err = DataModel::Decode(reader, previous);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace NetworkFaultChange.
@@ -6717,14 +7225,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kBootReason))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, bootReason));
+            err = DataModel::Decode(reader, bootReason);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace BootReason.
@@ -6758,30 +7270,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kId))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, id));
+            err = DataModel::Decode(reader, id);
         }
         else if (__context_tag == to_underlying(Fields::kName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, name));
+            err = DataModel::Decode(reader, name);
         }
         else if (__context_tag == to_underlying(Fields::kStackFreeCurrent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, stackFreeCurrent));
+            err = DataModel::Decode(reader, stackFreeCurrent);
         }
         else if (__context_tag == to_underlying(Fields::kStackFreeMinimum))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, stackFreeMinimum));
+            err = DataModel::Decode(reader, stackFreeMinimum);
         }
         else if (__context_tag == to_underlying(Fields::kStackSize))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, stackSize));
+            err = DataModel::Decode(reader, stackSize);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -6809,8 +7325,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ResetWatermarks.
@@ -6883,22 +7403,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kId))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, id));
+            err = DataModel::Decode(reader, id);
         }
         else if (__context_tag == to_underlying(Fields::kName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, name));
+            err = DataModel::Decode(reader, name);
         }
         else if (__context_tag == to_underlying(Fields::kFaultRecording))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, faultRecording));
+            err = DataModel::Decode(reader, faultRecording);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SoftwareFault.
@@ -6941,66 +7465,70 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kExtAddress))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, extAddress));
+            err = DataModel::Decode(reader, extAddress);
         }
         else if (__context_tag == to_underlying(Fields::kAge))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, age));
+            err = DataModel::Decode(reader, age);
         }
         else if (__context_tag == to_underlying(Fields::kRloc16))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, rloc16));
+            err = DataModel::Decode(reader, rloc16);
         }
         else if (__context_tag == to_underlying(Fields::kLinkFrameCounter))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, linkFrameCounter));
+            err = DataModel::Decode(reader, linkFrameCounter);
         }
         else if (__context_tag == to_underlying(Fields::kMleFrameCounter))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, mleFrameCounter));
+            err = DataModel::Decode(reader, mleFrameCounter);
         }
         else if (__context_tag == to_underlying(Fields::kLqi))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, lqi));
+            err = DataModel::Decode(reader, lqi);
         }
         else if (__context_tag == to_underlying(Fields::kAverageRssi))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, averageRssi));
+            err = DataModel::Decode(reader, averageRssi);
         }
         else if (__context_tag == to_underlying(Fields::kLastRssi))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, lastRssi));
+            err = DataModel::Decode(reader, lastRssi);
         }
         else if (__context_tag == to_underlying(Fields::kFrameErrorRate))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, frameErrorRate));
+            err = DataModel::Decode(reader, frameErrorRate);
         }
         else if (__context_tag == to_underlying(Fields::kMessageErrorRate))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, messageErrorRate));
+            err = DataModel::Decode(reader, messageErrorRate);
         }
         else if (__context_tag == to_underlying(Fields::kRxOnWhenIdle))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, rxOnWhenIdle));
+            err = DataModel::Decode(reader, rxOnWhenIdle);
         }
         else if (__context_tag == to_underlying(Fields::kFullThreadDevice))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fullThreadDevice));
+            err = DataModel::Decode(reader, fullThreadDevice);
         }
         else if (__context_tag == to_underlying(Fields::kFullNetworkData))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fullNetworkData));
+            err = DataModel::Decode(reader, fullNetworkData);
         }
         else if (__context_tag == to_underlying(Fields::kIsChild))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, isChild));
+            err = DataModel::Decode(reader, isChild);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -7037,58 +7565,62 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActiveTimestampPresent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, activeTimestampPresent));
+            err = DataModel::Decode(reader, activeTimestampPresent);
         }
         else if (__context_tag == to_underlying(Fields::kPendingTimestampPresent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, pendingTimestampPresent));
+            err = DataModel::Decode(reader, pendingTimestampPresent);
         }
         else if (__context_tag == to_underlying(Fields::kMasterKeyPresent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, masterKeyPresent));
+            err = DataModel::Decode(reader, masterKeyPresent);
         }
         else if (__context_tag == to_underlying(Fields::kNetworkNamePresent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, networkNamePresent));
+            err = DataModel::Decode(reader, networkNamePresent);
         }
         else if (__context_tag == to_underlying(Fields::kExtendedPanIdPresent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, extendedPanIdPresent));
+            err = DataModel::Decode(reader, extendedPanIdPresent);
         }
         else if (__context_tag == to_underlying(Fields::kMeshLocalPrefixPresent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, meshLocalPrefixPresent));
+            err = DataModel::Decode(reader, meshLocalPrefixPresent);
         }
         else if (__context_tag == to_underlying(Fields::kDelayPresent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, delayPresent));
+            err = DataModel::Decode(reader, delayPresent);
         }
         else if (__context_tag == to_underlying(Fields::kPanIdPresent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, panIdPresent));
+            err = DataModel::Decode(reader, panIdPresent);
         }
         else if (__context_tag == to_underlying(Fields::kChannelPresent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, channelPresent));
+            err = DataModel::Decode(reader, channelPresent);
         }
         else if (__context_tag == to_underlying(Fields::kPskcPresent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, pskcPresent));
+            err = DataModel::Decode(reader, pskcPresent);
         }
         else if (__context_tag == to_underlying(Fields::kSecurityPolicyPresent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, securityPolicyPresent));
+            err = DataModel::Decode(reader, securityPolicyPresent);
         }
         else if (__context_tag == to_underlying(Fields::kChannelMaskPresent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, channelMaskPresent));
+            err = DataModel::Decode(reader, channelMaskPresent);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -7123,50 +7655,54 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kExtAddress))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, extAddress));
+            err = DataModel::Decode(reader, extAddress);
         }
         else if (__context_tag == to_underlying(Fields::kRloc16))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, rloc16));
+            err = DataModel::Decode(reader, rloc16);
         }
         else if (__context_tag == to_underlying(Fields::kRouterId))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, routerId));
+            err = DataModel::Decode(reader, routerId);
         }
         else if (__context_tag == to_underlying(Fields::kNextHop))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nextHop));
+            err = DataModel::Decode(reader, nextHop);
         }
         else if (__context_tag == to_underlying(Fields::kPathCost))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, pathCost));
+            err = DataModel::Decode(reader, pathCost);
         }
         else if (__context_tag == to_underlying(Fields::kLQIIn))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, LQIIn));
+            err = DataModel::Decode(reader, LQIIn);
         }
         else if (__context_tag == to_underlying(Fields::kLQIOut))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, LQIOut));
+            err = DataModel::Decode(reader, LQIOut);
         }
         else if (__context_tag == to_underlying(Fields::kAge))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, age));
+            err = DataModel::Decode(reader, age);
         }
         else if (__context_tag == to_underlying(Fields::kAllocated))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, allocated));
+            err = DataModel::Decode(reader, allocated);
         }
         else if (__context_tag == to_underlying(Fields::kLinkEstablished))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, linkEstablished));
+            err = DataModel::Decode(reader, linkEstablished);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -7193,18 +7729,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kRotationTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, rotationTime));
+            err = DataModel::Decode(reader, rotationTime);
         }
         else if (__context_tag == to_underlying(Fields::kFlags))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, flags));
+            err = DataModel::Decode(reader, flags);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -7232,8 +7772,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ResetCounts.
@@ -7481,14 +8025,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kConnectionStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, connectionStatus));
+            err = DataModel::Decode(reader, connectionStatus);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ConnectionStatus.
@@ -7514,18 +8062,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCurrent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, current));
+            err = DataModel::Decode(reader, current);
         }
         else if (__context_tag == to_underlying(Fields::kPrevious))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, previous));
+            err = DataModel::Decode(reader, previous);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace NetworkFaultChange.
@@ -7555,8 +8107,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ResetCounts.
@@ -7654,14 +8210,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kReasonCode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, reasonCode));
+            err = DataModel::Decode(reader, reasonCode);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Disconnection.
@@ -7687,18 +8247,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kAssociationFailure))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, associationFailure));
+            err = DataModel::Decode(reader, associationFailure);
         }
         else if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AssociationFailure.
@@ -7723,14 +8287,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kConnectionStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, connectionStatus));
+            err = DataModel::Decode(reader, connectionStatus);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ConnectionStatus.
@@ -7760,8 +8328,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ResetCounts.
@@ -7853,22 +8425,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kOffset))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, offset));
+            err = DataModel::Decode(reader, offset);
         }
         else if (__context_tag == to_underlying(Fields::kValidStarting))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, validStarting));
+            err = DataModel::Decode(reader, validStarting);
         }
         else if (__context_tag == to_underlying(Fields::kValidUntil))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, validUntil));
+            err = DataModel::Decode(reader, validUntil);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -7895,18 +8471,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNodeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nodeID));
+            err = DataModel::Decode(reader, nodeID);
         }
         else if (__context_tag == to_underlying(Fields::kEndpoint))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, endpoint));
+            err = DataModel::Decode(reader, endpoint);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -7934,22 +8514,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kOffset))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, offset));
+            err = DataModel::Decode(reader, offset);
         }
         else if (__context_tag == to_underlying(Fields::kValidAt))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, validAt));
+            err = DataModel::Decode(reader, validAt);
         }
         else if (__context_tag == to_underlying(Fields::kName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, name));
+            err = DataModel::Decode(reader, name);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -7977,22 +8561,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else if (__context_tag == to_underlying(Fields::kNodeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nodeID));
+            err = DataModel::Decode(reader, nodeID);
         }
         else if (__context_tag == to_underlying(Fields::kEndpoint))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, endpoint));
+            err = DataModel::Decode(reader, endpoint);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -8023,22 +8611,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kUTCTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, UTCTime));
+            err = DataModel::Decode(reader, UTCTime);
         }
         else if (__context_tag == to_underlying(Fields::kGranularity))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, granularity));
+            err = DataModel::Decode(reader, granularity);
         }
         else if (__context_tag == to_underlying(Fields::kTimeSource))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, timeSource));
+            err = DataModel::Decode(reader, timeSource);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetUTCTime.
@@ -8063,14 +8655,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kTrustedTimeSource))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, trustedTimeSource));
+            err = DataModel::Decode(reader, trustedTimeSource);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetTrustedTimeSource.
@@ -8095,14 +8691,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kTimeZone))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, timeZone));
+            err = DataModel::Decode(reader, timeZone);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetTimeZone.
@@ -8127,14 +8727,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kDSTOffsetRequired))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, DSTOffsetRequired));
+            err = DataModel::Decode(reader, DSTOffsetRequired);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetTimeZoneResponse.
@@ -8159,14 +8763,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kDSTOffset))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, DSTOffset));
+            err = DataModel::Decode(reader, DSTOffset);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetDSTOffset.
@@ -8191,14 +8799,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kDefaultNTP))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, defaultNTP));
+            err = DataModel::Decode(reader, defaultNTP);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetDefaultNTP.
@@ -8295,8 +8907,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace DSTTableEmpty.
@@ -8321,14 +8937,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kDSTOffsetActive))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, DSTOffsetActive));
+            err = DataModel::Decode(reader, DSTOffsetActive);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace DSTStatus.
@@ -8354,18 +8974,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kOffset))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, offset));
+            err = DataModel::Decode(reader, offset);
         }
         else if (__context_tag == to_underlying(Fields::kName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, name));
+            err = DataModel::Decode(reader, name);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TimeZoneStatus.
@@ -8389,8 +9013,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TimeFailure.
@@ -8414,8 +9042,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace MissingTrustedTimeSource.
@@ -8446,18 +9078,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kFinish))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, finish));
+            err = DataModel::Decode(reader, finish);
         }
         else if (__context_tag == to_underlying(Fields::kPrimaryColor))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, primaryColor));
+            err = DataModel::Decode(reader, primaryColor);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -8567,14 +9203,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kSoftwareVersion))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
+            err = DataModel::Decode(reader, softwareVersion);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace StartUp.
@@ -8598,8 +9238,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ShutDown.
@@ -8623,8 +9267,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Leave.
@@ -8649,14 +9297,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kReachableNewValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, reachableNewValue));
+            err = DataModel::Decode(reader, reachableNewValue);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ReachableChanged.
@@ -8729,14 +9381,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNewPosition))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, newPosition));
+            err = DataModel::Decode(reader, newPosition);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SwitchLatched.
@@ -8761,14 +9417,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNewPosition))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, newPosition));
+            err = DataModel::Decode(reader, newPosition);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace InitialPress.
@@ -8793,14 +9453,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNewPosition))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, newPosition));
+            err = DataModel::Decode(reader, newPosition);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace LongPress.
@@ -8825,14 +9489,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kPreviousPosition))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, previousPosition));
+            err = DataModel::Decode(reader, previousPosition);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ShortRelease.
@@ -8857,14 +9525,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kPreviousPosition))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, previousPosition));
+            err = DataModel::Decode(reader, previousPosition);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace LongRelease.
@@ -8891,18 +9563,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNewPosition))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, newPosition));
+            err = DataModel::Decode(reader, newPosition);
         }
         else if (__context_tag == to_underlying(Fields::kCurrentNumberOfPressesCounted))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, currentNumberOfPressesCounted));
+            err = DataModel::Decode(reader, currentNumberOfPressesCounted);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace MultiPressOngoing.
@@ -8929,18 +9605,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kPreviousPosition))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, previousPosition));
+            err = DataModel::Decode(reader, previousPosition);
         }
         else if (__context_tag == to_underlying(Fields::kTotalNumberOfPressesCounted))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, totalNumberOfPressesCounted));
+            err = DataModel::Decode(reader, totalNumberOfPressesCounted);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace MultiPressComplete.
@@ -8975,30 +9655,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCommissioningTimeout))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, commissioningTimeout));
+            err = DataModel::Decode(reader, commissioningTimeout);
         }
         else if (__context_tag == to_underlying(Fields::kPAKEPasscodeVerifier))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, PAKEPasscodeVerifier));
+            err = DataModel::Decode(reader, PAKEPasscodeVerifier);
         }
         else if (__context_tag == to_underlying(Fields::kDiscriminator))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, discriminator));
+            err = DataModel::Decode(reader, discriminator);
         }
         else if (__context_tag == to_underlying(Fields::kIterations))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, iterations));
+            err = DataModel::Decode(reader, iterations);
         }
         else if (__context_tag == to_underlying(Fields::kSalt))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, salt));
+            err = DataModel::Decode(reader, salt);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace OpenCommissioningWindow.
@@ -9023,14 +9707,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCommissioningTimeout))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, commissioningTimeout));
+            err = DataModel::Decode(reader, commissioningTimeout);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace OpenBasicCommissioningWindow.
@@ -9054,8 +9742,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace RevokeCommissioning.
@@ -9145,34 +9837,38 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kRootPublicKey))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, rootPublicKey));
+            err = DataModel::Decode(reader, rootPublicKey);
         }
         else if (__context_tag == to_underlying(Fields::kVendorID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, vendorID));
+            err = DataModel::Decode(reader, vendorID);
         }
         else if (__context_tag == to_underlying(Fields::kFabricID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricID));
+            err = DataModel::Decode(reader, fabricID);
         }
         else if (__context_tag == to_underlying(Fields::kNodeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nodeID));
+            err = DataModel::Decode(reader, nodeID);
         }
         else if (__context_tag == to_underlying(Fields::kLabel))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, label));
+            err = DataModel::Decode(reader, label);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -9220,22 +9916,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNoc))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, noc));
+            err = DataModel::Decode(reader, noc);
         }
         else if (__context_tag == to_underlying(Fields::kIcac))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, icac));
+            err = DataModel::Decode(reader, icac);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -9264,14 +9964,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kAttestationNonce))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, attestationNonce));
+            err = DataModel::Decode(reader, attestationNonce);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AttestationRequest.
@@ -9297,18 +10001,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kAttestationElements))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, attestationElements));
+            err = DataModel::Decode(reader, attestationElements);
         }
         else if (__context_tag == to_underlying(Fields::kAttestationSignature))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, attestationSignature));
+            err = DataModel::Decode(reader, attestationSignature);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AttestationResponse.
@@ -9333,14 +10041,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCertificateType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, certificateType));
+            err = DataModel::Decode(reader, certificateType);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace CertificateChainRequest.
@@ -9365,14 +10077,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCertificate))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, certificate));
+            err = DataModel::Decode(reader, certificate);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace CertificateChainResponse.
@@ -9398,18 +10114,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCSRNonce))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, CSRNonce));
+            err = DataModel::Decode(reader, CSRNonce);
         }
         else if (__context_tag == to_underlying(Fields::kIsForUpdateNOC))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, isForUpdateNOC));
+            err = DataModel::Decode(reader, isForUpdateNOC);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace CSRRequest.
@@ -9435,18 +10155,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNOCSRElements))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, NOCSRElements));
+            err = DataModel::Decode(reader, NOCSRElements);
         }
         else if (__context_tag == to_underlying(Fields::kAttestationSignature))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, attestationSignature));
+            err = DataModel::Decode(reader, attestationSignature);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace CSRResponse.
@@ -9475,30 +10199,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNOCValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, NOCValue));
+            err = DataModel::Decode(reader, NOCValue);
         }
         else if (__context_tag == to_underlying(Fields::kICACValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, ICACValue));
+            err = DataModel::Decode(reader, ICACValue);
         }
         else if (__context_tag == to_underlying(Fields::kIPKValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, IPKValue));
+            err = DataModel::Decode(reader, IPKValue);
         }
         else if (__context_tag == to_underlying(Fields::kCaseAdminSubject))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, caseAdminSubject));
+            err = DataModel::Decode(reader, caseAdminSubject);
         }
         else if (__context_tag == to_underlying(Fields::kAdminVendorId))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, adminVendorId));
+            err = DataModel::Decode(reader, adminVendorId);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AddNOC.
@@ -9524,18 +10252,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNOCValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, NOCValue));
+            err = DataModel::Decode(reader, NOCValue);
         }
         else if (__context_tag == to_underlying(Fields::kICACValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, ICACValue));
+            err = DataModel::Decode(reader, ICACValue);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace UpdateNOC.
@@ -9562,22 +10294,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatusCode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, statusCode));
+            err = DataModel::Decode(reader, statusCode);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else if (__context_tag == to_underlying(Fields::kDebugText))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, debugText));
+            err = DataModel::Decode(reader, debugText);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace NOCResponse.
@@ -9602,14 +10338,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kLabel))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, label));
+            err = DataModel::Decode(reader, label);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace UpdateFabricLabel.
@@ -9634,14 +10374,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace RemoveFabric.
@@ -9666,14 +10410,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kRootCACertificate))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, rootCACertificate));
+            err = DataModel::Decode(reader, rootCACertificate);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AddTrustedRootCertificate.
@@ -9770,26 +10518,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupId))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
+            err = DataModel::Decode(reader, groupId);
         }
         else if (__context_tag == to_underlying(Fields::kEndpoints))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, endpoints));
+            err = DataModel::Decode(reader, endpoints);
         }
         else if (__context_tag == to_underlying(Fields::kGroupName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupName));
+            err = DataModel::Decode(reader, groupName);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -9830,22 +10582,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupId))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
+            err = DataModel::Decode(reader, groupId);
         }
         else if (__context_tag == to_underlying(Fields::kGroupKeySetID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySetID));
+            err = DataModel::Decode(reader, groupKeySetID);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -9878,42 +10634,46 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupKeySetID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySetID));
+            err = DataModel::Decode(reader, groupKeySetID);
         }
         else if (__context_tag == to_underlying(Fields::kGroupKeySecurityPolicy))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySecurityPolicy));
+            err = DataModel::Decode(reader, groupKeySecurityPolicy);
         }
         else if (__context_tag == to_underlying(Fields::kEpochKey0))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, epochKey0));
+            err = DataModel::Decode(reader, epochKey0);
         }
         else if (__context_tag == to_underlying(Fields::kEpochStartTime0))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, epochStartTime0));
+            err = DataModel::Decode(reader, epochStartTime0);
         }
         else if (__context_tag == to_underlying(Fields::kEpochKey1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, epochKey1));
+            err = DataModel::Decode(reader, epochKey1);
         }
         else if (__context_tag == to_underlying(Fields::kEpochStartTime1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, epochStartTime1));
+            err = DataModel::Decode(reader, epochStartTime1);
         }
         else if (__context_tag == to_underlying(Fields::kEpochKey2))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, epochKey2));
+            err = DataModel::Decode(reader, epochKey2);
         }
         else if (__context_tag == to_underlying(Fields::kEpochStartTime2))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, epochStartTime2));
+            err = DataModel::Decode(reader, epochStartTime2);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -9942,14 +10702,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupKeySet))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySet));
+            err = DataModel::Decode(reader, groupKeySet);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace KeySetWrite.
@@ -9974,14 +10738,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupKeySetID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySetID));
+            err = DataModel::Decode(reader, groupKeySetID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace KeySetRead.
@@ -10006,14 +10774,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupKeySet))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySet));
+            err = DataModel::Decode(reader, groupKeySet);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace KeySetReadResponse.
@@ -10038,14 +10810,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupKeySetID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySetID));
+            err = DataModel::Decode(reader, groupKeySetID);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace KeySetRemove.
@@ -10069,8 +10845,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace KeySetReadAllIndices.
@@ -10095,14 +10875,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kGroupKeySetIDs))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySetIDs));
+            err = DataModel::Decode(reader, groupKeySetIDs);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace KeySetReadAllIndicesResponse.
@@ -10412,14 +11196,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStateValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, stateValue));
+            err = DataModel::Decode(reader, stateValue);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace StateChange.
@@ -10475,26 +11263,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCheckInNodeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, checkInNodeID));
+            err = DataModel::Decode(reader, checkInNodeID);
         }
         else if (__context_tag == to_underlying(Fields::kMonitoredSubject))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, monitoredSubject));
+            err = DataModel::Decode(reader, monitoredSubject);
         }
         else if (__context_tag == to_underlying(Fields::kKey))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, key));
+            err = DataModel::Decode(reader, key);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -10526,26 +11318,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCheckInNodeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, checkInNodeID));
+            err = DataModel::Decode(reader, checkInNodeID);
         }
         else if (__context_tag == to_underlying(Fields::kMonitoredSubject))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, monitoredSubject));
+            err = DataModel::Decode(reader, monitoredSubject);
         }
         else if (__context_tag == to_underlying(Fields::kKey))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, key));
+            err = DataModel::Decode(reader, key);
         }
         else if (__context_tag == to_underlying(Fields::kVerificationKey))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, verificationKey));
+            err = DataModel::Decode(reader, verificationKey);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace RegisterClient.
@@ -10570,14 +11366,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kICDCounter))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, ICDCounter));
+            err = DataModel::Decode(reader, ICDCounter);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace RegisterClientResponse.
@@ -10603,18 +11403,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCheckInNodeID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, checkInNodeID));
+            err = DataModel::Decode(reader, checkInNodeID);
         }
         else if (__context_tag == to_underlying(Fields::kVerificationKey))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, verificationKey));
+            err = DataModel::Decode(reader, verificationKey);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace UnregisterClient.
@@ -10638,8 +11442,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace StayActiveRequest.
@@ -10721,18 +11529,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMfgCode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, mfgCode));
+            err = DataModel::Decode(reader, mfgCode);
         }
         else if (__context_tag == to_underlying(Fields::kValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, value));
+            err = DataModel::Decode(reader, value);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -10760,22 +11572,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kLabel))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, label));
+            err = DataModel::Decode(reader, label);
         }
         else if (__context_tag == to_underlying(Fields::kMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, mode));
+            err = DataModel::Decode(reader, mode);
         }
         else if (__context_tag == to_underlying(Fields::kSemanticTags))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, semanticTags));
+            err = DataModel::Decode(reader, semanticTags);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -10804,14 +11620,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNewMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, newMode));
+            err = DataModel::Decode(reader, newMode);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ChangeToMode.
@@ -10894,14 +11714,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNewMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, newMode));
+            err = DataModel::Decode(reader, newMode);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ChangeToMode.
@@ -10927,18 +11751,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kStatusText))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, statusText));
+            err = DataModel::Decode(reader, statusText);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ChangeToModeResponse.
@@ -11015,14 +11843,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNewMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, newMode));
+            err = DataModel::Decode(reader, newMode);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ChangeToMode.
@@ -11048,18 +11880,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kStatusText))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, statusText));
+            err = DataModel::Decode(reader, statusText);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ChangeToModeResponse.
@@ -11186,14 +12022,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNewMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, newMode));
+            err = DataModel::Decode(reader, newMode);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ChangeToMode.
@@ -11219,18 +12059,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kStatusText))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, statusText));
+            err = DataModel::Decode(reader, statusText);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ChangeToModeResponse.
@@ -11307,14 +12151,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNewMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, newMode));
+            err = DataModel::Decode(reader, newMode);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ChangeToMode.
@@ -11340,18 +12188,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kStatusText))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, statusText));
+            err = DataModel::Decode(reader, statusText);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ChangeToModeResponse.
@@ -11428,18 +12280,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kTargetTemperature))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, targetTemperature));
+            err = DataModel::Decode(reader, targetTemperature);
         }
         else if (__context_tag == to_underlying(Fields::kTargetTemperatureLevel))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, targetTemperatureLevel));
+            err = DataModel::Decode(reader, targetTemperatureLevel);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetTemperature.
@@ -11566,26 +12422,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActive))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, active));
+            err = DataModel::Decode(reader, active);
         }
         else if (__context_tag == to_underlying(Fields::kInactive))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, inactive));
+            err = DataModel::Decode(reader, inactive);
         }
         else if (__context_tag == to_underlying(Fields::kState))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, state));
+            err = DataModel::Decode(reader, state);
         }
         else if (__context_tag == to_underlying(Fields::kMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, mask));
+            err = DataModel::Decode(reader, mask);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Notify.
@@ -11617,14 +12477,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNewMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, newMode));
+            err = DataModel::Decode(reader, newMode);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ChangeToMode.
@@ -11650,18 +12514,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kStatusText))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, statusText));
+            err = DataModel::Decode(reader, statusText);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ChangeToModeResponse.
@@ -11777,8 +12645,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SelfTestRequest.
@@ -11876,14 +12748,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kAlarmSeverityLevel))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, alarmSeverityLevel));
+            err = DataModel::Decode(reader, alarmSeverityLevel);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SmokeAlarm.
@@ -11908,14 +12784,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kAlarmSeverityLevel))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, alarmSeverityLevel));
+            err = DataModel::Decode(reader, alarmSeverityLevel);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace COAlarm.
@@ -11940,14 +12820,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kAlarmSeverityLevel))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, alarmSeverityLevel));
+            err = DataModel::Decode(reader, alarmSeverityLevel);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace LowBattery.
@@ -11971,8 +12855,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace HardwareFault.
@@ -11996,8 +12884,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace EndOfService.
@@ -12021,8 +12913,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SelfTestComplete.
@@ -12046,8 +12942,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AlarmMuted.
@@ -12071,8 +12971,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace MuteEnded.
@@ -12097,14 +13001,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kAlarmSeverityLevel))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, alarmSeverityLevel));
+            err = DataModel::Decode(reader, alarmSeverityLevel);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace InterconnectSmokeAlarm.
@@ -12129,14 +13037,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kAlarmSeverityLevel))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, alarmSeverityLevel));
+            err = DataModel::Decode(reader, alarmSeverityLevel);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace InterconnectCOAlarm.
@@ -12160,8 +13072,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AllClear.
@@ -12192,14 +13108,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kAlarms))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, alarms));
+            err = DataModel::Decode(reader, alarms);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Reset.
@@ -12224,14 +13144,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, mask));
+            err = DataModel::Decode(reader, mask);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ModifyEnabledAlarms.
@@ -12305,26 +13229,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kActive))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, active));
+            err = DataModel::Decode(reader, active);
         }
         else if (__context_tag == to_underlying(Fields::kInactive))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, inactive));
+            err = DataModel::Decode(reader, inactive);
         }
         else if (__context_tag == to_underlying(Fields::kState))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, state));
+            err = DataModel::Decode(reader, state);
         }
         else if (__context_tag == to_underlying(Fields::kMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, mask));
+            err = DataModel::Decode(reader, mask);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Notify.
@@ -12355,8 +13283,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Pause.
@@ -12380,8 +13312,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Stop.
@@ -12405,8 +13341,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Start.
@@ -12430,8 +13370,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Resume.
@@ -12456,14 +13400,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCommandResponseState))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, commandResponseState));
+            err = DataModel::Decode(reader, commandResponseState);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace OperationalCommandResponse.
@@ -12540,14 +13488,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kErrorState))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, errorState));
+            err = DataModel::Decode(reader, errorState);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace OperationalError.
@@ -12574,22 +13526,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCompletionErrorCode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, completionErrorCode));
+            err = DataModel::Decode(reader, completionErrorCode);
         }
         else if (__context_tag == to_underlying(Fields::kTotalOperationalTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, totalOperationalTime));
+            err = DataModel::Decode(reader, totalOperationalTime);
         }
         else if (__context_tag == to_underlying(Fields::kPausedTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, pausedTime));
+            err = DataModel::Decode(reader, pausedTime);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace OperationCompletion.
@@ -12620,8 +13576,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Pause.
@@ -12645,8 +13605,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Stop.
@@ -12670,8 +13634,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Start.
@@ -12695,8 +13663,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Resume.
@@ -12721,14 +13693,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCommandResponseState))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, commandResponseState));
+            err = DataModel::Decode(reader, commandResponseState);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace OperationalCommandResponse.
@@ -12805,14 +13781,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kErrorState))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, errorState));
+            err = DataModel::Decode(reader, errorState);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace OperationalError.
@@ -12839,22 +13819,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCompletionErrorCode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, completionErrorCode));
+            err = DataModel::Decode(reader, completionErrorCode);
         }
         else if (__context_tag == to_underlying(Fields::kTotalOperationalTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, totalOperationalTime));
+            err = DataModel::Decode(reader, totalOperationalTime);
         }
         else if (__context_tag == to_underlying(Fields::kPausedTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, pausedTime));
+            err = DataModel::Decode(reader, pausedTime);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace OperationCompletion.
@@ -12885,18 +13869,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kProductIdentifierType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, productIdentifierType));
+            err = DataModel::Decode(reader, productIdentifierType);
         }
         else if (__context_tag == to_underlying(Fields::kProductIdentifierValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, productIdentifierValue));
+            err = DataModel::Decode(reader, productIdentifierValue);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -12924,8 +13912,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ResetCondition.
@@ -13007,18 +13999,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kProductIdentifierType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, productIdentifierType));
+            err = DataModel::Decode(reader, productIdentifierType);
         }
         else if (__context_tag == to_underlying(Fields::kProductIdentifierValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, productIdentifierValue));
+            err = DataModel::Decode(reader, productIdentifierValue);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -13046,8 +14042,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ResetCondition.
@@ -13129,18 +14129,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCredentialType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, credentialType));
+            err = DataModel::Decode(reader, credentialType);
         }
         else if (__context_tag == to_underlying(Fields::kCredentialIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, credentialIndex));
+            err = DataModel::Decode(reader, credentialIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -13169,14 +14173,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kPINCode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, PINCode));
+            err = DataModel::Decode(reader, PINCode);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace LockDoor.
@@ -13201,14 +14209,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kPINCode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, PINCode));
+            err = DataModel::Decode(reader, PINCode);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace UnlockDoor.
@@ -13234,18 +14246,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kTimeout))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, timeout));
+            err = DataModel::Decode(reader, timeout);
         }
         else if (__context_tag == to_underlying(Fields::kPINCode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, PINCode));
+            err = DataModel::Decode(reader, PINCode);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace UnlockWithTimeout.
@@ -13276,38 +14292,42 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kWeekDayIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, weekDayIndex));
+            err = DataModel::Decode(reader, weekDayIndex);
         }
         else if (__context_tag == to_underlying(Fields::kUserIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
+            err = DataModel::Decode(reader, userIndex);
         }
         else if (__context_tag == to_underlying(Fields::kDaysMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, daysMask));
+            err = DataModel::Decode(reader, daysMask);
         }
         else if (__context_tag == to_underlying(Fields::kStartHour))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, startHour));
+            err = DataModel::Decode(reader, startHour);
         }
         else if (__context_tag == to_underlying(Fields::kStartMinute))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, startMinute));
+            err = DataModel::Decode(reader, startMinute);
         }
         else if (__context_tag == to_underlying(Fields::kEndHour))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, endHour));
+            err = DataModel::Decode(reader, endHour);
         }
         else if (__context_tag == to_underlying(Fields::kEndMinute))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, endMinute));
+            err = DataModel::Decode(reader, endMinute);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetWeekDaySchedule.
@@ -13333,18 +14353,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kWeekDayIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, weekDayIndex));
+            err = DataModel::Decode(reader, weekDayIndex);
         }
         else if (__context_tag == to_underlying(Fields::kUserIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
+            err = DataModel::Decode(reader, userIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetWeekDaySchedule.
@@ -13376,42 +14400,46 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kWeekDayIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, weekDayIndex));
+            err = DataModel::Decode(reader, weekDayIndex);
         }
         else if (__context_tag == to_underlying(Fields::kUserIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
+            err = DataModel::Decode(reader, userIndex);
         }
         else if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kDaysMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, daysMask));
+            err = DataModel::Decode(reader, daysMask);
         }
         else if (__context_tag == to_underlying(Fields::kStartHour))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, startHour));
+            err = DataModel::Decode(reader, startHour);
         }
         else if (__context_tag == to_underlying(Fields::kStartMinute))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, startMinute));
+            err = DataModel::Decode(reader, startMinute);
         }
         else if (__context_tag == to_underlying(Fields::kEndHour))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, endHour));
+            err = DataModel::Decode(reader, endHour);
         }
         else if (__context_tag == to_underlying(Fields::kEndMinute))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, endMinute));
+            err = DataModel::Decode(reader, endMinute);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetWeekDayScheduleResponse.
@@ -13437,18 +14465,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kWeekDayIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, weekDayIndex));
+            err = DataModel::Decode(reader, weekDayIndex);
         }
         else if (__context_tag == to_underlying(Fields::kUserIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
+            err = DataModel::Decode(reader, userIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ClearWeekDaySchedule.
@@ -13476,26 +14508,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kYearDayIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, yearDayIndex));
+            err = DataModel::Decode(reader, yearDayIndex);
         }
         else if (__context_tag == to_underlying(Fields::kUserIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
+            err = DataModel::Decode(reader, userIndex);
         }
         else if (__context_tag == to_underlying(Fields::kLocalStartTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, localStartTime));
+            err = DataModel::Decode(reader, localStartTime);
         }
         else if (__context_tag == to_underlying(Fields::kLocalEndTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, localEndTime));
+            err = DataModel::Decode(reader, localEndTime);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetYearDaySchedule.
@@ -13521,18 +14557,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kYearDayIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, yearDayIndex));
+            err = DataModel::Decode(reader, yearDayIndex);
         }
         else if (__context_tag == to_underlying(Fields::kUserIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
+            err = DataModel::Decode(reader, userIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetYearDaySchedule.
@@ -13561,30 +14601,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kYearDayIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, yearDayIndex));
+            err = DataModel::Decode(reader, yearDayIndex);
         }
         else if (__context_tag == to_underlying(Fields::kUserIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
+            err = DataModel::Decode(reader, userIndex);
         }
         else if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kLocalStartTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, localStartTime));
+            err = DataModel::Decode(reader, localStartTime);
         }
         else if (__context_tag == to_underlying(Fields::kLocalEndTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, localEndTime));
+            err = DataModel::Decode(reader, localEndTime);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetYearDayScheduleResponse.
@@ -13610,18 +14654,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kYearDayIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, yearDayIndex));
+            err = DataModel::Decode(reader, yearDayIndex);
         }
         else if (__context_tag == to_underlying(Fields::kUserIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
+            err = DataModel::Decode(reader, userIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ClearYearDaySchedule.
@@ -13649,26 +14697,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kHolidayIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, holidayIndex));
+            err = DataModel::Decode(reader, holidayIndex);
         }
         else if (__context_tag == to_underlying(Fields::kLocalStartTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, localStartTime));
+            err = DataModel::Decode(reader, localStartTime);
         }
         else if (__context_tag == to_underlying(Fields::kLocalEndTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, localEndTime));
+            err = DataModel::Decode(reader, localEndTime);
         }
         else if (__context_tag == to_underlying(Fields::kOperatingMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, operatingMode));
+            err = DataModel::Decode(reader, operatingMode);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetHolidaySchedule.
@@ -13693,14 +14745,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kHolidayIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, holidayIndex));
+            err = DataModel::Decode(reader, holidayIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetHolidaySchedule.
@@ -13729,30 +14785,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kHolidayIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, holidayIndex));
+            err = DataModel::Decode(reader, holidayIndex);
         }
         else if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kLocalStartTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, localStartTime));
+            err = DataModel::Decode(reader, localStartTime);
         }
         else if (__context_tag == to_underlying(Fields::kLocalEndTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, localEndTime));
+            err = DataModel::Decode(reader, localEndTime);
         }
         else if (__context_tag == to_underlying(Fields::kOperatingMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, operatingMode));
+            err = DataModel::Decode(reader, operatingMode);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetHolidayScheduleResponse.
@@ -13777,14 +14837,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kHolidayIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, holidayIndex));
+            err = DataModel::Decode(reader, holidayIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ClearHolidaySchedule.
@@ -13815,38 +14879,42 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kOperationType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, operationType));
+            err = DataModel::Decode(reader, operationType);
         }
         else if (__context_tag == to_underlying(Fields::kUserIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
+            err = DataModel::Decode(reader, userIndex);
         }
         else if (__context_tag == to_underlying(Fields::kUserName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userName));
+            err = DataModel::Decode(reader, userName);
         }
         else if (__context_tag == to_underlying(Fields::kUserUniqueID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userUniqueID));
+            err = DataModel::Decode(reader, userUniqueID);
         }
         else if (__context_tag == to_underlying(Fields::kUserStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userStatus));
+            err = DataModel::Decode(reader, userStatus);
         }
         else if (__context_tag == to_underlying(Fields::kUserType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userType));
+            err = DataModel::Decode(reader, userType);
         }
         else if (__context_tag == to_underlying(Fields::kCredentialRule))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, credentialRule));
+            err = DataModel::Decode(reader, credentialRule);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetUser.
@@ -13871,14 +14939,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kUserIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
+            err = DataModel::Decode(reader, userIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetUser.
@@ -13912,50 +14984,54 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kUserIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
+            err = DataModel::Decode(reader, userIndex);
         }
         else if (__context_tag == to_underlying(Fields::kUserName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userName));
+            err = DataModel::Decode(reader, userName);
         }
         else if (__context_tag == to_underlying(Fields::kUserUniqueID))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userUniqueID));
+            err = DataModel::Decode(reader, userUniqueID);
         }
         else if (__context_tag == to_underlying(Fields::kUserStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userStatus));
+            err = DataModel::Decode(reader, userStatus);
         }
         else if (__context_tag == to_underlying(Fields::kUserType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userType));
+            err = DataModel::Decode(reader, userType);
         }
         else if (__context_tag == to_underlying(Fields::kCredentialRule))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, credentialRule));
+            err = DataModel::Decode(reader, credentialRule);
         }
         else if (__context_tag == to_underlying(Fields::kCredentials))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, credentials));
+            err = DataModel::Decode(reader, credentials);
         }
         else if (__context_tag == to_underlying(Fields::kCreatorFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, creatorFabricIndex));
+            err = DataModel::Decode(reader, creatorFabricIndex);
         }
         else if (__context_tag == to_underlying(Fields::kLastModifiedFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, lastModifiedFabricIndex));
+            err = DataModel::Decode(reader, lastModifiedFabricIndex);
         }
         else if (__context_tag == to_underlying(Fields::kNextUserIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nextUserIndex));
+            err = DataModel::Decode(reader, nextUserIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetUserResponse.
@@ -13980,14 +15056,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kUserIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
+            err = DataModel::Decode(reader, userIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ClearUser.
@@ -14017,34 +15097,38 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kOperationType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, operationType));
+            err = DataModel::Decode(reader, operationType);
         }
         else if (__context_tag == to_underlying(Fields::kCredential))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, credential));
+            err = DataModel::Decode(reader, credential);
         }
         else if (__context_tag == to_underlying(Fields::kCredentialData))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, credentialData));
+            err = DataModel::Decode(reader, credentialData);
         }
         else if (__context_tag == to_underlying(Fields::kUserIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
+            err = DataModel::Decode(reader, userIndex);
         }
         else if (__context_tag == to_underlying(Fields::kUserStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userStatus));
+            err = DataModel::Decode(reader, userStatus);
         }
         else if (__context_tag == to_underlying(Fields::kUserType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userType));
+            err = DataModel::Decode(reader, userType);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetCredential.
@@ -14071,22 +15155,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kUserIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
+            err = DataModel::Decode(reader, userIndex);
         }
         else if (__context_tag == to_underlying(Fields::kNextCredentialIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nextCredentialIndex));
+            err = DataModel::Decode(reader, nextCredentialIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetCredentialResponse.
@@ -14111,14 +15199,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCredential))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, credential));
+            err = DataModel::Decode(reader, credential);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetCredentialStatus.
@@ -14147,30 +15239,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCredentialExists))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, credentialExists));
+            err = DataModel::Decode(reader, credentialExists);
         }
         else if (__context_tag == to_underlying(Fields::kUserIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
+            err = DataModel::Decode(reader, userIndex);
         }
         else if (__context_tag == to_underlying(Fields::kCreatorFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, creatorFabricIndex));
+            err = DataModel::Decode(reader, creatorFabricIndex);
         }
         else if (__context_tag == to_underlying(Fields::kLastModifiedFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, lastModifiedFabricIndex));
+            err = DataModel::Decode(reader, lastModifiedFabricIndex);
         }
         else if (__context_tag == to_underlying(Fields::kNextCredentialIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nextCredentialIndex));
+            err = DataModel::Decode(reader, nextCredentialIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetCredentialStatusResponse.
@@ -14195,14 +15291,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCredential))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, credential));
+            err = DataModel::Decode(reader, credential);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ClearCredential.
@@ -14227,14 +15327,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kPINCode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, PINCode));
+            err = DataModel::Decode(reader, PINCode);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace UnboltDoor.
@@ -14401,14 +15505,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kAlarmCode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, alarmCode));
+            err = DataModel::Decode(reader, alarmCode);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace DoorLockAlarm.
@@ -14433,14 +15541,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kDoorState))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, doorState));
+            err = DataModel::Decode(reader, doorState);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace DoorStateChange.
@@ -14470,34 +15582,38 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kLockOperationType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, lockOperationType));
+            err = DataModel::Decode(reader, lockOperationType);
         }
         else if (__context_tag == to_underlying(Fields::kOperationSource))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, operationSource));
+            err = DataModel::Decode(reader, operationSource);
         }
         else if (__context_tag == to_underlying(Fields::kUserIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
+            err = DataModel::Decode(reader, userIndex);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else if (__context_tag == to_underlying(Fields::kSourceNode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sourceNode));
+            err = DataModel::Decode(reader, sourceNode);
         }
         else if (__context_tag == to_underlying(Fields::kCredentials))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, credentials));
+            err = DataModel::Decode(reader, credentials);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace LockOperation.
@@ -14528,38 +15644,42 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kLockOperationType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, lockOperationType));
+            err = DataModel::Decode(reader, lockOperationType);
         }
         else if (__context_tag == to_underlying(Fields::kOperationSource))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, operationSource));
+            err = DataModel::Decode(reader, operationSource);
         }
         else if (__context_tag == to_underlying(Fields::kOperationError))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, operationError));
+            err = DataModel::Decode(reader, operationError);
         }
         else if (__context_tag == to_underlying(Fields::kUserIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
+            err = DataModel::Decode(reader, userIndex);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else if (__context_tag == to_underlying(Fields::kSourceNode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sourceNode));
+            err = DataModel::Decode(reader, sourceNode);
         }
         else if (__context_tag == to_underlying(Fields::kCredentials))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, credentials));
+            err = DataModel::Decode(reader, credentials);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace LockOperationError.
@@ -14590,38 +15710,42 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kLockDataType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, lockDataType));
+            err = DataModel::Decode(reader, lockDataType);
         }
         else if (__context_tag == to_underlying(Fields::kDataOperationType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, dataOperationType));
+            err = DataModel::Decode(reader, dataOperationType);
         }
         else if (__context_tag == to_underlying(Fields::kOperationSource))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, operationSource));
+            err = DataModel::Decode(reader, operationSource);
         }
         else if (__context_tag == to_underlying(Fields::kUserIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
+            err = DataModel::Decode(reader, userIndex);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else if (__context_tag == to_underlying(Fields::kSourceNode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, sourceNode));
+            err = DataModel::Decode(reader, sourceNode);
         }
         else if (__context_tag == to_underlying(Fields::kDataIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, dataIndex));
+            err = DataModel::Decode(reader, dataIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace LockUserChange.
@@ -14651,8 +15775,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace UpOrOpen.
@@ -14676,8 +15804,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace DownOrClose.
@@ -14701,8 +15833,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace StopMotion.
@@ -14727,14 +15863,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kLiftValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, liftValue));
+            err = DataModel::Decode(reader, liftValue);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GoToLiftValue.
@@ -14759,14 +15899,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kLiftPercent100thsValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, liftPercent100thsValue));
+            err = DataModel::Decode(reader, liftPercent100thsValue);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GoToLiftPercentage.
@@ -14791,14 +15935,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kTiltValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, tiltValue));
+            err = DataModel::Decode(reader, tiltValue);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GoToTiltValue.
@@ -14823,14 +15971,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kTiltPercent100thsValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, tiltPercent100thsValue));
+            err = DataModel::Decode(reader, tiltPercent100thsValue);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GoToTiltPercentage.
@@ -14960,14 +16112,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kPercentOpen))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, percentOpen));
+            err = DataModel::Decode(reader, percentOpen);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace BarrierControlGoToPercent.
@@ -14991,8 +16147,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace BarrierControlStop.
@@ -15187,8 +16347,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SupplyVoltageLow.
@@ -15212,8 +16376,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SupplyVoltageHigh.
@@ -15237,8 +16405,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace PowerMissingPhase.
@@ -15262,8 +16434,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SystemPressureLow.
@@ -15287,8 +16463,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SystemPressureHigh.
@@ -15312,8 +16492,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace DryRunning.
@@ -15337,8 +16521,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace MotorTemperatureHigh.
@@ -15362,8 +16550,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace PumpMotorFatalFailure.
@@ -15387,8 +16579,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ElectronicTemperatureHigh.
@@ -15412,8 +16608,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace PumpBlocked.
@@ -15437,8 +16637,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SensorFailure.
@@ -15462,8 +16666,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ElectronicNonFatalFailure.
@@ -15487,8 +16695,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ElectronicFatalFailure.
@@ -15512,8 +16724,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GeneralFault.
@@ -15537,8 +16753,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Leakage.
@@ -15562,8 +16782,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AirDetection.
@@ -15587,8 +16811,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TurbineOperation.
@@ -15620,22 +16848,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kHeatSetpoint))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, heatSetpoint));
+            err = DataModel::Decode(reader, heatSetpoint);
         }
         else if (__context_tag == to_underlying(Fields::kCoolSetpoint))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, coolSetpoint));
+            err = DataModel::Decode(reader, coolSetpoint);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -15665,18 +16897,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, mode));
+            err = DataModel::Decode(reader, mode);
         }
         else if (__context_tag == to_underlying(Fields::kAmount))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, amount));
+            err = DataModel::Decode(reader, amount);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetpointRaiseLower.
@@ -15705,26 +16941,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNumberOfTransitionsForSequence))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, numberOfTransitionsForSequence));
+            err = DataModel::Decode(reader, numberOfTransitionsForSequence);
         }
         else if (__context_tag == to_underlying(Fields::kDayOfWeekForSequence))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, dayOfWeekForSequence));
+            err = DataModel::Decode(reader, dayOfWeekForSequence);
         }
         else if (__context_tag == to_underlying(Fields::kModeForSequence))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, modeForSequence));
+            err = DataModel::Decode(reader, modeForSequence);
         }
         else if (__context_tag == to_underlying(Fields::kTransitions))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitions));
+            err = DataModel::Decode(reader, transitions);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetWeeklyScheduleResponse.
@@ -15753,26 +16993,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNumberOfTransitionsForSequence))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, numberOfTransitionsForSequence));
+            err = DataModel::Decode(reader, numberOfTransitionsForSequence);
         }
         else if (__context_tag == to_underlying(Fields::kDayOfWeekForSequence))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, dayOfWeekForSequence));
+            err = DataModel::Decode(reader, dayOfWeekForSequence);
         }
         else if (__context_tag == to_underlying(Fields::kModeForSequence))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, modeForSequence));
+            err = DataModel::Decode(reader, modeForSequence);
         }
         else if (__context_tag == to_underlying(Fields::kTransitions))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitions));
+            err = DataModel::Decode(reader, transitions);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SetWeeklySchedule.
@@ -15798,18 +17042,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kDaysToReturn))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, daysToReturn));
+            err = DataModel::Decode(reader, daysToReturn);
         }
         else if (__context_tag == to_underlying(Fields::kModeToReturn))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, modeToReturn));
+            err = DataModel::Decode(reader, modeToReturn);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetWeeklySchedule.
@@ -15833,8 +17081,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ClearWeeklySchedule.
@@ -16047,22 +17299,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kDirection))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, direction));
+            err = DataModel::Decode(reader, direction);
         }
         else if (__context_tag == to_underlying(Fields::kWrap))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, wrap));
+            err = DataModel::Decode(reader, wrap);
         }
         else if (__context_tag == to_underlying(Fields::kLowestOff))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, lowestOff));
+            err = DataModel::Decode(reader, lowestOff);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Step.
@@ -16213,30 +17469,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kHue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, hue));
+            err = DataModel::Decode(reader, hue);
         }
         else if (__context_tag == to_underlying(Fields::kDirection))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, direction));
+            err = DataModel::Decode(reader, direction);
         }
         else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace MoveToHue.
@@ -16264,26 +17524,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMoveMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, moveMode));
+            err = DataModel::Decode(reader, moveMode);
         }
         else if (__context_tag == to_underlying(Fields::kRate))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, rate));
+            err = DataModel::Decode(reader, rate);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace MoveHue.
@@ -16312,30 +17576,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStepMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, stepMode));
+            err = DataModel::Decode(reader, stepMode);
         }
         else if (__context_tag == to_underlying(Fields::kStepSize))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, stepSize));
+            err = DataModel::Decode(reader, stepSize);
         }
         else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace StepHue.
@@ -16363,26 +17631,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kSaturation))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, saturation));
+            err = DataModel::Decode(reader, saturation);
         }
         else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace MoveToSaturation.
@@ -16410,26 +17682,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMoveMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, moveMode));
+            err = DataModel::Decode(reader, moveMode);
         }
         else if (__context_tag == to_underlying(Fields::kRate))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, rate));
+            err = DataModel::Decode(reader, rate);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace MoveSaturation.
@@ -16458,30 +17734,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStepMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, stepMode));
+            err = DataModel::Decode(reader, stepMode);
         }
         else if (__context_tag == to_underlying(Fields::kStepSize))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, stepSize));
+            err = DataModel::Decode(reader, stepSize);
         }
         else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace StepSaturation.
@@ -16510,30 +17790,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kHue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, hue));
+            err = DataModel::Decode(reader, hue);
         }
         else if (__context_tag == to_underlying(Fields::kSaturation))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, saturation));
+            err = DataModel::Decode(reader, saturation);
         }
         else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace MoveToHueAndSaturation.
@@ -16562,30 +17846,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kColorX))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, colorX));
+            err = DataModel::Decode(reader, colorX);
         }
         else if (__context_tag == to_underlying(Fields::kColorY))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, colorY));
+            err = DataModel::Decode(reader, colorY);
         }
         else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace MoveToColor.
@@ -16613,26 +17901,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kRateX))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, rateX));
+            err = DataModel::Decode(reader, rateX);
         }
         else if (__context_tag == to_underlying(Fields::kRateY))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, rateY));
+            err = DataModel::Decode(reader, rateY);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace MoveColor.
@@ -16661,30 +17953,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStepX))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, stepX));
+            err = DataModel::Decode(reader, stepX);
         }
         else if (__context_tag == to_underlying(Fields::kStepY))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, stepY));
+            err = DataModel::Decode(reader, stepY);
         }
         else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace StepColor.
@@ -16712,26 +18008,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kColorTemperatureMireds))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperatureMireds));
+            err = DataModel::Decode(reader, colorTemperatureMireds);
         }
         else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace MoveToColorTemperature.
@@ -16760,30 +18060,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kEnhancedHue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, enhancedHue));
+            err = DataModel::Decode(reader, enhancedHue);
         }
         else if (__context_tag == to_underlying(Fields::kDirection))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, direction));
+            err = DataModel::Decode(reader, direction);
         }
         else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace EnhancedMoveToHue.
@@ -16811,26 +18115,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMoveMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, moveMode));
+            err = DataModel::Decode(reader, moveMode);
         }
         else if (__context_tag == to_underlying(Fields::kRate))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, rate));
+            err = DataModel::Decode(reader, rate);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace EnhancedMoveHue.
@@ -16859,30 +18167,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStepMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, stepMode));
+            err = DataModel::Decode(reader, stepMode);
         }
         else if (__context_tag == to_underlying(Fields::kStepSize))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, stepSize));
+            err = DataModel::Decode(reader, stepSize);
         }
         else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace EnhancedStepHue.
@@ -16911,30 +18223,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kEnhancedHue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, enhancedHue));
+            err = DataModel::Decode(reader, enhancedHue);
         }
         else if (__context_tag == to_underlying(Fields::kSaturation))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, saturation));
+            err = DataModel::Decode(reader, saturation);
         }
         else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace EnhancedMoveToHueAndSaturation.
@@ -16965,38 +18281,42 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kUpdateFlags))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, updateFlags));
+            err = DataModel::Decode(reader, updateFlags);
         }
         else if (__context_tag == to_underlying(Fields::kAction))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, action));
+            err = DataModel::Decode(reader, action);
         }
         else if (__context_tag == to_underlying(Fields::kDirection))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, direction));
+            err = DataModel::Decode(reader, direction);
         }
         else if (__context_tag == to_underlying(Fields::kTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, time));
+            err = DataModel::Decode(reader, time);
         }
         else if (__context_tag == to_underlying(Fields::kStartHue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, startHue));
+            err = DataModel::Decode(reader, startHue);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ColorLoopSet.
@@ -17022,18 +18342,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace StopMoveStep.
@@ -17065,34 +18389,38 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMoveMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, moveMode));
+            err = DataModel::Decode(reader, moveMode);
         }
         else if (__context_tag == to_underlying(Fields::kRate))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, rate));
+            err = DataModel::Decode(reader, rate);
         }
         else if (__context_tag == to_underlying(Fields::kColorTemperatureMinimumMireds))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperatureMinimumMireds));
+            err = DataModel::Decode(reader, colorTemperatureMinimumMireds);
         }
         else if (__context_tag == to_underlying(Fields::kColorTemperatureMaximumMireds))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperatureMaximumMireds));
+            err = DataModel::Decode(reader, colorTemperatureMaximumMireds);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace MoveColorTemperature.
@@ -17125,38 +18453,42 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStepMode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, stepMode));
+            err = DataModel::Decode(reader, stepMode);
         }
         else if (__context_tag == to_underlying(Fields::kStepSize))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, stepSize));
+            err = DataModel::Decode(reader, stepSize);
         }
         else if (__context_tag == to_underlying(Fields::kTransitionTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
+            err = DataModel::Decode(reader, transitionTime);
         }
         else if (__context_tag == to_underlying(Fields::kColorTemperatureMinimumMireds))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperatureMinimumMireds));
+            err = DataModel::Decode(reader, colorTemperatureMinimumMireds);
         }
         else if (__context_tag == to_underlying(Fields::kColorTemperatureMaximumMireds))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperatureMaximumMireds));
+            err = DataModel::Decode(reader, colorTemperatureMaximumMireds);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsMask))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
+            err = DataModel::Decode(reader, optionsMask);
         }
         else if (__context_tag == to_underlying(Fields::kOptionsOverride))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
+            err = DataModel::Decode(reader, optionsOverride);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace StepColorTemperature.
@@ -18552,30 +19884,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMajorNumber))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, majorNumber));
+            err = DataModel::Decode(reader, majorNumber);
         }
         else if (__context_tag == to_underlying(Fields::kMinorNumber))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, minorNumber));
+            err = DataModel::Decode(reader, minorNumber);
         }
         else if (__context_tag == to_underlying(Fields::kName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, name));
+            err = DataModel::Decode(reader, name);
         }
         else if (__context_tag == to_underlying(Fields::kCallSign))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, callSign));
+            err = DataModel::Decode(reader, callSign);
         }
         else if (__context_tag == to_underlying(Fields::kAffiliateCallSign))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, affiliateCallSign));
+            err = DataModel::Decode(reader, affiliateCallSign);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -18604,26 +19940,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kOperatorName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, operatorName));
+            err = DataModel::Decode(reader, operatorName);
         }
         else if (__context_tag == to_underlying(Fields::kLineupName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, lineupName));
+            err = DataModel::Decode(reader, lineupName);
         }
         else if (__context_tag == to_underlying(Fields::kPostalCode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, postalCode));
+            err = DataModel::Decode(reader, postalCode);
         }
         else if (__context_tag == to_underlying(Fields::kLineupInfoType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, lineupInfoType));
+            err = DataModel::Decode(reader, lineupInfoType);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -18652,14 +19992,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMatch))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, match));
+            err = DataModel::Decode(reader, match);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ChangeChannel.
@@ -18685,18 +20029,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kData))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, data));
+            err = DataModel::Decode(reader, data);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ChangeChannelResponse.
@@ -18722,18 +20070,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMajorNumber))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, majorNumber));
+            err = DataModel::Decode(reader, majorNumber);
         }
         else if (__context_tag == to_underlying(Fields::kMinorNumber))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, minorNumber));
+            err = DataModel::Decode(reader, minorNumber);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ChangeChannelByNumber.
@@ -18758,14 +20110,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kCount))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, count));
+            err = DataModel::Decode(reader, count);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SkipChannel.
@@ -18838,18 +20194,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kIdentifier))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, identifier));
+            err = DataModel::Decode(reader, identifier);
         }
         else if (__context_tag == to_underlying(Fields::kName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, name));
+            err = DataModel::Decode(reader, name);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -18879,18 +20239,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kTarget))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, target));
+            err = DataModel::Decode(reader, target);
         }
         else if (__context_tag == to_underlying(Fields::kData))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, data));
+            err = DataModel::Decode(reader, data);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace NavigateTarget.
@@ -18916,18 +20280,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kData))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, data));
+            err = DataModel::Decode(reader, data);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace NavigateTargetResponse.
@@ -18997,18 +20365,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kUpdatedAt))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, updatedAt));
+            err = DataModel::Decode(reader, updatedAt);
         }
         else if (__context_tag == to_underlying(Fields::kPosition))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, position));
+            err = DataModel::Decode(reader, position);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -19036,8 +20408,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Play.
@@ -19061,8 +20437,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Pause.
@@ -19086,8 +20466,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Stop.
@@ -19111,8 +20495,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace StartOver.
@@ -19136,8 +20524,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Previous.
@@ -19161,8 +20553,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Next.
@@ -19186,8 +20582,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Rewind.
@@ -19211,8 +20611,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace FastForward.
@@ -19238,14 +20642,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kDeltaPositionMilliseconds))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, deltaPositionMilliseconds));
+            err = DataModel::Decode(reader, deltaPositionMilliseconds);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SkipForward.
@@ -19271,14 +20679,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kDeltaPositionMilliseconds))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, deltaPositionMilliseconds));
+            err = DataModel::Decode(reader, deltaPositionMilliseconds);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SkipBackward.
@@ -19304,18 +20716,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kData))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, data));
+            err = DataModel::Decode(reader, data);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace PlaybackResponse.
@@ -19340,14 +20756,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kPosition))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, position));
+            err = DataModel::Decode(reader, position);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Seek.
@@ -19434,26 +20854,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, index));
+            err = DataModel::Decode(reader, index);
         }
         else if (__context_tag == to_underlying(Fields::kInputType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, inputType));
+            err = DataModel::Decode(reader, inputType);
         }
         else if (__context_tag == to_underlying(Fields::kName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, name));
+            err = DataModel::Decode(reader, name);
         }
         else if (__context_tag == to_underlying(Fields::kDescription))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, description));
+            err = DataModel::Decode(reader, description);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -19482,14 +20906,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, index));
+            err = DataModel::Decode(reader, index);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SelectInput.
@@ -19513,8 +20941,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace ShowInputStatus.
@@ -19538,8 +20970,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace HideInputStatus.
@@ -19565,18 +21001,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, index));
+            err = DataModel::Decode(reader, index);
         }
         else if (__context_tag == to_underlying(Fields::kName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, name));
+            err = DataModel::Decode(reader, name);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace RenameInput.
@@ -19645,8 +21085,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Sleep.
@@ -19710,14 +21154,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kKeyCode))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, keyCode));
+            err = DataModel::Decode(reader, keyCode);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SendKey.
@@ -19742,14 +21190,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SendKeyResponse.
@@ -19814,22 +21266,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kWidth))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, width));
+            err = DataModel::Decode(reader, width);
         }
         else if (__context_tag == to_underlying(Fields::kHeight))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, height));
+            err = DataModel::Decode(reader, height);
         }
         else if (__context_tag == to_underlying(Fields::kMetric))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, metric));
+            err = DataModel::Decode(reader, metric);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -19856,18 +21312,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, name));
+            err = DataModel::Decode(reader, name);
         }
         else if (__context_tag == to_underlying(Fields::kValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, value));
+            err = DataModel::Decode(reader, value);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -19895,22 +21355,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, type));
+            err = DataModel::Decode(reader, type);
         }
         else if (__context_tag == to_underlying(Fields::kValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, value));
+            err = DataModel::Decode(reader, value);
         }
         else if (__context_tag == to_underlying(Fields::kExternalIDList))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, externalIDList));
+            err = DataModel::Decode(reader, externalIDList);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -19936,14 +21400,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kParameterList))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, parameterList));
+            err = DataModel::Decode(reader, parameterList);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -19971,22 +21439,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kImageURL))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, imageURL));
+            err = DataModel::Decode(reader, imageURL);
         }
         else if (__context_tag == to_underlying(Fields::kColor))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, color));
+            err = DataModel::Decode(reader, color);
         }
         else if (__context_tag == to_underlying(Fields::kSize))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, size));
+            err = DataModel::Decode(reader, size);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -20017,34 +21489,38 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kProviderName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, providerName));
+            err = DataModel::Decode(reader, providerName);
         }
         else if (__context_tag == to_underlying(Fields::kBackground))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, background));
+            err = DataModel::Decode(reader, background);
         }
         else if (__context_tag == to_underlying(Fields::kLogo))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, logo));
+            err = DataModel::Decode(reader, logo);
         }
         else if (__context_tag == to_underlying(Fields::kProgressBar))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, progressBar));
+            err = DataModel::Decode(reader, progressBar);
         }
         else if (__context_tag == to_underlying(Fields::kSplash))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, splash));
+            err = DataModel::Decode(reader, splash);
         }
         else if (__context_tag == to_underlying(Fields::kWaterMark))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, waterMark));
+            err = DataModel::Decode(reader, waterMark);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -20075,22 +21551,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kSearch))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, search));
+            err = DataModel::Decode(reader, search);
         }
         else if (__context_tag == to_underlying(Fields::kAutoPlay))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, autoPlay));
+            err = DataModel::Decode(reader, autoPlay);
         }
         else if (__context_tag == to_underlying(Fields::kData))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, data));
+            err = DataModel::Decode(reader, data);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace LaunchContent.
@@ -20117,22 +21597,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kContentURL))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, contentURL));
+            err = DataModel::Decode(reader, contentURL);
         }
         else if (__context_tag == to_underlying(Fields::kDisplayString))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, displayString));
+            err = DataModel::Decode(reader, displayString);
         }
         else if (__context_tag == to_underlying(Fields::kBrandingInformation))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, brandingInformation));
+            err = DataModel::Decode(reader, brandingInformation);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace LaunchURL.
@@ -20158,18 +21642,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kData))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, data));
+            err = DataModel::Decode(reader, data);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace LauncherResponse.
@@ -20240,22 +21728,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, index));
+            err = DataModel::Decode(reader, index);
         }
         else if (__context_tag == to_underlying(Fields::kOutputType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, outputType));
+            err = DataModel::Decode(reader, outputType);
         }
         else if (__context_tag == to_underlying(Fields::kName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, name));
+            err = DataModel::Decode(reader, name);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -20284,14 +21776,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, index));
+            err = DataModel::Decode(reader, index);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SelectOutput.
@@ -20317,18 +21813,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, index));
+            err = DataModel::Decode(reader, index);
         }
         else if (__context_tag == to_underlying(Fields::kName))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, name));
+            err = DataModel::Decode(reader, name);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace RenameOutput.
@@ -20398,18 +21898,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kApplication))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, application));
+            err = DataModel::Decode(reader, application);
         }
         else if (__context_tag == to_underlying(Fields::kEndpoint))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, endpoint));
+            err = DataModel::Decode(reader, endpoint);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -20439,18 +21943,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kApplication))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, application));
+            err = DataModel::Decode(reader, application);
         }
         else if (__context_tag == to_underlying(Fields::kData))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, data));
+            err = DataModel::Decode(reader, data);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace LaunchApp.
@@ -20475,14 +21983,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kApplication))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, application));
+            err = DataModel::Decode(reader, application);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace StopApp.
@@ -20507,14 +22019,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kApplication))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, application));
+            err = DataModel::Decode(reader, application);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace HideApp.
@@ -20540,18 +22056,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kData))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, data));
+            err = DataModel::Decode(reader, data);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace LauncherResponse.
@@ -20684,14 +22204,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kTempAccountIdentifier))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, tempAccountIdentifier));
+            err = DataModel::Decode(reader, tempAccountIdentifier);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetSetupPIN.
@@ -20716,14 +22240,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kSetupPIN))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, setupPIN));
+            err = DataModel::Decode(reader, setupPIN);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetSetupPINResponse.
@@ -20749,18 +22277,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kTempAccountIdentifier))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, tempAccountIdentifier));
+            err = DataModel::Decode(reader, tempAccountIdentifier);
         }
         else if (__context_tag == to_underlying(Fields::kSetupPIN))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, setupPIN));
+            err = DataModel::Decode(reader, setupPIN);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Login.
@@ -20784,8 +22316,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Logout.
@@ -20852,26 +22388,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kProfileCount))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, profileCount));
+            err = DataModel::Decode(reader, profileCount);
         }
         else if (__context_tag == to_underlying(Fields::kProfileIntervalPeriod))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, profileIntervalPeriod));
+            err = DataModel::Decode(reader, profileIntervalPeriod);
         }
         else if (__context_tag == to_underlying(Fields::kMaxNumberOfIntervals))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, maxNumberOfIntervals));
+            err = DataModel::Decode(reader, maxNumberOfIntervals);
         }
         else if (__context_tag == to_underlying(Fields::kListOfAttributes))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, listOfAttributes));
+            err = DataModel::Decode(reader, listOfAttributes);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetProfileInfoResponseCommand.
@@ -20895,8 +22435,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetProfileInfoCommand.
@@ -20927,34 +22471,38 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kStartTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, startTime));
+            err = DataModel::Decode(reader, startTime);
         }
         else if (__context_tag == to_underlying(Fields::kStatus))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
+            err = DataModel::Decode(reader, status);
         }
         else if (__context_tag == to_underlying(Fields::kProfileIntervalPeriod))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, profileIntervalPeriod));
+            err = DataModel::Decode(reader, profileIntervalPeriod);
         }
         else if (__context_tag == to_underlying(Fields::kNumberOfIntervalsDelivered))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, numberOfIntervalsDelivered));
+            err = DataModel::Decode(reader, numberOfIntervalsDelivered);
         }
         else if (__context_tag == to_underlying(Fields::kAttributeId))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, attributeId));
+            err = DataModel::Decode(reader, attributeId);
         }
         else if (__context_tag == to_underlying(Fields::kIntervals))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, intervals));
+            err = DataModel::Decode(reader, intervals);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetMeasurementProfileResponseCommand.
@@ -20981,22 +22529,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kAttributeId))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, attributeId));
+            err = DataModel::Decode(reader, attributeId);
         }
         else if (__context_tag == to_underlying(Fields::kStartTime))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, startTime));
+            err = DataModel::Decode(reader, startTime);
         }
         else if (__context_tag == to_underlying(Fields::kNumberOfIntervals))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, numberOfIntervals));
+            err = DataModel::Decode(reader, numberOfIntervals);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace GetMeasurementProfileCommand.
@@ -21450,42 +23002,46 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kA))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, a));
+            err = DataModel::Decode(reader, a);
         }
         else if (__context_tag == to_underlying(Fields::kB))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, b));
+            err = DataModel::Decode(reader, b);
         }
         else if (__context_tag == to_underlying(Fields::kC))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, c));
+            err = DataModel::Decode(reader, c);
         }
         else if (__context_tag == to_underlying(Fields::kD))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, d));
+            err = DataModel::Decode(reader, d);
         }
         else if (__context_tag == to_underlying(Fields::kE))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, e));
+            err = DataModel::Decode(reader, e);
         }
         else if (__context_tag == to_underlying(Fields::kF))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, f));
+            err = DataModel::Decode(reader, f);
         }
         else if (__context_tag == to_underlying(Fields::kG))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, g));
+            err = DataModel::Decode(reader, g);
         }
         else if (__context_tag == to_underlying(Fields::kH))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, h));
+            err = DataModel::Decode(reader, h);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -21558,42 +23114,46 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kFabricSensitiveInt8u))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricSensitiveInt8u));
+            err = DataModel::Decode(reader, fabricSensitiveInt8u);
         }
         else if (__context_tag == to_underlying(Fields::kOptionalFabricSensitiveInt8u))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionalFabricSensitiveInt8u));
+            err = DataModel::Decode(reader, optionalFabricSensitiveInt8u);
         }
         else if (__context_tag == to_underlying(Fields::kNullableFabricSensitiveInt8u))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableFabricSensitiveInt8u));
+            err = DataModel::Decode(reader, nullableFabricSensitiveInt8u);
         }
         else if (__context_tag == to_underlying(Fields::kNullableOptionalFabricSensitiveInt8u))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalFabricSensitiveInt8u));
+            err = DataModel::Decode(reader, nullableOptionalFabricSensitiveInt8u);
         }
         else if (__context_tag == to_underlying(Fields::kFabricSensitiveCharString))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricSensitiveCharString));
+            err = DataModel::Decode(reader, fabricSensitiveCharString);
         }
         else if (__context_tag == to_underlying(Fields::kFabricSensitiveStruct))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricSensitiveStruct));
+            err = DataModel::Decode(reader, fabricSensitiveStruct);
         }
         else if (__context_tag == to_underlying(Fields::kFabricSensitiveInt8uList))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricSensitiveInt8uList));
+            err = DataModel::Decode(reader, fabricSensitiveInt8uList);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -21630,58 +23190,62 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNullableInt))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableInt));
+            err = DataModel::Decode(reader, nullableInt);
         }
         else if (__context_tag == to_underlying(Fields::kOptionalInt))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionalInt));
+            err = DataModel::Decode(reader, optionalInt);
         }
         else if (__context_tag == to_underlying(Fields::kNullableOptionalInt))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalInt));
+            err = DataModel::Decode(reader, nullableOptionalInt);
         }
         else if (__context_tag == to_underlying(Fields::kNullableString))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableString));
+            err = DataModel::Decode(reader, nullableString);
         }
         else if (__context_tag == to_underlying(Fields::kOptionalString))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionalString));
+            err = DataModel::Decode(reader, optionalString);
         }
         else if (__context_tag == to_underlying(Fields::kNullableOptionalString))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalString));
+            err = DataModel::Decode(reader, nullableOptionalString);
         }
         else if (__context_tag == to_underlying(Fields::kNullableStruct))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableStruct));
+            err = DataModel::Decode(reader, nullableStruct);
         }
         else if (__context_tag == to_underlying(Fields::kOptionalStruct))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionalStruct));
+            err = DataModel::Decode(reader, optionalStruct);
         }
         else if (__context_tag == to_underlying(Fields::kNullableOptionalStruct))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStruct));
+            err = DataModel::Decode(reader, nullableOptionalStruct);
         }
         else if (__context_tag == to_underlying(Fields::kNullableList))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableList));
+            err = DataModel::Decode(reader, nullableList);
         }
         else if (__context_tag == to_underlying(Fields::kOptionalList))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionalList));
+            err = DataModel::Decode(reader, optionalList);
         }
         else if (__context_tag == to_underlying(Fields::kNullableOptionalList))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalList));
+            err = DataModel::Decode(reader, nullableOptionalList);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -21709,22 +23273,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kA))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, a));
+            err = DataModel::Decode(reader, a);
         }
         else if (__context_tag == to_underlying(Fields::kB))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, b));
+            err = DataModel::Decode(reader, b);
         }
         else if (__context_tag == to_underlying(Fields::kC))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, c));
+            err = DataModel::Decode(reader, c);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -21756,38 +23324,42 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kA))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, a));
+            err = DataModel::Decode(reader, a);
         }
         else if (__context_tag == to_underlying(Fields::kB))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, b));
+            err = DataModel::Decode(reader, b);
         }
         else if (__context_tag == to_underlying(Fields::kC))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, c));
+            err = DataModel::Decode(reader, c);
         }
         else if (__context_tag == to_underlying(Fields::kD))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, d));
+            err = DataModel::Decode(reader, d);
         }
         else if (__context_tag == to_underlying(Fields::kE))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, e));
+            err = DataModel::Decode(reader, e);
         }
         else if (__context_tag == to_underlying(Fields::kF))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, f));
+            err = DataModel::Decode(reader, f);
         }
         else if (__context_tag == to_underlying(Fields::kG))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, g));
+            err = DataModel::Decode(reader, g);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -21813,14 +23385,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kA))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, a));
+            err = DataModel::Decode(reader, a);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -21847,18 +23423,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kMember1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, member1));
+            err = DataModel::Decode(reader, member1);
         }
         else if (__context_tag == to_underlying(Fields::kMember2))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, member2));
+            err = DataModel::Decode(reader, member2);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 
@@ -21886,8 +23466,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Test.
@@ -21912,14 +23496,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kReturnValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, returnValue));
+            err = DataModel::Decode(reader, returnValue);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestSpecificResponse.
@@ -21943,8 +23531,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestNotHandled.
@@ -21969,14 +23561,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kReturnValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, returnValue));
+            err = DataModel::Decode(reader, returnValue);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestAddArgumentsResponse.
@@ -22000,8 +23596,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestSpecific.
@@ -22026,14 +23626,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kReturnValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, returnValue));
+            err = DataModel::Decode(reader, returnValue);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestSimpleArgumentResponse.
@@ -22057,8 +23661,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestUnknownCommand.
@@ -22088,34 +23696,38 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            err = DataModel::Decode(reader, arg1);
         }
         else if (__context_tag == to_underlying(Fields::kArg2))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg2));
+            err = DataModel::Decode(reader, arg2);
         }
         else if (__context_tag == to_underlying(Fields::kArg3))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg3));
+            err = DataModel::Decode(reader, arg3);
         }
         else if (__context_tag == to_underlying(Fields::kArg4))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg4));
+            err = DataModel::Decode(reader, arg4);
         }
         else if (__context_tag == to_underlying(Fields::kArg5))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg5));
+            err = DataModel::Decode(reader, arg5);
         }
         else if (__context_tag == to_underlying(Fields::kArg6))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg6));
+            err = DataModel::Decode(reader, arg6);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestStructArrayArgumentResponse.
@@ -22141,18 +23753,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            err = DataModel::Decode(reader, arg1);
         }
         else if (__context_tag == to_underlying(Fields::kArg2))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg2));
+            err = DataModel::Decode(reader, arg2);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestAddArguments.
@@ -22177,14 +23793,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            err = DataModel::Decode(reader, arg1);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestListInt8UReverseResponse.
@@ -22209,14 +23829,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            err = DataModel::Decode(reader, arg1);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestSimpleArgumentRequest.
@@ -22242,18 +23866,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            err = DataModel::Decode(reader, arg1);
         }
         else if (__context_tag == to_underlying(Fields::kArg2))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg2));
+            err = DataModel::Decode(reader, arg2);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestEnumsResponse.
@@ -22283,34 +23911,38 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            err = DataModel::Decode(reader, arg1);
         }
         else if (__context_tag == to_underlying(Fields::kArg2))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg2));
+            err = DataModel::Decode(reader, arg2);
         }
         else if (__context_tag == to_underlying(Fields::kArg3))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg3));
+            err = DataModel::Decode(reader, arg3);
         }
         else if (__context_tag == to_underlying(Fields::kArg4))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg4));
+            err = DataModel::Decode(reader, arg4);
         }
         else if (__context_tag == to_underlying(Fields::kArg5))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg5));
+            err = DataModel::Decode(reader, arg5);
         }
         else if (__context_tag == to_underlying(Fields::kArg6))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg6));
+            err = DataModel::Decode(reader, arg6);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestStructArrayArgumentRequest.
@@ -22338,26 +23970,30 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kWasPresent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, wasPresent));
+            err = DataModel::Decode(reader, wasPresent);
         }
         else if (__context_tag == to_underlying(Fields::kWasNull))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, wasNull));
+            err = DataModel::Decode(reader, wasNull);
         }
         else if (__context_tag == to_underlying(Fields::kValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, value));
+            err = DataModel::Decode(reader, value);
         }
         else if (__context_tag == to_underlying(Fields::kOriginalValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, originalValue));
+            err = DataModel::Decode(reader, originalValue);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestNullableOptionalResponse.
@@ -22382,14 +24018,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            err = DataModel::Decode(reader, arg1);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestStructArgumentRequest.
@@ -22452,122 +24092,126 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNullableIntWasNull))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableIntWasNull));
+            err = DataModel::Decode(reader, nullableIntWasNull);
         }
         else if (__context_tag == to_underlying(Fields::kNullableIntValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableIntValue));
+            err = DataModel::Decode(reader, nullableIntValue);
         }
         else if (__context_tag == to_underlying(Fields::kOptionalIntWasPresent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionalIntWasPresent));
+            err = DataModel::Decode(reader, optionalIntWasPresent);
         }
         else if (__context_tag == to_underlying(Fields::kOptionalIntValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionalIntValue));
+            err = DataModel::Decode(reader, optionalIntValue);
         }
         else if (__context_tag == to_underlying(Fields::kNullableOptionalIntWasPresent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalIntWasPresent));
+            err = DataModel::Decode(reader, nullableOptionalIntWasPresent);
         }
         else if (__context_tag == to_underlying(Fields::kNullableOptionalIntWasNull))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalIntWasNull));
+            err = DataModel::Decode(reader, nullableOptionalIntWasNull);
         }
         else if (__context_tag == to_underlying(Fields::kNullableOptionalIntValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalIntValue));
+            err = DataModel::Decode(reader, nullableOptionalIntValue);
         }
         else if (__context_tag == to_underlying(Fields::kNullableStringWasNull))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableStringWasNull));
+            err = DataModel::Decode(reader, nullableStringWasNull);
         }
         else if (__context_tag == to_underlying(Fields::kNullableStringValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableStringValue));
+            err = DataModel::Decode(reader, nullableStringValue);
         }
         else if (__context_tag == to_underlying(Fields::kOptionalStringWasPresent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionalStringWasPresent));
+            err = DataModel::Decode(reader, optionalStringWasPresent);
         }
         else if (__context_tag == to_underlying(Fields::kOptionalStringValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionalStringValue));
+            err = DataModel::Decode(reader, optionalStringValue);
         }
         else if (__context_tag == to_underlying(Fields::kNullableOptionalStringWasPresent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStringWasPresent));
+            err = DataModel::Decode(reader, nullableOptionalStringWasPresent);
         }
         else if (__context_tag == to_underlying(Fields::kNullableOptionalStringWasNull))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStringWasNull));
+            err = DataModel::Decode(reader, nullableOptionalStringWasNull);
         }
         else if (__context_tag == to_underlying(Fields::kNullableOptionalStringValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStringValue));
+            err = DataModel::Decode(reader, nullableOptionalStringValue);
         }
         else if (__context_tag == to_underlying(Fields::kNullableStructWasNull))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableStructWasNull));
+            err = DataModel::Decode(reader, nullableStructWasNull);
         }
         else if (__context_tag == to_underlying(Fields::kNullableStructValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableStructValue));
+            err = DataModel::Decode(reader, nullableStructValue);
         }
         else if (__context_tag == to_underlying(Fields::kOptionalStructWasPresent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionalStructWasPresent));
+            err = DataModel::Decode(reader, optionalStructWasPresent);
         }
         else if (__context_tag == to_underlying(Fields::kOptionalStructValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionalStructValue));
+            err = DataModel::Decode(reader, optionalStructValue);
         }
         else if (__context_tag == to_underlying(Fields::kNullableOptionalStructWasPresent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStructWasPresent));
+            err = DataModel::Decode(reader, nullableOptionalStructWasPresent);
         }
         else if (__context_tag == to_underlying(Fields::kNullableOptionalStructWasNull))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStructWasNull));
+            err = DataModel::Decode(reader, nullableOptionalStructWasNull);
         }
         else if (__context_tag == to_underlying(Fields::kNullableOptionalStructValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStructValue));
+            err = DataModel::Decode(reader, nullableOptionalStructValue);
         }
         else if (__context_tag == to_underlying(Fields::kNullableListWasNull))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableListWasNull));
+            err = DataModel::Decode(reader, nullableListWasNull);
         }
         else if (__context_tag == to_underlying(Fields::kNullableListValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableListValue));
+            err = DataModel::Decode(reader, nullableListValue);
         }
         else if (__context_tag == to_underlying(Fields::kOptionalListWasPresent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionalListWasPresent));
+            err = DataModel::Decode(reader, optionalListWasPresent);
         }
         else if (__context_tag == to_underlying(Fields::kOptionalListValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionalListValue));
+            err = DataModel::Decode(reader, optionalListValue);
         }
         else if (__context_tag == to_underlying(Fields::kNullableOptionalListWasPresent))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalListWasPresent));
+            err = DataModel::Decode(reader, nullableOptionalListWasPresent);
         }
         else if (__context_tag == to_underlying(Fields::kNullableOptionalListWasNull))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalListWasNull));
+            err = DataModel::Decode(reader, nullableOptionalListWasNull);
         }
         else if (__context_tag == to_underlying(Fields::kNullableOptionalListValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalListValue));
+            err = DataModel::Decode(reader, nullableOptionalListValue);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestComplexNullableOptionalResponse.
@@ -22592,14 +24236,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            err = DataModel::Decode(reader, arg1);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestNestedStructArgumentRequest.
@@ -22624,14 +24272,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, value));
+            err = DataModel::Decode(reader, value);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace BooleanResponse.
@@ -22656,14 +24308,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            err = DataModel::Decode(reader, arg1);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestListStructArgumentRequest.
@@ -22688,14 +24344,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            err = DataModel::Decode(reader, arg1);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SimpleStructResponse.
@@ -22720,14 +24380,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            err = DataModel::Decode(reader, arg1);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestListInt8UArgumentRequest.
@@ -22752,14 +24416,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, value));
+            err = DataModel::Decode(reader, value);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestEmitTestEventResponse.
@@ -22784,14 +24452,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            err = DataModel::Decode(reader, arg1);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestNestedStructListArgumentRequest.
@@ -22816,14 +24488,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, value));
+            err = DataModel::Decode(reader, value);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestEmitTestFabricScopedEventResponse.
@@ -22848,14 +24524,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            err = DataModel::Decode(reader, arg1);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestListNestedStructListArgumentRequest.
@@ -22880,14 +24560,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            err = DataModel::Decode(reader, arg1);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestListInt8UReverseRequest.
@@ -22913,18 +24597,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            err = DataModel::Decode(reader, arg1);
         }
         else if (__context_tag == to_underlying(Fields::kArg2))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg2));
+            err = DataModel::Decode(reader, arg2);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestEnumsRequest.
@@ -22949,14 +24637,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            err = DataModel::Decode(reader, arg1);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestNullableOptionalRequest.
@@ -22992,58 +24684,62 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kNullableInt))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableInt));
+            err = DataModel::Decode(reader, nullableInt);
         }
         else if (__context_tag == to_underlying(Fields::kOptionalInt))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionalInt));
+            err = DataModel::Decode(reader, optionalInt);
         }
         else if (__context_tag == to_underlying(Fields::kNullableOptionalInt))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalInt));
+            err = DataModel::Decode(reader, nullableOptionalInt);
         }
         else if (__context_tag == to_underlying(Fields::kNullableString))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableString));
+            err = DataModel::Decode(reader, nullableString);
         }
         else if (__context_tag == to_underlying(Fields::kOptionalString))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionalString));
+            err = DataModel::Decode(reader, optionalString);
         }
         else if (__context_tag == to_underlying(Fields::kNullableOptionalString))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalString));
+            err = DataModel::Decode(reader, nullableOptionalString);
         }
         else if (__context_tag == to_underlying(Fields::kNullableStruct))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableStruct));
+            err = DataModel::Decode(reader, nullableStruct);
         }
         else if (__context_tag == to_underlying(Fields::kOptionalStruct))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionalStruct));
+            err = DataModel::Decode(reader, optionalStruct);
         }
         else if (__context_tag == to_underlying(Fields::kNullableOptionalStruct))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStruct));
+            err = DataModel::Decode(reader, nullableOptionalStruct);
         }
         else if (__context_tag == to_underlying(Fields::kNullableList))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableList));
+            err = DataModel::Decode(reader, nullableList);
         }
         else if (__context_tag == to_underlying(Fields::kOptionalList))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, optionalList));
+            err = DataModel::Decode(reader, optionalList);
         }
         else if (__context_tag == to_underlying(Fields::kNullableOptionalList))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalList));
+            err = DataModel::Decode(reader, nullableOptionalList);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestComplexNullableOptionalRequest.
@@ -23068,14 +24764,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            err = DataModel::Decode(reader, arg1);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace SimpleStructEchoRequest.
@@ -23099,8 +24799,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TimedInvokeRequest.
@@ -23125,14 +24829,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            err = DataModel::Decode(reader, arg1);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestSimpleOptionalArgumentRequest.
@@ -23159,22 +24867,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            err = DataModel::Decode(reader, arg1);
         }
         else if (__context_tag == to_underlying(Fields::kArg2))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg2));
+            err = DataModel::Decode(reader, arg2);
         }
         else if (__context_tag == to_underlying(Fields::kArg3))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg3));
+            err = DataModel::Decode(reader, arg3);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestEmitTestEventRequest.
@@ -23199,14 +24911,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            err = DataModel::Decode(reader, arg1);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestEmitTestFabricScopedEventRequest.
@@ -23516,34 +25232,38 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            err = DataModel::Decode(reader, arg1);
         }
         else if (__context_tag == to_underlying(Fields::kArg2))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg2));
+            err = DataModel::Decode(reader, arg2);
         }
         else if (__context_tag == to_underlying(Fields::kArg3))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg3));
+            err = DataModel::Decode(reader, arg3);
         }
         else if (__context_tag == to_underlying(Fields::kArg4))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg4));
+            err = DataModel::Decode(reader, arg4);
         }
         else if (__context_tag == to_underlying(Fields::kArg5))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg5));
+            err = DataModel::Decode(reader, arg5);
         }
         else if (__context_tag == to_underlying(Fields::kArg6))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg6));
+            err = DataModel::Decode(reader, arg6);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestEvent.
@@ -23568,14 +25288,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            err = DataModel::Decode(reader, fabricIndex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace TestFabricScopedEvent.
@@ -23610,30 +25334,34 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, type));
+            err = DataModel::Decode(reader, type);
         }
         else if (__context_tag == to_underlying(Fields::kId))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, id));
+            err = DataModel::Decode(reader, id);
         }
         else if (__context_tag == to_underlying(Fields::kNumCallsToSkip))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, numCallsToSkip));
+            err = DataModel::Decode(reader, numCallsToSkip);
         }
         else if (__context_tag == to_underlying(Fields::kNumCallsToFail))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, numCallsToFail));
+            err = DataModel::Decode(reader, numCallsToFail);
         }
         else if (__context_tag == to_underlying(Fields::kTakeMutex))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, takeMutex));
+            err = DataModel::Decode(reader, takeMutex);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace FailAtFault.
@@ -23660,22 +25388,26 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kType))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, type));
+            err = DataModel::Decode(reader, type);
         }
         else if (__context_tag == to_underlying(Fields::kId))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, id));
+            err = DataModel::Decode(reader, id);
         }
         else if (__context_tag == to_underlying(Fields::kPercentage))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, percentage));
+            err = DataModel::Decode(reader, percentage);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace FailRandomlyAtFault.
@@ -23738,8 +25470,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         {}
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace Ping.
@@ -23764,14 +25500,18 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kReturnValue))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, returnValue));
+            err = DataModel::Decode(reader, returnValue);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AddArgumentsResponse.
@@ -23797,18 +25537,22 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             return std::get<CHIP_ERROR>(__element);
         }
 
+        CHIP_ERROR err                               = CHIP_NO_ERROR;
         [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
+
         if (__context_tag == to_underlying(Fields::kArg1))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
+            err = DataModel::Decode(reader, arg1);
         }
         else if (__context_tag == to_underlying(Fields::kArg2))
         {
-            ReturnErrorOnFailure(DataModel::Decode(reader, arg2));
+            err = DataModel::Decode(reader, arg2);
         }
         else
         {
         }
+
+        ReturnErrorOnFailure(err);
     }
 }
 } // namespace AddArguments.
