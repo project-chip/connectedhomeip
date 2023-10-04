@@ -14,21 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include "sl_wfx_configuration_defaults.h"
-
-#include "sl_wfx.h"
-#include "sl_wfx_board.h"
-#include "sl_wfx_host_api.h"
-
-#include "dmadrv.h"
-#include "em_bus.h"
-#include "em_cmu.h"
-#include "em_gpio.h"
-#include "em_ldma.h"
-#include "em_usart.h"
-#include "spidrv.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -37,21 +22,30 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 
+#include "dmadrv.h"
+#include "em_bus.h"
+#include "em_cmu.h"
+#include "em_gpio.h"
+#include "em_ldma.h"
+#include "em_usart.h"
 #include "gpiointerrupt.h"
-
+#include "sl_spidrv_exp_config.h"
+#include "sl_spidrv_instances.h"
+#include "sl_wfx.h"
 #include "sl_wfx_board.h"
+#include "sl_wfx_configuration_defaults.h"
 #include "sl_wfx_host.h"
 #include "sl_wfx_host_api.h"
 #include "sl_wfx_task.h"
+#include "spidrv.h"
+
+#include "spi_multiplex.h"
 #include "wfx_host_events.h"
 
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #include "sl_power_manager.h"
 #endif
 
-#include "sl_spidrv_exp_config.h"
-#include "sl_spidrv_instances.h"
-#include "spi_multiplex.h"
 // TODO: (MATTER-1906) Investigate why using SL_SPIDRV_EXP_BITRATE is causing WF200 init failure
 // REF: sl_spidrv_exp_config.h
 #define SL_SPIDRV_EXP_BITRATE_MULTIPLEXED 10000000

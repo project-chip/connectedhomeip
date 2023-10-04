@@ -22,6 +22,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "FreeRTOS.h"
+#include "event_groups.h"
+#include "task.h"
+
+#include "btl_interface.h"
 #include "dmadrv.h"
 #include "em_chip.h"
 #include "em_cmu.h"
@@ -29,37 +34,17 @@
 #include "em_device.h"
 #include "em_gpio.h"
 #include "em_ldma.h"
-#include "sl_spidrv_instances.h"
-#include "spi_multiplex.h"
-#include "spidrv.h"
-#if SL_LCDCTRL_MUX
-#include "sl_memlcd.h"
-#endif // SL_LCDCTRL_MUX
-#if defined(EFR32MG12)
-#include "em_usart.h"
-
-#define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
-
-#elif defined(EFR32MG24)
-#include "em_eusart.h"
-#include "sl_spidrv_eusart_exp_config.h"
-
-#define SL_SPIDRV_HANDLE sl_spidrv_eusart_exp_handle
-#define SL_SPIDRV_EXP_BITRATE_MULTIPLEXED SL_SPIDRV_EUSART_EXP_BITRATE
-#define SL_SPIDRV_UART_CONSOLE_BITRATE SL_UARTDRV_EUSART_VCOM_BAUDRATE
-#define SL_SPIDRV_FRAME_LENGTH SL_SPIDRV_EUSART_EXP_FRAME_LENGTH
-
-#endif // EFR32MG12 || EFR32MG24
-
 #include "gpiointerrupt.h"
+#include "spidrv.h"
+
 #include "sl_device_init_clocks.h"
+#include "sl_device_init_dpll.h"
+#include "sl_device_init_hfxo.h"
+#include "sl_spidrv_instances.h"
 #include "sl_status.h"
 
-#include "FreeRTOS.h"
-#include "event_groups.h"
-#include "task.h"
-
-#include "btl_interface.h"
+#include "silabs_utils.h"
+#include "spi_multiplex.h"
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 
@@ -77,16 +62,33 @@
 #include "rsi_driver.h"
 #endif
 
-#include "sl_device_init_dpll.h"
-#include "sl_device_init_hfxo.h"
+#if defined(EFR32MG12)
+#include "em_usart.h"
 
-#define DEFAULT_SPI_TRASFER_MODE 0
-// Macro to drive semaphore block minimun timer in milli seconds
+#define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
+
+#elif defined(EFR32MG24)
+#include "em_eusart.h"
+#include "sl_spidrv_eusart_exp_config.h"
+
+#define SL_SPIDRV_HANDLE sl_spidrv_eusart_exp_handle
+#define SL_SPIDRV_EXP_BITRATE_MULTIPLEXED SL_SPIDRV_EUSART_EXP_BITRATE
+#define SL_SPIDRV_UART_CONSOLE_BITRATE SL_UARTDRV_EUSART_VCOM_BAUDRATE
+#define SL_SPIDRV_FRAME_LENGTH SL_SPIDRV_EUSART_EXP_FRAME_LENGTH
+
+#endif // EFR32MG12 || EFR32MG24
+
+#if SL_LCDCTRL_MUX
+#include "sl_memlcd.h"
+#endif // SL_LCDCTRL_MUX
+
+// Macro to drive semaphore block minimum timer in milli seconds
 #define RSI_SEM_BLOCK_MIN_TIMER_VALUE_MS (50)
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
 #include "sl_power_manager.h"
 #endif
 
+#define DEFAULT_SPI_TRASFER_MODE 0
 #define CONCAT(A, B) (A##B)
 #define SPI_CLOCK(N) CONCAT(cmuClock_USART, N)
 
