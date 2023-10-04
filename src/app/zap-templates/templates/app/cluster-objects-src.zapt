@@ -79,9 +79,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR) {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {{#zcl_command_arguments}}
-        if (tag == TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})))
+        if (__tag == TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, {{asLowerCamelCase label}}));
         }
@@ -138,9 +138,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR) {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {{#zcl_event_fields}}
-        if (tag == TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase name}})))
+        if (__tag == TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase name}})))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, {{asLowerCamelCase name}}));
         }

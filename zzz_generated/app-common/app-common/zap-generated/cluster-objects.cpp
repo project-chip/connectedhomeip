@@ -70,33 +70,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kMfgCode)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kMfgCode):
             ReturnErrorOnFailure(DataModel::Decode(reader, mfgCode));
-            break;
-        case to_underlying(Fields::kValue):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kValue)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, value));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -115,36 +109,31 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kLabel)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kLabel):
             ReturnErrorOnFailure(DataModel::Decode(reader, label));
-            break;
-        case to_underlying(Fields::kMode):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kMode)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, mode));
-            break;
-        case to_underlying(Fields::kModeTags):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kModeTags)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, modeTags));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -162,33 +151,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCatalogVendorID)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kCatalogVendorID):
             ReturnErrorOnFailure(DataModel::Decode(reader, catalogVendorID));
-            break;
-        case to_underlying(Fields::kApplicationID):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kApplicationID)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, applicationID));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -207,36 +190,31 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kErrorStateID)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kErrorStateID):
             ReturnErrorOnFailure(DataModel::Decode(reader, errorStateID));
-            break;
-        case to_underlying(Fields::kErrorStateLabel):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kErrorStateLabel)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, errorStateLabel));
-            break;
-        case to_underlying(Fields::kErrorStateDetails):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kErrorStateDetails)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, errorStateDetails));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -254,33 +232,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kLabel)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kLabel):
             ReturnErrorOnFailure(DataModel::Decode(reader, label));
-            break;
-        case to_underlying(Fields::kValue):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kValue)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, value));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -298,33 +270,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kOperationalStateID)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kOperationalStateID):
             ReturnErrorOnFailure(DataModel::Decode(reader, operationalStateID));
-            break;
-        case to_underlying(Fields::kOperationalStateLabel):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOperationalStateLabel)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, operationalStateLabel));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -353,8 +319,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kIdentifyTime)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kIdentifyTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, identifyTime));
         }
@@ -386,12 +352,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kEffectIdentifier)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kEffectIdentifier)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, effectIdentifier));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kEffectVariant)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEffectVariant)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, effectVariant));
         }
@@ -468,12 +434,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kGroupName)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupName)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupName));
         }
@@ -505,12 +471,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
@@ -541,8 +507,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
@@ -575,16 +541,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kGroupName)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupName)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupName));
         }
@@ -615,8 +581,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kGroupList)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupList)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupList));
         }
@@ -648,12 +614,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCapacity)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCapacity)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, capacity));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kGroupList)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupList)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupList));
         }
@@ -684,8 +650,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
@@ -717,12 +683,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
@@ -752,7 +718,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -779,12 +745,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kGroupName)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupName)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupName));
         }
@@ -851,33 +817,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kAttributeID)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kAttributeID):
             ReturnErrorOnFailure(DataModel::Decode(reader, attributeID));
-            break;
-        case to_underlying(Fields::kAttributeValue):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kAttributeValue)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, attributeValue));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -895,33 +855,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kClusterID)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kClusterID):
             ReturnErrorOnFailure(DataModel::Decode(reader, clusterID));
-            break;
-        case to_underlying(Fields::kAttributeValueList):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kAttributeValueList)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, attributeValueList));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -951,24 +905,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSceneName)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSceneName)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneName));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kExtensionFieldSets)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kExtensionFieldSets)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, extensionFieldSets));
         }
@@ -1001,16 +955,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
         }
@@ -1042,12 +996,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
         }
@@ -1083,28 +1037,28 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSceneName)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSceneName)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneName));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kExtensionFieldSets)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kExtensionFieldSets)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, extensionFieldSets));
         }
@@ -1136,12 +1090,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
         }
@@ -1174,16 +1128,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
         }
@@ -1214,8 +1168,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
@@ -1247,12 +1201,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
@@ -1284,12 +1238,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
         }
@@ -1322,16 +1276,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
         }
@@ -1364,16 +1318,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
         }
@@ -1404,8 +1358,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
@@ -1439,20 +1393,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kCapacity)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kCapacity)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, capacity));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSceneList)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSceneList)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneList));
         }
@@ -1487,24 +1441,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSceneName)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSceneName)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneName));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kExtensionFieldSets)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kExtensionFieldSets)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, extensionFieldSets));
         }
@@ -1537,16 +1491,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
         }
@@ -1578,12 +1532,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
         }
@@ -1619,28 +1573,28 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSceneID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSceneName)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSceneName)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneName));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kExtensionFieldSets)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kExtensionFieldSets)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, extensionFieldSets));
         }
@@ -1675,24 +1629,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kMode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kMode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, mode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kGroupIdentifierFrom)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupIdentifierFrom)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupIdentifierFrom));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSceneIdentifierFrom)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSceneIdentifierFrom)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneIdentifierFrom));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kGroupIdentifierTo)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupIdentifierTo)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupIdentifierTo));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSceneIdentifierTo)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSceneIdentifierTo)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneIdentifierTo));
         }
@@ -1725,16 +1679,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kGroupIdentifierFrom)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupIdentifierFrom)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupIdentifierFrom));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSceneIdentifierFrom)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSceneIdentifierFrom)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sceneIdentifierFrom));
         }
@@ -1827,7 +1781,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -1852,7 +1806,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -1877,7 +1831,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -1904,12 +1858,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kEffectIdentifier)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kEffectIdentifier)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, effectIdentifier));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kEffectVariant)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEffectVariant)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, effectVariant));
         }
@@ -1939,7 +1893,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -1967,16 +1921,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kOnOffControl)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kOnOffControl)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, onOffControl));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOnTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOnTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, onTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOffWaitTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOffWaitTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, offWaitTime));
         }
@@ -2108,20 +2062,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kLevel)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kLevel)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, level));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -2155,20 +2109,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kMoveMode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kMoveMode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, moveMode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kRate)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kRate)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, rate));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -2203,24 +2157,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStepMode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStepMode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, stepMode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStepSize)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStepSize)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, stepSize));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -2252,12 +2206,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -2291,20 +2245,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kLevel)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kLevel)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, level));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -2338,20 +2292,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kMoveMode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kMoveMode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, moveMode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kRate)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kRate)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, rate));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -2386,24 +2340,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStepMode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStepMode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, stepMode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStepSize)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStepSize)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, stepSize));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -2435,12 +2389,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -2471,8 +2425,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kFrequency)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kFrequency)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, frequency));
         }
@@ -2681,33 +2635,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kDeviceType)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kDeviceType):
             ReturnErrorOnFailure(DataModel::Decode(reader, deviceType));
-            break;
-        case to_underlying(Fields::kRevision):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kRevision)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, revision));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -2727,39 +2675,35 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kMfgCode)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kMfgCode):
             ReturnErrorOnFailure(DataModel::Decode(reader, mfgCode));
-            break;
-        case to_underlying(Fields::kNamespaceID):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNamespaceID)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, namespaceID));
-            break;
-        case to_underlying(Fields::kTag):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTag)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, tag));
-            break;
-        case to_underlying(Fields::kLabel):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLabel)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, label));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -2848,42 +2792,39 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNode)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kNode):
             ReturnErrorOnFailure(DataModel::Decode(reader, node));
-            break;
-        case to_underlying(Fields::kGroup):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGroup)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, group));
-            break;
-        case to_underlying(Fields::kEndpoint):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEndpoint)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, endpoint));
-            break;
-        case to_underlying(Fields::kCluster):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kCluster)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, cluster));
-            break;
-        case to_underlying(Fields::kFabricIndex):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -2945,36 +2886,31 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCluster)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kCluster):
             ReturnErrorOnFailure(DataModel::Decode(reader, cluster));
-            break;
-        case to_underlying(Fields::kEndpoint):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEndpoint)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, endpoint));
-            break;
-        case to_underlying(Fields::kDeviceType):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDeviceType)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, deviceType));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -3021,42 +2957,39 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kPrivilege)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kPrivilege):
             ReturnErrorOnFailure(DataModel::Decode(reader, privilege));
-            break;
-        case to_underlying(Fields::kAuthMode):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kAuthMode)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, authMode));
-            break;
-        case to_underlying(Fields::kSubjects):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSubjects)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, subjects));
-            break;
-        case to_underlying(Fields::kTargets):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTargets)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, targets));
-            break;
-        case to_underlying(Fields::kFabricIndex):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -3091,33 +3024,27 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kData)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kData):
             ReturnErrorOnFailure(DataModel::Decode(reader, data));
-            break;
-        case to_underlying(Fields::kFabricIndex):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -3195,24 +3122,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kAdminNodeID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kAdminNodeID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, adminNodeID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kAdminPasscodeID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kAdminPasscodeID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, adminPasscodeID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kChangeType)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kChangeType)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, changeType));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kLatestValue)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLatestValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, latestValue));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
         }
@@ -3247,24 +3174,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kAdminNodeID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kAdminNodeID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, adminNodeID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kAdminPasscodeID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kAdminPasscodeID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, adminPasscodeID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kChangeType)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kChangeType)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, changeType));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kLatestValue)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLatestValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, latestValue));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
         }
@@ -3299,45 +3226,43 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kActionID):
             ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
-            break;
-        case to_underlying(Fields::kName):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kName)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, name));
-            break;
-        case to_underlying(Fields::kType):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kType)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, type));
-            break;
-        case to_underlying(Fields::kEndpointListID):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEndpointListID)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, endpointListID));
-            break;
-        case to_underlying(Fields::kSupportedCommands):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSupportedCommands)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, supportedCommands));
-            break;
-        case to_underlying(Fields::kState):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kState)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, state));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -3357,39 +3282,35 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kEndpointListID)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kEndpointListID):
             ReturnErrorOnFailure(DataModel::Decode(reader, endpointListID));
-            break;
-        case to_underlying(Fields::kName):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kName)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, name));
-            break;
-        case to_underlying(Fields::kType):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kType)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, type));
-            break;
-        case to_underlying(Fields::kEndpoints):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEndpoints)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, endpoints));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -3416,12 +3337,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
         }
@@ -3454,16 +3375,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
         }
@@ -3495,12 +3416,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
         }
@@ -3533,16 +3454,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDuration)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDuration)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, duration));
         }
@@ -3574,12 +3495,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
         }
@@ -3611,12 +3532,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
         }
@@ -3649,16 +3570,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDuration)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDuration)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, duration));
         }
@@ -3690,12 +3611,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
         }
@@ -3727,12 +3648,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
         }
@@ -3765,16 +3686,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDuration)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDuration)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, duration));
         }
@@ -3806,12 +3727,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
         }
@@ -3844,16 +3765,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDuration)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDuration)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, duration));
         }
@@ -3929,16 +3850,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNewState)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNewState)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, newState));
         }
@@ -3972,20 +3893,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kActionID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, actionID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kInvokeID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, invokeID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNewState)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNewState)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, newState));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kError)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kError)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, error));
         }
@@ -4016,33 +3937,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCaseSessionsPerFabric)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kCaseSessionsPerFabric):
             ReturnErrorOnFailure(DataModel::Decode(reader, caseSessionsPerFabric));
-            break;
-        case to_underlying(Fields::kSubscriptionsPerFabric):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSubscriptionsPerFabric)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, subscriptionsPerFabric));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -4060,33 +3975,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kFinish)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kFinish):
             ReturnErrorOnFailure(DataModel::Decode(reader, finish));
-            break;
-        case to_underlying(Fields::kPrimaryColor):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPrimaryColor)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, primaryColor));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -4111,7 +4020,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -4234,8 +4143,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kSoftwareVersion)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kSoftwareVersion)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
         }
@@ -4265,7 +4174,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -4291,8 +4200,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
         }
@@ -4323,8 +4232,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kReachableNewValue)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kReachableNewValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, reachableNewValue));
         }
@@ -4368,36 +4277,36 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kVendorID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kVendorID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, vendorID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kProductID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kProductID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, productID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSoftwareVersion)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSoftwareVersion)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kProtocolsSupported)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kProtocolsSupported)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, protocolsSupported));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kHardwareVersion)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kHardwareVersion)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, hardwareVersion));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kLocation)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLocation)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, location));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kRequestorCanConsent)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kRequestorCanConsent)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, requestorCanConsent));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kMetadataForProvider)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kMetadataForProvider)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, metadataForProvider));
         }
@@ -4435,36 +4344,36 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDelayedActionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDelayedActionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, delayedActionTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kImageURI)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kImageURI)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, imageURI));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSoftwareVersion)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSoftwareVersion)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSoftwareVersionString)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSoftwareVersionString)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersionString));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUpdateToken)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUpdateToken)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, updateToken));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserConsentNeeded)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserConsentNeeded)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userConsentNeeded));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kMetadataForRequestor)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kMetadataForRequestor)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, metadataForRequestor));
         }
@@ -4496,12 +4405,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kUpdateToken)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kUpdateToken)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, updateToken));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNewVersion)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNewVersion)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, newVersion));
         }
@@ -4533,12 +4442,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kAction)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kAction)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, action));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDelayedActionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDelayedActionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, delayedActionTime));
         }
@@ -4570,12 +4479,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kUpdateToken)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kUpdateToken)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, updateToken));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSoftwareVersion)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSoftwareVersion)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
         }
@@ -4653,36 +4562,31 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kProviderNodeID)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kProviderNodeID):
             ReturnErrorOnFailure(DataModel::Decode(reader, providerNodeID));
-            break;
-        case to_underlying(Fields::kEndpoint):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEndpoint)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, endpoint));
-            break;
-        case to_underlying(Fields::kFabricIndex):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -4712,24 +4616,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kProviderNodeID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kProviderNodeID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, providerNodeID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kVendorID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kVendorID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, vendorID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kAnnouncementReason)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kAnnouncementReason)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, announcementReason));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kMetadataForNode)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kMetadataForNode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, metadataForNode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kEndpoint)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEndpoint)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, endpoint));
         }
@@ -4809,20 +4713,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kPreviousState)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kPreviousState)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, previousState));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNewState)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNewState)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, newState));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kReason)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kReason)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, reason));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTargetSoftwareVersion)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTargetSoftwareVersion)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, targetSoftwareVersion));
         }
@@ -4854,12 +4758,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kSoftwareVersion)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kSoftwareVersion)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kProductID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kProductID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, productID));
         }
@@ -4893,20 +4797,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kSoftwareVersion)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kSoftwareVersion)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kBytesDownloaded)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kBytesDownloaded)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, bytesDownloaded));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kProgressPercent)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kProgressPercent)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, progressPercent));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kPlatformCode)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPlatformCode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, platformCode));
         }
@@ -5110,33 +5014,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCurrent)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kCurrent):
             ReturnErrorOnFailure(DataModel::Decode(reader, current));
-            break;
-        case to_underlying(Fields::kPrevious):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPrevious)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, previous));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -5154,33 +5052,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCurrent)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kCurrent):
             ReturnErrorOnFailure(DataModel::Decode(reader, current));
-            break;
-        case to_underlying(Fields::kPrevious):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPrevious)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, previous));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -5198,33 +5090,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCurrent)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kCurrent):
             ReturnErrorOnFailure(DataModel::Decode(reader, current));
-            break;
-        case to_underlying(Fields::kPrevious):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPrevious)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, previous));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -5380,12 +5266,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCurrent)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCurrent)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, current));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kPrevious)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPrevious)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, previous));
         }
@@ -5417,12 +5303,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCurrent)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCurrent)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, current));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kPrevious)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPrevious)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, previous));
         }
@@ -5454,12 +5340,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCurrent)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCurrent)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, current));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kPrevious)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPrevious)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, previous));
         }
@@ -5492,33 +5378,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kFailSafeExpiryLengthSeconds)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kFailSafeExpiryLengthSeconds):
             ReturnErrorOnFailure(DataModel::Decode(reader, failSafeExpiryLengthSeconds));
-            break;
-        case to_underlying(Fields::kMaxCumulativeFailsafeSeconds):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kMaxCumulativeFailsafeSeconds)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, maxCumulativeFailsafeSeconds));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -5545,12 +5425,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kExpiryLengthSeconds)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kExpiryLengthSeconds)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, expiryLengthSeconds));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kBreadcrumb)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kBreadcrumb)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, breadcrumb));
         }
@@ -5582,12 +5462,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kErrorCode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kErrorCode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, errorCode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDebugText)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDebugText)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, debugText));
         }
@@ -5620,16 +5500,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNewRegulatoryConfig)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNewRegulatoryConfig)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, newRegulatoryConfig));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kCountryCode)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kCountryCode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, countryCode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kBreadcrumb)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kBreadcrumb)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, breadcrumb));
         }
@@ -5661,12 +5541,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kErrorCode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kErrorCode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, errorCode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDebugText)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDebugText)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, debugText));
         }
@@ -5696,7 +5576,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -5723,12 +5603,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kErrorCode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kErrorCode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, errorCode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDebugText)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDebugText)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, debugText));
         }
@@ -5807,33 +5687,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNetworkID)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kNetworkID):
             ReturnErrorOnFailure(DataModel::Decode(reader, networkID));
-            break;
-        case to_underlying(Fields::kConnected):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kConnected)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, connected));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -5857,51 +5731,51 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kPanId)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kPanId):
             ReturnErrorOnFailure(DataModel::Decode(reader, panId));
-            break;
-        case to_underlying(Fields::kExtendedPanId):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kExtendedPanId)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, extendedPanId));
-            break;
-        case to_underlying(Fields::kNetworkName):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNetworkName)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, networkName));
-            break;
-        case to_underlying(Fields::kChannel):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kChannel)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, channel));
-            break;
-        case to_underlying(Fields::kVersion):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kVersion)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, version));
-            break;
-        case to_underlying(Fields::kExtendedAddress):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kExtendedAddress)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, extendedAddress));
-            break;
-        case to_underlying(Fields::kRssi):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kRssi)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, rssi));
-            break;
-        case to_underlying(Fields::kLqi):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLqi)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, lqi));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -5923,45 +5797,43 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kSecurity)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kSecurity):
             ReturnErrorOnFailure(DataModel::Decode(reader, security));
-            break;
-        case to_underlying(Fields::kSsid):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSsid)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, ssid));
-            break;
-        case to_underlying(Fields::kBssid):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kBssid)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, bssid));
-            break;
-        case to_underlying(Fields::kChannel):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kChannel)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, channel));
-            break;
-        case to_underlying(Fields::kWiFiBand):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kWiFiBand)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, wiFiBand));
-            break;
-        case to_underlying(Fields::kRssi):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kRssi)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, rssi));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -5988,12 +5860,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kSsid)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kSsid)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, ssid));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kBreadcrumb)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kBreadcrumb)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, breadcrumb));
         }
@@ -6027,20 +5899,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNetworkingStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNetworkingStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, networkingStatus));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDebugText)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDebugText)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, debugText));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kWiFiScanResults)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kWiFiScanResults)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, wiFiScanResults));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kThreadScanResults)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kThreadScanResults)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, threadScanResults));
         }
@@ -6073,16 +5945,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kSsid)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kSsid)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, ssid));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kCredentials)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kCredentials)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, credentials));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kBreadcrumb)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kBreadcrumb)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, breadcrumb));
         }
@@ -6114,12 +5986,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kOperationalDataset)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kOperationalDataset)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, operationalDataset));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kBreadcrumb)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kBreadcrumb)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, breadcrumb));
         }
@@ -6151,12 +6023,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNetworkID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNetworkID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, networkID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kBreadcrumb)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kBreadcrumb)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, breadcrumb));
         }
@@ -6189,16 +6061,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNetworkingStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNetworkingStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, networkingStatus));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDebugText)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDebugText)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, debugText));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNetworkIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNetworkIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, networkIndex));
         }
@@ -6230,12 +6102,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNetworkID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNetworkID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, networkID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kBreadcrumb)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kBreadcrumb)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, breadcrumb));
         }
@@ -6268,16 +6140,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNetworkingStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNetworkingStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, networkingStatus));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDebugText)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDebugText)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, debugText));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kErrorValue)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kErrorValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, errorValue));
         }
@@ -6310,16 +6182,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNetworkID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNetworkID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, networkID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNetworkIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNetworkIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, networkIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kBreadcrumb)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kBreadcrumb)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, breadcrumb));
         }
@@ -6415,16 +6287,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kIntent)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kIntent)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, intent));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kRequestedProtocol)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kRequestedProtocol)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, requestedProtocol));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransferFileDesignator)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransferFileDesignator)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transferFileDesignator));
         }
@@ -6458,20 +6330,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kLogContent)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLogContent)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, logContent));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUTCTimeStamp)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUTCTimeStamp)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, UTCTimeStamp));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTimeSinceBoot)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTimeSinceBoot)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, timeSinceBoot));
         }
@@ -6543,51 +6415,51 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kName)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kName):
             ReturnErrorOnFailure(DataModel::Decode(reader, name));
-            break;
-        case to_underlying(Fields::kIsOperational):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kIsOperational)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, isOperational));
-            break;
-        case to_underlying(Fields::kOffPremiseServicesReachableIPv4):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOffPremiseServicesReachableIPv4)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, offPremiseServicesReachableIPv4));
-            break;
-        case to_underlying(Fields::kOffPremiseServicesReachableIPv6):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOffPremiseServicesReachableIPv6)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, offPremiseServicesReachableIPv6));
-            break;
-        case to_underlying(Fields::kHardwareAddress):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kHardwareAddress)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, hardwareAddress));
-            break;
-        case to_underlying(Fields::kIPv4Addresses):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kIPv4Addresses)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, IPv4Addresses));
-            break;
-        case to_underlying(Fields::kIPv6Addresses):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kIPv6Addresses)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, IPv6Addresses));
-            break;
-        case to_underlying(Fields::kType):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kType)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, type));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -6614,12 +6486,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kEnableKey)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kEnableKey)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, enableKey));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kEventTrigger)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEventTrigger)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, eventTrigger));
         }
@@ -6715,12 +6587,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCurrent)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCurrent)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, current));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kPrevious)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPrevious)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, previous));
         }
@@ -6752,12 +6624,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCurrent)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCurrent)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, current));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kPrevious)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPrevious)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, previous));
         }
@@ -6789,12 +6661,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCurrent)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCurrent)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, current));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kPrevious)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPrevious)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, previous));
         }
@@ -6825,8 +6697,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kBootReason)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kBootReason)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, bootReason));
         }
@@ -6860,42 +6732,39 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kId)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kId):
             ReturnErrorOnFailure(DataModel::Decode(reader, id));
-            break;
-        case to_underlying(Fields::kName):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kName)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, name));
-            break;
-        case to_underlying(Fields::kStackFreeCurrent):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStackFreeCurrent)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, stackFreeCurrent));
-            break;
-        case to_underlying(Fields::kStackFreeMinimum):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStackFreeMinimum)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, stackFreeMinimum));
-            break;
-        case to_underlying(Fields::kStackSize):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStackSize)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, stackSize));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -6920,7 +6789,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -6994,16 +6863,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kId)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kId)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, id));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kName)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kName)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, name));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kFaultRecording)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFaultRecording)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, faultRecording));
         }
@@ -7046,69 +6915,75 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kExtAddress)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kExtAddress):
             ReturnErrorOnFailure(DataModel::Decode(reader, extAddress));
-            break;
-        case to_underlying(Fields::kAge):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kAge)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, age));
-            break;
-        case to_underlying(Fields::kRloc16):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kRloc16)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, rloc16));
-            break;
-        case to_underlying(Fields::kLinkFrameCounter):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLinkFrameCounter)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, linkFrameCounter));
-            break;
-        case to_underlying(Fields::kMleFrameCounter):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kMleFrameCounter)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, mleFrameCounter));
-            break;
-        case to_underlying(Fields::kLqi):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLqi)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, lqi));
-            break;
-        case to_underlying(Fields::kAverageRssi):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kAverageRssi)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, averageRssi));
-            break;
-        case to_underlying(Fields::kLastRssi):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLastRssi)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, lastRssi));
-            break;
-        case to_underlying(Fields::kFrameErrorRate):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFrameErrorRate)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, frameErrorRate));
-            break;
-        case to_underlying(Fields::kMessageErrorRate):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kMessageErrorRate)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, messageErrorRate));
-            break;
-        case to_underlying(Fields::kRxOnWhenIdle):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kRxOnWhenIdle)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, rxOnWhenIdle));
-            break;
-        case to_underlying(Fields::kFullThreadDevice):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFullThreadDevice)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, fullThreadDevice));
-            break;
-        case to_underlying(Fields::kFullNetworkData):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFullNetworkData)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, fullNetworkData));
-            break;
-        case to_underlying(Fields::kIsChild):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kIsChild)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, isChild));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -7136,63 +7011,67 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kActiveTimestampPresent)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kActiveTimestampPresent):
             ReturnErrorOnFailure(DataModel::Decode(reader, activeTimestampPresent));
-            break;
-        case to_underlying(Fields::kPendingTimestampPresent):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPendingTimestampPresent)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, pendingTimestampPresent));
-            break;
-        case to_underlying(Fields::kMasterKeyPresent):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kMasterKeyPresent)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, masterKeyPresent));
-            break;
-        case to_underlying(Fields::kNetworkNamePresent):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNetworkNamePresent)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, networkNamePresent));
-            break;
-        case to_underlying(Fields::kExtendedPanIdPresent):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kExtendedPanIdPresent)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, extendedPanIdPresent));
-            break;
-        case to_underlying(Fields::kMeshLocalPrefixPresent):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kMeshLocalPrefixPresent)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, meshLocalPrefixPresent));
-            break;
-        case to_underlying(Fields::kDelayPresent):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDelayPresent)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, delayPresent));
-            break;
-        case to_underlying(Fields::kPanIdPresent):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPanIdPresent)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, panIdPresent));
-            break;
-        case to_underlying(Fields::kChannelPresent):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kChannelPresent)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, channelPresent));
-            break;
-        case to_underlying(Fields::kPskcPresent):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPskcPresent)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, pskcPresent));
-            break;
-        case to_underlying(Fields::kSecurityPolicyPresent):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSecurityPolicyPresent)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, securityPolicyPresent));
-            break;
-        case to_underlying(Fields::kChannelMaskPresent):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kChannelMaskPresent)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, channelMaskPresent));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -7218,57 +7097,59 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kExtAddress)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kExtAddress):
             ReturnErrorOnFailure(DataModel::Decode(reader, extAddress));
-            break;
-        case to_underlying(Fields::kRloc16):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kRloc16)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, rloc16));
-            break;
-        case to_underlying(Fields::kRouterId):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kRouterId)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, routerId));
-            break;
-        case to_underlying(Fields::kNextHop):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNextHop)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, nextHop));
-            break;
-        case to_underlying(Fields::kPathCost):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPathCost)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, pathCost));
-            break;
-        case to_underlying(Fields::kLQIIn):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLQIIn)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, LQIIn));
-            break;
-        case to_underlying(Fields::kLQIOut):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLQIOut)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, LQIOut));
-            break;
-        case to_underlying(Fields::kAge):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kAge)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, age));
-            break;
-        case to_underlying(Fields::kAllocated):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kAllocated)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, allocated));
-            break;
-        case to_underlying(Fields::kLinkEstablished):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLinkEstablished)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, linkEstablished));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -7286,33 +7167,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kRotationTime)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kRotationTime):
             ReturnErrorOnFailure(DataModel::Decode(reader, rotationTime));
-            break;
-        case to_underlying(Fields::kFlags):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFlags)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, flags));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -7337,7 +7212,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -7586,8 +7461,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kConnectionStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kConnectionStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, connectionStatus));
         }
@@ -7619,12 +7494,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCurrent)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCurrent)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, current));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kPrevious)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPrevious)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, previous));
         }
@@ -7660,7 +7535,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -7759,8 +7634,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kReasonCode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kReasonCode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, reasonCode));
         }
@@ -7792,12 +7667,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kAssociationFailure)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kAssociationFailure)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, associationFailure));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
@@ -7828,8 +7703,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kConnectionStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kConnectionStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, connectionStatus));
         }
@@ -7865,7 +7740,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -7952,36 +7827,31 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kOffset)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kOffset):
             ReturnErrorOnFailure(DataModel::Decode(reader, offset));
-            break;
-        case to_underlying(Fields::kValidStarting):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kValidStarting)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, validStarting));
-            break;
-        case to_underlying(Fields::kValidUntil):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kValidUntil)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, validUntil));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -7999,33 +7869,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNodeID)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kNodeID):
             ReturnErrorOnFailure(DataModel::Decode(reader, nodeID));
-            break;
-        case to_underlying(Fields::kEndpoint):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEndpoint)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, endpoint));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -8044,36 +7908,31 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kOffset)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kOffset):
             ReturnErrorOnFailure(DataModel::Decode(reader, offset));
-            break;
-        case to_underlying(Fields::kValidAt):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kValidAt)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, validAt));
-            break;
-        case to_underlying(Fields::kName):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kName)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, name));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -8092,36 +7951,31 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kFabricIndex):
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
-            break;
-        case to_underlying(Fields::kNodeID):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNodeID)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, nodeID));
-            break;
-        case to_underlying(Fields::kEndpoint):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEndpoint)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, endpoint));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -8149,16 +8003,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kUTCTime)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kUTCTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, UTCTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kGranularity)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGranularity)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, granularity));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTimeSource)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTimeSource)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, timeSource));
         }
@@ -8189,8 +8043,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kTrustedTimeSource)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kTrustedTimeSource)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, trustedTimeSource));
         }
@@ -8221,8 +8075,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kTimeZone)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kTimeZone)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, timeZone));
         }
@@ -8253,8 +8107,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kDSTOffsetRequired)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kDSTOffsetRequired)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, DSTOffsetRequired));
         }
@@ -8285,8 +8139,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kDSTOffset)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kDSTOffset)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, DSTOffset));
         }
@@ -8317,8 +8171,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kDefaultNTP)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kDefaultNTP)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, defaultNTP));
         }
@@ -8421,7 +8275,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -8447,8 +8301,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kDSTOffsetActive)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kDSTOffsetActive)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, DSTOffsetActive));
         }
@@ -8480,12 +8334,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kOffset)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kOffset)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, offset));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kName)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kName)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, name));
         }
@@ -8515,7 +8369,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -8540,7 +8394,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -8566,33 +8420,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kFinish)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kFinish):
             ReturnErrorOnFailure(DataModel::Decode(reader, finish));
-            break;
-        case to_underlying(Fields::kPrimaryColor):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPrimaryColor)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, primaryColor));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -8699,8 +8547,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kSoftwareVersion)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kSoftwareVersion)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
         }
@@ -8730,7 +8578,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -8755,7 +8603,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -8781,8 +8629,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kReachableNewValue)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kReachableNewValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, reachableNewValue));
         }
@@ -8861,8 +8709,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNewPosition)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNewPosition)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, newPosition));
         }
@@ -8893,8 +8741,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNewPosition)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNewPosition)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, newPosition));
         }
@@ -8925,8 +8773,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNewPosition)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNewPosition)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, newPosition));
         }
@@ -8957,8 +8805,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kPreviousPosition)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kPreviousPosition)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, previousPosition));
         }
@@ -8989,8 +8837,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kPreviousPosition)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kPreviousPosition)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, previousPosition));
         }
@@ -9023,12 +8871,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNewPosition)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNewPosition)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, newPosition));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kCurrentNumberOfPressesCounted)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kCurrentNumberOfPressesCounted)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, currentNumberOfPressesCounted));
         }
@@ -9061,12 +8909,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kPreviousPosition)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kPreviousPosition)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, previousPosition));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTotalNumberOfPressesCounted)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTotalNumberOfPressesCounted)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, totalNumberOfPressesCounted));
         }
@@ -9107,24 +8955,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCommissioningTimeout)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCommissioningTimeout)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, commissioningTimeout));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kPAKEPasscodeVerifier)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPAKEPasscodeVerifier)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, PAKEPasscodeVerifier));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDiscriminator)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDiscriminator)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, discriminator));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kIterations)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kIterations)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, iterations));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSalt)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSalt)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, salt));
         }
@@ -9155,8 +9003,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCommissioningTimeout)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCommissioningTimeout)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, commissioningTimeout));
         }
@@ -9186,7 +9034,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -9271,45 +9119,43 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kRootPublicKey)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kRootPublicKey):
             ReturnErrorOnFailure(DataModel::Decode(reader, rootPublicKey));
-            break;
-        case to_underlying(Fields::kVendorID):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kVendorID)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, vendorID));
-            break;
-        case to_underlying(Fields::kFabricID):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricID)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricID));
-            break;
-        case to_underlying(Fields::kNodeID):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNodeID)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, nodeID));
-            break;
-        case to_underlying(Fields::kLabel):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLabel)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, label));
-            break;
-        case to_underlying(Fields::kFabricIndex):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -9348,36 +9194,31 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNoc)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kNoc):
             ReturnErrorOnFailure(DataModel::Decode(reader, noc));
-            break;
-        case to_underlying(Fields::kIcac):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kIcac)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, icac));
-            break;
-        case to_underlying(Fields::kFabricIndex):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -9403,8 +9244,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kAttestationNonce)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kAttestationNonce)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, attestationNonce));
         }
@@ -9436,12 +9277,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kAttestationElements)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kAttestationElements)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, attestationElements));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kAttestationSignature)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kAttestationSignature)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, attestationSignature));
         }
@@ -9472,8 +9313,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCertificateType)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCertificateType)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, certificateType));
         }
@@ -9504,8 +9345,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCertificate)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCertificate)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, certificate));
         }
@@ -9537,12 +9378,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCSRNonce)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCSRNonce)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, CSRNonce));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kIsForUpdateNOC)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kIsForUpdateNOC)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, isForUpdateNOC));
         }
@@ -9574,12 +9415,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNOCSRElements)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNOCSRElements)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, NOCSRElements));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kAttestationSignature)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kAttestationSignature)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, attestationSignature));
         }
@@ -9614,24 +9455,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNOCValue)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNOCValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, NOCValue));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kICACValue)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kICACValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, ICACValue));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kIPKValue)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kIPKValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, IPKValue));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kCaseAdminSubject)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kCaseAdminSubject)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, caseAdminSubject));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kAdminVendorId)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kAdminVendorId)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, adminVendorId));
         }
@@ -9663,12 +9504,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNOCValue)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNOCValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, NOCValue));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kICACValue)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kICACValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, ICACValue));
         }
@@ -9701,16 +9542,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatusCode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatusCode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, statusCode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDebugText)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDebugText)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, debugText));
         }
@@ -9741,8 +9582,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kLabel)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kLabel)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, label));
         }
@@ -9773,8 +9614,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
         }
@@ -9805,8 +9646,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kRootCACertificate)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kRootCACertificate)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, rootCACertificate));
         }
@@ -9903,39 +9744,35 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupId)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kGroupId):
             ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
-            break;
-        case to_underlying(Fields::kEndpoints):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEndpoints)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, endpoints));
-            break;
-        case to_underlying(Fields::kGroupName):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupName)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupName));
-            break;
-        case to_underlying(Fields::kFabricIndex):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -9967,36 +9804,31 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupId)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kGroupId):
             ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
-            break;
-        case to_underlying(Fields::kGroupKeySetID):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupKeySetID)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySetID));
-            break;
-        case to_underlying(Fields::kFabricIndex):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -10020,51 +9852,51 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupKeySetID)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kGroupKeySetID):
             ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySetID));
-            break;
-        case to_underlying(Fields::kGroupKeySecurityPolicy):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupKeySecurityPolicy)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySecurityPolicy));
-            break;
-        case to_underlying(Fields::kEpochKey0):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEpochKey0)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, epochKey0));
-            break;
-        case to_underlying(Fields::kEpochStartTime0):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEpochStartTime0)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, epochStartTime0));
-            break;
-        case to_underlying(Fields::kEpochKey1):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEpochKey1)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, epochKey1));
-            break;
-        case to_underlying(Fields::kEpochStartTime1):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEpochStartTime1)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, epochStartTime1));
-            break;
-        case to_underlying(Fields::kEpochKey2):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEpochKey2)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, epochKey2));
-            break;
-        case to_underlying(Fields::kEpochStartTime2):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEpochStartTime2)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, epochStartTime2));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -10090,8 +9922,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kGroupKeySet)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupKeySet)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySet));
         }
@@ -10122,8 +9954,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kGroupKeySetID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupKeySetID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySetID));
         }
@@ -10154,8 +9986,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kGroupKeySet)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupKeySet)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySet));
         }
@@ -10186,8 +10018,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kGroupKeySetID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupKeySetID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySetID));
         }
@@ -10217,7 +10049,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -10243,8 +10075,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kGroupKeySetIDs)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kGroupKeySetIDs)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySetIDs));
         }
@@ -10560,8 +10392,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStateValue)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStateValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, stateValue));
         }
@@ -10617,39 +10449,35 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCheckInNodeID)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kCheckInNodeID):
             ReturnErrorOnFailure(DataModel::Decode(reader, checkInNodeID));
-            break;
-        case to_underlying(Fields::kMonitoredSubject):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kMonitoredSubject)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, monitoredSubject));
-            break;
-        case to_underlying(Fields::kKey):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kKey)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, key));
-            break;
-        case to_underlying(Fields::kFabricIndex):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -10678,20 +10506,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCheckInNodeID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCheckInNodeID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, checkInNodeID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kMonitoredSubject)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kMonitoredSubject)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, monitoredSubject));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kKey)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kKey)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, key));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kVerificationKey)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kVerificationKey)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, verificationKey));
         }
@@ -10722,8 +10550,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kICDCounter)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kICDCounter)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, ICDCounter));
         }
@@ -10755,12 +10583,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCheckInNodeID)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCheckInNodeID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, checkInNodeID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kVerificationKey)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kVerificationKey)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, verificationKey));
         }
@@ -10790,7 +10618,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -10867,33 +10695,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kMfgCode)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kMfgCode):
             ReturnErrorOnFailure(DataModel::Decode(reader, mfgCode));
-            break;
-        case to_underlying(Fields::kValue):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kValue)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, value));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -10912,36 +10734,31 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kLabel)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kLabel):
             ReturnErrorOnFailure(DataModel::Decode(reader, label));
-            break;
-        case to_underlying(Fields::kMode):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kMode)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, mode));
-            break;
-        case to_underlying(Fields::kSemanticTags):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSemanticTags)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, semanticTags));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -10967,8 +10784,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNewMode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNewMode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, newMode));
         }
@@ -11057,8 +10874,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNewMode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNewMode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, newMode));
         }
@@ -11090,12 +10907,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStatusText)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStatusText)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, statusText));
         }
@@ -11178,8 +10995,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNewMode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNewMode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, newMode));
         }
@@ -11211,12 +11028,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStatusText)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStatusText)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, statusText));
         }
@@ -11349,8 +11166,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNewMode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNewMode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, newMode));
         }
@@ -11382,12 +11199,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStatusText)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStatusText)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, statusText));
         }
@@ -11470,8 +11287,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNewMode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNewMode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, newMode));
         }
@@ -11503,12 +11320,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStatusText)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStatusText)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, statusText));
         }
@@ -11591,12 +11408,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kTargetTemperature)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kTargetTemperature)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, targetTemperature));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTargetTemperatureLevel)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTargetTemperatureLevel)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, targetTemperatureLevel));
         }
@@ -11729,20 +11546,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kActive)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kActive)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, active));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kInactive)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kInactive)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, inactive));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kState)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kState)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, state));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, mask));
         }
@@ -11780,8 +11597,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNewMode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNewMode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, newMode));
         }
@@ -11813,12 +11630,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStatusText)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStatusText)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, statusText));
         }
@@ -11940,7 +11757,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -12039,8 +11856,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kAlarmSeverityLevel)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kAlarmSeverityLevel)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, alarmSeverityLevel));
         }
@@ -12071,8 +11888,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kAlarmSeverityLevel)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kAlarmSeverityLevel)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, alarmSeverityLevel));
         }
@@ -12103,8 +11920,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kAlarmSeverityLevel)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kAlarmSeverityLevel)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, alarmSeverityLevel));
         }
@@ -12134,7 +11951,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -12159,7 +11976,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -12184,7 +12001,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -12209,7 +12026,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -12234,7 +12051,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -12260,8 +12077,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kAlarmSeverityLevel)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kAlarmSeverityLevel)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, alarmSeverityLevel));
         }
@@ -12292,8 +12109,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kAlarmSeverityLevel)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kAlarmSeverityLevel)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, alarmSeverityLevel));
         }
@@ -12323,7 +12140,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -12355,8 +12172,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kAlarms)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kAlarms)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, alarms));
         }
@@ -12387,8 +12204,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kMask)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, mask));
         }
@@ -12468,20 +12285,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kActive)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kActive)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, active));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kInactive)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kInactive)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, inactive));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kState)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kState)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, state));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, mask));
         }
@@ -12518,7 +12335,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -12543,7 +12360,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -12568,7 +12385,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -12593,7 +12410,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -12619,8 +12436,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCommandResponseState)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCommandResponseState)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, commandResponseState));
         }
@@ -12703,8 +12520,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kErrorState)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kErrorState)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, errorState));
         }
@@ -12737,16 +12554,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCompletionErrorCode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCompletionErrorCode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, completionErrorCode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTotalOperationalTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTotalOperationalTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, totalOperationalTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kPausedTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPausedTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, pausedTime));
         }
@@ -12783,7 +12600,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -12808,7 +12625,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -12833,7 +12650,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -12858,7 +12675,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -12884,8 +12701,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCommandResponseState)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCommandResponseState)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, commandResponseState));
         }
@@ -12968,8 +12785,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kErrorState)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kErrorState)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, errorState));
         }
@@ -13002,16 +12819,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCompletionErrorCode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCompletionErrorCode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, completionErrorCode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTotalOperationalTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTotalOperationalTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, totalOperationalTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kPausedTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPausedTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, pausedTime));
         }
@@ -13042,33 +12859,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kProductIdentifierType)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kProductIdentifierType):
             ReturnErrorOnFailure(DataModel::Decode(reader, productIdentifierType));
-            break;
-        case to_underlying(Fields::kProductIdentifierValue):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kProductIdentifierValue)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, productIdentifierValue));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -13093,7 +12904,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -13170,33 +12981,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kProductIdentifierType)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kProductIdentifierType):
             ReturnErrorOnFailure(DataModel::Decode(reader, productIdentifierType));
-            break;
-        case to_underlying(Fields::kProductIdentifierValue):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kProductIdentifierValue)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, productIdentifierValue));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -13221,7 +13026,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -13298,33 +13103,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCredentialType)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kCredentialType):
             ReturnErrorOnFailure(DataModel::Decode(reader, credentialType));
-            break;
-        case to_underlying(Fields::kCredentialIndex):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kCredentialIndex)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, credentialIndex));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -13350,8 +13149,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kPINCode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kPINCode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, PINCode));
         }
@@ -13382,8 +13181,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kPINCode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kPINCode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, PINCode));
         }
@@ -13415,12 +13214,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kTimeout)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kTimeout)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, timeout));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kPINCode)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPINCode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, PINCode));
         }
@@ -13457,32 +13256,32 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kWeekDayIndex)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kWeekDayIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, weekDayIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDaysMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDaysMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, daysMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStartHour)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStartHour)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, startHour));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStartMinute)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStartMinute)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, startMinute));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kEndHour)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEndHour)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, endHour));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kEndMinute)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEndMinute)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, endMinute));
         }
@@ -13514,12 +13313,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kWeekDayIndex)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kWeekDayIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, weekDayIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
         }
@@ -13557,36 +13356,36 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kWeekDayIndex)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kWeekDayIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, weekDayIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDaysMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDaysMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, daysMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStartHour)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStartHour)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, startHour));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStartMinute)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStartMinute)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, startMinute));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kEndHour)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEndHour)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, endHour));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kEndMinute)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEndMinute)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, endMinute));
         }
@@ -13618,12 +13417,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kWeekDayIndex)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kWeekDayIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, weekDayIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
         }
@@ -13657,20 +13456,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kYearDayIndex)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kYearDayIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, yearDayIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kLocalStartTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLocalStartTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, localStartTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kLocalEndTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLocalEndTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, localEndTime));
         }
@@ -13702,12 +13501,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kYearDayIndex)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kYearDayIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, yearDayIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
         }
@@ -13742,24 +13541,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kYearDayIndex)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kYearDayIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, yearDayIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kLocalStartTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLocalStartTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, localStartTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kLocalEndTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLocalEndTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, localEndTime));
         }
@@ -13791,12 +13590,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kYearDayIndex)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kYearDayIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, yearDayIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
         }
@@ -13830,20 +13629,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kHolidayIndex)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kHolidayIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, holidayIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kLocalStartTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLocalStartTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, localStartTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kLocalEndTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLocalEndTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, localEndTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOperatingMode)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOperatingMode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, operatingMode));
         }
@@ -13874,8 +13673,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kHolidayIndex)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kHolidayIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, holidayIndex));
         }
@@ -13910,24 +13709,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kHolidayIndex)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kHolidayIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, holidayIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kLocalStartTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLocalStartTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, localStartTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kLocalEndTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLocalEndTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, localEndTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOperatingMode)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOperatingMode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, operatingMode));
         }
@@ -13958,8 +13757,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kHolidayIndex)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kHolidayIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, holidayIndex));
         }
@@ -13996,32 +13795,32 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kOperationType)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kOperationType)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, operationType));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserName)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserName)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userName));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserUniqueID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserUniqueID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userUniqueID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserStatus)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userStatus));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserType)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserType)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userType));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kCredentialRule)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kCredentialRule)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, credentialRule));
         }
@@ -14052,8 +13851,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
         }
@@ -14093,44 +13892,44 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserName)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserName)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userName));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserUniqueID)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserUniqueID)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userUniqueID));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserStatus)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userStatus));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserType)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserType)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userType));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kCredentialRule)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kCredentialRule)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, credentialRule));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kCredentials)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kCredentials)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, credentials));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kCreatorFabricIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kCreatorFabricIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, creatorFabricIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kLastModifiedFabricIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLastModifiedFabricIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, lastModifiedFabricIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNextUserIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNextUserIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nextUserIndex));
         }
@@ -14161,8 +13960,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
         }
@@ -14198,28 +13997,28 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kOperationType)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kOperationType)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, operationType));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kCredential)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kCredential)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, credential));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kCredentialData)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kCredentialData)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, credentialData));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserStatus)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userStatus));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserType)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserType)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userType));
         }
@@ -14252,16 +14051,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNextCredentialIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNextCredentialIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nextCredentialIndex));
         }
@@ -14292,8 +14091,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCredential)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCredential)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, credential));
         }
@@ -14328,24 +14127,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCredentialExists)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCredentialExists)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, credentialExists));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kCreatorFabricIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kCreatorFabricIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, creatorFabricIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kLastModifiedFabricIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLastModifiedFabricIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, lastModifiedFabricIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNextCredentialIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNextCredentialIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nextCredentialIndex));
         }
@@ -14376,8 +14175,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCredential)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCredential)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, credential));
         }
@@ -14408,8 +14207,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kPINCode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kPINCode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, PINCode));
         }
@@ -14582,8 +14381,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kAlarmCode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kAlarmCode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, alarmCode));
         }
@@ -14614,8 +14413,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kDoorState)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kDoorState)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, doorState));
         }
@@ -14651,28 +14450,28 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kLockOperationType)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kLockOperationType)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, lockOperationType));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOperationSource)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOperationSource)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, operationSource));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSourceNode)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSourceNode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sourceNode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kCredentials)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kCredentials)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, credentials));
         }
@@ -14709,32 +14508,32 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kLockOperationType)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kLockOperationType)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, lockOperationType));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOperationSource)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOperationSource)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, operationSource));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOperationError)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOperationError)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, operationError));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSourceNode)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSourceNode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sourceNode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kCredentials)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kCredentials)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, credentials));
         }
@@ -14771,32 +14570,32 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kLockDataType)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kLockDataType)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, lockDataType));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDataOperationType)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDataOperationType)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, dataOperationType));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOperationSource)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOperationSource)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, operationSource));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kUserIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, userIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSourceNode)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSourceNode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, sourceNode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDataIndex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDataIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, dataIndex));
         }
@@ -14832,7 +14631,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -14857,7 +14656,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -14882,7 +14681,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -14908,8 +14707,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kLiftValue)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kLiftValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, liftValue));
         }
@@ -14940,8 +14739,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kLiftPercent100thsValue)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kLiftPercent100thsValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, liftPercent100thsValue));
         }
@@ -14972,8 +14771,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kTiltValue)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kTiltValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, tiltValue));
         }
@@ -15004,8 +14803,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kTiltPercent100thsValue)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kTiltPercent100thsValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, tiltPercent100thsValue));
         }
@@ -15141,8 +14940,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kPercentOpen)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kPercentOpen)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, percentOpen));
         }
@@ -15172,7 +14971,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -15368,7 +15167,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -15393,7 +15192,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -15418,7 +15217,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -15443,7 +15242,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -15468,7 +15267,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -15493,7 +15292,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -15518,7 +15317,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -15543,7 +15342,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -15568,7 +15367,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -15593,7 +15392,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -15618,7 +15417,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -15643,7 +15442,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -15668,7 +15467,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -15693,7 +15492,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -15718,7 +15517,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -15743,7 +15542,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -15768,7 +15567,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -15795,36 +15594,31 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kTransitionTime):
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
-            break;
-        case to_underlying(Fields::kHeatSetpoint):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kHeatSetpoint)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, heatSetpoint));
-            break;
-        case to_underlying(Fields::kCoolSetpoint):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kCoolSetpoint)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, coolSetpoint));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -15851,12 +15645,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kMode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kMode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, mode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kAmount)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kAmount)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, amount));
         }
@@ -15891,20 +15685,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNumberOfTransitionsForSequence)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNumberOfTransitionsForSequence)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, numberOfTransitionsForSequence));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDayOfWeekForSequence)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDayOfWeekForSequence)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, dayOfWeekForSequence));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kModeForSequence)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kModeForSequence)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, modeForSequence));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitions)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitions)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitions));
         }
@@ -15939,20 +15733,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNumberOfTransitionsForSequence)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNumberOfTransitionsForSequence)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, numberOfTransitionsForSequence));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDayOfWeekForSequence)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDayOfWeekForSequence)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, dayOfWeekForSequence));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kModeForSequence)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kModeForSequence)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, modeForSequence));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitions)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitions)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitions));
         }
@@ -15984,12 +15778,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kDaysToReturn)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kDaysToReturn)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, daysToReturn));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kModeToReturn)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kModeToReturn)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, modeToReturn));
         }
@@ -16019,7 +15813,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -16233,16 +16027,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kDirection)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kDirection)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, direction));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kWrap)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kWrap)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, wrap));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kLowestOff)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLowestOff)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, lowestOff));
         }
@@ -16399,24 +16193,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kHue)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kHue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, hue));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDirection)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDirection)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, direction));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -16450,20 +16244,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kMoveMode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kMoveMode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, moveMode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kRate)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kRate)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, rate));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -16498,24 +16292,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStepMode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStepMode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, stepMode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStepSize)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStepSize)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, stepSize));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -16549,20 +16343,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kSaturation)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kSaturation)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, saturation));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -16596,20 +16390,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kMoveMode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kMoveMode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, moveMode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kRate)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kRate)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, rate));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -16644,24 +16438,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStepMode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStepMode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, stepMode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStepSize)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStepSize)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, stepSize));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -16696,24 +16490,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kHue)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kHue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, hue));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSaturation)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSaturation)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, saturation));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -16748,24 +16542,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kColorX)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kColorX)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, colorX));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kColorY)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kColorY)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, colorY));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -16799,20 +16593,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kRateX)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kRateX)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, rateX));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kRateY)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kRateY)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, rateY));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -16847,24 +16641,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStepX)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStepX)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, stepX));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStepY)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStepY)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, stepY));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -16898,20 +16692,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kColorTemperatureMireds)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kColorTemperatureMireds)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperatureMireds));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -16946,24 +16740,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kEnhancedHue)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kEnhancedHue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, enhancedHue));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDirection)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDirection)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, direction));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -16997,20 +16791,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kMoveMode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kMoveMode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, moveMode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kRate)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kRate)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, rate));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -17045,24 +16839,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStepMode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStepMode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, stepMode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStepSize)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStepSize)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, stepSize));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -17097,24 +16891,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kEnhancedHue)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kEnhancedHue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, enhancedHue));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSaturation)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSaturation)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, saturation));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -17151,32 +16945,32 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kUpdateFlags)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kUpdateFlags)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, updateFlags));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kAction)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kAction)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, action));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDirection)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDirection)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, direction));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, time));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStartHue)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStartHue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, startHue));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -17208,12 +17002,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -17251,28 +17045,28 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kMoveMode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kMoveMode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, moveMode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kRate)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kRate)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, rate));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kColorTemperatureMinimumMireds)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kColorTemperatureMinimumMireds)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperatureMinimumMireds));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kColorTemperatureMaximumMireds)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kColorTemperatureMaximumMireds)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperatureMaximumMireds));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -17311,32 +17105,32 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStepMode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStepMode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, stepMode));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStepSize)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStepSize)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, stepSize));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTransitionTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, transitionTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kColorTemperatureMinimumMireds)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kColorTemperatureMinimumMireds)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperatureMinimumMireds));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kColorTemperatureMaximumMireds)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kColorTemperatureMaximumMireds)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, colorTemperatureMaximumMireds));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsMask)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsMask));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionsOverride)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionsOverride));
         }
@@ -18732,42 +18526,39 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kMajorNumber)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kMajorNumber):
             ReturnErrorOnFailure(DataModel::Decode(reader, majorNumber));
-            break;
-        case to_underlying(Fields::kMinorNumber):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kMinorNumber)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, minorNumber));
-            break;
-        case to_underlying(Fields::kName):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kName)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, name));
-            break;
-        case to_underlying(Fields::kCallSign):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kCallSign)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, callSign));
-            break;
-        case to_underlying(Fields::kAffiliateCallSign):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kAffiliateCallSign)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, affiliateCallSign));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -18787,39 +18578,35 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kOperatorName)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kOperatorName):
             ReturnErrorOnFailure(DataModel::Decode(reader, operatorName));
-            break;
-        case to_underlying(Fields::kLineupName):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLineupName)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, lineupName));
-            break;
-        case to_underlying(Fields::kPostalCode):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPostalCode)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, postalCode));
-            break;
-        case to_underlying(Fields::kLineupInfoType):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLineupInfoType)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, lineupInfoType));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -18845,8 +18632,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kMatch)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kMatch)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, match));
         }
@@ -18878,12 +18665,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kData)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kData)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, data));
         }
@@ -18915,12 +18702,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kMajorNumber)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kMajorNumber)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, majorNumber));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kMinorNumber)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kMinorNumber)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, minorNumber));
         }
@@ -18951,8 +18738,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kCount)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kCount)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, count));
         }
@@ -19025,33 +18812,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kIdentifier)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kIdentifier):
             ReturnErrorOnFailure(DataModel::Decode(reader, identifier));
-            break;
-        case to_underlying(Fields::kName):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kName)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, name));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -19078,12 +18859,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kTarget)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kTarget)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, target));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kData)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kData)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, data));
         }
@@ -19115,12 +18896,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kData)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kData)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, data));
         }
@@ -19190,33 +18971,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kUpdatedAt)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kUpdatedAt):
             ReturnErrorOnFailure(DataModel::Decode(reader, updatedAt));
-            break;
-        case to_underlying(Fields::kPosition):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPosition)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, position));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -19241,7 +19016,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -19266,7 +19041,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -19291,7 +19066,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -19316,7 +19091,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -19341,7 +19116,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -19366,7 +19141,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -19391,7 +19166,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -19416,7 +19191,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -19443,8 +19218,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kDeltaPositionMilliseconds)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kDeltaPositionMilliseconds)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, deltaPositionMilliseconds));
         }
@@ -19476,8 +19251,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kDeltaPositionMilliseconds)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kDeltaPositionMilliseconds)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, deltaPositionMilliseconds));
         }
@@ -19509,12 +19284,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kData)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kData)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, data));
         }
@@ -19545,8 +19320,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kPosition)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kPosition)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, position));
         }
@@ -19633,39 +19408,35 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kIndex)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kIndex):
             ReturnErrorOnFailure(DataModel::Decode(reader, index));
-            break;
-        case to_underlying(Fields::kInputType):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kInputType)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, inputType));
-            break;
-        case to_underlying(Fields::kName):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kName)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, name));
-            break;
-        case to_underlying(Fields::kDescription):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDescription)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, description));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -19691,8 +19462,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kIndex)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, index));
         }
@@ -19722,7 +19493,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -19747,7 +19518,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -19774,12 +19545,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kIndex)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, index));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kName)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kName)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, name));
         }
@@ -19854,7 +19625,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -19919,8 +19690,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kKeyCode)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kKeyCode)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, keyCode));
         }
@@ -19951,8 +19722,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
@@ -20017,36 +19788,31 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kWidth)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kWidth):
             ReturnErrorOnFailure(DataModel::Decode(reader, width));
-            break;
-        case to_underlying(Fields::kHeight):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kHeight)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, height));
-            break;
-        case to_underlying(Fields::kMetric):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kMetric)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, metric));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -20064,33 +19830,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kName)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kName):
             ReturnErrorOnFailure(DataModel::Decode(reader, name));
-            break;
-        case to_underlying(Fields::kValue):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kValue)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, value));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -20109,36 +19869,31 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kType)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kType):
             ReturnErrorOnFailure(DataModel::Decode(reader, type));
-            break;
-        case to_underlying(Fields::kValue):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kValue)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, value));
-            break;
-        case to_underlying(Fields::kExternalIDList):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kExternalIDList)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, externalIDList));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -20155,30 +19910,23 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kParameterList)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kParameterList):
             ReturnErrorOnFailure(DataModel::Decode(reader, parameterList));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -20197,36 +19945,31 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kImageURL)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kImageURL):
             ReturnErrorOnFailure(DataModel::Decode(reader, imageURL));
-            break;
-        case to_underlying(Fields::kColor):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kColor)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, color));
-            break;
-        case to_underlying(Fields::kSize):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSize)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, size));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -20248,45 +19991,43 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kProviderName)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kProviderName):
             ReturnErrorOnFailure(DataModel::Decode(reader, providerName));
-            break;
-        case to_underlying(Fields::kBackground):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kBackground)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, background));
-            break;
-        case to_underlying(Fields::kLogo):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kLogo)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, logo));
-            break;
-        case to_underlying(Fields::kProgressBar):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kProgressBar)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, progressBar));
-            break;
-        case to_underlying(Fields::kSplash):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSplash)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, splash));
-            break;
-        case to_underlying(Fields::kWaterMark):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kWaterMark)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, waterMark));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -20314,16 +20055,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kSearch)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kSearch)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, search));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kAutoPlay)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kAutoPlay)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, autoPlay));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kData)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kData)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, data));
         }
@@ -20356,16 +20097,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kContentURL)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kContentURL)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, contentURL));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kDisplayString)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kDisplayString)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, displayString));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kBrandingInformation)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kBrandingInformation)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, brandingInformation));
         }
@@ -20397,12 +20138,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kData)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kData)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, data));
         }
@@ -20473,36 +20214,31 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kIndex)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kIndex):
             ReturnErrorOnFailure(DataModel::Decode(reader, index));
-            break;
-        case to_underlying(Fields::kOutputType):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOutputType)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, outputType));
-            break;
-        case to_underlying(Fields::kName):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kName)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, name));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -20528,8 +20264,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kIndex)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, index));
         }
@@ -20561,12 +20297,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kIndex)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, index));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kName)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kName)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, name));
         }
@@ -20636,33 +20372,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kApplication)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kApplication):
             ReturnErrorOnFailure(DataModel::Decode(reader, application));
-            break;
-        case to_underlying(Fields::kEndpoint):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kEndpoint)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, endpoint));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -20689,12 +20419,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kApplication)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kApplication)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, application));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kData)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kData)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, data));
         }
@@ -20725,8 +20455,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kApplication)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kApplication)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, application));
         }
@@ -20757,8 +20487,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kApplication)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kApplication)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, application));
         }
@@ -20790,12 +20520,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kData)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kData)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, data));
         }
@@ -20934,8 +20664,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kTempAccountIdentifier)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kTempAccountIdentifier)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, tempAccountIdentifier));
         }
@@ -20966,8 +20696,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kSetupPIN)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kSetupPIN)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, setupPIN));
         }
@@ -20999,12 +20729,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kTempAccountIdentifier)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kTempAccountIdentifier)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, tempAccountIdentifier));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kSetupPIN)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kSetupPIN)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, setupPIN));
         }
@@ -21034,7 +20764,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -21102,20 +20832,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kProfileCount)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kProfileCount)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, profileCount));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kProfileIntervalPeriod)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kProfileIntervalPeriod)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, profileIntervalPeriod));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kMaxNumberOfIntervals)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kMaxNumberOfIntervals)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, maxNumberOfIntervals));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kListOfAttributes)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kListOfAttributes)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, listOfAttributes));
         }
@@ -21145,7 +20875,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -21177,28 +20907,28 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kStartTime)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kStartTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, startTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStatus)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, status));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kProfileIntervalPeriod)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kProfileIntervalPeriod)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, profileIntervalPeriod));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNumberOfIntervalsDelivered)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNumberOfIntervalsDelivered)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, numberOfIntervalsDelivered));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kAttributeId)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kAttributeId)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, attributeId));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kIntervals)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kIntervals)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, intervals));
         }
@@ -21231,16 +20961,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kAttributeId)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kAttributeId)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, attributeId));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kStartTime)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kStartTime)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, startTime));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNumberOfIntervals)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNumberOfIntervals)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, numberOfIntervals));
         }
@@ -21694,51 +21424,51 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kA)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kA):
             ReturnErrorOnFailure(DataModel::Decode(reader, a));
-            break;
-        case to_underlying(Fields::kB):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kB)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, b));
-            break;
-        case to_underlying(Fields::kC):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kC)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, c));
-            break;
-        case to_underlying(Fields::kD):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kD)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, d));
-            break;
-        case to_underlying(Fields::kE):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kE)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, e));
-            break;
-        case to_underlying(Fields::kF):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kF)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, f));
-            break;
-        case to_underlying(Fields::kG):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kG)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, g));
-            break;
-        case to_underlying(Fields::kH):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kH)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, h));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -21802,51 +21532,51 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricSensitiveInt8u)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kFabricSensitiveInt8u):
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricSensitiveInt8u));
-            break;
-        case to_underlying(Fields::kOptionalFabricSensitiveInt8u):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionalFabricSensitiveInt8u)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionalFabricSensitiveInt8u));
-            break;
-        case to_underlying(Fields::kNullableFabricSensitiveInt8u):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableFabricSensitiveInt8u)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableFabricSensitiveInt8u));
-            break;
-        case to_underlying(Fields::kNullableOptionalFabricSensitiveInt8u):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalFabricSensitiveInt8u)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalFabricSensitiveInt8u));
-            break;
-        case to_underlying(Fields::kFabricSensitiveCharString):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricSensitiveCharString)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricSensitiveCharString));
-            break;
-        case to_underlying(Fields::kFabricSensitiveStruct):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricSensitiveStruct)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricSensitiveStruct));
-            break;
-        case to_underlying(Fields::kFabricSensitiveInt8uList):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricSensitiveInt8uList)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricSensitiveInt8uList));
-            break;
-        case to_underlying(Fields::kFabricIndex):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -21874,63 +21604,67 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableInt)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kNullableInt):
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableInt));
-            break;
-        case to_underlying(Fields::kOptionalInt):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionalInt)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionalInt));
-            break;
-        case to_underlying(Fields::kNullableOptionalInt):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalInt)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalInt));
-            break;
-        case to_underlying(Fields::kNullableString):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableString)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableString));
-            break;
-        case to_underlying(Fields::kOptionalString):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionalString)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionalString));
-            break;
-        case to_underlying(Fields::kNullableOptionalString):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalString)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalString));
-            break;
-        case to_underlying(Fields::kNullableStruct):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableStruct)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableStruct));
-            break;
-        case to_underlying(Fields::kOptionalStruct):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionalStruct)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionalStruct));
-            break;
-        case to_underlying(Fields::kNullableOptionalStruct):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalStruct)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStruct));
-            break;
-        case to_underlying(Fields::kNullableList):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableList)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableList));
-            break;
-        case to_underlying(Fields::kOptionalList):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionalList)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionalList));
-            break;
-        case to_underlying(Fields::kNullableOptionalList):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalList)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalList));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -21949,36 +21683,31 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kA)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kA):
             ReturnErrorOnFailure(DataModel::Decode(reader, a));
-            break;
-        case to_underlying(Fields::kB):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kB)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, b));
-            break;
-        case to_underlying(Fields::kC):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kC)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, c));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -22001,48 +21730,47 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kA)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kA):
             ReturnErrorOnFailure(DataModel::Decode(reader, a));
-            break;
-        case to_underlying(Fields::kB):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kB)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, b));
-            break;
-        case to_underlying(Fields::kC):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kC)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, c));
-            break;
-        case to_underlying(Fields::kD):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kD)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, d));
-            break;
-        case to_underlying(Fields::kE):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kE)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, e));
-            break;
-        case to_underlying(Fields::kF):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kF)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, f));
-            break;
-        case to_underlying(Fields::kG):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kG)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, g));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -22059,30 +21787,23 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kA)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kA):
             ReturnErrorOnFailure(DataModel::Decode(reader, a));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -22100,33 +21821,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    err = reader.EnterContainer(outer);
-    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kMember1)))
         {
-            continue;
-        }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kMember1):
             ReturnErrorOnFailure(DataModel::Decode(reader, member1));
-            break;
-        case to_underlying(Fields::kMember2):
+        }
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kMember2)))
+        {
             ReturnErrorOnFailure(DataModel::Decode(reader, member2));
-            break;
-        default:
-            break;
+        }
+        else
+        {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 
@@ -22151,7 +21866,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -22177,8 +21892,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kReturnValue)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kReturnValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, returnValue));
         }
@@ -22208,7 +21923,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -22234,8 +21949,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kReturnValue)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kReturnValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, returnValue));
         }
@@ -22265,7 +21980,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -22291,8 +22006,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kReturnValue)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kReturnValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, returnValue));
         }
@@ -22322,7 +22037,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -22353,28 +22068,28 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kArg2)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kArg2)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg2));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kArg3)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kArg3)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg3));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kArg4)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kArg4)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg4));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kArg5)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kArg5)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg5));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kArg6)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kArg6)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg6));
         }
@@ -22406,12 +22121,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kArg2)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kArg2)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg2));
         }
@@ -22442,8 +22157,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
         }
@@ -22474,8 +22189,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
         }
@@ -22507,12 +22222,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kArg2)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kArg2)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg2));
         }
@@ -22548,28 +22263,28 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kArg2)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kArg2)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg2));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kArg3)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kArg3)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg3));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kArg4)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kArg4)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg4));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kArg5)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kArg5)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg5));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kArg6)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kArg6)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg6));
         }
@@ -22603,20 +22318,20 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kWasPresent)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kWasPresent)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, wasPresent));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kWasNull)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kWasNull)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, wasNull));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kValue)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, value));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOriginalValue)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOriginalValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, originalValue));
         }
@@ -22647,8 +22362,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
         }
@@ -22717,116 +22432,116 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNullableIntWasNull)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableIntWasNull)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableIntWasNull));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableIntValue)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableIntValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableIntValue));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionalIntWasPresent)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionalIntWasPresent)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionalIntWasPresent));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionalIntValue)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionalIntValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionalIntValue));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalIntWasPresent)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalIntWasPresent)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalIntWasPresent));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalIntWasNull)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalIntWasNull)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalIntWasNull));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalIntValue)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalIntValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalIntValue));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableStringWasNull)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableStringWasNull)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableStringWasNull));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableStringValue)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableStringValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableStringValue));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionalStringWasPresent)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionalStringWasPresent)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionalStringWasPresent));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionalStringValue)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionalStringValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionalStringValue));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalStringWasPresent)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalStringWasPresent)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStringWasPresent));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalStringWasNull)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalStringWasNull)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStringWasNull));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalStringValue)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalStringValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStringValue));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableStructWasNull)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableStructWasNull)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableStructWasNull));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableStructValue)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableStructValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableStructValue));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionalStructWasPresent)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionalStructWasPresent)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionalStructWasPresent));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionalStructValue)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionalStructValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionalStructValue));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalStructWasPresent)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalStructWasPresent)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStructWasPresent));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalStructWasNull)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalStructWasNull)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStructWasNull));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalStructValue)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalStructValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStructValue));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableListWasNull)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableListWasNull)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableListWasNull));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableListValue)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableListValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableListValue));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionalListWasPresent)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionalListWasPresent)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionalListWasPresent));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionalListValue)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionalListValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionalListValue));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalListWasPresent)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalListWasPresent)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalListWasPresent));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalListWasNull)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalListWasNull)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalListWasNull));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalListValue)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalListValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalListValue));
         }
@@ -22857,8 +22572,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
         }
@@ -22889,8 +22604,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kValue)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, value));
         }
@@ -22921,8 +22636,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
         }
@@ -22953,8 +22668,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
         }
@@ -22985,8 +22700,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
         }
@@ -23017,8 +22732,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kValue)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, value));
         }
@@ -23049,8 +22764,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
         }
@@ -23081,8 +22796,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kValue)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, value));
         }
@@ -23113,8 +22828,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
         }
@@ -23145,8 +22860,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
         }
@@ -23178,12 +22893,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kArg2)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kArg2)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg2));
         }
@@ -23214,8 +22929,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
         }
@@ -23257,52 +22972,52 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kNullableInt)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableInt)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableInt));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionalInt)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionalInt)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionalInt));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalInt)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalInt)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalInt));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableString)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableString)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableString));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionalString)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionalString)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionalString));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalString)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalString)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalString));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableStruct)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableStruct)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableStruct));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionalStruct)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionalStruct)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionalStruct));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalStruct)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalStruct)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalStruct));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableList)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableList)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableList));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kOptionalList)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kOptionalList)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, optionalList));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalList)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNullableOptionalList)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, nullableOptionalList));
         }
@@ -23333,8 +23048,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
         }
@@ -23364,7 +23079,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -23390,8 +23105,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
         }
@@ -23424,16 +23139,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kArg2)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kArg2)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg2));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kArg3)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kArg3)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg3));
         }
@@ -23464,8 +23179,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
         }
@@ -23781,28 +23496,28 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kArg2)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kArg2)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg2));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kArg3)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kArg3)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg3));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kArg4)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kArg4)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg4));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kArg5)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kArg5)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg5));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kArg6)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kArg6)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg6));
         }
@@ -23833,8 +23548,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kFabricIndex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
         }
@@ -23875,24 +23590,24 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kType)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kType)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, type));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kId)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kId)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, id));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNumCallsToSkip)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNumCallsToSkip)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, numCallsToSkip));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kNumCallsToFail)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kNumCallsToFail)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, numCallsToFail));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kTakeMutex)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kTakeMutex)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, takeMutex));
         }
@@ -23925,16 +23640,16 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kType)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kType)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, type));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kId)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kId)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, id));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kPercentage)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kPercentage)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, percentage));
         }
@@ -24003,7 +23718,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
         {}
     }
 
@@ -24029,8 +23744,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kReturnValue)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kReturnValue)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, returnValue));
         }
@@ -24062,12 +23777,12 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
-        [[maybe_unused]] const TLV::Tag tag = reader.GetTag();
-        if (tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
+        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        if (__tag == TLV::ContextTag(to_underlying(Fields::kArg1)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg1));
         }
-        else if (tag == TLV::ContextTag(to_underlying(Fields::kArg2)))
+        else if (__tag == TLV::ContextTag(to_underlying(Fields::kArg2)))
         {
             ReturnErrorOnFailure(DataModel::Decode(reader, arg2));
         }
