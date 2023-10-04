@@ -49,7 +49,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRDiagnosticLogResult : NSObject
 
 /**
- * A boolean indicating that the request for diagnostic logs has timed out.
+ * A boolean indicating whether the request for diagnostic logs has timed out.
  */
 @property (readonly, nonatomic) BOOL requestTimedOut;
 
@@ -243,7 +243,7 @@ MTR_PROVISIONALLY_AVAILABLE
 - (void)getDiagnosticLogsOfTypes:(MTRDiagnosticLogType)type
                          timeout:(NSInteger * _Nullable)timeout
                            queue:(dispatch_queue_t)queue
-                      completion:(void (^)(NSError * _Nullable error, MTRDiagnosticLogResult * logResult))completion MTR_PROVISIONALLY_AVAILABLE;
+                      completion:(void (^)(NSError * _Nullable error, MTRDiagnosticLogResult * _Nullable logResult))completion MTR_PROVISIONALLY_AVAILABLE;
 
 @end
 
