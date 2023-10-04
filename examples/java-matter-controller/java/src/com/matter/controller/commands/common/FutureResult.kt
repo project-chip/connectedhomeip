@@ -18,6 +18,7 @@
 
 package com.matter.controller.commands.common
 
+import java.util.concurrent.TimeoutException
 import java.util.logging.Level
 import java.util.logging.Logger
 
@@ -27,8 +28,6 @@ import java.util.logging.Logger
  * duration elapsed without receiving the expected realResult, the runtime exception would be
  * raised.
  */
-class RealResultException(message: String) : RuntimeException(message)
-
 class FutureResult {
   private var realResult: RealResult? = null
   private var timeoutMs: Long = 0
@@ -42,7 +41,7 @@ class FutureResult {
   fun setRealResult(realResult: RealResult) {
     synchronized(lock) {
       if (this.realResult != null) {
-        throw RealResultException("Error, real result has been set!")
+        throw TimeoutException("Error, real result has been set!")
       }
       this.realResult = realResult
       lock.notifyAll()
@@ -55,16 +54,16 @@ class FutureResult {
       while (realResult == null) {
         try {
           if (System.currentTimeMillis() > start + timeoutMs) {
-            throw RealResultException("Timeout!")
+            throw TimeoutException("Timeout!")
           }
           lock.wait()
         } catch (e: InterruptedException) {
           logger.log(Level.INFO, "Wait Result failed with exception: " + e.message)
         }
       }
-      if (realResult?.getResult() == false) {
-        logger.log(Level.INFO, "Error: ${realResult?.getError()}")
-        throw RealResultException("Received failure test result")
+      if (realResult?.result == false) {
+        logger.log(Level.INFO, "Error: ${realResult?.error}")
+        throw TimeoutException("Received failure test result")
       }
     }
   }
