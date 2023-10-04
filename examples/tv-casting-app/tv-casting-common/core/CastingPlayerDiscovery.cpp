@@ -81,7 +81,7 @@ void DeviceDiscoveryDelegateImpl::OnDiscoveredDevice(const chip::Dnssd::Discover
     CastingPlayerAttributes attributes;
     strcpy(attributes.id, nodeData.resolutionData.hostName);
 
-    char port[kPortMaxLength] = {};
+    char port[kPortMaxLength + 1] = {};
     snprintf(port, sizeof(port), "%u", nodeData.resolutionData.port);
     strcat(attributes.id, port);
 

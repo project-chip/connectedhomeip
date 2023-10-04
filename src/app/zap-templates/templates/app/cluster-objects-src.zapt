@@ -7,6 +7,41 @@ namespace app {
 namespace Clusters {
 
 namespace detail {
+
+CHIP_ERROR FlightCheckDecodeAndEnterStruct(TLV::TLVReader & reader, TLV::TLVType & outer)
+{
+    TLV::TLVReader temp_reader;
+
+    // Make a copy of the struct reader to do pre-checks.
+    temp_reader.Init(reader);
+
+    // Ensure we have a single struct and that it's properly bounded.
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrReturnError(TLV::kTLVType_Structure == temp_reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(temp_reader.EnterContainer(outer));
+    while ((err = temp_reader.Next()) == CHIP_NO_ERROR)
+    {
+        if (!TLV::IsContextTag(temp_reader.GetTag()))
+        {
+            continue;
+        }
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(temp_reader.ExitContainer(outer));
+
+    // Guaranteed to work due to prior checks.
+    VerifyOrDie(reader.EnterContainer(outer) == CHIP_NO_ERROR);
+    return CHIP_NO_ERROR;
+}
+
+void ExitStructAfterDecode(TLV::TLVReader & reader, TLV::TLVType & outer)
+{
+    // Ensure we exit the container. Will be OK since FlightCheckDecodeAndEnterStruct will have
+    // already been called, and generated code properly iterates over entire container.
+    VerifyOrDie(reader.Next() == CHIP_END_OF_TLV);
+    VerifyOrDie(reader.ExitContainer(outer) == CHIP_NO_ERROR);
+}
+
 // Structs shared across multiple clusters.
 namespace Structs {
 {{#zcl_structs}}
@@ -45,10 +80,10 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const{
 }
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR) {
         if (!TLV::IsContextTag(reader.GetTag()))
         {
@@ -66,8 +101,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 } // namespace {{asUpperCamelCase name}}.
@@ -109,10 +143,10 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const{
 }
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
+    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR) {
         if (!TLV::IsContextTag(reader.GetTag()))
         {
@@ -130,8 +164,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
         }
     }
 
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
     return CHIP_NO_ERROR;
 }
 } // namespace {{asUpperCamelCase name}}.

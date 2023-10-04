@@ -33,8 +33,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) chip::EndpointId endpoint;
 
 - (instancetype)initWithEndpointID:(NSNumber *)endpointID queue:(dispatch_queue_t)queue;
-- (chip::ByteSpan)asByteSpan:(NSData *)value;
-- (chip::CharSpan)asCharSpan:(NSString *)value;
 @end
 
 @interface MTRReadParams ()

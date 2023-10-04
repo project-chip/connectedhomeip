@@ -10,7 +10,6 @@
 #include <lib/support/TypeTraits.h>
 
 {{#>MTRCallbackBridge partial-type="Status"                         }}DefaultSuccessCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge partial-type="CommandStatus"                  }}CommandSuccessCallback{{/MTRCallbackBridge}}
 {{#>MTRCallbackBridge type="Octet_String" isNullable=false ns="chip"}}OctetStringAttributeCallback{{/MTRCallbackBridge}}
 {{#>MTRCallbackBridge type="Octet_String" isNullable=true  ns="chip"}}NullableOctetStringAttributeCallback{{/MTRCallbackBridge}}
 {{#>MTRCallbackBridge type="Char_String"  isNullable=false ns="chip"}}CharStringAttributeCallback{{/MTRCallbackBridge}}
@@ -55,14 +54,6 @@
 {{/if}}
 {{/if}}
 {{/zcl_attributes_server}}
-{{/zcl_clusters}}
-
-{{#zcl_clusters}}
-{{#zcl_command_responses}}
-{{#if (isSupported (asUpperCamelCase ../name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
-{{#>MTRCallbackBridge partial-type="Command"                        }}{{asUpperCamelCase ../../name preserveAcronyms=true}}Cluster{{asUpperCamelCase ../name preserveAcronyms=true}}Callback{{/MTRCallbackBridge}}
-{{/if}}
-{{/zcl_command_responses}}
 {{/zcl_clusters}}
 
 {{#zcl_clusters}}

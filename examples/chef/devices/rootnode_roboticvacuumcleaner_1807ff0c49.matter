@@ -1040,6 +1040,8 @@ server cluster RvcRunMode = 84 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
+  attribute nullable int8u startUpMode = 2;
+  attribute nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1088,6 +1090,8 @@ server cluster RvcCleanMode = 85 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
+  attribute nullable int8u startUpMode = 2;
+  attribute nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1149,6 +1153,7 @@ server cluster RvcOperationalState = 97 {
 
   readonly attribute nullable CHAR_STRING phaseList[] = 0;
   readonly attribute nullable int8u currentPhase = 1;
+  readonly attribute nullable elapsed_s countdownTime = 2;
   readonly attribute OperationalStateStruct operationalStateList[] = 3;
   readonly attribute enum8 operationalState = 4;
   readonly attribute ErrorStateStruct operationalError = 5;
@@ -1164,6 +1169,8 @@ server cluster RvcOperationalState = 97 {
   }
 
   command Pause(): OperationalCommandResponse = 0;
+  command Stop(): OperationalCommandResponse = 1;
+  command Start(): OperationalCommandResponse = 2;
   command Resume(): OperationalCommandResponse = 3;
 }
 
@@ -1346,8 +1353,10 @@ endpoint 1 {
   }
 
   server cluster RvcRunMode {
-    callback attribute supportedModes;
-    callback attribute currentMode;
+    callback attribute supportedModes default = 0;
+    callback attribute currentMode default = 0;
+    callback attribute startUpMode default = 0;
+    callback attribute onMode default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -1357,8 +1366,10 @@ endpoint 1 {
   }
 
   server cluster RvcCleanMode {
-    callback attribute supportedModes;
-    callback attribute currentMode;
+    callback attribute supportedModes default = 0;
+    callback attribute currentMode default = 0;
+    callback attribute startUpMode default = 0;
+    callback attribute onMode default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
@@ -1371,10 +1382,11 @@ endpoint 1 {
     emits event OperationalError;
     emits event OperationCompletion;
     callback attribute phaseList;
-    callback attribute currentPhase;
-    callback attribute operationalStateList;
-    callback attribute operationalState;
-    callback attribute operationalError;
+    callback attribute currentPhase default = 0;
+    callback attribute countdownTime default = 0;
+    callback attribute operationalStateList default = 0;
+    callback attribute operationalState default = 0;
+    callback attribute operationalError default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;

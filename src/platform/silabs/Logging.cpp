@@ -13,14 +13,10 @@
 #endif
 
 #include "AppConfig.h"
-#include <FreeRTOS.h>
-#include <queue.h>
 #include <stdio.h>
 #include <string.h>
-#include <task.h>
 
 #ifndef BRD4325A
-#include "rail_types.h"
 
 #ifdef RAIL_ASSERT_DEBUG_STRING
 #include "rail_assert_error_codes.h"
