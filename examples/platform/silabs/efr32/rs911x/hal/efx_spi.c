@@ -388,15 +388,15 @@ static void spi_dmaTransfertComplete(SPIDRV_HandleData_t * pxHandle, Ecode_t tra
 }
 
 /*********************************************************************
- * @fn   int16_t rsi_spi_transfer(uint8_t *tx_buf, uint8_t *rx_buf, uint16_t xlen, uint8_t mode)
- * @brief
- *       Do a SPI transfer - Mode is 8/16 bit - But every 8 bit is aligned
- * @param[in] tx_buf:
- * @param[in] rx_buf:
- * @param[in] xlen:
- * @param[in] mode:
- * @return
- *        None
+ * @fn         int16_t rsi_spi_transfer(uint8_t *ptrBuf,uint16_t bufLen,uint8_t *valBuf,uint8_t mode)
+ * @param[in]  uint8_t *tx_buff, pointer to the buffer with the data to be transfered
+ * @param[in]  uint8_t *rx_buff, pointer to the buffer to store the data received
+ * @param[in]  uint16_t transfer_length, Number of bytes to send and receive
+ * @param[in]  uint8_t mode, To indicate mode 8 BIT/32 BIT mode transfers.
+ * @param[out] None
+ * @return     0, 0=success
+ * @section description
+ * This API is used to transfer/receive data to the Wi-Fi module through the SPI interface.
  **************************************************************************/
 int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint8_t mode)
 {
@@ -471,15 +471,14 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
 }
 
 /*********************************************************************
- * @fn   int16_t rsi_spi_transfer(uint8_t *tx_buf, uint8_t *rx_buf, uint16_t xlen, uint8_t mode)
- * @brief
- *       Do a SPI transfer - Mode is 8/16 bit - But every 8 bit is aligned
- * @param[in] tx_buf:
- * @param[in] rx_buf:
- * @param[in] xlen:
- * @param[in] mode:
- * @return
- *        None
+ * @fn   int16_t sl_si91x_host_spi_transfer(uint8_t *tx_buf, uint8_t *rx_buf, uint16_t xlen)
+ * @param[in]  uint8_t *tx_buff, pointer to the buffer with the data to be transferred
+ * @param[in]  uint8_t *rx_buff, pointer to the buffer to store the data received
+ * @param[in]  uint16_t transfer_length, Number of bytes to send and receive
+ * @param[out] None
+ * @return     0, 0=success
+ * @section description
+ * This API is used to transfer/receive data to the Wi-Fi module through the SPI interface.
  **************************************************************************/
 sl_status_t sl_si91x_host_spi_transfer(const void * tx_buf, void * rx_buf, uint16_t xlen)
 {
