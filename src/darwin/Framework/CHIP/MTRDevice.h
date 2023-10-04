@@ -55,8 +55,9 @@ MTR_PROVISIONALLY_AVAILABLE
 
 /**
  * Array containing the file path(s) for the desired log type(s)
+ * If there are no logs an empty array will be returned.
  */
-@property (readonly, nonatomic, nullable) NSArray<NSString *> * filePathArray;
+@property (readonly, nonatomic) NSArray<NSString *> * filePathArray;
 
 @end
 
@@ -237,6 +238,8 @@ MTR_PROVISIONALLY_AVAILABLE
  * @param timeout    The timeout for getting the logs.  If the timeout expires, completion
  *                   will be called with whatever logs have been retrieved by that point
  *                   (which might be none, and might include partial logs).
+ *                   If the timeout is null, logs will be retreived when processing is
+ *                   complete and completion is called.
  * @param queue      The queue on which completion will be called.
  * @param completion The completion that will be called to pass in the file paths for the requested logs.
  */
