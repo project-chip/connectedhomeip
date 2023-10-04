@@ -88,7 +88,6 @@
 #include "sl_power_manager.h"
 #endif
 
-#define DEFAULT_SPI_TRASFER_MODE 0
 #define CONCAT(A, B) (A##B)
 #define SPI_CLOCK(N) CONCAT(cmuClock_USART, N)
 
@@ -484,5 +483,5 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
  **************************************************************************/
 sl_status_t sl_si91x_host_spi_transfer(const void * tx_buf, void * rx_buf, uint16_t xlen)
 {
-    return (rsi_spi_transfer((uint8_t *) tx_buf, rx_buf, xlen, DEFAULT_SPI_TRASFER_MODE));
+    return (rsi_spi_transfer((uint8_t *) tx_buf, rx_buf, xlen, RSI_MODE_8BIT));
 }
