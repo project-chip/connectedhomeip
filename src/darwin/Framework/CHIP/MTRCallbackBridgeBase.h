@@ -155,18 +155,6 @@ public:
     using SuccessCallbackType = T;
 
     /**
-     * Construct a callback bridge, which can then have DispatcLocalAction() called
-     * on it.
-     */
-    MTRCallbackBridge(dispatch_queue_t queue, MTRResponseHandler handler, T OnSuccessFn)
-        : MTRCallbackBridgeBase(queue)
-        , mHandler(handler)
-        , mSuccess(OnSuccessFn)
-        , mFailure(OnFailureFn)
-    {
-    }
-
-    /**
      * Construct a callback bridge, which can then have DispatchAction() called
      * on it.
      */
@@ -177,41 +165,6 @@ public:
         , mSuccess(OnSuccessFn)
         , mFailure(OnFailureFn)
     {
-    }
-
-    /**
-     * Try to run the given MTRLocalActionBlock on the Matter thread, if we have
-     * a device and it's attached to a running controller, then handle
-     * converting the value produced by the success callback to the right type
-     * so it can be passed to a callback of the type we're templated over.
-     *
-     * Does not attempt to establish any sessions to devices.  Must not be used
-     * with any action blocks that need a session.
-     */
-    void DispatchLocalAction(MTRBaseDevice * _Nullable device, MTRLocalActionBlock _Nonnull action)
-    {
-        if (!device) {
-            OnFailureFn(this, CHIP_ERROR_INCORRECT_STATE);
-            return;
-        }
-
-        LogRequestStart();
-
-        [device.deviceController
-            asyncDispatchToMatterQueue:^() {
-                CHIP_ERROR err = action(mSuccess, mFailure);
-                if (err != CHIP_NO_ERROR) {
-                    ChipLogError(Controller, "Failure performing action. C++-mangled success callback type: '%s', error: %s",
-                        typeid(T).name(), chip::ErrorStr(err));
-
-                    // Take the normal async error-reporting codepath.  This will also
-                    // handle cleaning us up properly.
-                    OnFailureFn(this, err);
-                }
-            }
-            errorHandler:^(NSError * error) {
-                DispatchFailure(this, error);
-            }];
     }
 
     void LogRequestStart() override
