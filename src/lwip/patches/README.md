@@ -19,6 +19,13 @@ Troubleshooting: The patch uses the `ip6_addr_net_eq` function, which is a
 recent API change on upstream LwIP. The previous version of this function is
 `ip6_addr_netcmp`, so this function call may need to be replaced on older forks.
 
+### ND6 LLADDR fix
+
+This patch fixes a bug where the RA processing fails if the RA includes an LLADDR
+option with a hw address that is not the max length. This happens for thread devices.
+
+-   patch file: nd6_lladdr_fix.patch
+
 ## Important upstream patches
 
 ### Malformed neighbor solicitation packet fix
