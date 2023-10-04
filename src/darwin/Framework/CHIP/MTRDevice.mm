@@ -857,7 +857,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                                                   attributeID:(NSNumber *)attributeID
                                                        params:(MTRReadParams *)params
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"%@ read %@ %@ %@", self, endpointID, clusterID, attributeID];
     MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointID:endpointID
                                                                            clusterID:clusterID
                                                                          attributeID:attributeID];
@@ -894,46 +893,40 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
         // Create work item, set ready handler to perform task, then enqueue the work
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
-        [workItem setBatchingID:MTRDeviceWorkItemBatchingReadID data:readRequests handler:^(id opaqueDataCurrent, id opaqueDataNext, BOOL * fullyMerged) {
+        [workItem setBatchingID:MTRDeviceWorkItemBatchingReadID data:readRequests handler:^(id opaqueDataCurrent, id opaqueDataNext) {
+            nullptr_t self; // don't capture self accidentally
             NSMutableArray<NSArray *> * readRequestsCurrent = opaqueDataCurrent;
             NSMutableArray<NSArray *> * readRequestsNext = opaqueDataNext;
 
-            // Can only read up to 9 paths at a time, per spec
-            if (readRequestsCurrent.count >= 9) {
-                MTR_LOG_DEFAULT("%@ batching cannot add more", logPrefix);
-                return;
-            }
-
+            MTRBatchingOutcome outcome = MTRNotBatched;
             while (readRequestsNext.count) {
+                // Can only read up to 9 paths at a time, per spec
+                if (readRequestsCurrent.count >= 9) {
+                    MTR_LOG_INFO("Batching cannot add more work, current item is full");
+                    return outcome;
+                }
+
                 // if params don't match then they cannot be merged
                 if (![readRequestsNext[0][MTRDeviceReadRequestFieldParamsIndex]
                         isEqual:readRequestsCurrent[0][MTRDeviceReadRequestFieldParamsIndex]]) {
-                    MTR_LOG_DEFAULT("%@ batching merged all possible items", logPrefix);
-                    return;
+                    MTR_LOG_INFO("Batching cannot add more work, parameter mismatch");
+                    return outcome;
                 }
 
                 // merge the next item's first request into the current item's list
+                MTR_LOG_INFO("Batching %@ => %tu total", readRequestsNext[0], readRequestsCurrent.count);
                 [readRequestsCurrent addObject:readRequestsNext[0]];
-                MTR_LOG_INFO("%@ batching merging %@ => %lu total", logPrefix, readRequestsNext[0],
-                    (unsigned long) readRequestsCurrent.count);
                 [readRequestsNext removeObjectAtIndex:0];
-
-                // Can only read up to 9 paths at a time, per spec
-                if (readRequestsCurrent.count == 9) {
-                    MTR_LOG_DEFAULT("%@ batching to max paths allowed", logPrefix);
-                    break;
-                }
+                outcome = MTRBatchedPartially;
             }
-
-            if (readRequestsNext.count == 0) {
-                MTR_LOG_DEFAULT("%@ batching - fully merged next item", logPrefix);
-                *fullyMerged = YES;
-            }
+            NSCAssert(readRequestsNext.count == 0, @"should have batched everything or returned early");
+            return MTRBatchedFully;
         }];
         [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
+            nullptr_t self; // don't capture self accidentally
             for (NSArray * readItem in readRequests) {
                 if ([readItem isEqual:opaqueItemData]) {
-                    MTR_LOG_DEFAULT("%@ duplicate check found %@ - report duplicate", logPrefix, readItem);
+                    MTR_LOG_DEFAULT("Read attribute duplicate check found %@ - report duplicate", readItem);
                     *isDuplicate = YES;
                     *stop = YES;
                     return;
@@ -941,12 +934,10 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             }
             *stop = NO;
         }];
-        [workItem setReadyHandler:^(MTRDevice * device, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
-            MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, self->_asyncWorkQueue);
-
+        [workItem setReadyHandler:^(MTRDevice * self, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
             // Sanity check
             if (readRequests.count == 0) {
-                MTR_LOG_ERROR("%@ dequeueWorkItem no read requests", logPrefix);
+                MTR_LOG_ERROR("Read attribute work contained no read requests");
                 completion(MTRAsyncWorkComplete);
                 return;
             }
@@ -954,12 +945,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             // Build the attribute paths from the read requests
             NSMutableArray<MTRAttributeRequestPath *> * attributePaths = [NSMutableArray array];
             for (NSArray * readItem in readRequests) {
-                // Sanity check
-                if (readItem.count < 2) {
-                    MTR_LOG_ERROR("%@ dequeueWorkItem read item missing info %@", logPrefix, readItem);
-                    completion(MTRAsyncWorkComplete);
-                    return;
-                }
+                NSAssert(readItem.count == 2, @"invalid read attribute item");
                 [attributePaths addObject:readItem[MTRDeviceReadRequestFieldPathIndex]];
             }
             // If param is the NSNull stand-in, then just use nil
@@ -976,22 +962,21 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                             if (values) {
                                 // Since the format is the same data-value dictionary, this looks like an
                                 // attribute report
-                                MTR_LOG_INFO("%@ completion values %@", logPrefix, values);
+                                MTR_LOG_INFO("Read attribute result: %@", values);
                                 [self _handleAttributeReport:values];
                             }
 
                             // TODO: better retry logic
                             if (error && (retryCount < 2)) {
-                                MTR_LOG_ERROR("%@ completion error %@ retryWork %lu", logPrefix, error, (unsigned long) retryCount);
+                                MTR_LOG_ERROR("Read attribute failed (will retry): %@", error);
                                 completion(MTRAsyncWorkNeedsRetry);
                             } else {
-                                MTR_LOG_DEFAULT("%@ completion error %@ endWork", logPrefix, error);
+                                MTR_LOG_DEFAULT("Read attribute failed (giving up): %@", error);
                                 completion(MTRAsyncWorkComplete);
                             }
                         }];
         }];
-        MTR_LOG_DEFAULT("%@ enqueueWorkItem %@", logPrefix, _asyncWorkQueue);
-        [_asyncWorkQueue enqueueWorkItem:workItem];
+        [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"read %@ %@ %@", endpointID, clusterID, attributeID];
     }
 
     return attributeValueToReturn;
@@ -1004,7 +989,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                expectedValueInterval:(NSNumber *)expectedValueInterval
                    timedWriteTimeout:(NSNumber * _Nullable)timeout
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"%@ write %@ %@ %@", self, endpointID, clusterID, attributeID];
     if (timeout) {
         timeout = MTRClampedNumber(timeout, @(1), @(UINT16_MAX));
     }
@@ -1026,8 +1010,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         *isDuplicate = NO;
         *stop = YES;
     }];
-    [workItem setReadyHandler:^(MTRDevice * device, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
-        MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, self->_asyncWorkQueue);
+    [workItem setReadyHandler:^(MTRDevice * self, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
         MTRBaseDevice * baseDevice = [self newBaseDevice];
         [baseDevice
             writeAttributeWithEndpointID:endpointID
@@ -1037,15 +1020,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                        timedWriteTimeout:timeout
                                    queue:self.queue
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                                  MTR_LOG_DEFAULT("%@ completion error %@ endWork", logPrefix, error);
                                   if (error) {
+                                      MTR_LOG_ERROR("Write attribute failed: %@", error);
                                       [self removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
                                   }
                                   completion(MTRAsyncWorkComplete);
                               }];
     }];
-    MTR_LOG_DEFAULT("%@ enqueueWorkItem %@", logPrefix, _asyncWorkQueue);
-    [_asyncWorkQueue enqueueWorkItem:workItem];
+    [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"write %@ %@ %@", endpointID, clusterID, attributeID];
 }
 
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
@@ -1085,7 +1067,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"%@ command %@ %@ %@", self, endpointID, clusterID, commandID];
     if (!expectedValueInterval || ([expectedValueInterval compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
@@ -1112,7 +1093,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         *stop = YES;
     }];
     [workItem setReadyHandler:^(MTRDevice * device, NSInteger retryCount, MTRAsyncWorkCompletionBlock workCompletion) {
-        MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, self->_asyncWorkQueue);
         MTRBaseDevice * baseDevice = [self newBaseDevice];
         [baseDevice
             _invokeCommandWithEndpointID:endpointID
@@ -1125,19 +1105,17 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                   // Log the data at the INFO level (not usually persisted permanently),
                                   // but make sure we log the work completion at the DEFAULT level.
-                                  MTR_LOG_INFO("%@ received response: %@ error: %@", logPrefix, values, error);
+                                  MTR_LOG_INFO("Received command response: %@ error: %@", values, error);
                                   dispatch_async(queue, ^{
                                       completion(values, error);
                                   });
                                   if (error && expectedValues) {
                                       [self removeExpectedValuesForAttributePaths:attributePaths expectedValueID:expectedValueID];
                                   }
-                                  MTR_LOG_DEFAULT("%@ endWork", logPrefix);
                                   workCompletion(MTRAsyncWorkComplete);
                               }];
     }];
-    MTR_LOG_DEFAULT("%@ enqueueWorkItem %@", logPrefix, _asyncWorkQueue);
-    [_asyncWorkQueue enqueueWorkItem:workItem];
+    [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"invoke %@ %@ %@", endpointID, clusterID, commandID];
 }
 
 - (void)_invokeKnownCommandWithEndpointID:(NSNumber *)endpointID
