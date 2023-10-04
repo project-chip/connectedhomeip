@@ -31,7 +31,8 @@ import chip.clusters as Clusters
 import chip.clusters.ClusterObjects
 import chip.tlv
 from chip.clusters.Attribute import ValueDecodeFailure
-from matter_testing_support import AttributePathLocation, CommandPathLocation, ClusterPathLocation, MatterBaseTest, async_test_body, default_matter_test_main
+from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest,
+                                    async_test_body, default_matter_test_main)
 from mobly import asserts
 
 
