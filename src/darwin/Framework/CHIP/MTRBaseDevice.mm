@@ -1319,13 +1319,6 @@ exit:
                                     queue:(dispatch_queue_t)queue
                                completion:(void (^)(id _Nullable response, NSError * _Nullable error))completion
 {
-    if (![commandPayload respondsToSelector:@selector(_encodeAsDataValue:)]) {
-        dispatch_async(queue, ^{
-            completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
-        });
-        return;
-    }
-
     NSError * encodingError;
     auto * commandFields = [commandPayload _encodeAsDataValue:&encodingError];
     if (commandFields == nil) {
