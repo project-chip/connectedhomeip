@@ -407,6 +407,10 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
     */
     if (xlen <= MIN_XLEN || (tx_buf == NULL && rx_buf == NULL))
     {
+        if (xlen > sizeof(dummy_buffer))
+        {
+            return RSI_ERROR_INVALID_PARAM; // Ensuring that the dummy buffer won't corrupt the memory
+        }
         rx_buf = (uint8_t *) &dummy_buffer;
         tx_buf = (uint8_t *) &dummy_buffer;
     }
