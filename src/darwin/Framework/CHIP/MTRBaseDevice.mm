@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#import <Matter/MTRClusterConstants.h>
 #import <Matter/MTRDefines.h>
 
 #import "MTRAttributeTLVValueDecoder_Internal.h"
@@ -583,7 +584,17 @@ NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV
             NSMutableDictionary * arrayElement = [NSMutableDictionary dictionary];
             [arrayElement setObject:value forKey:MTRDataKey];
             if (dataTLVType == chip::TLV::kTLVType_Structure) {
-                [arrayElement setObject:[NSNumber numberWithUnsignedLong:TagNumFromTag(tag)] forKey:MTRContextTagKey];
+                uint64_t tagNum;
+                if (IsContextTag(tag)) {
+                    tagNum = TagNumFromTag(tag);
+                } else if (IsProfileTag(tag)) {
+                    uint64_t profile = ProfileIdFromTag(tag);
+                    tagNum = (profile << kProfileIdShift) | TagNumFromTag(tag);
+                } else {
+                    MTR_LOG_ERROR("Skipping unknown tag type when decoding TLV structure.");
+                    continue;
+                }
+                [arrayElement setObject:[NSNumber numberWithUnsignedLongLong:tagNum] forKey:MTRContextTagKey];
             }
             [array addObject:arrayElement];
         }
@@ -680,14 +691,28 @@ static CHIP_ERROR MTREncodeTLVFromDataValueDictionary(id object, chip::TLV::TLVW
                 MTR_LOG_ERROR("Error: Structure element to encode has corrupt type: %@", [element class]);
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
-            NSNumber * elementTag = element[MTRContextTagKey];
+            id elementTag = element[MTRContextTagKey];
             id elementValue = element[MTRDataKey];
             if (!elementTag || !elementValue) {
                 MTR_LOG_ERROR("Error: Structure element to encode has corrupt value: %@", element);
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
+            if (![elementTag isKindOfClass:NSNumber.class]) {
+                MTR_LOG_ERROR("Error: Structure element to encode has corrupt tag type: %@", [elementTag class]);
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+
+            // Our tag might actually be a profile tag.
+            uint64_t tagValue = [elementTag unsignedLongLongValue];
+            TLV::Tag tag;
+            if (tagValue > UINT8_MAX) {
+                tag = TLV::ProfileTag(tagValue >> kProfileIdShift,
+                    (tagValue & ((1ull << kProfileIdShift) - 1)));
+            } else {
+                tag = TLV::ContextTag(static_cast<uint8_t>(tagValue));
+            }
             ReturnErrorOnFailure(
-                MTREncodeTLVFromDataValueDictionary(elementValue, writer, chip::TLV::ContextTag([elementTag unsignedCharValue])));
+                MTREncodeTLVFromDataValueDictionary(elementValue, writer, tag));
         }
         ReturnErrorOnFailure(writer.EndContainer(outer));
         return CHIP_NO_ERROR;
@@ -751,10 +776,10 @@ public:
 
     static bool MustUseTimedInvoke() { return false; }
 
-    id _Nullable GetDecodedObject() const { return decodedObj; }
+    NSDictionary<NSString *, id> * _Nullable GetDecodedObject() const { return decodedObj; }
 
 private:
-    id _Nullable decodedObj;
+    NSDictionary<NSString *, id> * _Nullable decodedObj;
 };
 
 // Callback bridge for MTRDataValueDictionaryCallback
@@ -1252,15 +1277,41 @@ exit:
     auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, MTRDataValueDictionaryCallback successCb,
             MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+            NSData * attestationChallenge;
+            if ([clusterID isEqualToNumber:@(MTRClusterIDTypeOperationalCredentialsID)] &&
+                [commandID isEqualToNumber:@(MTRCommandIDTypeClusterOperationalCredentialsCommandAttestationRequestID)] && session->IsSecureSession()) {
+                // An AttestationResponse command needs to have an attestationChallenge
+                // to make sense of the results.  If we are doing an
+                // AttestationRequest, store the challenge now.
+                attestationChallenge = AsData(session->AsSecureSession()->GetCryptoContext().GetAttestationChallenge());
+            }
             // NSObjectCommandCallback guarantees that there will be exactly one call to either the success callback or the failure
             // callback.
-            auto onSuccessCb = [successCb, bridge](const app::ConcreteCommandPath & commandPath, const app::StatusIB & status,
+            auto onSuccessCb = [successCb, bridge, attestationChallenge](const app::ConcreteCommandPath & commandPath, const app::StatusIB & status,
                                    const MTRDataValueDictionaryDecodableType & responseData) {
                 auto resultArray = [[NSMutableArray alloc] init];
                 if (responseData.GetDecodedObject()) {
+                    auto response = responseData.GetDecodedObject();
+                    if (attestationChallenge != nil) {
+                        // Add the attestationChallenge to our data.
+                        NSArray<NSDictionary<NSString *, id> *> * value = response[MTRValueKey];
+                        NSMutableArray<NSDictionary<NSString *, id> *> * newValue = [[NSMutableArray alloc] initWithCapacity:(value.count + 1)];
+                        [newValue addObjectsFromArray:value];
+                        [newValue addObject:@{
+                            MTRContextTagKey : @(kAttestationChallengeTagValue),
+                            MTRDataKey : @ {
+                                MTRTypeKey : MTROctetStringValueType,
+                                MTRValueKey : attestationChallenge,
+                            },
+                        }];
+                        auto * newResponse = [NSMutableDictionary dictionaryWithCapacity:(response.count + 1)];
+                        [newResponse addEntriesFromDictionary:response];
+                        newResponse[MTRValueKey] = newValue;
+                        response = newResponse;
+                    }
                     [resultArray addObject:@ {
                         MTRCommandPathKey : [[MTRCommandPath alloc] initWithPath:commandPath],
-                        MTRDataKey : responseData.GetDecodedObject()
+                        MTRDataKey : response,
                     }];
                 } else {
                     [resultArray addObject:@ { MTRCommandPathKey : [[MTRCommandPath alloc] initWithPath:commandPath] }];
