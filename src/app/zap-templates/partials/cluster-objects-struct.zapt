@@ -113,14 +113,16 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {{/if}}
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+    detail::StructDecodeIterator __iterator(reader);
+    while (true) {
+        detail::StructDecodeIterator::EntryElement __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element)) {
+           return std::get<CHIP_ERROR>(__element);
+        }
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    while ((err = reader.Next()) == CHIP_NO_ERROR) {
-        [[maybe_unused]] const TLV::Tag __tag = reader.GetTag();
+        [[maybe_unused]] const uint8_t __context_tag = std::get<uint8_t>(__element);
         {{#zcl_struct_items}}
-        if (__tag == TLV::ContextTag(to_underlying(Fields::k{{asUpperCamelCase label}})))
+        if (__context_tag == to_underlying(Fields::k{{asUpperCamelCase label}}))
         {
            ReturnErrorOnFailure(DataModel::Decode(reader, {{asLowerCamelCase label}}));
         }
@@ -129,9 +131,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
         {
         }
     }
-
-    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
-    return CHIP_NO_ERROR;
 }
 
 } // namespace {{asUpperCamelCase name}}
