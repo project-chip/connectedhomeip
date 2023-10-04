@@ -23,7 +23,9 @@
 extern "C" {
 #include "btl_interface.h"
 #include "em_bus.h" // For CORE_CRITICAL_SECTION
+#if SL_WIFI
 #include "spi_multiplex.h"
+#endif // SL_WIFI
 }
 
 #include <platform/silabs/SilabsConfig.h>

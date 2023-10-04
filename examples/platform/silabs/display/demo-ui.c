@@ -23,7 +23,9 @@
 #include "dmd/dmd.h"
 #include "em_types.h"
 #include "glib.h"
+#if SL_WIFI && !SIWX_917
 #include "spi_multiplex.h"
+#endif // SL_WIFI && !SIWX_917
 #include <stdio.h>
 #include <string.h>
 

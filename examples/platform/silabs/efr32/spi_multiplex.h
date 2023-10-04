@@ -49,34 +49,18 @@
 extern "C" {
 #endif
 #include "FreeRTOS.h"
-#include "em_eusart.h"
 #include "semphr.h"
+#if SL_LCDCTRL_MUX
 #include "sl_memlcd_display.h"
+#endif // SL_LCDCTRL_MUX
+#if SL_MX25CTRL_MUX
 #include "sl_mx25_flash_shutdown_usart_config.h"
+#endif // SL_MX25CTRL_MUX
 
 #include "spidrv.h"
 
 #define SL_SPIDRV_LCD_BITRATE SL_MEMLCD_SCLK_FREQ
 #define SL_SPIDRV_MX25_FLASH_BITRATE 16000000
-
-#ifdef RS911X_WIFI
-#include "sl_spidrv_eusart_exp_config.h"
-#define SL_SPIDRV_EXP_BITRATE_MULTIPLEXED SL_SPIDRV_EUSART_EXP_BITRATE
-#define SL_SPIDRV_UART_CONSOLE_BITRATE SL_UARTDRV_EUSART_VCOM_BAUDRATE
-#define SL_SPIDRV_FRAME_LENGTH SL_SPIDRV_EUSART_EXP_FRAME_LENGTH
-
-#elif WF200_WIFI
-// TODO: (MATTER-1906) Investigate why using SL_SPIDRV_EXP_BITRATE is causing WF200 init failure
-// REF: sl_spidrv_exp_config.h
-#include "sl_spidrv_exp_config.h"
-#define SL_SPIDRV_EXP_BITRATE_MULTIPLEXED 10000000
-#define SL_SPIDRV_UART_CONSOLE_BITRATE SL_UARTDRV_USART_VCOM_BAUDRATE
-#define SL_SPIDRV_FRAME_LENGTH SL_SPIDRV_EXP_FRAME_LENGTH
-
-#else
-#error "Unknown platform"
-
-#endif /* RS911X_WIFI || WF200_WIFI */
 
 #if SL_SPICTRL_MUX
 /****************************************************************************

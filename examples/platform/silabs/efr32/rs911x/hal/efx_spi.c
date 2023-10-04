@@ -29,21 +29,31 @@
 #include "em_device.h"
 #include "em_gpio.h"
 #include "em_ldma.h"
+#include "sl_spidrv_instances.h"
+#include "spi_multiplex.h"
+#include "spidrv.h"
+#if SL_LCDCTRL_MUX
+#include "sl_memlcd.h"
+#endif // SL_LCDCTRL_MUX
 #if defined(EFR32MG12)
 #include "em_usart.h"
+
+#define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
+
 #elif defined(EFR32MG24)
 #include "em_eusart.h"
 #include "sl_spidrv_eusart_exp_config.h"
-#endif
-#include "spidrv.h"
 
-#include "silabs_utils.h"
+#define SL_SPIDRV_HANDLE sl_spidrv_eusart_exp_handle
+#define SL_SPIDRV_EXP_BITRATE_MULTIPLEXED SL_SPIDRV_EUSART_EXP_BITRATE
+#define SL_SPIDRV_UART_CONSOLE_BITRATE SL_UARTDRV_EUSART_VCOM_BAUDRATE
+#define SL_SPIDRV_FRAME_LENGTH SL_SPIDRV_EUSART_EXP_FRAME_LENGTH
+
+#endif // EFR32MG12 || EFR32MG24
 
 #include "gpiointerrupt.h"
 #include "sl_device_init_clocks.h"
-#include "sl_memlcd.h"
 #include "sl_status.h"
-#include "spi_multiplex.h"
 
 #include "FreeRTOS.h"
 #include "event_groups.h"
@@ -90,15 +100,6 @@ static SemaphoreHandle_t spiTransferLock;
 static TaskHandle_t spiInitiatorTaskHandle = NULL;
 
 static uint32_t dummy_buffer; /* Used for DMA - when results don't matter */
-
-#include "sl_spidrv_instances.h"
-#if defined(SL_CATALOG_UARTDRV_USART_PRESENT)
-#define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
-#elif defined(SL_CATALOG_UARTDRV_EUSART_PRESENT)
-#define SL_SPIDRV_HANDLE sl_spidrv_eusart_exp_handle
-#else
-#error "Unknown platform"
-#endif
 
 // variable to identify spi configured for expansion header
 // EUSART configuration available on the SPIDRV

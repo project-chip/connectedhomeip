@@ -52,6 +52,11 @@
 #include "sl_spidrv_exp_config.h"
 #include "sl_spidrv_instances.h"
 #include "spi_multiplex.h"
+// TODO: (MATTER-1906) Investigate why using SL_SPIDRV_EXP_BITRATE is causing WF200 init failure
+// REF: sl_spidrv_exp_config.h
+#define SL_SPIDRV_EXP_BITRATE_MULTIPLEXED 10000000
+#define SL_SPIDRV_UART_CONSOLE_BITRATE SL_UARTDRV_USART_VCOM_BAUDRATE
+#define SL_SPIDRV_FRAME_LENGTH SL_SPIDRV_EXP_FRAME_LENGTH
 #define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
 
 #define USART SL_WFX_HOST_PINOUT_SPI_PERIPHERAL
