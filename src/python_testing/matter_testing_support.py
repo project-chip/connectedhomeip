@@ -333,6 +333,7 @@ class CommandPathLocation:
     cluster_id: int
     command_id: int
 
+
 @dataclass
 class ClusterPathLocation:
     endpoint_id: int

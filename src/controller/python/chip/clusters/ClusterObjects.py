@@ -206,6 +206,7 @@ class ClusterObject:
     def descriptor(cls):
         raise NotImplementedError()
 
+
 # The below dictionaries will be filled dynamically
 # and are used for quick lookup/mapping from cluster/attribute id to the correct class
 ALL_CLUSTERS = {}
@@ -213,6 +214,7 @@ ALL_ATTRIBUTES = {}
 # These need to be separate because there can be overlap in command ids for commands and responses.
 ALL_ACCEPTED_COMMANDS = {}
 ALL_GENERATED_COMMANDS = {}
+
 
 class ClusterCommand(ClusterObject):
     def __init_subclass__(cls, *args, **kwargs) -> None:
@@ -231,6 +233,7 @@ class ClusterCommand(ClusterObject):
             # handle case where the ClusterAttribute class is not (fully) subclassed
             # and accessing the id property throws a NotImplementedError.
             pass
+
     @ChipUtility.classproperty
     def cluster_id(self) -> int:
         raise NotImplementedError()
@@ -242,8 +245,6 @@ class ClusterCommand(ClusterObject):
     @ChipUtility.classproperty
     def must_use_timed_invoke(cls) -> bool:
         return False
-
-
 
 
 class Cluster(ClusterObject):
