@@ -32,12 +32,13 @@ def gen_test_certs(chip_cert_exe: str,
                    cd_type: int = 1,
                    device_type: int = 1,
                    paa_cert_path: str = None,
-                   paa_key_path: str = None):
+                   paa_key_path: str = None,
+                   valid_from: str = "2023-01-01 00:00:00",
+                   lifetime: str = "7305"):
     """
     Generate Matter certificates according to given Vendor ID and Product ID using the chip-cert executable.
     To use own Product Attestation Authority certificate provide paa_cert_path and paa_key_path arguments.
-    Without providing these arguments a PAA certificate will be get from /credentials/test/attestation directory
-    in the Matter repository.
+    Without providing these arguments a PAA certificate will be generated in the output directory.
 
     Args:
         chip_cert_exe (str): path to chip-cert executable
@@ -45,16 +46,10 @@ def gen_test_certs(chip_cert_exe: str,
         vendor_id (int): an identification number specific to Vendor
         product_id (int): an identification number specific to Product
         device_name (str): human-readable device name
-        generate_cd (bool, optional): Generate Certificate Declaration and store it in thee output directory. Defaults to False.
-        paa_cert_path (str, optional): provide PAA certification path. Defaults to None - a path will be set to
-        /credentials/test/attestation directory.
-        paa_key_path (str, optional): provide PAA key path. Defaults to None - a path will be set to
-        /credentials/test/attestation directory.
-
-    Returns:
-        dictionary: ["PAI_CERT": (str)<path to PAI cert .der file>,
-                     "DAC_CERT": (str)<path to DAC cert .der file>,
-                     "DAC_KEY": (str)<path to DAC key .der file>]
+        generate_cd (bool, optional): Generate Certificate Declaration and store it in the output directory. Defaults to False.
+        paa_cert_path (str, optional): provide PAA certification path. Defaults to None - the certificate and key will
+        be generated.
+        paa_key_path (str, optional): provide PAA key path. Defaults to None - the certificate and key will be generated.
     """
 
     CD_PATH = MATTER_ROOT + "/credentials/test/certification-declaration/Chip-Test-CD-Signing-Cert.pem"
@@ -97,8 +92,8 @@ def gen_test_certs(chip_cert_exe: str,
             "--subject-cn", device_name,
             "--out", new_certificates["PAA_CERT"] + ".pem",
             "--out-key", new_certificates["PAA_KEY"] + ".pem",
-            "--lifetime", "7305",
-            "--valid-from", "2023-01-01 00:00:00"
+            "--valid-from", valid_from,
+            "--lifetime", lifetime
         ]
         subprocess.run(cmd)
         PAA_PATH = new_certificates["PAA_CERT"] + ".pem"
@@ -119,8 +114,8 @@ def gen_test_certs(chip_cert_exe: str,
         "--ca-key", PAA_KEY_PATH,
         "--out", new_certificates["PAI_CERT"] + ".pem",
         "--out-key", new_certificates["PAI_KEY"] + ".pem",
-        "--lifetime", "7305",
-        "--valid-from", "2023-01-01 00:00:00"
+        "--valid-from", valid_from,
+        "--lifetime", lifetime
     ]
     subprocess.run(cmd)
 
@@ -135,12 +130,12 @@ def gen_test_certs(chip_cert_exe: str,
         "--ca-key", new_certificates["PAI_KEY"] + ".pem",
         "--out", new_certificates["DAC_CERT"] + ".pem",
         "--out-key", new_certificates["DAC_KEY"] + ".pem",
-        "--lifetime", "7305",
-        "--valid-from", "2023-01-01 00:00:00"
+        "--valid-from", valid_from,
+        "--lifetime", lifetime
     ]
     subprocess.run(cmd)
 
-    # convert to .der files
+    log.info("Converting to .der files...")
     for cert_k, cert_v in new_certificates.items():
         action_type = "convert-cert" if cert_k.find("CERT") != -1 else "convert-key"
         log.info(cert_v + ".der")
@@ -159,7 +154,7 @@ def main():
     def allow_any_int(i): return int(i, 0)
 
     parser.add_argument("--chip_cert_path", type=str, required=True,
-                        help=("This tool requires a path to chip-cert executable."
+                        help=("This tool requires a path to chip-cert executable. "
                                 "By default you can find chip-cert in connectedhomeip/src/tools/chip-cert directory "
                                 "and build it there."))
     parser.add_argument("-o", "--output", type=str, required=True,
@@ -174,23 +169,25 @@ def main():
                         help="[string] provide human-readable product name")
     parser.add_argument("--gen_cd", action="store_true", default=False,
                         help=("Generate a new Certificate Declaration in .der format according to used Vendor ID "
-                                "and Product ID. This certificate will not be included to the factory data."))
+                                "and Product ID."))
     parser.add_argument("--cd_type", type=int, default=1,
                         help=("[int] Type of generated Certification Declaration: "
                                 "0 - development, 1 - provisional, 2 - official"))
     parser.add_argument("--device_type", type=int, default=0,
-                        help=("[int] Provides the primary device type implemented by the node."
-                                "This must be one of the device type identifiers defined in the Matter Device Library"
+                        help=("[int] Provides the primary device type implemented by the node. "
+                                "This must be one of the device type identifiers defined in the Matter Device Library "
 	                            "specification."))
     parser.add_argument("--paa_cert", type=str,
                         help=("Provide a path to the Product Attestation Authority (PAA) certificate to generate "
-                                "the PAI certificate. Without providing it, a testing PAA stored in the Matter "
-                                "repository will be used."))
+                                "the PAI certificate. Without providing it, a testing PAA certificate will be generated."))
     parser.add_argument("--paa_key", type=str,
                         help=("Provide a path to the Product Attestation Authority (PAA) key to generate "
-                                "the PAI certificate. Without providing it, a testing PAA key stored in the Matter "
-                                "repository will be used."))
-
+                                "the PAI certificate. Without providing it, a testing PAA key will be generated."))
+    parser.add_argument("--valid_from", type=str, default="2023-01-01 00:00:00",
+                        help=("The start date for the certificate's validity period in"
+                                "<YYYY>-<MM>-<DD> [ <HH>:<MM>:<SS> ] format. Default to 2023-01-01 00:00:00"))
+    parser.add_argument("--lifetime", type=str, default="7305",
+                        help=("The lifetime for the new certificate, in whole days. Default to 7305 days."))
     args = parser.parse_args()
 
     log.basicConfig(format='[%(levelname)s] %(message)s', level=log.INFO)
@@ -204,7 +201,9 @@ def main():
                     args.cd_type,
                     args.device_type,
                     args.paa_cert,
-                    args.paa_key)
+                    args.paa_key,
+                    args.valid_from,
+                    args.lifetime)
 
 if __name__ == "__main__":
     main()
