@@ -246,45 +246,6 @@ void AppTask::PostEvent(const AppEvent * aEvent)
     }
 }
 
-// void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
-// {
-//     // If the action has been initiated by the lock, update the bolt lock trait
-//     // and start flashing the LEDs rapidly to indicate action initiation.
- 
-//     LED_setOn(gLedGreenHandle, LED_BRIGHTNESS_MAX);
-//     LED_startBlinking(gLedGreenHandle, 50 /* ms */, LED_BLINK_FOREVER);
-//     LED_setOn(gLedRedHandle, LED_BRIGHTNESS_MAX);
-//     LED_startBlinking(gLedRedHandle, 110 /* ms */, LED_BLINK_FOREVER);
-// }
-
-// void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
-// {
-//     uint8_t state;
-
-//     // if the action has been completed by the lock, update the bolt lock trait.
-//     // Turn on the lock LED if in a LOCKED state OR
-//     // Turn off the lock LED if in an UNLOCKED state.
-//     if (aAction == BoltLockManager::LOCK_ACTION)
-//     {
-//         PLAT_LOG("Lock completed");
-//         LED_stopBlinking(gLedGreenHandle);
-//         LED_setOn(gLedGreenHandle, LED_BRIGHTNESS_MAX);
-//         LED_stopBlinking(gLedRedHandle);
-//         LED_setOn(gLedRedHandle, LED_BRIGHTNESS_MAX);
-//         state = 1;
-//     }
-//     else if (aAction == BoltLockManager::UNLOCK_ACTION)
-//     {
-//         PLAT_LOG("Unlock completed");
-//         LED_stopBlinking(gLedGreenHandle);
-//         LED_setOff(gLedGreenHandle);
-//         LED_stopBlinking(gLedRedHandle);
-//         LED_setOff(gLedRedHandle);
-//         state = 0;
-//     }
-//     app::Clusters::OnOff::Attributes::OnOff::Set(1, state);
-// }
-
 // need to define custom tokens to read/write files from the file system
 #define KVS_TOKEN 0x13578642
 
