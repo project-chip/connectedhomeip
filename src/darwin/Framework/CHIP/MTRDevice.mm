@@ -894,7 +894,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         // Create work item, set ready handler to perform task, then enqueue the work
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
         [workItem setBatchingID:MTRDeviceWorkItemBatchingReadID data:readRequests handler:^(id opaqueDataCurrent, id opaqueDataNext) {
-            nullptr_t self; // don't capture self accidentally
+            mtr_hide(self); // don't capture self accidentally
             NSMutableArray<NSArray *> * readRequestsCurrent = opaqueDataCurrent;
             NSMutableArray<NSArray *> * readRequestsNext = opaqueDataNext;
 
@@ -923,7 +923,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             return MTRBatchedFully;
         }];
         [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
-            nullptr_t self; // don't capture self accidentally
+            mtr_hide(self); // don't capture self accidentally
             for (NSArray * readItem in readRequests) {
                 if ([readItem isEqual:opaqueItemData]) {
                     MTR_LOG_DEFAULT("Read attribute duplicate check found %@ - report duplicate", readItem);
