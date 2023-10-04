@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    Copyright (c) 2020 Texas Instruments Incorporated
  *    All rights reserved.
  *
