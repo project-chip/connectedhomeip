@@ -26,7 +26,9 @@
 #import "MTRLogging_Internal.h"
 #import "MTRStructsObjc.h"
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <platform/CHIPDeviceLayer.h>
+
 #include <type_traits>
 
 using chip::Callback::Callback;
@@ -66,9 +68,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Identify::Commands::Identify::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeIdentifyID)
-                                         commandID:@(MTRCommandIDTypeClusterIdentifyCommandIdentifyID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -92,9 +95,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Identify::Commands::TriggerEffect::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeIdentifyID)
-                                         commandID:@(MTRCommandIDTypeClusterIdentifyCommandTriggerEffectID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -204,9 +208,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Groups::Commands::AddGroup::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeGroupsID)
-                                         commandID:@(MTRCommandIDTypeClusterGroupsCommandAddGroupID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -230,9 +235,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Groups::Commands::ViewGroup::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeGroupsID)
-                                         commandID:@(MTRCommandIDTypeClusterGroupsCommandViewGroupID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -256,9 +262,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Groups::Commands::GetGroupMembership::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeGroupsID)
-                                         commandID:@(MTRCommandIDTypeClusterGroupsCommandGetGroupMembershipID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -282,9 +289,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Groups::Commands::RemoveGroup::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeGroupsID)
-                                         commandID:@(MTRCommandIDTypeClusterGroupsCommandRemoveGroupID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -312,9 +320,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Groups::Commands::RemoveAllGroups::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeGroupsID)
-                                         commandID:@(MTRCommandIDTypeClusterGroupsCommandRemoveAllGroupsID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -338,9 +347,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Groups::Commands::AddGroupIfIdentifying::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeGroupsID)
-                                         commandID:@(MTRCommandIDTypeClusterGroupsCommandAddGroupIfIdentifyingID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -470,9 +480,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Scenes::Commands::AddScene::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeScenesID)
-                                         commandID:@(MTRCommandIDTypeClusterScenesCommandAddSceneID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -496,9 +507,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Scenes::Commands::ViewScene::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeScenesID)
-                                         commandID:@(MTRCommandIDTypeClusterScenesCommandViewSceneID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -522,9 +534,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Scenes::Commands::RemoveScene::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeScenesID)
-                                         commandID:@(MTRCommandIDTypeClusterScenesCommandRemoveSceneID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -548,9 +561,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Scenes::Commands::RemoveAllScenes::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeScenesID)
-                                         commandID:@(MTRCommandIDTypeClusterScenesCommandRemoveAllScenesID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -574,9 +588,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Scenes::Commands::StoreScene::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeScenesID)
-                                         commandID:@(MTRCommandIDTypeClusterScenesCommandStoreSceneID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -600,9 +615,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Scenes::Commands::RecallScene::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeScenesID)
-                                         commandID:@(MTRCommandIDTypeClusterScenesCommandRecallSceneID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -626,9 +642,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Scenes::Commands::GetSceneMembership::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeScenesID)
-                                         commandID:@(MTRCommandIDTypeClusterScenesCommandGetSceneMembershipID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -652,9 +669,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Scenes::Commands::EnhancedAddScene::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeScenesID)
-                                         commandID:@(MTRCommandIDTypeClusterScenesCommandEnhancedAddSceneID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -678,9 +696,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Scenes::Commands::EnhancedViewScene::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeScenesID)
-                                         commandID:@(MTRCommandIDTypeClusterScenesCommandEnhancedViewSceneID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -704,9 +723,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Scenes::Commands::CopyScene::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeScenesID)
-                                         commandID:@(MTRCommandIDTypeClusterScenesCommandCopySceneID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -906,9 +926,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = OnOff::Commands::Off::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeOnOffID)
-                                         commandID:@(MTRCommandIDTypeClusterOnOffCommandOffID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -936,9 +957,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = OnOff::Commands::On::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeOnOffID)
-                                         commandID:@(MTRCommandIDTypeClusterOnOffCommandOnID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -966,9 +988,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = OnOff::Commands::Toggle::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeOnOffID)
-                                         commandID:@(MTRCommandIDTypeClusterOnOffCommandToggleID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -992,9 +1015,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = OnOff::Commands::OffWithEffect::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeOnOffID)
-                                         commandID:@(MTRCommandIDTypeClusterOnOffCommandOffWithEffectID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -1022,9 +1046,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = OnOff::Commands::OnWithRecallGlobalScene::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeOnOffID)
-                                         commandID:@(MTRCommandIDTypeClusterOnOffCommandOnWithRecallGlobalSceneID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -1048,9 +1073,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = OnOff::Commands::OnWithTimedOff::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeOnOffID)
-                                         commandID:@(MTRCommandIDTypeClusterOnOffCommandOnWithTimedOffID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -1309,9 +1335,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = LevelControl::Commands::MoveToLevel::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeLevelControlID)
-                                         commandID:@(MTRCommandIDTypeClusterLevelControlCommandMoveToLevelID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -1335,9 +1362,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = LevelControl::Commands::Move::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeLevelControlID)
-                                         commandID:@(MTRCommandIDTypeClusterLevelControlCommandMoveID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -1361,9 +1389,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = LevelControl::Commands::Step::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeLevelControlID)
-                                         commandID:@(MTRCommandIDTypeClusterLevelControlCommandStepID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -1387,9 +1416,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = LevelControl::Commands::Stop::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeLevelControlID)
-                                         commandID:@(MTRCommandIDTypeClusterLevelControlCommandStopID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -1413,9 +1443,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = LevelControl::Commands::MoveToLevelWithOnOff::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeLevelControlID)
-                                         commandID:@(MTRCommandIDTypeClusterLevelControlCommandMoveToLevelWithOnOffID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -1439,9 +1470,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = LevelControl::Commands::MoveWithOnOff::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeLevelControlID)
-                                         commandID:@(MTRCommandIDTypeClusterLevelControlCommandMoveWithOnOffID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -1465,9 +1497,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = LevelControl::Commands::StepWithOnOff::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeLevelControlID)
-                                         commandID:@(MTRCommandIDTypeClusterLevelControlCommandStepWithOnOffID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -1491,9 +1524,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = LevelControl::Commands::StopWithOnOff::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeLevelControlID)
-                                         commandID:@(MTRCommandIDTypeClusterLevelControlCommandStopWithOnOffID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -1517,9 +1551,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = LevelControl::Commands::MoveToClosestFrequency::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeLevelControlID)
-                                         commandID:@(MTRCommandIDTypeClusterLevelControlCommandMoveToClosestFrequencyID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -2271,9 +2306,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Actions::Commands::InstantAction::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeActionsID)
-                                         commandID:@(MTRCommandIDTypeClusterActionsCommandInstantActionID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -2297,9 +2333,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Actions::Commands::InstantActionWithTransition::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeActionsID)
-                                         commandID:@(MTRCommandIDTypeClusterActionsCommandInstantActionWithTransitionID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -2323,9 +2360,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Actions::Commands::StartAction::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeActionsID)
-                                         commandID:@(MTRCommandIDTypeClusterActionsCommandStartActionID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -2349,9 +2387,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Actions::Commands::StartActionWithDuration::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeActionsID)
-                                         commandID:@(MTRCommandIDTypeClusterActionsCommandStartActionWithDurationID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -2375,9 +2414,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Actions::Commands::StopAction::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeActionsID)
-                                         commandID:@(MTRCommandIDTypeClusterActionsCommandStopActionID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -2401,9 +2441,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Actions::Commands::PauseAction::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeActionsID)
-                                         commandID:@(MTRCommandIDTypeClusterActionsCommandPauseActionID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -2427,9 +2468,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Actions::Commands::PauseActionWithDuration::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeActionsID)
-                                         commandID:@(MTRCommandIDTypeClusterActionsCommandPauseActionWithDurationID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -2453,9 +2495,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Actions::Commands::ResumeAction::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeActionsID)
-                                         commandID:@(MTRCommandIDTypeClusterActionsCommandResumeActionID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -2479,9 +2522,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Actions::Commands::EnableAction::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeActionsID)
-                                         commandID:@(MTRCommandIDTypeClusterActionsCommandEnableActionID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -2505,9 +2549,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Actions::Commands::EnableActionWithDuration::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeActionsID)
-                                         commandID:@(MTRCommandIDTypeClusterActionsCommandEnableActionWithDurationID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -2531,9 +2576,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Actions::Commands::DisableAction::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeActionsID)
-                                         commandID:@(MTRCommandIDTypeClusterActionsCommandDisableActionID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -2557,9 +2603,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Actions::Commands::DisableActionWithDuration::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeActionsID)
-                                         commandID:@(MTRCommandIDTypeClusterActionsCommandDisableActionWithDurationID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -2717,9 +2764,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = BasicInformation::Commands::MfgSpecificPing::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(0x00000028)
-                                         commandID:@(0x10020000)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -2947,9 +2995,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = OtaSoftwareUpdateProvider::Commands::QueryImage::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeOTASoftwareUpdateProviderID)
-                                         commandID:@(MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandQueryImageID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -2973,9 +3022,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeOTASoftwareUpdateProviderID)
-                                         commandID:@(MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandApplyUpdateRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -2999,9 +3049,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeOTASoftwareUpdateProviderID)
-                                         commandID:@(MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandNotifyUpdateAppliedID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -3103,9 +3154,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeOTASoftwareUpdateRequestorID)
-                                         commandID:@(MTRCommandIDTypeClusterOTASoftwareUpdateRequestorCommandAnnounceOTAProviderID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -3748,9 +3800,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = GeneralCommissioning::Commands::ArmFailSafe::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeGeneralCommissioningID)
-                                         commandID:@(MTRCommandIDTypeClusterGeneralCommissioningCommandArmFailSafeID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -3774,9 +3827,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = GeneralCommissioning::Commands::SetRegulatoryConfig::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeGeneralCommissioningID)
-                                         commandID:@(MTRCommandIDTypeClusterGeneralCommissioningCommandSetRegulatoryConfigID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -3804,9 +3858,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = GeneralCommissioning::Commands::CommissioningComplete::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeGeneralCommissioningID)
-                                         commandID:@(MTRCommandIDTypeClusterGeneralCommissioningCommandCommissioningCompleteID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -3949,9 +4004,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = NetworkCommissioning::Commands::ScanNetworks::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeNetworkCommissioningID)
-                                         commandID:@(MTRCommandIDTypeClusterNetworkCommissioningCommandScanNetworksID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -3975,9 +4031,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeNetworkCommissioningID)
-                                         commandID:@(MTRCommandIDTypeClusterNetworkCommissioningCommandAddOrUpdateWiFiNetworkID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -4001,9 +4058,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeNetworkCommissioningID)
-                                         commandID:@(MTRCommandIDTypeClusterNetworkCommissioningCommandAddOrUpdateThreadNetworkID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -4027,9 +4085,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = NetworkCommissioning::Commands::RemoveNetwork::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeNetworkCommissioningID)
-                                         commandID:@(MTRCommandIDTypeClusterNetworkCommissioningCommandRemoveNetworkID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -4053,9 +4112,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = NetworkCommissioning::Commands::ConnectNetwork::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeNetworkCommissioningID)
-                                         commandID:@(MTRCommandIDTypeClusterNetworkCommissioningCommandConnectNetworkID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -4079,9 +4139,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = NetworkCommissioning::Commands::ReorderNetwork::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeNetworkCommissioningID)
-                                         commandID:@(MTRCommandIDTypeClusterNetworkCommissioningCommandReorderNetworkID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -4259,9 +4320,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = DiagnosticLogs::Commands::RetrieveLogsRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDiagnosticLogsID)
-                                         commandID:@(MTRCommandIDTypeClusterDiagnosticLogsCommandRetrieveLogsRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -4348,9 +4410,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = GeneralDiagnostics::Commands::TestEventTrigger::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeGeneralDiagnosticsID)
-                                         commandID:@(MTRCommandIDTypeClusterGeneralDiagnosticsCommandTestEventTriggerID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -4492,9 +4555,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = SoftwareDiagnostics::Commands::ResetWatermarks::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeSoftwareDiagnosticsID)
-                                         commandID:@(MTRCommandIDTypeClusterSoftwareDiagnosticsCommandResetWatermarksID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -4606,9 +4670,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ThreadNetworkDiagnostics::Commands::ResetCounts::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeThreadNetworkDiagnosticsID)
-                                         commandID:@(MTRCommandIDTypeClusterThreadNetworkDiagnosticsCommandResetCountsID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -5023,9 +5088,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = WiFiNetworkDiagnostics::Commands::ResetCounts::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeWiFiNetworkDiagnosticsID)
-                                         commandID:@(MTRCommandIDTypeClusterWiFiNetworkDiagnosticsCommandResetCountsID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -5190,9 +5256,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = EthernetNetworkDiagnostics::Commands::ResetCounts::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeEthernetNetworkDiagnosticsID)
-                                         commandID:@(MTRCommandIDTypeClusterEthernetNetworkDiagnosticsCommandResetCountsID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -5325,9 +5392,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = TimeSynchronization::Commands::SetUTCTime::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeTimeSynchronizationID)
-                                         commandID:@(MTRCommandIDTypeClusterTimeSynchronizationCommandSetUTCTimeID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -5351,9 +5419,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = TimeSynchronization::Commands::SetTrustedTimeSource::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeTimeSynchronizationID)
-                                         commandID:@(MTRCommandIDTypeClusterTimeSynchronizationCommandSetTrustedTimeSourceID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -5377,9 +5446,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = TimeSynchronization::Commands::SetTimeZone::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeTimeSynchronizationID)
-                                         commandID:@(MTRCommandIDTypeClusterTimeSynchronizationCommandSetTimeZoneID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -5403,9 +5473,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = TimeSynchronization::Commands::SetDSTOffset::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeTimeSynchronizationID)
-                                         commandID:@(MTRCommandIDTypeClusterTimeSynchronizationCommandSetDSTOffsetID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -5429,9 +5500,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = TimeSynchronization::Commands::SetDefaultNTP::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeTimeSynchronizationID)
-                                         commandID:@(MTRCommandIDTypeClusterTimeSynchronizationCommandSetDefaultNTPID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -5787,9 +5859,10 @@ using chip::System::Clock::Timeout;
         timedInvokeTimeoutMs = @(10000);
     }
 
+    using RequestType = AdministratorCommissioning::Commands::OpenCommissioningWindow::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeAdministratorCommissioningID)
-                                         commandID:@(MTRCommandIDTypeClusterAdministratorCommissioningCommandOpenCommissioningWindowID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -5816,9 +5889,10 @@ using chip::System::Clock::Timeout;
         timedInvokeTimeoutMs = @(10000);
     }
 
+    using RequestType = AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeAdministratorCommissioningID)
-                                         commandID:@(MTRCommandIDTypeClusterAdministratorCommissioningCommandOpenBasicCommissioningWindowID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -5849,9 +5923,10 @@ using chip::System::Clock::Timeout;
         timedInvokeTimeoutMs = @(10000);
     }
 
+    using RequestType = AdministratorCommissioning::Commands::RevokeCommissioning::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeAdministratorCommissioningID)
-                                         commandID:@(MTRCommandIDTypeClusterAdministratorCommissioningCommandRevokeCommissioningID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -5964,9 +6039,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = OperationalCredentials::Commands::AttestationRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
-                                         commandID:@(MTRCommandIDTypeClusterOperationalCredentialsCommandAttestationRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -5990,9 +6066,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = OperationalCredentials::Commands::CertificateChainRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
-                                         commandID:@(MTRCommandIDTypeClusterOperationalCredentialsCommandCertificateChainRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -6016,9 +6093,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = OperationalCredentials::Commands::CSRRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
-                                         commandID:@(MTRCommandIDTypeClusterOperationalCredentialsCommandCSRRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -6042,9 +6120,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = OperationalCredentials::Commands::AddNOC::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
-                                         commandID:@(MTRCommandIDTypeClusterOperationalCredentialsCommandAddNOCID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -6068,9 +6147,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = OperationalCredentials::Commands::UpdateNOC::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
-                                         commandID:@(MTRCommandIDTypeClusterOperationalCredentialsCommandUpdateNOCID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -6094,9 +6174,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = OperationalCredentials::Commands::UpdateFabricLabel::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
-                                         commandID:@(MTRCommandIDTypeClusterOperationalCredentialsCommandUpdateFabricLabelID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -6120,9 +6201,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = OperationalCredentials::Commands::RemoveFabric::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
-                                         commandID:@(MTRCommandIDTypeClusterOperationalCredentialsCommandRemoveFabricID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -6146,9 +6228,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = OperationalCredentials::Commands::AddTrustedRootCertificate::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
-                                         commandID:@(MTRCommandIDTypeClusterOperationalCredentialsCommandAddTrustedRootCertificateID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -6318,9 +6401,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = GroupKeyManagement::Commands::KeySetWrite::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeGroupKeyManagementID)
-                                         commandID:@(MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetWriteID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -6344,9 +6428,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = GroupKeyManagement::Commands::KeySetRead::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeGroupKeyManagementID)
-                                         commandID:@(MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetReadID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -6370,9 +6455,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = GroupKeyManagement::Commands::KeySetRemove::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeGroupKeyManagementID)
-                                         commandID:@(MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetRemoveID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -6400,9 +6486,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = GroupKeyManagement::Commands::KeySetReadAllIndices::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeGroupKeyManagementID)
-                                         commandID:@(MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetReadAllIndicesID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -6729,9 +6816,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = IcdManagement::Commands::RegisterClient::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeICDManagementID)
-                                         commandID:@(MTRCommandIDTypeClusterICDManagementCommandRegisterClientID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -6755,9 +6843,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = IcdManagement::Commands::UnregisterClient::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeICDManagementID)
-                                         commandID:@(MTRCommandIDTypeClusterICDManagementCommandUnregisterClientID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -6785,9 +6874,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = IcdManagement::Commands::StayActiveRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeICDManagementID)
-                                         commandID:@(MTRCommandIDTypeClusterICDManagementCommandStayActiveRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -6887,9 +6977,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ModeSelect::Commands::ChangeToMode::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeModeSelectID)
-                                         commandID:@(MTRCommandIDTypeClusterModeSelectCommandChangeToModeID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -7025,9 +7116,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = LaundryWasherMode::Commands::ChangeToMode::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeLaundryWasherModeID)
-                                         commandID:@(MTRCommandIDTypeClusterLaundryWasherModeCommandChangeToModeID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -7139,9 +7231,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToMode::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeRefrigeratorAndTemperatureControlledCabinetModeID)
-                                         commandID:@(MTRCommandIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeCommandChangeToModeID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -7341,9 +7434,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = RvcRunMode::Commands::ChangeToMode::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeRVCRunModeID)
-                                         commandID:@(MTRCommandIDTypeClusterRVCRunModeCommandChangeToModeID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -7455,9 +7549,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = RvcCleanMode::Commands::ChangeToMode::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeRVCCleanModeID)
-                                         commandID:@(MTRCommandIDTypeClusterRVCCleanModeCommandChangeToModeID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -7569,9 +7664,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = TemperatureControl::Commands::SetTemperature::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeTemperatureControlID)
-                                         commandID:@(MTRCommandIDTypeClusterTemperatureControlCommandSetTemperatureID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -7732,9 +7828,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = DishwasherMode::Commands::ChangeToMode::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDishwasherModeID)
-                                         commandID:@(MTRCommandIDTypeClusterDishwasherModeCommandChangeToModeID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -7901,9 +7998,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = SmokeCoAlarm::Commands::SelfTestRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeSmokeCOAlarmID)
-                                         commandID:@(MTRCommandIDTypeClusterSmokeCOAlarmCommandSelfTestRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -8049,9 +8147,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = DishwasherAlarm::Commands::Reset::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDishwasherAlarmID)
-                                         commandID:@(MTRCommandIDTypeClusterDishwasherAlarmCommandResetID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -8075,9 +8174,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = DishwasherAlarm::Commands::ModifyEnabledAlarms::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDishwasherAlarmID)
-                                         commandID:@(MTRCommandIDTypeClusterDishwasherAlarmCommandModifyEnabledAlarmsID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -8171,9 +8271,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = OperationalState::Commands::Pause::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeOperationalStateID)
-                                         commandID:@(MTRCommandIDTypeClusterOperationalStateCommandPauseID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -8201,9 +8302,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = OperationalState::Commands::Stop::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeOperationalStateID)
-                                         commandID:@(MTRCommandIDTypeClusterOperationalStateCommandStopID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -8231,9 +8333,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = OperationalState::Commands::Start::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeOperationalStateID)
-                                         commandID:@(MTRCommandIDTypeClusterOperationalStateCommandStartID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -8261,9 +8364,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = OperationalState::Commands::Resume::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeOperationalStateID)
-                                         commandID:@(MTRCommandIDTypeClusterOperationalStateCommandResumeID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -8367,9 +8471,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = RvcOperationalState::Commands::Pause::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeRVCOperationalStateID)
-                                         commandID:@(MTRCommandIDTypeClusterRVCOperationalStateCommandPauseID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -8397,9 +8502,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = RvcOperationalState::Commands::Stop::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeRVCOperationalStateID)
-                                         commandID:@(MTRCommandIDTypeClusterRVCOperationalStateCommandStopID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -8427,9 +8533,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = RvcOperationalState::Commands::Start::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeRVCOperationalStateID)
-                                         commandID:@(MTRCommandIDTypeClusterRVCOperationalStateCommandStartID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -8457,9 +8564,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = RvcOperationalState::Commands::Resume::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeRVCOperationalStateID)
-                                         commandID:@(MTRCommandIDTypeClusterRVCOperationalStateCommandResumeID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -8563,9 +8671,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = HepaFilterMonitoring::Commands::ResetCondition::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeHEPAFilterMonitoringID)
-                                         commandID:@(MTRCommandIDTypeClusterHEPAFilterMonitoringCommandResetConditionID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -8680,9 +8789,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ActivatedCarbonFilterMonitoring::Commands::ResetCondition::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeActivatedCarbonFilterMonitoringID)
-                                         commandID:@(MTRCommandIDTypeClusterActivatedCarbonFilterMonitoringCommandResetConditionID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -8796,9 +8906,10 @@ using chip::System::Clock::Timeout;
         timedInvokeTimeoutMs = @(10000);
     }
 
+    using RequestType = DoorLock::Commands::LockDoor::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDoorLockID)
-                                         commandID:@(MTRCommandIDTypeClusterDoorLockCommandLockDoorID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -8825,9 +8936,10 @@ using chip::System::Clock::Timeout;
         timedInvokeTimeoutMs = @(10000);
     }
 
+    using RequestType = DoorLock::Commands::UnlockDoor::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDoorLockID)
-                                         commandID:@(MTRCommandIDTypeClusterDoorLockCommandUnlockDoorID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -8854,9 +8966,10 @@ using chip::System::Clock::Timeout;
         timedInvokeTimeoutMs = @(10000);
     }
 
+    using RequestType = DoorLock::Commands::UnlockWithTimeout::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDoorLockID)
-                                         commandID:@(MTRCommandIDTypeClusterDoorLockCommandUnlockWithTimeoutID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -8880,9 +8993,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = DoorLock::Commands::SetWeekDaySchedule::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDoorLockID)
-                                         commandID:@(MTRCommandIDTypeClusterDoorLockCommandSetWeekDayScheduleID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -8906,9 +9020,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = DoorLock::Commands::GetWeekDaySchedule::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDoorLockID)
-                                         commandID:@(MTRCommandIDTypeClusterDoorLockCommandGetWeekDayScheduleID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -8932,9 +9047,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = DoorLock::Commands::ClearWeekDaySchedule::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDoorLockID)
-                                         commandID:@(MTRCommandIDTypeClusterDoorLockCommandClearWeekDayScheduleID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -8958,9 +9074,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = DoorLock::Commands::SetYearDaySchedule::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDoorLockID)
-                                         commandID:@(MTRCommandIDTypeClusterDoorLockCommandSetYearDayScheduleID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -8984,9 +9101,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = DoorLock::Commands::GetYearDaySchedule::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDoorLockID)
-                                         commandID:@(MTRCommandIDTypeClusterDoorLockCommandGetYearDayScheduleID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -9010,9 +9128,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = DoorLock::Commands::ClearYearDaySchedule::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDoorLockID)
-                                         commandID:@(MTRCommandIDTypeClusterDoorLockCommandClearYearDayScheduleID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -9036,9 +9155,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = DoorLock::Commands::SetHolidaySchedule::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDoorLockID)
-                                         commandID:@(MTRCommandIDTypeClusterDoorLockCommandSetHolidayScheduleID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -9062,9 +9182,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = DoorLock::Commands::GetHolidaySchedule::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDoorLockID)
-                                         commandID:@(MTRCommandIDTypeClusterDoorLockCommandGetHolidayScheduleID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -9088,9 +9209,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = DoorLock::Commands::ClearHolidaySchedule::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDoorLockID)
-                                         commandID:@(MTRCommandIDTypeClusterDoorLockCommandClearHolidayScheduleID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -9117,9 +9239,10 @@ using chip::System::Clock::Timeout;
         timedInvokeTimeoutMs = @(10000);
     }
 
+    using RequestType = DoorLock::Commands::SetUser::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDoorLockID)
-                                         commandID:@(MTRCommandIDTypeClusterDoorLockCommandSetUserID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -9143,9 +9266,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = DoorLock::Commands::GetUser::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDoorLockID)
-                                         commandID:@(MTRCommandIDTypeClusterDoorLockCommandGetUserID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -9172,9 +9296,10 @@ using chip::System::Clock::Timeout;
         timedInvokeTimeoutMs = @(10000);
     }
 
+    using RequestType = DoorLock::Commands::ClearUser::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDoorLockID)
-                                         commandID:@(MTRCommandIDTypeClusterDoorLockCommandClearUserID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -9201,9 +9326,10 @@ using chip::System::Clock::Timeout;
         timedInvokeTimeoutMs = @(10000);
     }
 
+    using RequestType = DoorLock::Commands::SetCredential::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDoorLockID)
-                                         commandID:@(MTRCommandIDTypeClusterDoorLockCommandSetCredentialID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -9227,9 +9353,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = DoorLock::Commands::GetCredentialStatus::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDoorLockID)
-                                         commandID:@(MTRCommandIDTypeClusterDoorLockCommandGetCredentialStatusID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -9256,9 +9383,10 @@ using chip::System::Clock::Timeout;
         timedInvokeTimeoutMs = @(10000);
     }
 
+    using RequestType = DoorLock::Commands::ClearCredential::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDoorLockID)
-                                         commandID:@(MTRCommandIDTypeClusterDoorLockCommandClearCredentialID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -9285,9 +9413,10 @@ using chip::System::Clock::Timeout;
         timedInvokeTimeoutMs = @(10000);
     }
 
+    using RequestType = DoorLock::Commands::UnboltDoor::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeDoorLockID)
-                                         commandID:@(MTRCommandIDTypeClusterDoorLockCommandUnboltDoorID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -9856,9 +9985,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = WindowCovering::Commands::UpOrOpen::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeWindowCoveringID)
-                                         commandID:@(MTRCommandIDTypeClusterWindowCoveringCommandUpOrOpenID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -9886,9 +10016,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = WindowCovering::Commands::DownOrClose::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeWindowCoveringID)
-                                         commandID:@(MTRCommandIDTypeClusterWindowCoveringCommandDownOrCloseID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -9916,9 +10047,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = WindowCovering::Commands::StopMotion::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeWindowCoveringID)
-                                         commandID:@(MTRCommandIDTypeClusterWindowCoveringCommandStopMotionID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -9942,9 +10074,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = WindowCovering::Commands::GoToLiftValue::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeWindowCoveringID)
-                                         commandID:@(MTRCommandIDTypeClusterWindowCoveringCommandGoToLiftValueID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -9968,9 +10101,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = WindowCovering::Commands::GoToLiftPercentage::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeWindowCoveringID)
-                                         commandID:@(MTRCommandIDTypeClusterWindowCoveringCommandGoToLiftPercentageID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -9994,9 +10128,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = WindowCovering::Commands::GoToTiltValue::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeWindowCoveringID)
-                                         commandID:@(MTRCommandIDTypeClusterWindowCoveringCommandGoToTiltValueID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -10020,9 +10155,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = WindowCovering::Commands::GoToTiltPercentage::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeWindowCoveringID)
-                                         commandID:@(MTRCommandIDTypeClusterWindowCoveringCommandGoToTiltPercentageID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -10269,9 +10405,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = BarrierControl::Commands::BarrierControlGoToPercent::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeBarrierControlID)
-                                         commandID:@(MTRCommandIDTypeClusterBarrierControlCommandBarrierControlGoToPercentID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -10299,9 +10436,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = BarrierControl::Commands::BarrierControlStop::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeBarrierControlID)
-                                         commandID:@(MTRCommandIDTypeClusterBarrierControlCommandBarrierControlStopID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -10724,9 +10862,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Thermostat::Commands::SetpointRaiseLower::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeThermostatID)
-                                         commandID:@(MTRCommandIDTypeClusterThermostatCommandSetpointRaiseLowerID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -10750,9 +10889,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Thermostat::Commands::SetWeeklySchedule::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeThermostatID)
-                                         commandID:@(MTRCommandIDTypeClusterThermostatCommandSetWeeklyScheduleID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -10776,9 +10916,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Thermostat::Commands::GetWeeklySchedule::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeThermostatID)
-                                         commandID:@(MTRCommandIDTypeClusterThermostatCommandGetWeeklyScheduleID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -10806,9 +10947,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Thermostat::Commands::ClearWeeklySchedule::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeThermostatID)
-                                         commandID:@(MTRCommandIDTypeClusterThermostatCommandClearWeeklyScheduleID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -11456,9 +11598,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = FanControl::Commands::Step::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeFanControlID)
-                                         commandID:@(MTRCommandIDTypeClusterFanControlCommandStepID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -11777,9 +11920,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ColorControl::Commands::MoveToHue::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeColorControlID)
-                                         commandID:@(MTRCommandIDTypeClusterColorControlCommandMoveToHueID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -11803,9 +11947,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ColorControl::Commands::MoveHue::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeColorControlID)
-                                         commandID:@(MTRCommandIDTypeClusterColorControlCommandMoveHueID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -11829,9 +11974,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ColorControl::Commands::StepHue::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeColorControlID)
-                                         commandID:@(MTRCommandIDTypeClusterColorControlCommandStepHueID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -11855,9 +12001,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ColorControl::Commands::MoveToSaturation::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeColorControlID)
-                                         commandID:@(MTRCommandIDTypeClusterColorControlCommandMoveToSaturationID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -11881,9 +12028,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ColorControl::Commands::MoveSaturation::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeColorControlID)
-                                         commandID:@(MTRCommandIDTypeClusterColorControlCommandMoveSaturationID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -11907,9 +12055,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ColorControl::Commands::StepSaturation::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeColorControlID)
-                                         commandID:@(MTRCommandIDTypeClusterColorControlCommandStepSaturationID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -11933,9 +12082,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ColorControl::Commands::MoveToHueAndSaturation::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeColorControlID)
-                                         commandID:@(MTRCommandIDTypeClusterColorControlCommandMoveToHueAndSaturationID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -11959,9 +12109,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ColorControl::Commands::MoveToColor::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeColorControlID)
-                                         commandID:@(MTRCommandIDTypeClusterColorControlCommandMoveToColorID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -11985,9 +12136,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ColorControl::Commands::MoveColor::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeColorControlID)
-                                         commandID:@(MTRCommandIDTypeClusterColorControlCommandMoveColorID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -12011,9 +12163,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ColorControl::Commands::StepColor::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeColorControlID)
-                                         commandID:@(MTRCommandIDTypeClusterColorControlCommandStepColorID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -12037,9 +12190,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ColorControl::Commands::MoveToColorTemperature::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeColorControlID)
-                                         commandID:@(MTRCommandIDTypeClusterColorControlCommandMoveToColorTemperatureID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -12063,9 +12217,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ColorControl::Commands::EnhancedMoveToHue::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeColorControlID)
-                                         commandID:@(MTRCommandIDTypeClusterColorControlCommandEnhancedMoveToHueID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -12089,9 +12244,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ColorControl::Commands::EnhancedMoveHue::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeColorControlID)
-                                         commandID:@(MTRCommandIDTypeClusterColorControlCommandEnhancedMoveHueID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -12115,9 +12271,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ColorControl::Commands::EnhancedStepHue::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeColorControlID)
-                                         commandID:@(MTRCommandIDTypeClusterColorControlCommandEnhancedStepHueID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -12141,9 +12298,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeColorControlID)
-                                         commandID:@(MTRCommandIDTypeClusterColorControlCommandEnhancedMoveToHueAndSaturationID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -12167,9 +12325,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ColorControl::Commands::ColorLoopSet::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeColorControlID)
-                                         commandID:@(MTRCommandIDTypeClusterColorControlCommandColorLoopSetID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -12193,9 +12352,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ColorControl::Commands::StopMoveStep::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeColorControlID)
-                                         commandID:@(MTRCommandIDTypeClusterColorControlCommandStopMoveStepID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -12219,9 +12379,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ColorControl::Commands::MoveColorTemperature::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeColorControlID)
-                                         commandID:@(MTRCommandIDTypeClusterColorControlCommandMoveColorTemperatureID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -12245,9 +12406,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ColorControl::Commands::StepColorTemperature::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeColorControlID)
-                                         commandID:@(MTRCommandIDTypeClusterColorControlCommandStepColorTemperatureID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -14798,9 +14960,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Channel::Commands::ChangeChannel::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeChannelID)
-                                         commandID:@(MTRCommandIDTypeClusterChannelCommandChangeChannelID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -14824,9 +14987,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Channel::Commands::ChangeChannelByNumber::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeChannelID)
-                                         commandID:@(MTRCommandIDTypeClusterChannelCommandChangeChannelByNumberID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -14850,9 +15014,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = Channel::Commands::SkipChannel::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeChannelID)
-                                         commandID:@(MTRCommandIDTypeClusterChannelCommandSkipChannelID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -14964,9 +15129,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = TargetNavigator::Commands::NavigateTarget::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeTargetNavigatorID)
-                                         commandID:@(MTRCommandIDTypeClusterTargetNavigatorCommandNavigateTargetID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -15067,9 +15233,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = MediaPlayback::Commands::Play::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeMediaPlaybackID)
-                                         commandID:@(MTRCommandIDTypeClusterMediaPlaybackCommandPlayID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -15097,9 +15264,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = MediaPlayback::Commands::Pause::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeMediaPlaybackID)
-                                         commandID:@(MTRCommandIDTypeClusterMediaPlaybackCommandPauseID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -15127,9 +15295,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = MediaPlayback::Commands::Stop::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeMediaPlaybackID)
-                                         commandID:@(MTRCommandIDTypeClusterMediaPlaybackCommandStopID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -15157,9 +15326,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = MediaPlayback::Commands::StartOver::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeMediaPlaybackID)
-                                         commandID:@(MTRCommandIDTypeClusterMediaPlaybackCommandStartOverID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -15187,9 +15357,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = MediaPlayback::Commands::Previous::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeMediaPlaybackID)
-                                         commandID:@(MTRCommandIDTypeClusterMediaPlaybackCommandPreviousID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -15217,9 +15388,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = MediaPlayback::Commands::Next::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeMediaPlaybackID)
-                                         commandID:@(MTRCommandIDTypeClusterMediaPlaybackCommandNextID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -15247,9 +15419,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = MediaPlayback::Commands::Rewind::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeMediaPlaybackID)
-                                         commandID:@(MTRCommandIDTypeClusterMediaPlaybackCommandRewindID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -15277,9 +15450,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = MediaPlayback::Commands::FastForward::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeMediaPlaybackID)
-                                         commandID:@(MTRCommandIDTypeClusterMediaPlaybackCommandFastForwardID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -15303,9 +15477,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = MediaPlayback::Commands::SkipForward::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeMediaPlaybackID)
-                                         commandID:@(MTRCommandIDTypeClusterMediaPlaybackCommandSkipForwardID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -15329,9 +15504,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = MediaPlayback::Commands::SkipBackward::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeMediaPlaybackID)
-                                         commandID:@(MTRCommandIDTypeClusterMediaPlaybackCommandSkipBackwardID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -15355,9 +15531,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = MediaPlayback::Commands::Seek::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeMediaPlaybackID)
-                                         commandID:@(MTRCommandIDTypeClusterMediaPlaybackCommandSeekID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -15591,9 +15768,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = MediaInput::Commands::SelectInput::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeMediaInputID)
-                                         commandID:@(MTRCommandIDTypeClusterMediaInputCommandSelectInputID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -15621,9 +15799,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = MediaInput::Commands::ShowInputStatus::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeMediaInputID)
-                                         commandID:@(MTRCommandIDTypeClusterMediaInputCommandShowInputStatusID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -15651,9 +15830,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = MediaInput::Commands::HideInputStatus::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeMediaInputID)
-                                         commandID:@(MTRCommandIDTypeClusterMediaInputCommandHideInputStatusID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -15677,9 +15857,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = MediaInput::Commands::RenameInput::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeMediaInputID)
-                                         commandID:@(MTRCommandIDTypeClusterMediaInputCommandRenameInputID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -15800,9 +15981,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = LowPower::Commands::Sleep::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeLowPowerID)
-                                         commandID:@(MTRCommandIDTypeClusterLowPowerCommandSleepID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -15890,9 +16072,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = KeypadInput::Commands::SendKey::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeKeypadInputID)
-                                         commandID:@(MTRCommandIDTypeClusterKeypadInputCommandSendKeyID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -15979,9 +16162,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ContentLauncher::Commands::LaunchContent::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeContentLauncherID)
-                                         commandID:@(MTRCommandIDTypeClusterContentLauncherCommandLaunchContentID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -16005,9 +16189,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ContentLauncher::Commands::LaunchURL::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeContentLauncherID)
-                                         commandID:@(MTRCommandIDTypeClusterContentLauncherCommandLaunchURLID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -16123,9 +16308,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = AudioOutput::Commands::SelectOutput::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeAudioOutputID)
-                                         commandID:@(MTRCommandIDTypeClusterAudioOutputCommandSelectOutputID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -16149,9 +16335,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = AudioOutput::Commands::RenameOutput::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeAudioOutputID)
-                                         commandID:@(MTRCommandIDTypeClusterAudioOutputCommandRenameOutputID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -16250,9 +16437,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ApplicationLauncher::Commands::LaunchApp::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeApplicationLauncherID)
-                                         commandID:@(MTRCommandIDTypeClusterApplicationLauncherCommandLaunchAppID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -16276,9 +16464,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ApplicationLauncher::Commands::StopApp::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeApplicationLauncherID)
-                                         commandID:@(MTRCommandIDTypeClusterApplicationLauncherCommandStopAppID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -16302,9 +16491,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ApplicationLauncher::Commands::HideApp::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeApplicationLauncherID)
-                                         commandID:@(MTRCommandIDTypeClusterApplicationLauncherCommandHideAppID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -16526,9 +16716,10 @@ using chip::System::Clock::Timeout;
         timedInvokeTimeoutMs = @(10000);
     }
 
+    using RequestType = AccountLogin::Commands::GetSetupPIN::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeAccountLoginID)
-                                         commandID:@(MTRCommandIDTypeClusterAccountLoginCommandGetSetupPINID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -16555,9 +16746,10 @@ using chip::System::Clock::Timeout;
         timedInvokeTimeoutMs = @(10000);
     }
 
+    using RequestType = AccountLogin::Commands::Login::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeAccountLoginID)
-                                         commandID:@(MTRCommandIDTypeClusterAccountLoginCommandLoginID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -16588,9 +16780,10 @@ using chip::System::Clock::Timeout;
         timedInvokeTimeoutMs = @(10000);
     }
 
+    using RequestType = AccountLogin::Commands::Logout::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeAccountLoginID)
-                                         commandID:@(MTRCommandIDTypeClusterAccountLoginCommandLogoutID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -16695,9 +16888,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ElectricalMeasurement::Commands::GetProfileInfoCommand::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
-                                         commandID:@(MTRCommandIDTypeClusterElectricalMeasurementCommandGetProfileInfoCommandID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -16721,9 +16915,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = ElectricalMeasurement::Commands::GetMeasurementProfileCommand::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeElectricalMeasurementID)
-                                         commandID:@(MTRCommandIDTypeClusterElectricalMeasurementCommandGetMeasurementProfileCommandID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -17548,9 +17743,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = UnitTesting::Commands::Test::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeUnitTestingID)
-                                         commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -17578,9 +17774,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = UnitTesting::Commands::TestNotHandled::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeUnitTestingID)
-                                         commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestNotHandledID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -17608,9 +17805,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = UnitTesting::Commands::TestSpecific::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeUnitTestingID)
-                                         commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestSpecificID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -17638,9 +17836,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = UnitTesting::Commands::TestUnknownCommand::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeUnitTestingID)
-                                         commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestUnknownCommandID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -17664,9 +17863,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = UnitTesting::Commands::TestAddArguments::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeUnitTestingID)
-                                         commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestAddArgumentsID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -17690,9 +17890,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = UnitTesting::Commands::TestSimpleArgumentRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeUnitTestingID)
-                                         commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestSimpleArgumentRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -17716,9 +17917,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = UnitTesting::Commands::TestStructArrayArgumentRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeUnitTestingID)
-                                         commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestStructArrayArgumentRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -17742,9 +17944,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = UnitTesting::Commands::TestStructArgumentRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeUnitTestingID)
-                                         commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestStructArgumentRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -17768,9 +17971,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = UnitTesting::Commands::TestNestedStructArgumentRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeUnitTestingID)
-                                         commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestNestedStructArgumentRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -17794,9 +17998,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = UnitTesting::Commands::TestListStructArgumentRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeUnitTestingID)
-                                         commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestListStructArgumentRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -17820,9 +18025,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = UnitTesting::Commands::TestListInt8UArgumentRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeUnitTestingID)
-                                         commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestListInt8UArgumentRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -17846,9 +18052,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = UnitTesting::Commands::TestNestedStructListArgumentRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeUnitTestingID)
-                                         commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestNestedStructListArgumentRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -17872,9 +18079,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = UnitTesting::Commands::TestListNestedStructListArgumentRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeUnitTestingID)
-                                         commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestListNestedStructListArgumentRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -17898,9 +18106,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = UnitTesting::Commands::TestListInt8UReverseRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeUnitTestingID)
-                                         commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestListInt8UReverseRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -17924,9 +18133,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = UnitTesting::Commands::TestEnumsRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeUnitTestingID)
-                                         commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestEnumsRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -17950,9 +18160,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = UnitTesting::Commands::TestNullableOptionalRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeUnitTestingID)
-                                         commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestNullableOptionalRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -17976,9 +18187,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = UnitTesting::Commands::TestComplexNullableOptionalRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeUnitTestingID)
-                                         commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestComplexNullableOptionalRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -18002,9 +18214,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = UnitTesting::Commands::SimpleStructEchoRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeUnitTestingID)
-                                         commandID:@(MTRCommandIDTypeClusterUnitTestingCommandSimpleStructEchoRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -18035,9 +18248,10 @@ using chip::System::Clock::Timeout;
         timedInvokeTimeoutMs = @(10000);
     }
 
+    using RequestType = UnitTesting::Commands::TimedInvokeRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeUnitTestingID)
-                                         commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTimedInvokeRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -18061,9 +18275,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = UnitTesting::Commands::TestSimpleOptionalArgumentRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeUnitTestingID)
-                                         commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestSimpleOptionalArgumentRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -18087,9 +18302,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = UnitTesting::Commands::TestEmitTestEventRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeUnitTestingID)
-                                         commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestEventRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -18113,9 +18329,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = UnitTesting::Commands::TestEmitTestFabricScopedEventRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeUnitTestingID)
-                                         commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestFabricScopedEventRequestID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -19696,9 +19913,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = SampleMei::Commands::Ping::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeSampleMEIID)
-                                         commandID:@(MTRCommandIDTypeClusterSampleMEICommandPingID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
@@ -19722,9 +19940,10 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
+    using RequestType = SampleMei::Commands::AddArguments::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
-                                         clusterID:@(MTRClusterIDTypeSampleMEIID)
-                                         commandID:@(MTRCommandIDTypeClusterSampleMEICommandAddArgumentsID)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
                                     commandPayload:params
                                     expectedValues:expectedValues
                              expectedValueInterval:expectedValueIntervalMs
