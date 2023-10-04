@@ -51,7 +51,7 @@ jobs:
             - name: Cleanup pigweed CIPD packages
               # This should not generally be needed, however android CI runs out of space
               # We do not need pigweed cross compile here because we use android NDK
-              # compilers, so removing rust and arm compilers saves 2.5GB
+              # compilers. Removing this package save significant amount of space.
               run: |
                 du -sh .environment/cipd/packages/arm
                 rm -rf .environment/cipd/packages/arm
