@@ -316,25 +316,11 @@
             "DSTOffsetListMaxSize"
         ],
         "Temperature Control": ["SupportedTemperatureLevels"],
-        "Dishwasher Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "StartUpMode",
-            "OnMode",
-            "FeatureMap"
-        ],
-        "Laundry Washer Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "StartUpMode",
-            "OnMode",
-            "FeatureMap"
-        ],
+        "Dishwasher Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
+        "Laundry Washer Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Refrigerator And Temperature Controlled Cabinet Mode": [
             "SupportedModes",
             "CurrentMode",
-            "StartUpMode",
-            "OnMode",
             "FeatureMap"
         ],
         "RVC Clean Mode": [
