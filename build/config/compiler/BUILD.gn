@@ -235,7 +235,6 @@ config("strict_warnings") {
   cflags = [
     "-Wextra",
     "-Wshadow",
-    "-Wundef",
     "-Wunreachable-code",
     "-Wvla",
     "-Wformat",
@@ -252,6 +251,20 @@ config("strict_warnings") {
 
   if (current_os == "mac" || current_os == "ios") {
     cflags += [ "-Wconversion" ]
+  }
+
+  # For now we can't enable -Wundef across the board.  Enable it where
+  # we can.  Ideally this would be checking chip_device_platform or so
+  # to be more fine-grained than current_os, but it's not clear that
+  # we can access that here.
+  if (current_os != "android" && current_os != "freertos" &&
+      current_os != "linux" && current_os != "mbed" && current_os != "tizen" &&
+      current_os != "zephyr" &&
+      # cmsis-rtos is OpenIOT
+      current_os != "cmsis-rtos" &&
+      # cyw30739 is one of the Infineon builds
+      current_os != "cyw30739") {
+    cflags += [ "-Wundef" ]
   }
 
   if (matter_enable_java_compilation) {
