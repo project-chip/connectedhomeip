@@ -22,6 +22,7 @@
 
 #include <app_control.h>
 
+#include <core/CHIPBuildConfig.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 
 namespace {
