@@ -304,6 +304,10 @@ class TestParser(unittest.TestCase):
                 enum StableEnum : ENUM16 {}
                 provisional enum ProvisionalEnum : ENUM16 {}
                 internal enum InternalEnum : ENUM16 {}
+
+                bitmap StableBitmap : BITMAP32 {}
+                provisional bitmap ProvisionalBitmap : BITMAP32 {}
+                internal bitmap InternalBitmap : BITMAP32 {}
             }
         """)
         # TODO: bitmap, command, attribute, event, struct
@@ -315,6 +319,11 @@ class TestParser(unittest.TestCase):
                         Enum(name="StableEnum", base_type="ENUM16", entries=[]),
                         Enum(name="ProvisionalEnum", base_type="ENUM16", entries=[], api_maturity=ApiMaturity.PROVISIONAL),
                         Enum(name="InternalEnum", base_type="ENUM16", entries=[], api_maturity=ApiMaturity.INTERNAL),
+                    ],
+                    bitmaps=[
+                        Bitmap(name="StableBitmap", base_type="BITMAP32", entries=[]),
+                        Bitmap(name="ProvisionalBitmap", base_type="BITMAP32", entries=[], api_maturity=ApiMaturity.PROVISIONAL),
+                        Bitmap(name="InternalBitmap", base_type="BITMAP32", entries=[], api_maturity=ApiMaturity.INTERNAL),
                     ],
                     )])
         self.assertEqual(actual, expected)
