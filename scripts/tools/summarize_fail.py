@@ -3,6 +3,7 @@ import os
 import subprocess
 import datetime
 import yaml
+import sqlite3
 
 import pandas as pd
 from slugify import slugify
@@ -106,6 +107,8 @@ def main():
     pass_rate = pd.DataFrame.from_dict(pass_rate, 'index', columns=["Pass Rate"]).sort_values("Pass Rate")
     print("Recent Pass Rate of Each Workflow:")
     pass_rate.to_markdown("docs/daily_pass_percentage.md")
+    pass_rate_sql = sqlite3.connect("workflow_pass_rate.sqlite3")
+    pass_rate.to_sql("workflow_pass_rate", pass_rate_sql, if_exists="replace")
     print(pass_rate.to_string())
     pass_rate.to_csv("workflow_pass_rate.csv")
 
