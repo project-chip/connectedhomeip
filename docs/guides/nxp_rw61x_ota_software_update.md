@@ -1,9 +1,9 @@
-# OTA requestor feature
+# Matter Over-The-Air Software Update with NXP RW61x example applications
 
 ## Overview
 The OTA Requestor feature enables the device to be informed of, download and apply a software update from an OTA Provider.
 
-This section explains how to perform an OTA Software Update using the RW61x All-Clusters application.
+This section explains how to perform an OTA Software Update with NXP RW61x example applications. Throughout this guide, the all-clusters application is used as an example.
 
 In general, the Over-The-Air Software Update process consists of the following steps :
 - The OTA Requestor queries an update image from the OTA Provider which responds according to its availability.
@@ -15,11 +15,11 @@ In general, the Over-The-Air Software Update process consists of the following s
 
 The RW61x Flash is divided into different regions as follow :
 - Bootloader : MCUBoot resides at the base of the flash and occupies 0x20000 (128 kB).
-- Primary application partition : The all-clusters application which would be run by the bootloader (active application). The size reserved for this partition is 4.4 MB.
+- Primary application partition : The example application which would be run by the bootloader (active application). The size reserved for this partition is 4.4 MB.
 - Secondary application partition : Update image received with the OTA (candidate application). The size reserved for the partition is 4.4 MB.
 
 Notes : 
-- The CPU1/CPU2 firmware are embedded in the CPU3 all-clusters application.
+- The CPU1/CPU2 firmware are embedded in the CPU3 example application.
 - The sizes of the primary and secondary applications are provided as an example (currently 4.4 MB is reserved for each partition). The size can be changed by modifying the `m_app_max_sectors` value in the linker script of the application (`RW610_flash.ld`).
 
 ### MCUBoot Bootloader
@@ -28,7 +28,7 @@ MCUBoot is an open-source secure bootloader used by RW61x to apply the self-upgr
 
 In our use case, the bootloader runs the application residing in the primary partition. In order to run the OTA update image, the bootloader will swap the content of the primary and the secondary partitions. This type of upgrade is called swap-move and is the default upgrade configured by MCUBoot.
 
-## OTA Software Update process for RW61x all-clusters application
+## OTA Software Update process for RW61x example application
 
 ### Flashing the bootloader
 
@@ -53,12 +53,12 @@ J-Link > exec EnableEraseAllFlashBanks
 J-Link > erase 0x8000000, 0x88a0000
 ```
 - Using MCUXPresso, import the `mcuboot_opensource` demo example from the SDK previously downloaded.
-![mcuboot_demo](../../../../platform/nxp/rt/rw61x/doc/images/mcuboot_demo.PNG)
+![mcuboot_demo](../../examples/platform/nxp/rt/rw61x/doc/images/mcuboot_demo.PNG)
 - Before building the demo example, it should be specified that the application to be run by the bootloader is monolithic. As a result, only one image will be upgraded by the bootloader. This can be done by defining `MONOLITHIC_APP` as 1 in the settings of the `mcuboot_opensource` project :
 ```
 Right click on the Project -> Properties -> C/C++ Build -> Settings -> Tool Settings -> MCU C Compiler -> Preprocessor -> Add "MONOLITHIC_APP=1" in the Defined Symbols
 ```
-![rw610_mcuboot_monolithic](../../../../platform/nxp/rt/rw61x/doc/images/mcuboot_monolithic_app.PNG)
+![rw610_mcuboot_monolithic](../../examples/platform/nxp/rt/rw61x/doc/images/mcuboot_monolithic_app.PNG)
 - Build the demo example project and program it to the target board.
 - To run the flashed demo, either press the reset button of the device or use the debugger IDE of MCUXpresso. If it runs successfully, the following logs will be displayed on the terminal :
 
@@ -82,9 +82,8 @@ After flashing the bootloader, the application can be programmed to the board. T
 - Code of the application : generated binary 
 - Trailer : contains metadata needed by the bootloader such as the image signature, the upgrade type, the swap status...
 
-The application can be generated using the instructions from the [README.md 'Building section'][readme_building_section] section. The application is automatically linked to be executed from the primary image partition, taking into consideration the offset imposed by mcuboot.
+The all-clusters application can be generated using the instructions from the [README.md 'Building'](../../examples/all-clusters-app/nxp/rt/rw61x/README.md#building) section. The application is automatically linked to be executed from the primary image partition, taking into consideration the offset imposed by mcuboot.
 
-[readme_building_section]: README.md#building
 
 The resulting executable file found in out/debug/chip-rw61x-all-cluster-example needs to be converted into raw binary format as shown below.
 ```
@@ -140,9 +139,9 @@ The generated OTA file can be used to perform the OTA Software Update. The instr
 ### Performing the OTA Software Update
 
 Setup example : 
-- [Chip-tool](../../../../../examples/chip-tool/README.md) application running on the RPi. 
+- [Chip-tool](../../examples/chip-tool/README.md) application running on the RPi. 
 - OTA Provider application built on the same RPi (as explained below).
-- RW61x board programmed with the All-clusters application (with the instructions above).
+- RW61x board programmed with the example application (with the instructions above).
 
 Before starting the OTA process, the Linux OTA Provider application can be built on the RPi (if not already present in the pre-installed apps) :
 ```

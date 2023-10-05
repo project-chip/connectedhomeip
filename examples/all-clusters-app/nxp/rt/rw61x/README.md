@@ -17,6 +17,7 @@ control.
 -   [Flashing and debugging](#flashing-and-debugging)
 -   [Testing the example](#testing-the-example)
 -   [Matter Shell](#testing-the-all-clusters-application-with-matter-cli-enabled)
+-   [OTA Software Update](#ota-software-update)
 
 <hr>
 
@@ -30,17 +31,19 @@ RW612 SDK. The example supports basic ZCL commands and acts as a thermostat devi
 
 The example supports:
 
-- Matter over Wi-Fi. For that follow instructions from [README_Wifi.md][README_Wifi.md].
-- Matter over Openthread. For that follow instructions from [README_Openthread.md][README_Openthread.md].
+- Matter over Wi-Fi
+- Matter over Openthread
 
-[README_Wifi.md]: README_Wifi.md
-[README_Openthread.md]: README_Openthread.md
 
-The example targets the
-[`NXP RD-RW610-BGA`] and the [`NXP RD-RW612-BGA`]
-boards, with the following configurations :
-- RW610 : Matter over Wi-Fi.
-- RW612 : Matter over Wi-Fi and Matter over Thread.
+### Hardware requirements
+For Matter over Thread configuration :
+- [`NXP RD-RW612-BGA`] board
+- BLE/15.4 antenna (to plug in Ant1)
+
+For Matter over WiFi configuration :
+- [`NXP RD-RW612-BGA`] or [`NXP RD-RW610-BGA`] board
+- BLE antenna (to plug in Ant1)
+- Wi-Fi antenna (to plug in Ant2)
 
 
 <a name="building"></a>
@@ -69,6 +72,26 @@ user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_SDK_ROOT=/home/user/Deskto
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/all-clusters-app/nxp/rt/rw61x/
 ```
+
+#### Building with Matter over Wifi configuration on RW61x
+- Build Matter-over-Wifi configuration with BLE commissioning (ble-wifi) :
+
+```
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ gn gen --args="chip_enable_wifi=true is_sdk_package=true" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ ninja -C out/debug
+```
+
+#### Building with Matter over Thread configuration on RW612
+
+-   Build the Openthread configuration with BLE commissioning.
+
+```
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ gn gen --args="chip_enable_openthread=true chip_inet_config_enable_ipv4=false chip_config_network_layer_ble=true is_sdk_package=true" out/debug
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/all-clusters-app/nxp/rt/rw61x$ ninja -C out/debug
+```
+#### General information
+
+The resulting output file can be found in out/debug/chip-rw61x-all-cluster-example.
 
 Optional GN options that can be added when building an application:
 
@@ -136,6 +159,8 @@ Right click on the Project -> Debug -> As->SEGGER JLink probes -> OK -> Select e
 
 ## Testing the example
 
+CHIP Tool is a Matter controller which can be used to commission a Matter device into the network. For more information regarding how to use the CHIP Tool controller, please refer to the [CHIP Tool guide](../../../../../docs/guides/chip_tool_guide.md).
+
 To know how to commission a device over BLE, follow the instructions from [chip-tool's README.md 'Commission a device over BLE'][readme_ble_commissioning_section].
 
 [readme_ble_commissioning_section]:../../../../chip-tool/README.md#commission-a-device-over-ble
@@ -143,6 +168,14 @@ To know how to commission a device over BLE, follow the instructions from [chip-
 To know how to commissioning a device over IP, follow the instructions from [chip-tool's README.md 'Pair a device over IP'][readme_pair_ip_commissioning_section]
 
 [readme_pair_ip_commissioning_section]: ../../../../chip-tool/README.md#pair-a-device-over-ip
+
+
+#### Matter over wifi configuration :
+The "ble-wifi" pairing method can be used in order to commission the device. 
+
+#### Matter over thread configuration :
+
+The "ble-thread" pairing method can be used in order to commission the device.
 
 ### Testing the all-clusters application without Matter CLI:
 
@@ -197,3 +230,9 @@ Here are described steps to use the all-cluster-app with the Matter CLI enabled
    - No flow control
 
 4. On the client side, start sending commands using the chip-tool application as it is described [here](../../../../chip-tool/README.md#using-the-client-to-send-matter-commands).
+
+
+<a name="ota-software-update"></a>
+
+## OTA Software Update
+Over-The-Air software updates are supported with the RW61x all-clusters example. The process to follow in order to perform a software update is described in the dedicated guide ['Matter Over-The-Air Software Update with NXP RW61x example applications'](../../../../../docs/guides/nxp_rw61x_ota_software_update.md).
