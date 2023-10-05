@@ -1,11 +1,11 @@
+import datetime
 import logging
 import os
-import subprocess
-import datetime
-import yaml
 import sqlite3
+import subprocess
 
 import pandas as pd
+import yaml
 from slugify import slugify
 
 yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
