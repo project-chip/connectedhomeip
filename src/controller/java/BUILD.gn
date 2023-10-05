@@ -360,8 +360,8 @@ kotlin_library("kotlin_matter_controller") {
   ]
 
   sources = [
-    "src/matter/controller/ControllerParams.kt",
     "src/matter/controller/CompletionListenerAdapter.kt",
+    "src/matter/controller/ControllerParams.kt",
     "src/matter/controller/InteractionClient.kt",
     "src/matter/controller/MatterController.kt",
     "src/matter/controller/MatterControllerException.kt",
@@ -381,8 +381,6 @@ kotlin_library("kotlin_matter_controller") {
     ]
   } else {
     deps += [ ":android" ]
-
-    data_deps += [ "${chip_root}/build/chip/java:shared_cpplib" ]
   }
 }
 
