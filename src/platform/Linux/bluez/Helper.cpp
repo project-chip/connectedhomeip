@@ -314,39 +314,6 @@ static gboolean BluezCharacteristicReadValue(BluezGattCharacteristic1 * aChar, G
     return TRUE;
 }
 
-#if CHIP_BLUEZ_CHAR_WRITE_VALUE
-static gboolean BluezCharacteristicWriteValue(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
-                                              GVariant * aValue, GVariant * aOptions, gpointer apEndpoint)
-{
-    const uint8_t * tmpBuf;
-    uint8_t * buf;
-    size_t len;
-    bool isSuccess         = false;
-    BluezConnection * conn = nullptr;
-
-    BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apEndpoint);
-    VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
-
-    VerifyOrExit(aValue != nullptr, ChipLogError(DeviceLayer, "aValue is NULL in %s", __func__));
-
-    conn = GetBluezConnectionViaDevice(endpoint);
-    VerifyOrExit(conn != nullptr,
-                 g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No CHIP Bluez connection"));
-
-    bluez_gatt_characteristic1_set_value(aChar, g_variant_ref(aValue));
-
-    tmpBuf = (uint8_t *) (g_variant_get_fixed_array(aValue, &len, sizeof(uint8_t)));
-    buf    = (uint8_t *) (g_memdup(tmpBuf, len));
-
-    BLEManagerImpl::HandleRXCharWrite(conn, buf, len);
-    bluez_gatt_characteristic1_complete_write_value(aChar, aInvocation);
-    isSuccess = true;
-
-exit:
-    return isSuccess ? TRUE : FALSE;
-}
-#endif
-
 static gboolean BluezCharacteristicWriteValueError(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
                                                    GVariant * aValue, GVariant * aOptions, gpointer apClosure)
 {
@@ -1064,84 +1031,6 @@ static BluezConnection * GetBluezConnectionViaDevice(BluezEndpoint * apEndpoint)
     return retval;
 }
 
-#if CHIP_BLUEZ_CENTRAL_SUPPORT
-static BluezConnection * BluezCharacteristicGetBluezConnection(BluezGattCharacteristic1 * aChar, GVariant * aOptions,
-                                                               BluezEndpoint * apEndpoint)
-{
-    BluezConnection * retval = nullptr;
-    GVariantDict * options   = nullptr;
-    GVariant * option_device = nullptr;
-
-    VerifyOrExit(apEndpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
-    VerifyOrExit(apEndpoint->mIsCentral, );
-
-    /* TODO Unfortunately StartNotify/StopNotify doesn't provide info about
-     * peer device in call params so we need look this up ourselves.
-     */
-    if (aOptions == nullptr)
-    {
-        GList * objects;
-        GList * l;
-        GList * ll;
-
-        objects = g_dbus_object_manager_get_objects(apEndpoint->mpObjMgr);
-        for (l = objects; l != nullptr; l = l->next)
-        {
-            BluezDevice1 * device = bluez_object_get_device1(BLUEZ_OBJECT(l->data));
-            if (device != nullptr)
-            {
-                if (BluezIsDeviceOnAdapter(device, apEndpoint->mpAdapter))
-                {
-                    for (ll = objects; ll != nullptr; ll = ll->next)
-                    {
-                        BluezGattService1 * service = bluez_object_get_gatt_service1(BLUEZ_OBJECT(ll->data));
-                        if (service != nullptr)
-                        {
-                            if (BluezIsServiceOnDevice(service, device))
-                            {
-                                if (BluezIsCharOnService(aChar, service))
-                                {
-                                    retval = static_cast<BluezConnection *>(g_hash_table_lookup(
-                                        apEndpoint->mpConnMap, g_dbus_proxy_get_object_path(G_DBUS_PROXY(device))));
-                                }
-                            }
-                            g_object_unref(service);
-                            if (retval != nullptr)
-                                break;
-                        }
-                    }
-                }
-                g_object_unref(device);
-                if (retval != nullptr)
-                    break;
-            }
-        }
-
-        g_list_free_full(objects, g_object_unref);
-    }
-    else
-    {
-        options       = g_variant_dict_new(aOptions);
-        option_device = g_variant_dict_lookup_value(options, "device", G_VARIANT_TYPE_OBJECT_PATH);
-        VerifyOrExit(option_device != nullptr, ChipLogError(DeviceLayer, "FAIL: No device in options in %s", __func__););
-
-        retval = static_cast<BluezConnection *>(
-            g_hash_table_lookup(apEndpoint->mpConnMap, g_variant_get_string(option_device, nullptr)));
-    }
-
-exit:
-    if (options != nullptr)
-    {
-        g_variant_dict_unref(options);
-    }
-    if (option_device != nullptr)
-    {
-        g_variant_unref(option_device);
-    }
-    return retval;
-}
-#endif // CHIP_BLUEZ_CENTRAL_SUPPORT
-
 static void EndpointCleanup(BluezEndpoint * apEndpoint)
 {
     if (apEndpoint != nullptr)
@@ -1322,18 +1211,6 @@ static void BluezOnBusAcquired(GDBusConnection * aConn, const gchar * aName, gpo
 exit:
     return;
 }
-
-#if CHIP_BLUEZ_NAME_MONITOR
-static void BluezOnNameAcquired(GDBusConnection * aConn, const gchar * aName, gpointer apClosure)
-{
-    ChipLogDetail(DeviceLayer, "TRACE: Owning name: Acquired %s", aName);
-}
-
-static void BluezOnNameLost(GDBusConnection * aConn, const gchar * aName, gpointer apClosure)
-{
-    ChipLogDetail(DeviceLayer, "TRACE: Owning name: lost %s", aName);
-}
-#endif
 
 static CHIP_ERROR StartupEndpointBindings(BluezEndpoint * endpoint)
 {
