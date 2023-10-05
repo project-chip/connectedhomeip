@@ -19,8 +19,8 @@
 #pragma once
 
 #include <app/data-model/Encode.h>
-#include <app/data-model/List.h>
 #include <app/data-model/FabricScoped.h>
+#include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
 
 #include <lib/core/CHIPError.h>
@@ -36,15 +36,16 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
-class WrappedStructEncoder {
-  public:
+class WrappedStructEncoder
+{
+public:
     WrappedStructEncoder(TLV::TLVWriter & writer, TLV::Tag outerTag) : mWriter(writer)
     {
-      mLastError = mWriter.StartContainer(outerTag, TLV::kTLVType_Structure, mOuter);
+        mLastError = mWriter.StartContainer(outerTag, TLV::kTLVType_Structure, mOuter);
     }
 
     template <typename... Args>
-    void Encode(uint8_t contextTag, Args&&... args)
+    void Encode(uint8_t contextTag, Args &&... args)
     {
         VerifyOrReturn(mLastError == CHIP_NO_ERROR);
         mLastError = DataModel::Encode(mWriter, TLV::ContextTag(contextTag), std::forward<Args>(args)...);
@@ -59,11 +60,10 @@ class WrappedStructEncoder {
         return mLastError;
     }
 
-
 private:
-  TLV::TLVWriter & mWriter;
-  CHIP_ERROR mLastError = CHIP_NO_ERROR;
-  TLV::TLVType mOuter;
+    TLV::TLVWriter & mWriter;
+    CHIP_ERROR mLastError = CHIP_NO_ERROR;
+    TLV::TLVType mOuter;
 };
 
 } // namespace DataModel
