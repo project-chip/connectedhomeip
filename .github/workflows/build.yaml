@@ -307,6 +307,7 @@ jobs:
                   scripts/run_in_build_env.sh "ninja -C ./out"
                   scripts/tests/gn_tests.sh
             - name: Setup test python environment
+              shell: bash
               run: |
                   scripts/run_in_build_env.sh 'virtualenv pyenv'
                   source pyenv/bin/activate
@@ -315,6 +316,7 @@ jobs:
                   pip3 install ./out/controller/python/chip_repl-0.0-py3-none-any.whl
 
             - name: Run Python tests
+              shell: bash
               run: |
                   source pyenv/bin/activate
                   cd src/controller/python/test/unit_tests/
@@ -322,6 +324,7 @@ jobs:
             - name: Clean previous outputs
               run: rm -rf out pyenv
             - name: Run Python Setup Payload Generator Test
+              shell: bash
               run: |
                   scripts/run_in_build_env.sh 'scripts/examples/gn_build_example.sh examples/chip-tool out/'
                   scripts/run_in_build_env.sh 'virtualenv pyenv'
