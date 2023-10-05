@@ -5,8 +5,15 @@ from typing import List, Optional, Set, Union
 from lark.tree import Meta
 
 
+class ApiMaturity(enum.Enum):
+    STABLE = enum.auto()  # default
+    PROVISIONAL = enum.auto()
+    INTERNAL = enum.auto()
+
 # Information about parsing location for specific items
 # Helpful when referencing data items in logs when processing
+
+
 @dataclass
 class ParseMetaData:
     line: Optional[int]
@@ -223,6 +230,7 @@ class Cluster:
     structs: List[Struct] = field(default_factory=list)
     commands: List[Command] = field(default_factory=list)
     description: Optional[str] = None
+    api_maturity: ApiMaturity = ApiMaturity.STABLE
 
     # Parsing meta data missing only when skip meta data is requested
     parse_meta: Optional[ParseMetaData] = field(default=None)

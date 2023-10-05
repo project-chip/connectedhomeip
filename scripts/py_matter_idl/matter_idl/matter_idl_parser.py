@@ -18,10 +18,11 @@ except ModuleNotFoundError:
 
     from matter_idl.matter_idl_types import AccessPrivilege
 
-from matter_idl.matter_idl_types import (Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality, AttributeStorage,
-                                         Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType, DeviceType,
-                                         Endpoint, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
-                                         ParseMetaData, ServerClusterInstantiation, Struct, StructQuality, StructTag)
+from matter_idl.matter_idl_types import (ApiMaturity, Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality,
+                                         AttributeStorage, Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry,
+                                         DataType, DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality, Field,
+                                         FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct, StructQuality,
+                                         StructTag)
 
 
 def UnionOfAllFlags(flags_list):
@@ -156,6 +157,12 @@ class MatterIdlTransformer(Transformer):
 
     def bool_default_false(self, _):
         return False
+
+    def provisional_api_maturity(self, _):
+        return ApiMaturity.PROVISIONAL
+
+    def internal_api_maturity(self, _):
+        return ApiMaturity.INTERNAL
 
     def id(self, tokens):
         """An id is a string containing an identifier
@@ -446,14 +453,18 @@ class MatterIdlTransformer(Transformer):
             ServerClusterInstantiation(parse_meta=meta, name=id, attributes=attributes, events_emitted=events))
 
     @v_args(inline=True, meta=True)
-    def cluster(self, meta, side, name, code, *content):
+    def cluster(self, meta, maturity, side, name, code, *content):
         meta = None if self.skip_meta else ParseMetaData(meta)
 
         # shift actual starting position where the doc comment would start
         if meta and self._cluster_start_pos:
             meta.start_pos = self._cluster_start_pos
 
-        result = Cluster(parse_meta=meta, side=side, name=name, code=code)
+        if maturity is None:
+            maturity = ApiMaturity.STABLE
+
+        result = Cluster(parse_meta=meta, side=side, name=name,
+                         code=code, api_maturity=maturity)
 
         for item in content:
             if type(item) == Enum:

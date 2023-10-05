@@ -2,6 +2,12 @@ struct: struct_qualities "struct"i id "{" (struct_field ";")* "}"
 struct_quality: "fabric_scoped"i -> struct_fabric_scoped
 struct_qualities: struct_quality*
 
+// Composing elements may be at different maturity level
+// This only contains non-stable items. Items without a maturity
+// flag are to be assumed "stable"
+?maturity: "provisional"i -> provisional_api_maturity
+         | "internal"i -> internal_api_maturity
+
 enum: "enum"i id ":" type "{" constant_entry* "}"
 bitmap: "bitmap"i id ":" type "{" constant_entry* "}"
 
@@ -53,7 +59,7 @@ command_with_access: "command"i command_access? id
 
 command: command_qualities command_with_access "(" id? ")" ":" id "=" positive_integer ";"
 
-cluster: cluster_side "cluster"i id "=" positive_integer "{" (enum|bitmap|event|attribute|struct|request_struct|response_struct|command)* "}"
+cluster: [maturity] cluster_side "cluster"i id "=" positive_integer "{" (enum|bitmap|event|attribute|struct|request_struct|response_struct|command)* "}"
 ?cluster_side: "server"i -> server_cluster
              | "client"i -> client_cluster
 

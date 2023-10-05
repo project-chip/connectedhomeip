@@ -26,10 +26,10 @@ except ModuleNotFoundError:
 
 import unittest
 
-from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeInstantiation, AttributeQuality, AttributeStorage,
-                                         Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType, DeviceType,
-                                         Endpoint, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
-                                         ParseMetaData, ServerClusterInstantiation, Struct, StructTag)
+from matter_idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeInstantiation, AttributeQuality,
+                                         AttributeStorage, Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry,
+                                         DataType, DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality, Field,
+                                         FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct, StructTag)
 
 
 def parseText(txt, skip_meta=True):
@@ -498,6 +498,22 @@ server cluster A = 1 { /* Test comment */ }
             Endpoint(number=2),
             Endpoint(number=10),
             Endpoint(number=100),
+        ])
+        self.assertEqual(actual, expected)
+
+    def test_cluster_api_maturity(self):
+        actual = parseText("""
+            provisional server cluster A = 1 { /* Test comment */ }
+            internal client cluster B = 2 { }
+            client cluster C = 3 { }
+        """)
+
+        expected = Idl(clusters=[
+            Cluster(side=ClusterSide.SERVER, name="A", code=1,
+                    api_maturity=ApiMaturity.PROVISIONAL),
+            Cluster(side=ClusterSide.CLIENT, name="B", code=2,
+                    api_maturity=ApiMaturity.INTERNAL),
+            Cluster(side=ClusterSide.CLIENT, name="C", code=3),
         ])
         self.assertEqual(actual, expected)
 
