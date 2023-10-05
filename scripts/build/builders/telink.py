@@ -41,7 +41,7 @@ class TelinkApp(Enum):
 
     def ExampleName(self):
         if self == TelinkApp.AIR_QUALITY_SENSOR:
-            return 'air-quality-sensor-app'        
+            return 'air-quality-sensor-app'
         elif self == TelinkApp.ALL_CLUSTERS:
             return 'all-clusters-app'
         elif self == TelinkApp.ALL_CLUSTERS_MINIMAL:
@@ -79,7 +79,7 @@ class TelinkApp(Enum):
 
     def AppNamePrefix(self):
         if self == TelinkApp.AIR_QUALITY_SENSOR:
-            return 'chip-telink-air-quality-sensor-example'            
+            return 'chip-telink-air-quality-sensor-example'
         elif self == TelinkApp.ALL_CLUSTERS:
             return 'chip-telink-all-clusters-example'
         elif self == TelinkApp.ALL_CLUSTERS_MINIMAL:
