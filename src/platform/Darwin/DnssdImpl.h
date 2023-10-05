@@ -18,6 +18,7 @@
 #pragma once
 
 #include <dns_sd.h>
+#include <lib/core/Global.h>
 #include <lib/dnssd/platform/Dnssd.h>
 
 #include "DnssdHostNameRegistrar.h"
@@ -62,10 +63,10 @@ struct ResolveContext;
 class MdnsContexts
 {
 public:
-    MdnsContexts(const MdnsContexts &) = delete;
+    MdnsContexts(const MdnsContexts &)             = delete;
     MdnsContexts & operator=(const MdnsContexts &) = delete;
     ~MdnsContexts();
-    static MdnsContexts & GetInstance() { return sInstance; }
+    static MdnsContexts & GetInstance() { return sInstance.get(); }
 
     CHIP_ERROR Add(GenericContext * context, DNSServiceRef sdRef);
     CHIP_ERROR Remove(GenericContext * context);
@@ -128,8 +129,9 @@ public:
     }
 
 private:
-    MdnsContexts(){};
-    static MdnsContexts sInstance;
+    MdnsContexts() = default;
+    friend class Global<MdnsContexts>;
+    static Global<MdnsContexts> sInstance;
 
     std::vector<GenericContext *> mContexts;
 };

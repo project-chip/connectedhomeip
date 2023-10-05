@@ -126,9 +126,9 @@ RgbColor_t XYToRgb(uint8_t Level, uint16_t currentX, uint16_t currentY)
     b = clamp(b, 0, 1);
 
     // these rgb values are in  the range of 0 to 1, convert to limit of HW specific LED
-    rgb.r = (uint8_t)(r * 255);
-    rgb.g = (uint8_t)(g * 255);
-    rgb.b = (uint8_t)(b * 255);
+    rgb.r = (uint8_t) (r * 255);
+    rgb.g = (uint8_t) (g * 255);
+    rgb.b = (uint8_t) (b * 255);
 
     return rgb;
 }

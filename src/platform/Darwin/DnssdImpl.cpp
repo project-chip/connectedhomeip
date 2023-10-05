@@ -131,7 +131,7 @@ std::shared_ptr<uint32_t> GetCounterHolder(const char * name)
 namespace chip {
 namespace Dnssd {
 
-MdnsContexts MdnsContexts::sInstance;
+Global<MdnsContexts> MdnsContexts::sInstance;
 
 namespace {
 

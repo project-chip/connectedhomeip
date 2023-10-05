@@ -27,7 +27,7 @@
 #import "MTRLogging_Internal.h"
 
 #include <app/InteractionModelEngine.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <platform/PlatformManager.h>
 
 using namespace chip;

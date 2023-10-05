@@ -15,6 +15,7 @@
 declare_args() {
   # EFR32 board used
   silabs_board = ""
+  silabs_board_lower = ""
 
   # LCD is enabled by default
   # Boards BRD4166A, BRD2601B, BRD2703A and BRD4319A do not have a LCD so they disable it explicitly
@@ -47,6 +48,9 @@ declare_args() {
 
   # Disable UART log forwarding by default
   sl_uart_log_output = false
+
+  # Self-provision enabled
+  use_provision_channel = false
 }
 
 declare_args() {
@@ -106,6 +110,7 @@ if (silabs_board == "BRD4304A") {
   disable_lcd = true
   show_qr_code = false
   wifi_soc = true
+  silabs_board_lower = "brd4325b"
 } else if (silabs_board == "BRD4325C") {
   silabs_family = "SiWx917-common"
   silabs_mcu = "SiWG917M111MGTBA"
@@ -113,6 +118,7 @@ if (silabs_board == "BRD4304A") {
   show_qr_code = false
   wifi_soc = true
   wifi_soc_common_flash = true
+  silabs_board_lower = "brd4325c"
 } else if (silabs_board == "BRD4325G") {
   silabs_family = "SiWx917-common"
   silabs_mcu = "SiWG917M111MGTBA"
@@ -120,13 +126,15 @@ if (silabs_board == "BRD4304A") {
   show_qr_code = false
   wifi_soc = true
   wifi_soc_common_flash = true
+  silabs_board_lower = "brd4325g"
 } else if (silabs_board == "BRD4338A") {
   silabs_family = "SiWx917-common"
   silabs_mcu = "SiWG917M111MGTBA"
-  disable_lcd = true
-  show_qr_code = false
+  disable_lcd = false
+  show_qr_code = true
   wifi_soc = true
   wifi_soc_common_flash = true
+  silabs_board_lower = "brd4338a"
 } else if (silabs_board == "BRD4180A") {
   assert(
       false,

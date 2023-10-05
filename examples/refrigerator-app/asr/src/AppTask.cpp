@@ -70,7 +70,7 @@ constexpr const uint8_t kTagFreezer                                             
 const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type refrigeratorTagList[] = { { .namespaceID = kNamespaceRefrigerator,
                                                                                               .tag         = kTagRefrigerator } };
 const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type freezerTagList[]      = { { .namespaceID = kNamespaceRefrigerator,
-                                                                                         .tag         = kTagFreezer } };
+                                                                                              .tag         = kTagFreezer } };
 } // namespace
 
 void NetWorkCommissioningInstInit()

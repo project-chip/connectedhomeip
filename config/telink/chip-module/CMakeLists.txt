@@ -52,6 +52,8 @@ if (CONFIG_POSIX_API)
     matter_add_flags(-isystem${ZEPHYR_BASE}/include/zephyr/posix)
 endif()
 
+matter_add_flags(-DNL_ASSERT_USE_FLAGS_DEFAULT=1)
+
 zephyr_include_directories(${CHIP_ROOT}/src/platform/telink/)
 
 zephyr_get_compile_flags(ZEPHYR_CFLAGS_C C)
@@ -60,6 +62,8 @@ zephyr_get_compile_flags(ZEPHYR_CFLAGS_CC CXX)
 matter_add_cxxflags("${ZEPHYR_CFLAGS_CC}")
 zephyr_get_gnu_cpp_standard(ZEPHYR_GNU_CPP_STD)
 matter_add_cxxflags(${ZEPHYR_GNU_CPP_STD})
+
+matter_add_flags(-DMBEDTLS_USER_CONFIG_FILE=<telink-mbedtls-config.h>)
 
 # Set up custom OpenThread configuration
 
@@ -97,6 +101,7 @@ matter_add_gn_arg_bool  ("chip_error_logging"                     CONFIG_MATTER_
 matter_add_gn_arg_bool  ("chip_progress_logging"                  CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 3)
 matter_add_gn_arg_bool  ("chip_detail_logging"                    CONFIG_MATTER_LOG_LEVEL GREATER_EQUAL 4)
 matter_add_gn_arg_bool  ("chip_automation_logging"                FALSE)
+matter_add_gn_arg_bool  ("chip_enable_icd_server"                 CONFIG_CHIP_ENABLE_ICD_SUPPORT)
 
 if (CONFIG_CHIP_FACTORY_DATA)
     matter_add_gn_arg_bool  ("chip_use_transitional_commissionable_data_provider"  "false")

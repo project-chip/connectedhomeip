@@ -19,8 +19,8 @@
 #include "system/SystemClock.h"
 
 #include <credentials/tests/CHIPCert_unit_test_vectors.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <protocols/secure_channel/Constants.h>
 
 namespace chip {

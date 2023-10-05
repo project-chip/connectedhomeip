@@ -47,7 +47,7 @@ public:
     using IntegerType = StorageType;
 
     constexpr BitFlags() : mValue(0) {}
-    BitFlags(const BitFlags & other) = default;
+    BitFlags(const BitFlags & other)       = default;
     BitFlags & operator=(const BitFlags &) = default;
 
     explicit BitFlags(FlagsEnum value) : mValue(static_cast<IntegerType>(value)) {}

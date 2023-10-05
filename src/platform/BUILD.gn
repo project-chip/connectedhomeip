@@ -205,6 +205,9 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     } else if (chip_device_platform == "k32w0") {
       device_layer_target_define = "K32W"
       defines += [ "CHIP_DEVICE_LAYER_TARGET=nxp/k32w/k32w0" ]
+    } else if (chip_device_platform == "k32w1") {
+      device_layer_target_define = "K32W"
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=nxp/k32w/k32w1" ]
     } else if (chip_device_platform == "telink") {
       device_layer_target_define = "TELINK"
       defines += [ "CHIP_DEVICE_LAYER_TARGET=telink" ]
@@ -494,6 +497,8 @@ if (chip_device_platform != "none") {
       _platform_target = "ESP32"
     } else if (chip_device_platform == "k32w0") {
       _platform_target = "nxp/k32w/k32w0"
+    } else if (chip_device_platform == "k32w1") {
+      _platform_target = "nxp/k32w/k32w1"
     } else if (chip_device_platform == "linux") {
       _platform_target = "Linux"
     } else if (chip_device_platform == "nrfconnect") {

@@ -22,8 +22,9 @@
 #include "RequestPath.h"
 #include "SubjectDescriptor.h"
 
-#include "lib/support/CodeUtils.h"
 #include <lib/core/CHIPCore.h>
+#include <lib/core/Global.h>
+#include <lib/support/CodeUtils.h>
 
 // Dump function for use during development only (0 for disabled, non-zero for enabled).
 #define CHIP_ACCESS_CONTROL_DUMP_ENABLED 0
@@ -70,7 +71,7 @@ public:
         public:
             Delegate() = default;
 
-            Delegate(const Delegate &) = delete;
+            Delegate(const Delegate &)             = delete;
             Delegate & operator=(const Delegate &) = delete;
 
             virtual ~Delegate() = default;
@@ -104,7 +105,7 @@ public:
 
         Entry() = default;
 
-        Entry(Entry && other) : mDelegate(other.mDelegate) { other.mDelegate = &mDefaultDelegate; }
+        Entry(Entry && other) : mDelegate(other.mDelegate) { other.mDelegate = &mDefaultDelegate.get(); }
 
         Entry & operator=(Entry && other)
         {
@@ -112,12 +113,12 @@ public:
             {
                 mDelegate->Release();
                 mDelegate       = other.mDelegate;
-                other.mDelegate = &mDefaultDelegate;
+                other.mDelegate = &mDefaultDelegate.get();
             }
             return *this;
         }
 
-        Entry(const Entry &) = delete;
+        Entry(const Entry &)             = delete;
         Entry & operator=(const Entry &) = delete;
 
         ~Entry() { mDelegate->Release(); }
@@ -208,7 +209,7 @@ public:
          */
         CHIP_ERROR RemoveTarget(size_t index) { return mDelegate->RemoveTarget(index); }
 
-        bool HasDefaultDelegate() const { return mDelegate == &mDefaultDelegate; }
+        bool HasDefaultDelegate() const { return mDelegate == &mDefaultDelegate.get(); }
 
         const Delegate & GetDelegate() const { return *mDelegate; }
 
@@ -223,12 +224,12 @@ public:
         void ResetDelegate()
         {
             mDelegate->Release();
-            mDelegate = &mDefaultDelegate;
+            mDelegate = &mDefaultDelegate.get();
         }
 
     private:
-        static Delegate mDefaultDelegate;
-        Delegate * mDelegate = &mDefaultDelegate;
+        static Global<Delegate> mDefaultDelegate;
+        Delegate * mDelegate = &mDefaultDelegate.get();
     };
 
     /**
@@ -244,7 +245,7 @@ public:
         public:
             Delegate() = default;
 
-            Delegate(const Delegate &) = delete;
+            Delegate(const Delegate &)             = delete;
             Delegate & operator=(const Delegate &) = delete;
 
             virtual ~Delegate() = default;
@@ -256,7 +257,7 @@ public:
 
         EntryIterator() = default;
 
-        EntryIterator(const EntryIterator &) = delete;
+        EntryIterator(const EntryIterator &)             = delete;
         EntryIterator & operator=(const EntryIterator &) = delete;
 
         ~EntryIterator() { mDelegate->Release(); }
@@ -276,12 +277,12 @@ public:
         void ResetDelegate()
         {
             mDelegate->Release();
-            mDelegate = &mDefaultDelegate;
+            mDelegate = &mDefaultDelegate.get();
         }
 
     private:
-        static Delegate mDefaultDelegate;
-        Delegate * mDelegate = &mDefaultDelegate;
+        static Global<Delegate> mDefaultDelegate;
+        Delegate * mDelegate = &mDefaultDelegate.get();
     };
 
     /**
@@ -326,7 +327,7 @@ public:
     public:
         Delegate() = default;
 
-        Delegate(const Delegate &) = delete;
+        Delegate(const Delegate &)             = delete;
         Delegate & operator=(const Delegate &) = delete;
 
         virtual ~Delegate() = default;
@@ -399,7 +400,7 @@ public:
 
     AccessControl() = default;
 
-    AccessControl(const AccessControl &) = delete;
+    AccessControl(const AccessControl &)             = delete;
     AccessControl & operator=(const AccessControl &) = delete;
 
     ~AccessControl()

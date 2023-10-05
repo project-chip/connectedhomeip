@@ -123,7 +123,7 @@ public:
     /**
      * The maximum size buffer an application can allocate with no protocol header reserve.
      */
-#if CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
     static constexpr uint16_t kMaxSizeWithoutReserve = LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE);
 #else
     static constexpr uint16_t kMaxSizeWithoutReserve = CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX;
@@ -670,7 +670,7 @@ protected:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 private:
-    PacketBufferHandle(const PacketBufferHandle &) = delete;
+    PacketBufferHandle(const PacketBufferHandle &)             = delete;
     PacketBufferHandle & operator=(const PacketBufferHandle &) = delete;
 
     // The caller's ownership is transferred to this.

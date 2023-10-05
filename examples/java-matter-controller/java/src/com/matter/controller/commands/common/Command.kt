@@ -28,16 +28,8 @@ import java.util.concurrent.atomic.AtomicLong
  *   that may be performed. Commands are verb-like, such as pair a Matter device or discover Matter
  *   devices from the environment.
  */
-abstract class Command(private val name: String, private val helpText: String? = null) {
+abstract class Command(val name: String, val helpText: String? = null) {
   private val arguments = ArrayList<Argument>()
-
-  fun getName(): String {
-    return name
-  }
-
-  fun getHelpText(): String? {
-    return helpText
-  }
 
   fun getArgumentName(index: Int): String {
     return arguments[index].name
@@ -92,8 +84,8 @@ abstract class Command(private val name: String, private val helpText: String? =
    * @return The number of arguments currently added to the command
    * @brief Add a bool command argument
    */
-  fun addArgument(name: String?, out: AtomicBoolean?, desc: String?, optional: Boolean) {
-    val arg = Argument(name!!, out!!, desc, optional)
+  fun addArgument(name: String, out: AtomicBoolean, desc: String?, optional: Boolean) {
+    val arg = Argument(name, out, desc, optional)
     addArgumentToList(arg)
   }
 
@@ -108,14 +100,14 @@ abstract class Command(private val name: String, private val helpText: String? =
    * @brief Add a short command argument
    */
   fun addArgument(
-    name: String?,
+    name: String,
     min: Short,
     max: Short,
-    out: AtomicInteger?,
+    out: AtomicInteger,
     desc: String?,
     optional: Boolean
   ) {
-    val arg = Argument(name!!, min, max, out!!, desc, optional)
+    val arg = Argument(name, min, max, out, desc, optional)
     addArgumentToList(arg)
   }
 
@@ -130,14 +122,14 @@ abstract class Command(private val name: String, private val helpText: String? =
    * @brief Add an int command argument
    */
   fun addArgument(
-    name: String?,
+    name: String,
     min: Int,
     max: Int,
-    out: AtomicInteger?,
+    out: AtomicInteger,
     desc: String?,
     optional: Boolean
   ) {
-    val arg = Argument(name!!, min, max, out!!, desc, optional)
+    val arg = Argument(name, min, max, out, desc, optional)
     addArgumentToList(arg)
   }
 
@@ -152,14 +144,14 @@ abstract class Command(private val name: String, private val helpText: String? =
    * @brief Add a long Integer command argument
    */
   fun addArgument(
-    name: String?,
+    name: String,
     min: Short,
     max: Short,
-    out: AtomicLong?,
+    out: AtomicLong,
     desc: String?,
     optional: Boolean
   ) {
-    val arg = Argument(name!!, min, max, out!!, desc, optional)
+    val arg = Argument(name, min, max, out, desc, optional)
     addArgumentToList(arg)
   }
 
@@ -174,14 +166,14 @@ abstract class Command(private val name: String, private val helpText: String? =
    * @brief Add a long Integer command argument
    */
   fun addArgument(
-    name: String?,
+    name: String,
     min: Long,
     max: Long,
-    out: AtomicLong?,
+    out: AtomicLong,
     desc: String?,
     optional: Boolean
   ) {
-    val arg = Argument(name!!, min, max, out!!, desc, optional)
+    val arg = Argument(name, min, max, out, desc, optional)
     addArgumentToList(arg)
   }
 
@@ -192,8 +184,8 @@ abstract class Command(private val name: String, private val helpText: String? =
    * @return The number of arguments currently added to the command
    * @brief Add an IP address command argument
    */
-  fun addArgument(name: String?, out: IPAddress?, optional: Boolean) {
-    val arg = Argument(name!!, out!!, optional)
+  fun addArgument(name: String, out: IPAddress, optional: Boolean) {
+    val arg = Argument(name, out, optional)
     addArgumentToList(arg)
   }
 
@@ -205,8 +197,8 @@ abstract class Command(private val name: String, private val helpText: String? =
    * @return The number of arguments currently added to the command
    * @brief Add a String command argument
    */
-  fun addArgument(name: String?, out: StringBuffer?, desc: String?, optional: Boolean) {
-    val arg = Argument(name!!, out!!, desc, optional)
+  fun addArgument(name: String, out: StringBuffer, desc: String?, optional: Boolean) {
+    val arg = Argument(name, out, desc, optional)
     addArgumentToList(arg)
   }
 
@@ -214,7 +206,7 @@ abstract class Command(private val name: String, private val helpText: String? =
    * @param args Supplied command-line arguments as an array of String objects.
    * @brief Initialize command arguments
    */
-  fun initArguments(args: Array<String>) {
+  fun setArgumentValues(args: Array<String>) {
     val argc = args.size
     var mandatoryArgsCount = 0
     var currentIndex = 0
@@ -224,12 +216,12 @@ abstract class Command(private val name: String, private val helpText: String? =
       }
     }
     require(argc >= mandatoryArgsCount) {
-      "initArguments: Wrong arguments number: $argc instead of $mandatoryArgsCount"
+      "setArgumentValues: Wrong arguments number: $argc instead of $mandatoryArgsCount"
     }
 
     // Initialize mandatory arguments
     for (i in 0 until mandatoryArgsCount) {
-      initArgument(currentIndex++, args[i])
+      setArgumentValue(currentIndex++, args[i])
     }
 
     // Initialize optional arguments
@@ -242,18 +234,20 @@ abstract class Command(private val name: String, private val helpText: String? =
         !(args[i].length <= OPTIONAL_ARGUMENT_PREFIX_LENGTH &&
           !args[i].startsWith(OPTIONAL_ARGUMENT_PREFIX))
       ) {
-        "initArguments: Invalid optional argument: " + args[i]
+        "setArgumentValues: Invalid optional argument: " + args[i]
       }
       if (args[i].substring(OPTIONAL_ARGUMENT_PREFIX_LENGTH) == arguments[currentIndex].name) {
-        require(i + 1 < argc) { "initArguments: Optional argument " + args[i] + " missing value" }
-        initArgument(currentIndex++, args[i + 1])
+        require(i + 1 < argc) {
+          "setArgumentValues: Optional argument " + args[i] + " missing value"
+        }
+        setArgumentValue(currentIndex++, args[i + 1])
       }
       i += 2
     }
   }
 
-  fun initArgument(argIndex: Int, argValue: String?) {
-    arguments[argIndex].setValue(argValue!!)
+  private fun setArgumentValue(argIndex: Int, argValue: String) {
+    arguments[argIndex].setValue(argValue)
   }
 
   @Throws(Exception::class) abstract fun run()

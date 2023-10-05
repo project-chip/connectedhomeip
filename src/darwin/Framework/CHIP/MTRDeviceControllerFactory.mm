@@ -26,7 +26,6 @@
 #endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #import "MTRCertificates.h"
-#import "MTRControllerAccessControl.h"
 #import "MTRDemuxingStorage.h"
 #import "MTRDeviceController.h"
 #import "MTRDeviceControllerStartupParams.h"
@@ -45,6 +44,7 @@
 
 #import <os/lock.h>
 
+#include <app/dynamic_server/AccessControl.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/FabricTable.h>
@@ -405,7 +405,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
             return;
         }
 
-        [MTRControllerAccessControl init];
+        app::dynamic_server::InitAccessControl();
 
         if (startupParams.hasStorage) {
             _persistentStorageDelegate = new (std::nothrow) MTRPersistentStorageDelegateBridge(startupParams.storage);
@@ -671,7 +671,7 @@ static void ShutdownOnExit() { [[MTRDeviceControllerFactory sharedInstance] stop
         // matches a running controller.
         auto * controllersCopy = [self getRunningControllers];
         for (MTRDeviceController * existing in controllersCopy) {
-            if (existing != controller && [existing.uniqueIdentifier compare:params.uniqueIdentifier] == NSOrderedSame) {
+            if (existing != controller && [existing.uniqueIdentifier isEqual:params.uniqueIdentifier]) {
                 MTR_LOG_ERROR("Already have running controller with uniqueIdentifier %@", existing.uniqueIdentifier);
                 fabricError = CHIP_ERROR_INVALID_ARGUMENT;
                 params = nil;

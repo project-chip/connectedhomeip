@@ -33,7 +33,7 @@ struct ConcreteClusterPath
 
     ConcreteClusterPath() {}
 
-    ConcreteClusterPath(const ConcreteClusterPath & aOther) = default;
+    ConcreteClusterPath(const ConcreteClusterPath & aOther)             = default;
     ConcreteClusterPath & operator=(const ConcreteClusterPath & aOther) = default;
 
     bool IsValidConcreteClusterPath() const { return !(mEndpointId == kInvalidEndpointId || mClusterId == kInvalidClusterId); }

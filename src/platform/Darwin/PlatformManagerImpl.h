@@ -23,8 +23,10 @@
 
 #pragma once
 
-#include <dispatch/dispatch.h>
+#include <lib/core/Global.h>
 #include <platform/internal/GenericPlatformManagerImpl.h>
+
+#include <dispatch/dispatch.h>
 
 static constexpr const char * const CHIP_CONTROLLER_QUEUE = "org.csa-iot.matter.framework.controller.workqueue";
 
@@ -77,9 +79,8 @@ private:
 
     friend PlatformManager & PlatformMgr(void);
     friend PlatformManagerImpl & PlatformMgrImpl(void);
-    friend class Internal::BLEManagerImpl;
 
-    static PlatformManagerImpl sInstance;
+    static Global<PlatformManagerImpl> sInstance;
 
     System::Clock::Timestamp mStartTime = System::Clock::kZero;
 
@@ -104,7 +105,7 @@ private:
  */
 inline PlatformManager & PlatformMgr(void)
 {
-    return PlatformManagerImpl::sInstance;
+    return PlatformManagerImpl::sInstance.get();
 }
 
 /**
@@ -115,7 +116,7 @@ inline PlatformManager & PlatformMgr(void)
  */
 inline PlatformManagerImpl & PlatformMgrImpl(void)
 {
-    return PlatformManagerImpl::sInstance;
+    return PlatformManagerImpl::sInstance.get();
 }
 
 } // namespace DeviceLayer

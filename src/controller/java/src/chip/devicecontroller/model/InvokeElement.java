@@ -19,6 +19,7 @@ package chip.devicecontroller.model;
 
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nullable;
@@ -28,12 +29,15 @@ import org.json.JSONObject;
 /** An invoke element that should be used for interaction model invoke request and response. */
 public final class InvokeElement {
   private static final Logger logger = Logger.getLogger(InvokeElement.class.getName());
-  private final ChipPathId endpointId, clusterId, commandId;
+  @Nullable private final ChipPathId endpointId;
+  private final ChipPathId clusterId, commandId;
+  private final Optional<Integer> groupId;
   @Nullable private final byte[] tlv;
   @Nullable private final JSONObject json;
 
   private InvokeElement(
       ChipPathId endpointId,
+      Optional<Integer> groupId,
       ChipPathId clusterId,
       ChipPathId commandId,
       @Nullable byte[] tlv,
@@ -41,6 +45,7 @@ public final class InvokeElement {
     this.endpointId = endpointId;
     this.clusterId = clusterId;
     this.commandId = commandId;
+    this.groupId = groupId;
 
     if (tlv != null) {
       this.tlv = tlv.clone();
@@ -70,6 +75,18 @@ public final class InvokeElement {
 
   public ChipPathId getCommandId() {
     return commandId;
+  }
+
+  public Optional<Integer> getGroupId() {
+    return groupId;
+  }
+
+  public boolean isEndpointIdValid() {
+    return endpointId != null;
+  }
+
+  public boolean isGroupIdValid() {
+    return groupId.isPresent();
   }
 
   @Nullable
@@ -120,7 +137,7 @@ public final class InvokeElement {
       ChipPathId commandId,
       @Nullable byte[] tlv,
       @Nullable String jsonString) {
-    return new InvokeElement(endpointId, clusterId, commandId, tlv, jsonString);
+    return new InvokeElement(endpointId, Optional.empty(), clusterId, commandId, tlv, jsonString);
   }
 
   /** Create a new {@link InvokeElement} with only concrete ids. */
@@ -132,9 +149,34 @@ public final class InvokeElement {
       @Nullable String jsonString) {
     return new InvokeElement(
         ChipPathId.forId(endpointId),
+        Optional.empty(),
         ChipPathId.forId(clusterId),
         ChipPathId.forId(commandId),
         tlv,
         jsonString);
+  }
+
+  public static InvokeElement newGroupInstance(
+      int groupId,
+      long clusterId,
+      long commandId,
+      @Nullable byte[] tlv,
+      @Nullable String jsonString) {
+    return new InvokeElement(
+        null,
+        Optional.of(groupId),
+        ChipPathId.forId(clusterId),
+        ChipPathId.forId(commandId),
+        tlv,
+        jsonString);
+  }
+
+  public static InvokeElement newGroupInstance(
+      int groupId,
+      ChipPathId clusterId,
+      ChipPathId commandId,
+      @Nullable byte[] tlv,
+      @Nullable String jsonString) {
+    return new InvokeElement(null, Optional.of(groupId), clusterId, commandId, tlv, jsonString);
   }
 }

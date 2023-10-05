@@ -33,11 +33,6 @@
 #define ICD_ENFORCE_SIT_SLOW_POLL_LIMIT 0
 #endif
 
-#ifndef ICD_REPORT_ON_ENTER_ACTIVE_MODE
-// Enabling this makes the device emit subscription reports when transitioning from idle to active mode.
-#define ICD_REPORT_ON_ENTER_ACTIVE_MODE 0
-#endif
-
 namespace chip {
 namespace app {
 
@@ -55,7 +50,7 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     mFabricTable   = fabricTable;
     mStateObserver = stateObserver;
 
-    uint32_t activeModeInterval = IcdManagementServer::GetInstance().GetActiveModeInterval();
+    uint32_t activeModeInterval = IcdManagementServer::GetInstance().GetActiveModeIntervalMs();
     VerifyOrDie(kFastPollingInterval.count() < activeModeInterval);
 
     UpdateIcdMode();
@@ -128,7 +123,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
     if (state == OperationalState::IdleMode)
     {
         mOperationalState         = OperationalState::IdleMode;
-        uint32_t idleModeInterval = IcdManagementServer::GetInstance().GetIdleModeInterval();
+        uint32_t idleModeInterval = IcdManagementServer::GetInstance().GetIdleModeIntervalSec();
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(idleModeInterval), OnIdleModeDone, this);
 
         System::Clock::Milliseconds32 slowPollInterval = GetSlowPollingInterval();
@@ -156,7 +151,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
             DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
 
             mOperationalState           = OperationalState::ActiveMode;
-            uint32_t activeModeInterval = IcdManagementServer::GetInstance().GetActiveModeInterval();
+            uint32_t activeModeInterval = IcdManagementServer::GetInstance().GetActiveModeIntervalMs();
             DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeInterval), OnActiveModeDone, this);
             uint32_t activeModeJitterInterval =
                 (activeModeInterval >= ICD_ACTIVE_TIME_JITTER_MS) ? activeModeInterval - ICD_ACTIVE_TIME_JITTER_MS : 0;
@@ -172,7 +167,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
         }
         else
         {
-            uint16_t activeModeThreshold = IcdManagementServer::GetInstance().GetActiveModeThreshold();
+            uint16_t activeModeThreshold = IcdManagementServer::GetInstance().GetActiveModeThresholdMs();
             DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Timeout(activeModeThreshold), OnActiveModeDone, this);
             uint16_t activeModeJitterThreshold =
                 (activeModeThreshold >= ICD_ACTIVE_TIME_JITTER_MS) ? activeModeThreshold - ICD_ACTIVE_TIME_JITTER_MS : 0;

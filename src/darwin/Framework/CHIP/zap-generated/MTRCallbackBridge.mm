@@ -24,9 +24,7 @@
 
 #include <lib/support/TypeTraits.h>
 
-void MTRDefaultSuccessCallbackBridge::OnSuccessFn(void * context) { DispatchSuccess(context, nil); };
-
-void MTRCommandSuccessCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::NullObjectType &)
+void MTRDefaultSuccessCallbackBridge::OnSuccessFn(void * context)
 {
     DispatchSuccess(context, nil);
 };
@@ -53,8 +51,7 @@ void MTROctetStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablishe
     }
 }
 
-void MTRNullableOctetStringAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
+void MTRNullableOctetStringAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
 {
     NSData * _Nullable objCValue;
     if (value.IsNull()) {
@@ -107,8 +104,7 @@ void MTRCharStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished
     }
 }
 
-void MTRNullableCharStringAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & value)
+void MTRNullableCharStringAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & value)
 {
     NSString * _Nullable objCValue;
     if (value.IsNull()) {
@@ -689,8 +685,7 @@ void MTRVendorIdAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
     }
 }
 
-void MTRNullableVendorIdAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::VendorId> & value)
+void MTRNullableVendorIdAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::VendorId> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -716,8 +711,7 @@ void MTRNullableVendorIdAttributeCallbackSubscriptionBridge::OnSubscriptionEstab
     }
 }
 
-void MTRIdentifyGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRIdentifyGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -754,8 +748,7 @@ void MTRIdentifyGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRIdentifyAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRIdentifyAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -792,8 +785,7 @@ void MTRIdentifyAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRIdentifyEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRIdentifyEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -830,8 +822,7 @@ void MTRIdentifyEventListListAttributeCallbackSubscriptionBridge::OnSubscription
     }
 }
 
-void MTRIdentifyAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRIdentifyAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -868,8 +859,7 @@ void MTRIdentifyAttributeListListAttributeCallbackSubscriptionBridge::OnSubscrip
     }
 }
 
-void MTRGroupsNameSupportAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap> value)
+void MTRGroupsNameSupportAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::Groups::NameSupportBitmap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -891,8 +881,7 @@ void MTRGroupsNameSupportAttributeCallbackSubscriptionBridge::OnSubscriptionEsta
     }
 }
 
-void MTRGroupsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRGroupsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -929,8 +918,7 @@ void MTRGroupsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRGroupsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRGroupsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -967,8 +955,7 @@ void MTRGroupsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRGroupsEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRGroupsEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1005,8 +992,7 @@ void MTRGroupsEventListListAttributeCallbackSubscriptionBridge::OnSubscriptionEs
     }
 }
 
-void MTRGroupsAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRGroupsAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1043,8 +1029,7 @@ void MTRGroupsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
-void MTRScenesGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRScenesGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1081,8 +1066,7 @@ void MTRScenesGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRScenesAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRScenesAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1119,8 +1103,7 @@ void MTRScenesAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRScenesEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRScenesEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1157,8 +1140,7 @@ void MTRScenesEventListListAttributeCallbackSubscriptionBridge::OnSubscriptionEs
     }
 }
 
-void MTRScenesAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRScenesAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1195,8 +1177,7 @@ void MTRScenesAttributeListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
-void MTROnOffGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTROnOffGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1233,8 +1214,7 @@ void MTROnOffGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTROnOffAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTROnOffAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1271,8 +1251,7 @@ void MTROnOffAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTROnOffEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTROnOffEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1309,8 +1288,7 @@ void MTROnOffEventListListAttributeCallbackSubscriptionBridge::OnSubscriptionEst
     }
 }
 
-void MTROnOffAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTROnOffAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1347,8 +1325,7 @@ void MTROnOffAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptio
     }
 }
 
-void MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1385,8 +1362,7 @@ void MTROnOffSwitchConfigurationGeneratedCommandListListAttributeCallbackSubscri
     }
 }
 
-void MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1423,8 +1399,7 @@ void MTROnOffSwitchConfigurationAcceptedCommandListListAttributeCallbackSubscrip
     }
 }
 
-void MTROnOffSwitchConfigurationEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTROnOffSwitchConfigurationEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1461,8 +1436,7 @@ void MTROnOffSwitchConfigurationEventListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTROnOffSwitchConfigurationAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTROnOffSwitchConfigurationAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1499,8 +1473,7 @@ void MTROnOffSwitchConfigurationAttributeListListAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRLevelControlOptionsAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions> value)
+void MTRLevelControlOptionsAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::LevelControl::LevelControlOptions> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -1522,8 +1495,7 @@ void MTRLevelControlOptionsAttributeCallbackSubscriptionBridge::OnSubscriptionEs
     }
 }
 
-void MTRLevelControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRLevelControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1560,8 +1532,7 @@ void MTRLevelControlGeneratedCommandListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRLevelControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRLevelControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1598,8 +1569,7 @@ void MTRLevelControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRLevelControlEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRLevelControlEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1636,8 +1606,7 @@ void MTRLevelControlEventListListAttributeCallbackSubscriptionBridge::OnSubscrip
     }
 }
 
-void MTRLevelControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRLevelControlAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1674,8 +1643,7 @@ void MTRLevelControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1712,8 +1680,7 @@ void MTRBinaryInputBasicGeneratedCommandListListAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1750,8 +1717,7 @@ void MTRBinaryInputBasicAcceptedCommandListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRBinaryInputBasicEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRBinaryInputBasicEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1788,8 +1754,7 @@ void MTRBinaryInputBasicEventListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRBinaryInputBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRBinaryInputBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1826,8 +1791,7 @@ void MTRBinaryInputBasicAttributeListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRPulseWidthModulationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRPulseWidthModulationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1864,8 +1828,7 @@ void MTRPulseWidthModulationGeneratedCommandListListAttributeCallbackSubscriptio
     }
 }
 
-void MTRPulseWidthModulationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRPulseWidthModulationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1902,8 +1865,7 @@ void MTRPulseWidthModulationAcceptedCommandListListAttributeCallbackSubscription
     }
 }
 
-void MTRPulseWidthModulationEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRPulseWidthModulationEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1940,8 +1902,7 @@ void MTRPulseWidthModulationEventListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRPulseWidthModulationAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRPulseWidthModulationAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -1978,8 +1939,7 @@ void MTRPulseWidthModulationAttributeListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRDescriptorDeviceTypeListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType> & value)
+void MTRDescriptorDeviceTypeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2018,8 +1978,7 @@ void MTRDescriptorDeviceTypeListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRDescriptorServerListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
+void MTRDescriptorServerListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2056,8 +2015,7 @@ void MTRDescriptorServerListListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void MTRDescriptorClientListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
+void MTRDescriptorClientListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2094,8 +2052,7 @@ void MTRDescriptorClientListListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void MTRDescriptorPartsListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & value)
+void MTRDescriptorPartsListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2132,8 +2089,7 @@ void MTRDescriptorPartsListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
-void MTRDescriptorTagListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::DecodableType> & value)
+void MTRDescriptorTagListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2191,8 +2147,7 @@ void MTRDescriptorTagListListAttributeCallbackSubscriptionBridge::OnSubscription
     }
 }
 
-void MTRDescriptorGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRDescriptorGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2229,8 +2184,7 @@ void MTRDescriptorGeneratedCommandListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRDescriptorAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRDescriptorAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2267,8 +2221,7 @@ void MTRDescriptorAcceptedCommandListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRDescriptorEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRDescriptorEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2305,8 +2258,7 @@ void MTRDescriptorEventListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
-void MTRDescriptorAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRDescriptorAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2343,8 +2295,7 @@ void MTRDescriptorAttributeListListAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRBindingBindingListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & value)
+void MTRBindingBindingListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2402,8 +2353,7 @@ void MTRBindingBindingListAttributeCallbackSubscriptionBridge::OnSubscriptionEst
     }
 }
 
-void MTRBindingGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRBindingGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2440,8 +2390,7 @@ void MTRBindingGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRBindingAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRBindingAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2478,8 +2427,7 @@ void MTRBindingAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRBindingEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRBindingEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2516,8 +2464,7 @@ void MTRBindingEventListListAttributeCallbackSubscriptionBridge::OnSubscriptionE
     }
 }
 
-void MTRBindingAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRBindingAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2554,9 +2501,7 @@ void MTRBindingAttributeListListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void MTRAccessControlACLListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::DecodableType> & value)
+void MTRAccessControlACLListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntryStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2651,9 +2596,7 @@ void MTRAccessControlACLListAttributeCallbackSubscriptionBridge::OnSubscriptionE
     }
 }
 
-void MTRAccessControlExtensionListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::AccessControl::Structs::AccessControlExtensionStruct::DecodableType> & value)
+void MTRAccessControlExtensionListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlExtensionStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2692,8 +2635,7 @@ void MTRAccessControlExtensionListAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void MTRAccessControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRAccessControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2730,8 +2672,7 @@ void MTRAccessControlGeneratedCommandListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRAccessControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRAccessControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2768,8 +2709,7 @@ void MTRAccessControlAcceptedCommandListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRAccessControlEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRAccessControlEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2806,8 +2746,7 @@ void MTRAccessControlEventListListAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void MTRAccessControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRAccessControlAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2844,8 +2783,7 @@ void MTRAccessControlAttributeListListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRActionsActionListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Actions::Structs::ActionStruct::DecodableType> & value)
+void MTRActionsActionListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::Actions::Structs::ActionStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2893,8 +2831,7 @@ void MTRActionsActionListListAttributeCallbackSubscriptionBridge::OnSubscription
     }
 }
 
-void MTRActionsEndpointListsListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Actions::Structs::EndpointListStruct::DecodableType> & value)
+void MTRActionsEndpointListsListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::Actions::Structs::EndpointListStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2955,8 +2892,7 @@ void MTRActionsEndpointListsListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void MTRActionsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRActionsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -2993,8 +2929,7 @@ void MTRActionsGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRActionsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRActionsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3031,8 +2966,7 @@ void MTRActionsAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRActionsEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRActionsEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3069,8 +3003,7 @@ void MTRActionsEventListListAttributeCallbackSubscriptionBridge::OnSubscriptionE
     }
 }
 
-void MTRActionsAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRActionsAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3107,8 +3040,7 @@ void MTRActionsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void MTRBasicInformationCapabilityMinimaStructAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::BasicInformation::Structs::CapabilityMinimaStruct::DecodableType & value)
+void MTRBasicInformationCapabilityMinimaStructAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::BasicInformation::Structs::CapabilityMinimaStruct::DecodableType & value)
 {
     MTRBasicInformationClusterCapabilityMinimaStruct * _Nonnull objCValue;
     objCValue = [MTRBasicInformationClusterCapabilityMinimaStruct new];
@@ -3132,8 +3064,7 @@ void MTRBasicInformationCapabilityMinimaStructAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRBasicInformationProductAppearanceStructAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::BasicInformation::Structs::ProductAppearanceStruct::DecodableType & value)
+void MTRBasicInformationProductAppearanceStructAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::BasicInformation::Structs::ProductAppearanceStruct::DecodableType & value)
 {
     MTRBasicInformationClusterProductAppearanceStruct * _Nonnull objCValue;
     objCValue = [MTRBasicInformationClusterProductAppearanceStruct new];
@@ -3161,8 +3092,7 @@ void MTRBasicInformationProductAppearanceStructAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRBasicInformationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRBasicInformationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3199,8 +3129,7 @@ void MTRBasicInformationGeneratedCommandListListAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRBasicInformationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRBasicInformationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3237,8 +3166,7 @@ void MTRBasicInformationAcceptedCommandListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRBasicInformationEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRBasicInformationEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3275,8 +3203,7 @@ void MTRBasicInformationEventListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRBasicInformationAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRBasicInformationAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3313,8 +3240,7 @@ void MTRBasicInformationAttributeListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTROTASoftwareUpdateProviderGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTROTASoftwareUpdateProviderGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3351,8 +3277,7 @@ void MTROTASoftwareUpdateProviderGeneratedCommandListListAttributeCallbackSubscr
     }
 }
 
-void MTROTASoftwareUpdateProviderAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTROTASoftwareUpdateProviderAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3389,8 +3314,7 @@ void MTROTASoftwareUpdateProviderAcceptedCommandListListAttributeCallbackSubscri
     }
 }
 
-void MTROTASoftwareUpdateProviderEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTROTASoftwareUpdateProviderEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3427,8 +3351,7 @@ void MTROTASoftwareUpdateProviderEventListListAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTROTASoftwareUpdateProviderAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTROTASoftwareUpdateProviderAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3465,9 +3388,7 @@ void MTROTASoftwareUpdateProviderAttributeListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & value)
+void MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3507,8 +3428,7 @@ void MTROTASoftwareUpdateRequestorDefaultOTAProvidersListAttributeCallbackSubscr
     }
 }
 
-void MTROTASoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTROTASoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3545,8 +3465,7 @@ void MTROTASoftwareUpdateRequestorGeneratedCommandListListAttributeCallbackSubsc
     }
 }
 
-void MTROTASoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTROTASoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3583,8 +3502,7 @@ void MTROTASoftwareUpdateRequestorAcceptedCommandListListAttributeCallbackSubscr
     }
 }
 
-void MTROTASoftwareUpdateRequestorEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTROTASoftwareUpdateRequestorEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3621,8 +3539,7 @@ void MTROTASoftwareUpdateRequestorEventListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTROTASoftwareUpdateRequestorAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTROTASoftwareUpdateRequestorAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3659,8 +3576,7 @@ void MTROTASoftwareUpdateRequestorAttributeListListAttributeCallbackSubscription
     }
 }
 
-void MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
+void MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3702,8 +3618,7 @@ void MTRLocalizationConfigurationSupportedLocalesListAttributeCallbackSubscripti
     }
 }
 
-void MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3740,8 +3655,7 @@ void MTRLocalizationConfigurationGeneratedCommandListListAttributeCallbackSubscr
     }
 }
 
-void MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3778,8 +3692,7 @@ void MTRLocalizationConfigurationAcceptedCommandListListAttributeCallbackSubscri
     }
 }
 
-void MTRLocalizationConfigurationEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRLocalizationConfigurationEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3816,8 +3729,7 @@ void MTRLocalizationConfigurationEventListListAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRLocalizationConfigurationAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRLocalizationConfigurationAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3854,8 +3766,7 @@ void MTRLocalizationConfigurationAttributeListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum> & value)
+void MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3892,8 +3803,7 @@ void MTRTimeFormatLocalizationSupportedCalendarTypesListAttributeCallbackSubscri
     }
 }
 
-void MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3930,8 +3840,7 @@ void MTRTimeFormatLocalizationGeneratedCommandListListAttributeCallbackSubscript
     }
 }
 
-void MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -3968,8 +3877,7 @@ void MTRTimeFormatLocalizationAcceptedCommandListListAttributeCallbackSubscripti
     }
 }
 
-void MTRTimeFormatLocalizationEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRTimeFormatLocalizationEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4006,8 +3914,7 @@ void MTRTimeFormatLocalizationEventListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRTimeFormatLocalizationAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRTimeFormatLocalizationAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4044,8 +3951,7 @@ void MTRTimeFormatLocalizationAttributeListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRUnitLocalizationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRUnitLocalizationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4082,8 +3988,7 @@ void MTRUnitLocalizationGeneratedCommandListListAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRUnitLocalizationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRUnitLocalizationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4120,8 +4025,7 @@ void MTRUnitLocalizationAcceptedCommandListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRUnitLocalizationEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRUnitLocalizationEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4158,8 +4062,7 @@ void MTRUnitLocalizationEventListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRUnitLocalizationAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRUnitLocalizationAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4196,8 +4099,7 @@ void MTRUnitLocalizationAttributeListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRPowerSourceConfigurationSourcesListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
+void MTRPowerSourceConfigurationSourcesListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4234,8 +4136,7 @@ void MTRPowerSourceConfigurationSourcesListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4272,8 +4173,7 @@ void MTRPowerSourceConfigurationGeneratedCommandListListAttributeCallbackSubscri
     }
 }
 
-void MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4310,8 +4210,7 @@ void MTRPowerSourceConfigurationAcceptedCommandListListAttributeCallbackSubscrip
     }
 }
 
-void MTRPowerSourceConfigurationEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRPowerSourceConfigurationEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4348,8 +4247,7 @@ void MTRPowerSourceConfigurationEventListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRPowerSourceConfigurationAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRPowerSourceConfigurationAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4386,8 +4284,7 @@ void MTRPowerSourceConfigurationAttributeListListAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRPowerSourceActiveWiredFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFaultEnum> & value)
+void MTRPowerSourceActiveWiredFaultsListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::WiredFaultEnum> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4424,8 +4321,7 @@ void MTRPowerSourceActiveWiredFaultsListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRPowerSourceActiveBatFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFaultEnum> & value)
+void MTRPowerSourceActiveBatFaultsListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatFaultEnum> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4462,8 +4358,7 @@ void MTRPowerSourceActiveBatFaultsListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFaultEnum> & value)
+void MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::PowerSource::BatChargeFaultEnum> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4500,8 +4395,7 @@ void MTRPowerSourceActiveBatChargeFaultsListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRPowerSourceEndpointListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & value)
+void MTRPowerSourceEndpointListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4538,8 +4432,7 @@ void MTRPowerSourceEndpointListListAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRPowerSourceGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRPowerSourceGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4576,8 +4469,7 @@ void MTRPowerSourceGeneratedCommandListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRPowerSourceAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRPowerSourceAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4614,8 +4506,7 @@ void MTRPowerSourceAcceptedCommandListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRPowerSourceEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRPowerSourceEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4652,8 +4543,7 @@ void MTRPowerSourceEventListListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void MTRPowerSourceAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRPowerSourceAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4690,8 +4580,7 @@ void MTRPowerSourceAttributeListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::DecodableType & value)
+void MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfo::DecodableType & value)
 {
     MTRGeneralCommissioningClusterBasicCommissioningInfo * _Nonnull objCValue;
     objCValue = [MTRGeneralCommissioningClusterBasicCommissioningInfo new];
@@ -4715,8 +4604,7 @@ void MTRGeneralCommissioningBasicCommissioningInfoStructAttributeCallbackSubscri
     }
 }
 
-void MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4753,8 +4641,7 @@ void MTRGeneralCommissioningGeneratedCommandListListAttributeCallbackSubscriptio
     }
 }
 
-void MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4791,8 +4678,7 @@ void MTRGeneralCommissioningAcceptedCommandListListAttributeCallbackSubscription
     }
 }
 
-void MTRGeneralCommissioningEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRGeneralCommissioningEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4829,8 +4715,7 @@ void MTRGeneralCommissioningEventListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRGeneralCommissioningAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRGeneralCommissioningAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4867,9 +4752,7 @@ void MTRGeneralCommissioningAttributeListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRNetworkCommissioningNetworksListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfoStruct::DecodableType> & value)
+void MTRNetworkCommissioningNetworksListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfoStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4908,8 +4791,7 @@ void MTRNetworkCommissioningNetworksListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4946,8 +4828,7 @@ void MTRNetworkCommissioningGeneratedCommandListListAttributeCallbackSubscriptio
     }
 }
 
-void MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -4984,8 +4865,7 @@ void MTRNetworkCommissioningAcceptedCommandListListAttributeCallbackSubscription
     }
 }
 
-void MTRNetworkCommissioningEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRNetworkCommissioningEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5022,8 +4902,7 @@ void MTRNetworkCommissioningEventListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRNetworkCommissioningAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRNetworkCommissioningAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5060,8 +4939,7 @@ void MTRNetworkCommissioningAttributeListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5098,8 +4976,7 @@ void MTRDiagnosticLogsGeneratedCommandListListAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5136,8 +5013,7 @@ void MTRDiagnosticLogsAcceptedCommandListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRDiagnosticLogsEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRDiagnosticLogsEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5174,8 +5050,7 @@ void MTRDiagnosticLogsEventListListAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRDiagnosticLogsAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRDiagnosticLogsAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5212,9 +5087,7 @@ void MTRDiagnosticLogsAttributeListListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterface::DecodableType> &
-        value)
+void MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterface::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5234,14 +5107,12 @@ void MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucces
             if (entry_0.offPremiseServicesReachableIPv4.IsNull()) {
                 newElement_0.offPremiseServicesReachableIPv4 = nil;
             } else {
-                newElement_0.offPremiseServicesReachableIPv4 =
-                    [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv4.Value()];
+                newElement_0.offPremiseServicesReachableIPv4 = [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv4.Value()];
             }
             if (entry_0.offPremiseServicesReachableIPv6.IsNull()) {
                 newElement_0.offPremiseServicesReachableIPv6 = nil;
             } else {
-                newElement_0.offPremiseServicesReachableIPv6 =
-                    [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv6.Value()];
+                newElement_0.offPremiseServicesReachableIPv6 = [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv6.Value()];
             }
             newElement_0.hardwareAddress = AsData(entry_0.hardwareAddress);
             { // Scope for our temporary variables
@@ -5304,8 +5175,7 @@ void MTRGeneralDiagnosticsNetworkInterfacesListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum> & value)
+void MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5342,8 +5212,7 @@ void MTRGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackSubscriptionB
     }
 }
 
-void MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum> & value)
+void MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5380,8 +5249,7 @@ void MTRGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum> & value)
+void MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5418,8 +5286,7 @@ void MTRGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5456,8 +5323,7 @@ void MTRGeneralDiagnosticsGeneratedCommandListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5494,8 +5360,7 @@ void MTRGeneralDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRGeneralDiagnosticsEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRGeneralDiagnosticsEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5532,8 +5397,7 @@ void MTRGeneralDiagnosticsEventListListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRGeneralDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRGeneralDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5570,9 +5434,7 @@ void MTRGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::DecodableType> & value)
+void MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetricsStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5635,8 +5497,7 @@ void MTRSoftwareDiagnosticsThreadMetricsListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5673,8 +5534,7 @@ void MTRSoftwareDiagnosticsGeneratedCommandListListAttributeCallbackSubscription
     }
 }
 
-void MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5711,8 +5571,7 @@ void MTRSoftwareDiagnosticsAcceptedCommandListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTRSoftwareDiagnosticsEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRSoftwareDiagnosticsEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5749,8 +5608,7 @@ void MTRSoftwareDiagnosticsEventListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRSoftwareDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRSoftwareDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5787,9 +5645,7 @@ void MTRSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRThreadNetworkDiagnosticsNeighborTableListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTableStruct::DecodableType> & value)
+void MTRThreadNetworkDiagnosticsNeighborTableListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTableStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5848,9 +5704,7 @@ void MTRThreadNetworkDiagnosticsNeighborTableListAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRThreadNetworkDiagnosticsRouteTableListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTableStruct::DecodableType> & value)
+void MTRThreadNetworkDiagnosticsRouteTableListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTableStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -5897,9 +5751,7 @@ void MTRThreadNetworkDiagnosticsRouteTableListAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> &
-        value)
+void MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & value)
 {
     MTRThreadNetworkDiagnosticsClusterSecurityPolicy * _Nullable objCValue;
     if (value.IsNull()) {
@@ -5927,9 +5779,7 @@ void MTRThreadNetworkDiagnosticsSecurityPolicyStructAttributeCallbackSubscriptio
     }
 }
 
-void MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & value)
+void MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & value)
 {
     MTRThreadNetworkDiagnosticsClusterOperationalDatasetComponents * _Nullable objCValue;
     if (value.IsNull()) {
@@ -5967,8 +5817,7 @@ void MTRThreadNetworkDiagnosticsOperationalDatasetComponentsStructAttributeCallb
     }
 }
 
-void MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum> & value)
+void MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6005,8 +5854,7 @@ void MTRThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackSubs
     }
 }
 
-void MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6043,8 +5891,7 @@ void MTRThreadNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscri
     }
 }
 
-void MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6081,8 +5928,7 @@ void MTRThreadNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscrip
     }
 }
 
-void MTRThreadNetworkDiagnosticsEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRThreadNetworkDiagnosticsEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6119,8 +5965,7 @@ void MTRThreadNetworkDiagnosticsEventListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6157,8 +6002,7 @@ void MTRThreadNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6195,8 +6039,7 @@ void MTRWiFiNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubscript
     }
 }
 
-void MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6233,8 +6076,7 @@ void MTRWiFiNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscripti
     }
 }
 
-void MTRWiFiNetworkDiagnosticsEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRWiFiNetworkDiagnosticsEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6271,8 +6113,7 @@ void MTRWiFiNetworkDiagnosticsEventListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6309,8 +6150,7 @@ void MTRWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6347,8 +6187,7 @@ void MTREthernetNetworkDiagnosticsGeneratedCommandListListAttributeCallbackSubsc
     }
 }
 
-void MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6385,8 +6224,7 @@ void MTREthernetNetworkDiagnosticsAcceptedCommandListListAttributeCallbackSubscr
     }
 }
 
-void MTREthernetNetworkDiagnosticsEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTREthernetNetworkDiagnosticsEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6423,8 +6261,7 @@ void MTREthernetNetworkDiagnosticsEventListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6461,9 +6298,7 @@ void MTREthernetNetworkDiagnosticsAttributeListListAttributeCallbackSubscription
     }
 }
 
-void MTRTimeSynchronizationTrustedTimeSourceStructAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<
-        chip::app::Clusters::TimeSynchronization::Structs::TrustedTimeSourceStruct::DecodableType> & value)
+void MTRTimeSynchronizationTrustedTimeSourceStructAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeSynchronization::Structs::TrustedTimeSourceStruct::DecodableType> & value)
 {
     MTRTimeSynchronizationClusterTrustedTimeSourceStruct * _Nullable objCValue;
     if (value.IsNull()) {
@@ -6492,9 +6327,7 @@ void MTRTimeSynchronizationTrustedTimeSourceStructAttributeCallbackSubscriptionB
     }
 }
 
-void MTRTimeSynchronizationTimeZoneListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::DecodableType> &
-        value)
+void MTRTimeSynchronizationTimeZoneListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6543,9 +6376,7 @@ void MTRTimeSynchronizationTimeZoneListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRTimeSynchronizationDSTOffsetListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::DecodableType> &
-        value)
+void MTRTimeSynchronizationDSTOffsetListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6589,8 +6420,7 @@ void MTRTimeSynchronizationDSTOffsetListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRTimeSynchronizationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRTimeSynchronizationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6627,8 +6457,7 @@ void MTRTimeSynchronizationGeneratedCommandListListAttributeCallbackSubscription
     }
 }
 
-void MTRTimeSynchronizationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRTimeSynchronizationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6665,8 +6494,7 @@ void MTRTimeSynchronizationAcceptedCommandListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTRTimeSynchronizationEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRTimeSynchronizationEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6703,8 +6531,7 @@ void MTRTimeSynchronizationEventListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRTimeSynchronizationAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRTimeSynchronizationAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6741,8 +6568,7 @@ void MTRTimeSynchronizationAttributeListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRBridgedDeviceBasicInformationProductAppearanceStructAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::Clusters::BridgedDeviceBasicInformation::Structs::ProductAppearanceStruct::DecodableType & value)
+void MTRBridgedDeviceBasicInformationProductAppearanceStructAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::BridgedDeviceBasicInformation::Structs::ProductAppearanceStruct::DecodableType & value)
 {
     MTRBridgedDeviceBasicInformationClusterProductAppearanceStruct * _Nonnull objCValue;
     objCValue = [MTRBridgedDeviceBasicInformationClusterProductAppearanceStruct new];
@@ -6770,8 +6596,7 @@ void MTRBridgedDeviceBasicInformationProductAppearanceStructAttributeCallbackSub
     }
 }
 
-void MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6808,8 +6633,7 @@ void MTRBridgedDeviceBasicInformationGeneratedCommandListListAttributeCallbackSu
     }
 }
 
-void MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6846,8 +6670,7 @@ void MTRBridgedDeviceBasicInformationAcceptedCommandListListAttributeCallbackSub
     }
 }
 
-void MTRBridgedDeviceBasicInformationEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRBridgedDeviceBasicInformationEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6884,8 +6707,7 @@ void MTRBridgedDeviceBasicInformationEventListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6922,8 +6744,7 @@ void MTRBridgedDeviceBasicInformationAttributeListListAttributeCallbackSubscript
     }
 }
 
-void MTRSwitchGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRSwitchGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6960,8 +6781,7 @@ void MTRSwitchGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRSwitchAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRSwitchAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -6998,8 +6818,7 @@ void MTRSwitchAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRSwitchEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRSwitchEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7036,8 +6855,7 @@ void MTRSwitchEventListListAttributeCallbackSubscriptionBridge::OnSubscriptionEs
     }
 }
 
-void MTRSwitchAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRSwitchAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7074,8 +6892,7 @@ void MTRSwitchAttributeListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
-void MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7112,8 +6929,7 @@ void MTRAdministratorCommissioningGeneratedCommandListListAttributeCallbackSubsc
     }
 }
 
-void MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7150,8 +6966,7 @@ void MTRAdministratorCommissioningAcceptedCommandListListAttributeCallbackSubscr
     }
 }
 
-void MTRAdministratorCommissioningEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRAdministratorCommissioningEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7188,8 +7003,7 @@ void MTRAdministratorCommissioningEventListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRAdministratorCommissioningAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRAdministratorCommissioningAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7226,9 +7040,7 @@ void MTRAdministratorCommissioningAttributeListListAttributeCallbackSubscription
     }
 }
 
-void MTROperationalCredentialsNOCsListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> &
-        value)
+void MTROperationalCredentialsNOCsListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7272,9 +7084,7 @@ void MTROperationalCredentialsNOCsListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTROperationalCredentialsFabricsListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::DecodableType> & value)
+void MTROperationalCredentialsFabricsListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7322,8 +7132,7 @@ void MTROperationalCredentialsFabricsListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
+void MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7360,8 +7169,7 @@ void MTROperationalCredentialsTrustedRootCertificatesListAttributeCallbackSubscr
     }
 }
 
-void MTROperationalCredentialsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTROperationalCredentialsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7398,8 +7206,7 @@ void MTROperationalCredentialsGeneratedCommandListListAttributeCallbackSubscript
     }
 }
 
-void MTROperationalCredentialsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTROperationalCredentialsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7436,8 +7243,7 @@ void MTROperationalCredentialsAcceptedCommandListListAttributeCallbackSubscripti
     }
 }
 
-void MTROperationalCredentialsEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTROperationalCredentialsEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7474,8 +7280,7 @@ void MTROperationalCredentialsEventListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTROperationalCredentialsAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTROperationalCredentialsAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7512,9 +7317,7 @@ void MTROperationalCredentialsAttributeListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRGroupKeyManagementGroupKeyMapListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> &
-        value)
+void MTRGroupKeyManagementGroupKeyMapListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7554,9 +7357,7 @@ void MTRGroupKeyManagementGroupKeyMapListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRGroupKeyManagementGroupTableListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> &
-        value)
+void MTRGroupKeyManagementGroupTableListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7621,8 +7422,7 @@ void MTRGroupKeyManagementGroupTableListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7659,8 +7459,7 @@ void MTRGroupKeyManagementGeneratedCommandListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7697,8 +7496,7 @@ void MTRGroupKeyManagementAcceptedCommandListListAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRGroupKeyManagementEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRGroupKeyManagementEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7735,8 +7533,7 @@ void MTRGroupKeyManagementEventListListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRGroupKeyManagementAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRGroupKeyManagementAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7773,8 +7570,7 @@ void MTRGroupKeyManagementAttributeListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRFixedLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & value)
+void MTRFixedLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7823,8 +7619,7 @@ void MTRFixedLabelLabelListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
-void MTRFixedLabelGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRFixedLabelGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7861,8 +7656,7 @@ void MTRFixedLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRFixedLabelAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRFixedLabelAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7899,8 +7693,7 @@ void MTRFixedLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRFixedLabelEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRFixedLabelEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7937,8 +7730,7 @@ void MTRFixedLabelEventListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
-void MTRFixedLabelAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRFixedLabelAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -7975,8 +7767,7 @@ void MTRFixedLabelAttributeListListAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRUserLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> & value)
+void MTRUserLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8025,8 +7816,7 @@ void MTRUserLabelLabelListListAttributeCallbackSubscriptionBridge::OnSubscriptio
     }
 }
 
-void MTRUserLabelGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRUserLabelGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8063,8 +7853,7 @@ void MTRUserLabelGeneratedCommandListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRUserLabelAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRUserLabelAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8101,8 +7890,7 @@ void MTRUserLabelAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRUserLabelEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRUserLabelEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8139,8 +7927,7 @@ void MTRUserLabelEventListListAttributeCallbackSubscriptionBridge::OnSubscriptio
     }
 }
 
-void MTRUserLabelAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRUserLabelAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8177,8 +7964,7 @@ void MTRUserLabelAttributeListListAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void MTRBooleanStateGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRBooleanStateGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8215,8 +8001,7 @@ void MTRBooleanStateGeneratedCommandListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRBooleanStateAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRBooleanStateAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8253,8 +8038,7 @@ void MTRBooleanStateAcceptedCommandListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRBooleanStateEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRBooleanStateEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8291,8 +8075,7 @@ void MTRBooleanStateEventListListAttributeCallbackSubscriptionBridge::OnSubscrip
     }
 }
 
-void MTRBooleanStateAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRBooleanStateAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8329,9 +8112,7 @@ void MTRBooleanStateAttributeListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRICDManagementRegisteredClientsListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::DecodableType> & value)
+void MTRICDManagementRegisteredClientsListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8372,8 +8153,7 @@ void MTRICDManagementRegisteredClientsListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRICDManagementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRICDManagementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8410,8 +8190,7 @@ void MTRICDManagementGeneratedCommandListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRICDManagementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRICDManagementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8448,8 +8227,7 @@ void MTRICDManagementAcceptedCommandListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRICDManagementEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRICDManagementEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8486,8 +8264,7 @@ void MTRICDManagementEventListListAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void MTRICDManagementAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRICDManagementAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8524,8 +8301,7 @@ void MTRICDManagementAttributeListListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> & value)
+void MTRModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8587,8 +8363,7 @@ void MTRModeSelectSupportedModesListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRModeSelectGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRModeSelectGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8625,8 +8400,7 @@ void MTRModeSelectGeneratedCommandListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRModeSelectAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRModeSelectAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8663,8 +8437,7 @@ void MTRModeSelectAcceptedCommandListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRModeSelectEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRModeSelectEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8701,8 +8474,7 @@ void MTRModeSelectEventListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
-void MTRModeSelectAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRModeSelectAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8739,9 +8511,7 @@ void MTRModeSelectAttributeListListAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRLaundryWasherModeSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherMode::Structs::ModeOptionStruct::DecodableType> &
-        value)
+void MTRLaundryWasherModeSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherMode::Structs::ModeOptionStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8807,8 +8577,7 @@ void MTRLaundryWasherModeSupportedModesListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRLaundryWasherModeGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRLaundryWasherModeGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8845,8 +8614,7 @@ void MTRLaundryWasherModeGeneratedCommandListListAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRLaundryWasherModeAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRLaundryWasherModeAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8883,8 +8651,7 @@ void MTRLaundryWasherModeAcceptedCommandListListAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRLaundryWasherModeEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRLaundryWasherModeEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8921,8 +8688,7 @@ void MTRLaundryWasherModeEventListListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRLaundryWasherModeAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRLaundryWasherModeAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -8959,9 +8725,7 @@ void MTRLaundryWasherModeAttributeListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRRefrigeratorAndTemperatureControlledCabinetModeSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Structs::ModeOptionStruct::DecodableType> & value)
+void MTRRefrigeratorAndTemperatureControlledCabinetModeSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Structs::ModeOptionStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9012,8 +8776,7 @@ void MTRRefrigeratorAndTemperatureControlledCabinetModeSupportedModesListAttribu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRefrigeratorAndTemperatureControlledCabinetModeSupportedModesListAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRRefrigeratorAndTemperatureControlledCabinetModeSupportedModesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -9028,8 +8791,7 @@ void MTRRefrigeratorAndTemperatureControlledCabinetModeSupportedModesListAttribu
     }
 }
 
-void MTRRefrigeratorAndTemperatureControlledCabinetModeGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRRefrigeratorAndTemperatureControlledCabinetModeGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9051,8 +8813,7 @@ void MTRRefrigeratorAndTemperatureControlledCabinetModeGeneratedCommandListListA
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRefrigeratorAndTemperatureControlledCabinetModeGeneratedCommandListListAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRRefrigeratorAndTemperatureControlledCabinetModeGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -9067,8 +8828,7 @@ void MTRRefrigeratorAndTemperatureControlledCabinetModeGeneratedCommandListListA
     }
 }
 
-void MTRRefrigeratorAndTemperatureControlledCabinetModeAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRRefrigeratorAndTemperatureControlledCabinetModeAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9090,8 +8850,7 @@ void MTRRefrigeratorAndTemperatureControlledCabinetModeAcceptedCommandListListAt
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRefrigeratorAndTemperatureControlledCabinetModeAcceptedCommandListListAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRRefrigeratorAndTemperatureControlledCabinetModeAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -9106,8 +8865,7 @@ void MTRRefrigeratorAndTemperatureControlledCabinetModeAcceptedCommandListListAt
     }
 }
 
-void MTRRefrigeratorAndTemperatureControlledCabinetModeEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRRefrigeratorAndTemperatureControlledCabinetModeEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9144,8 +8902,7 @@ void MTRRefrigeratorAndTemperatureControlledCabinetModeEventListListAttributeCal
     }
 }
 
-void MTRRefrigeratorAndTemperatureControlledCabinetModeAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRRefrigeratorAndTemperatureControlledCabinetModeAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9167,8 +8924,7 @@ void MTRRefrigeratorAndTemperatureControlledCabinetModeAttributeListListAttribut
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRefrigeratorAndTemperatureControlledCabinetModeAttributeListListAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRRefrigeratorAndTemperatureControlledCabinetModeAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -9183,8 +8939,7 @@ void MTRRefrigeratorAndTemperatureControlledCabinetModeAttributeListListAttribut
     }
 }
 
-void MTRLaundryWasherControlsSpinSpeedsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
+void MTRLaundryWasherControlsSpinSpeedsListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9226,8 +8981,7 @@ void MTRLaundryWasherControlsSpinSpeedsListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRLaundryWasherControlsSupportedRinsesListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum> & value)
+void MTRLaundryWasherControlsSupportedRinsesListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9264,8 +9018,7 @@ void MTRLaundryWasherControlsSupportedRinsesListAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRLaundryWasherControlsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRLaundryWasherControlsGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9302,8 +9055,7 @@ void MTRLaundryWasherControlsGeneratedCommandListListAttributeCallbackSubscripti
     }
 }
 
-void MTRLaundryWasherControlsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRLaundryWasherControlsAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9340,8 +9092,7 @@ void MTRLaundryWasherControlsAcceptedCommandListListAttributeCallbackSubscriptio
     }
 }
 
-void MTRLaundryWasherControlsEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRLaundryWasherControlsEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9378,8 +9129,7 @@ void MTRLaundryWasherControlsEventListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRLaundryWasherControlsAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRLaundryWasherControlsAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9416,8 +9166,7 @@ void MTRLaundryWasherControlsAttributeListListAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRRVCRunModeSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::RvcRunMode::Structs::ModeOptionStruct::DecodableType> & value)
+void MTRRVCRunModeSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::RvcRunMode::Structs::ModeOptionStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9483,8 +9232,7 @@ void MTRRVCRunModeSupportedModesListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRRVCRunModeGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRRVCRunModeGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9521,8 +9269,7 @@ void MTRRVCRunModeGeneratedCommandListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRRVCRunModeAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRRVCRunModeAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9559,8 +9306,7 @@ void MTRRVCRunModeAcceptedCommandListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRRVCRunModeEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRRVCRunModeEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9597,8 +9343,7 @@ void MTRRVCRunModeEventListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
-void MTRRVCRunModeAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRRVCRunModeAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9635,8 +9380,7 @@ void MTRRVCRunModeAttributeListListAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRRVCCleanModeSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::RvcCleanMode::Structs::ModeOptionStruct::DecodableType> & value)
+void MTRRVCCleanModeSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::RvcCleanMode::Structs::ModeOptionStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9702,8 +9446,7 @@ void MTRRVCCleanModeSupportedModesListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRRVCCleanModeGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRRVCCleanModeGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9740,8 +9483,7 @@ void MTRRVCCleanModeGeneratedCommandListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRRVCCleanModeAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRRVCCleanModeAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9778,8 +9520,7 @@ void MTRRVCCleanModeAcceptedCommandListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRRVCCleanModeEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRRVCCleanModeEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9816,8 +9557,7 @@ void MTRRVCCleanModeEventListListAttributeCallbackSubscriptionBridge::OnSubscrip
     }
 }
 
-void MTRRVCCleanModeAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRRVCCleanModeAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9854,8 +9594,7 @@ void MTRRVCCleanModeAttributeListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
+void MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9897,8 +9636,7 @@ void MTRTemperatureControlSupportedTemperatureLevelsListAttributeCallbackSubscri
     }
 }
 
-void MTRTemperatureControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRTemperatureControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9935,8 +9673,7 @@ void MTRTemperatureControlGeneratedCommandListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTRTemperatureControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRTemperatureControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -9973,8 +9710,7 @@ void MTRTemperatureControlAcceptedCommandListListAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRTemperatureControlEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRTemperatureControlEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -10011,8 +9747,7 @@ void MTRTemperatureControlEventListListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRTemperatureControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRTemperatureControlAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -10049,8 +9784,7 @@ void MTRTemperatureControlAttributeListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRRefrigeratorAlarmMaskAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value)
+void MTRRefrigeratorAlarmMaskAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -10072,8 +9806,7 @@ void MTRRefrigeratorAlarmMaskAttributeCallbackSubscriptionBridge::OnSubscription
     }
 }
 
-void MTRRefrigeratorAlarmStateAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value)
+void MTRRefrigeratorAlarmStateAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -10095,8 +9828,7 @@ void MTRRefrigeratorAlarmStateAttributeCallbackSubscriptionBridge::OnSubscriptio
     }
 }
 
-void MTRRefrigeratorAlarmSupportedAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value)
+void MTRRefrigeratorAlarmSupportedAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -10118,8 +9850,7 @@ void MTRRefrigeratorAlarmSupportedAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void MTRRefrigeratorAlarmGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRRefrigeratorAlarmGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -10156,8 +9887,7 @@ void MTRRefrigeratorAlarmGeneratedCommandListListAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRRefrigeratorAlarmAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRRefrigeratorAlarmAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -10194,8 +9924,7 @@ void MTRRefrigeratorAlarmAcceptedCommandListListAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRRefrigeratorAlarmEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRRefrigeratorAlarmEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -10232,8 +9961,7 @@ void MTRRefrigeratorAlarmEventListListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRRefrigeratorAlarmAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRRefrigeratorAlarmAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -10270,9 +9998,7 @@ void MTRRefrigeratorAlarmAttributeListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRDishwasherModeSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::DishwasherMode::Structs::ModeOptionStruct::DecodableType> &
-        value)
+void MTRDishwasherModeSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::DishwasherMode::Structs::ModeOptionStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -10338,8 +10064,7 @@ void MTRDishwasherModeSupportedModesListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRDishwasherModeGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRDishwasherModeGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -10376,8 +10101,7 @@ void MTRDishwasherModeGeneratedCommandListListAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRDishwasherModeAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRDishwasherModeAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -10414,8 +10138,7 @@ void MTRDishwasherModeAcceptedCommandListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRDishwasherModeEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRDishwasherModeEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -10452,8 +10175,7 @@ void MTRDishwasherModeEventListListAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRDishwasherModeAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRDishwasherModeAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -10490,8 +10212,7 @@ void MTRDishwasherModeAttributeListListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRAirQualityGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRAirQualityGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -10528,8 +10249,7 @@ void MTRAirQualityGeneratedCommandListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRAirQualityAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRAirQualityAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -10566,8 +10286,7 @@ void MTRAirQualityAcceptedCommandListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRAirQualityEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRAirQualityEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -10604,8 +10323,7 @@ void MTRAirQualityEventListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
-void MTRAirQualityAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRAirQualityAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -10642,8 +10360,7 @@ void MTRAirQualityAttributeListListAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRSmokeCOAlarmGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRSmokeCOAlarmGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -10680,8 +10397,7 @@ void MTRSmokeCOAlarmGeneratedCommandListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRSmokeCOAlarmAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRSmokeCOAlarmAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -10718,8 +10434,7 @@ void MTRSmokeCOAlarmAcceptedCommandListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRSmokeCOAlarmEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRSmokeCOAlarmEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -10756,8 +10471,7 @@ void MTRSmokeCOAlarmEventListListAttributeCallbackSubscriptionBridge::OnSubscrip
     }
 }
 
-void MTRSmokeCOAlarmAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRSmokeCOAlarmAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -10794,8 +10508,7 @@ void MTRSmokeCOAlarmAttributeListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRDishwasherAlarmMaskAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value)
+void MTRDishwasherAlarmMaskAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -10817,8 +10530,7 @@ void MTRDishwasherAlarmMaskAttributeCallbackSubscriptionBridge::OnSubscriptionEs
     }
 }
 
-void MTRDishwasherAlarmLatchAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value)
+void MTRDishwasherAlarmLatchAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -10840,8 +10552,7 @@ void MTRDishwasherAlarmLatchAttributeCallbackSubscriptionBridge::OnSubscriptionE
     }
 }
 
-void MTRDishwasherAlarmStateAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value)
+void MTRDishwasherAlarmStateAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -10863,8 +10574,7 @@ void MTRDishwasherAlarmStateAttributeCallbackSubscriptionBridge::OnSubscriptionE
     }
 }
 
-void MTRDishwasherAlarmSupportedAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value)
+void MTRDishwasherAlarmSupportedAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -10886,8 +10596,7 @@ void MTRDishwasherAlarmSupportedAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void MTRDishwasherAlarmGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRDishwasherAlarmGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -10924,8 +10633,7 @@ void MTRDishwasherAlarmGeneratedCommandListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRDishwasherAlarmAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRDishwasherAlarmAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -10962,8 +10670,7 @@ void MTRDishwasherAlarmAcceptedCommandListListAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRDishwasherAlarmEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRDishwasherAlarmEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11000,8 +10707,7 @@ void MTRDishwasherAlarmEventListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRDishwasherAlarmAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRDishwasherAlarmAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11038,8 +10744,7 @@ void MTRDishwasherAlarmAttributeListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTROperationalStatePhaseListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<chip::CharSpan>> & value)
+void MTROperationalStatePhaseListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<chip::CharSpan>> & value)
 {
     NSArray * _Nullable objCValue;
     if (value.IsNull()) {
@@ -11085,9 +10790,7 @@ void MTROperationalStatePhaseListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTROperationalStateOperationalStateListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::DecodableType> & value)
+void MTROperationalStateOperationalStateListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalState::Structs::OperationalStateStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11135,8 +10838,7 @@ void MTROperationalStateOperationalStateListListAttributeCallbackSubscriptionBri
     }
 }
 
-void MTROperationalStateOperationalErrorStructAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::DecodableType & value)
+void MTROperationalStateOperationalErrorStructAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::OperationalState::Structs::ErrorStateStruct::DecodableType & value)
 {
     MTROperationalStateClusterErrorStateStruct * _Nonnull objCValue;
     objCValue = [MTROperationalStateClusterErrorStateStruct new];
@@ -11179,8 +10881,7 @@ void MTROperationalStateOperationalErrorStructAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTROperationalStateGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTROperationalStateGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11217,8 +10918,7 @@ void MTROperationalStateGeneratedCommandListListAttributeCallbackSubscriptionBri
     }
 }
 
-void MTROperationalStateAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTROperationalStateAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11255,8 +10955,7 @@ void MTROperationalStateAcceptedCommandListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTROperationalStateEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTROperationalStateEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11293,8 +10992,7 @@ void MTROperationalStateEventListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTROperationalStateAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTROperationalStateAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11331,8 +11029,7 @@ void MTROperationalStateAttributeListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRRVCOperationalStatePhaseListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<chip::CharSpan>> & value)
+void MTRRVCOperationalStatePhaseListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<chip::CharSpan>> & value)
 {
     NSArray * _Nullable objCValue;
     if (value.IsNull()) {
@@ -11378,9 +11075,7 @@ void MTRRVCOperationalStatePhaseListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRRVCOperationalStateOperationalStateListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::RvcOperationalState::Structs::OperationalStateStruct::DecodableType> & value)
+void MTRRVCOperationalStateOperationalStateListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::RvcOperationalState::Structs::OperationalStateStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11428,8 +11123,7 @@ void MTRRVCOperationalStateOperationalStateListListAttributeCallbackSubscription
     }
 }
 
-void MTRRVCOperationalStateOperationalErrorStructAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::RvcOperationalState::Structs::ErrorStateStruct::DecodableType & value)
+void MTRRVCOperationalStateOperationalErrorStructAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::RvcOperationalState::Structs::ErrorStateStruct::DecodableType & value)
 {
     MTRRVCOperationalStateClusterErrorStateStruct * _Nonnull objCValue;
     objCValue = [MTRRVCOperationalStateClusterErrorStateStruct new];
@@ -11472,8 +11166,7 @@ void MTRRVCOperationalStateOperationalErrorStructAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRRVCOperationalStateGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRRVCOperationalStateGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11510,8 +11203,7 @@ void MTRRVCOperationalStateGeneratedCommandListListAttributeCallbackSubscription
     }
 }
 
-void MTRRVCOperationalStateAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRRVCOperationalStateAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11548,8 +11240,7 @@ void MTRRVCOperationalStateAcceptedCommandListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTRRVCOperationalStateEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRRVCOperationalStateEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11586,8 +11277,7 @@ void MTRRVCOperationalStateEventListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRRVCOperationalStateAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRRVCOperationalStateAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11624,9 +11314,7 @@ void MTRRVCOperationalStateAttributeListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRHEPAFilterMonitoringReplacementProductListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> & value)
+void MTRHEPAFilterMonitoringReplacementProductListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::HepaFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11636,8 +11324,7 @@ void MTRHEPAFilterMonitoringReplacementProductListListAttributeCallbackBridge::O
             auto & entry_0 = iter_0.GetValue();
             MTRHEPAFilterMonitoringClusterReplacementProductStruct * newElement_0;
             newElement_0 = [MTRHEPAFilterMonitoringClusterReplacementProductStruct new];
-            newElement_0.productIdentifierType =
-                [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.productIdentifierType)];
+            newElement_0.productIdentifierType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.productIdentifierType)];
             newElement_0.productIdentifierValue = AsString(entry_0.productIdentifierValue);
             if (newElement_0.productIdentifierValue == nil) {
                 CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
@@ -11671,8 +11358,7 @@ void MTRHEPAFilterMonitoringReplacementProductListListAttributeCallbackSubscript
     }
 }
 
-void MTRHEPAFilterMonitoringGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRHEPAFilterMonitoringGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11709,8 +11395,7 @@ void MTRHEPAFilterMonitoringGeneratedCommandListListAttributeCallbackSubscriptio
     }
 }
 
-void MTRHEPAFilterMonitoringAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRHEPAFilterMonitoringAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11747,8 +11432,7 @@ void MTRHEPAFilterMonitoringAcceptedCommandListListAttributeCallbackSubscription
     }
 }
 
-void MTRHEPAFilterMonitoringEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRHEPAFilterMonitoringEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11785,8 +11469,7 @@ void MTRHEPAFilterMonitoringEventListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRHEPAFilterMonitoringAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRHEPAFilterMonitoringAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11823,9 +11506,7 @@ void MTRHEPAFilterMonitoringAttributeListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRActivatedCarbonFilterMonitoringReplacementProductListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> & value)
+void MTRActivatedCarbonFilterMonitoringReplacementProductListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ActivatedCarbonFilterMonitoring::Structs::ReplacementProductStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11835,8 +11516,7 @@ void MTRActivatedCarbonFilterMonitoringReplacementProductListListAttributeCallba
             auto & entry_0 = iter_0.GetValue();
             MTRActivatedCarbonFilterMonitoringClusterReplacementProductStruct * newElement_0;
             newElement_0 = [MTRActivatedCarbonFilterMonitoringClusterReplacementProductStruct new];
-            newElement_0.productIdentifierType =
-                [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.productIdentifierType)];
+            newElement_0.productIdentifierType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.productIdentifierType)];
             newElement_0.productIdentifierValue = AsString(entry_0.productIdentifierValue);
             if (newElement_0.productIdentifierValue == nil) {
                 CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
@@ -11870,8 +11550,7 @@ void MTRActivatedCarbonFilterMonitoringReplacementProductListListAttributeCallba
     }
 }
 
-void MTRActivatedCarbonFilterMonitoringGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRActivatedCarbonFilterMonitoringGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11908,8 +11587,7 @@ void MTRActivatedCarbonFilterMonitoringGeneratedCommandListListAttributeCallback
     }
 }
 
-void MTRActivatedCarbonFilterMonitoringAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRActivatedCarbonFilterMonitoringAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11946,8 +11624,7 @@ void MTRActivatedCarbonFilterMonitoringAcceptedCommandListListAttributeCallbackS
     }
 }
 
-void MTRActivatedCarbonFilterMonitoringEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRActivatedCarbonFilterMonitoringEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -11984,8 +11661,7 @@ void MTRActivatedCarbonFilterMonitoringEventListListAttributeCallbackSubscriptio
     }
 }
 
-void MTRActivatedCarbonFilterMonitoringAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRActivatedCarbonFilterMonitoringAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -12022,8 +11698,7 @@ void MTRActivatedCarbonFilterMonitoringAttributeListListAttributeCallbackSubscri
     }
 }
 
-void MTRDoorLockCredentialRulesSupportAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value)
+void MTRDoorLockCredentialRulesSupportAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlCredentialRuleMask> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -12045,8 +11720,7 @@ void MTRDoorLockCredentialRulesSupportAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRDoorLockSupportedOperatingModesAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value)
+void MTRDoorLockSupportedOperatingModesAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlSupportedOperatingModes> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -12068,8 +11742,7 @@ void MTRDoorLockSupportedOperatingModesAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRDoorLockDefaultConfigurationRegisterAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> value)
+void MTRDoorLockDefaultConfigurationRegisterAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlDefaultConfigurationRegister> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -12091,8 +11764,7 @@ void MTRDoorLockDefaultConfigurationRegisterAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRDoorLockLocalProgrammingFeaturesAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> value)
+void MTRDoorLockLocalProgrammingFeaturesAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DoorLock::DlLocalProgrammingFeatures> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -12114,8 +11786,7 @@ void MTRDoorLockLocalProgrammingFeaturesAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRDoorLockGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRDoorLockGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -12152,8 +11823,7 @@ void MTRDoorLockGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRDoorLockAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRDoorLockAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -12190,8 +11860,7 @@ void MTRDoorLockAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRDoorLockEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRDoorLockEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -12228,8 +11897,7 @@ void MTRDoorLockEventListListAttributeCallbackSubscriptionBridge::OnSubscription
     }
 }
 
-void MTRDoorLockAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRDoorLockAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -12266,8 +11934,7 @@ void MTRDoorLockAttributeListListAttributeCallbackSubscriptionBridge::OnSubscrip
     }
 }
 
-void MTRWindowCoveringConfigStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value)
+void MTRWindowCoveringConfigStatusAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::WindowCovering::ConfigStatus> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -12289,8 +11956,7 @@ void MTRWindowCoveringConfigStatusAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void MTRWindowCoveringOperationalStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value)
+void MTRWindowCoveringOperationalStatusAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::WindowCovering::OperationalStatus> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -12312,8 +11978,7 @@ void MTRWindowCoveringOperationalStatusAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRWindowCoveringModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value)
+void MTRWindowCoveringModeAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::WindowCovering::Mode> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -12335,8 +12000,7 @@ void MTRWindowCoveringModeAttributeCallbackSubscriptionBridge::OnSubscriptionEst
     }
 }
 
-void MTRWindowCoveringSafetyStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus> value)
+void MTRWindowCoveringSafetyStatusAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::WindowCovering::SafetyStatus> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -12358,8 +12022,7 @@ void MTRWindowCoveringSafetyStatusAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void MTRWindowCoveringGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRWindowCoveringGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -12396,8 +12059,7 @@ void MTRWindowCoveringGeneratedCommandListListAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRWindowCoveringAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRWindowCoveringAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -12434,8 +12096,7 @@ void MTRWindowCoveringAcceptedCommandListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRWindowCoveringEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRWindowCoveringEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -12472,8 +12133,7 @@ void MTRWindowCoveringEventListListAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRWindowCoveringAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRWindowCoveringAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -12510,8 +12170,7 @@ void MTRWindowCoveringAttributeListListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRBarrierControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRBarrierControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -12548,8 +12207,7 @@ void MTRBarrierControlGeneratedCommandListListAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRBarrierControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRBarrierControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -12586,8 +12244,7 @@ void MTRBarrierControlAcceptedCommandListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRBarrierControlEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRBarrierControlEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -12624,8 +12281,7 @@ void MTRBarrierControlEventListListAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRBarrierControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRBarrierControlAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -12662,8 +12318,7 @@ void MTRBarrierControlAttributeListListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRPumpConfigurationAndControlPumpStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap> value)
+void MTRPumpConfigurationAndControlPumpStatusAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::PumpConfigurationAndControl::PumpStatusBitmap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -12685,8 +12340,7 @@ void MTRPumpConfigurationAndControlPumpStatusAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -12723,8 +12377,7 @@ void MTRPumpConfigurationAndControlGeneratedCommandListListAttributeCallbackSubs
     }
 }
 
-void MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -12761,8 +12414,7 @@ void MTRPumpConfigurationAndControlAcceptedCommandListListAttributeCallbackSubsc
     }
 }
 
-void MTRPumpConfigurationAndControlEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRPumpConfigurationAndControlEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -12799,8 +12451,7 @@ void MTRPumpConfigurationAndControlEventListListAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRPumpConfigurationAndControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRPumpConfigurationAndControlAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -12837,8 +12488,7 @@ void MTRPumpConfigurationAndControlAttributeListListAttributeCallbackSubscriptio
     }
 }
 
-void MTRThermostatGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRThermostatGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -12875,8 +12525,7 @@ void MTRThermostatGeneratedCommandListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRThermostatAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRThermostatAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -12913,8 +12562,7 @@ void MTRThermostatAcceptedCommandListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRThermostatEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRThermostatEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -12951,8 +12599,7 @@ void MTRThermostatEventListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
-void MTRThermostatAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRThermostatAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -12989,8 +12636,7 @@ void MTRThermostatAttributeListListAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRFanControlRockSupportAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> value)
+void MTRFanControlRockSupportAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -13012,8 +12658,7 @@ void MTRFanControlRockSupportAttributeCallbackSubscriptionBridge::OnSubscription
     }
 }
 
-void MTRFanControlRockSettingAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> value)
+void MTRFanControlRockSettingAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::FanControl::RockBitmap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -13035,8 +12680,7 @@ void MTRFanControlRockSettingAttributeCallbackSubscriptionBridge::OnSubscription
     }
 }
 
-void MTRFanControlWindSupportAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> value)
+void MTRFanControlWindSupportAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -13058,8 +12702,7 @@ void MTRFanControlWindSupportAttributeCallbackSubscriptionBridge::OnSubscription
     }
 }
 
-void MTRFanControlWindSettingAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> value)
+void MTRFanControlWindSettingAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::FanControl::WindBitmap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -13081,8 +12724,7 @@ void MTRFanControlWindSettingAttributeCallbackSubscriptionBridge::OnSubscription
     }
 }
 
-void MTRFanControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRFanControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13119,8 +12761,7 @@ void MTRFanControlGeneratedCommandListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRFanControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRFanControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13157,8 +12798,7 @@ void MTRFanControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRFanControlEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRFanControlEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13195,8 +12835,7 @@ void MTRFanControlEventListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
-void MTRFanControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRFanControlAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13233,8 +12872,7 @@ void MTRFanControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13271,8 +12909,7 @@ void MTRThermostatUserInterfaceConfigurationGeneratedCommandListListAttributeCal
     }
 }
 
-void MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13309,8 +12946,7 @@ void MTRThermostatUserInterfaceConfigurationAcceptedCommandListListAttributeCall
     }
 }
 
-void MTRThermostatUserInterfaceConfigurationEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRThermostatUserInterfaceConfigurationEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13347,8 +12983,7 @@ void MTRThermostatUserInterfaceConfigurationEventListListAttributeCallbackSubscr
     }
 }
 
-void MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13385,8 +13020,7 @@ void MTRThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackSu
     }
 }
 
-void MTRColorControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRColorControlGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13423,8 +13057,7 @@ void MTRColorControlGeneratedCommandListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRColorControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRColorControlAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13461,8 +13094,7 @@ void MTRColorControlAcceptedCommandListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRColorControlEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRColorControlEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13499,8 +13131,7 @@ void MTRColorControlEventListListAttributeCallbackSubscriptionBridge::OnSubscrip
     }
 }
 
-void MTRColorControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRColorControlAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13537,8 +13168,7 @@ void MTRColorControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRBallastConfigurationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRBallastConfigurationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13575,8 +13205,7 @@ void MTRBallastConfigurationGeneratedCommandListListAttributeCallbackSubscriptio
     }
 }
 
-void MTRBallastConfigurationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRBallastConfigurationAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13613,8 +13242,7 @@ void MTRBallastConfigurationAcceptedCommandListListAttributeCallbackSubscription
     }
 }
 
-void MTRBallastConfigurationEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRBallastConfigurationEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13651,8 +13279,7 @@ void MTRBallastConfigurationEventListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRBallastConfigurationAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRBallastConfigurationAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13689,8 +13316,7 @@ void MTRBallastConfigurationAttributeListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13727,8 +13353,7 @@ void MTRIlluminanceMeasurementGeneratedCommandListListAttributeCallbackSubscript
     }
 }
 
-void MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13765,8 +13390,7 @@ void MTRIlluminanceMeasurementAcceptedCommandListListAttributeCallbackSubscripti
     }
 }
 
-void MTRIlluminanceMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRIlluminanceMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13803,8 +13427,7 @@ void MTRIlluminanceMeasurementEventListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRIlluminanceMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRIlluminanceMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13841,8 +13464,7 @@ void MTRIlluminanceMeasurementAttributeListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13879,8 +13501,7 @@ void MTRTemperatureMeasurementGeneratedCommandListListAttributeCallbackSubscript
     }
 }
 
-void MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13917,8 +13538,7 @@ void MTRTemperatureMeasurementAcceptedCommandListListAttributeCallbackSubscripti
     }
 }
 
-void MTRTemperatureMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRTemperatureMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13955,8 +13575,7 @@ void MTRTemperatureMeasurementEventListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRTemperatureMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRTemperatureMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -13993,8 +13612,7 @@ void MTRTemperatureMeasurementAttributeListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRPressureMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRPressureMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14031,8 +13649,7 @@ void MTRPressureMeasurementGeneratedCommandListListAttributeCallbackSubscription
     }
 }
 
-void MTRPressureMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRPressureMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14069,8 +13686,7 @@ void MTRPressureMeasurementAcceptedCommandListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTRPressureMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRPressureMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14107,8 +13723,7 @@ void MTRPressureMeasurementEventListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRPressureMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRPressureMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14145,8 +13760,7 @@ void MTRPressureMeasurementAttributeListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRFlowMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRFlowMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14183,8 +13797,7 @@ void MTRFlowMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRFlowMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRFlowMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14221,8 +13834,7 @@ void MTRFlowMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRFlowMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRFlowMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14259,8 +13871,7 @@ void MTRFlowMeasurementEventListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRFlowMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRFlowMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14297,8 +13908,7 @@ void MTRFlowMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14335,8 +13945,7 @@ void MTRRelativeHumidityMeasurementGeneratedCommandListListAttributeCallbackSubs
     }
 }
 
-void MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14373,8 +13982,7 @@ void MTRRelativeHumidityMeasurementAcceptedCommandListListAttributeCallbackSubsc
     }
 }
 
-void MTRRelativeHumidityMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRRelativeHumidityMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14411,8 +14019,7 @@ void MTRRelativeHumidityMeasurementEventListListAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14449,8 +14056,7 @@ void MTRRelativeHumidityMeasurementAttributeListListAttributeCallbackSubscriptio
     }
 }
 
-void MTROccupancySensingOccupancyAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap> value)
+void MTROccupancySensingOccupancyAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancyBitmap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -14472,8 +14078,7 @@ void MTROccupancySensingOccupancyAttributeCallbackSubscriptionBridge::OnSubscrip
     }
 }
 
-void MTROccupancySensingOccupancySensorTypeBitmapAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap> value)
+void MTROccupancySensingOccupancySensorTypeBitmapAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::OccupancySensing::OccupancySensorTypeBitmap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -14495,8 +14100,7 @@ void MTROccupancySensingOccupancySensorTypeBitmapAttributeCallbackSubscriptionBr
     }
 }
 
-void MTROccupancySensingGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTROccupancySensingGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14533,8 +14137,7 @@ void MTROccupancySensingGeneratedCommandListListAttributeCallbackSubscriptionBri
     }
 }
 
-void MTROccupancySensingAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTROccupancySensingAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14571,8 +14174,7 @@ void MTROccupancySensingAcceptedCommandListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTROccupancySensingEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTROccupancySensingEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14609,8 +14211,7 @@ void MTROccupancySensingEventListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTROccupancySensingAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTROccupancySensingAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14647,8 +14248,7 @@ void MTROccupancySensingAttributeListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRCarbonMonoxideConcentrationMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRCarbonMonoxideConcentrationMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14670,8 +14270,7 @@ void MTRCarbonMonoxideConcentrationMeasurementGeneratedCommandListListAttributeC
     DispatchSuccess(context, objCValue);
 };
 
-void MTRCarbonMonoxideConcentrationMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRCarbonMonoxideConcentrationMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14686,8 +14285,7 @@ void MTRCarbonMonoxideConcentrationMeasurementGeneratedCommandListListAttributeC
     }
 }
 
-void MTRCarbonMonoxideConcentrationMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRCarbonMonoxideConcentrationMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14709,8 +14307,7 @@ void MTRCarbonMonoxideConcentrationMeasurementAcceptedCommandListListAttributeCa
     DispatchSuccess(context, objCValue);
 };
 
-void MTRCarbonMonoxideConcentrationMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRCarbonMonoxideConcentrationMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14725,8 +14322,7 @@ void MTRCarbonMonoxideConcentrationMeasurementAcceptedCommandListListAttributeCa
     }
 }
 
-void MTRCarbonMonoxideConcentrationMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRCarbonMonoxideConcentrationMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14763,8 +14359,7 @@ void MTRCarbonMonoxideConcentrationMeasurementEventListListAttributeCallbackSubs
     }
 }
 
-void MTRCarbonMonoxideConcentrationMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRCarbonMonoxideConcentrationMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14801,8 +14396,7 @@ void MTRCarbonMonoxideConcentrationMeasurementAttributeListListAttributeCallback
     }
 }
 
-void MTRCarbonDioxideConcentrationMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRCarbonDioxideConcentrationMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14824,8 +14418,7 @@ void MTRCarbonDioxideConcentrationMeasurementGeneratedCommandListListAttributeCa
     DispatchSuccess(context, objCValue);
 };
 
-void MTRCarbonDioxideConcentrationMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRCarbonDioxideConcentrationMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14840,8 +14433,7 @@ void MTRCarbonDioxideConcentrationMeasurementGeneratedCommandListListAttributeCa
     }
 }
 
-void MTRCarbonDioxideConcentrationMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRCarbonDioxideConcentrationMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14878,8 +14470,7 @@ void MTRCarbonDioxideConcentrationMeasurementAcceptedCommandListListAttributeCal
     }
 }
 
-void MTRCarbonDioxideConcentrationMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRCarbonDioxideConcentrationMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14916,8 +14507,7 @@ void MTRCarbonDioxideConcentrationMeasurementEventListListAttributeCallbackSubsc
     }
 }
 
-void MTRCarbonDioxideConcentrationMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRCarbonDioxideConcentrationMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14954,8 +14544,7 @@ void MTRCarbonDioxideConcentrationMeasurementAttributeListListAttributeCallbackS
     }
 }
 
-void MTRNitrogenDioxideConcentrationMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRNitrogenDioxideConcentrationMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -14977,8 +14566,7 @@ void MTRNitrogenDioxideConcentrationMeasurementGeneratedCommandListListAttribute
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNitrogenDioxideConcentrationMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNitrogenDioxideConcentrationMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -14993,8 +14581,7 @@ void MTRNitrogenDioxideConcentrationMeasurementGeneratedCommandListListAttribute
     }
 }
 
-void MTRNitrogenDioxideConcentrationMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRNitrogenDioxideConcentrationMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15016,8 +14603,7 @@ void MTRNitrogenDioxideConcentrationMeasurementAcceptedCommandListListAttributeC
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNitrogenDioxideConcentrationMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNitrogenDioxideConcentrationMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15032,8 +14618,7 @@ void MTRNitrogenDioxideConcentrationMeasurementAcceptedCommandListListAttributeC
     }
 }
 
-void MTRNitrogenDioxideConcentrationMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRNitrogenDioxideConcentrationMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15070,8 +14655,7 @@ void MTRNitrogenDioxideConcentrationMeasurementEventListListAttributeCallbackSub
     }
 }
 
-void MTRNitrogenDioxideConcentrationMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRNitrogenDioxideConcentrationMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15108,8 +14692,7 @@ void MTRNitrogenDioxideConcentrationMeasurementAttributeListListAttributeCallbac
     }
 }
 
-void MTROzoneConcentrationMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTROzoneConcentrationMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15146,8 +14729,7 @@ void MTROzoneConcentrationMeasurementGeneratedCommandListListAttributeCallbackSu
     }
 }
 
-void MTROzoneConcentrationMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTROzoneConcentrationMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15184,8 +14766,7 @@ void MTROzoneConcentrationMeasurementAcceptedCommandListListAttributeCallbackSub
     }
 }
 
-void MTROzoneConcentrationMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTROzoneConcentrationMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15222,8 +14803,7 @@ void MTROzoneConcentrationMeasurementEventListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTROzoneConcentrationMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTROzoneConcentrationMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15260,8 +14840,7 @@ void MTROzoneConcentrationMeasurementAttributeListListAttributeCallbackSubscript
     }
 }
 
-void MTRPM25ConcentrationMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRPM25ConcentrationMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15298,8 +14877,7 @@ void MTRPM25ConcentrationMeasurementGeneratedCommandListListAttributeCallbackSub
     }
 }
 
-void MTRPM25ConcentrationMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRPM25ConcentrationMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15336,8 +14914,7 @@ void MTRPM25ConcentrationMeasurementAcceptedCommandListListAttributeCallbackSubs
     }
 }
 
-void MTRPM25ConcentrationMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRPM25ConcentrationMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15374,8 +14951,7 @@ void MTRPM25ConcentrationMeasurementEventListListAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRPM25ConcentrationMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRPM25ConcentrationMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15412,8 +14988,7 @@ void MTRPM25ConcentrationMeasurementAttributeListListAttributeCallbackSubscripti
     }
 }
 
-void MTRFormaldehydeConcentrationMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRFormaldehydeConcentrationMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15450,8 +15025,7 @@ void MTRFormaldehydeConcentrationMeasurementGeneratedCommandListListAttributeCal
     }
 }
 
-void MTRFormaldehydeConcentrationMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRFormaldehydeConcentrationMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15488,8 +15062,7 @@ void MTRFormaldehydeConcentrationMeasurementAcceptedCommandListListAttributeCall
     }
 }
 
-void MTRFormaldehydeConcentrationMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRFormaldehydeConcentrationMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15526,8 +15099,7 @@ void MTRFormaldehydeConcentrationMeasurementEventListListAttributeCallbackSubscr
     }
 }
 
-void MTRFormaldehydeConcentrationMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRFormaldehydeConcentrationMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15564,8 +15136,7 @@ void MTRFormaldehydeConcentrationMeasurementAttributeListListAttributeCallbackSu
     }
 }
 
-void MTRPM1ConcentrationMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRPM1ConcentrationMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15602,8 +15173,7 @@ void MTRPM1ConcentrationMeasurementGeneratedCommandListListAttributeCallbackSubs
     }
 }
 
-void MTRPM1ConcentrationMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRPM1ConcentrationMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15640,8 +15210,7 @@ void MTRPM1ConcentrationMeasurementAcceptedCommandListListAttributeCallbackSubsc
     }
 }
 
-void MTRPM1ConcentrationMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRPM1ConcentrationMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15678,8 +15247,7 @@ void MTRPM1ConcentrationMeasurementEventListListAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRPM1ConcentrationMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRPM1ConcentrationMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15716,8 +15284,7 @@ void MTRPM1ConcentrationMeasurementAttributeListListAttributeCallbackSubscriptio
     }
 }
 
-void MTRPM10ConcentrationMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRPM10ConcentrationMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15754,8 +15321,7 @@ void MTRPM10ConcentrationMeasurementGeneratedCommandListListAttributeCallbackSub
     }
 }
 
-void MTRPM10ConcentrationMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRPM10ConcentrationMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15792,8 +15358,7 @@ void MTRPM10ConcentrationMeasurementAcceptedCommandListListAttributeCallbackSubs
     }
 }
 
-void MTRPM10ConcentrationMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRPM10ConcentrationMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15830,8 +15395,7 @@ void MTRPM10ConcentrationMeasurementEventListListAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRPM10ConcentrationMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRPM10ConcentrationMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15868,8 +15432,7 @@ void MTRPM10ConcentrationMeasurementAttributeListListAttributeCallbackSubscripti
     }
 }
 
-void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15891,8 +15454,7 @@ void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementGeneratedCommandLis
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15907,8 +15469,7 @@ void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementGeneratedCommandLis
     }
 }
 
-void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15930,8 +15491,7 @@ void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementAcceptedCommandList
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15946,8 +15506,7 @@ void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementAcceptedCommandList
     }
 }
 
-void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -15969,8 +15528,7 @@ void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementEventListListAttrib
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementEventListListAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementEventListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -15985,8 +15543,7 @@ void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementEventListListAttrib
     }
 }
 
-void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -16008,8 +15565,7 @@ void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeListListAt
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeListListAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -16024,8 +15580,7 @@ void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementAttributeListListAt
     }
 }
 
-void MTRRadonConcentrationMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRRadonConcentrationMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -16062,8 +15617,7 @@ void MTRRadonConcentrationMeasurementGeneratedCommandListListAttributeCallbackSu
     }
 }
 
-void MTRRadonConcentrationMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRRadonConcentrationMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -16100,8 +15654,7 @@ void MTRRadonConcentrationMeasurementAcceptedCommandListListAttributeCallbackSub
     }
 }
 
-void MTRRadonConcentrationMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRRadonConcentrationMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -16138,8 +15691,7 @@ void MTRRadonConcentrationMeasurementEventListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTRRadonConcentrationMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRRadonConcentrationMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -16176,8 +15728,7 @@ void MTRRadonConcentrationMeasurementAttributeListListAttributeCallbackSubscript
     }
 }
 
-void MTRWakeOnLANGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRWakeOnLANGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -16214,8 +15765,7 @@ void MTRWakeOnLANGeneratedCommandListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRWakeOnLANAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRWakeOnLANAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -16252,8 +15802,7 @@ void MTRWakeOnLANAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRWakeOnLANEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRWakeOnLANEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -16290,8 +15839,7 @@ void MTRWakeOnLANEventListListAttributeCallbackSubscriptionBridge::OnSubscriptio
     }
 }
 
-void MTRWakeOnLANAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRWakeOnLANAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -16328,8 +15876,7 @@ void MTRWakeOnLANAttributeListListAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void MTRChannelChannelListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType> & value)
+void MTRChannelChannelListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -16398,8 +15945,7 @@ void MTRChannelChannelListListAttributeCallbackSubscriptionBridge::OnSubscriptio
     }
 }
 
-void MTRChannelLineupStructAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfoStruct::DecodableType> & value)
+void MTRChannelLineupStructAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::LineupInfoStruct::DecodableType> & value)
 {
     MTRChannelClusterLineupInfoStruct * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16452,8 +15998,7 @@ void MTRChannelLineupStructAttributeCallbackSubscriptionBridge::OnSubscriptionEs
     }
 }
 
-void MTRChannelCurrentChannelStructAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType> & value)
+void MTRChannelCurrentChannelStructAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::Structs::ChannelInfoStruct::DecodableType> & value)
 {
     MTRChannelClusterChannelInfoStruct * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16511,8 +16056,7 @@ void MTRChannelCurrentChannelStructAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRChannelGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRChannelGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -16549,8 +16093,7 @@ void MTRChannelGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRChannelAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRChannelAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -16587,8 +16130,7 @@ void MTRChannelAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRChannelEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRChannelEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -16625,8 +16167,7 @@ void MTRChannelEventListListAttributeCallbackSubscriptionBridge::OnSubscriptionE
     }
 }
 
-void MTRChannelAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRChannelAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -16663,9 +16204,7 @@ void MTRChannelAttributeListListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void MTRTargetNavigatorTargetListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType> &
-        value)
+void MTRTargetNavigatorTargetListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfoStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -16709,8 +16248,7 @@ void MTRTargetNavigatorTargetListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRTargetNavigatorGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRTargetNavigatorGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -16747,8 +16285,7 @@ void MTRTargetNavigatorGeneratedCommandListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRTargetNavigatorAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRTargetNavigatorAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -16785,8 +16322,7 @@ void MTRTargetNavigatorAcceptedCommandListListAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRTargetNavigatorEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRTargetNavigatorEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -16823,8 +16359,7 @@ void MTRTargetNavigatorEventListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRTargetNavigatorAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRTargetNavigatorAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -16861,9 +16396,7 @@ void MTRTargetNavigatorAttributeListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRMediaPlaybackSampledPositionStructAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::DecodableType> &
-        value)
+void MTRMediaPlaybackSampledPositionStructAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::PlaybackPositionStruct::DecodableType> & value)
 {
     MTRMediaPlaybackClusterPlaybackPositionStruct * _Nullable objCValue;
     if (value.IsNull()) {
@@ -16895,8 +16428,7 @@ void MTRMediaPlaybackSampledPositionStructAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRMediaPlaybackGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRMediaPlaybackGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -16933,8 +16465,7 @@ void MTRMediaPlaybackGeneratedCommandListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRMediaPlaybackAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRMediaPlaybackAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -16971,8 +16502,7 @@ void MTRMediaPlaybackAcceptedCommandListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRMediaPlaybackEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRMediaPlaybackEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17009,8 +16539,7 @@ void MTRMediaPlaybackEventListListAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void MTRMediaPlaybackAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRMediaPlaybackAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17047,8 +16576,7 @@ void MTRMediaPlaybackAttributeListListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRMediaInputInputListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfoStruct::DecodableType> & value)
+void MTRMediaInputInputListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfoStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17099,8 +16627,7 @@ void MTRMediaInputInputListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
-void MTRMediaInputGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRMediaInputGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17137,8 +16664,7 @@ void MTRMediaInputGeneratedCommandListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRMediaInputAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRMediaInputAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17175,8 +16701,7 @@ void MTRMediaInputAcceptedCommandListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRMediaInputEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRMediaInputEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17213,8 +16738,7 @@ void MTRMediaInputEventListListAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
-void MTRMediaInputAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRMediaInputAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17251,8 +16775,7 @@ void MTRMediaInputAttributeListListAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRLowPowerGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRLowPowerGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17289,8 +16812,7 @@ void MTRLowPowerGeneratedCommandListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRLowPowerAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRLowPowerAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17327,8 +16849,7 @@ void MTRLowPowerAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRLowPowerEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRLowPowerEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17365,8 +16886,7 @@ void MTRLowPowerEventListListAttributeCallbackSubscriptionBridge::OnSubscription
     }
 }
 
-void MTRLowPowerAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRLowPowerAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17403,8 +16923,7 @@ void MTRLowPowerAttributeListListAttributeCallbackSubscriptionBridge::OnSubscrip
     }
 }
 
-void MTRKeypadInputGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRKeypadInputGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17441,8 +16960,7 @@ void MTRKeypadInputGeneratedCommandListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRKeypadInputAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRKeypadInputAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17479,8 +16997,7 @@ void MTRKeypadInputAcceptedCommandListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRKeypadInputEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRKeypadInputEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17517,8 +17034,7 @@ void MTRKeypadInputEventListListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void MTRKeypadInputAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRKeypadInputAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17555,8 +17071,7 @@ void MTRKeypadInputAttributeListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRContentLauncherAcceptHeaderListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
+void MTRContentLauncherAcceptHeaderListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17598,8 +17113,7 @@ void MTRContentLauncherAcceptHeaderListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRContentLauncherGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRContentLauncherGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17636,8 +17150,7 @@ void MTRContentLauncherGeneratedCommandListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRContentLauncherAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRContentLauncherAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17674,8 +17187,7 @@ void MTRContentLauncherAcceptedCommandListListAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRContentLauncherEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRContentLauncherEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17712,8 +17224,7 @@ void MTRContentLauncherEventListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRContentLauncherAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRContentLauncherAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17750,8 +17261,7 @@ void MTRContentLauncherAttributeListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRAudioOutputOutputListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::DecodableType> & value)
+void MTRAudioOutputOutputListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfoStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17796,8 +17306,7 @@ void MTRAudioOutputOutputListListAttributeCallbackSubscriptionBridge::OnSubscrip
     }
 }
 
-void MTRAudioOutputGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRAudioOutputGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17834,8 +17343,7 @@ void MTRAudioOutputGeneratedCommandListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRAudioOutputAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRAudioOutputAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17872,8 +17380,7 @@ void MTRAudioOutputAcceptedCommandListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRAudioOutputEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRAudioOutputEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17910,8 +17417,7 @@ void MTRAudioOutputEventListListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void MTRAudioOutputAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRAudioOutputAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17948,8 +17454,7 @@ void MTRAudioOutputAttributeListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRApplicationLauncherCatalogListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<uint16_t> & value)
+void MTRApplicationLauncherCatalogListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint16_t> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -17986,9 +17491,7 @@ void MTRApplicationLauncherCatalogListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRApplicationLauncherCurrentAppStructAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::DecodableType> &
-        value)
+void MTRApplicationLauncherCurrentAppStructAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::DecodableType> & value)
 {
     MTRApplicationLauncherClusterApplicationEPStruct * _Nullable objCValue;
     if (value.IsNull()) {
@@ -18027,8 +17530,7 @@ void MTRApplicationLauncherCurrentAppStructAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRApplicationLauncherGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRApplicationLauncherGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -18065,8 +17567,7 @@ void MTRApplicationLauncherGeneratedCommandListListAttributeCallbackSubscription
     }
 }
 
-void MTRApplicationLauncherAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRApplicationLauncherAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -18103,8 +17604,7 @@ void MTRApplicationLauncherAcceptedCommandListListAttributeCallbackSubscriptionB
     }
 }
 
-void MTRApplicationLauncherEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRApplicationLauncherEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -18141,8 +17641,7 @@ void MTRApplicationLauncherEventListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRApplicationLauncherAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRApplicationLauncherAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -18179,8 +17678,7 @@ void MTRApplicationLauncherAttributeListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRApplicationBasicApplicationStructAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::ApplicationBasic::Structs::ApplicationStruct::DecodableType & value)
+void MTRApplicationBasicApplicationStructAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::ApplicationBasic::Structs::ApplicationStruct::DecodableType & value)
 {
     MTRApplicationBasicClusterApplicationStruct * _Nonnull objCValue;
     objCValue = [MTRApplicationBasicClusterApplicationStruct new];
@@ -18209,8 +17707,7 @@ void MTRApplicationBasicApplicationStructAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRApplicationBasicAllowedVendorListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & value)
+void MTRApplicationBasicAllowedVendorListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -18247,8 +17744,7 @@ void MTRApplicationBasicAllowedVendorListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRApplicationBasicGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRApplicationBasicGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -18285,8 +17781,7 @@ void MTRApplicationBasicGeneratedCommandListListAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRApplicationBasicAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRApplicationBasicAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -18323,8 +17818,7 @@ void MTRApplicationBasicAcceptedCommandListListAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRApplicationBasicEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRApplicationBasicEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -18361,8 +17855,7 @@ void MTRApplicationBasicEventListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRApplicationBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRApplicationBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -18399,8 +17892,7 @@ void MTRApplicationBasicAttributeListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRAccountLoginGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRAccountLoginGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -18437,8 +17929,7 @@ void MTRAccountLoginGeneratedCommandListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRAccountLoginAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRAccountLoginAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -18475,8 +17966,7 @@ void MTRAccountLoginAcceptedCommandListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRAccountLoginEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRAccountLoginEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -18513,8 +18003,7 @@ void MTRAccountLoginEventListListAttributeCallbackSubscriptionBridge::OnSubscrip
     }
 }
 
-void MTRAccountLoginAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRAccountLoginAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -18551,8 +18040,7 @@ void MTRAccountLoginAttributeListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -18589,8 +18077,7 @@ void MTRElectricalMeasurementGeneratedCommandListListAttributeCallbackSubscripti
     }
 }
 
-void MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -18627,8 +18114,7 @@ void MTRElectricalMeasurementAcceptedCommandListListAttributeCallbackSubscriptio
     }
 }
 
-void MTRElectricalMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRElectricalMeasurementEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -18665,8 +18151,7 @@ void MTRElectricalMeasurementEventListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRElectricalMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRElectricalMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -18703,8 +18188,7 @@ void MTRElectricalMeasurementAttributeListListAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRUnitTestingBitmap8AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap> value)
+void MTRUnitTestingBitmap8AttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
@@ -18726,8 +18210,7 @@ void MTRUnitTestingBitmap8AttributeCallbackSubscriptionBridge::OnSubscriptionEst
     }
 }
 
-void MTRUnitTestingBitmap16AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap> value)
+void MTRUnitTestingBitmap16AttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value.Raw()];
@@ -18749,8 +18232,7 @@ void MTRUnitTestingBitmap16AttributeCallbackSubscriptionBridge::OnSubscriptionEs
     }
 }
 
-void MTRUnitTestingBitmap32AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap> value)
+void MTRUnitTestingBitmap32AttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -18772,8 +18254,7 @@ void MTRUnitTestingBitmap32AttributeCallbackSubscriptionBridge::OnSubscriptionEs
     }
 }
 
-void MTRUnitTestingBitmap64AttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap> value)
+void MTRUnitTestingBitmap64AttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedLongLong:value.Raw()];
@@ -18795,8 +18276,7 @@ void MTRUnitTestingBitmap64AttributeCallbackSubscriptionBridge::OnSubscriptionEs
     }
 }
 
-void MTRUnitTestingListInt8uListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
+void MTRUnitTestingListInt8uListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -18833,8 +18313,7 @@ void MTRUnitTestingListInt8uListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void MTRUnitTestingListOctetStringListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
+void MTRUnitTestingListOctetStringListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -18871,9 +18350,7 @@ void MTRUnitTestingListOctetStringListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRUnitTestingListStructOctetStringListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestListStructOctet::DecodableType> &
-        value)
+void MTRUnitTestingListStructOctetStringListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestListStructOctet::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -18912,9 +18389,7 @@ void MTRUnitTestingListStructOctetStringListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::DecodableType> & value)
+void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::NullablesAndOptionalsStruct::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -18938,8 +18413,7 @@ void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge::O
                 if (entry_0.nullableOptionalInt.Value().IsNull()) {
                     newElement_0.nullableOptionalInt = nil;
                 } else {
-                    newElement_0.nullableOptionalInt =
-                        [NSNumber numberWithUnsignedShort:entry_0.nullableOptionalInt.Value().Value()];
+                    newElement_0.nullableOptionalInt = [NSNumber numberWithUnsignedShort:entry_0.nullableOptionalInt.Value().Value()];
                 }
             } else {
                 newElement_0.nullableOptionalInt = nil;
@@ -18984,8 +18458,7 @@ void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge::O
                 newElement_0.nullableStruct = [MTRUnitTestingClusterSimpleStruct new];
                 newElement_0.nullableStruct.a = [NSNumber numberWithUnsignedChar:entry_0.nullableStruct.Value().a];
                 newElement_0.nullableStruct.b = [NSNumber numberWithBool:entry_0.nullableStruct.Value().b];
-                newElement_0.nullableStruct.c =
-                    [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.nullableStruct.Value().c)];
+                newElement_0.nullableStruct.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.nullableStruct.Value().c)];
                 newElement_0.nullableStruct.d = AsData(entry_0.nullableStruct.Value().d);
                 newElement_0.nullableStruct.e = AsString(entry_0.nullableStruct.Value().e);
                 if (newElement_0.nullableStruct.e == nil) {
@@ -19001,8 +18474,7 @@ void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge::O
                 newElement_0.optionalStruct = [MTRUnitTestingClusterSimpleStruct new];
                 newElement_0.optionalStruct.a = [NSNumber numberWithUnsignedChar:entry_0.optionalStruct.Value().a];
                 newElement_0.optionalStruct.b = [NSNumber numberWithBool:entry_0.optionalStruct.Value().b];
-                newElement_0.optionalStruct.c =
-                    [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.optionalStruct.Value().c)];
+                newElement_0.optionalStruct.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.optionalStruct.Value().c)];
                 newElement_0.optionalStruct.d = AsData(entry_0.optionalStruct.Value().d);
                 newElement_0.optionalStruct.e = AsString(entry_0.optionalStruct.Value().e);
                 if (newElement_0.optionalStruct.e == nil) {
@@ -19021,12 +18493,9 @@ void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge::O
                     newElement_0.nullableOptionalStruct = nil;
                 } else {
                     newElement_0.nullableOptionalStruct = [MTRUnitTestingClusterSimpleStruct new];
-                    newElement_0.nullableOptionalStruct.a =
-                        [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().a];
-                    newElement_0.nullableOptionalStruct.b =
-                        [NSNumber numberWithBool:entry_0.nullableOptionalStruct.Value().Value().b];
-                    newElement_0.nullableOptionalStruct.c =
-                        [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.nullableOptionalStruct.Value().Value().c)];
+                    newElement_0.nullableOptionalStruct.a = [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().a];
+                    newElement_0.nullableOptionalStruct.b = [NSNumber numberWithBool:entry_0.nullableOptionalStruct.Value().Value().b];
+                    newElement_0.nullableOptionalStruct.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.nullableOptionalStruct.Value().Value().c)];
                     newElement_0.nullableOptionalStruct.d = AsData(entry_0.nullableOptionalStruct.Value().Value().d);
                     newElement_0.nullableOptionalStruct.e = AsString(entry_0.nullableOptionalStruct.Value().Value().e);
                     if (newElement_0.nullableOptionalStruct.e == nil) {
@@ -19034,12 +18503,9 @@ void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackBridge::O
                         OnFailureFn(context, err);
                         return;
                     }
-                    newElement_0.nullableOptionalStruct.f =
-                        [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().f.Raw()];
-                    newElement_0.nullableOptionalStruct.g =
-                        [NSNumber numberWithFloat:entry_0.nullableOptionalStruct.Value().Value().g];
-                    newElement_0.nullableOptionalStruct.h =
-                        [NSNumber numberWithDouble:entry_0.nullableOptionalStruct.Value().Value().h];
+                    newElement_0.nullableOptionalStruct.f = [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().f.Raw()];
+                    newElement_0.nullableOptionalStruct.g = [NSNumber numberWithFloat:entry_0.nullableOptionalStruct.Value().Value().g];
+                    newElement_0.nullableOptionalStruct.h = [NSNumber numberWithDouble:entry_0.nullableOptionalStruct.Value().Value().h];
                 }
             } else {
                 newElement_0.nullableOptionalStruct = nil;
@@ -19135,8 +18601,7 @@ void MTRUnitTestingListNullablesAndOptionalsStructListAttributeCallbackSubscript
     }
 }
 
-void MTRUnitTestingStructAttrStructAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType & value)
+void MTRUnitTestingStructAttrStructAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType & value)
 {
     MTRUnitTestingClusterSimpleStruct * _Nonnull objCValue;
     objCValue = [MTRUnitTestingClusterSimpleStruct new];
@@ -19171,8 +18636,7 @@ void MTRUnitTestingStructAttrStructAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRUnitTestingListLongOctetStringListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
+void MTRUnitTestingListLongOctetStringListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -19209,8 +18673,7 @@ void MTRUnitTestingListLongOctetStringListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRUnitTestingListFabricScopedListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestFabricScoped::DecodableType> & value)
+void MTRUnitTestingListFabricScopedListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::UnitTesting::Structs::TestFabricScoped::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -19222,23 +18685,20 @@ void MTRUnitTestingListFabricScopedListAttributeCallbackBridge::OnSuccessFn(void
             newElement_0 = [MTRUnitTestingClusterTestFabricScoped new];
             newElement_0.fabricSensitiveInt8u = [NSNumber numberWithUnsignedChar:entry_0.fabricSensitiveInt8u];
             if (entry_0.optionalFabricSensitiveInt8u.HasValue()) {
-                newElement_0.optionalFabricSensitiveInt8u =
-                    [NSNumber numberWithUnsignedChar:entry_0.optionalFabricSensitiveInt8u.Value()];
+                newElement_0.optionalFabricSensitiveInt8u = [NSNumber numberWithUnsignedChar:entry_0.optionalFabricSensitiveInt8u.Value()];
             } else {
                 newElement_0.optionalFabricSensitiveInt8u = nil;
             }
             if (entry_0.nullableFabricSensitiveInt8u.IsNull()) {
                 newElement_0.nullableFabricSensitiveInt8u = nil;
             } else {
-                newElement_0.nullableFabricSensitiveInt8u =
-                    [NSNumber numberWithUnsignedChar:entry_0.nullableFabricSensitiveInt8u.Value()];
+                newElement_0.nullableFabricSensitiveInt8u = [NSNumber numberWithUnsignedChar:entry_0.nullableFabricSensitiveInt8u.Value()];
             }
             if (entry_0.nullableOptionalFabricSensitiveInt8u.HasValue()) {
                 if (entry_0.nullableOptionalFabricSensitiveInt8u.Value().IsNull()) {
                     newElement_0.nullableOptionalFabricSensitiveInt8u = nil;
                 } else {
-                    newElement_0.nullableOptionalFabricSensitiveInt8u =
-                        [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalFabricSensitiveInt8u.Value().Value()];
+                    newElement_0.nullableOptionalFabricSensitiveInt8u = [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalFabricSensitiveInt8u.Value().Value()];
                 }
             } else {
                 newElement_0.nullableOptionalFabricSensitiveInt8u = nil;
@@ -19252,8 +18712,7 @@ void MTRUnitTestingListFabricScopedListAttributeCallbackBridge::OnSuccessFn(void
             newElement_0.fabricSensitiveStruct = [MTRUnitTestingClusterSimpleStruct new];
             newElement_0.fabricSensitiveStruct.a = [NSNumber numberWithUnsignedChar:entry_0.fabricSensitiveStruct.a];
             newElement_0.fabricSensitiveStruct.b = [NSNumber numberWithBool:entry_0.fabricSensitiveStruct.b];
-            newElement_0.fabricSensitiveStruct.c =
-                [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.fabricSensitiveStruct.c)];
+            newElement_0.fabricSensitiveStruct.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.fabricSensitiveStruct.c)];
             newElement_0.fabricSensitiveStruct.d = AsData(entry_0.fabricSensitiveStruct.d);
             newElement_0.fabricSensitiveStruct.e = AsString(entry_0.fabricSensitiveStruct.e);
             if (newElement_0.fabricSensitiveStruct.e == nil) {
@@ -19308,8 +18767,7 @@ void MTRUnitTestingListFabricScopedListAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRUnitTestingNullableBitmap8AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>> & value)
+void MTRUnitTestingNullableBitmap8AttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap8MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19335,8 +18793,7 @@ void MTRUnitTestingNullableBitmap8AttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void MTRUnitTestingNullableBitmap16AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>> & value)
+void MTRUnitTestingNullableBitmap16AttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap16MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19362,8 +18819,7 @@ void MTRUnitTestingNullableBitmap16AttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRUnitTestingNullableBitmap32AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>> & value)
+void MTRUnitTestingNullableBitmap32AttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap32MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19389,8 +18845,7 @@ void MTRUnitTestingNullableBitmap32AttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRUnitTestingNullableBitmap64AttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>> & value)
+void MTRUnitTestingNullableBitmap64AttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::BitMask<chip::app::Clusters::UnitTesting::Bitmap64MaskMap>> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19416,8 +18871,7 @@ void MTRUnitTestingNullableBitmap64AttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRUnitTestingNullableStructStructAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType> & value)
+void MTRUnitTestingNullableStructStructAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::Structs::SimpleStruct::DecodableType> & value)
 {
     MTRUnitTestingClusterSimpleStruct * _Nullable objCValue;
     if (value.IsNull()) {
@@ -19456,8 +18910,7 @@ void MTRUnitTestingNullableStructStructAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRUnitTestingGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRUnitTestingGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -19494,8 +18947,7 @@ void MTRUnitTestingGeneratedCommandListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRUnitTestingAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRUnitTestingAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -19532,8 +18984,7 @@ void MTRUnitTestingAcceptedCommandListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRUnitTestingEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRUnitTestingEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -19570,8 +19021,7 @@ void MTRUnitTestingEventListListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void MTRUnitTestingAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRUnitTestingAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -19608,8 +19058,7 @@ void MTRUnitTestingAttributeListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRSampleMEIGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRSampleMEIGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -19646,8 +19095,7 @@ void MTRSampleMEIGeneratedCommandListListAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRSampleMEIAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void MTRSampleMEIAcceptedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -19684,8 +19132,7 @@ void MTRSampleMEIAcceptedCommandListListAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRSampleMEIEventListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
+void MTRSampleMEIEventListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EventId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -19722,8 +19169,7 @@ void MTRSampleMEIEventListListAttributeCallbackSubscriptionBridge::OnSubscriptio
     }
 }
 
-void MTRSampleMEIAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void MTRSampleMEIAttributeListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     { // Scope for our temporary variables
@@ -19760,841 +19206,7 @@ void MTRSampleMEIAttributeListListAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void MTRGroupsClusterAddGroupResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType & data)
-{
-    auto * response = [MTRGroupsClusterAddGroupResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRGroupsClusterViewGroupResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType & data)
-{
-    auto * response = [MTRGroupsClusterViewGroupResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRGroupsClusterGetGroupMembershipResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType & data)
-{
-    auto * response = [MTRGroupsClusterGetGroupMembershipResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRGroupsClusterRemoveGroupResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType & data)
-{
-    auto * response = [MTRGroupsClusterRemoveGroupResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRScenesClusterAddSceneResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType & data)
-{
-    auto * response = [MTRScenesClusterAddSceneResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRScenesClusterViewSceneResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType & data)
-{
-    auto * response = [MTRScenesClusterViewSceneResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRScenesClusterRemoveSceneResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType & data)
-{
-    auto * response = [MTRScenesClusterRemoveSceneResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRScenesClusterRemoveAllScenesResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType & data)
-{
-    auto * response = [MTRScenesClusterRemoveAllScenesResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRScenesClusterStoreSceneResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType & data)
-{
-    auto * response = [MTRScenesClusterStoreSceneResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRScenesClusterGetSceneMembershipResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType & data)
-{
-    auto * response = [MTRScenesClusterGetSceneMembershipResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRScenesClusterEnhancedAddSceneResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType & data)
-{
-    auto * response = [MTRScenesClusterEnhancedAddSceneResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRScenesClusterEnhancedViewSceneResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType & data)
-{
-    auto * response = [MTRScenesClusterEnhancedViewSceneResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRScenesClusterCopySceneResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Scenes::Commands::CopySceneResponse::DecodableType & data)
-{
-    auto * response = [MTRScenesClusterCopySceneResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTROTASoftwareUpdateProviderClusterQueryImageResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & data)
-{
-    auto * response = [MTROTASoftwareUpdateProviderClusterQueryImageResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTROTASoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType & data)
-{
-    auto * response = [MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRGeneralCommissioningClusterArmFailSafeResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
-{
-    auto * response = [MTRGeneralCommissioningClusterArmFailSafeResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data)
-{
-    auto * response = [MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data)
-{
-    auto * response = [MTRGeneralCommissioningClusterCommissioningCompleteResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & data)
-{
-    auto * response = [MTRNetworkCommissioningClusterScanNetworksResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data)
-{
-    auto * response = [MTRNetworkCommissioningClusterNetworkConfigResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRNetworkCommissioningClusterConnectNetworkResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data)
-{
-    auto * response = [MTRNetworkCommissioningClusterConnectNetworkResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & data)
-{
-    auto * response = [MTRDiagnosticLogsClusterRetrieveLogsResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRTimeSynchronizationClusterSetTimeZoneResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::TimeSynchronization::Commands::SetTimeZoneResponse::DecodableType & data)
-{
-    auto * response = [MTRTimeSynchronizationClusterSetTimeZoneResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTROperationalCredentialsClusterAttestationResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType & data)
-{
-    auto * response = [MTROperationalCredentialsClusterAttestationResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTROperationalCredentialsClusterCertificateChainResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & data)
-{
-    auto * response = [MTROperationalCredentialsClusterCertificateChainResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTROperationalCredentialsClusterCSRResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType & data)
-{
-    auto * response = [MTROperationalCredentialsClusterCSRResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTROperationalCredentialsClusterNOCResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & data)
-{
-    auto * response = [MTROperationalCredentialsClusterNOCResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType & data)
-{
-    auto * response = [MTRGroupKeyManagementClusterKeySetReadResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & data)
-{
-    auto * response = [MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRICDManagementClusterRegisterClientResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data)
-{
-    auto * response = [MTRICDManagementClusterRegisterClientResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRLaundryWasherModeClusterChangeToModeResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::DecodableType & data)
-{
-    auto * response = [MTRLaundryWasherModeClusterChangeToModeResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeResponse::DecodableType &
-        data)
-{
-    auto * response = [MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRRVCRunModeClusterChangeToModeResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::RvcRunMode::Commands::ChangeToModeResponse::DecodableType & data)
-{
-    auto * response = [MTRRVCRunModeClusterChangeToModeResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRRVCCleanModeClusterChangeToModeResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeResponse::DecodableType & data)
-{
-    auto * response = [MTRRVCCleanModeClusterChangeToModeResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRDishwasherModeClusterChangeToModeResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DishwasherMode::Commands::ChangeToModeResponse::DecodableType & data)
-{
-    auto * response = [MTRDishwasherModeClusterChangeToModeResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTROperationalStateClusterOperationalCommandResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType & data)
-{
-    auto * response = [MTROperationalStateClusterOperationalCommandResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRRVCOperationalStateClusterOperationalCommandResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType & data)
-{
-    auto * response = [MTRRVCOperationalStateClusterOperationalCommandResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data)
-{
-    auto * response = [MTRDoorLockClusterGetWeekDayScheduleResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRDoorLockClusterGetYearDayScheduleResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data)
-{
-    auto * response = [MTRDoorLockClusterGetYearDayScheduleResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRDoorLockClusterGetHolidayScheduleResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data)
-{
-    auto * response = [MTRDoorLockClusterGetHolidayScheduleResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRDoorLockClusterGetUserResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType & data)
-{
-    auto * response = [MTRDoorLockClusterGetUserResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRDoorLockClusterSetCredentialResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType & data)
-{
-    auto * response = [MTRDoorLockClusterSetCredentialResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRDoorLockClusterGetCredentialStatusResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType & data)
-{
-    auto * response = [MTRDoorLockClusterGetCredentialStatusResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRThermostatClusterGetWeeklyScheduleResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & data)
-{
-    auto * response = [MTRThermostatClusterGetWeeklyScheduleResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRChannelClusterChangeChannelResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType & data)
-{
-    auto * response = [MTRChannelClusterChangeChannelResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRTargetNavigatorClusterNavigateTargetResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType & data)
-{
-    auto * response = [MTRTargetNavigatorClusterNavigateTargetResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRMediaPlaybackClusterPlaybackResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType & data)
-{
-    auto * response = [MTRMediaPlaybackClusterPlaybackResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRKeypadInputClusterSendKeyResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType & data)
-{
-    auto * response = [MTRKeypadInputClusterSendKeyResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRContentLauncherClusterLauncherResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType & data)
-{
-    auto * response = [MTRContentLauncherClusterLauncherResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRApplicationLauncherClusterLauncherResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType & data)
-{
-    auto * response = [MTRApplicationLauncherClusterLauncherResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRAccountLoginClusterGetSetupPINResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & data)
-{
-    auto * response = [MTRAccountLoginClusterGetSetupPINResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterTestSpecificResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::UnitTesting::Commands::TestSpecificResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterTestSpecificResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterTestAddArgumentsResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::UnitTesting::Commands::TestAddArgumentsResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterTestAddArgumentsResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterTestSimpleArgumentResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::UnitTesting::Commands::TestSimpleArgumentResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterTestSimpleArgumentResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterTestStructArrayArgumentResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterTestStructArrayArgumentResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterTestListInt8UReverseResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::UnitTesting::Commands::TestListInt8UReverseResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterTestListInt8UReverseResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterTestEnumsResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::UnitTesting::Commands::TestEnumsResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterTestEnumsResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterTestNullableOptionalResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::UnitTesting::Commands::TestNullableOptionalResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterTestNullableOptionalResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterTestComplexNullableOptionalResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::UnitTesting::Commands::TestComplexNullableOptionalResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterTestComplexNullableOptionalResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterBooleanResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::UnitTesting::Commands::BooleanResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterBooleanResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterSimpleStructResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::UnitTesting::Commands::SimpleStructResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterSimpleStructResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterTestEmitTestEventResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterTestEmitTestEventResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRSampleMEIClusterAddArgumentsResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType & data)
-{
-    auto * response = [MTRSampleMEIClusterAddArgumentsResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRIdentifyClusterEffectIdentifierEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Identify::EffectIdentifierEnum value)
+void MTRIdentifyClusterEffectIdentifierEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Identify::EffectIdentifierEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20616,8 +19228,7 @@ void MTRIdentifyClusterEffectIdentifierEnumAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRNullableIdentifyClusterEffectIdentifierEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::EffectIdentifierEnum> & value)
+void MTRNullableIdentifyClusterEffectIdentifierEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::EffectIdentifierEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20643,8 +19254,7 @@ void MTRNullableIdentifyClusterEffectIdentifierEnumAttributeCallbackSubscription
     }
 }
 
-void MTRIdentifyClusterEffectVariantEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Identify::EffectVariantEnum value)
+void MTRIdentifyClusterEffectVariantEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Identify::EffectVariantEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20666,8 +19276,7 @@ void MTRIdentifyClusterEffectVariantEnumAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRNullableIdentifyClusterEffectVariantEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::EffectVariantEnum> & value)
+void MTRNullableIdentifyClusterEffectVariantEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::EffectVariantEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20693,8 +19302,7 @@ void MTRNullableIdentifyClusterEffectVariantEnumAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRIdentifyClusterIdentifyTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Identify::IdentifyTypeEnum value)
+void MTRIdentifyClusterIdentifyTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Identify::IdentifyTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20716,8 +19324,7 @@ void MTRIdentifyClusterIdentifyTypeEnumAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRNullableIdentifyClusterIdentifyTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyTypeEnum> & value)
+void MTRNullableIdentifyClusterIdentifyTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20743,15 +19350,14 @@ void MTRNullableIdentifyClusterIdentifyTypeEnumAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant value)
+void MTROnOffClusterDelayedAllOffEffectVariantEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OnOff::DelayedAllOffEffectVariantEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTROnOffClusterDelayedAllOffEffectVariantEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -20766,8 +19372,7 @@ void MTROnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscription
     }
 }
 
-void MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant> & value)
+void MTRNullableOnOffClusterDelayedAllOffEffectVariantEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::DelayedAllOffEffectVariantEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20778,7 +19383,7 @@ void MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableOnOffClusterDelayedAllOffEffectVariantEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -20793,15 +19398,14 @@ void MTRNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubs
     }
 }
 
-void MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OnOff::OnOffDyingLightEffectVariant value)
+void MTROnOffClusterDyingLightEffectVariantEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OnOff::DyingLightEffectVariantEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTROnOffClusterDyingLightEffectVariantEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -20816,8 +19420,7 @@ void MTROnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffDyingLightEffectVariant> & value)
+void MTRNullableOnOffClusterDyingLightEffectVariantEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::DyingLightEffectVariantEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20828,7 +19431,7 @@ void MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableOnOffClusterDyingLightEffectVariantEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -20843,15 +19446,14 @@ void MTRNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscri
     }
 }
 
-void MTROnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OnOff::OnOffEffectIdentifier value)
+void MTROnOffClusterEffectIdentifierEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OnOff::EffectIdentifierEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTROnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTROnOffClusterEffectIdentifierEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -20866,8 +19468,7 @@ void MTROnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffEffectIdentifier> & value)
+void MTRNullableOnOffClusterEffectIdentifierEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::EffectIdentifierEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20878,7 +19479,7 @@ void MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::OnSucc
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableOnOffClusterEffectIdentifierEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -20893,15 +19494,14 @@ void MTRNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBr
     }
 }
 
-void MTROnOffClusterOnOffStartUpOnOffAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OnOff::OnOffStartUpOnOff value)
+void MTROnOffClusterStartUpOnOffEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OnOff::StartUpOnOffEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTROnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTROnOffClusterStartUpOnOffEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -20916,8 +19516,7 @@ void MTROnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> & value)
+void MTRNullableOnOffClusterStartUpOnOffEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::StartUpOnOffEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20928,7 +19527,7 @@ void MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableOnOffClusterStartUpOnOffEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -20943,8 +19542,7 @@ void MTRNullableOnOffClusterOnOffStartUpOnOffAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRLevelControlClusterMoveModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::LevelControl::MoveMode value)
+void MTRLevelControlClusterMoveModeAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::LevelControl::MoveMode value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -20966,8 +19564,7 @@ void MTRLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRNullableLevelControlClusterMoveModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LevelControl::MoveMode> & value)
+void MTRNullableLevelControlClusterMoveModeAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LevelControl::MoveMode> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20993,8 +19590,7 @@ void MTRNullableLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRLevelControlClusterStepModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::LevelControl::StepMode value)
+void MTRLevelControlClusterStepModeAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::LevelControl::StepMode value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -21016,8 +19612,7 @@ void MTRLevelControlClusterStepModeAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRNullableLevelControlClusterStepModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LevelControl::StepMode> & value)
+void MTRNullableLevelControlClusterStepModeAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LevelControl::StepMode> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21043,8 +19638,7 @@ void MTRNullableLevelControlClusterStepModeAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::AccessControl::AccessControlEntryAuthModeEnum value)
+void MTRAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::AccessControl::AccessControlEntryAuthModeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -21066,8 +19660,7 @@ void MTRAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackSubsc
     }
 }
 
-void MTRNullableAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::AccessControlEntryAuthModeEnum> & value)
+void MTRNullableAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::AccessControlEntryAuthModeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21093,8 +19686,7 @@ void MTRNullableAccessControlClusterAccessControlEntryAuthModeEnumAttributeCallb
     }
 }
 
-void MTRAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::AccessControl::AccessControlEntryPrivilegeEnum value)
+void MTRAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::AccessControl::AccessControlEntryPrivilegeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -21116,8 +19708,7 @@ void MTRAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackSubs
     }
 }
 
-void MTRNullableAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::AccessControlEntryPrivilegeEnum> & value)
+void MTRNullableAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::AccessControlEntryPrivilegeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21143,8 +19734,7 @@ void MTRNullableAccessControlClusterAccessControlEntryPrivilegeEnumAttributeCall
     }
 }
 
-void MTRAccessControlClusterChangeTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::AccessControl::ChangeTypeEnum value)
+void MTRAccessControlClusterChangeTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::AccessControl::ChangeTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -21166,8 +19756,7 @@ void MTRAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::ChangeTypeEnum> & value)
+void MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::ChangeTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21193,8 +19782,7 @@ void MTRNullableAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionB
     }
 }
 
-void MTRActionsClusterActionErrorEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Actions::ActionErrorEnum value)
+void MTRActionsClusterActionErrorEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Actions::ActionErrorEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -21216,8 +19804,7 @@ void MTRActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRNullableActionsClusterActionErrorEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Actions::ActionErrorEnum> & value)
+void MTRNullableActionsClusterActionErrorEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Actions::ActionErrorEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21243,8 +19830,7 @@ void MTRNullableActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRActionsClusterActionStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Actions::ActionStateEnum value)
+void MTRActionsClusterActionStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Actions::ActionStateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -21266,8 +19852,7 @@ void MTRActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRNullableActionsClusterActionStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Actions::ActionStateEnum> & value)
+void MTRNullableActionsClusterActionStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Actions::ActionStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21293,8 +19878,7 @@ void MTRNullableActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRActionsClusterActionTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Actions::ActionTypeEnum value)
+void MTRActionsClusterActionTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Actions::ActionTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -21316,8 +19900,7 @@ void MTRActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRNullableActionsClusterActionTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Actions::ActionTypeEnum> & value)
+void MTRNullableActionsClusterActionTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Actions::ActionTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21343,8 +19926,7 @@ void MTRNullableActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRActionsClusterEndpointListTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Actions::EndpointListTypeEnum value)
+void MTRActionsClusterEndpointListTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Actions::EndpointListTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -21366,8 +19948,7 @@ void MTRActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Actions::EndpointListTypeEnum> & value)
+void MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Actions::EndpointListTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21393,8 +19974,7 @@ void MTRNullableActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionB
     }
 }
 
-void MTRBasicInformationClusterColorEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::BasicInformation::ColorEnum value)
+void MTRBasicInformationClusterColorEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::BasicInformation::ColorEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -21416,8 +19996,7 @@ void MTRBasicInformationClusterColorEnumAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRNullableBasicInformationClusterColorEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BasicInformation::ColorEnum> & value)
+void MTRNullableBasicInformationClusterColorEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BasicInformation::ColorEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21443,8 +20022,7 @@ void MTRNullableBasicInformationClusterColorEnumAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRBasicInformationClusterProductFinishEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::BasicInformation::ProductFinishEnum value)
+void MTRBasicInformationClusterProductFinishEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::BasicInformation::ProductFinishEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -21466,8 +20044,7 @@ void MTRBasicInformationClusterProductFinishEnumAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRNullableBasicInformationClusterProductFinishEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BasicInformation::ProductFinishEnum> & value)
+void MTRNullableBasicInformationClusterProductFinishEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BasicInformation::ProductFinishEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21493,8 +20070,7 @@ void MTRNullableBasicInformationClusterProductFinishEnumAttributeCallbackSubscri
     }
 }
 
-void MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction value)
+void MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -21516,8 +20092,7 @@ void MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSub
     }
 }
 
-void MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction> & value)
+void MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21543,8 +20118,7 @@ void MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCal
     }
 }
 
-void MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol value)
+void MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -21566,8 +20140,7 @@ void MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubs
     }
 }
 
-void MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol> & value)
+void MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21593,8 +20166,7 @@ void MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCall
     }
 }
 
-void MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus value)
+void MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -21616,8 +20188,7 @@ void MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscript
     }
 }
 
-void MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus> & value)
+void MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21643,8 +20214,7 @@ void MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackS
     }
 }
 
-void MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason value)
+void MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -21666,8 +20236,7 @@ void MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackS
     }
 }
 
-void MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason> & value)
+void MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21678,8 +20247,7 @@ void MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeC
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -21694,8 +20262,7 @@ void MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeC
     }
 }
 
-void MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum value)
+void MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -21717,8 +20284,7 @@ void MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSub
     }
 }
 
-void MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum> & value)
+void MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21744,8 +20310,7 @@ void MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCal
     }
 }
 
-void MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value)
+void MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -21767,8 +20332,7 @@ void MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubs
     }
 }
 
-void MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum> & value)
+void MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21794,8 +20358,7 @@ void MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCall
     }
 }
 
-void MTRTimeFormatLocalizationClusterCalendarTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum value)
+void MTRTimeFormatLocalizationClusterCalendarTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -21817,8 +20380,7 @@ void MTRTimeFormatLocalizationClusterCalendarTypeEnumAttributeCallbackSubscripti
     }
 }
 
-void MTRNullableTimeFormatLocalizationClusterCalendarTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum> & value)
+void MTRNullableTimeFormatLocalizationClusterCalendarTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21844,8 +20406,7 @@ void MTRNullableTimeFormatLocalizationClusterCalendarTypeEnumAttributeCallbackSu
     }
 }
 
-void MTRTimeFormatLocalizationClusterHourFormatEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TimeFormatLocalization::HourFormatEnum value)
+void MTRTimeFormatLocalizationClusterHourFormatEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::TimeFormatLocalization::HourFormatEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -21867,8 +20428,7 @@ void MTRTimeFormatLocalizationClusterHourFormatEnumAttributeCallbackSubscription
     }
 }
 
-void MTRNullableTimeFormatLocalizationClusterHourFormatEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::HourFormatEnum> & value)
+void MTRNullableTimeFormatLocalizationClusterHourFormatEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::HourFormatEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21894,8 +20454,7 @@ void MTRNullableTimeFormatLocalizationClusterHourFormatEnumAttributeCallbackSubs
     }
 }
 
-void MTRUnitLocalizationClusterTempUnitEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::UnitLocalization::TempUnitEnum value)
+void MTRUnitLocalizationClusterTempUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::UnitLocalization::TempUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -21917,8 +20476,7 @@ void MTRUnitLocalizationClusterTempUnitEnumAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRNullableUnitLocalizationClusterTempUnitEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitLocalization::TempUnitEnum> & value)
+void MTRNullableUnitLocalizationClusterTempUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitLocalization::TempUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21944,8 +20502,7 @@ void MTRNullableUnitLocalizationClusterTempUnitEnumAttributeCallbackSubscription
     }
 }
 
-void MTRPowerSourceClusterBatApprovedChemistryEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatApprovedChemistryEnum value)
+void MTRPowerSourceClusterBatApprovedChemistryEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::PowerSource::BatApprovedChemistryEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
@@ -21967,8 +20524,7 @@ void MTRPowerSourceClusterBatApprovedChemistryEnumAttributeCallbackSubscriptionB
     }
 }
 
-void MTRNullablePowerSourceClusterBatApprovedChemistryEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatApprovedChemistryEnum> & value)
+void MTRNullablePowerSourceClusterBatApprovedChemistryEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatApprovedChemistryEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21994,8 +20550,7 @@ void MTRNullablePowerSourceClusterBatApprovedChemistryEnumAttributeCallbackSubsc
     }
 }
 
-void MTRPowerSourceClusterBatChargeFaultEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatChargeFaultEnum value)
+void MTRPowerSourceClusterBatChargeFaultEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::PowerSource::BatChargeFaultEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -22017,8 +20572,7 @@ void MTRPowerSourceClusterBatChargeFaultEnumAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullablePowerSourceClusterBatChargeFaultEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeFaultEnum> & value)
+void MTRNullablePowerSourceClusterBatChargeFaultEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeFaultEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -22044,8 +20598,7 @@ void MTRNullablePowerSourceClusterBatChargeFaultEnumAttributeCallbackSubscriptio
     }
 }
 
-void MTRPowerSourceClusterBatChargeLevelEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatChargeLevelEnum value)
+void MTRPowerSourceClusterBatChargeLevelEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::PowerSource::BatChargeLevelEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -22067,8 +20620,7 @@ void MTRPowerSourceClusterBatChargeLevelEnumAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullablePowerSourceClusterBatChargeLevelEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeLevelEnum> & value)
+void MTRNullablePowerSourceClusterBatChargeLevelEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeLevelEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -22094,8 +20646,7 @@ void MTRNullablePowerSourceClusterBatChargeLevelEnumAttributeCallbackSubscriptio
     }
 }
 
-void MTRPowerSourceClusterBatChargeStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatChargeStateEnum value)
+void MTRPowerSourceClusterBatChargeStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::PowerSource::BatChargeStateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -22117,8 +20668,7 @@ void MTRPowerSourceClusterBatChargeStateEnumAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullablePowerSourceClusterBatChargeStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeStateEnum> & value)
+void MTRNullablePowerSourceClusterBatChargeStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatChargeStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -22144,8 +20694,7 @@ void MTRNullablePowerSourceClusterBatChargeStateEnumAttributeCallbackSubscriptio
     }
 }
 
-void MTRPowerSourceClusterBatCommonDesignationEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatCommonDesignationEnum value)
+void MTRPowerSourceClusterBatCommonDesignationEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::PowerSource::BatCommonDesignationEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
@@ -22167,8 +20716,7 @@ void MTRPowerSourceClusterBatCommonDesignationEnumAttributeCallbackSubscriptionB
     }
 }
 
-void MTRNullablePowerSourceClusterBatCommonDesignationEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatCommonDesignationEnum> & value)
+void MTRNullablePowerSourceClusterBatCommonDesignationEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatCommonDesignationEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -22194,8 +20742,7 @@ void MTRNullablePowerSourceClusterBatCommonDesignationEnumAttributeCallbackSubsc
     }
 }
 
-void MTRPowerSourceClusterBatFaultEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatFaultEnum value)
+void MTRPowerSourceClusterBatFaultEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::PowerSource::BatFaultEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -22217,8 +20764,7 @@ void MTRPowerSourceClusterBatFaultEnumAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRNullablePowerSourceClusterBatFaultEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatFaultEnum> & value)
+void MTRNullablePowerSourceClusterBatFaultEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatFaultEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -22244,8 +20790,7 @@ void MTRNullablePowerSourceClusterBatFaultEnumAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRPowerSourceClusterBatReplaceabilityEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::BatReplaceabilityEnum value)
+void MTRPowerSourceClusterBatReplaceabilityEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::PowerSource::BatReplaceabilityEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -22267,8 +20812,7 @@ void MTRPowerSourceClusterBatReplaceabilityEnumAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRNullablePowerSourceClusterBatReplaceabilityEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatReplaceabilityEnum> & value)
+void MTRNullablePowerSourceClusterBatReplaceabilityEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::BatReplaceabilityEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -22294,8 +20838,7 @@ void MTRNullablePowerSourceClusterBatReplaceabilityEnumAttributeCallbackSubscrip
     }
 }
 
-void MTRPowerSourceClusterPowerSourceStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::PowerSourceStatusEnum value)
+void MTRPowerSourceClusterPowerSourceStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::PowerSource::PowerSourceStatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -22317,8 +20860,7 @@ void MTRPowerSourceClusterPowerSourceStatusEnumAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRNullablePowerSourceClusterPowerSourceStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::PowerSourceStatusEnum> & value)
+void MTRNullablePowerSourceClusterPowerSourceStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::PowerSourceStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -22344,8 +20886,7 @@ void MTRNullablePowerSourceClusterPowerSourceStatusEnumAttributeCallbackSubscrip
     }
 }
 
-void MTRPowerSourceClusterWiredCurrentTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::WiredCurrentTypeEnum value)
+void MTRPowerSourceClusterWiredCurrentTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::PowerSource::WiredCurrentTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -22367,8 +20908,7 @@ void MTRPowerSourceClusterWiredCurrentTypeEnumAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRNullablePowerSourceClusterWiredCurrentTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredCurrentTypeEnum> & value)
+void MTRNullablePowerSourceClusterWiredCurrentTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredCurrentTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -22394,8 +20934,7 @@ void MTRNullablePowerSourceClusterWiredCurrentTypeEnumAttributeCallbackSubscript
     }
 }
 
-void MTRPowerSourceClusterWiredFaultEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PowerSource::WiredFaultEnum value)
+void MTRPowerSourceClusterWiredFaultEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::PowerSource::WiredFaultEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -22417,8 +20956,7 @@ void MTRPowerSourceClusterWiredFaultEnumAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRNullablePowerSourceClusterWiredFaultEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredFaultEnum> & value)
+void MTRNullablePowerSourceClusterWiredFaultEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PowerSource::WiredFaultEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -22444,8 +20982,7 @@ void MTRNullablePowerSourceClusterWiredFaultEnumAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum value)
+void MTRGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -22467,8 +21004,7 @@ void MTRGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackSubscr
     }
 }
 
-void MTRNullableGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum> & value)
+void MTRNullableGeneralCommissioningClusterCommissioningErrorEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::CommissioningErrorEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -22494,8 +21030,7 @@ void MTRNullableGeneralCommissioningClusterCommissioningErrorEnumAttributeCallba
     }
 }
 
-void MTRGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum value)
+void MTRGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -22517,8 +21052,7 @@ void MTRGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackSu
     }
 }
 
-void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum> & value)
+void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -22529,8 +21063,7 @@ void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCa
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -22545,8 +21078,7 @@ void MTRNullableGeneralCommissioningClusterRegulatoryLocationTypeEnumAttributeCa
     }
 }
 
-void MTRNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum value)
+void MTRNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -22568,8 +21100,7 @@ void MTRNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallba
     }
 }
 
-void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> & value)
+void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -22580,8 +21111,7 @@ void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttribu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -22596,8 +21126,7 @@ void MTRNullableNetworkCommissioningClusterNetworkCommissioningStatusEnumAttribu
     }
 }
 
-void MTRNetworkCommissioningClusterWiFiBandEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::NetworkCommissioning::WiFiBandEnum value)
+void MTRNetworkCommissioningClusterWiFiBandEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::NetworkCommissioning::WiFiBandEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -22619,8 +21148,7 @@ void MTRNetworkCommissioningClusterWiFiBandEnumAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRNullableNetworkCommissioningClusterWiFiBandEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::WiFiBandEnum> & value)
+void MTRNullableNetworkCommissioningClusterWiFiBandEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::WiFiBandEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -22646,8 +21174,7 @@ void MTRNullableNetworkCommissioningClusterWiFiBandEnumAttributeCallbackSubscrip
     }
 }
 
-void MTRDiagnosticLogsClusterIntentEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DiagnosticLogs::IntentEnum value)
+void MTRDiagnosticLogsClusterIntentEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DiagnosticLogs::IntentEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -22669,8 +21196,7 @@ void MTRDiagnosticLogsClusterIntentEnumAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRNullableDiagnosticLogsClusterIntentEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::IntentEnum> & value)
+void MTRNullableDiagnosticLogsClusterIntentEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::IntentEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -22696,8 +21222,7 @@ void MTRNullableDiagnosticLogsClusterIntentEnumAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRDiagnosticLogsClusterStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DiagnosticLogs::StatusEnum value)
+void MTRDiagnosticLogsClusterStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DiagnosticLogs::StatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -22719,8 +21244,7 @@ void MTRDiagnosticLogsClusterStatusEnumAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRNullableDiagnosticLogsClusterStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::StatusEnum> & value)
+void MTRNullableDiagnosticLogsClusterStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::StatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -22746,8 +21270,7 @@ void MTRNullableDiagnosticLogsClusterStatusEnumAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRDiagnosticLogsClusterTransferProtocolEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DiagnosticLogs::TransferProtocolEnum value)
+void MTRDiagnosticLogsClusterTransferProtocolEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DiagnosticLogs::TransferProtocolEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -22769,8 +21292,7 @@ void MTRDiagnosticLogsClusterTransferProtocolEnumAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRNullableDiagnosticLogsClusterTransferProtocolEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::TransferProtocolEnum> & value)
+void MTRNullableDiagnosticLogsClusterTransferProtocolEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::TransferProtocolEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -22796,8 +21318,7 @@ void MTRNullableDiagnosticLogsClusterTransferProtocolEnumAttributeCallbackSubscr
     }
 }
 
-void MTRGeneralDiagnosticsClusterBootReasonEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GeneralDiagnostics::BootReasonEnum value)
+void MTRGeneralDiagnosticsClusterBootReasonEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::GeneralDiagnostics::BootReasonEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -22819,8 +21340,7 @@ void MTRGeneralDiagnosticsClusterBootReasonEnumAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRNullableGeneralDiagnosticsClusterBootReasonEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::BootReasonEnum> & value)
+void MTRNullableGeneralDiagnosticsClusterBootReasonEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::BootReasonEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -22846,8 +21366,7 @@ void MTRNullableGeneralDiagnosticsClusterBootReasonEnumAttributeCallbackSubscrip
     }
 }
 
-void MTRGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum value)
+void MTRGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -22869,8 +21388,7 @@ void MTRGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackSubscriptionB
     }
 }
 
-void MTRNullableGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum> & value)
+void MTRNullableGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::HardwareFaultEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -22896,8 +21414,7 @@ void MTRNullableGeneralDiagnosticsClusterHardwareFaultEnumAttributeCallbackSubsc
     }
 }
 
-void MTRGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GeneralDiagnostics::InterfaceTypeEnum value)
+void MTRGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::GeneralDiagnostics::InterfaceTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -22919,8 +21436,7 @@ void MTRGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackSubscriptionB
     }
 }
 
-void MTRNullableGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::InterfaceTypeEnum> & value)
+void MTRNullableGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::InterfaceTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -22946,8 +21462,7 @@ void MTRNullableGeneralDiagnosticsClusterInterfaceTypeEnumAttributeCallbackSubsc
     }
 }
 
-void MTRGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum value)
+void MTRGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -22969,8 +21484,7 @@ void MTRGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRNullableGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum> & value)
+void MTRNullableGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::NetworkFaultEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -22996,8 +21510,7 @@ void MTRNullableGeneralDiagnosticsClusterNetworkFaultEnumAttributeCallbackSubscr
     }
 }
 
-void MTRGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum value)
+void MTRGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -23019,8 +21532,7 @@ void MTRGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRNullableGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum> & value)
+void MTRNullableGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::RadioFaultEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23046,8 +21558,7 @@ void MTRNullableGeneralDiagnosticsClusterRadioFaultEnumAttributeCallbackSubscrip
     }
 }
 
-void MTRThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum value)
+void MTRThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -23069,8 +21580,7 @@ void MTRThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackSubs
     }
 }
 
-void MTRNullableThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum> & value)
+void MTRNullableThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::ConnectionStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23096,8 +21606,7 @@ void MTRNullableThreadNetworkDiagnosticsClusterConnectionStatusEnumAttributeCall
     }
 }
 
-void MTRThreadNetworkDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum value)
+void MTRThreadNetworkDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -23119,8 +21628,7 @@ void MTRThreadNetworkDiagnosticsClusterNetworkFaultEnumAttributeCallbackSubscrip
     }
 }
 
-void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum> & value)
+void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFaultEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23146,8 +21654,7 @@ void MTRNullableThreadNetworkDiagnosticsClusterNetworkFaultEnumAttributeCallback
     }
 }
 
-void MTRThreadNetworkDiagnosticsClusterRoutingRoleEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRoleEnum value)
+void MTRThreadNetworkDiagnosticsClusterRoutingRoleEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRoleEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -23169,8 +21676,7 @@ void MTRThreadNetworkDiagnosticsClusterRoutingRoleEnumAttributeCallbackSubscript
     }
 }
 
-void MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRoleEnum> & value)
+void MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRoleEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23196,8 +21702,7 @@ void MTRNullableThreadNetworkDiagnosticsClusterRoutingRoleEnumAttributeCallbackS
     }
 }
 
-void MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum value)
+void MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -23219,8 +21724,7 @@ void MTRWiFiNetworkDiagnosticsClusterAssociationFailureCauseEnumAttributeCallbac
     }
 }
 
-void MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum> & value)
+void MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCauseEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23231,8 +21735,7 @@ void MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseEnumAttribut
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -23247,8 +21750,7 @@ void MTRNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseEnumAttribut
     }
 }
 
-void MTRWiFiNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum value)
+void MTRWiFiNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -23270,8 +21772,7 @@ void MTRWiFiNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackSubscr
     }
 }
 
-void MTRNullableWiFiNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum> & value)
+void MTRNullableWiFiNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::ConnectionStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23297,8 +21798,7 @@ void MTRNullableWiFiNetworkDiagnosticsClusterConnectionStatusEnumAttributeCallba
     }
 }
 
-void MTRWiFiNetworkDiagnosticsClusterSecurityTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum value)
+void MTRWiFiNetworkDiagnosticsClusterSecurityTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -23320,8 +21820,7 @@ void MTRWiFiNetworkDiagnosticsClusterSecurityTypeEnumAttributeCallbackSubscripti
     }
 }
 
-void MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum> & value)
+void MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23347,8 +21846,7 @@ void MTRNullableWiFiNetworkDiagnosticsClusterSecurityTypeEnumAttributeCallbackSu
     }
 }
 
-void MTRWiFiNetworkDiagnosticsClusterWiFiVersionEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum value)
+void MTRWiFiNetworkDiagnosticsClusterWiFiVersionEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -23370,8 +21868,7 @@ void MTRWiFiNetworkDiagnosticsClusterWiFiVersionEnumAttributeCallbackSubscriptio
     }
 }
 
-void MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum> & value)
+void MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23397,8 +21894,7 @@ void MTRNullableWiFiNetworkDiagnosticsClusterWiFiVersionEnumAttributeCallbackSub
     }
 }
 
-void MTREthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum value)
+void MTREthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -23420,8 +21916,7 @@ void MTREthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackSubscriptio
     }
 }
 
-void MTRNullableEthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum> & value)
+void MTRNullableEthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23447,8 +21942,7 @@ void MTRNullableEthernetNetworkDiagnosticsClusterPHYRateEnumAttributeCallbackSub
     }
 }
 
-void MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TimeSynchronization::GranularityEnum value)
+void MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::TimeSynchronization::GranularityEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -23470,8 +21964,7 @@ void MTRTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeSynchronization::GranularityEnum> & value)
+void MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeSynchronization::GranularityEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23497,8 +21990,7 @@ void MTRNullableTimeSynchronizationClusterGranularityEnumAttributeCallbackSubscr
     }
 }
 
-void MTRTimeSynchronizationClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TimeSynchronization::StatusCode value)
+void MTRTimeSynchronizationClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::TimeSynchronization::StatusCode value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -23520,8 +22012,7 @@ void MTRTimeSynchronizationClusterStatusCodeAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullableTimeSynchronizationClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeSynchronization::StatusCode> & value)
+void MTRNullableTimeSynchronizationClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeSynchronization::StatusCode> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23547,8 +22038,7 @@ void MTRNullableTimeSynchronizationClusterStatusCodeAttributeCallbackSubscriptio
     }
 }
 
-void MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TimeSynchronization::TimeSourceEnum value)
+void MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::TimeSynchronization::TimeSourceEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -23570,8 +22060,7 @@ void MTRTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeSynchronization::TimeSourceEnum> & value)
+void MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeSynchronization::TimeSourceEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23597,8 +22086,7 @@ void MTRNullableTimeSynchronizationClusterTimeSourceEnumAttributeCallbackSubscri
     }
 }
 
-void MTRTimeSynchronizationClusterTimeZoneDatabaseEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TimeSynchronization::TimeZoneDatabaseEnum value)
+void MTRTimeSynchronizationClusterTimeZoneDatabaseEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::TimeSynchronization::TimeZoneDatabaseEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -23620,8 +22108,7 @@ void MTRTimeSynchronizationClusterTimeZoneDatabaseEnumAttributeCallbackSubscript
     }
 }
 
-void MTRNullableTimeSynchronizationClusterTimeZoneDatabaseEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeSynchronization::TimeZoneDatabaseEnum> & value)
+void MTRNullableTimeSynchronizationClusterTimeZoneDatabaseEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeSynchronization::TimeZoneDatabaseEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23647,8 +22134,7 @@ void MTRNullableTimeSynchronizationClusterTimeZoneDatabaseEnumAttributeCallbackS
     }
 }
 
-void MTRBridgedDeviceBasicInformationClusterColorEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::BridgedDeviceBasicInformation::ColorEnum value)
+void MTRBridgedDeviceBasicInformationClusterColorEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::BridgedDeviceBasicInformation::ColorEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -23670,8 +22156,7 @@ void MTRBridgedDeviceBasicInformationClusterColorEnumAttributeCallbackSubscripti
     }
 }
 
-void MTRNullableBridgedDeviceBasicInformationClusterColorEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedDeviceBasicInformation::ColorEnum> & value)
+void MTRNullableBridgedDeviceBasicInformationClusterColorEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedDeviceBasicInformation::ColorEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23697,8 +22182,7 @@ void MTRNullableBridgedDeviceBasicInformationClusterColorEnumAttributeCallbackSu
     }
 }
 
-void MTRBridgedDeviceBasicInformationClusterProductFinishEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::BridgedDeviceBasicInformation::ProductFinishEnum value)
+void MTRBridgedDeviceBasicInformationClusterProductFinishEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::BridgedDeviceBasicInformation::ProductFinishEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -23720,8 +22204,7 @@ void MTRBridgedDeviceBasicInformationClusterProductFinishEnumAttributeCallbackSu
     }
 }
 
-void MTRNullableBridgedDeviceBasicInformationClusterProductFinishEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedDeviceBasicInformation::ProductFinishEnum> & value)
+void MTRNullableBridgedDeviceBasicInformationClusterProductFinishEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedDeviceBasicInformation::ProductFinishEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23732,8 +22215,7 @@ void MTRNullableBridgedDeviceBasicInformationClusterProductFinishEnumAttributeCa
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableBridgedDeviceBasicInformationClusterProductFinishEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableBridgedDeviceBasicInformationClusterProductFinishEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -23748,16 +22230,14 @@ void MTRNullableBridgedDeviceBasicInformationClusterProductFinishEnumAttributeCa
     }
 }
 
-void MTRAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum value)
+void MTRAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -23772,8 +22252,7 @@ void MTRAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeC
     }
 }
 
-void MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum> & value)
+void MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23784,8 +22263,7 @@ void MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusEnumAt
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -23800,8 +22278,7 @@ void MTRNullableAdministratorCommissioningClusterCommissioningWindowStatusEnumAt
     }
 }
 
-void MTRAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::AdministratorCommissioning::StatusCode value)
+void MTRAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::AdministratorCommissioning::StatusCode value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -23823,8 +22300,7 @@ void MTRAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscription
     }
 }
 
-void MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::StatusCode> & value)
+void MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::StatusCode> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23850,8 +22326,7 @@ void MTRNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackSubs
     }
 }
 
-void MTROperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OperationalCredentials::CertificateChainTypeEnum value)
+void MTROperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OperationalCredentials::CertificateChainTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -23873,8 +22348,7 @@ void MTROperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackSu
     }
 }
 
-void MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::CertificateChainTypeEnum> & value)
+void MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::CertificateChainTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23885,8 +22359,7 @@ void MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCa
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -23901,8 +22374,7 @@ void MTRNullableOperationalCredentialsClusterCertificateChainTypeEnumAttributeCa
     }
 }
 
-void MTROperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum value)
+void MTROperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -23924,8 +22396,7 @@ void MTROperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallb
     }
 }
 
-void MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum> & value)
+void MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -23936,8 +22407,7 @@ void MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttrib
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -23952,8 +22422,7 @@ void MTRNullableOperationalCredentialsClusterNodeOperationalCertStatusEnumAttrib
     }
 }
 
-void MTRGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum value)
+void MTRGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -23975,8 +22444,7 @@ void MTRGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackSubs
     }
 }
 
-void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum> & value)
+void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicyEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24002,8 +22470,7 @@ void MTRNullableGroupKeyManagementClusterGroupKeySecurityPolicyEnumAttributeCall
     }
 }
 
-void MTRLaundryWasherModeClusterModeTagAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::LaundryWasherMode::ModeTag value)
+void MTRLaundryWasherModeClusterModeTagAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::LaundryWasherMode::ModeTag value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
@@ -24025,8 +22492,7 @@ void MTRLaundryWasherModeClusterModeTagAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRNullableLaundryWasherModeClusterModeTagAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LaundryWasherMode::ModeTag> & value)
+void MTRNullableLaundryWasherModeClusterModeTagAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LaundryWasherMode::ModeTag> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24052,16 +22518,14 @@ void MTRNullableLaundryWasherModeClusterModeTagAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRRefrigeratorAndTemperatureControlledCabinetModeClusterModeTagAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::ModeTag value)
+void MTRRefrigeratorAndTemperatureControlledCabinetModeClusterModeTagAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::ModeTag value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRRefrigeratorAndTemperatureControlledCabinetModeClusterModeTagAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRRefrigeratorAndTemperatureControlledCabinetModeClusterModeTagAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24076,8 +22540,7 @@ void MTRRefrigeratorAndTemperatureControlledCabinetModeClusterModeTagAttributeCa
     }
 }
 
-void MTRNullableRefrigeratorAndTemperatureControlledCabinetModeClusterModeTagAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::ModeTag> & value)
+void MTRNullableRefrigeratorAndTemperatureControlledCabinetModeClusterModeTagAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::ModeTag> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24088,8 +22551,7 @@ void MTRNullableRefrigeratorAndTemperatureControlledCabinetModeClusterModeTagAtt
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableRefrigeratorAndTemperatureControlledCabinetModeClusterModeTagAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableRefrigeratorAndTemperatureControlledCabinetModeClusterModeTagAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -24104,8 +22566,7 @@ void MTRNullableRefrigeratorAndTemperatureControlledCabinetModeClusterModeTagAtt
     }
 }
 
-void MTRLaundryWasherControlsClusterNumberOfRinsesEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum value)
+void MTRLaundryWasherControlsClusterNumberOfRinsesEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -24127,8 +22588,7 @@ void MTRLaundryWasherControlsClusterNumberOfRinsesEnumAttributeCallbackSubscript
     }
 }
 
-void MTRNullableLaundryWasherControlsClusterNumberOfRinsesEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum> & value)
+void MTRNullableLaundryWasherControlsClusterNumberOfRinsesEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LaundryWasherControls::NumberOfRinsesEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24176,8 +22636,7 @@ void MTRRVCRunModeClusterModeTagAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void MTRNullableRVCRunModeClusterModeTagAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcRunMode::ModeTag> & value)
+void MTRNullableRVCRunModeClusterModeTagAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcRunMode::ModeTag> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24203,8 +22662,7 @@ void MTRNullableRVCRunModeClusterModeTagAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRRVCRunModeClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::RvcRunMode::StatusCode value)
+void MTRRVCRunModeClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::RvcRunMode::StatusCode value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -24226,8 +22684,7 @@ void MTRRVCRunModeClusterStatusCodeAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRNullableRVCRunModeClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcRunMode::StatusCode> & value)
+void MTRNullableRVCRunModeClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcRunMode::StatusCode> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24253,8 +22710,7 @@ void MTRNullableRVCRunModeClusterStatusCodeAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRRVCCleanModeClusterModeTagAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::RvcCleanMode::ModeTag value)
+void MTRRVCCleanModeClusterModeTagAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::RvcCleanMode::ModeTag value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
@@ -24276,8 +22732,7 @@ void MTRRVCCleanModeClusterModeTagAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void MTRNullableRVCCleanModeClusterModeTagAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcCleanMode::ModeTag> & value)
+void MTRNullableRVCCleanModeClusterModeTagAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcCleanMode::ModeTag> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24303,8 +22758,7 @@ void MTRNullableRVCCleanModeClusterModeTagAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRRVCCleanModeClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::RvcCleanMode::StatusCode value)
+void MTRRVCCleanModeClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::RvcCleanMode::StatusCode value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -24326,8 +22780,7 @@ void MTRRVCCleanModeClusterStatusCodeAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRNullableRVCCleanModeClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcCleanMode::StatusCode> & value)
+void MTRNullableRVCCleanModeClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcCleanMode::StatusCode> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24353,8 +22806,7 @@ void MTRNullableRVCCleanModeClusterStatusCodeAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRDishwasherModeClusterModeTagAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DishwasherMode::ModeTag value)
+void MTRDishwasherModeClusterModeTagAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DishwasherMode::ModeTag value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
@@ -24376,8 +22828,7 @@ void MTRDishwasherModeClusterModeTagAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRNullableDishwasherModeClusterModeTagAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DishwasherMode::ModeTag> & value)
+void MTRNullableDishwasherModeClusterModeTagAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DishwasherMode::ModeTag> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24403,8 +22854,7 @@ void MTRNullableDishwasherModeClusterModeTagAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRAirQualityClusterAirQualityEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::AirQuality::AirQualityEnum value)
+void MTRAirQualityClusterAirQualityEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::AirQuality::AirQualityEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -24426,8 +22876,7 @@ void MTRAirQualityClusterAirQualityEnumAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRNullableAirQualityClusterAirQualityEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AirQuality::AirQualityEnum> & value)
+void MTRNullableAirQualityClusterAirQualityEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AirQuality::AirQualityEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24453,8 +22902,7 @@ void MTRNullableAirQualityClusterAirQualityEnumAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value)
+void MTRSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -24476,8 +22924,7 @@ void MTRSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRNullableSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum> & value)
+void MTRNullableSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::AlarmStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24503,8 +22950,7 @@ void MTRNullableSmokeCOAlarmClusterAlarmStateEnumAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum value)
+void MTRSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -24526,8 +22972,7 @@ void MTRSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRNullableSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum> & value)
+void MTRNullableSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::ContaminationStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24553,8 +22998,7 @@ void MTRNullableSmokeCOAlarmClusterContaminationStateEnumAttributeCallbackSubscr
     }
 }
 
-void MTRSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum value)
+void MTRSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -24576,8 +23020,7 @@ void MTRSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRNullableSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum> & value)
+void MTRNullableSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::EndOfServiceEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24603,8 +23046,7 @@ void MTRNullableSmokeCOAlarmClusterEndOfServiceEnumAttributeCallbackSubscription
     }
 }
 
-void MTRSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum value)
+void MTRSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -24626,8 +23068,7 @@ void MTRSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRNullableSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum> & value)
+void MTRNullableSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::ExpressedStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24653,8 +23094,7 @@ void MTRNullableSmokeCOAlarmClusterExpressedStateEnumAttributeCallbackSubscripti
     }
 }
 
-void MTRSmokeCOAlarmClusterMuteStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::SmokeCoAlarm::MuteStateEnum value)
+void MTRSmokeCOAlarmClusterMuteStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::SmokeCoAlarm::MuteStateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -24676,8 +23116,7 @@ void MTRSmokeCOAlarmClusterMuteStateEnumAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRNullableSmokeCOAlarmClusterMuteStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::MuteStateEnum> & value)
+void MTRNullableSmokeCOAlarmClusterMuteStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::MuteStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24703,8 +23142,7 @@ void MTRNullableSmokeCOAlarmClusterMuteStateEnumAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRSmokeCOAlarmClusterSensitivityEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::SmokeCoAlarm::SensitivityEnum value)
+void MTRSmokeCOAlarmClusterSensitivityEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::SmokeCoAlarm::SensitivityEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -24726,8 +23164,7 @@ void MTRSmokeCOAlarmClusterSensitivityEnumAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRNullableSmokeCOAlarmClusterSensitivityEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::SensitivityEnum> & value)
+void MTRNullableSmokeCOAlarmClusterSensitivityEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::SmokeCoAlarm::SensitivityEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24753,8 +23190,7 @@ void MTRNullableSmokeCOAlarmClusterSensitivityEnumAttributeCallbackSubscriptionB
     }
 }
 
-void MTROperationalStateClusterErrorStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OperationalState::ErrorStateEnum value)
+void MTROperationalStateClusterErrorStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OperationalState::ErrorStateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -24776,8 +23212,7 @@ void MTROperationalStateClusterErrorStateEnumAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRNullableOperationalStateClusterErrorStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalState::ErrorStateEnum> & value)
+void MTRNullableOperationalStateClusterErrorStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalState::ErrorStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24803,8 +23238,7 @@ void MTRNullableOperationalStateClusterErrorStateEnumAttributeCallbackSubscripti
     }
 }
 
-void MTROperationalStateClusterOperationalStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OperationalState::OperationalStateEnum value)
+void MTROperationalStateClusterOperationalStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OperationalState::OperationalStateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -24826,8 +23260,7 @@ void MTROperationalStateClusterOperationalStateEnumAttributeCallbackSubscription
     }
 }
 
-void MTRNullableOperationalStateClusterOperationalStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalState::OperationalStateEnum> & value)
+void MTRNullableOperationalStateClusterOperationalStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalState::OperationalStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24853,8 +23286,7 @@ void MTRNullableOperationalStateClusterOperationalStateEnumAttributeCallbackSubs
     }
 }
 
-void MTRRVCOperationalStateClusterErrorStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::RvcOperationalState::ErrorStateEnum value)
+void MTRRVCOperationalStateClusterErrorStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::RvcOperationalState::ErrorStateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -24876,8 +23308,7 @@ void MTRRVCOperationalStateClusterErrorStateEnumAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRNullableRVCOperationalStateClusterErrorStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcOperationalState::ErrorStateEnum> & value)
+void MTRNullableRVCOperationalStateClusterErrorStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcOperationalState::ErrorStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24903,8 +23334,7 @@ void MTRNullableRVCOperationalStateClusterErrorStateEnumAttributeCallbackSubscri
     }
 }
 
-void MTRRVCOperationalStateClusterOperationalStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::RvcOperationalState::OperationalStateEnum value)
+void MTRRVCOperationalStateClusterOperationalStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::RvcOperationalState::OperationalStateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -24926,8 +23356,7 @@ void MTRRVCOperationalStateClusterOperationalStateEnumAttributeCallbackSubscript
     }
 }
 
-void MTRNullableRVCOperationalStateClusterOperationalStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcOperationalState::OperationalStateEnum> & value)
+void MTRNullableRVCOperationalStateClusterOperationalStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RvcOperationalState::OperationalStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -24953,8 +23382,7 @@ void MTRNullableRVCOperationalStateClusterOperationalStateEnumAttributeCallbackS
     }
 }
 
-void MTRHEPAFilterMonitoringClusterChangeIndicationEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum value)
+void MTRHEPAFilterMonitoringClusterChangeIndicationEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -24976,8 +23404,7 @@ void MTRHEPAFilterMonitoringClusterChangeIndicationEnumAttributeCallbackSubscrip
     }
 }
 
-void MTRNullableHEPAFilterMonitoringClusterChangeIndicationEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum> & value)
+void MTRNullableHEPAFilterMonitoringClusterChangeIndicationEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::HepaFilterMonitoring::ChangeIndicationEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25003,8 +23430,7 @@ void MTRNullableHEPAFilterMonitoringClusterChangeIndicationEnumAttributeCallback
     }
 }
 
-void MTRHEPAFilterMonitoringClusterDegradationDirectionEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum value)
+void MTRHEPAFilterMonitoringClusterDegradationDirectionEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -25026,8 +23452,7 @@ void MTRHEPAFilterMonitoringClusterDegradationDirectionEnumAttributeCallbackSubs
     }
 }
 
-void MTRNullableHEPAFilterMonitoringClusterDegradationDirectionEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum> & value)
+void MTRNullableHEPAFilterMonitoringClusterDegradationDirectionEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::HepaFilterMonitoring::DegradationDirectionEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25053,8 +23478,7 @@ void MTRNullableHEPAFilterMonitoringClusterDegradationDirectionEnumAttributeCall
     }
 }
 
-void MTRHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::HepaFilterMonitoring::ProductIdentifierTypeEnum value)
+void MTRHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::HepaFilterMonitoring::ProductIdentifierTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -25076,8 +23500,7 @@ void MTRHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackSub
     }
 }
 
-void MTRNullableHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::HepaFilterMonitoring::ProductIdentifierTypeEnum> & value)
+void MTRNullableHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::HepaFilterMonitoring::ProductIdentifierTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25103,8 +23526,7 @@ void MTRNullableHEPAFilterMonitoringClusterProductIdentifierTypeEnumAttributeCal
     }
 }
 
-void MTRActivatedCarbonFilterMonitoringClusterChangeIndicationEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ActivatedCarbonFilterMonitoring::ChangeIndicationEnum value)
+void MTRActivatedCarbonFilterMonitoringClusterChangeIndicationEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ActivatedCarbonFilterMonitoring::ChangeIndicationEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -25126,8 +23548,7 @@ void MTRActivatedCarbonFilterMonitoringClusterChangeIndicationEnumAttributeCallb
     }
 }
 
-void MTRNullableActivatedCarbonFilterMonitoringClusterChangeIndicationEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ActivatedCarbonFilterMonitoring::ChangeIndicationEnum> & value)
+void MTRNullableActivatedCarbonFilterMonitoringClusterChangeIndicationEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ActivatedCarbonFilterMonitoring::ChangeIndicationEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25138,8 +23559,7 @@ void MTRNullableActivatedCarbonFilterMonitoringClusterChangeIndicationEnumAttrib
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableActivatedCarbonFilterMonitoringClusterChangeIndicationEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableActivatedCarbonFilterMonitoringClusterChangeIndicationEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25154,16 +23574,14 @@ void MTRNullableActivatedCarbonFilterMonitoringClusterChangeIndicationEnumAttrib
     }
 }
 
-void MTRActivatedCarbonFilterMonitoringClusterDegradationDirectionEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ActivatedCarbonFilterMonitoring::DegradationDirectionEnum value)
+void MTRActivatedCarbonFilterMonitoringClusterDegradationDirectionEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ActivatedCarbonFilterMonitoring::DegradationDirectionEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRActivatedCarbonFilterMonitoringClusterDegradationDirectionEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRActivatedCarbonFilterMonitoringClusterDegradationDirectionEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25178,8 +23596,7 @@ void MTRActivatedCarbonFilterMonitoringClusterDegradationDirectionEnumAttributeC
     }
 }
 
-void MTRNullableActivatedCarbonFilterMonitoringClusterDegradationDirectionEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ActivatedCarbonFilterMonitoring::DegradationDirectionEnum> & value)
+void MTRNullableActivatedCarbonFilterMonitoringClusterDegradationDirectionEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ActivatedCarbonFilterMonitoring::DegradationDirectionEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25190,8 +23607,7 @@ void MTRNullableActivatedCarbonFilterMonitoringClusterDegradationDirectionEnumAt
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableActivatedCarbonFilterMonitoringClusterDegradationDirectionEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableActivatedCarbonFilterMonitoringClusterDegradationDirectionEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25206,16 +23622,14 @@ void MTRNullableActivatedCarbonFilterMonitoringClusterDegradationDirectionEnumAt
     }
 }
 
-void MTRActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ActivatedCarbonFilterMonitoring::ProductIdentifierTypeEnum value)
+void MTRActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ActivatedCarbonFilterMonitoring::ProductIdentifierTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25230,8 +23644,7 @@ void MTRActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttribute
     }
 }
 
-void MTRNullableActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ActivatedCarbonFilterMonitoring::ProductIdentifierTypeEnum> & value)
+void MTRNullableActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ActivatedCarbonFilterMonitoring::ProductIdentifierTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25242,8 +23655,7 @@ void MTRNullableActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumA
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -25258,8 +23670,7 @@ void MTRNullableActivatedCarbonFilterMonitoringClusterProductIdentifierTypeEnumA
     }
 }
 
-void MTRDoorLockClusterAlarmCodeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::AlarmCodeEnum value)
+void MTRDoorLockClusterAlarmCodeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DoorLock::AlarmCodeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -25281,8 +23692,7 @@ void MTRDoorLockClusterAlarmCodeEnumAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRNullableDoorLockClusterAlarmCodeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::AlarmCodeEnum> & value)
+void MTRNullableDoorLockClusterAlarmCodeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::AlarmCodeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25308,8 +23718,7 @@ void MTRNullableDoorLockClusterAlarmCodeEnumAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRDoorLockClusterCredentialRuleEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::CredentialRuleEnum value)
+void MTRDoorLockClusterCredentialRuleEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DoorLock::CredentialRuleEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -25331,8 +23740,7 @@ void MTRDoorLockClusterCredentialRuleEnumAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRNullableDoorLockClusterCredentialRuleEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::CredentialRuleEnum> & value)
+void MTRNullableDoorLockClusterCredentialRuleEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::CredentialRuleEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25358,8 +23766,7 @@ void MTRNullableDoorLockClusterCredentialRuleEnumAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRDoorLockClusterCredentialTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::CredentialTypeEnum value)
+void MTRDoorLockClusterCredentialTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DoorLock::CredentialTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -25381,8 +23788,7 @@ void MTRDoorLockClusterCredentialTypeEnumAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRNullableDoorLockClusterCredentialTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::CredentialTypeEnum> & value)
+void MTRNullableDoorLockClusterCredentialTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::CredentialTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25408,8 +23814,7 @@ void MTRNullableDoorLockClusterCredentialTypeEnumAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRDoorLockClusterDataOperationTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DataOperationTypeEnum value)
+void MTRDoorLockClusterDataOperationTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DataOperationTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -25431,8 +23836,7 @@ void MTRDoorLockClusterDataOperationTypeEnumAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullableDoorLockClusterDataOperationTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DataOperationTypeEnum> & value)
+void MTRNullableDoorLockClusterDataOperationTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DataOperationTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25458,8 +23862,7 @@ void MTRNullableDoorLockClusterDataOperationTypeEnumAttributeCallbackSubscriptio
     }
 }
 
-void MTRDoorLockClusterDlLockStateAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlLockState value)
+void MTRDoorLockClusterDlLockStateAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlLockState value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -25481,8 +23884,7 @@ void MTRDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void MTRNullableDoorLockClusterDlLockStateAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & value)
+void MTRNullableDoorLockClusterDlLockStateAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25508,8 +23910,7 @@ void MTRNullableDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRDoorLockClusterDlLockTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DlLockType value)
+void MTRDoorLockClusterDlLockTypeAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlLockType value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -25531,8 +23932,7 @@ void MTRDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge::OnSubscrip
     }
 }
 
-void MTRNullableDoorLockClusterDlLockTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockType> & value)
+void MTRNullableDoorLockClusterDlLockTypeAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockType> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25580,8 +23980,7 @@ void MTRDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge::OnSubscripti
     }
 }
 
-void MTRNullableDoorLockClusterDlStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlStatus> & value)
+void MTRNullableDoorLockClusterDlStatusAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlStatus> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25607,8 +24006,7 @@ void MTRNullableDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DoorLockOperationEventCode value)
+void MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DoorLockOperationEventCode value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -25630,8 +24028,7 @@ void MTRDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockOperationEventCode> & value)
+void MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockOperationEventCode> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25657,8 +24054,7 @@ void MTRNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscr
     }
 }
 
-void MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DoorLockProgrammingEventCode value)
+void MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DoorLockProgrammingEventCode value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -25680,8 +24076,7 @@ void MTRDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscription
     }
 }
 
-void MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockProgrammingEventCode> & value)
+void MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockProgrammingEventCode> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25707,8 +24102,7 @@ void MTRNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubs
     }
 }
 
-void MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DoorLockSetPinOrIdStatus value)
+void MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DoorLockSetPinOrIdStatus value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -25730,8 +24124,7 @@ void MTRDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockSetPinOrIdStatus> & value)
+void MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockSetPinOrIdStatus> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25757,8 +24150,7 @@ void MTRNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscrip
     }
 }
 
-void MTRDoorLockClusterDoorStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::DoorStateEnum value)
+void MTRDoorLockClusterDoorStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DoorStateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -25780,8 +24172,7 @@ void MTRDoorLockClusterDoorStateEnumAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRNullableDoorLockClusterDoorStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorStateEnum> & value)
+void MTRNullableDoorLockClusterDoorStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25807,8 +24198,7 @@ void MTRNullableDoorLockClusterDoorStateEnumAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRDoorLockClusterLockDataTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::LockDataTypeEnum value)
+void MTRDoorLockClusterLockDataTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DoorLock::LockDataTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -25830,8 +24220,7 @@ void MTRDoorLockClusterLockDataTypeEnumAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRNullableDoorLockClusterLockDataTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::LockDataTypeEnum> & value)
+void MTRNullableDoorLockClusterLockDataTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::LockDataTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25857,8 +24246,7 @@ void MTRNullableDoorLockClusterLockDataTypeEnumAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRDoorLockClusterLockOperationTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::LockOperationTypeEnum value)
+void MTRDoorLockClusterLockOperationTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DoorLock::LockOperationTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -25880,8 +24268,7 @@ void MTRDoorLockClusterLockOperationTypeEnumAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullableDoorLockClusterLockOperationTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::LockOperationTypeEnum> & value)
+void MTRNullableDoorLockClusterLockOperationTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::LockOperationTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25907,8 +24294,7 @@ void MTRNullableDoorLockClusterLockOperationTypeEnumAttributeCallbackSubscriptio
     }
 }
 
-void MTRDoorLockClusterOperatingModeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::OperatingModeEnum value)
+void MTRDoorLockClusterOperatingModeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DoorLock::OperatingModeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -25930,8 +24316,7 @@ void MTRDoorLockClusterOperatingModeEnumAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRNullableDoorLockClusterOperatingModeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::OperatingModeEnum> & value)
+void MTRNullableDoorLockClusterOperatingModeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::OperatingModeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -25957,8 +24342,7 @@ void MTRNullableDoorLockClusterOperatingModeEnumAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRDoorLockClusterOperationErrorEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::OperationErrorEnum value)
+void MTRDoorLockClusterOperationErrorEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DoorLock::OperationErrorEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -25980,8 +24364,7 @@ void MTRDoorLockClusterOperationErrorEnumAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRNullableDoorLockClusterOperationErrorEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::OperationErrorEnum> & value)
+void MTRNullableDoorLockClusterOperationErrorEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::OperationErrorEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26007,8 +24390,7 @@ void MTRNullableDoorLockClusterOperationErrorEnumAttributeCallbackSubscriptionBr
     }
 }
 
-void MTRDoorLockClusterOperationSourceEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::OperationSourceEnum value)
+void MTRDoorLockClusterOperationSourceEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DoorLock::OperationSourceEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -26030,8 +24412,7 @@ void MTRDoorLockClusterOperationSourceEnumAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRNullableDoorLockClusterOperationSourceEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::OperationSourceEnum> & value)
+void MTRNullableDoorLockClusterOperationSourceEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::OperationSourceEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26057,8 +24438,7 @@ void MTRNullableDoorLockClusterOperationSourceEnumAttributeCallbackSubscriptionB
     }
 }
 
-void MTRDoorLockClusterUserStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::UserStatusEnum value)
+void MTRDoorLockClusterUserStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DoorLock::UserStatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -26080,8 +24460,7 @@ void MTRDoorLockClusterUserStatusEnumAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRNullableDoorLockClusterUserStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::UserStatusEnum> & value)
+void MTRNullableDoorLockClusterUserStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::UserStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26107,8 +24486,7 @@ void MTRNullableDoorLockClusterUserStatusEnumAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRDoorLockClusterUserTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::DoorLock::UserTypeEnum value)
+void MTRDoorLockClusterUserTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DoorLock::UserTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -26130,8 +24508,7 @@ void MTRDoorLockClusterUserTypeEnumAttributeCallbackSubscriptionBridge::OnSubscr
     }
 }
 
-void MTRNullableDoorLockClusterUserTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::UserTypeEnum> & value)
+void MTRNullableDoorLockClusterUserTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::UserTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26157,8 +24534,7 @@ void MTRNullableDoorLockClusterUserTypeEnumAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRWindowCoveringClusterEndProductTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::WindowCovering::EndProductType value)
+void MTRWindowCoveringClusterEndProductTypeAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::WindowCovering::EndProductType value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -26180,8 +24556,7 @@ void MTRWindowCoveringClusterEndProductTypeAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRNullableWindowCoveringClusterEndProductTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WindowCovering::EndProductType> & value)
+void MTRNullableWindowCoveringClusterEndProductTypeAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WindowCovering::EndProductType> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26207,8 +24582,7 @@ void MTRNullableWindowCoveringClusterEndProductTypeAttributeCallbackSubscription
     }
 }
 
-void MTRWindowCoveringClusterTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::WindowCovering::Type value)
+void MTRWindowCoveringClusterTypeAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::WindowCovering::Type value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -26230,8 +24604,7 @@ void MTRWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge::OnSubscrip
     }
 }
 
-void MTRNullableWindowCoveringClusterTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WindowCovering::Type> & value)
+void MTRNullableWindowCoveringClusterTypeAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WindowCovering::Type> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26257,8 +24630,7 @@ void MTRNullableWindowCoveringClusterTypeAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void MTRPumpConfigurationAndControlClusterControlModeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum value)
+void MTRPumpConfigurationAndControlClusterControlModeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -26280,8 +24652,7 @@ void MTRPumpConfigurationAndControlClusterControlModeEnumAttributeCallbackSubscr
     }
 }
 
-void MTRNullablePumpConfigurationAndControlClusterControlModeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum> & value)
+void MTRNullablePumpConfigurationAndControlClusterControlModeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::ControlModeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26307,8 +24678,7 @@ void MTRNullablePumpConfigurationAndControlClusterControlModeEnumAttributeCallba
     }
 }
 
-void MTRPumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum value)
+void MTRPumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -26330,8 +24700,7 @@ void MTRPumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackSubs
     }
 }
 
-void MTRNullablePumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum> & value)
+void MTRNullablePumpConfigurationAndControlClusterOperationModeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::OperationModeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26357,8 +24726,7 @@ void MTRNullablePumpConfigurationAndControlClusterOperationModeEnumAttributeCall
     }
 }
 
-void MTRThermostatClusterSetpointAdjustModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Thermostat::SetpointAdjustMode value)
+void MTRThermostatClusterSetpointAdjustModeAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Thermostat::SetpointAdjustMode value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -26380,8 +24748,7 @@ void MTRThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRNullableThermostatClusterSetpointAdjustModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::SetpointAdjustMode> & value)
+void MTRNullableThermostatClusterSetpointAdjustModeAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::SetpointAdjustMode> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26407,8 +24774,7 @@ void MTRNullableThermostatClusterSetpointAdjustModeAttributeCallbackSubscription
     }
 }
 
-void MTRThermostatClusterThermostatControlSequenceAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Thermostat::ThermostatControlSequence value)
+void MTRThermostatClusterThermostatControlSequenceAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Thermostat::ThermostatControlSequence value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -26430,8 +24796,7 @@ void MTRThermostatClusterThermostatControlSequenceAttributeCallbackSubscriptionB
     }
 }
 
-void MTRNullableThermostatClusterThermostatControlSequenceAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatControlSequence> & value)
+void MTRNullableThermostatClusterThermostatControlSequenceAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatControlSequence> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26457,8 +24822,7 @@ void MTRNullableThermostatClusterThermostatControlSequenceAttributeCallbackSubsc
     }
 }
 
-void MTRThermostatClusterThermostatRunningModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Thermostat::ThermostatRunningMode value)
+void MTRThermostatClusterThermostatRunningModeAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Thermostat::ThermostatRunningMode value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -26480,8 +24844,7 @@ void MTRThermostatClusterThermostatRunningModeAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatRunningMode> & value)
+void MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatRunningMode> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26507,8 +24870,7 @@ void MTRNullableThermostatClusterThermostatRunningModeAttributeCallbackSubscript
     }
 }
 
-void MTRThermostatClusterThermostatSystemModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Thermostat::ThermostatSystemMode value)
+void MTRThermostatClusterThermostatSystemModeAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Thermostat::ThermostatSystemMode value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -26530,8 +24892,7 @@ void MTRThermostatClusterThermostatSystemModeAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatSystemMode> & value)
+void MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::ThermostatSystemMode> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26557,8 +24918,7 @@ void MTRNullableThermostatClusterThermostatSystemModeAttributeCallbackSubscripti
     }
 }
 
-void MTRFanControlClusterAirflowDirectionEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FanControl::AirflowDirectionEnum value)
+void MTRFanControlClusterAirflowDirectionEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::FanControl::AirflowDirectionEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -26580,8 +24940,7 @@ void MTRFanControlClusterAirflowDirectionEnumAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRNullableFanControlClusterAirflowDirectionEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::AirflowDirectionEnum> & value)
+void MTRNullableFanControlClusterAirflowDirectionEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::AirflowDirectionEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26607,8 +24966,7 @@ void MTRNullableFanControlClusterAirflowDirectionEnumAttributeCallbackSubscripti
     }
 }
 
-void MTRFanControlClusterFanModeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FanControl::FanModeEnum value)
+void MTRFanControlClusterFanModeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::FanControl::FanModeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -26630,8 +24988,7 @@ void MTRFanControlClusterFanModeEnumAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRNullableFanControlClusterFanModeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeEnum> & value)
+void MTRNullableFanControlClusterFanModeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26657,8 +25014,7 @@ void MTRNullableFanControlClusterFanModeEnumAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRFanControlClusterFanModeSequenceEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FanControl::FanModeSequenceEnum value)
+void MTRFanControlClusterFanModeSequenceEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::FanControl::FanModeSequenceEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -26680,8 +25036,7 @@ void MTRFanControlClusterFanModeSequenceEnumAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullableFanControlClusterFanModeSequenceEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeSequenceEnum> & value)
+void MTRNullableFanControlClusterFanModeSequenceEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::FanModeSequenceEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26707,8 +25062,7 @@ void MTRNullableFanControlClusterFanModeSequenceEnumAttributeCallbackSubscriptio
     }
 }
 
-void MTRFanControlClusterStepDirectionEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FanControl::StepDirectionEnum value)
+void MTRFanControlClusterStepDirectionEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::FanControl::StepDirectionEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -26730,8 +25084,7 @@ void MTRFanControlClusterStepDirectionEnumAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRNullableFanControlClusterStepDirectionEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::StepDirectionEnum> & value)
+void MTRNullableFanControlClusterStepDirectionEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FanControl::StepDirectionEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26757,8 +25110,7 @@ void MTRNullableFanControlClusterStepDirectionEnumAttributeCallbackSubscriptionB
     }
 }
 
-void MTRColorControlClusterColorLoopActionAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ColorControl::ColorLoopAction value)
+void MTRColorControlClusterColorLoopActionAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ColorControl::ColorLoopAction value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -26780,8 +25132,7 @@ void MTRColorControlClusterColorLoopActionAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void MTRNullableColorControlClusterColorLoopActionAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::ColorLoopAction> & value)
+void MTRNullableColorControlClusterColorLoopActionAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::ColorLoopAction> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26807,8 +25158,7 @@ void MTRNullableColorControlClusterColorLoopActionAttributeCallbackSubscriptionB
     }
 }
 
-void MTRColorControlClusterColorLoopDirectionAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ColorControl::ColorLoopDirection value)
+void MTRColorControlClusterColorLoopDirectionAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ColorControl::ColorLoopDirection value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -26830,8 +25180,7 @@ void MTRColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRNullableColorControlClusterColorLoopDirectionAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::ColorLoopDirection> & value)
+void MTRNullableColorControlClusterColorLoopDirectionAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::ColorLoopDirection> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26857,8 +25206,7 @@ void MTRNullableColorControlClusterColorLoopDirectionAttributeCallbackSubscripti
     }
 }
 
-void MTRColorControlClusterColorModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ColorControl::ColorMode value)
+void MTRColorControlClusterColorModeAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ColorControl::ColorMode value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -26880,8 +25228,7 @@ void MTRColorControlClusterColorModeAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRNullableColorControlClusterColorModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::ColorMode> & value)
+void MTRNullableColorControlClusterColorModeAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::ColorMode> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26907,8 +25254,7 @@ void MTRNullableColorControlClusterColorModeAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRColorControlClusterHueDirectionAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ColorControl::HueDirection value)
+void MTRColorControlClusterHueDirectionAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ColorControl::HueDirection value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -26930,8 +25276,7 @@ void MTRColorControlClusterHueDirectionAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRNullableColorControlClusterHueDirectionAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::HueDirection> & value)
+void MTRNullableColorControlClusterHueDirectionAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::HueDirection> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -26957,8 +25302,7 @@ void MTRNullableColorControlClusterHueDirectionAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRColorControlClusterHueMoveModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ColorControl::HueMoveMode value)
+void MTRColorControlClusterHueMoveModeAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ColorControl::HueMoveMode value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -26980,8 +25324,7 @@ void MTRColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRNullableColorControlClusterHueMoveModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::HueMoveMode> & value)
+void MTRNullableColorControlClusterHueMoveModeAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::HueMoveMode> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27007,8 +25350,7 @@ void MTRNullableColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRColorControlClusterHueStepModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ColorControl::HueStepMode value)
+void MTRColorControlClusterHueStepModeAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ColorControl::HueStepMode value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -27030,8 +25372,7 @@ void MTRColorControlClusterHueStepModeAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRNullableColorControlClusterHueStepModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::HueStepMode> & value)
+void MTRNullableColorControlClusterHueStepModeAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::HueStepMode> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27057,8 +25398,7 @@ void MTRNullableColorControlClusterHueStepModeAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRColorControlClusterSaturationMoveModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ColorControl::SaturationMoveMode value)
+void MTRColorControlClusterSaturationMoveModeAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ColorControl::SaturationMoveMode value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -27080,8 +25420,7 @@ void MTRColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRNullableColorControlClusterSaturationMoveModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::SaturationMoveMode> & value)
+void MTRNullableColorControlClusterSaturationMoveModeAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::SaturationMoveMode> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27107,8 +25446,7 @@ void MTRNullableColorControlClusterSaturationMoveModeAttributeCallbackSubscripti
     }
 }
 
-void MTRColorControlClusterSaturationStepModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ColorControl::SaturationStepMode value)
+void MTRColorControlClusterSaturationStepModeAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ColorControl::SaturationStepMode value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -27130,8 +25468,7 @@ void MTRColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRNullableColorControlClusterSaturationStepModeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::SaturationStepMode> & value)
+void MTRNullableColorControlClusterSaturationStepModeAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::SaturationStepMode> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27157,8 +25494,7 @@ void MTRNullableColorControlClusterSaturationStepModeAttributeCallbackSubscripti
     }
 }
 
-void MTRIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum value)
+void MTRIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -27180,8 +25516,7 @@ void MTRIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackSubscri
     }
 }
 
-void MTRNullableIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum> & value)
+void MTRNullableIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27207,8 +25542,7 @@ void MTRNullableIlluminanceMeasurementClusterLightSensorTypeEnumAttributeCallbac
     }
 }
 
-void MTROccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum value)
+void MTROccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -27230,8 +25564,7 @@ void MTROccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackSubscript
     }
 }
 
-void MTRNullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum> & value)
+void MTRNullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OccupancySensing::OccupancySensorTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27257,8 +25590,7 @@ void MTRNullableOccupancySensingClusterOccupancySensorTypeEnumAttributeCallbackS
     }
 }
 
-void MTRCarbonMonoxideConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::LevelValueEnum value)
+void MTRCarbonMonoxideConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -27280,8 +25612,7 @@ void MTRCarbonMonoxideConcentrationMeasurementClusterLevelValueEnumAttributeCall
     }
 }
 
-void MTRNullableCarbonMonoxideConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::LevelValueEnum> & value)
+void MTRNullableCarbonMonoxideConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27292,8 +25623,7 @@ void MTRNullableCarbonMonoxideConcentrationMeasurementClusterLevelValueEnumAttri
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableCarbonMonoxideConcentrationMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableCarbonMonoxideConcentrationMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27308,16 +25638,14 @@ void MTRNullableCarbonMonoxideConcentrationMeasurementClusterLevelValueEnumAttri
     }
 }
 
-void MTRCarbonMonoxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementMediumEnum value)
+void MTRCarbonMonoxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRCarbonMonoxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRCarbonMonoxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27332,10 +25660,7 @@ void MTRCarbonMonoxideConcentrationMeasurementClusterMeasurementMediumEnumAttrib
     }
 }
 
-void MTRNullableCarbonMonoxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementMediumEnum> &
-        value)
+void MTRNullableCarbonMonoxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27346,8 +25671,7 @@ void MTRNullableCarbonMonoxideConcentrationMeasurementClusterMeasurementMediumEn
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableCarbonMonoxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableCarbonMonoxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27362,16 +25686,14 @@ void MTRNullableCarbonMonoxideConcentrationMeasurementClusterMeasurementMediumEn
     }
 }
 
-void MTRCarbonMonoxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementUnitEnum value)
+void MTRCarbonMonoxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRCarbonMonoxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRCarbonMonoxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27386,8 +25708,7 @@ void MTRCarbonMonoxideConcentrationMeasurementClusterMeasurementUnitEnumAttribut
     }
 }
 
-void MTRNullableCarbonMonoxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementUnitEnum> & value)
+void MTRNullableCarbonMonoxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonMonoxideConcentrationMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27398,8 +25719,7 @@ void MTRNullableCarbonMonoxideConcentrationMeasurementClusterMeasurementUnitEnum
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableCarbonMonoxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableCarbonMonoxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27414,8 +25734,7 @@ void MTRNullableCarbonMonoxideConcentrationMeasurementClusterMeasurementUnitEnum
     }
 }
 
-void MTRCarbonDioxideConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::CarbonDioxideConcentrationMeasurement::LevelValueEnum value)
+void MTRCarbonDioxideConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::CarbonDioxideConcentrationMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -27437,8 +25756,7 @@ void MTRCarbonDioxideConcentrationMeasurementClusterLevelValueEnumAttributeCallb
     }
 }
 
-void MTRNullableCarbonDioxideConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::LevelValueEnum> & value)
+void MTRNullableCarbonDioxideConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27449,8 +25767,7 @@ void MTRNullableCarbonDioxideConcentrationMeasurementClusterLevelValueEnumAttrib
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableCarbonDioxideConcentrationMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableCarbonDioxideConcentrationMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27465,16 +25782,14 @@ void MTRNullableCarbonDioxideConcentrationMeasurementClusterLevelValueEnumAttrib
     }
 }
 
-void MTRCarbonDioxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementMediumEnum value)
+void MTRCarbonDioxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRCarbonDioxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRCarbonDioxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27489,9 +25804,7 @@ void MTRCarbonDioxideConcentrationMeasurementClusterMeasurementMediumEnumAttribu
     }
 }
 
-void MTRNullableCarbonDioxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementMediumEnum> & value)
+void MTRNullableCarbonDioxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27502,8 +25815,7 @@ void MTRNullableCarbonDioxideConcentrationMeasurementClusterMeasurementMediumEnu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableCarbonDioxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableCarbonDioxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27518,16 +25830,14 @@ void MTRNullableCarbonDioxideConcentrationMeasurementClusterMeasurementMediumEnu
     }
 }
 
-void MTRCarbonDioxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementUnitEnum value)
+void MTRCarbonDioxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRCarbonDioxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRCarbonDioxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27542,8 +25852,7 @@ void MTRCarbonDioxideConcentrationMeasurementClusterMeasurementUnitEnumAttribute
     }
 }
 
-void MTRNullableCarbonDioxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementUnitEnum> & value)
+void MTRNullableCarbonDioxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::CarbonDioxideConcentrationMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27554,8 +25863,7 @@ void MTRNullableCarbonDioxideConcentrationMeasurementClusterMeasurementUnitEnumA
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableCarbonDioxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableCarbonDioxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27570,8 +25878,7 @@ void MTRNullableCarbonDioxideConcentrationMeasurementClusterMeasurementUnitEnumA
     }
 }
 
-void MTRNitrogenDioxideConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::LevelValueEnum value)
+void MTRNitrogenDioxideConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -27593,8 +25900,7 @@ void MTRNitrogenDioxideConcentrationMeasurementClusterLevelValueEnumAttributeCal
     }
 }
 
-void MTRNullableNitrogenDioxideConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::LevelValueEnum> & value)
+void MTRNullableNitrogenDioxideConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27605,8 +25911,7 @@ void MTRNullableNitrogenDioxideConcentrationMeasurementClusterLevelValueEnumAttr
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableNitrogenDioxideConcentrationMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableNitrogenDioxideConcentrationMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27621,16 +25926,14 @@ void MTRNullableNitrogenDioxideConcentrationMeasurementClusterLevelValueEnumAttr
     }
 }
 
-void MTRNitrogenDioxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementMediumEnum value)
+void MTRNitrogenDioxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNitrogenDioxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNitrogenDioxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27645,10 +25948,7 @@ void MTRNitrogenDioxideConcentrationMeasurementClusterMeasurementMediumEnumAttri
     }
 }
 
-void MTRNullableNitrogenDioxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementMediumEnum> &
-        value)
+void MTRNullableNitrogenDioxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27659,8 +25959,7 @@ void MTRNullableNitrogenDioxideConcentrationMeasurementClusterMeasurementMediumE
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableNitrogenDioxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableNitrogenDioxideConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27675,16 +25974,14 @@ void MTRNullableNitrogenDioxideConcentrationMeasurementClusterMeasurementMediumE
     }
 }
 
-void MTRNitrogenDioxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementUnitEnum value)
+void MTRNitrogenDioxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNitrogenDioxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNitrogenDioxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27699,9 +25996,7 @@ void MTRNitrogenDioxideConcentrationMeasurementClusterMeasurementUnitEnumAttribu
     }
 }
 
-void MTRNullableNitrogenDioxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementUnitEnum> & value)
+void MTRNullableNitrogenDioxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::NitrogenDioxideConcentrationMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27712,8 +26007,7 @@ void MTRNullableNitrogenDioxideConcentrationMeasurementClusterMeasurementUnitEnu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableNitrogenDioxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableNitrogenDioxideConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27728,8 +26022,7 @@ void MTRNullableNitrogenDioxideConcentrationMeasurementClusterMeasurementUnitEnu
     }
 }
 
-void MTROzoneConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OzoneConcentrationMeasurement::LevelValueEnum value)
+void MTROzoneConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OzoneConcentrationMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -27751,8 +26044,7 @@ void MTROzoneConcentrationMeasurementClusterLevelValueEnumAttributeCallbackSubsc
     }
 }
 
-void MTRNullableOzoneConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::OzoneConcentrationMeasurement::LevelValueEnum> & value)
+void MTRNullableOzoneConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OzoneConcentrationMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27778,8 +26070,7 @@ void MTRNullableOzoneConcentrationMeasurementClusterLevelValueEnumAttributeCallb
     }
 }
 
-void MTROzoneConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementMediumEnum value)
+void MTROzoneConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -27801,8 +26092,7 @@ void MTROzoneConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallba
     }
 }
 
-void MTRNullableOzoneConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementMediumEnum> & value)
+void MTRNullableOzoneConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27813,8 +26103,7 @@ void MTRNullableOzoneConcentrationMeasurementClusterMeasurementMediumEnumAttribu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOzoneConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableOzoneConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27829,8 +26118,7 @@ void MTRNullableOzoneConcentrationMeasurementClusterMeasurementMediumEnumAttribu
     }
 }
 
-void MTROzoneConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementUnitEnum value)
+void MTROzoneConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -27852,8 +26140,7 @@ void MTROzoneConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallback
     }
 }
 
-void MTRNullableOzoneConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementUnitEnum> & value)
+void MTRNullableOzoneConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OzoneConcentrationMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27864,8 +26151,7 @@ void MTRNullableOzoneConcentrationMeasurementClusterMeasurementUnitEnumAttribute
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOzoneConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableOzoneConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27880,8 +26166,7 @@ void MTRNullableOzoneConcentrationMeasurementClusterMeasurementUnitEnumAttribute
     }
 }
 
-void MTRPM25ConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Pm25ConcentrationMeasurement::LevelValueEnum value)
+void MTRPM25ConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Pm25ConcentrationMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -27903,8 +26188,7 @@ void MTRPM25ConcentrationMeasurementClusterLevelValueEnumAttributeCallbackSubscr
     }
 }
 
-void MTRNullablePM25ConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm25ConcentrationMeasurement::LevelValueEnum> & value)
+void MTRNullablePM25ConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm25ConcentrationMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27930,8 +26214,7 @@ void MTRNullablePM25ConcentrationMeasurementClusterLevelValueEnumAttributeCallba
     }
 }
 
-void MTRPM25ConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementMediumEnum value)
+void MTRPM25ConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -27953,8 +26236,7 @@ void MTRPM25ConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbac
     }
 }
 
-void MTRNullablePM25ConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementMediumEnum> & value)
+void MTRNullablePM25ConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -27965,8 +26247,7 @@ void MTRNullablePM25ConcentrationMeasurementClusterMeasurementMediumEnumAttribut
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePM25ConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullablePM25ConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -27981,8 +26262,7 @@ void MTRNullablePM25ConcentrationMeasurementClusterMeasurementMediumEnumAttribut
     }
 }
 
-void MTRPM25ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementUnitEnum value)
+void MTRPM25ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -28004,8 +26284,7 @@ void MTRPM25ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackS
     }
 }
 
-void MTRNullablePM25ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementUnitEnum> & value)
+void MTRNullablePM25ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm25ConcentrationMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28016,8 +26295,7 @@ void MTRNullablePM25ConcentrationMeasurementClusterMeasurementUnitEnumAttributeC
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePM25ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullablePM25ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28032,8 +26310,7 @@ void MTRNullablePM25ConcentrationMeasurementClusterMeasurementUnitEnumAttributeC
     }
 }
 
-void MTRFormaldehydeConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FormaldehydeConcentrationMeasurement::LevelValueEnum value)
+void MTRFormaldehydeConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::FormaldehydeConcentrationMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -28055,8 +26332,7 @@ void MTRFormaldehydeConcentrationMeasurementClusterLevelValueEnumAttributeCallba
     }
 }
 
-void MTRNullableFormaldehydeConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::FormaldehydeConcentrationMeasurement::LevelValueEnum> & value)
+void MTRNullableFormaldehydeConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FormaldehydeConcentrationMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28067,8 +26343,7 @@ void MTRNullableFormaldehydeConcentrationMeasurementClusterLevelValueEnumAttribu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableFormaldehydeConcentrationMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableFormaldehydeConcentrationMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28083,16 +26358,14 @@ void MTRNullableFormaldehydeConcentrationMeasurementClusterLevelValueEnumAttribu
     }
 }
 
-void MTRFormaldehydeConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementMediumEnum value)
+void MTRFormaldehydeConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFormaldehydeConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRFormaldehydeConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28107,8 +26380,7 @@ void MTRFormaldehydeConcentrationMeasurementClusterMeasurementMediumEnumAttribut
     }
 }
 
-void MTRNullableFormaldehydeConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementMediumEnum> & value)
+void MTRNullableFormaldehydeConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28119,8 +26391,7 @@ void MTRNullableFormaldehydeConcentrationMeasurementClusterMeasurementMediumEnum
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableFormaldehydeConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableFormaldehydeConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28135,16 +26406,14 @@ void MTRNullableFormaldehydeConcentrationMeasurementClusterMeasurementMediumEnum
     }
 }
 
-void MTRFormaldehydeConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementUnitEnum value)
+void MTRFormaldehydeConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRFormaldehydeConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRFormaldehydeConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28159,8 +26428,7 @@ void MTRFormaldehydeConcentrationMeasurementClusterMeasurementUnitEnumAttributeC
     }
 }
 
-void MTRNullableFormaldehydeConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementUnitEnum> & value)
+void MTRNullableFormaldehydeConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::FormaldehydeConcentrationMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28171,8 +26439,7 @@ void MTRNullableFormaldehydeConcentrationMeasurementClusterMeasurementUnitEnumAt
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableFormaldehydeConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableFormaldehydeConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28187,8 +26454,7 @@ void MTRNullableFormaldehydeConcentrationMeasurementClusterMeasurementUnitEnumAt
     }
 }
 
-void MTRPM1ConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Pm1ConcentrationMeasurement::LevelValueEnum value)
+void MTRPM1ConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Pm1ConcentrationMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -28210,8 +26476,7 @@ void MTRPM1ConcentrationMeasurementClusterLevelValueEnumAttributeCallbackSubscri
     }
 }
 
-void MTRNullablePM1ConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm1ConcentrationMeasurement::LevelValueEnum> & value)
+void MTRNullablePM1ConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm1ConcentrationMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28237,8 +26502,7 @@ void MTRNullablePM1ConcentrationMeasurementClusterLevelValueEnumAttributeCallbac
     }
 }
 
-void MTRPM1ConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementMediumEnum value)
+void MTRPM1ConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -28260,8 +26524,7 @@ void MTRPM1ConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallback
     }
 }
 
-void MTRNullablePM1ConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementMediumEnum> & value)
+void MTRNullablePM1ConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28272,8 +26535,7 @@ void MTRNullablePM1ConcentrationMeasurementClusterMeasurementMediumEnumAttribute
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePM1ConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullablePM1ConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28288,8 +26550,7 @@ void MTRNullablePM1ConcentrationMeasurementClusterMeasurementMediumEnumAttribute
     }
 }
 
-void MTRPM1ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementUnitEnum value)
+void MTRPM1ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -28311,8 +26572,7 @@ void MTRPM1ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSu
     }
 }
 
-void MTRNullablePM1ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementUnitEnum> & value)
+void MTRNullablePM1ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm1ConcentrationMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28323,8 +26583,7 @@ void MTRNullablePM1ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCa
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePM1ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullablePM1ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28339,8 +26598,7 @@ void MTRNullablePM1ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCa
     }
 }
 
-void MTRPM10ConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Pm10ConcentrationMeasurement::LevelValueEnum value)
+void MTRPM10ConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Pm10ConcentrationMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -28362,8 +26620,7 @@ void MTRPM10ConcentrationMeasurementClusterLevelValueEnumAttributeCallbackSubscr
     }
 }
 
-void MTRNullablePM10ConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm10ConcentrationMeasurement::LevelValueEnum> & value)
+void MTRNullablePM10ConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm10ConcentrationMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28389,8 +26646,7 @@ void MTRNullablePM10ConcentrationMeasurementClusterLevelValueEnumAttributeCallba
     }
 }
 
-void MTRPM10ConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementMediumEnum value)
+void MTRPM10ConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -28412,8 +26668,7 @@ void MTRPM10ConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbac
     }
 }
 
-void MTRNullablePM10ConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementMediumEnum> & value)
+void MTRNullablePM10ConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28424,8 +26679,7 @@ void MTRNullablePM10ConcentrationMeasurementClusterMeasurementMediumEnumAttribut
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePM10ConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullablePM10ConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28440,8 +26694,7 @@ void MTRNullablePM10ConcentrationMeasurementClusterMeasurementMediumEnumAttribut
     }
 }
 
-void MTRPM10ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementUnitEnum value)
+void MTRPM10ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -28463,8 +26716,7 @@ void MTRPM10ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackS
     }
 }
 
-void MTRNullablePM10ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementUnitEnum> & value)
+void MTRNullablePM10ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Pm10ConcentrationMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28475,8 +26727,7 @@ void MTRNullablePM10ConcentrationMeasurementClusterMeasurementUnitEnumAttributeC
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullablePM10ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullablePM10ConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28491,16 +26742,14 @@ void MTRNullablePM10ConcentrationMeasurementClusterMeasurementUnitEnumAttributeC
     }
 }
 
-void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::LevelValueEnum value)
+void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28515,10 +26764,7 @@ void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementClusterLevelValueEn
     }
 }
 
-void MTRNullableTotalVolatileOrganicCompoundsConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context,
-    const chip::app::DataModel::Nullable<
-        chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::LevelValueEnum> & value)
+void MTRNullableTotalVolatileOrganicCompoundsConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28529,8 +26775,7 @@ void MTRNullableTotalVolatileOrganicCompoundsConcentrationMeasurementClusterLeve
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTotalVolatileOrganicCompoundsConcentrationMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableTotalVolatileOrganicCompoundsConcentrationMeasurementClusterLevelValueEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28545,16 +26790,14 @@ void MTRNullableTotalVolatileOrganicCompoundsConcentrationMeasurementClusterLeve
     }
 }
 
-void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementMediumEnum value)
+void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28569,10 +26812,7 @@ void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementClusterMeasurementM
     }
 }
 
-void MTRNullableTotalVolatileOrganicCompoundsConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::
-    OnSuccessFn(void * context,
-        const chip::app::DataModel::Nullable<
-            chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementMediumEnum> & value)
+void MTRNullableTotalVolatileOrganicCompoundsConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28583,8 +26823,7 @@ void MTRNullableTotalVolatileOrganicCompoundsConcentrationMeasurementClusterMeas
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTotalVolatileOrganicCompoundsConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableTotalVolatileOrganicCompoundsConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28599,16 +26838,14 @@ void MTRNullableTotalVolatileOrganicCompoundsConcentrationMeasurementClusterMeas
     }
 }
 
-void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementUnitEnum value)
+void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28623,10 +26860,7 @@ void MTRTotalVolatileOrganicCompoundsConcentrationMeasurementClusterMeasurementU
     }
 }
 
-void MTRNullableTotalVolatileOrganicCompoundsConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context,
-    const chip::app::DataModel::Nullable<
-        chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementUnitEnum> & value)
+void MTRNullableTotalVolatileOrganicCompoundsConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28637,8 +26871,7 @@ void MTRNullableTotalVolatileOrganicCompoundsConcentrationMeasurementClusterMeas
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableTotalVolatileOrganicCompoundsConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableTotalVolatileOrganicCompoundsConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28653,8 +26886,7 @@ void MTRNullableTotalVolatileOrganicCompoundsConcentrationMeasurementClusterMeas
     }
 }
 
-void MTRRadonConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::RadonConcentrationMeasurement::LevelValueEnum value)
+void MTRRadonConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::RadonConcentrationMeasurement::LevelValueEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -28676,8 +26908,7 @@ void MTRRadonConcentrationMeasurementClusterLevelValueEnumAttributeCallbackSubsc
     }
 }
 
-void MTRNullableRadonConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::RadonConcentrationMeasurement::LevelValueEnum> & value)
+void MTRNullableRadonConcentrationMeasurementClusterLevelValueEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RadonConcentrationMeasurement::LevelValueEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28703,8 +26934,7 @@ void MTRNullableRadonConcentrationMeasurementClusterLevelValueEnumAttributeCallb
     }
 }
 
-void MTRRadonConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::RadonConcentrationMeasurement::MeasurementMediumEnum value)
+void MTRRadonConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::RadonConcentrationMeasurement::MeasurementMediumEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -28726,8 +26956,7 @@ void MTRRadonConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallba
     }
 }
 
-void MTRNullableRadonConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::RadonConcentrationMeasurement::MeasurementMediumEnum> & value)
+void MTRNullableRadonConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RadonConcentrationMeasurement::MeasurementMediumEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28738,8 +26967,7 @@ void MTRNullableRadonConcentrationMeasurementClusterMeasurementMediumEnumAttribu
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableRadonConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableRadonConcentrationMeasurementClusterMeasurementMediumEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28754,8 +26982,7 @@ void MTRNullableRadonConcentrationMeasurementClusterMeasurementMediumEnumAttribu
     }
 }
 
-void MTRRadonConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::RadonConcentrationMeasurement::MeasurementUnitEnum value)
+void MTRRadonConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::RadonConcentrationMeasurement::MeasurementUnitEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -28777,8 +27004,7 @@ void MTRRadonConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallback
     }
 }
 
-void MTRNullableRadonConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::RadonConcentrationMeasurement::MeasurementUnitEnum> & value)
+void MTRNullableRadonConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::RadonConcentrationMeasurement::MeasurementUnitEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28789,8 +27015,7 @@ void MTRNullableRadonConcentrationMeasurementClusterMeasurementUnitEnumAttribute
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableRadonConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableRadonConcentrationMeasurementClusterMeasurementUnitEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -28805,8 +27030,7 @@ void MTRNullableRadonConcentrationMeasurementClusterMeasurementUnitEnumAttribute
     }
 }
 
-void MTRChannelClusterChannelStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Channel::ChannelStatusEnum value)
+void MTRChannelClusterChannelStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Channel::ChannelStatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -28828,8 +27052,7 @@ void MTRChannelClusterChannelStatusEnumAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void MTRNullableChannelClusterChannelStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::ChannelStatusEnum> & value)
+void MTRNullableChannelClusterChannelStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::ChannelStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28855,8 +27078,7 @@ void MTRNullableChannelClusterChannelStatusEnumAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRChannelClusterLineupInfoTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Channel::LineupInfoTypeEnum value)
+void MTRChannelClusterLineupInfoTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Channel::LineupInfoTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -28878,8 +27100,7 @@ void MTRChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::LineupInfoTypeEnum> & value)
+void MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::LineupInfoTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28905,8 +27126,7 @@ void MTRNullableChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TargetNavigator::TargetNavigatorStatusEnum value)
+void MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::TargetNavigator::TargetNavigatorStatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -28928,8 +27148,7 @@ void MTRTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackSubscrip
     }
 }
 
-void MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TargetNavigator::TargetNavigatorStatusEnum> & value)
+void MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TargetNavigator::TargetNavigatorStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -28955,8 +27174,7 @@ void MTRNullableTargetNavigatorClusterTargetNavigatorStatusEnumAttributeCallback
     }
 }
 
-void MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::MediaPlayback::MediaPlaybackStatusEnum value)
+void MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::MediaPlayback::MediaPlaybackStatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -28978,8 +27196,7 @@ void MTRMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubscription
     }
 }
 
-void MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::MediaPlaybackStatusEnum> & value)
+void MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::MediaPlaybackStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -29005,8 +27222,7 @@ void MTRNullableMediaPlaybackClusterMediaPlaybackStatusEnumAttributeCallbackSubs
     }
 }
 
-void MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum value)
+void MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -29028,8 +27244,7 @@ void MTRMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge
     }
 }
 
-void MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::PlaybackStateEnum> & value)
+void MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::PlaybackStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -29055,8 +27270,7 @@ void MTRNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscripti
     }
 }
 
-void MTRMediaInputClusterInputTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::MediaInput::InputTypeEnum value)
+void MTRMediaInputClusterInputTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::MediaInput::InputTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -29078,8 +27292,7 @@ void MTRMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void MTRNullableMediaInputClusterInputTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaInput::InputTypeEnum> & value)
+void MTRNullableMediaInputClusterInputTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaInput::InputTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -29105,8 +27318,7 @@ void MTRNullableMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridg
     }
 }
 
-void MTRKeypadInputClusterCecKeyCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::KeypadInput::CecKeyCode value)
+void MTRKeypadInputClusterCecKeyCodeAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::KeypadInput::CecKeyCode value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -29128,8 +27340,7 @@ void MTRKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::CecKeyCode> & value)
+void MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::CecKeyCode> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -29155,8 +27366,7 @@ void MTRNullableKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::KeypadInput::KeypadInputStatusEnum value)
+void MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::KeypadInput::KeypadInputStatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -29178,8 +27388,7 @@ void MTRKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscriptionBrid
     }
 }
 
-void MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::KeypadInputStatusEnum> & value)
+void MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::KeypadInputStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -29205,8 +27414,7 @@ void MTRNullableKeypadInputClusterKeypadInputStatusEnumAttributeCallbackSubscrip
     }
 }
 
-void MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum value)
+void MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -29228,8 +27436,7 @@ void MTRContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSubscripti
     }
 }
 
-void MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum> & value)
+void MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -29255,8 +27462,7 @@ void MTRNullableContentLauncherClusterContentLaunchStatusEnumAttributeCallbackSu
     }
 }
 
-void MTRContentLauncherClusterMetricTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ContentLauncher::MetricTypeEnum value)
+void MTRContentLauncherClusterMetricTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ContentLauncher::MetricTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -29278,8 +27484,7 @@ void MTRContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge:
     }
 }
 
-void MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::MetricTypeEnum> & value)
+void MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::MetricTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -29305,8 +27510,7 @@ void MTRNullableContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptio
     }
 }
 
-void MTRContentLauncherClusterParameterEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ContentLauncher::ParameterEnum value)
+void MTRContentLauncherClusterParameterEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ContentLauncher::ParameterEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -29328,8 +27532,7 @@ void MTRContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRNullableContentLauncherClusterParameterEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ParameterEnum> & value)
+void MTRNullableContentLauncherClusterParameterEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ParameterEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -29355,8 +27558,7 @@ void MTRNullableContentLauncherClusterParameterEnumAttributeCallbackSubscription
     }
 }
 
-void MTRAudioOutputClusterOutputTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::AudioOutput::OutputTypeEnum value)
+void MTRAudioOutputClusterOutputTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::AudioOutput::OutputTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -29378,8 +27580,7 @@ void MTRAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AudioOutput::OutputTypeEnum> & value)
+void MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AudioOutput::OutputTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -29405,8 +27606,7 @@ void MTRNullableAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBri
     }
 }
 
-void MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatusEnum value)
+void MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -29428,8 +27628,7 @@ void MTRApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallback
     }
 }
 
-void MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatusEnum> & value)
+void MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -29440,8 +27639,7 @@ void MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttribute
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge::
-    OnSubscriptionEstablished()
+void MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -29456,8 +27654,7 @@ void MTRNullableApplicationLauncherClusterApplicationLauncherStatusEnumAttribute
     }
 }
 
-void MTRApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum value)
+void MTRApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -29479,8 +27676,7 @@ void MTRApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptio
     }
 }
 
-void MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum> & value)
+void MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -29506,8 +27702,7 @@ void MTRNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackSub
     }
 }
 
-void MTRUnitTestingClusterSimpleEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::UnitTesting::SimpleEnum value)
+void MTRUnitTestingClusterSimpleEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::UnitTesting::SimpleEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
@@ -29529,8 +27724,7 @@ void MTRUnitTestingClusterSimpleEnumAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::SimpleEnum> & value)
+void MTRNullableUnitTestingClusterSimpleEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::UnitTesting::SimpleEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {

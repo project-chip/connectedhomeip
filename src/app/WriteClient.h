@@ -36,6 +36,7 @@
 #include <messaging/ExchangeHolder.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
+#include <platform/LockTracker.h>
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
@@ -127,15 +128,21 @@ public:
         mpExchangeMgr(apExchangeMgr),
         mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs),
         mSuppressResponse(aSuppressResponse)
-    {}
+    {
+        assertChipStackLockedByCurrentThread();
+    }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const Optional<uint16_t> & aTimedWriteTimeoutMs,
                 uint16_t aReservedSize) :
         mpExchangeMgr(apExchangeMgr),
         mExchangeCtx(*this), mpCallback(apCallback), mTimedWriteTimeoutMs(aTimedWriteTimeoutMs), mReservedSize(aReservedSize)
-    {}
+    {
+        assertChipStackLockedByCurrentThread();
+    }
 #endif
+
+    ~WriteClient() { assertChipStackLockedByCurrentThread(); }
 
     /**
      *  Encode an attribute value that can be directly encoded using DataModel::Encode. Will create a new chunk when necessary.

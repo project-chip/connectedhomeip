@@ -22,16 +22,16 @@ import chip.tlv.Tag
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class UnitTestingClusterTestFabricScopedEventEvent(val fabricIndex: Int) {
+class UnitTestingClusterTestFabricScopedEventEvent(val fabricIndex: UInt) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterTestFabricScopedEventEvent {\n")
     append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
@@ -40,9 +40,9 @@ class UnitTestingClusterTestFabricScopedEventEvent(val fabricIndex: Int) {
   companion object {
     private const val TAG_FABRIC_INDEX = 254
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): UnitTestingClusterTestFabricScopedEventEvent {
-      tlvReader.enterStructure(tag)
-      val fabricIndex = tlvReader.getInt(ContextSpecificTag(TAG_FABRIC_INDEX))
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): UnitTestingClusterTestFabricScopedEventEvent {
+      tlvReader.enterStructure(tlvTag)
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
