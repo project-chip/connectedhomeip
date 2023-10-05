@@ -351,8 +351,8 @@ kotlin_library("chipcluster_test") {
   kotlinc_flags = [ "-Xlint:deprecation" ]
 }
 
-kotlin_library("matter_controller") {
-  output_name = "MatterController.jar"
+kotlin_library("kotlin_matter_controller") {
+  output_name = "KotlinMatterController.jar"
 
   deps = [
     ":java",
