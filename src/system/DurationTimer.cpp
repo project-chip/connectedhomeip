@@ -84,7 +84,7 @@ namespace chip{
         }
         #endif
 
-         #ifdef CHIP_DEVICE_IS_ESP32
+        #ifdef CHIP_DEVICE_IS_ESP32
          // member functions
         void DurationTimer::start()
         {
