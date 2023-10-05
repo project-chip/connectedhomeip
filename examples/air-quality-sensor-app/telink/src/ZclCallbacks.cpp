@@ -28,7 +28,6 @@ LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace chip;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::OnOff;
 using namespace chip::app::Clusters::AirQuality;
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,

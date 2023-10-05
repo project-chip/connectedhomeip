@@ -23,9 +23,7 @@
 class AppTask : public AppTaskCommon
 {
 public:
-    void SetInitiateAction(PWMDevice::Action_t aAction, int32_t aActor, uint8_t * value);
-    void UpdateClusterState(void);
-    PWMDevice & GetPWMDevice(void) { return mPwmRgbBlueLed; }
+void UpdateClusterState(void);
 
 private:
     friend AppTask & GetAppTask(void);
@@ -33,12 +31,10 @@ private:
 
     CHIP_ERROR Init(void);
 
-    static void ActionInitiated(PWMDevice::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(PWMDevice::Action_t aAction, int32_t aActor);
-
     static void AirQualityActionEventHandler(AppEvent * aEvent);
     static void SelfTestHandler(AppEvent * aEvent);
-    PWMDevice mPwmRgbBlueLed;
+
+    chip::app::Clusters::AirQuality::AirQualityEnum AirQualityState;
 
     static AppTask sAppTask;
 };

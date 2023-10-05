@@ -19,16 +19,11 @@
 #include "AppTask.h"
 #include <app/server/Server.h>
 
-#include "ColorFormat.h"
-#include "PWMDevice.h"
-
 #include <app-common/zap-generated/attributes/Accessors.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
-namespace {
-const struct pwm_dt_spec sPwmRgbSpecBlueLed = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led0));
-} // namespace
+using namespace ::chip::app::Clusters::AirQuality;
 
 AppTask AppTask::sAppTask;
 
@@ -49,33 +44,17 @@ CHIP_ERROR AppTask::Init(void)
     return CHIP_NO_ERROR;
 }
 
-// void AppTask::AirQualityActionEventHandler(AppEvent * aEvent)
-// {
-//     PWMDevice::Action_t action = PWMDevice::INVALID_ACTION;
-//     int32_t actor              = 0;
-
-//     if (aEvent->Type == AppEvent::kEventType_Lighting)
-//     {
-//         action = static_cast<PWMDevice::Action_t>(aEvent->LightingEvent.Action);
-//         actor  = aEvent->LightingEvent.Actor;
-//     }
-//     else if (aEvent->Type == AppEvent::kEventType_Button)
-//     {
-//         action = sAppTask.mPwmRgbBlueLed.IsTurnedOn() ? PWMDevice::OFF_ACTION : PWMDevice::ON_ACTION;
-//         actor = AppEvent::kEventType_Button;
-//     }
-
-//     if (action != PWMDevice::INVALID_ACTION &&
-//         (
-//             !sAppTask.mPwmRgbBlueLed.InitiateAction(action, actor, NULL)))
-//     {
-//         LOG_INF("Action is in progress or active");
-//     }
-// }
+void AppTask::UpdateClusterState(void)
+{
+    EndpointId endpoint  = 1;
+    AirQualityState = AirQualityEnum::kGood;
+    EmberAfStatus status = Clusters::AirQuality::Attributes::AirQuality::Set(endpoint, AirQualityState);
+    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set AirQuality attribute"));
+}
 
 void AppTask::SelfTestHandler(AppEvent * aEvent)
 {
-
+    sAppTask.UpdateClusterState();
 }
 
 void AppTask::AirQualityActionEventHandler(AppEvent * aEvent)
@@ -88,74 +67,3 @@ void AppTask::AirQualityActionEventHandler(AppEvent * aEvent)
         GetAppTask().PostEvent(&event);
     }
 }
-
-void AppTask::ActionInitiated(PWMDevice::Action_t aAction, int32_t aActor)
-{
-    if (aAction == PWMDevice::ON_ACTION)
-    {
-        LOG_DBG("ON_ACTION initiated");
-    }
-    else if (aAction == PWMDevice::OFF_ACTION)
-    {
-        LOG_DBG("OFF_ACTION initiated");
-    }
-    else if (aAction == PWMDevice::LEVEL_ACTION)
-    {
-        LOG_DBG("LEVEL_ACTION initiated");
-    }
-}
-
-void AppTask::ActionCompleted(PWMDevice::Action_t aAction, int32_t aActor)
-{
-    if (aAction == PWMDevice::ON_ACTION)
-    {
-        LOG_DBG("ON_ACTION completed");
-    }
-    else if (aAction == PWMDevice::OFF_ACTION)
-    {
-        LOG_DBG("OFF_ACTION completed");
-    }
-    else if (aAction == PWMDevice::LEVEL_ACTION)
-    {
-        LOG_DBG("LEVEL_ACTION completed");
-    }
-
-    if (aActor == AppEvent::kEventType_Button)
-    {
-        sAppTask.UpdateClusterState();
-    }
-}
-
-void AppTask::UpdateClusterState(void)
-{
-    bool isTurnedOn = sAppTask.mPwmRgbBlueLed.IsTurnedOn();
-    // write the new on/off value
-    EmberAfStatus status = Clusters::OnOff::Attributes::OnOff::Set(kExampleEndpointId, isTurnedOn);
-
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        LOG_ERR("Update OnOff fail: %x", status);
-    }
-
-    uint8_t setLevel = sAppTask.mPwmRgbBlueLed.GetLevel();
-    status = Clusters::LevelControl::Attributes::CurrentLevel::Set(kExampleEndpointId, setLevel);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        LOG_ERR("Update CurrentLevel fail: %x", status);
-    }
-}
-
-void AppTask::SetInitiateAction(PWMDevice::Action_t aAction, int32_t aActor, uint8_t * value)
-{
-
-    if (aAction == PWMDevice::ON_ACTION || aAction == PWMDevice::OFF_ACTION)
-    {
-        sAppTask.mPwmRgbBlueLed.InitiateAction(aAction, aActor, value);
-    }
-    else if (aAction == PWMDevice::LEVEL_ACTION)
-    {
-        sAppTask.mPwmRgbBlueLed.InitiateAction(aAction, aActor, value);
-    }
-
-}
-
