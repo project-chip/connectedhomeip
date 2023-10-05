@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
@@ -19,17 +18,11 @@
 #pragma once
 
 #include <app/data-model/Encode.h>
-#include <app/data-model/FabricScoped.h>
-#include <app/data-model/List.h>
-#include <app/data-model/Nullable.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
-#include <protocols/interaction_model/Constants.h>
 
-#include <type_traits>
 #include <utility>
 
 namespace chip {
