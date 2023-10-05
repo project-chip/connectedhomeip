@@ -1,6 +1,7 @@
 {{> header}}
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <variant>
 
 namespace chip {
 namespace app {
@@ -8,39 +9,48 @@ namespace Clusters {
 
 namespace detail {
 
-CHIP_ERROR FlightCheckDecodeAndEnterStruct(TLV::TLVReader & reader, TLV::TLVType & outer)
-{
-    TLV::TLVReader temp_reader;
+class StructDecodeIterator {
+  public:
+    // may return a context tag, a CHIP_ERROR (end iteration)
+    using EntryElement = std::variant<uint8_t, CHIP_ERROR>;
 
-    // Make a copy of the struct reader to do pre-checks.
-    temp_reader.Init(reader);
+    StructDecodeIterator(TLV::TLVReader &reader) : mReader(reader){}
 
-    // Ensure we have a single struct and that it's properly bounded.
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrReturnError(TLV::kTLVType_Structure == temp_reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(temp_reader.EnterContainer(outer));
-    while ((err = temp_reader.Next()) == CHIP_NO_ERROR)
-    {
-        if (!TLV::IsContextTag(temp_reader.GetTag()))
-        {
+    // Iterate through structure elements. Returns one of:
+    //   - uint8_t CONTEXT TAG (keep iterating)
+    //   - CHIP_ERROR (including CHIP_NO_ERROR) which should be a final
+    //     return value (stop iterating)
+    EntryElement Next() {
+       if (!mEntered) {
+          VerifyOrReturnError(TLV::kTLVType_Structure == mReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+          ReturnErrorOnFailure(mReader.EnterContainer(mOuter));
+          mEntered = true;
+       }
+
+       while (true) {
+          CHIP_ERROR err = mReader.Next();
+          if (err != CHIP_NO_ERROR) {
+             VerifyOrReturnError(err == CHIP_ERROR_END_OF_TLV, err);
+             break;
+          }
+
+          const TLV::Tag tag = mReader.GetTag();
+          if (!TLV::IsContextTag(tag)) {
             continue;
-        }
+          }
+
+          // we know context tags are 8-bit
+          return static_cast<uint8_t>(TLV::TagNumFromTag(tag));
+       }
+
+       return mReader.ExitContainer(mOuter);
     }
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(temp_reader.ExitContainer(outer));
 
-    // Guaranteed to work due to prior checks.
-    VerifyOrDie(reader.EnterContainer(outer) == CHIP_NO_ERROR);
-    return CHIP_NO_ERROR;
-}
-
-void ExitStructAfterDecode(TLV::TLVReader & reader, TLV::TLVType & outer)
-{
-    // Ensure we exit the container. Will be OK since FlightCheckDecodeAndEnterStruct will have
-    // already been called, and generated code properly iterates over entire container.
-    VerifyOrDie(reader.Next() == CHIP_END_OF_TLV);
-    VerifyOrDie(reader.ExitContainer(outer) == CHIP_NO_ERROR);
-}
+  private:
+    bool mEntered = false;
+    TLV::TLVType mOuter;
+    TLV::TLVReader &mReader;
+};
 
 // Structs shared across multiple clusters.
 namespace Structs {
@@ -75,34 +85,37 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const{
     {{#zcl_command_arguments}}
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}}));
     {{/zcl_command_arguments}}
-    ReturnErrorOnFailure(aWriter.EndContainer(outer));
-    return CHIP_NO_ERROR;
+    return aWriter.EndContainer(outer);
 }
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+    detail::StructDecodeIterator __iterator(reader);
+    while (true) {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element)) {
+           return std::get<CHIP_ERROR>(__element);
+        }
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    while ((err = reader.Next()) == CHIP_NO_ERROR) {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        {{#zcl_command_arguments~}}
+        {{#first}}
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        {{/first~}}
+        {{! NOTE: using if/else instead of switch because it seems to generate smaller code. ~}}
+        if (__context_tag == to_underlying(Fields::k{{asUpperCamelCase label}}))
         {
-            continue;
+            err = DataModel::Decode(reader, {{asLowerCamelCase label}});
         }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
+        else
+        {{#last}}
         {
-            {{#zcl_command_arguments}}
-            case to_underlying(Fields::k{{asUpperCamelCase label}}):
-                ReturnErrorOnFailure(DataModel::Decode(reader, {{asLowerCamelCase label}}));
-                break;
-                {{/zcl_command_arguments}}
-            default:
-                break;
         }
+
+        ReturnErrorOnFailure(err);
+        {{/last}}
+        {{/zcl_command_arguments}}
     }
-
-    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
-    return CHIP_NO_ERROR;
 }
 } // namespace {{asUpperCamelCase name}}.
 {{/zcl_commands}}
@@ -114,14 +127,11 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader &reader, const Concret
     {
 {{#zcl_attributes_server}}
     case Attributes::{{asUpperCamelCase label}}::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, {{asLowerCamelCase label}}));
-        break;
+        return DataModel::Decode(reader, {{asLowerCamelCase label}});
 {{/zcl_attributes_server}}
     default:
-        break;
+        return CHIP_NO_ERROR;
     }
-
-    return CHIP_NO_ERROR;
 }
 } // namespace Attributes
 
@@ -138,34 +148,37 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const{
     ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::k{{asUpperCamelCase name}}), {{asLowerCamelCase name}}));
     {{/if_is_fabric_scoped_struct}}
     {{/zcl_event_fields}}
-    ReturnErrorOnFailure(aWriter.EndContainer(outer));
-    return CHIP_NO_ERROR;
+    return aWriter.EndContainer(outer);
 }
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(chip::app::Clusters::detail::FlightCheckDecodeAndEnterStruct(reader, outer));
+    detail::StructDecodeIterator __iterator(reader);
+    while (true) {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element)) {
+           return std::get<CHIP_ERROR>(__element);
+        }
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    while ((err = reader.Next()) == CHIP_NO_ERROR) {
-        if (!TLV::IsContextTag(reader.GetTag()))
+        {{#zcl_event_fields}}
+        {{#first}}
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        {{/first~}}
+        {{! NOTE: using if/else instead of switch because it seems to generate smaller code. ~}}
+        if (__context_tag == to_underlying(Fields::k{{asUpperCamelCase name}}))
         {
-            continue;
+            err = DataModel::Decode(reader, {{asLowerCamelCase name}});
         }
-        switch (TLV::TagNumFromTag(reader.GetTag()))
+        else
+        {{#last}}
         {
-            {{#zcl_event_fields}}
-        case to_underlying(Fields::k{{asUpperCamelCase name}}):
-            ReturnErrorOnFailure(DataModel::Decode(reader, {{asLowerCamelCase name}}));
-            break;
-            {{/zcl_event_fields}}
-        default:
-            break;
         }
+
+        ReturnErrorOnFailure(err);
+        {{/last}}
+        {{/zcl_event_fields}}
     }
-
-    chip::app::Clusters::detail::ExitStructAfterDecode(reader, outer);
-    return CHIP_NO_ERROR;
 }
 } // namespace {{asUpperCamelCase name}}.
 {{/zcl_events}}
