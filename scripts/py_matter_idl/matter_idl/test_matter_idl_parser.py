@@ -298,6 +298,34 @@ class TestParser(unittest.TestCase):
                     )])
         self.assertEqual(actual, expected)
 
+    def test_struct_field_api_maturity(self):
+        actual = parseText("""
+            server cluster MaturityTest = 1 {
+                struct TestStruct {
+                  nullable int16u someStableMember = 0;
+                  provisional nullable int16u someProvisionalMember = 1;
+                  internal nullable int16u someInternalMember = 2;
+                }
+           }
+        """)
+        expected = Idl(clusters=[
+            Cluster(side=ClusterSide.SERVER,
+                    name="MaturityTest",
+                    code=1,
+                    structs=[
+                        Struct(name="TestStruct", fields=[
+                            Field(name="someStableMember", code=0, data_type=DataType(
+                                name="int16u"), qualities=FieldQuality.NULLABLE),
+                            Field(name="someProvisionalMember", code=1, data_type=DataType(
+                                name="int16u"), qualities=FieldQuality.NULLABLE, api_maturity=ApiMaturity.PROVISIONAL),
+                            Field(name="someInternalMember", code=2, data_type=DataType(
+                                name="int16u"), qualities=FieldQuality.NULLABLE, api_maturity=ApiMaturity.INTERNAL),
+
+                        ]),
+                    ],
+                    )])
+        self.assertEqual(actual, expected)
+
     def test_cluster_entry_maturity(self):
         actual = parseText("""
             client cluster Test = 0xab {
@@ -316,9 +344,28 @@ class TestParser(unittest.TestCase):
                 info event StableEvent = 1 {}
                 provisional info event ProvisionalEvent = 2 {}
                 internal info event InternalEvent = 3 {}
+
+                request struct StableCommandRequest {}
+                response struct StableCommandResponse = 200 {}
+
+                provisional request struct ProvisionalCommandRequest {}
+                provisional response struct ProvisionalCommandResponse = 201 {}
+
+                internal request struct InternalCommandRequest {}
+                internal response struct InternalCommandResponse = 202 {}
+
+                command StableCommand(StableCommandRequest): StableCommandResponse = 100;
+                provisional command ProvisionalCommand(ProvisionalCommandRequest): ProvisionalCommandResponse = 101;
+                internal command InternalCommand(InternalCommandRequest): InternalCommandResponse = 102;
+
+                readonly attribute int8u roStable = 1;
+                attribute int32u rwStable[] = 2;
+                provisional readonly attribute int8u roProvisional = 11;
+                provisional attribute int32u rwProvisional[] = 12;
+                internal readonly attribute int8u roInternal = 21;
+                internal attribute int32u rwInternal[] = 22;
             }
         """)
-        # TODO: command, attribute
         expected = Idl(clusters=[
             Cluster(side=ClusterSide.CLIENT,
                     name="Test",
@@ -344,6 +391,19 @@ class TestParser(unittest.TestCase):
                                api_maturity=ApiMaturity.PROVISIONAL),
                         Struct(name="InternalStruct", fields=[],
                                api_maturity=ApiMaturity.INTERNAL),
+
+                        Struct(name="StableCommandRequest",
+                               fields=[], tag=StructTag.REQUEST),
+                        Struct(name="StableCommandResponse", fields=[],
+                               tag=StructTag.RESPONSE, code=200),
+                        Struct(name="ProvisionalCommandRequest", fields=[
+                        ], tag=StructTag.REQUEST, api_maturity=ApiMaturity.PROVISIONAL),
+                        Struct(name="ProvisionalCommandResponse", fields=[
+                        ], tag=StructTag.RESPONSE, code=201, api_maturity=ApiMaturity.PROVISIONAL),
+                        Struct(name="InternalCommandRequest", fields=[
+                        ], tag=StructTag.REQUEST, api_maturity=ApiMaturity.INTERNAL),
+                        Struct(name="InternalCommandResponse", fields=[
+                        ], tag=StructTag.RESPONSE, code=202, api_maturity=ApiMaturity.INTERNAL),
                     ],
                     events=[
                         Event(priority=EventPriority.INFO,
@@ -353,6 +413,28 @@ class TestParser(unittest.TestCase):
                         Event(priority=EventPriority.INFO, name="InternalEvent",
                               code=3, fields=[], api_maturity=ApiMaturity.INTERNAL),
                     ],
+                    commands=[
+                        Command(name="StableCommand", code=100, input_param="StableCommandRequest",
+                                output_param="StableCommandResponse"),
+                        Command(name="ProvisionalCommand", code=101, input_param="ProvisionalCommandRequest",
+                                output_param="ProvisionalCommandResponse", api_maturity=ApiMaturity.PROVISIONAL),
+                        Command(name="InternalCommand", code=102, input_param="InternalCommandRequest",
+                                output_param="InternalCommandResponse", api_maturity=ApiMaturity.INTERNAL),
+                    ],
+                    attributes=[
+                        Attribute(qualities=AttributeQuality.READABLE, definition=Field(
+                            data_type=DataType(name="int8u"), code=1, name="roStable")),
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
+                            data_type=DataType(name="int32u"), code=2, name="rwStable", is_list=True)),
+                        Attribute(qualities=AttributeQuality.READABLE, definition=Field(
+                            data_type=DataType(name="int8u"), code=11, name="roProvisional"), api_maturity=ApiMaturity.PROVISIONAL),
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
+                            data_type=DataType(name="int32u"), code=12, name="rwProvisional", is_list=True), api_maturity=ApiMaturity.PROVISIONAL),
+                        Attribute(qualities=AttributeQuality.READABLE, definition=Field(
+                            data_type=DataType(name="int8u"), code=21, name="roInternal"), api_maturity=ApiMaturity.INTERNAL),
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
+                            data_type=DataType(name="int32u"), code=22, name="rwInternal", is_list=True), api_maturity=ApiMaturity.INTERNAL),
+                    ]
                     )])
         self.assertEqual(actual, expected)
 

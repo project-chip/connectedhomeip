@@ -261,7 +261,9 @@ class MatterIdlTransformer(Transformer):
         # Last argument is the named_member, the rest
         # are qualities
         field = args[-1]
-        field.qualities = UnionOfAllFlags(args[:-1]) or FieldQuality.NONE
+        field.qualities = UnionOfAllFlags(args[1:-1]) or FieldQuality.NONE
+        if args[0] is not None:
+            field.api_maturity = args[0]
         return field
 
     @v_args(meta=True)

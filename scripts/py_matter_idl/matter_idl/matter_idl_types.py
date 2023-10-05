@@ -121,6 +121,7 @@ class Field:
     name: str
     is_list: bool = False
     qualities: FieldQuality = FieldQuality.NONE
+    api_maturity: ApiMaturity = ApiMaturity.STABLE
 
     @property
     def is_optional(self):

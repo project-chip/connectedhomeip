@@ -91,7 +91,7 @@ negative_integer: "-" positive_integer
 
 integer: positive_integer | negative_integer
 
-struct_field: member_attribute* field
+struct_field: [maturity] member_attribute* field
 
 member_attribute: "optional"i -> optional
                 | "nullable"i -> nullable
