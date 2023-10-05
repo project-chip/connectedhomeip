@@ -130,8 +130,8 @@ server cluster AccessControl = 31 {
 
   // commands may have multiple attributes
   fabric timed command RequiresTimedInvoke(): DefaultSuccess = 7;
-  
-  // Items may have a prefix about api stability. 
+
+  // Items may have a prefix about api stability.
   //   - "provisional" are generally subject to change
   //   - "internal" are for internal SDK development/usage/testing
 
