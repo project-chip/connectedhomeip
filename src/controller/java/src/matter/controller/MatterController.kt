@@ -20,7 +20,7 @@ package matter.controller
 import java.io.Closeable
 
 /** Controller interface for interacting with a CHIP device. */
-interface MatterController : Closeable, Interactions {
+interface MatterController : Closeable, InteractionClient {
   /** Interface for listening to callbacks from the MatterController. */
   interface CompletionListener {
     /** Notifies the completion of the "ConnectDevice" command. */

@@ -19,7 +19,7 @@ package matter.controller
 
 import kotlinx.coroutines.flow.Flow
 
-interface Interactions {
+interface InteractionClient {
   /**
    * Subscribes to periodic updates of all attributes and events from a device.
    *

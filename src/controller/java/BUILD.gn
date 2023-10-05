@@ -361,7 +361,7 @@ kotlin_library("kotlin_matter_controller") {
 
   sources = [
     "src/matter/controller/ControllerParams.kt",
-    "src/matter/controller/Interactions.kt",
+    "src/matter/controller/InteractionClient.kt",
     "src/matter/controller/MatterController.kt",
     "src/matter/controller/MatterControllerException.kt",
     "src/matter/controller/MatterControllerImpl.kt",
