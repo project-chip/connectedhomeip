@@ -298,6 +298,27 @@ class TestParser(unittest.TestCase):
                     )])
         self.assertEqual(actual, expected)
 
+    def test_cluster_entry_maturity(self):
+        actual = parseText("""
+            client cluster Test = 0xab {
+                enum StableEnum : ENUM16 {}
+                provisional enum ProvisionalEnum : ENUM16 {}
+                internal enum InternalEnum : ENUM16 {}
+            }
+        """)
+        # TODO: bitmap, command, attribute, event, struct
+        expected = Idl(clusters=[
+            Cluster(side=ClusterSide.CLIENT,
+                    name="Test",
+                    code=0xab,
+                    enums=[
+                        Enum(name="StableEnum", base_type="ENUM16", entries=[]),
+                        Enum(name="ProvisionalEnum", base_type="ENUM16", entries=[], api_maturity=ApiMaturity.PROVISIONAL),
+                        Enum(name="InternalEnum", base_type="ENUM16", entries=[], api_maturity=ApiMaturity.INTERNAL),
+                    ],
+                    )])
+        self.assertEqual(actual, expected)
+
     def test_cluster_bitmap(self):
         actual = parseText("""
             client cluster Test = 0xab {

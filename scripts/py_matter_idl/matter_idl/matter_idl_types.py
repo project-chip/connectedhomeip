@@ -138,6 +138,7 @@ class Attribute:
     readacl: AccessPrivilege = AccessPrivilege.VIEW
     writeacl: AccessPrivilege = AccessPrivilege.OPERATE
     default: Optional[Union[str, int]] = None
+    api_maturity: ApiMaturity = ApiMaturity.STABLE
 
     @property
     def is_readable(self):
@@ -163,6 +164,7 @@ class Struct:
     tag: Optional[StructTag] = None
     code: Optional[int] = None  # for responses only
     qualities: StructQuality = StructQuality.NONE
+    api_maturity: ApiMaturity = ApiMaturity.STABLE
 
 
 @dataclass
@@ -174,6 +176,7 @@ class Event:
     readacl: AccessPrivilege = AccessPrivilege.VIEW
     qualities: EventQuality = EventQuality.NONE
     description: Optional[str] = None
+    api_maturity: ApiMaturity = ApiMaturity.STABLE
 
     @property
     def is_fabric_sensitive(self):
@@ -191,6 +194,7 @@ class Enum:
     name: str
     base_type: str
     entries: List[ConstantEntry]
+    api_maturity: ApiMaturity = ApiMaturity.STABLE
 
 
 @dataclass
@@ -198,6 +202,7 @@ class Bitmap:
     name: str
     base_type: str
     entries: List[ConstantEntry]
+    api_maturity: ApiMaturity = ApiMaturity.STABLE
 
 
 @dataclass
@@ -209,6 +214,7 @@ class Command:
     qualities: CommandQuality = CommandQuality.NONE
     invokeacl: AccessPrivilege = AccessPrivilege.OPERATE
     description: Optional[str] = None
+    api_maturity: ApiMaturity = ApiMaturity.STABLE
 
     # Parsing meta data missing only when skip meta data is requested
     parse_meta: Optional[ParseMetaData] = field(default=None)

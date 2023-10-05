@@ -452,6 +452,12 @@ class MatterIdlTransformer(Transformer):
         return AddServerClusterToEndpointTransform(
             ServerClusterInstantiation(parse_meta=meta, name=id, attributes=attributes, events_emitted=events))
 
+    @v_args(inline=True)
+    def cluster_content(self, maturity, element):
+        if maturity is not None:
+            element.api_maturity = maturity
+        return element
+
     @v_args(inline=True, meta=True)
     def cluster(self, meta, maturity, side, name, code, *content):
         meta = None if self.skip_meta else ParseMetaData(meta)
