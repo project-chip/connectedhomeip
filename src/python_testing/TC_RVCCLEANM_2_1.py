@@ -88,6 +88,7 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
             SUCCESS = 0x00
             UNSUPPORTED_MODE = 0x01
             GENERIC_FAILURE = 0x02
+            INVALID_IN_MODE = 0x03
 
         rvcCleanCodes = [code.value for code in Clusters.RvcCleanMode.Enums.StatusCode
                          if code is not Clusters.RvcCleanMode.Enums.StatusCode.kUnknownEnumValue]
@@ -98,6 +99,8 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         asserts.assert_true(ret.status == CommonCodes.SUCCESS.value, "Changing the mode to the current mode should be a no-op")
 
         if self.check_pics("RVCCLEANM.S.M.CAN_TEST_MODE_FAILURE"):
+            asserts.assert_true(self.modefail in modes,
+                                "The MODE_CHANGE_FAIL PIXIT value (%d) is not a supported mode" % (self.modefail))
             self.print_step(5, "Manually put the device in a state from which it will FAIL to transition to mode %d" % (self.modefail))
             input("Press Enter when done.\n")
 
@@ -111,7 +114,8 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
             ret = await self.send_change_to_mode_cmd(newMode=self.modefail)
             st = ret.status
             is_mfg_code = st in range(0x80, 0xC0)
-            is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (st in rvcCleanCodes) or is_mfg_code
+            is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (
+                st == CommonCodes.INVALID_IN_MODE.value) or (st in rvcCleanCodes) or is_mfg_code
             asserts.assert_true(
                 is_err_code, "Changing to mode %d must fail due to the current state of the device" % (self.modefail))
             st_text_len = len(ret.statusText)
