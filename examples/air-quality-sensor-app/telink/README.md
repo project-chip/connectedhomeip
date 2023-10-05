@@ -56,7 +56,7 @@ The following buttons are available on **tlsr9518adk80d** board:
 | Name     | Function               | Description                                                                                            |
 | :------- | :--------------------- | :----------------------------------------------------------------------------------------------------- |
 | Button 1 | Factory reset          | Perform factory reset to forget currently commissioned Thread network and back to uncommissioned state |
-| Button 2 | AirQuality control     | Manually triggers the AirQuality state                                                                 |
+| Button 2 | `AirQuality` control   | Manually triggers the `AirQuality` state                                                               |
 | Button 3 | Thread start           | Commission thread with static credentials and enables the Thread on device                             |
 | Button 4 | Open commission window | The button is opening commissioning window to perform commissioning over BLE                           |
 
