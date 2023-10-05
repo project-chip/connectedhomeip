@@ -14,7 +14,7 @@ with open("scripts/tools/build_fail_defs.yaml", "r") as fail_defs:
     try:
         error_catalog = yaml.safe_load(fail_defs)
     except Exception:
-        logging.exception(f"Could not load fail definition file.")
+        logging.exception("Could not load fail definition file.")
 
 
 def pass_fail_rate(workflow):
