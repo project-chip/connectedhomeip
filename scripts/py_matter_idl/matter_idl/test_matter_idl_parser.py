@@ -298,6 +298,34 @@ class TestParser(unittest.TestCase):
                     )])
         self.assertEqual(actual, expected)
 
+    def test_event_field_api_maturity(self):
+        actual = parseText("""
+            server cluster MaturityTest = 1 {
+                critical event TestEvent = 123 {
+                  nullable int16u someStableMember = 0;
+                  provisional nullable int16u someProvisionalMember = 1;
+                  internal nullable int16u someInternalMember = 2;
+                }
+           }
+        """)
+        expected = Idl(clusters=[
+            Cluster(side=ClusterSide.SERVER,
+                    name="MaturityTest",
+                    code=1,
+                    events=[
+                        Event(priority=EventPriority.CRITICAL, name="TestEvent", code=123, fields=[
+                            Field(name="someStableMember", code=0, data_type=DataType(
+                                name="int16u"), qualities=FieldQuality.NULLABLE),
+                            Field(name="someProvisionalMember", code=1, data_type=DataType(
+                                name="int16u"), qualities=FieldQuality.NULLABLE, api_maturity=ApiMaturity.PROVISIONAL),
+                            Field(name="someInternalMember", code=2, data_type=DataType(
+                                name="int16u"), qualities=FieldQuality.NULLABLE, api_maturity=ApiMaturity.INTERNAL),
+
+                        ]),
+                    ],
+                    )])
+        self.assertEqual(actual, expected)
+
     def test_struct_field_api_maturity(self):
         actual = parseText("""
             server cluster MaturityTest = 1 {
