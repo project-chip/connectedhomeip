@@ -103,7 +103,6 @@ tests:
           constraints:
               type: int16u
 
-
     - label:
           "Step 9: TH reads from the DUT the (0x0007) RemainingCapacity
           attribute"

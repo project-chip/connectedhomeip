@@ -238,7 +238,7 @@ tests:
               - name: "SceneID"
                 value: 0x01
       response:
-          error: ''
+          error: ""
 
     - label: "Step 3c: TH reads the SceneCount attribute from DUT."
       PICS: S.S.A0000 && S.S.A0001 && S.S.A0002 && S.S.A0003 && !S.S.F03
@@ -428,12 +428,7 @@ tests:
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [
-                                    {
-                                        AttributeID: 0x0000,
-                                        AttributeValue: 0x64,
-                                    },
-                                ],
+                                [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
                         },
                     ]
 
@@ -541,12 +536,7 @@ tests:
                         {
                             ClusterID: 0x0008,
                             AttributeValueList:
-                                [
-                                    {
-                                        AttributeID: 0x0000,
-                                        AttributeValue: 0x64,
-                                    },
-                                ],
+                                [{ AttributeID: 0x0000, AttributeValue: 0x64 }],
                         },
                     ]
       response:
