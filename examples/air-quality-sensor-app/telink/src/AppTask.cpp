@@ -17,15 +17,16 @@
  */
 
 #include "AppTask.h"
-#include <app/server/Server.h>
-
-#include <app-common/zap-generated/attributes/Accessors.h>
+#include <air-quality-sensor-manager.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
+using namespace ::chip::app::Clusters;
 using namespace ::chip::app::Clusters::AirQuality;
 
 AppTask AppTask::sAppTask;
+
+constexpr EndpointId kAirQualityEndpoint = 1;
 
 CHIP_ERROR AppTask::Init(void)
 {
@@ -34,13 +35,26 @@ CHIP_ERROR AppTask::Init(void)
 #endif
     InitCommonParts();
 
+    AirQualitySensorManager::InitInstance(kAirQualityEndpoint);
+
     return CHIP_NO_ERROR;
 }
 
 void AppTask::UpdateClusterState(void)
 {
-    // Jira ticket: https://github.com/project-chip/connectedhomeip/pull/29329
-    // OnAirQualityChangeHandler(static_cast<AirQualityEnum>(newValue));
+    AirQualitySensorManager * mInstance = AirQualitySensorManager::GetInstance();
+
+    // Update AirQuality value
+    mInstance->OnAirQualityChangeHandler(AirQualityEnum::kModerate);
+
+    // Update Carbon Dioxide
+    mInstance->OnCarbonDioxideMeasurementChangeHandler(400);
+
+    // Update Temperature value
+    mInstance->OnTemperatureMeasurementChangeHandler(18);
+
+    // Update Humidity value
+    mInstance->OnHumidityMeasurementChangeHandler(60);
 }
 
 void AppTask::AirQualityActionEventHandler(AppEvent * aEvent)

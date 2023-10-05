@@ -33,8 +33,6 @@ private:
 
     static void AirQualityActionEventHandler(AppEvent * aEvent);
 
-    chip::app::Clusters::AirQuality::AirQualityEnum AirQualityState;
-
     static AppTask sAppTask;
 };
 
