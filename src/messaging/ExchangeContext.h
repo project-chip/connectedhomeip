@@ -238,7 +238,7 @@ public:
      * If the call is not done, we will rely on information within the exchange context.
      *
      * @param shouldPeerBeActive true if the peer should be active, false if we don't know or it should not be
-      */
+     */
     void SetShouldPeerBeActive(bool shouldPeerBeActive) { mFlags.Set(Flags::kPeerShouldBeActive, shouldPeerBeActive); }
 
     /**

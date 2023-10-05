@@ -325,7 +325,6 @@ public:
     static int InitializeTestCase(void * inContext);
 };
 
-
 void TestReliableMessageProtocol::CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
@@ -2150,25 +2149,33 @@ int TestReliableMessageProtocol::InitializeTestCase(void * inContext)
 
 const nlTest sTests[] = {
     NL_TEST_DEF("Test ReliableMessageMgr::CheckAddClearRetrans", TestReliableMessageProtocol::CheckAddClearRetrans),
-    NL_TEST_DEF("Test ReliableMessageMgr::CheckResendApplicationMessage", TestReliableMessageProtocol::CheckResendApplicationMessage),
+    NL_TEST_DEF("Test ReliableMessageMgr::CheckResendApplicationMessage",
+                TestReliableMessageProtocol::CheckResendApplicationMessage),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckCloseExchangeAndResendApplicationMessage",
                 TestReliableMessageProtocol::CheckCloseExchangeAndResendApplicationMessage),
-    NL_TEST_DEF("Test ReliableMessageMgr::CheckFailedMessageRetainOnSend",TestReliableMessageProtocol::CheckFailedMessageRetainOnSend),
+    NL_TEST_DEF("Test ReliableMessageMgr::CheckFailedMessageRetainOnSend",
+                TestReliableMessageProtocol::CheckFailedMessageRetainOnSend),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckResendApplicationMessageWithPeerExchange",
                 TestReliableMessageProtocol::CheckResendApplicationMessageWithPeerExchange),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckResendSessionEstablishmentMessageWithPeerExchange",
                 TestReliableMessageProtocol::CheckResendSessionEstablishmentMessageWithPeerExchange),
     NL_TEST_DEF("Test ReliableMessageMgr::CheckDuplicateMessage", TestReliableMessageProtocol::CheckDuplicateMessage),
-    NL_TEST_DEF("Test ReliableMessageMgr::CheckDuplicateMessageClosedExchange", TestReliableMessageProtocol::CheckDuplicateMessageClosedExchange),
-    NL_TEST_DEF("Test ReliableMessageMgr::CheckDuplicateOldMessageClosedExchange", TestReliableMessageProtocol::CheckDuplicateOldMessageClosedExchange),
-    NL_TEST_DEF("Test that a reply after a standalone ack comes through correctly", TestReliableMessageProtocol::CheckReceiveAfterStandaloneAck),
+    NL_TEST_DEF("Test ReliableMessageMgr::CheckDuplicateMessageClosedExchange",
+                TestReliableMessageProtocol::CheckDuplicateMessageClosedExchange),
+    NL_TEST_DEF("Test ReliableMessageMgr::CheckDuplicateOldMessageClosedExchange",
+                TestReliableMessageProtocol::CheckDuplicateOldMessageClosedExchange),
+    NL_TEST_DEF("Test that a reply after a standalone ack comes through correctly",
+                TestReliableMessageProtocol::CheckReceiveAfterStandaloneAck),
     NL_TEST_DEF("Test that a reply to a non-MRP message piggybacks an ack if there were MRP things happening on the context before",
                 TestReliableMessageProtocol::CheckPiggybackAfterPiggyback),
-    NL_TEST_DEF("Test sending an unsolicited ack-soliciting 'standalone ack' message", TestReliableMessageProtocol::CheckSendUnsolicitedStandaloneAckMessage),
-    NL_TEST_DEF("Test ReliableMessageMgr::CheckSendStandaloneAckMessage", TestReliableMessageProtocol::CheckSendStandaloneAckMessage),
+    NL_TEST_DEF("Test sending an unsolicited ack-soliciting 'standalone ack' message",
+                TestReliableMessageProtocol::CheckSendUnsolicitedStandaloneAckMessage),
+    NL_TEST_DEF("Test ReliableMessageMgr::CheckSendStandaloneAckMessage",
+                TestReliableMessageProtocol::CheckSendStandaloneAckMessage),
     NL_TEST_DEF("Test command, response, default response, with receiver closing exchange after sending response",
                 TestReliableMessageProtocol::CheckMessageAfterClosed),
-    NL_TEST_DEF("Test that unencrypted message is dropped if exchange requires encryption", TestReliableMessageProtocol::CheckUnencryptedMessageReceiveFailure),
+    NL_TEST_DEF("Test that unencrypted message is dropped if exchange requires encryption",
+                TestReliableMessageProtocol::CheckUnencryptedMessageReceiveFailure),
     NL_TEST_DEF("Test that dropping an application-level message with a piggyback ack works ok once both sides retransmit",
                 TestReliableMessageProtocol::CheckLostResponseWithPiggyback),
     NL_TEST_DEF("Test that an application-level response-to-response after a lost standalone ack to the initial message works",
