@@ -16,6 +16,7 @@ with open("scripts/tools/build_fail_defs.yaml", "r") as fail_defs:
     except Exception:
         logging.exception(f"Could not load fail definition file.")
 
+
 def pass_fail_rate(workflow):
     logging.info(f"Checking recent pass/fail rate of workflow {workflow}.")
     workflow_fail_rate_output_path = f"workflow_pass_rate/{slugify(workflow)}"
@@ -25,6 +26,7 @@ def pass_fail_rate(workflow):
             f"gh run list -R project-chip/connectedhomeip -b master -w '{workflow}' -L 500 --created {yesterday} --json conclusion > {workflow_fail_rate_output_path}/run_list.json", shell=True)
     else:
         logging.info("This workflow has already been processed.")
+
 
 def process_fail(id, pr, start_time, workflow):
     logging.info(f"Processing failure in {pr}, workflow {workflow} that started at {start_time}.")
@@ -53,7 +55,8 @@ def process_fail(id, pr, start_time, workflow):
 
 def main():
     logging.info("Gathering recent fails information into fail_run_list.json.")
-    subprocess.run(f"gh run list -R project-chip/connectedhomeip -b master -s failure -L 500 --created {yesterday} --json databaseId,displayTitle,startedAt,workflowName > fail_run_list.json", shell=True)
+    subprocess.run(
+        f"gh run list -R project-chip/connectedhomeip -b master -s failure -L 500 --created {yesterday} --json databaseId,displayTitle,startedAt,workflowName > fail_run_list.json", shell=True)
 
     logging.info("Reading fail_run_list.json into a DataFrame.")
     df = pd.read_json("fail_run_list.json")
@@ -74,7 +77,8 @@ def main():
     frequency.to_csv("recent_workflow_fails_frequency.csv")
 
     logging.info("Gathering recent runs information into all_run_list.json.")
-    subprocess.run(f"gh run list -R project-chip/connectedhomeip -b master -L 5000 --created {yesterday} --json workflowName > all_run_list.json", shell=True)
+    subprocess.run(
+        f"gh run list -R project-chip/connectedhomeip -b master -L 5000 --created {yesterday} --json workflowName > all_run_list.json", shell=True)
 
     logging.info("Reading all_run_list.json into a DataFrame.")
     all_df = pd.read_json("all_run_list.json")
