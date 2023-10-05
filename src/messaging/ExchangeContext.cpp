@@ -672,8 +672,8 @@ bool ExchangeContext::ShouldPeerBeActive()
     if (!IsInitiator())
         return true;
 
-    // If we create an Ephemeral Exchange, it was just to generate a StandaloneAck
-    // Since we are sending an ack, we know the peer is active
+    // If we create an Ephemeral Exchange, it was just to generate a StandaloneAck.
+    // Since we are sending an ack, we know the peer is active.
     if (IsEphemeralExchange())
         return true;
 

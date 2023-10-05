@@ -231,7 +231,7 @@ public:
      * The first message of the exchange set as the initiator should never have the ShouldPeerBeActive flag to true.
      * The API should only called after receiving a message from the peer and after calling the WillSendMessage API.
      * The next message sent will then use the active retransmission time out.
-     * The flag is set to false each time we receive the response from our peer (receiver).
+     * The flag is reset to false each time we receive the response from our peer (receiver).
      * As such, the API needs to be called each time we send another message over the exchange.
      *
      * The API call is not mandatory for the communication to be successful.
