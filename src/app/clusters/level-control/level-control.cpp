@@ -419,14 +419,6 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
 
     updateCoupledColorTemp(endpoint);
 
-#ifdef EMBER_AF_PLUGIN_SCENES
-    // The level has changed, so the scene is no longer valid.
-    if (emberAfContainsServer(endpoint, Scenes::Id))
-    {
-        Scenes::ScenesServer::Instance().MakeSceneInvalid(endpoint);
-    }
-#endif // EMBER_AF_PLUGIN_SCENES
-
     // Are we at the requested level?
     if (currentLevel.Value() == state->moveToLevel)
     {
@@ -917,6 +909,14 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
     state->storedLevel = storedLevel;
 
     state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
+
+#ifdef EMBER_AF_PLUGIN_SCENES
+    // The level has changed, the scene is no longer valid.
+    if (emberAfContainsServer(endpoint, Scenes::Id))
+    {
+        Scenes::ScenesServer::Instance().MakeSceneInvalid(endpoint);
+    }
+#endif // EMBER_AF_PLUGIN_SCENES
 
     // The setup was successful, so mark the new state as active and return.
     scheduleTimerCallbackMs(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
