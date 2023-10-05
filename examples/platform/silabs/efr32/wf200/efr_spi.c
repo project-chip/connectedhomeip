@@ -393,7 +393,7 @@ void SPIDRV_SetBaudrate(uint32_t baudrate)
     USART_InitSync(MY_USART, &usartInit);
 }
 #endif // SL_SPICTRL_MUX
-#if SL_MUX25CTRL_MUX
+#if SL_MX25CTRL_MUX
 sl_status_t sl_wfx_host_spiflash_cs_assert(void)
 {
     GPIO_PinOutClear(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
@@ -405,7 +405,7 @@ sl_status_t sl_wfx_host_spiflash_cs_deassert(void)
     GPIO_PinOutSet(SL_MX25_FLASH_SHUTDOWN_CS_PORT, SL_MX25_FLASH_SHUTDOWN_CS_PIN);
     return SL_STATUS_OK;
 }
-#endif // SL_MUX25CTRL_MUX
+#endif // SL_MX25CTRL_MUX
 
 #if SL_BTLCTRL_MUX
 sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void)
@@ -417,9 +417,9 @@ sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void)
      * Assert CS pin for EXT SPI Flash
      */
     SPIDRV_SetBaudrate(SL_SPIDRV_MX25_FLASH_BITRATE);
-#if SL_MUX25CTRL_MUX
+#if SL_MX25CTRL_MUX
     sl_wfx_host_spiflash_cs_assert();
-#endif // SL_MUX25CTRL_MUX
+#endif // SL_MX25CTRL_MUX
     return SL_STATUS_OK;
 }
 
@@ -428,9 +428,9 @@ sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
     /*
      * De-Assert CS pin for EXT SPI Flash
      */
-#if SL_MUX25CTRL_MUX
+#if SL_MX25CTRL_MUX
     sl_wfx_host_spiflash_cs_deassert();
-#endif // SL_MUX25CTRL_MUX
+#endif // SL_MX25CTRL_MUX
 #if SL_SPICTRL_MUX
     xSemaphoreGive(spi_sem_sync_hdl);
 #endif // SL_SPICTRL_MUX
