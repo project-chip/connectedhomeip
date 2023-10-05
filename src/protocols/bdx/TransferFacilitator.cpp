@@ -54,7 +54,7 @@ CHIP_ERROR TransferFacilitator::OnMessageReceived(chip::Messaging::ExchangeConte
     // For this reason, it is left up to the application logic to call ExchangeContext::Close() when it has determined that the
     // transfer is finished.
     mExchangeCtx->WillSendMessage();
-    mExchangeCtx->SetShouldPeerBeActive(true);
+    mExchangeCtx->SetPeerActiveStateHint(true);
 
     return err;
 }

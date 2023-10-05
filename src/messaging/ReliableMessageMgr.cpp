@@ -450,11 +450,11 @@ CHIP_ERROR ReliableMessageMgr::MapSendError(CHIP_ERROR error, uint16_t exchangeI
     return error;
 }
 
-void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry * entry)
+void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry *& entry)
 {
     System::Clock::Timestamp baseTimeout = System::Clock::Milliseconds64(0);
 
-    if (entry->ec->ShouldPeerBeActive())
+    if (entry->ec->IsPeerLikelyActiveHint())
     {
         // If we know the peer is active with the exchangeContext, use the Active Retrans timeout
         baseTimeout = entry->ec->GetSessionHandle()->GetRemoteMRPConfig().mActiveRetransTimeout;

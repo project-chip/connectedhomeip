@@ -192,13 +192,13 @@ protected:
      *
      * If we are not initiator                          -> peer is active
      * If ephemeral context                             -> peer is active
-     * else we default to information provided by the consummer
+     * else we default to information provided by the client
      *
      * @return true Based on available information, Peer should be active
      * @return false We weren't able to determine if the peer is active.
      *               We don't know in which state the peer is.
      */
-    bool ShouldPeerBeActive();
+    bool IsPeerLikelyActiveHint();
 
 private:
     void HandleRcvdAck(uint32_t ackMessageCounter);

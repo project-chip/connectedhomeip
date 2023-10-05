@@ -1575,7 +1575,7 @@ void TestReliableMessageProtocol::CheckIsPeerActiveNotInitiator(nlTestSuite * in
     /**
      * This tests the following scenario:
      * 1) A reliable message expecting a response is sent from the initiator to responder which is losts
-     * 2) Initiator resends the message a the IdleRetrans interval
+     * 2) Initiator resends the message at the IdleRetrans interval
      * 3) Responder receives the message and sends a standalone ack
      * 4) Responder sends a response and fails
      * 5) Responder retries at the ActiveRestrans interval
@@ -1620,7 +1620,7 @@ void TestReliableMessageProtocol::CheckIsPeerActiveNotInitiator(nlTestSuite * in
     mockReceiver.mRetainExchange = true;
     mockSender.mRetainExchange   = true;
 
-    NL_TEST_ASSERT(inSuite, !exchange->ShouldPeerBeActive());
+    NL_TEST_ASSERT(inSuite, !exchange->IsPeerLikelyActiveHint());
 
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendFlags(SendMessageFlags::kExpectResponse));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -1635,7 +1635,7 @@ void TestReliableMessageProtocol::CheckIsPeerActiveNotInitiator(nlTestSuite * in
     ctx.GetIOContext().DriveIOUntil(500_ms32, [&] { return loopback.mSentMessageCount >= 1; });
     ctx.DrainAndServiceIO();
 
-    NL_TEST_ASSERT(inSuite, !exchange->ShouldPeerBeActive());
+    NL_TEST_ASSERT(inSuite, !exchange->IsPeerLikelyActiveHint());
 
     // // Make sure nothing happened
     NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == 1);
@@ -1645,15 +1645,15 @@ void TestReliableMessageProtocol::CheckIsPeerActiveNotInitiator(nlTestSuite * in
     ctx.GetIOContext().DriveIOUntil(2000_ms32, [&] { return loopback.mSentMessageCount >= 2; });
     ctx.DrainAndServiceIO();
 
-    NL_TEST_ASSERT(inSuite, !exchange->ShouldPeerBeActive());
+    NL_TEST_ASSERT(inSuite, !exchange->IsPeerLikelyActiveHint());
 
     // // Make sure nothing happened
     NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == 2);
     NL_TEST_ASSERT(inSuite, mockReceiver.IsOnMessageReceivedCalled);
 
     // // Verify that the receiver considers the sender is active
-    NL_TEST_ASSERT(inSuite, !exchange->ShouldPeerBeActive());
-    NL_TEST_ASSERT(inSuite, mockReceiver.mExchange->ShouldPeerBeActive());
+    NL_TEST_ASSERT(inSuite, !exchange->IsPeerLikelyActiveHint());
+    NL_TEST_ASSERT(inSuite, mockReceiver.mExchange->IsPeerLikelyActiveHint());
 
     mockReceiver.mExchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
         1000_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL

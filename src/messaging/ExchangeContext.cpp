@@ -514,9 +514,12 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
     // layer has completed its work on the ExchangeContext.
     ExchangeHandle ref(*this);
 
-    // If we received a message from the Peer and we are still expecting a response, we know the peer is active
-    // If we receive a message from the Peer but we are not expecting a response, we don't know if the peer is still active
-    SetShouldPeerBeActive(IsResponseExpected());
+    // If we receive a message while we are expecting a response for our previous message,
+    // we assume that the peer is likely active. If the message was in fact the response,
+    // the flag will be reset to false when we process the message later in the function.
+    // If we receive a message while we are not expecting a response,
+    // we reset the flag to false because we don't if the peer should still be active or not.
+    SetPeerActiveStateHint(IsResponseExpected());
 
     bool isStandaloneAck = payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck);
     bool isDuplicate     = msgFlags.Has(MessageFlagValues::kDuplicateMessage);
@@ -603,7 +606,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         SetResponseExpected(false);
 
         // If we received the expected response, we don't if the peer is still active after having sent the response
-        SetShouldPeerBeActive(false);
+        SetPeerActiveStateHint(false);
     }
 
     // Don't send messages on to our delegate if our dispatch does not allow
@@ -665,7 +668,7 @@ void ExchangeContext::ExchangeSessionHolder::GrabExpiredSession(const SessionHan
     GrabUnchecked(session);
 }
 
-bool ExchangeContext::ShouldPeerBeActive()
+bool ExchangeContext::IsPeerLikelyActiveHint()
 {
     // If we are not the initiator, it means the peer sent the first message.
     // This means our peer is active if we are sending a message to them.

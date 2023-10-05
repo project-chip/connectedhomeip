@@ -826,7 +826,7 @@ CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const Payl
     SuccessOrExit(err);
 
     // Once we receive a message for the PASE protocol, we know the Peer is active
-    mExchangeCtxt->SetShouldPeerBeActive(true);
+    mExchangeCtxt->SetPeerActiveStateHint(true);
 
 #if CHIP_CONFIG_SLOW_CRYPTO
     if (msgType == MsgType::PBKDFParamRequest || msgType == MsgType::PBKDFParamResponse || msgType == MsgType::PASE_Pake1 ||
