@@ -2198,9 +2198,9 @@ nlTestSuite sSuite = {
 };
 // clang-format on
 
-int TestReliableMessageProtocol()
+int TestReliableMessageProtocolSuite()
 {
     return chip::ExecuteTestsWithContext<TestContext>(&sSuite);
 }
 
-CHIP_REGISTER_TEST_SUITE(TestReliableMessageProtocol)
+CHIP_REGISTER_TEST_SUITE(TestReliableMessageProtocolSuite)
