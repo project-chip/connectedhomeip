@@ -308,22 +308,50 @@ class TestParser(unittest.TestCase):
                 bitmap StableBitmap : BITMAP32 {}
                 provisional bitmap ProvisionalBitmap : BITMAP32 {}
                 internal bitmap InternalBitmap : BITMAP32 {}
+
+                struct StableStruct {}
+                provisional struct ProvisionalStruct {}
+                internal struct InternalStruct {}
+
+                info event StableEvent = 1 {}
+                provisional info event ProvisionalEvent = 2 {}
+                internal info event InternalEvent = 3 {}
             }
         """)
-        # TODO: bitmap, command, attribute, event, struct
+        # TODO: command, attribute
         expected = Idl(clusters=[
             Cluster(side=ClusterSide.CLIENT,
                     name="Test",
                     code=0xab,
                     enums=[
                         Enum(name="StableEnum", base_type="ENUM16", entries=[]),
-                        Enum(name="ProvisionalEnum", base_type="ENUM16", entries=[], api_maturity=ApiMaturity.PROVISIONAL),
-                        Enum(name="InternalEnum", base_type="ENUM16", entries=[], api_maturity=ApiMaturity.INTERNAL),
+                        Enum(name="ProvisionalEnum", base_type="ENUM16",
+                             entries=[], api_maturity=ApiMaturity.PROVISIONAL),
+                        Enum(name="InternalEnum", base_type="ENUM16",
+                             entries=[], api_maturity=ApiMaturity.INTERNAL),
                     ],
                     bitmaps=[
-                        Bitmap(name="StableBitmap", base_type="BITMAP32", entries=[]),
-                        Bitmap(name="ProvisionalBitmap", base_type="BITMAP32", entries=[], api_maturity=ApiMaturity.PROVISIONAL),
-                        Bitmap(name="InternalBitmap", base_type="BITMAP32", entries=[], api_maturity=ApiMaturity.INTERNAL),
+                        Bitmap(name="StableBitmap",
+                               base_type="BITMAP32", entries=[]),
+                        Bitmap(name="ProvisionalBitmap", base_type="BITMAP32",
+                               entries=[], api_maturity=ApiMaturity.PROVISIONAL),
+                        Bitmap(name="InternalBitmap", base_type="BITMAP32",
+                               entries=[], api_maturity=ApiMaturity.INTERNAL),
+                    ],
+                    structs=[
+                        Struct(name="StableStruct", fields=[]),
+                        Struct(name="ProvisionalStruct", fields=[],
+                               api_maturity=ApiMaturity.PROVISIONAL),
+                        Struct(name="InternalStruct", fields=[],
+                               api_maturity=ApiMaturity.INTERNAL),
+                    ],
+                    events=[
+                        Event(priority=EventPriority.INFO,
+                              name="StableEvent", code=1, fields=[]),
+                        Event(priority=EventPriority.INFO, name="ProvisionalEvent",
+                              code=2, fields=[], api_maturity=ApiMaturity.PROVISIONAL),
+                        Event(priority=EventPriority.INFO, name="InternalEvent",
+                              code=3, fields=[], api_maturity=ApiMaturity.INTERNAL),
                     ],
                     )])
         self.assertEqual(actual, expected)
