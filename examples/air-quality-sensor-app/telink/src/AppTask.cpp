@@ -34,13 +34,6 @@ CHIP_ERROR AppTask::Init(void)
 #endif
     InitCommonParts();
 
-   CHIP_ERROR err = ConnectivityMgr().SetBLEDeviceName("TelinkAirQuality");
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("SetBLEDeviceName fail");
-        return err;
-    }
-
     return CHIP_NO_ERROR;
 }
 

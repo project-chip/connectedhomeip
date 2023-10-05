@@ -23,7 +23,7 @@
 class AppTask : public AppTaskCommon
 {
 public:
-void UpdateClusterState(void);
+    void UpdateClusterState(void);
 
 private:
     friend AppTask & GetAppTask(void);
