@@ -209,7 +209,7 @@ private:
     /**
      * Calculates the next retransmission time for the entry
      * Function sets the nextRetransTime of the entry
-     * 
+     *
      * @param[in/out] entry RetransTableEntry for which we need to calculate the nextRetransTime
      */
     void CalculateNextRetransTime(RetransTableEntry * entry);

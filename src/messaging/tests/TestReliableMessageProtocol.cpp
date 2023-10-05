@@ -301,7 +301,7 @@ struct BackoffComplianceTestVector theBackoffComplianceTestVector[] = {
 class TestReliableMessageProtocol
 {
 public:
-    static void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext);    
+    static void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext);
     static void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext);
     static void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void * inContext);
     static void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext);
