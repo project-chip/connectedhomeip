@@ -46,6 +46,15 @@
 #include "sl_power_manager.h"
 #endif
 
+#if SL_LCDCTRL_MUX
+#include "sl_memlcd_display.h"
+#define SL_SPIDRV_LCD_BITRATE SL_MEMLCD_SCLK_FREQ
+#endif // SL_LCDCTRL_MUX
+#if SL_MX25CTRL_MUX
+#include "sl_mx25_flash_shutdown_usart_config.h"
+#define SL_SPIDRV_MX25_FLASH_BITRATE 16000000
+#endif // SL_MX25CTRL_MUX
+
 // TODO: (MATTER-1906) Investigate why using SL_SPIDRV_EXP_BITRATE is causing WF200 init failure
 // REF: sl_spidrv_exp_config.h
 #define SL_SPIDRV_EXP_BITRATE_MULTIPLEXED 10000000

@@ -48,19 +48,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "FreeRTOS.h"
-#include "semphr.h"
-#if SL_LCDCTRL_MUX
-#include "sl_memlcd_display.h"
-#endif // SL_LCDCTRL_MUX
-#if SL_MX25CTRL_MUX
-#include "sl_mx25_flash_shutdown_usart_config.h"
-#endif // SL_MX25CTRL_MUX
-
-#include "spidrv.h"
-
-#define SL_SPIDRV_LCD_BITRATE SL_MEMLCD_SCLK_FREQ
-#define SL_SPIDRV_MX25_FLASH_BITRATE 16000000
 
 #if SL_SPICTRL_MUX
 /****************************************************************************

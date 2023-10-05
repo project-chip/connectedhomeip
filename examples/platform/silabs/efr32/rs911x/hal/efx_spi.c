@@ -24,6 +24,7 @@
 
 #include "FreeRTOS.h"
 #include "event_groups.h"
+#include "semphr.h"
 #include "task.h"
 
 #include "btl_interface.h"
@@ -48,6 +49,10 @@
 #include "wfx_host_events.h"
 #include "wfx_rsi.h"
 
+#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
+#include "sl_power_manager.h"
+#endif
+
 #ifdef CHIP_9117
 #include "cmsis_os2.h"
 #include "sl_board_configuration.h"
@@ -57,10 +62,21 @@
 #include "sl_wifi_callback_framework.h"
 #include "sl_wifi_constants.h"
 #include "sl_wifi_types.h"
+
+// macro to drive semaphore block minimum timer in milli seconds
+// ported from rsi_hal.h (rs911x)
+#define RSI_SEM_BLOCK_MIN_TIMER_VALUE_MS (50)
 #else
 #include "rsi_board_configuration.h"
 #include "rsi_driver.h"
-#endif
+#endif // CHIP_9117
+
+#if SL_LCDCTRL_MUX
+#include "sl_memlcd.h"
+#endif // SL_LCDCTRL_MUX
+#if SL_MX25CTRL_MUX
+#include "sl_mx25_flash_shutdown_usart_config.h"
+#endif // SL_MX25CTRL_MUX
 
 #if defined(EFR32MG12)
 #include "em_usart.h"
@@ -77,16 +93,6 @@
 #define SL_SPIDRV_FRAME_LENGTH SL_SPIDRV_EUSART_EXP_FRAME_LENGTH
 
 #endif // EFR32MG12 || EFR32MG24
-
-#if SL_LCDCTRL_MUX
-#include "sl_memlcd.h"
-#endif // SL_LCDCTRL_MUX
-
-// Macro to drive semaphore block minimum timer in milli seconds
-#define RSI_SEM_BLOCK_MIN_TIMER_VALUE_MS (50)
-#if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
-#include "sl_power_manager.h"
-#endif
 
 #define CONCAT(A, B) (A##B)
 #define SPI_CLOCK(N) CONCAT(cmuClock_USART, N)
@@ -470,6 +476,7 @@ int16_t rsi_spi_transfer(uint8_t * tx_buf, uint8_t * rx_buf, uint16_t xlen, uint
     return rsiError;
 }
 
+#ifdef CHIP_9117
 /*********************************************************************
  * @fn   int16_t sl_si91x_host_spi_transfer(uint8_t *tx_buf, uint8_t *rx_buf, uint16_t xlen)
  * @param[in]  uint8_t *tx_buff, pointer to the buffer with the data to be transferred
@@ -484,3 +491,4 @@ sl_status_t sl_si91x_host_spi_transfer(const void * tx_buf, void * rx_buf, uint1
 {
     return (rsi_spi_transfer((uint8_t *) tx_buf, rx_buf, xlen, RSI_MODE_8BIT));
 }
+#endif // CHIP_9117
