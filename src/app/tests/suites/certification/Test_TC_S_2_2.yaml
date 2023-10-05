@@ -22,6 +22,12 @@ config:
     nodeId: 0x12344321
     cluster: "Scenes"
     endpoint: 1
+    G1:
+        type: int16u
+        defaultValue: 0x0001
+    G2:
+        type: int16u
+        defaultValue: 0x0002
 
     GroupKeyManagement.Endpoint: 0
     Groups.Endpoint: 1
@@ -75,8 +81,8 @@ tests:
       arguments:
           value:
               [
-                  { FabricIndex: 1, GroupId: 0x0001, GroupKeySetID: 0x01a1 },
-                  { FabricIndex: 1, GroupId: 0x0002, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: G1, GroupKeySetID: 0x01a1 },
+                  { FabricIndex: 1, GroupId: G2, GroupKeySetID: 0x01a1 },
               ]
 
     - label: "Step 0c: TH sends a RemoveAllGroups command to DUT."
@@ -87,14 +93,14 @@ tests:
 
     - label:
           "Step 1a: TH sends a AddGroup command to DUT with the GroupID field
-          set to 0x0001."
+          set to G1."
       PICS: G.S.C00.Rsp
       cluster: "Groups"
       command: "AddGroup"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "GroupName"
                 value: "Group1"
       response:
@@ -102,33 +108,33 @@ tests:
               - name: "Status"
                 value: 0
               - name: "GroupID"
-                value: 0x0001
+                value: G1
 
     - label:
           "Step 1b: TH sends a RemoveAllScenes command to DUT with the GroupID
-          field set to 0x0001."
+          field set to G1."
       PICS: S.S.C03.Rsp
       command: "RemoveAllScenes"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
       response:
           values:
               - name: "Status"
-                value: 0
+                value: 0x00
               - name: "GroupID"
-                value: 0x0001
+                value: G1
 
     - label:
           "Step 1c: TH sends a GetSceneMembership command to DUT with the
-          GroupID field set to 0x0001."
+          GroupID field set to G1."
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
       response:
           values:
               - name: "Status"
@@ -136,7 +142,7 @@ tests:
               - name: "Capacity"
                 value: ( maxScenes / 2 )
               - name: "GroupID"
-                value: 0x0001
+                value: G1
 
     - label:
           "STep 2a: TH configures AC1 on DUT for all implemented application
@@ -174,13 +180,13 @@ tests:
 
     - label:
           "Step 2b: TH sends a StoreScene command to DUT with the GroupID field
-          set to 0x0001 and the SceneID field set to 0x01."
+          set to G1 and the SceneID field set to 0x01."
       PICS: S.S.C04.Rsp
       command: "StoreScene"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
       response:
@@ -188,7 +194,7 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
 
@@ -228,13 +234,13 @@ tests:
 
     - label:
           "Step 3b: TH sends a RecallScene command to DUT with the GroupID field
-          set to 0x0001 and the SceneID field set to 0x01."
+          set to G1 and the SceneID field set to 0x01."
       PICS: S.S.C05.Rsp
       command: "RecallScene"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
       response:
@@ -264,9 +270,9 @@ tests:
       command: "readAttribute"
       attribute: "CurrentGroup"
       response:
-          value: 0x0001
+          value: G1
           constraints:
-              type: int16u
+              type: group_id
 
     - label: "Step 3f: TH reads the SceneValid attribute from DUT."
       PICS: S.S.A0000 && S.S.A0001 && S.S.A0002 && S.S.A0003 && !S.S.F03
@@ -318,7 +324,7 @@ tests:
     #      value: {
     #              SceneCount: SceneCountValue,
     #              CurrentScene: 0x01,
-    #              CurrentGroup: 0x0001,
+    #              CurrentGroup: G1,
     #              SceneValid: true,
     #              RemainingCapacity: ( SceneTableSizeValue/2 ),
     #          }
@@ -386,25 +392,25 @@ tests:
 
     - label:
           "Step 4d: TH sends a RecallScene command to DUT with the GroupID field
-          set to 0x0001 and the SceneID field set to 0x01."
+          set to G1 and the SceneID field set to 0x01."
       PICS: S.S.C05.Rsp
       command: "RecallScene"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
 
     - label:
           "Step 5: TH sends a ViewScene command to DUT with the GroupID field
-          set to 0x0001 and the SceneID field set to 0x01."
+          set to G1 and the SceneID field set to 0x01."
       PICS: S.S.C01.Rsp && PICS_SDK_CI_ONLY
       command: "ViewScene"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
       response:
@@ -412,7 +418,7 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
@@ -434,13 +440,13 @@ tests:
 
     - label:
           "Step 5: TH sends a ViewScene command to DUT with the GroupID field
-          set to 0x0001 and the SceneID field set to 0x01."
+          set to G1 and the SceneID field set to 0x01."
       PICS: S.S.C01.Rsp && PICS_SKIP_SAMPLE_APP
       command: "ViewScene"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
       response:
@@ -448,7 +454,7 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
               - name: "TransitionTime"
@@ -456,13 +462,13 @@ tests:
 
     - label:
           "Step 6: TH sends a GetSceneMembership command to DUT with the GroupID
-          field set to 0x0001."
+          field set to G1."
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
       response:
           values:
               - name: "Status"
@@ -470,35 +476,35 @@ tests:
               - name: "Capacity"
                 value: ( maxScenes / 2 ) - 1
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneList"
                 value: [0x01]
 
     - label:
           "Step 7a: TH sends a RemoveAllScenes command to DUT with the GroupID
-          field set to 0x0001."
+          field set to G1."
       PICS: S.S.C03.Rsp
       command: "RemoveAllScenes"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
       response:
           values:
               - name: "Status"
                 value: 0
               - name: "GroupID"
-                value: 0x0001
+                value: G1
 
     - label:
           "Step 7b: TH sends a GetSceneMembership command to DUT with the
-          GroupID field set to 0x0001."
+          GroupID field set to G1."
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
       response:
           values:
               - name: "Status"
@@ -507,20 +513,20 @@ tests:
                 constraints:
                     anyOf: [( maxScenes / 2 ), 0xfe, 0x89]
               - name: "GroupID"
-                value: 0x0001
+                value: G1
 
     - label:
           "Step 8a: TH sends a AddScene command to DUT with the GroupID field
-          set to 0x0001, the SceneID field set to 0x01, the TransitionTime field
+          set to G1, the SceneID field set to 0x01, the TransitionTime field
           set to 0x0001 and a set of extension fields appropriate to AC1."
       PICS: S.S.C00.Rsp && PICS_SDK_CI_ONLY
       command: "AddScene"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
-                value: 0x0001
+                value: 0x01
               - name: "TransitionTime"
                 value: 0x0001
               - name: "SceneName"
@@ -544,13 +550,13 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
 
     - label:
           "Step 8a: TH sends a AddScene command to DUT with the GroupID field
-          set to 0x0001, the SceneID field set to 0x01, the TransitionTime field
+          set to G1, the SceneID field set to 0x01, the TransitionTime field
           set to 0x0001 and a set of extension fields appropriate to AC1."
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
@@ -612,13 +618,13 @@ tests:
 
     - label:
           "Step 8b: TH sends a GetSceneMembership command to DUT with the
-          GroupID field set to 0x0001."
+          GroupID field set to G1."
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
       response:
           values:
               - name: "Status"
@@ -627,39 +633,39 @@ tests:
                 constraints:
                     anyOf: [( maxScenes / 2 ) - 1, 0xfe, 0x89]
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneList"
                 value: [0x01]
 
     - label:
           "Step 9a: TH sends a RemoveScene command to DUT with the GroupID field
-          set to 0x0001 and the SceneID field set to 0x01."
+          set to G1 and the SceneID field set to 0x01."
       PICS: S.S.C02.Rsp
       command: "RemoveScene"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
-                value: 0x0001
+                value: 0x01
       response:
           values:
               - name: "Status"
                 value: 0x00
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
 
     - label:
           "Step 9b: TH sends a GetSceneMembership command to DUT with the
-          GroupID field set to 0x0001."
+          GroupID field set to G1."
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
       response:
           values:
               - name: "Status"
@@ -668,7 +674,7 @@ tests:
                 constraints:
                     anyOf: [( maxScenes / 2 ), 0xfe, 0x89]
               - name: "GroupID"
-                value: 0x0001
+                value: G1
 
     - label:
           "Step 10a: TH configures AC2 on DUT for all implemented application
@@ -706,13 +712,13 @@ tests:
 
     - label:
           "Step 10b: TH sends a RecallScene command to DUT with the GroupID
-          field set to 0x0001 and the SceneID field set to 0x01."
+          field set to G1 and the SceneID field set to 0x01."
       PICS: S.S.C05.Rsp
       command: "RecallScene"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
       response:
@@ -754,13 +760,13 @@ tests:
 
     - label:
           "Step 11b: TH sends a StoreScene command to DUT with the GroupID field
-          set to 0x0001 and the SceneID field set to 0x01."
+          set to G1 and the SceneID field set to 0x01."
       PICS: S.S.C04.Rsp
       command: "StoreScene"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
       response:
@@ -768,7 +774,7 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x01
 
@@ -808,13 +814,13 @@ tests:
 
     - label:
           "Step 12b: TH sends a StoreScene command to DUT with the GroupID field
-          set to 0x0001 and the SceneID field set to 0x02."
+          set to G1 and the SceneID field set to 0x02."
       PICS: S.S.C04.Rsp
       command: "StoreScene"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x02
       response:
@@ -824,7 +830,7 @@ tests:
                 constraints:
                     anyOf: [0x00, 0x89]
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneID"
                 value: 0x02
 
@@ -846,14 +852,14 @@ tests:
 
     - label:
           "Step 12c: TH sends a GetSceneMembership command to DUT with the
-          GroupID field set to 0x0001."
+          GroupID field set to G1."
       runIf: ContinueTest
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0001
+                value: G1
       response:
           values:
               - name: "Status"
@@ -861,13 +867,13 @@ tests:
               - name: "Capacity"
                 value: ( maxScenes / 2 ) - 2
               - name: "GroupID"
-                value: 0x0001
+                value: G1
               - name: "SceneList"
                 value: [0x01, 0x02]
 
     - label:
           "Step 13a: If capacity allows, TH sends a AddGroup command to DUT with
-          the GroupID field set to 0x0002."
+          the GroupID field set to G2."
       runIf: ContinueTest
       PICS: G.S.C00.Rsp
       cluster: "Groups"
@@ -875,7 +881,7 @@ tests:
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0002
+                value: G2
               - name: "GroupName"
                 value: "Group2"
       response:
@@ -883,35 +889,35 @@ tests:
               - name: "Status"
                 value: 0
               - name: "GroupID"
-                value: 0x0002
+                value: G2
 
     - label:
           "Step 13b: TH sends a RemoveAllScenes command to DUT with the GroupID
-          field set to 0x0002."
+          field set to G2."
       runIf: ContinueTest
       PICS: S.S.C03.Rsp
       command: "RemoveAllScenes"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0002
+                value: G2
       response:
           values:
               - name: "Status"
                 value: 0
               - name: "GroupID"
-                value: 0x0002
+                value: G2
 
     - label:
           "Step 13c: TH sends a GetSceneMembership command to DUT with the
-          GroupID field set to 0x0002."
+          GroupID field set to G2."
       runIf: ContinueTest
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0002
+                value: G2
       response:
           values:
               - name: "Status"
@@ -919,7 +925,7 @@ tests:
               - name: "Capacity"
                 value: ( maxScenes / 2 ) - 2
               - name: "GroupID"
-                value: 0x0002
+                value: G2
 
     - label:
           "Step 14a: TH configures AC3 on DUT for all implemented application
@@ -959,14 +965,14 @@ tests:
 
     - label:
           "Step 14b: TH sends a StoreScene command to DUT with the GroupID field
-          set to 0x0002 and the SceneID field set to 0x03."
+          set to G2 and the SceneID field set to 0x03."
       runIf: ContinueTest
       PICS: S.S.C04.Rsp
       command: "StoreScene"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0002
+                value: G2
               - name: "SceneID"
                 value: 0x03
       response:
@@ -976,7 +982,7 @@ tests:
                 constraints:
                     anyOf: [0x00, 0x89]
               - name: "GroupID"
-                value: 0x0002
+                value: G2
               - name: "SceneID"
                 value: 0x03
 
@@ -999,14 +1005,14 @@ tests:
 
     - label:
           "Step 14c: TH sends a GetSceneMembership command to DUT with the
-          GroupID field set to 0x0002."
+          GroupID field set to G2."
       runIf: ContinueTest
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"
       arguments:
           values:
               - name: "GroupID"
-                value: 0x0002
+                value: G2
       response:
           values:
               - name: "Status"
@@ -1014,7 +1020,7 @@ tests:
               - name: "Capacity"
                 value: ( maxScenes / 2 ) - 3
               - name: "GroupID"
-                value: 0x0002
+                value: G2
               - name: "SceneList"
                 value: [0x03]
 

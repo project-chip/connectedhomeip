@@ -56,7 +56,7 @@ tests:
       attribute: "CurrentGroup"
       response:
           constraints:
-              type: int16u
+              type: group_id
 
     - label: "Step 5: TH reads from the DUT the (0x0003) SceneValid attribute"
       PICS: S.S.A0003
@@ -91,7 +91,7 @@ tests:
       attribute: "LastConfiguredBy"
       response:
           constraints:
-              type: nodeId
+              type: node_id
 
     - label:
           "Step 8: TH reads from the DUT the (0x0006) SceneTableSize attribute"
@@ -99,7 +99,6 @@ tests:
       command: "readAttribute"
       attribute: "SceneTableSize"
       response:
-          value: 0x10
           constraints:
               type: int16u
 
@@ -110,6 +109,5 @@ tests:
       command: "readAttribute"
       attribute: "RemainingCapacity"
       response:
-          value: 0x08
           constraints:
               type: int8u

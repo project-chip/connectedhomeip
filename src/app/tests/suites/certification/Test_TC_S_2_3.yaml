@@ -91,7 +91,7 @@ tests:
       response:
           values:
               - name: "Status"
-                value: 0
+                value: 0x00
               - name: "GroupID"
                 value: G1
 
@@ -107,7 +107,7 @@ tests:
       response:
           values:
               - name: "Status"
-                value: 0
+                value: 0x00
               - name: "GroupID"
                 value: G1
 
@@ -143,7 +143,7 @@ tests:
               - name: "GroupID"
                 value: G1
               - name: "SceneID"
-                value: 0x0001
+                value: 0x01
               - name: "TransitionTime"
                 value: 0x000a
               - name: "SceneName"
@@ -182,7 +182,7 @@ tests:
               - name: "GroupID"
                 value: G1
               - name: "SceneID"
-                value: 0x0001
+                value: 0x01
               - name: "TransitionTime"
                 value: 0x0001
               - name: "SceneName"
@@ -256,7 +256,7 @@ tests:
           [1670970505.890328][5742:5744] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0040
           [1670970505.890458][5742:5744] CHIP:TOO:   EnhancedAddSceneResponse: {
           [1670970505.890551][5742:5744] CHIP:TOO:     status: 0
-          [1670970505.890608][5742:5744] CHIP:TOO:     groupId: 101
+          [1670970505.890608][5742:5744] CHIP:TOO:     groupId: 257
           [1670970505.890717][5742:5744] CHIP:TOO:     sceneId: 1
           [1670970505.890774][5742:5744] CHIP:TOO:    }
       cluster: "LogCommands"
@@ -275,7 +275,7 @@ tests:
     - label:
           "Step 2b: TH sends a AddScene command to DUT with the GroupID field
           set to G1, the SceneID field set to 0x01, the TransitionTime field set
-          to 0x0001 and a set of extension fields appropriate to AC1."
+          to G1 and a set of extension fields appropriate to AC1."
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
 
@@ -318,7 +318,7 @@ tests:
           [1670970505.890328][5742:5744] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_0005 Command 0x0000_0000
           [1670970505.890458][5742:5744] CHIP:TOO:   AddSceneResponse: {
           [1670970505.890551][5742:5744] CHIP:TOO:     status: 0
-          [1670970505.890608][5742:5744] CHIP:TOO:     groupId: 101
+          [1670970505.890608][5742:5744] CHIP:TOO:     groupId: 257
           [1670970505.890717][5742:5744] CHIP:TOO:     sceneId: 1
           [1670970505.890774][5742:5744] CHIP:TOO:    }
       cluster: "LogCommands"
@@ -419,7 +419,7 @@ tests:
 
           Verify that the extension fields in the log match the ones expected and that
           Status = 0x00
-          GroupID = 0x0001
+          GroupID = G1
           SceneID = 0x01
           TransitionTime = 0x000a
       cluster: "LogCommands"
@@ -447,7 +447,7 @@ tests:
 
           Verify that the extension fields in the log match the ones expected and that
           Status = 0x00
-          GroupID = 0x0001
+          GroupID = G1
           SceneID = 0x01
           TransitionTime = 0x0001
       cluster: "LogCommands"

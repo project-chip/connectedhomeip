@@ -60,80 +60,55 @@ tests:
               type: bitmap32
 
     - label:
-          "Step 4: Read AttributeList (global attribute 65531) if S.S.A0005 is
-          true"
-      PICS: S.S.A0005 && PICS_EVENT_LIST_ENABLED
+          "Step 4: Read Mandatory attributes in AttributeList (global attribute 65531)"
+      PICS: S.S
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
               contains:
-                  [
-                      0,
-                      1,
-                      2,
-                      3,
-                      4,
-                      5,
-                      6,
-                      7,
-                      65528,
-                      65529,
-                      65530,
-                      65531,
-                      65532,
-                      65533,
-                  ]
+                  [4, 65528, 65529, 65531, 65532, 65533]
 
     - label:
-          "Step 4: Read AttributeList (global attribute 65531) if S.S.A0005 is
-          true"
-      PICS: S.S.A0005 && !PICS_EVENT_LIST_ENABLED
+          "Step 4b: Read optional attributes(SceneCount, CurrentScene, CurrentGroup, SceneValid) in AttributeList (global attribute 65531)"
+      PICS: (!S.S.F03)
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
-              contains:
-                  [0, 1, 2, 3, 4, 5, 6, 7, 65528, 65529, 65531, 65532, 65533]
+              contains: [0, 1, 2, 3]
 
     - label:
-          "Step 4: Read AttributeList (global attribute 65531) if S.S.A0005 is
-          false"
-      PICS: " !S.S.A0005 && PICS_EVENT_LIST_ENABLED"
+          "Step 4c: Read optinnal attribute(LastConfiguredBy) in AttributeList (global attribute 65531)"
+      PICS: S.S.A0005
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
-              contains:
-                  [
-                      0,
-                      1,
-                      2,
-                      3,
-                      4,
-                      6,
-                      7,
-                      65528,
-                      65529,
-                      65530,
-                      65531,
-                      65532,
-                      65533,
-                  ]
+              contains: [5]
 
     - label:
-          "Step 4: Read AttributeList (global attribute 65531) if S.S.A0005 is
-          false"
-      PICS: " !S.S.A0005 && !PICS_EVENT_LIST_ENABLED"
+          "Step 4d: Read optionnal attribute(SceneTableSize) in AttributeList (global attribute 65531)"
+      PICS: S.S.F02
       command: "readAttribute"
       attribute: "AttributeList"
       response:
           constraints:
               type: list
-              contains: [0, 1, 2, 3, 4, 6, 7, 65528, 65529, 65531, 65532, 65533]
+              contains: [6]
+
+    - label:
+          "Step 4e: Read optionnal attribute(FabricSceneInfo) in AttributeList (global attribute 65531)"
+      PICS: S.S.F03
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+              contains: [7]
 
     - label: "Step 5: Read EventList (global attribute 65530)"
       PICS: PICS_EVENT_LIST_ENABLED
@@ -144,41 +119,41 @@ tests:
               type: list
               contains: []
 
-    - label: "Step 6a: Read AcceptedCommandList (global attribute 65529)"
+    - label: "Step 6a: Read Mandatory commands in AcceptedCommandList (global attribute 65529)"
+      PICS: S.S
+      command: "readAttribute"
+      attribute: "AcceptedCommandList"
+      response:
+          constraints:
+              type: list
+              contains: [0, 1, 2, 3, 4, 5, 6]
+
+    - label: "Step 6b: Read optional command(EnhancedAddSceneResponse) AcceptedCommandList (global attribute 65529)"
       PICS: S.S.C40.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
           constraints:
               type: list
-              contains: [0, 1, 2, 3, 4, 5, 6, 64, 65, 66]
+              contains: [64]
 
-    - label: "Step 6b: Read AcceptedCommandList (global attribute 65529)"
-      PICS: (!S.S.C40.Rsp)
+    - label: "Step 6c: Read optional command(EnhancedViewSceneResponse) AcceptedCommandList (global attribute 65529)"
+      PICS: S.S.C41.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
           constraints:
               type: list
-              contains: [0, 1, 2, 3, 4, 5, 6]
+              contains: [65]
 
-    - label: "Step 6c: Read AcceptedCommandList (global attribute 65529)"
-      PICS: S.C.C40.Tx
+    - label: "Step 6d: Read optional command(CopySceneResponse) AcceptedCommandList (global attribute 65529)"
+      PICS: S.S.C42.Rsp
       command: "readAttribute"
       attribute: "AcceptedCommandList"
       response:
           constraints:
               type: list
-              contains: [0, 1, 2, 3, 4, 5, 6, 64, 65, 66]
-
-    - label: "Step 6d: Read AcceptedCommandList (global attribute 65529)"
-      PICS: (!S.C.C40.Tx)
-      command: "readAttribute"
-      attribute: "AcceptedCommandList"
-      response:
-          constraints:
-              type: list
-              contains: [0, 1, 2, 3, 4, 5, 6]
+              contains: [66]
 
     - label: "Step 7a: Read GeneratedCommandList (global attribute 65528)"
       command: "readAttribute"
