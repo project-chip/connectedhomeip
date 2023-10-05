@@ -21,6 +21,7 @@ from .builder import Builder
 
 
 class TelinkApp(Enum):
+    AIR_QUALITY_SENSOR = auto()
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
     BRIDGE = auto()
@@ -39,7 +40,9 @@ class TelinkApp(Enum):
     WINDOW_COVERING = auto()
 
     def ExampleName(self):
-        if self == TelinkApp.ALL_CLUSTERS:
+        if self == TelinkApp.AIR_QUALITY_SENSOR:
+            return 'air-quality-sensor-app'        
+        elif self == TelinkApp.ALL_CLUSTERS:
             return 'all-clusters-app'
         elif self == TelinkApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app'
@@ -75,7 +78,9 @@ class TelinkApp(Enum):
             raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
-        if self == TelinkApp.ALL_CLUSTERS:
+        if self == TelinkApp.AIR_QUALITY_SENSOR:
+            return 'chip-telink-air-quality-sensor-example'            
+        elif self == TelinkApp.ALL_CLUSTERS:
             return 'chip-telink-all-clusters-example'
         elif self == TelinkApp.ALL_CLUSTERS_MINIMAL:
             return 'chip-telink-all-clusters-minimal-example'

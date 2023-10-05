@@ -60,7 +60,7 @@ target_include_directories(app PRIVATE
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/air-quality-sensor-app
                            ${TELINK_COMMON}/common/include
-                           ${TELINK_COMMON}/util/include
+                           ${TELINK_COMMON}/util/include)
 
 add_definitions(
     "-DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>"
@@ -74,7 +74,7 @@ target_sources(app PRIVATE
                ${TELINK_COMMON}/util/src/LEDWidget.cpp
                ${TELINK_COMMON}/util/src/ButtonManager.cpp
                ${TELINK_COMMON}/util/src/ThreadUtil.cpp
-               ${TELINK_COMMON}/util/src/PWMDevice.cpp
+               ${TELINK_COMMON}/util/src/PWMDevice.cpp)
 
 chip_configure_data_model(app
     INCLUDE_SERVER

@@ -694,6 +694,7 @@ def BuildTelinkTarget():
     ])
 
     target.AppendFixedTargets([
+        TargetPart('all-clusters', app=TelinkApp.AIR_QUALITY_SENSOR),
         TargetPart('all-clusters', app=TelinkApp.ALL_CLUSTERS),
         TargetPart('all-clusters-minimal', app=TelinkApp.ALL_CLUSTERS_MINIMAL),
         TargetPart('bridge', app=TelinkApp.BRIDGE),

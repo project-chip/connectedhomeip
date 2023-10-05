@@ -1,4 +1,4 @@
-# Matter Telink AirQuality Example Application
+# Matter Telink Air Quality Sensor Example Application
 
 You can use this example as a reference for creating your own application.
 
