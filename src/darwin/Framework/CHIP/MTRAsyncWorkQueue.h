@@ -107,6 +107,10 @@ MTR_TESTABLE
 /// Creates a work item that will run on the specified dispatch queue.
 - (instancetype)initWithQueue:(dispatch_queue_t)queue;
 
+/// A unique (modulo overflow) ID automatically assigned to each work item for
+/// the purpose of correlating log messages from the work queue.
+@property (readonly, nonatomic) NSUInteger uniqueID;
+
 /// Called by the work queue to start this work item.
 ///
 /// Will be called on the dispatch queue associated with this item.

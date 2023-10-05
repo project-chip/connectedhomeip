@@ -45,11 +45,6 @@ struct ContextSnapshot {
 };
 
 MTR_DIRECT_MEMBERS
-@interface MTRAsyncWorkItem ()
-@property (readonly, nonatomic) NSUInteger uniqueID;
-@end
-
-MTR_DIRECT_MEMBERS
 @implementation MTRAsyncWorkItem {
     dispatch_queue_t _queue;
     MTRAsyncWorkItemState _state; // protected by queue lock once enqueued
