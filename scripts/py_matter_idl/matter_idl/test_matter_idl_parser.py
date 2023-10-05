@@ -326,6 +326,32 @@ class TestParser(unittest.TestCase):
                     )])
         self.assertEqual(actual, expected)
 
+    def test_bitmap_constant_maturity(self):
+        actual = parseText("""
+            client cluster Test = 0xab {
+                bitmap TestBitmap : BITMAP32 {
+                    kStable = 0x1;
+                    internal kInternal = 0x2;
+                    provisional kProvisional = 0x4;
+                }
+            }
+        """)
+        expected = Idl(clusters=[
+            Cluster(side=ClusterSide.CLIENT,
+                    name="Test",
+                    code=0xab,
+                    bitmaps=[
+                        Bitmap(name="TestBitmap", base_type="BITMAP32",
+                               entries=[
+                                   ConstantEntry(name="kStable", code=0x1),
+                                   ConstantEntry(
+                                       name="kInternal", code=0x2, api_maturity=ApiMaturity.INTERNAL),
+                                   ConstantEntry(
+                                       name="kProvisional", code=0x4, api_maturity=ApiMaturity.PROVISIONAL),
+                               ])],
+                    )])
+        self.assertEqual(actual, expected)
+
     def test_struct_field_api_maturity(self):
         actual = parseText("""
             server cluster MaturityTest = 1 {

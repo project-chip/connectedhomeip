@@ -188,6 +188,7 @@ class Event:
 class ConstantEntry:
     name: str
     code: int
+    api_maturity: ApiMaturity = ApiMaturity.STABLE
 
 
 @dataclass

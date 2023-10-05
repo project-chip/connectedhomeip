@@ -188,8 +188,10 @@ class MatterIdlTransformer(Transformer):
             raise Exception("Unexpected size for data type")
 
     @v_args(inline=True)
-    def constant_entry(self, id, number):
-        return ConstantEntry(name=id, code=number)
+    def constant_entry(self, api_maturity, id, number):
+        if api_maturity is None:
+            api_maturity = ApiMaturity.STABLE
+        return ConstantEntry(name=id, code=number, api_maturity=api_maturity)
 
     @v_args(inline=True)
     def enum(self, id, type, *entries):
@@ -455,24 +457,24 @@ class MatterIdlTransformer(Transformer):
             ServerClusterInstantiation(parse_meta=meta, name=id, attributes=attributes, events_emitted=events))
 
     @v_args(inline=True)
-    def cluster_content(self, maturity, element):
-        if maturity is not None:
-            element.api_maturity = maturity
+    def cluster_content(self, api_maturity, element):
+        if api_maturity is not None:
+            element.api_maturity = api_maturity
         return element
 
     @v_args(inline=True, meta=True)
-    def cluster(self, meta, maturity, side, name, code, *content):
+    def cluster(self, meta, api_maturity, side, name, code, *content):
         meta = None if self.skip_meta else ParseMetaData(meta)
 
         # shift actual starting position where the doc comment would start
         if meta and self._cluster_start_pos:
             meta.start_pos = self._cluster_start_pos
 
-        if maturity is None:
-            maturity = ApiMaturity.STABLE
+        if api_maturity is None:
+            api_maturity = ApiMaturity.STABLE
 
         result = Cluster(parse_meta=meta, side=side, name=name,
-                         code=code, api_maturity=maturity)
+                         code=code, api_maturity=api_maturity)
 
         for item in content:
             if type(item) == Enum:
