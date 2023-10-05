@@ -214,6 +214,47 @@ public:
      */
     bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
 
+    /**
+     * Notifies the exchange that our consummer is going to send a message where it knows the peer (receiver) should be active
+     *
+     * This API is used to set the ShouldPeerBeActive flag.
+     * The ShouldPeerBeActive flag allows the consummer of the exchange to notify the exchange that the peer (receiver)
+     * will be active for the next message the consummer will send.
+     * This allows the consummer to notify the exchange on the state of the peer with the context of the messages being sent.
+     *
+     * The ShouldPeerBeActive flag is only used when calculating the next retransmission time in the ReliableMessageMgr.
+     * If the ShouldPeerBeActive flag is true, we will used the Active Retransmission timeout when calculating the next
+     * retransmission time. If the ShouldPeerBeActive flag is false, we will rely on other information to determine which
+     * retransmission timeout should be used. See the ShouldPeerBeActive API for the alternative means to determine if the Peer
+     * (receiver) is active.
+     *
+     * The first message of the exchange set as the initiator should never have the ShouldPeerBeActive flag to true.
+     * The API should only called after receiving a message from the peer and after calling the WillSendMessage API.
+     * The next message sent will then use the active retransmission time out.
+     * The flag is set to false each time we receive the response from our peer (receiver).
+     * As such, the API needs to be called each time we send another message over the exchange.
+     *
+     * The API call is not mandatory for the communication to be successful.
+     * If the call is not done, we will rely on information within the exchange context.
+     * 
+     * @param shouldPeerBeActive true if the peer should be active, false if we don't know or it should not be
+      */
+    void SetShouldPeerBeActive(bool shouldPeerBeActive) { mFlags.Set(Flags::kPeerShouldBeActive, shouldPeerBeActive); }
+
+    /**
+     * Function checks with information available in the ExchangeContext if the peer should be active or not
+     * API should only be used when we are determining if we need to use the Active or Idle retransmission timeout
+     *
+     * If we are not initiator                          -> peer is active
+     * If ephemeral context                             -> peer is active
+     * else we default to information provided by the consummer
+     *
+     * @return true Based on available information, Peer should be active
+     * @return false We weren't able to determine if the peer is active.
+     *               We don't know in which state the peer is.
+     */
+    bool ShouldPeerBeActive();
+
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     SessionHolder & GetSessionHolder() { return mSession; }
 
@@ -291,25 +332,6 @@ private:
      * re-evaluate out state to see whether we should still be open.
      */
     void MessageHandled();
-
-    /**
-     * Updates Sleepy End Device intervals mode in the following way:
-     * - does nothing for exchanges over Bluetooth LE
-     * - requests active mode if there are more messages,
-     *   including MRP acknowledgements, expected to be sent or received on
-     *   this exchange.
-     * - withdraws the request for active mode, otherwise.
-     */
-    void UpdateSEDIntervalMode();
-
-    /**
-     * Requests or withdraws the request for Sleepy End Device active mode
-     * based on the argument value.
-     *
-     * Note that the device switches to the idle mode if no
-     * exchange nor other component requests the active mode.
-     */
-    void UpdateSEDIntervalMode(bool activeMode);
 
     static ExchangeMessageDispatch & GetMessageDispatch(bool isEphemeralExchange, ExchangeDelegate * delegate);
 

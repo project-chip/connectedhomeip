@@ -168,10 +168,7 @@ void ReliableMessageMgr::ExecuteActions()
                         " Send Cnt %d",
                         messageCounter, ChipLogValueExchange(&entry->ec.Get()), entry->sendCount);
 
-        // Choose active/idle timeout from PeerActiveMode of session per 4.11.2.1. Retransmissions.
-        System::Clock::Timestamp baseTimeout = entry->ec->GetSessionHandle()->GetMRPBaseTimeout();
-        System::Clock::Timestamp backoff     = ReliableMessageMgr::GetBackoff(baseTimeout, entry->sendCount);
-        entry->nextRetransTime               = System::SystemClock().GetMonotonicTimestamp() + backoff;
+        CalculateNextRetransTime(entry);
         SendFromRetransTable(entry);
 
         return Loop::Continue;
@@ -272,10 +269,7 @@ System::Clock::Timestamp ReliableMessageMgr::GetBackoff(System::Clock::Timestamp
 
 void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
 {
-    // Choose active/idle timeout from PeerActiveMode of session per 4.11.2.1. Retransmissions.
-    System::Clock::Timestamp baseTimeout = entry->ec->GetSessionHandle()->GetMRPBaseTimeout();
-    System::Clock::Timestamp backoff     = ReliableMessageMgr::GetBackoff(baseTimeout, entry->sendCount);
-    entry->nextRetransTime               = System::SystemClock().GetMonotonicTimestamp() + backoff;
+    CalculateNextRetransTime(entry);
     StartTimer();
 }
 
@@ -454,6 +448,26 @@ CHIP_ERROR ReliableMessageMgr::MapSendError(CHIP_ERROR error, uint16_t exchangeI
     }
 
     return error;
+}
+
+void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry * entry)
+{
+    System::Clock::Timestamp baseTimeout = System::Clock::Milliseconds64(0);
+
+    if (entry->ec->ShouldPeerBeActive())
+    {
+        // If we know the peer is active with the exchangeContext, use the Active Retrans timeout
+        baseTimeout = entry->ec->GetSessionHandle()->GetRemoteMRPConfig().mActiveRetransTimeout;
+    }
+    else
+    {
+        // If the exchange context doesn't know if the peer is active or not.
+        // Choose active/idle timeout from PeerActiveMode of session per 4.11.2.1. Retransmissions.
+        baseTimeout = entry->ec->GetSessionHandle()->GetMRPBaseTimeout();
+    }
+
+    System::Clock::Timestamp backoff = ReliableMessageMgr::GetBackoff(baseTimeout, entry->sendCount);
+    entry->nextRetransTime           = System::SystemClock().GetMonotonicTimestamp() + backoff;
 }
 
 #if CHIP_CONFIG_TEST

@@ -123,9 +123,6 @@ public:
     /// Set if this exchange is requesting Sleepy End Device active mode
     void SetRequestingActiveMode(bool activeMode);
 
-    /// Determine whether this exchange is requesting Sleepy End Device active mode
-    bool IsRequestingActiveMode() const;
-
     /// Determine whether this exchange is a EphemeralExchange for replying a StandaloneAck
     bool IsEphemeralExchange() const;
 
@@ -169,14 +166,15 @@ protected:
         /// When set, we have had Close() or Abort() called on us already.
         kFlagClosed = (1u << 7),
 
-        /// When set, signifies that the exchange is requesting Sleepy End Device active mode.
-        kFlagActiveMode = (1u << 8),
-
         /// When set, signifies that the exchange created sorely for replying a StandaloneAck
-        kFlagEphemeralExchange = (1u << 9),
+        kFlagEphemeralExchange = (1u << 8),
 
         /// When set, ignore session being released, because we are releasing it ourselves.
-        kFlagIgnoreSessionRelease = (1u << 10),
+        kFlagIgnoreSessionRelease = (1u << 9),
+
+        // When set, sender knows that the peer (receiver) should currently be active
+        // When bit is not set, we don't know if the peer (receiver) is active or not
+        kPeerShouldBeActive = (1u << 10)
 
         /// When set:
         ///
@@ -187,6 +185,20 @@ protected:
     };
 
     BitFlags<Flags> mFlags; // Internal state flags
+
+    /**
+     * Function checks with information available in the ExchangeContext if the peer should be active or not
+     * API should only be used when we are determining if we need to use the Active or Idle retransmission timeout
+     *
+     * If we are not initiator                          -> peer is active
+     * If ephemeral context                             -> peer is active
+     * else we default to information provided by the consummer
+     *
+     * @return true Based on available information, Peer should be active
+     * @return false We weren't able to determine if the peer is active.
+     *               We don't know in which state the peer is.
+     */
+    bool ShouldPeerBeActive();
 
 private:
     void HandleRcvdAck(uint32_t ackMessageCounter);
@@ -238,11 +250,6 @@ inline bool ReliableMessageContext::HasPiggybackAckPending() const
     return mFlags.Has(Flags::kFlagAckMessageCounterIsValid);
 }
 
-inline bool ReliableMessageContext::IsRequestingActiveMode() const
-{
-    return mFlags.Has(Flags::kFlagActiveMode);
-}
-
 inline void ReliableMessageContext::SetAutoRequestAck(bool autoReqAck)
 {
     mFlags.Set(Flags::kFlagAutoRequestAck, autoReqAck);
@@ -251,11 +258,6 @@ inline void ReliableMessageContext::SetAutoRequestAck(bool autoReqAck)
 inline void ReliableMessageContext::SetAckPending(bool inAckPending)
 {
     mFlags.Set(Flags::kFlagAckPending, inAckPending);
-}
-
-inline void ReliableMessageContext::SetRequestingActiveMode(bool activeMode)
-{
-    mFlags.Set(Flags::kFlagActiveMode, activeMode);
 }
 
 inline bool ReliableMessageContext::IsEphemeralExchange() const

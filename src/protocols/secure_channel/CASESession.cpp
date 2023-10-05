@@ -1410,6 +1410,7 @@ CHIP_ERROR CASESession::SendSigma3a()
             SuccessOrExit(err = helper->ScheduleWork());
             mSendSigma3Helper = helper;
             mExchangeCtxt->WillSendMessage();
+            mExchangeCtxt->SetShouldPeerBeActive(true); // When we send sigma3, peer has processed sigma 1 and sent sigma2 which means it is active
             mState = State::kSendSigma3Pending;
         }
         else
@@ -1703,6 +1704,7 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
         SuccessOrExit(err = helper->ScheduleWork());
         mHandleSigma3Helper = helper;
         mExchangeCtxt->WillSendMessage();
+        mExchangeCtxt->SetShouldPeerBeActive(true); // When we receive sigma3, peer has received and processed sigma2 which means it is active
         mState = State::kHandleSigma3Pending;
     }
 

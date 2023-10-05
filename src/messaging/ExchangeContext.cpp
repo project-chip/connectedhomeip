@@ -514,6 +514,10 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
     // layer has completed its work on the ExchangeContext.
     ExchangeHandle ref(*this);
 
+    // If we received a message from the Peer and we are still expecting a response, we know the peer is active
+    // If we receive a message from the Peer but we are not expecting a response, we don't know if the peer is still active
+    SetShouldPeerBeActive(IsResponseExpected());
+
     bool isStandaloneAck = payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck);
     bool isDuplicate     = msgFlags.Has(MessageFlagValues::kDuplicateMessage);
 
@@ -542,7 +546,6 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         if (payloadHeader.NeedsAck())
         {
             // An acknowledgment needs to be sent back to the peer for this message on this exchange,
-
             HandleNeedsAck(messageCounter, msgFlags);
         }
     }
@@ -598,6 +601,9 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         // If the context was expecting a response to a previously sent message, this message
         // is implicitly that response.
         SetResponseExpected(false);
+
+        // If we received the expected response, we don't if the peer is still active after having sent the response
+        SetShouldPeerBeActive(false);
     }
 
     // Don't send messages on to our delegate if our dispatch does not allow
@@ -657,6 +663,22 @@ void ExchangeContext::ExchangeSessionHolder::GrabExpiredSession(const SessionHan
 {
     VerifyOrDie(session->AsSecureSession()->IsPendingEviction());
     GrabUnchecked(session);
+}
+
+bool ExchangeContext::ShouldPeerBeActive()
+{
+    // If we are not the initiator, it means the peer sent the first message.
+    // This means our peer is active if we are sending a message to them.
+    if (!IsInitiator())
+        return true;
+
+    // If we create an Ephemeral Exchange, it was just to generate a StandaloneAck
+    // Since we are sending an ack, we know the peer is active
+    if (IsEphemeralExchange())
+        return true;
+
+    // Return previously stored state if we have no absolute answer
+    return mFlags.Has(Flags::kPeerShouldBeActive);
 }
 
 } // namespace Messaging
