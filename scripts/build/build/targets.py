@@ -24,7 +24,7 @@ from builders.genio import GenioApp, GenioBuilder
 from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary, HostFuzzingType
 from builders.imx import IMXApp, IMXBuilder
 from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
-from builders.k32w import K32WApp, K32WBuilder
+from builders.k32w import K32WApp, K32WBoard, K32WBuilder
 from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
@@ -454,12 +454,18 @@ def BuildASRTarget():
 def BuildK32WTarget():
     target = BuildTarget('k32w', K32WBuilder)
 
+    # boards
+    target.AppendFixedTargets([
+        TargetPart('k32w0', board=K32WBoard.K32W0),
+        TargetPart('k32w1', board=K32WBoard.K32W1)
+    ])
+
     # apps
     target.AppendFixedTargets([
         TargetPart('light', app=K32WApp.LIGHT, release=True),
         TargetPart('shell', app=K32WApp.SHELL, release=True),
         TargetPart('lock', app=K32WApp.LOCK, release=True),
-        TargetPart('contact', app=K32WApp.CONTACT, release=True),
+        TargetPart('contact', app=K32WApp.CONTACT, release=True)
     ])
 
     target.AppendModifier(name="se05x", se05x=True)
@@ -470,6 +476,7 @@ def BuildK32WTarget():
     target.AppendModifier(name="crypto-platform", crypto_platform=True)
     target.AppendModifier(
         name="tokenizer", tokenizer=True).ExceptIfRe("-nologs")
+    target.AppendModifier(name="openthread-ftd", openthread_ftd=True)
 
     return target
 

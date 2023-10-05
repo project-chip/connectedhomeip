@@ -23,10 +23,6 @@
 #endif
 #endif // BRD4325A
 
-#ifdef BRD4325A // For SiWx917 Platform only
-#include "core_cm4.h"
-#endif
-
 #ifdef PW_RPC_ENABLED
 #include "PigweedLogger.h"
 #endif

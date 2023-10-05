@@ -56,6 +56,8 @@ if (chip_device_platform == "cc13x2_26x2") {
   import("${qpg_sdk_build_root}/qpg_sdk.gni")
 } else if (chip_device_platform == "k32w0") {
   import("//build_overrides/k32w0_sdk.gni")
+} else if (chip_device_platform == "k32w1") {
+  import("//build_overrides/k32w1_sdk.gni")
 } else if (chip_device_platform == "psoc6") {
   import("//build_overrides/psoc6.gni")
 } else if (chip_device_platform == "cyw30739") {
@@ -175,6 +177,9 @@ source_set("system_config_header") {
       }
       if (chip_device_platform == "k32w0") {
         public_deps += [ "${k32w0_sdk_build_root}:k32w0_sdk" ]
+      }
+      if (chip_device_platform == "k32w1") {
+        public_deps += [ "${k32w1_sdk_build_root}:k32w1_sdk" ]
       }
       if (chip_device_platform == "cyw30739") {
         public_deps += [ "${cyw30739_sdk_build_root}:cyw30739_sdk" ]

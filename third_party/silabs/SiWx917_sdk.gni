@@ -205,7 +205,6 @@ template("siwx917_sdk") {
       if (silabs_board == "BRD4338A") {
         defines += [
           "SI917_RADIO_BOARD_V2=1",
-          "SL_BOARD_NAME=\"BRD4338A\"",
           "SL_BOARD_REV=\"A00\"",
           "SPI_MULTI_SLAVE=1",
           "SYSCALLS_WRITE=1",

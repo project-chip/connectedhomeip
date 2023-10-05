@@ -20,6 +20,7 @@
 
 #include "AppConfig.h"
 #include "AppEvent.h"
+#include "FabricTableDelegate.h"
 #include "LEDUtil.h"
 #include "PWMDevice.h"
 
@@ -246,6 +247,7 @@ CHIP_ERROR AppTask::Init()
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
+    AppFabricTableDelegate::Init();
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);

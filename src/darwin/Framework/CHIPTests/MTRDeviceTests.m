@@ -1370,8 +1370,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  clientQueue:queue
                                reportHandler:^(id _Nullable values, NSError * _Nullable error) {
                                }
-                     subscriptionEstablished:^() {
-                     }];
+                     subscriptionEstablished:^() {}];
     [self waitForExpectations:@[ errorExpectation ] timeout:60];
 }
 
@@ -1424,8 +1423,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  clientQueue:queue
                                reportHandler:^(id _Nullable values, NSError * _Nullable error) {
                                }
-                     subscriptionEstablished:^() {
-                     }];
+                     subscriptionEstablished:^() {}];
     [self waitForExpectations:@[ errorExpectation ] timeout:60];
 }
 
@@ -1598,8 +1596,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                      clientQueue:queue
                                    reportHandler:^(id _Nullable values, NSError * _Nullable error) {
                                    }
-                         subscriptionEstablished:^() {
-                         }];
+                         subscriptionEstablished:^() {}];
 
     [self waitForExpectations:@[ subscriptionDroppedExpectation ] timeout:60];
 
@@ -1674,8 +1671,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  clientQueue:queue
                                reportHandler:^(id _Nullable values, NSError * _Nullable error) {
                                }
-                     subscriptionEstablished:^() {
-                     }];
+                     subscriptionEstablished:^() {}];
     [self waitForExpectations:@[ errorExpectation ] timeout:60];
 }
 
@@ -1687,6 +1683,30 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __auto_type * opcredsCluster = [[MTRClusterOperationalCredentials alloc] initWithDevice:device endpointID:@(0) queue:queue];
     __auto_type * onOffCluster = [[MTRClusterOnOff alloc] initWithDevice:device endpointID:@(1) queue:queue];
     __auto_type * badOnOffCluster = [[MTRClusterOnOff alloc] initWithDevice:device endpointID:@(0) queue:queue];
+
+    // Ensure our existing fabric label is not "Test".  This uses a "base"
+    // cluster to ensure read-through to the other side.
+    __auto_type * baseOpCredsCluster = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:GetConnectedDevice() endpointID:@(0) queue:queue];
+    XCTestExpectation * readFabricLabelExpectation = [self expectationWithDescription:@"Read fabric label first time"];
+    [baseOpCredsCluster readAttributeFabricsWithParams:nil completion:^(NSArray * _Nullable value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(value);
+        XCTAssertEqual(value.count, 1);
+        MTROperationalCredentialsClusterFabricDescriptorStruct * entry = value[0];
+        XCTAssertNotEqualObjects(entry.label, @"Test");
+        [readFabricLabelExpectation fulfill];
+    }];
+
+    XCTestExpectation * readFabricIndexExpectation = [self expectationWithDescription:@"Read current fabric index"];
+    __block NSNumber * currentFabricIndex;
+    [baseOpCredsCluster readAttributeCurrentFabricIndexWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(value);
+        currentFabricIndex = value;
+        [readFabricIndexExpectation fulfill];
+    }];
+
+    [self waitForExpectations:@[ readFabricLabelExpectation, readFabricIndexExpectation ] timeout:kTimeoutInSeconds];
 
     XCTestExpectation * onExpectation = [self expectationWithDescription:@"On command executed"];
     [onOffCluster onWithParams:nil
@@ -1718,6 +1738,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                          XCTAssertNotNil(data);
                                          XCTAssertEqualObjects(data.statusCode, @(0));
                                          XCTAssertNotNil(data.fabricIndex);
+                                         XCTAssertEqualObjects(data.fabricIndex, currentFabricIndex);
                                          [updateLabelExpectation fulfill];
                                      }];
 
@@ -1757,6 +1778,19 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     ]
                       timeout:60
                  enforceOrder:YES];
+
+    // Now make sure our fabric label got updated.
+    readFabricLabelExpectation = [self expectationWithDescription:@"Read fabric label second time"];
+    [baseOpCredsCluster readAttributeFabricsWithParams:nil completion:^(NSArray * _Nullable value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(value);
+        XCTAssertEqual(value.count, 1);
+        MTROperationalCredentialsClusterFabricDescriptorStruct * entry = value[0];
+        XCTAssertEqualObjects(entry.label, @"Test");
+        [readFabricLabelExpectation fulfill];
+    }];
+
+    [self waitForExpectations:@[ readFabricLabelExpectation ] timeout:kTimeoutInSeconds];
 }
 
 - (void)test020_ReadMultipleAttributes
