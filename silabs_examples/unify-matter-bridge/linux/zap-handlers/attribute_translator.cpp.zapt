@@ -179,7 +179,13 @@ void {{asUpperCamelCase label}}AttributeAccess::reported_updated(const bridged_e
       {{else}}
       using T = MN::{{asUpperCamelCase label}}::TypeInfo::Type;
       {{/if}}
+      {{#if (attributeHasSpecialValues parent.label label)}}
+      nlohmann::json modified_unify_value = unify_value;
+      {{getSpecialValues parent.label label 'modified_unify_value'}}
+      std::optional<T> value = from_json<T>(modified_unify_value);
+      {{else}}
       std::optional<T> value = from_json<T>(unify_value);
+      {{/if}}
 
       if (value.has_value()) {
         sl_log_debug(LOG_TAG,"{{asUpperCamelCase label}} attribute value is %s",unify_value.dump().c_str());

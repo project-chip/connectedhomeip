@@ -959,7 +959,15 @@ void LevelControlAttributeAccess::reported_updated(const bridged_endpoint* ep, c
         // type is int8u
     case MN::StartUpCurrentLevel::Id: {
         using T = MN::StartUpCurrentLevel::TypeInfo::Type;
-        std::optional<T> value = from_json<T>(unify_value);
+        nlohmann::json modified_unify_value = unify_value;
+
+        if (strcmp(modified_unify_value.dump().c_str(), "\"MinimumDeviceValuePermitted\"") == 0) {
+            modified_unify_value = 0;
+        } else if (strcmp(modified_unify_value.dump().c_str(), "\"SetToPreviousValue\"") == 0) {
+            modified_unify_value = 0xFF;
+        }
+
+        std::optional<T> value = from_json<T>(modified_unify_value);
 
         if (value.has_value()) {
             sl_log_debug(LOG_TAG, "StartUpCurrentLevel attribute value is %s", unify_value.dump().c_str());

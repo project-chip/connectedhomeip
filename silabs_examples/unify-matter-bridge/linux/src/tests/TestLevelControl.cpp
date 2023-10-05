@@ -191,6 +191,26 @@ static void TestLevelControlAttributeStartUpCurrentLevel(nlTestSuite * sSuite, v
     NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
 }
 
+static void TestLevelControlAttributeStartUpCurrentLevelForMinimumValue(nlTestSuite * sSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    DataModel::Nullable<uint8_t> value;
+    value.SetNonNull((uint8_t) 0);
+    CHIP_ERROR err = ctx.attribute_test<Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo>(
+        sSuite, "ucl/by-unid/zw-0x0002/ep2/Level/Attributes/StartUpCurrentLevel/Reported", R"({ "value": "MinimumDeviceValuePermitted" })", value);
+    NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
+}
+
+static void TestLevelControlAttributeStartUpCurrentLevelForPreviousValue(nlTestSuite * sSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    DataModel::Nullable<uint8_t> value;
+    value.SetNull();
+    CHIP_ERROR err = ctx.attribute_test<Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo>(
+        sSuite, "ucl/by-unid/zw-0x0002/ep2/Level/Attributes/StartUpCurrentLevel/Reported", R"({ "value": "SetToPreviousValue" })", value);
+    NL_TEST_ASSERT(sSuite, err == CHIP_NO_ERROR);
+}
+
 static void TestLevelControlAttributeGeneratedCommandList(nlTestSuite * sSuite, void * apContext) {}
 static void TestLevelControlAttributeAcceptedCommandList(nlTestSuite * sSuite, void * apContext) {}
 static void TestLevelControlAttributeAttributeList(nlTestSuite * sSuite, void * apContext) {}
@@ -309,6 +329,8 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("LevelControl::TestLevelControlAttributeOnTransitionTime", TestLevelControlAttributeOnTransitionTime),
     NL_TEST_DEF("LevelControl::TestLevelControlAttributeOffTransitionTime", TestLevelControlAttributeOffTransitionTime),
     NL_TEST_DEF("LevelControl::TestLevelControlAttributeDefaultMoveRate", TestLevelControlAttributeDefaultMoveRate),
+    NL_TEST_DEF("LevelControl::TestLevelControlAttributeStartUpCurrentLevelForPreviousValue", TestLevelControlAttributeStartUpCurrentLevelForPreviousValue),
+    NL_TEST_DEF("LevelControl::TestLevelControlAttributeStartUpCurrentLevelForMinimumValue", TestLevelControlAttributeStartUpCurrentLevelForMinimumValue),
     NL_TEST_DEF("LevelControl::TestLevelControlAttributeStartUpCurrentLevel", TestLevelControlAttributeStartUpCurrentLevel),
     NL_TEST_DEF("LevelControl::TestLevelControlAttributeGeneratedCommandList", TestLevelControlAttributeGeneratedCommandList),
     NL_TEST_DEF("LevelControl::TestLevelControlAttributeAcceptedCommandList", TestLevelControlAttributeAcceptedCommandList),
