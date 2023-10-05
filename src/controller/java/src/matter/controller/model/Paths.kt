@@ -15,7 +15,7 @@
  *   limitations under the License.
  *
  */
-package matter.controller
+package matter.controller.model
 
 /**
  * Represents a full path for reading an attribute from a node.

@@ -64,7 +64,7 @@ interface MatterController : Closeable, InteractionClient {
    *
    * @param listener The listener to set.
    */
-  fun setCompletionListener(listener: CompletionListener)
+  fun setCompletionListener(listener: CompletionListener?)
 
   /**
    * Commissions a device into a Matter fabric.

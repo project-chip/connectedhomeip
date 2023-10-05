@@ -42,17 +42,21 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
+import matter.controller.model.AttributePath
+import matter.controller.model.AttributeState
+import matter.controller.model.ClusterState
+import matter.controller.model.EndpointState
+import matter.controller.model.EventPath
+import matter.controller.model.EventState
+import matter.controller.model.NodeState
 
 /** Controller to interact with the CHIP device. */
-class MatterControllerImpl(params: ControllerParams) :
-  MatterController, chip.devicecontroller.ChipDeviceController.CompletionListener {
+class MatterControllerImpl(params: ControllerParams) : MatterController {
   private val deviceController: ChipDeviceController
-  private var completionListener: MatterController.CompletionListener? = null
   private var nodeId: Long? = null
 
-  override fun setCompletionListener(listener: MatterController.CompletionListener) {
-    completionListener = listener
-  }
+  override fun setCompletionListener(listener: MatterController.CompletionListener?) =
+    deviceController.setCompletionListener(CompletionListenerAdapter.from(listener))
 
   override fun pairDevice(
     nodeId: Long,
@@ -62,7 +66,6 @@ class MatterControllerImpl(params: ControllerParams) :
     pinCode: Long,
   ) {
     this.nodeId = nodeId
-    deviceController.setCompletionListener(this)
     deviceController.pairDeviceWithAddress(nodeId, address, port, discriminator, pinCode, null)
   }
 
@@ -78,60 +81,6 @@ class MatterControllerImpl(params: ControllerParams) :
     setupPincode: Long
   ) {
     deviceController.establishPaseConnection(nodeId, address, port, setupPincode)
-  }
-
-  override fun onConnectDeviceComplete() {
-    completionListener?.onConnectDeviceComplete()
-  }
-
-  override fun onStatusUpdate(status: Int) {
-    completionListener?.onStatusUpdate(status)
-  }
-
-  override fun onPairingComplete(errorCode: Int) {
-    completionListener?.onPairingComplete(errorCode)
-  }
-
-  override fun onPairingDeleted(errorCode: Int) {
-    completionListener?.onPairingDeleted(errorCode)
-  }
-
-  override fun onNotifyChipConnectionClosed() {
-    completionListener?.onNotifyChipConnectionClosed()
-  }
-
-  override fun onCloseBleComplete() {
-    logger.log(Level.INFO, "Not implemented, override the abstract function.")
-  }
-
-  override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
-    completionListener?.onCommissioningComplete(nodeId, errorCode)
-  }
-
-  override fun onCommissioningStatusUpdate(nodeId: Long, stage: String?, errorCode: Int) {
-    completionListener?.onCommissioningStatusUpdate(nodeId, stage, errorCode)
-  }
-
-  override fun onReadCommissioningInfo(
-    vendorId: Int,
-    productId: Int,
-    wifiEndpointId: Int,
-    threadEndpointId: Int
-  ) {
-    completionListener?.onReadCommissioningInfo(
-      vendorId,
-      productId,
-      wifiEndpointId,
-      threadEndpointId
-    )
-  }
-
-  override fun onOpCSRGenerationComplete(csr: ByteArray) {
-    completionListener?.onOpCSRGenerationComplete(csr)
-  }
-
-  override fun onError(error: Throwable) {
-    completionListener?.onError(error)
   }
 
   override fun subscribe(request: SubscribeRequest): Flow<SubscriptionState> {
@@ -261,6 +210,8 @@ class MatterControllerImpl(params: ControllerParams) :
               // The underlying subscription is terminated if both attributePath & eventPath are
               // null
               if (attributePath == null && eventPath == null) {
+                logger.log(Level.SEVERE, "The underlying subscription is terminated")
+
                 trySendBlocking(
                     SubscriptionState.SubscriptionErrorNotification(CHIP_ERROR_UNEXPECTED_EVENT)
                   )

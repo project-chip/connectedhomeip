@@ -15,7 +15,7 @@
  *   limitations under the License.
  *
  */
-package matter.controller
+package matter.controller.model
 
 /**
  * Represents information about a node, including data on all available endpoints.

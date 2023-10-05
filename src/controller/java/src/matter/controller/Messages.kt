@@ -18,9 +18,12 @@
 package matter.controller
 
 import java.time.Duration
+import matter.controller.model.AttributePath
+import matter.controller.model.CommandPath
+import matter.controller.model.EventPath
 
-private const val SUBSCRIPTION_MIN_INTERVAL_S: Long = 0L
-private const val SUBSCRIPTION_MAX_INTERVAL_S: Long = 30L
+private const val DEFAULT_SUBSCRIPTION_MIN_INTERVAL_S: Long = 0L
+private const val DEFAULT_SUBSCRIPTION_MAX_INTERVAL_S: Long = 30L
 
 /**
  * Representation of Timestamp type.
@@ -35,14 +38,6 @@ sealed class Timestamp {
   data class MillisSinceBoot(val value: Long) : Timestamp()
 
   data class MillisSinceEpoch(val value: Long) : Timestamp()
-
-  fun isSystem(): Boolean {
-    return this is MillisSinceBoot
-  }
-
-  fun isEpoch(): Boolean {
-    return this is MillisSinceEpoch
-  }
 }
 
 /**
@@ -124,30 +119,30 @@ class ReadResponse(val successes: List<ReadData>, val failures: List<ReadFailure
 class SubscribeRequest(
   val eventPaths: List<EventPath>,
   val attributePaths: List<AttributePath>,
-  val minInterval: Duration = Duration.ofSeconds(SUBSCRIPTION_MIN_INTERVAL_S),
-  val maxInterval: Duration = Duration.ofSeconds(SUBSCRIPTION_MAX_INTERVAL_S),
+  val minInterval: Duration = Duration.ofSeconds(DEFAULT_SUBSCRIPTION_MIN_INTERVAL_S),
+  val maxInterval: Duration = Duration.ofSeconds(DEFAULT_SUBSCRIPTION_MAX_INTERVAL_S),
   val keepSubscriptions: Boolean = true,
   val fabricFiltered: Boolean = true
 )
 
 /** An interface representing the possible states of a subscription. */
-sealed interface SubscriptionState {
+sealed class SubscriptionState {
   /**
    * Represents an error notification in the subscription.
    *
    * @param terminationCause The cause of the subscription termination.
    */
-  class SubscriptionErrorNotification(val terminationCause: UInt) : SubscriptionState
+  class SubscriptionErrorNotification(val terminationCause: UInt) : SubscriptionState()
 
   /**
    * Represents an update in the state of a subscribed node.
    *
    * @param updateState The state update received from the subscribed node.
    */
-  class NodeStateUpdate(val updateState: ReadResponse) : SubscriptionState
+  class NodeStateUpdate(val updateState: ReadResponse) : SubscriptionState()
 
   /** Represents the state where the subscription has been successfully established. */
-  object SubscriptionEstablished : SubscriptionState
+  object SubscriptionEstablished : SubscriptionState()
 }
 
 /**
