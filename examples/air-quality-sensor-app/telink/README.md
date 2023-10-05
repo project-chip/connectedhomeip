@@ -12,7 +12,7 @@ You can use this example as a reference for creating your own application.
     $ docker pull ghcr.io/project-chip/chip-build-telink:1
     ```
 
-1. Run docker container:
+2. Run docker container:
 
     ```bash
     $ docker run -it --rm -v ${CHIP_BASE}:/root/chip -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" ghcr.io/project-chip/chip-build-telink:1
@@ -21,19 +21,19 @@ You can use this example as a reference for creating your own application.
     here `${CHIP_BASE}` is directory which contains CHIP repo files **!!!Pay
     attention that OUTPUT_DIR should contains ABSOLUTE path to output dir**
 
-1. Activate the build environment:
+3. Activate the build environment:
 
     ```bash
     $ source ./scripts/activate.sh
     ```
 
-1. In the example dir run:
+4. In the example dir run:
 
     ```bash
     $ west build
     ```
 
-1. Flash binary:
+5. Flash binary:
 
     ```
     $ west flash --erase
@@ -58,7 +58,7 @@ The following buttons are available on **tlsr9518adk80d** board:
 | Name     | Function               | Description                                                                                            |
 | :------- | :--------------------- | :----------------------------------------------------------------------------------------------------- |
 | Button 1 | Factory reset          | Perform factory reset to forget currently commissioned Thread network and back to uncommissioned state |
-| Button 2 | AirQuality control       | Manually triggers the AirQuality state                                                                   |
+| Button 2 | AirQuality control     | Manually triggers the AirQuality state                                                                 |
 | Button 3 | Thread start           | Commission thread with static credentials and enables the Thread on device                             |
 | Button 4 | Open commission window | The button is opening commissioning window to perform commissioning over BLE                           |
 
@@ -186,15 +186,3 @@ Usage of OTA:
 Once the transfer is complete, OTA requestor sends ApplyUpdateRequest command to
 OTA provider for applying the image. Device will restart on successful
 application of OTA image.
-
-### Building with Pigweed RPCs
-
-The RPCs in `lighting-common/lighting_service/lighting_service.proto` can be
-used to control various functionalities of the lighting app from a USB-connected
-host computer. To build the example with the RPC server, run the following
-command with _build-target_ replaced with the build target name of the Telink
-Semiconductor's kit you own:
-
-    ```
-    $ west build -b tlsr9518adk80d -- -DOVERLAY_CONFIG=rpc.overlay
-    ```
