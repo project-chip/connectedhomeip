@@ -502,7 +502,7 @@ void CloseIOCTLSocket()
     }
 }
 
-#if __ANDROID__
+#ifdef __ANDROID__
 
 static struct if_nameindex * backport_if_nameindex(void);
 static void backport_if_freenameindex(struct if_nameindex *);
@@ -648,7 +648,7 @@ InterfaceIterator::~InterfaceIterator()
 {
     if (mIntfArray != nullptr)
     {
-#if __ANDROID__
+#ifdef __ANDROID__
         backport_if_freenameindex(mIntfArray);
 #else
         if_freenameindex(mIntfArray);
@@ -666,7 +666,7 @@ bool InterfaceIterator::Next()
 {
     if (mIntfArray == nullptr)
     {
-#if __ANDROID__
+#ifdef __ANDROID__
         mIntfArray = backport_if_nameindex();
 #else
         mIntfArray = if_nameindex();

@@ -235,6 +235,7 @@ config("strict_warnings") {
   cflags = [
     "-Wextra",
     "-Wshadow",
+    "-Wundef",
     "-Wunreachable-code",
     "-Wvla",
     "-Wformat",
