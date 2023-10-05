@@ -32,7 +32,6 @@ private:
     CHIP_ERROR Init(void);
 
     static void AirQualityActionEventHandler(AppEvent * aEvent);
-    static void SelfTestHandler(AppEvent * aEvent);
 
     chip::app::Clusters::AirQuality::AirQualityEnum AirQualityState;
 

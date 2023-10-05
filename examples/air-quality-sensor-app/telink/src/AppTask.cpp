@@ -39,24 +39,14 @@ CHIP_ERROR AppTask::Init(void)
 
 void AppTask::UpdateClusterState(void)
 {
-    EndpointId endpoint  = 1;
-    AirQualityState = AirQualityEnum::kGood;
-    EmberAfStatus status = Clusters::AirQuality::Attributes::AirQuality::Set(endpoint, AirQualityState);
-    VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(NotSpecified, "Failed to set AirQuality attribute"));
-}
-
-void AppTask::SelfTestHandler(AppEvent * aEvent)
-{
-    sAppTask.UpdateClusterState();
+    // Jira ticket: https://github.com/project-chip/connectedhomeip/pull/29329
+    // OnAirQualityChangeHandler(static_cast<AirQualityEnum>(newValue));
 }
 
 void AppTask::AirQualityActionEventHandler(AppEvent * aEvent)
 {
-    AppEvent event;
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        event.ButtonEvent.Action = kButtonPushEvent;
-        event.Handler            = SelfTestHandler;
-        GetAppTask().PostEvent(&event);
+        sAppTask.UpdateClusterState();
     }
 }
