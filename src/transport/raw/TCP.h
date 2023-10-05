@@ -225,7 +225,7 @@ private:
      */
     CHIP_ERROR ProcessSingleMessage(const PeerAddress & peerAddress, ActiveConnectionState * state, uint16_t messageSize);
 
-    // Release an active connection(corresponding to the passed TCPEndPoint)
+    // Release an active connection (corresponding to the passed TCPEndPoint)
     // from the pool.
     void ReleaseActiveConnection(Inet::TCPEndPoint * endPoint);
 
