@@ -21,8 +21,9 @@ recent API change on upstream LwIP. The previous version of this function is
 
 ### ND6 LLADDR fix
 
-This patch fixes a bug where the RA processing fails if the RA includes an LLADDR
-option with a hw address that is not the max length. This happens for thread devices.
+This patch fixes a bug where the RA processing fails if the RA includes an
+LLADDR option with a hw address that is not the max length. This happens for
+thread devices.
 
 -   patch file: nd6_lladdr_fix.patch
 
