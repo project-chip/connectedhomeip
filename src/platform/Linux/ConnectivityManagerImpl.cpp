@@ -1560,8 +1560,10 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
         GAutoPtr<const char *> keyMgmts(g_variant_get_strv(keyMgmt.get(), nullptr));
         const gchar ** keyMgmtsHendle = keyMgmts.get();
         uint8_t res                   = 0;
-        for (const gchar * keyMgmtVal = (keyMgmtsHendle != nullptr ? *keyMgmtsHendle : nullptr); keyMgmtVal != nullptr;
-             keyMgmtVal               = *(++keyMgmtsHendle))
+
+        VerifyOrReturnError(keyMgmtsHendle != nullptr, res);
+
+        for (auto keyMgmtVal = *keyMgmtsHendle; keyMgmtVal != nullptr; keyMgmtVal = *(++keyMgmtsHendle))
         {
             if (g_strcasecmp(keyMgmtVal, "wpa-psk") == 0 || g_strcasecmp(keyMgmtVal, "wpa-none") == 0)
             {
@@ -1588,8 +1590,10 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
         GAutoPtr<const char *> keyMgmts(g_variant_get_strv(keyMgmt.get(), nullptr));
         const gchar ** keyMgmtsHendle = keyMgmts.get();
         uint8_t res                   = 0;
-        for (const gchar * keyMgmtVal = (keyMgmtsHendle != nullptr ? *keyMgmtsHendle : nullptr); keyMgmtVal != nullptr;
-             keyMgmtVal               = *(++keyMgmtsHendle))
+
+        VerifyOrReturnError(keyMgmtsHendle != nullptr, res);
+
+        for (auto keyMgmtVal = *keyMgmtsHendle; keyMgmtVal != nullptr; keyMgmtVal = *(++keyMgmtsHendle))
         {
             if (g_strcasecmp(keyMgmtVal, "wpa-psk") == 0 || g_strcasecmp(keyMgmtVal, "wpa-psk-sha256") == 0 ||
                 g_strcasecmp(keyMgmtVal, "wpa-ft-psk") == 0)
