@@ -515,10 +515,11 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
     ExchangeHandle ref(*this);
 
     // If we receive a message while we are expecting a response for our previous message,
-    // we assume that the peer is likely active. If the message was in fact the response,
+    // we assume that the peer is likely active, since it has not sent us that response yet and hence
+    // still has an active exchange corresponding to this one.  If this message is in fact the response,
     // the flag will be reset to false when we process the message later in the function.
     // If we receive a message while we are not expecting a response,
-    // we reset the flag to false because we don't if the peer should still be active or not.
+    // we reset the flag to false because we don't know whether the peer should still be active or not.
     SetPeerActiveStateHint(IsResponseExpected());
 
     bool isStandaloneAck = payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck);
@@ -680,7 +681,7 @@ bool ExchangeContext::IsPeerLikelyActiveHint()
     if (IsEphemeralExchange())
         return true;
 
-    // Return previously stored state if we have no absolute answer
+    // Return previously stored state if we have no absolute answer.
     return mFlags.Has(Flags::kPeerShouldBeActive);
 }
 
