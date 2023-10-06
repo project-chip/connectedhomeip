@@ -31,13 +31,13 @@ ICDNotifier::~ICDNotifier()
 
 CHIP_ERROR ICDNotifier::Subscribe(ICDSubscriber * subscriber)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     for (auto & sub : mSubscribers)
     {
         if (sub == nullptr)
         {
             sub = subscriber;
-            err = CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+            err = CHIP_NO_ERROR;
             break;
         }
     }
