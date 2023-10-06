@@ -198,7 +198,7 @@ CHIP_ERROR SilabsDeviceDataProvider::GetSetupPayload(MutableCharSpan & payloadBu
             static constexpr uint8_t defaultSetupPayloadBitset[] = { 0x88, 0xFF, 0x2F, 0x00, 0x44, 0x00, 0xE0, 0x4B, 0x84, 0x68, 0x02 };
             bitSetLen                                          = sizeof(defaultSetupPayloadBitset);
             ReturnErrorCodeIf(bitSetLen > kTotalPayloadDataSizeInBytes, CHIP_ERROR_BUFFER_TOO_SMALL);
-            memcpy(payloadBitSet, defaultSetupPayloadBitset, bitSetLen); 
+            memcpy(payloadBitSet, defaultSetupPayloadBitset, bitSetLen);
         } else {
             bitSetLen                                          = sizeof(kTestSetupPayloadBitset);
             ReturnErrorCodeIf(bitSetLen > kTotalPayloadDataSizeInBytes, CHIP_ERROR_BUFFER_TOO_SMALL);
