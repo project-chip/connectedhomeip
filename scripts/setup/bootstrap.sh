@@ -21,14 +21,14 @@ _install_additional_pip_requirements() {
     # figure out additional pip install items
     while [ $# -gt 0 ]; do
         case $1 in
-            -p | --platform)
-                _SETUP_PLATFORM=$2
-                shift # argument
-                shift # value
-                ;;
-            *)
-                shift
-                ;;
+        -p | --platform)
+            _SETUP_PLATFORM=$2
+            shift # argument
+            shift # value
+            ;;
+        *)
+            shift
+            ;;
         esac
     done
 
@@ -75,10 +75,14 @@ _bootstrap_or_activate() {
         unset PW_CONFIG_FILE
     fi
 
+    declare -a minimum_required_modules=("third_party/nlunit-test/repo" "third_party/nlassert/repo" "third_party/pigweed/repo" "third_party/editline/repo" "third_party/jsoncpp/repo" "third_party/libwebsockets/repo" "third_party/nlio/repo" "third_party/perfetto/repo")
+
     if [ ! -f "$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/util.sh" ]; then
         # Make sure our submodule remotes are correct for this revision.
-        git submodule sync --recursive
-        git submodule update --init
+        for submodule in "${minimum_required_modules[@]}"; do
+            git submodule sync $submodule
+            git submodule update --init $submodule
+        done
     elif [ "$_BOOTSTRAP_NAME" = "bootstrap.sh" ]; then
         # In this case, only update already checked out submodules.
         git submodule sync --recursive
