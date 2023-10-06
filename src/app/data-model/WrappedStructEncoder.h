@@ -48,7 +48,7 @@ public:
     {
         if (mLastError == CHIP_NO_ERROR)
         {
-            mWriter.EndContainer(mOuter);
+            mLastError = mWriter.EndContainer(mOuter);
         }
         return mLastError;
     }
