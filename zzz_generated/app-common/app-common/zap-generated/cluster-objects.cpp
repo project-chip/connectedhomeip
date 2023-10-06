@@ -10258,10 +10258,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, monitoredSubject);
         }
-        else if (__context_tag == to_underlying(Fields::kKey))
-        {
-            err = DataModel::Decode(reader, key);
-        }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
             err = DataModel::Decode(reader, fabricIndex);
