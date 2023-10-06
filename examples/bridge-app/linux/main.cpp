@@ -1024,6 +1024,7 @@ int main(int argc, char * argv[])
 
     // Run CHIP
 
+    ChipLinuxAppInitNetworkCommissioning();
     ApplicationInit();
     registerAttributeAccessOverride(&gPowerAttrAccess);
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
