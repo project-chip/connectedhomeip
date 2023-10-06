@@ -164,6 +164,9 @@ class MatterIdlTransformer(Transformer):
     def internal_api_maturity(self, _):
         return ApiMaturity.INTERNAL
 
+    def deprecated_api_maturity(self, _):
+        return ApiMaturity.DEPRECATED
+
     def id(self, tokens):
         """An id is a string containing an identifier
         """

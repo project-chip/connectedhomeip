@@ -9,6 +9,7 @@ class ApiMaturity(enum.Enum):
     STABLE = enum.auto()  # default
     PROVISIONAL = enum.auto()
     INTERNAL = enum.auto()
+    DEPRECATED = enum.auto()
 
 # Information about parsing location for specific items
 # Helpful when referencing data items in logs when processing

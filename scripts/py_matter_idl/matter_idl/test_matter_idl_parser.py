@@ -412,6 +412,7 @@ class TestParser(unittest.TestCase):
                 enum StableEnum : ENUM16 {}
                 provisional enum ProvisionalEnum : ENUM16 {}
                 internal enum InternalEnum : ENUM16 {}
+                deprecated enum DeprecatedEnum : ENUM16 {}
 
                 bitmap StableBitmap : BITMAP32 {}
                 provisional bitmap ProvisionalBitmap : BITMAP32 {}
@@ -456,6 +457,8 @@ class TestParser(unittest.TestCase):
                              entries=[], api_maturity=ApiMaturity.PROVISIONAL),
                         Enum(name="InternalEnum", base_type="ENUM16",
                              entries=[], api_maturity=ApiMaturity.INTERNAL),
+                        Enum(name="DeprecatedEnum", base_type="ENUM16",
+                             entries=[], api_maturity=ApiMaturity.DEPRECATED),
                     ],
                     bitmaps=[
                         Bitmap(name="StableBitmap",
