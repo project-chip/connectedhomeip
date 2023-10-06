@@ -246,8 +246,19 @@ def tests_with_command(chip_tool: str, is_manual: bool):
     if is_manual:
         cmd += "-manual"
 
-    result = subprocess.run([chip_tool, "tests", cmd], capture_output=True)
-    result.check_returncode()
+    try:
+      result = subprocess.run([chip_tool, "tests", cmd], capture_output=True)
+      result.check_returncode()
+    except subprocess.CalledProcessError as err:
+        # Print out output since otherwise we just say "error code 1" and that is not
+        # useful for debugging
+        print("!!!!!!!!!!!!!!!!! Execution exception !!!!!!!!!!!!!!!!!!!")
+        print("----------------------- STDOUT --------------------------")
+        print("%s" % err.stdout)
+        print("----------------------- STDERR --------------------------")
+        print("%s" % err.stderr)
+        print("---------------------------------------------------------")
+        raise
 
     test_tags = set()
     if is_manual:
