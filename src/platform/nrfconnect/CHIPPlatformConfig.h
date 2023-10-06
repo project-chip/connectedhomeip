@@ -70,7 +70,7 @@
 #define CHIP_CONFIG_MAX_FABRICS 5
 #endif
 
-#if CONFIG_CHIP_LOG_SIZE_OPTIMIZATION
+#if defined(CONFIG_CHIP_LOG_SIZE_OPTIMIZATION) && CONFIG_CHIP_LOG_SIZE_OPTIMIZATION
 // Disable some of the too detailed log modules to save flash
 #define CHIP_CONFIG_LOG_MODULE_ExchangeManager_DETAIL 0
 #define CHIP_CONFIG_LOG_MODULE_Crypto_DETAIL 0

@@ -138,7 +138,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapFree(uint64_t & currentHeap
 
     currentHeapFree = stats.free;
     return CHIP_NO_ERROR;
-#elif CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
+#elif defined(CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO) && CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
     const auto stats = mallinfo();
     currentHeapFree  = kMaxHeapSize - stats.arena + stats.fordblks;
     return CHIP_NO_ERROR;
@@ -155,7 +155,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
 
     currentHeapUsed = stats.used;
     return CHIP_NO_ERROR;
-#elif CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
+#elif defined(CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO) && CHIP_DEVICE_CONFIG_HEAP_STATISTICS_MALLINFO
     currentHeapUsed = mallinfo().uordblks;
     return CHIP_NO_ERROR;
 #else

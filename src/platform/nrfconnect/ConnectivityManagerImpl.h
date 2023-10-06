@@ -23,7 +23,7 @@
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <platform/internal/GenericConnectivityManagerImpl_TCP.h>
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.h>
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoBLE.h>
@@ -61,7 +61,7 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                       public Internal::GenericConnectivityManagerImpl_TCP<ConnectivityManagerImpl>,
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
                                       public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
 #else
                                       public Internal::GenericConnectivityManagerImpl_NoBLE<ConnectivityManagerImpl>,
