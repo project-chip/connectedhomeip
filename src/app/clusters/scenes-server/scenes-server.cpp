@@ -126,7 +126,8 @@ CHIP_ERROR ScenesServer::Init()
         //  The bit of 7 the NameSupport attribute indicates whether or not scene names are supported
         //
         //  According to spec, bit 7 (Scene Names) MUST match feature bit 0 (Scene Names)
-        uint8_t nameSupport = (featureMap & to_underlying(Feature::kSceneNames)) ? static_cast<uint8_t>(0x80) : static_cast<uint8_t>(0x00);
+        uint8_t nameSupport =
+            (featureMap & to_underlying(Feature::kSceneNames)) ? static_cast<uint8_t>(0x80) : static_cast<uint8_t>(0x00);
         status = Attributes::NameSupport::Set(endpoint, nameSupport);
         if (EMBER_ZCL_STATUS_SUCCESS != status)
         {
@@ -135,7 +136,7 @@ CHIP_ERROR ScenesServer::Init()
 
         // Forcing matter mandatory features on
         // Explicit AttributeValuePairs is mandatory for matter so we force it here
-        featureMap  |= to_underlying(Feature::kExplicit);
+        featureMap |= to_underlying(Feature::kExplicit);
         status = Attributes::FeatureMap::Set(endpoint, featureMap);
         if (EMBER_ZCL_STATUS_SUCCESS != status)
         {
@@ -210,13 +211,12 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
     uint8_t EFSCount = 0;
 
     uint32_t featureMap = 0x00;
-    ReturnOnFailure(
-        AddResponseOnError(ctx, response, Attributes::FeatureMap::Get(ctx.mRequestPath.mEndpointId, &featureMap)));
+    ReturnOnFailure(AddResponseOnError(ctx, response, Attributes::FeatureMap::Get(ctx.mRequestPath.mEndpointId, &featureMap)));
 
     SceneData storageData(CharSpan(), transitionTimeMs);
-    if(featureMap & to_underlying(Feature::kSceneNames))
+    if (featureMap & to_underlying(Feature::kSceneNames))
     {
-       storageData.SetName(req.sceneName);
+        storageData.SetName(req.sceneName);
     }
 
     // Goes through all EFS in command
@@ -393,9 +393,10 @@ CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & end
     else
     {
         uint32_t featureMap = 0x00;
-        ReturnErrorOnFailure(StatusIB(ToInteractionModelStatus(Attributes::FeatureMap::Get(endpointID, &featureMap))).ToChipError());
+        ReturnErrorOnFailure(
+            StatusIB(ToInteractionModelStatus(Attributes::FeatureMap::Get(endpointID, &featureMap))).ToChipError());
         // Check if we still support scenes name in case an OTA changed that, if we don't, set name to empty
-        if(!(featureMap & to_underlying(Feature::kSceneNames)))
+        if (!(featureMap & to_underlying(Feature::kSceneNames)))
         {
             scene.mStorageData.SetName(CharSpan());
         }
