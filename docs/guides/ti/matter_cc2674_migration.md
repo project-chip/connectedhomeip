@@ -24,10 +24,6 @@ CC2674P10 device
     defines for the CC2674
     -   `ti_simplelink_board = CC2674`
     -   `ti_simplelink_device = CC2674P10RGZ`
--   `third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx`, replace this folder
-    contents with the 7.10.01.24 version from
-    [TI's downloads page](https://www.ti.com/tool/download/SIMPLELINK-LOWPOWER-F2-SDK/7.10.01.24)
-    which is required to add support SDK for the CC2674P10 device.
 
 ## Configuring `chip.syscfg` in the SysConfig GUI
 
