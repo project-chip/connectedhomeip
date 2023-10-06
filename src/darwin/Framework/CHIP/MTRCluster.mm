@@ -34,15 +34,6 @@ using namespace ::chip;
     return self;
 }
 
-- (chip::ByteSpan)asByteSpan:(NSData *)value
-{
-    return AsByteSpan(value);
-}
-
-- (chip::CharSpan)asCharSpan:(NSString *)value
-{
-    return AsCharSpan(value);
-}
 @end
 
 @implementation MTRWriteParams

@@ -40,12 +40,13 @@ using ConnectCallback    = std::function<void(ConnectionError)>;
 using DisconnectCallback = std::function<void(void)>;
 
 const int kPortMaxLength = 5; // port is uint16_t
-const int kIdMaxLength   = chip::Dnssd::kHostNameMaxLength + kPortMaxLength;
+// +1 for the : between the hostname and the port.
+const int kIdMaxLength = chip::Dnssd::kHostNameMaxLength + kPortMaxLength + 1;
 
 class CastingPlayerAttributes
 {
 public:
-    char id[kIdMaxLength]                                  = {};
+    char id[kIdMaxLength + 1]                              = {};
     char deviceName[chip::Dnssd::kMaxDeviceNameLen + 1]    = {};
     char hostName[chip::Dnssd::kHostNameMaxLength + 1]     = {};
     char instanceName[chip::Dnssd::kHostNameMaxLength + 1] = {};

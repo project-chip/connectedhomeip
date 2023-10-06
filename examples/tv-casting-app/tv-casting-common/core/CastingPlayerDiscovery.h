@@ -86,7 +86,7 @@ private:
     static CastingPlayerDiscovery * _castingPlayerDiscovery;
 
     CastingPlayerDiscovery(CastingPlayerDiscovery & other) = delete;
-    void operator=(const CastingPlayerDiscovery &) = delete;
+    void operator=(const CastingPlayerDiscovery &)         = delete;
 
     chip::Controller::CommissionableNodeController mCommissionableNodeController;
     CastingPlayerDiscoveryState mState = DISCOVERY_NOT_READY;

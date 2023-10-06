@@ -37,7 +37,7 @@
 #include <string.h>
 
 #include <ble/BleError.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>

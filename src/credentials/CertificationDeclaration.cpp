@@ -470,7 +470,10 @@ CHIP_ERROR EncodeSignerInfo(const ByteSpan & signerKeyId, const P256ECDSASignatu
             ASN1_END_SEQUENCE;
 
             // signatureAlgorithm OBJECT IDENTIFIER ecdsa-with-SHA256 (1.2.840.10045.4.3.2)
-            ASN1_START_SEQUENCE { ASN1_ENCODE_OBJECT_ID(kOID_SigAlgo_ECDSAWithSHA256); }
+            ASN1_START_SEQUENCE
+            {
+                ASN1_ENCODE_OBJECT_ID(kOID_SigAlgo_ECDSAWithSHA256);
+            }
             ASN1_END_SEQUENCE;
 
             uint8_t asn1SignatureBuf[kMax_ECDSA_Signature_Length_Der];

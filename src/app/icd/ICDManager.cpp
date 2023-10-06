@@ -33,11 +33,6 @@
 #define ICD_ENFORCE_SIT_SLOW_POLL_LIMIT 0
 #endif
 
-#ifndef ICD_REPORT_ON_ENTER_ACTIVE_MODE
-// Enabling this makes the device emit subscription reports when transitioning from idle to active mode.
-#define ICD_REPORT_ON_ENTER_ACTIVE_MODE 0
-#endif
-
 namespace chip {
 namespace app {
 

@@ -37,7 +37,7 @@
 #include <string.h>
 
 #include <lib/core/CHIPError.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 

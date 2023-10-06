@@ -41,7 +41,7 @@
  *
  */
 
-//#include <lib/core/CHIPConfig.h>
+// #include <lib/core/CHIPConfig.h>
 #include <lib/support/CHIPMem.h>
 
 #include "heap_4_silabs.h"

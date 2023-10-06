@@ -13806,16 +13806,14 @@ enum class Fields : uint8_t
 {
     kCheckInNodeID    = 1,
     kMonitoredSubject = 2,
-    kKey              = 3,
     kFabricIndex      = 254,
 };
 
 struct Type
 {
 public:
-    chip::NodeId checkInNodeID = static_cast<chip::NodeId>(0);
-    uint64_t monitoredSubject  = static_cast<uint64_t>(0);
-    chip::ByteSpan key;
+    chip::NodeId checkInNodeID    = static_cast<chip::NodeId>(0);
+    uint64_t monitoredSubject     = static_cast<uint64_t>(0);
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

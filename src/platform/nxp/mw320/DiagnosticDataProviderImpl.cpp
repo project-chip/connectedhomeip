@@ -35,7 +35,7 @@ extern "C" {
 #include "wlan.h"
 }
 
-//#include <openthread/platform/entropy.h>
+// #include <openthread/platform/entropy.h>
 using namespace ::chip;
 using namespace ::chip::app;
 using namespace ::chip::DeviceLayer;

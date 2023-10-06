@@ -1,38 +1,6 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
-struct ModeTagStruct {
-    optional vendor_id mfgCode = 0;
-    enum16 value = 1;
-}
-
-struct ModeOptionStruct {
-    char_string<64> label = 0;
-    int8u mode = 1;
-    ModeTagStruct modeTags[] = 2;
-}
-
-struct ApplicationStruct {
-    int16u catalogVendorID = 0;
-    char_string applicationID = 1;
-}
-
-struct ErrorStateStruct {
-    enum8 errorStateID = 0;
-    optional char_string<64> errorStateLabel = 1;
-    optional char_string<64> errorStateDetails = 2;
-}
-
-struct LabelStruct {
-    char_string<16> label = 0;
-    char_string<16> value = 1;
-}
-
-struct OperationalStateStruct {
-    enum8 operationalStateID = 0;
-    optional char_string<64> operationalStateLabel = 1;
-}
-
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
 server cluster OnOff = 6 {
   enum DelayedAllOffEffectVariantEnum : ENUM8 {

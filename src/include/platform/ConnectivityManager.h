@@ -260,8 +260,8 @@ protected:
     ~ConnectivityManager() = default;
 
     // No copy, move or assignment.
-    ConnectivityManager(const ConnectivityManager &)  = delete;
-    ConnectivityManager(const ConnectivityManager &&) = delete;
+    ConnectivityManager(const ConnectivityManager &)             = delete;
+    ConnectivityManager(const ConnectivityManager &&)            = delete;
     ConnectivityManager & operator=(const ConnectivityManager &) = delete;
 };
 

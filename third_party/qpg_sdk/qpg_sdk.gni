@@ -98,7 +98,10 @@ template("qpg_sdk") {
       defines += [ "MBEDTLS_SW_ONLY" ]
     }
 
-    cflags = []
+    #Wundef fix - to be updated in SDK
+    defines += [ "GP_SCHED_NR_OF_IDLE_CALLBACKS=0" ]
+
+    cflags = [ "-Wundef" ]
 
     # Allow warning due to mbedtls
     cflags += [

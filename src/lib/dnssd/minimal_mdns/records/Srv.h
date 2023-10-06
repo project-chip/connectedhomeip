@@ -28,7 +28,7 @@ public:
     SrvResourceRecord(const FullQName & qName, const FullQName & serverName, uint16_t port) :
         ResourceRecord(QType::SRV, qName), mServerName(serverName), mPort(port)
     {}
-    SrvResourceRecord(const SrvResourceRecord & other) = default;
+    SrvResourceRecord(const SrvResourceRecord & other)             = default;
     SrvResourceRecord & operator=(const SrvResourceRecord & other) = default;
 
     FullQName GetServerName() const { return mServerName; }

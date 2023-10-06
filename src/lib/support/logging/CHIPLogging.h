@@ -435,7 +435,7 @@ void HandleTokenizedLog(uint32_t levels, pw_tokenizer_Token token, pw_tokenizer_
         if (chip::Logging::IsCategoryEnabled(CAT))                                                                                 \
         {                                                                                                                          \
             PW_TOKENIZE_FORMAT_STRING(PW_TOKENIZER_DEFAULT_DOMAIN, UINT32_MAX, MSG, __VA_ARGS__);                                  \
-            ::chip::Logging::HandleTokenizedLog((uint32_t)((CAT << 8) | chip::Logging::kLogModule_##MOD), _pw_tokenizer_token,     \
+            ::chip::Logging::HandleTokenizedLog((uint32_t) ((CAT << 8) | chip::Logging::kLogModule_##MOD), _pw_tokenizer_token,    \
                                                 PW_TOKENIZER_ARG_TYPES(__VA_ARGS__) PW_COMMA_ARGS(__VA_ARGS__));                   \
         }                                                                                                                          \
     } while (0)

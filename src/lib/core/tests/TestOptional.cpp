@@ -64,10 +64,10 @@ struct CountMovable : public Count
 public:
     CountMovable(int i) : Count(i) {}
 
-    CountMovable(const CountMovable & o) = delete;
+    CountMovable(const CountMovable & o)           = delete;
     CountMovable & operator=(const CountMovable &) = delete;
 
-    CountMovable(CountMovable && o) = default;
+    CountMovable(CountMovable && o)           = default;
     CountMovable & operator=(CountMovable &&) = default;
 };
 

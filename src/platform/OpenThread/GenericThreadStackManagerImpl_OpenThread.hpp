@@ -1710,7 +1710,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
     VerifyOrExit(otErr == OT_ERROR_NONE, err = MapOpenThreadError(otErr));
 
     // Enable automatic assignment of Thread advertised addresses.
-#if OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE
+#if defined(OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE) && OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE
     otIp6SetSlaacEnabled(otInst, true);
 #endif
 

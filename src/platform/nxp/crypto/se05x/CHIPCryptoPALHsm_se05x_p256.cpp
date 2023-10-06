@@ -86,7 +86,7 @@ static CHIP_ERROR parse_se05x_keyid_from_keypair(const P256KeypairContext mKeypa
 
     return CHIP_NO_ERROR;
 }
-#endif //#if (ENABLE_SE05X_GENERATE_EC_KEY || ENABLE_SE05X_ECDSA_VERIFY)
+#endif // #if (ENABLE_SE05X_GENERATE_EC_KEY || ENABLE_SE05X_ECDSA_VERIFY)
 
 P256Keypair::~P256Keypair()
 {
@@ -297,12 +297,12 @@ CHIP_ERROR P256Keypair::Deserialize(P256SerializedKeypair & input)
 
         sss_object_t sss_object = { 0 };
         sss_status_t sss_status = kStatus_SSS_Fail;
-        uint32_t keyid = 0;
+        uint32_t keyid          = 0;
         uint8_t keyid_buffer[4] = { 0 };
-        uint8_t key[128] = { 0 };
-        uint8_t header[] = EC_NIST_P256_KP_HEADER;
-        uint8_t pub_header[] = EC_NIST_P256_KP_PUB_HEADER;
-        size_t key_length = 0;
+        uint8_t key[128]        = { 0 };
+        uint8_t header[]        = EC_NIST_P256_KP_HEADER;
+        uint8_t pub_header[]    = EC_NIST_P256_KP_PUB_HEADER;
+        size_t key_length       = 0;
 
         memcpy(&key[key_length], header, sizeof(header));
         key_length += sizeof(header);
@@ -344,7 +344,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     return ECDH_derive_secret_H(&mKeypair, remote_public_key, out_secret);
 #else
     size_t secret_length = (out_secret.Length() == 0) ? out_secret.Capacity() : out_secret.Length();
-    uint32_t keyid = 0;
+    uint32_t keyid       = 0;
 
     if (CHIP_NO_ERROR != parse_se05x_keyid_from_keypair(mKeypair, &keyid))
     {
@@ -358,7 +358,7 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
     VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
 
     const uint8_t * const rem_pubKey = Uint8::to_const_uchar(remote_public_key);
-    const size_t rem_pubKeyLen = remote_public_key.Length();
+    const size_t rem_pubKeyLen       = remote_public_key.Length();
 
     VerifyOrReturnError(gex_sss_chip_ctx.ks.session != nullptr, CHIP_ERROR_INTERNAL);
 
@@ -415,16 +415,16 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, size
 #if !ENABLE_SE05X_ECDSA_VERIFY
     return ECDSA_validate_msg_signature_H(this, msg, msg_length, signature);
 #else
-    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
-    sss_status_t status = kStatus_SSS_Success;
+    CHIP_ERROR error           = CHIP_ERROR_INTERNAL;
+    sss_status_t status        = kStatus_SSS_Success;
     sss_asymmetric_t asymm_ctx = { 0 };
-    uint8_t hash[32] = {
+    uint8_t hash[32]           = {
         0,
     };
-    size_t hash_length = sizeof(hash);
-    sss_object_t keyObject = { 0 };
+    size_t hash_length                                       = sizeof(hash);
+    sss_object_t keyObject                                   = { 0 };
     uint8_t signature_se05x[kMax_ECDSA_Signature_Length_Der] = { 0 };
-    size_t signature_se05x_len = sizeof(signature_se05x);
+    size_t signature_se05x_len                               = sizeof(signature_se05x);
     MutableByteSpan out_der_sig_span(signature_se05x, signature_se05x_len);
 
     VerifyOrReturnError(msg != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -478,12 +478,12 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, si
 #if !ENABLE_SE05X_ECDSA_VERIFY
     return ECDSA_validate_hash_signature_H(this, hash, hash_length, signature);
 #else
-    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
-    sss_status_t status = kStatus_SSS_Success;
-    sss_asymmetric_t asymm_ctx = { 0 };
-    sss_object_t keyObject = { 0 };
+    CHIP_ERROR error                                         = CHIP_ERROR_INTERNAL;
+    sss_status_t status                                      = kStatus_SSS_Success;
+    sss_asymmetric_t asymm_ctx                               = { 0 };
+    sss_object_t keyObject                                   = { 0 };
     uint8_t signature_se05x[kMax_ECDSA_Signature_Length_Der] = { 0 };
-    size_t signature_se05x_len = sizeof(signature_se05x);
+    size_t signature_se05x_len                               = sizeof(signature_se05x);
     MutableByteSpan out_der_sig_span(signature_se05x, signature_se05x_len);
 
     VerifyOrReturnError(hash != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -577,28 +577,28 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * csr, size_t & csr
 #if !ENABLE_SE05X_GENERATE_EC_KEY
     return NewCertificateSigningRequest_H(&mKeypair, csr, csr_length);
 #else
-    CHIP_ERROR error = CHIP_ERROR_INTERNAL;
-    sss_status_t status = kStatus_SSS_Success;
+    CHIP_ERROR error           = CHIP_ERROR_INTERNAL;
+    sss_status_t status        = kStatus_SSS_Success;
     sss_asymmetric_t asymm_ctx = { 0 };
-    sss_object_t keyObject = { 0 };
-    uint32_t keyid = 0;
+    sss_object_t keyObject     = { 0 };
+    uint32_t keyid             = 0;
 
     uint8_t data_to_hash[128] = { 0 };
-    size_t data_to_hash_len = sizeof(data_to_hash);
-    uint8_t pubkey[128] = { 0 };
-    size_t pubKeyLen = 0;
-    uint8_t hash[32] = { 0 };
-    size_t hash_length = sizeof(hash);
-    uint8_t signature[128] = { 0 };
-    size_t signature_len = sizeof(signature);
+    size_t data_to_hash_len   = sizeof(data_to_hash);
+    uint8_t pubkey[128]       = { 0 };
+    size_t pubKeyLen          = 0;
+    uint8_t hash[32]          = { 0 };
+    size_t hash_length        = sizeof(hash);
+    uint8_t signature[128]    = { 0 };
+    size_t signature_len      = sizeof(signature);
 
-    size_t csr_index = 0;
+    size_t csr_index    = 0;
     size_t buffer_index = data_to_hash_len;
 
     uint8_t organisation_oid[3] = { 0x55, 0x04, 0x0a };
 
     // Version  ::=  INTEGER  {  v1(0), v2(1), v3(2)  }
-    uint8_t version[3] = { 0x02, 0x01, 0x00 };
+    uint8_t version[3]       = { 0x02, 0x01, 0x00 };
     uint8_t signature_oid[8] = { 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x04, 0x03, 0x02 };
     uint8_t nist256_header[] = { 0x30, 0x59, 0x30, 0x13, 0x06, 0x07, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01,
                                  0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x03, 0x01, 0x07, 0x03, 0x42, 0x00 };
@@ -695,7 +695,7 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * csr, size_t & csr
     {
         csr[csr_index++] = 0x81;
     }
-    csr[csr_index++] = (uint8_t)(data_to_hash_len + 14 + kTlvHeader + signature_len);
+    csr[csr_index++] = (uint8_t) (data_to_hash_len + 14 + kTlvHeader + signature_len);
 
     VerifyOrExit((csr_index + data_to_hash_len) <= csr_length, error = CHIP_ERROR_INTERNAL);
     memcpy((csr + csr_index), data_to_hash, data_to_hash_len);
@@ -717,7 +717,7 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * csr, size_t & csr
 
     VerifyOrExit((csr_index + kTlvHeader) <= csr_length, error = CHIP_ERROR_INTERNAL);
     csr[csr_index++] = ASN1_BIT_STRING;
-    csr[csr_index++] = (uint8_t)((signature[0] != 0) ? (signature_len + 1) : (signature_len));
+    csr[csr_index++] = (uint8_t) ((signature[0] != 0) ? (signature_len + 1) : (signature_len));
 
     if (signature[0] != 0)
     {

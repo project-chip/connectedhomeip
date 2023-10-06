@@ -26,7 +26,7 @@
 #include <app/server/Server.h>
 #include <app/util/af.h>
 
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <platform/Ameba/AmebaConfig.h>
 #include <platform/Ameba/NetworkCommissioningDriver.h>
 #include <platform/CHIPDeviceLayer.h>

@@ -27,6 +27,8 @@ config("config") {
   ]
 
   cflags = [ "-Wconversion" ]
+
+  defines = [ "CONFIG_USE_SEPARATE_EVENTLOOP=0" ]
 }
 
 chip_data_model("tv-casting-common") {

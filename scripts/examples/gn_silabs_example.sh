@@ -323,7 +323,7 @@ else
         source "$CHIP_ROOT/scripts/activate.sh"
     fi
 
-    ninja -v -C "$BUILD_DIR"/
+    ninja -C "$BUILD_DIR"/
     #print stats
     arm-none-eabi-size -A "$BUILD_DIR"/*.out
 

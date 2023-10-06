@@ -19170,11 +19170,6 @@ void CHIPIcdManagementRegisteredClientsAttributeCallback::CallbackFn(
         chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(
             newElement_0_monitoredSubjectClassName.c_str(), newElement_0_monitoredSubjectCtorSignature.c_str(),
             jninewElement_0_monitoredSubject, newElement_0_monitoredSubject);
-        jobject newElement_0_key;
-        jbyteArray newElement_0_keyByteArray = env->NewByteArray(static_cast<jsize>(entry_0.key.size()));
-        env->SetByteArrayRegion(newElement_0_keyByteArray, 0, static_cast<jsize>(entry_0.key.size()),
-                                reinterpret_cast<const jbyte *>(entry_0.key.data()));
-        newElement_0_key = newElement_0_keyByteArray;
         jobject newElement_0_fabricIndex;
         std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
         std::string newElement_0_fabricIndexCtorSignature = "(I)V";
@@ -19193,16 +19188,15 @@ void CHIPIcdManagementRegisteredClientsAttributeCallback::CallbackFn(
             return;
         }
         jmethodID monitoringRegistrationStructStructCtor_1 = env->GetMethodID(
-            monitoringRegistrationStructStructClass_1, "<init>", "(Ljava/lang/Long;Ljava/lang/Long;[BLjava/lang/Integer;)V");
+            monitoringRegistrationStructStructClass_1, "<init>", "(Ljava/lang/Long;Ljava/lang/Long;Ljava/lang/Integer;)V");
         if (monitoringRegistrationStructStructCtor_1 == nullptr)
         {
             ChipLogError(Zcl, "Could not find ChipStructs$IcdManagementClusterMonitoringRegistrationStruct constructor");
             return;
         }
 
-        newElement_0 =
-            env->NewObject(monitoringRegistrationStructStructClass_1, monitoringRegistrationStructStructCtor_1,
-                           newElement_0_checkInNodeID, newElement_0_monitoredSubject, newElement_0_key, newElement_0_fabricIndex);
+        newElement_0 = env->NewObject(monitoringRegistrationStructStructClass_1, monitoringRegistrationStructStructCtor_1,
+                                      newElement_0_checkInNodeID, newElement_0_monitoredSubject, newElement_0_fabricIndex);
         chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
     }
 

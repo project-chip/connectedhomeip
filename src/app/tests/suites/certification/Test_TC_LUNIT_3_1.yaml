@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name:
     105.3.1. [TC-LUNIT-3.1] Read and Write Unit Localization Cluster Attributes
@@ -43,7 +42,7 @@ tests:
               type: enum8
 
     - label: "Step 2: TH writes 0 (Fahrenheit) to TemperatureUnit attribute"
-      PICS: LUNIT.S.A0000 && LUNIT.TempUnit.Fahrenheit
+      PICS: LUNIT.S.A0000 && LUNIT.S.M.Fahrenheit
       cluster: "Unit Localization"
       command: "writeAttribute"
       attribute: "TemperatureUnit"
@@ -51,14 +50,14 @@ tests:
           value: 0
 
     - label: "Step 3: TH reads TemperatureUnit attribute"
-      PICS: LUNIT.S.A0000 && LUNIT.TempUnit.Fahrenheit
+      PICS: LUNIT.S.A0000 && LUNIT.S.M.Fahrenheit
       command: "readAttribute"
       attribute: "TemperatureUnit"
       response:
           value: 0
 
     - label: "Step 4: TH writes 1 (Celsius) to TemperatureUnit attribute"
-      PICS: LUNIT.S.A0000 && LUNIT.TempUnit.Celsius
+      PICS: LUNIT.S.A0000 && LUNIT.S.M.Celsius
       cluster: "Unit Localization"
       command: "writeAttribute"
       attribute: "TemperatureUnit"
@@ -66,14 +65,14 @@ tests:
           value: 1
 
     - label: "Step 5: TH reads TemperatureUnit attribute"
-      PICS: LUNIT.S.A0000 && LUNIT.TempUnit.Celsius
+      PICS: LUNIT.S.A0000 && LUNIT.S.M.Celsius
       command: "readAttribute"
       attribute: "TemperatureUnit"
       response:
           value: 1
 
     - label: "Step 6: TH writes 2 (Kelvin) to TemperatureUnit attribute"
-      PICS: LUNIT.S.A0000 && LUNIT.TempUnit.Kelvin
+      PICS: LUNIT.S.A0000 && LUNIT.S.M.Kelvin
       cluster: "Unit Localization"
       command: "writeAttribute"
       attribute: "TemperatureUnit"
@@ -81,7 +80,7 @@ tests:
           value: 2
 
     - label: "Step 7: TH reads TemperatureUnit attribute"
-      PICS: LUNIT.S.A0000 && LUNIT.TempUnit.Kelvin
+      PICS: LUNIT.S.A0000 && LUNIT.S.M.Kelvin
       command: "readAttribute"
       attribute: "TemperatureUnit"
       response:

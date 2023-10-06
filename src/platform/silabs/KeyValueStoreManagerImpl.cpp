@@ -183,7 +183,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     // The user doesn't need the KeyString prefix, Read data after it
     size_t KeyStringLen = strlen(key);
     err                 = SilabsConfig::ReadConfigValueBin(nvm3Key, reinterpret_cast<uint8_t *>(value), value_size, outLen,
-                                           (offset_bytes + KeyStringLen));
+                                                           (offset_bytes + KeyStringLen));
     if (read_bytes_size)
     {
         *read_bytes_size = outLen;

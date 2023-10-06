@@ -29,8 +29,8 @@ class JniReferences
 {
 public:
     // No copy, move or assignment.
-    JniReferences(const JniReferences &)  = delete;
-    JniReferences(const JniReferences &&) = delete;
+    JniReferences(const JniReferences &)             = delete;
+    JniReferences(const JniReferences &&)            = delete;
     JniReferences & operator=(const JniReferences &) = delete;
 
     static JniReferences & GetInstance()

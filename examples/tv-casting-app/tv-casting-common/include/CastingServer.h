@@ -50,7 +50,7 @@ inline constexpr chip::System::Clock::Seconds16 kCommissioningWindowTimeout = ch
 class CastingServer : public AppDelegate
 {
 public:
-    CastingServer(CastingServer & other) = delete;
+    CastingServer(CastingServer & other)  = delete;
     void operator=(const CastingServer &) = delete;
     static CastingServer * GetInstance();
 

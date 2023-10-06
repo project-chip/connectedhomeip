@@ -207,7 +207,7 @@ public:
 
 private:
     // Copy and assignment NOT DEFINED
-    Layer(const Layer &) = delete;
+    Layer(const Layer &)             = delete;
     Layer & operator=(const Layer &) = delete;
 };
 

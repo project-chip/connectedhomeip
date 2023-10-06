@@ -97,6 +97,38 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
                                                   clusterID:(chip::ClusterId)clusterID
                                                   commandID:(chip::CommandId)commandID
                                                       error:(NSError * __autoreleasing *)error;
+
+/**
+ * Like the public invokeCommandWithEndpointID but allows passing through a
+ * serverSideProcessingTimeout.
+ */
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(id)commandFields
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion;
+
+/**
+ * Like the public invokeCommandWithEndpointID but:
+ *
+ * 1) Allows passing through a serverSideProcessingTimeout.
+ * 2) Expects one of the command payload structs as commandPayload
+ * 3) On success, returns an instance of responseClass via the completion (or
+ *    nil if there is no responseClass, which indicates a status-only command).
+ */
+- (void)_invokeKnownCommandWithEndpointID:(NSNumber *)endpointID
+                                clusterID:(NSNumber *)clusterID
+                                commandID:(NSNumber *)commandID
+                           commandPayload:(id)commandPayload
+                       timedInvokeTimeout:(NSNumber * _Nullable)timeout
+              serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                            responseClass:(Class _Nullable)responseClass
+                                    queue:(dispatch_queue_t)queue
+                               completion:(void (^)(id _Nullable response, NSError * _Nullable error))completion;
+
 @end
 
 @interface MTRClusterPath ()
@@ -140,6 +172,6 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
 
 // Exported utility function
 // Convert TLV data into data-value dictionary as described in MTRDeviceResponseHandler
-id _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data);
+NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data);
 
 NS_ASSUME_NONNULL_END

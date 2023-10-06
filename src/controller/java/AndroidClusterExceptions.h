@@ -24,8 +24,8 @@ namespace chip {
 class AndroidClusterExceptions
 {
 public:
-    AndroidClusterExceptions(const AndroidClusterExceptions &)  = delete;
-    AndroidClusterExceptions(const AndroidClusterExceptions &&) = delete;
+    AndroidClusterExceptions(const AndroidClusterExceptions &)             = delete;
+    AndroidClusterExceptions(const AndroidClusterExceptions &&)            = delete;
     AndroidClusterExceptions & operator=(const AndroidClusterExceptions &) = delete;
 
     static AndroidClusterExceptions & GetInstance()

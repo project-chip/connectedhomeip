@@ -33,7 +33,7 @@
 #include <app/tests/integration/common.h>
 #include <chrono>
 #include <lib/core/CHIPCore.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/TypeTraits.h>
 #include <memory>
 #include <mutex>

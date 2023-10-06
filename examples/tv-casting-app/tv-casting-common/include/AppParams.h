@@ -20,6 +20,7 @@
 
 #include <lib/core/Optional.h>
 #include <lib/support/Span.h>
+#include <setup_payload/CHIPAdditionalDataPayloadBuildConfig.h>
 
 /**
  * @brief Parameters passed to the CastingServer at the time of startup (i.e. init call)
