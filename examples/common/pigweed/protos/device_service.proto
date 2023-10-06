@@ -45,9 +45,13 @@ message MetadataForProvider {
   bytes tlv = 1;
 }
 
+message RebootRequest {
+  uint32 delay_ms = 1;
+}
+
 service Device {
   rpc FactoryReset(pw.protobuf.Empty) returns (pw.protobuf.Empty){}
-  rpc Reboot(pw.protobuf.Empty) returns (pw.protobuf.Empty){}
+  rpc Reboot(RebootRequest) returns (pw.protobuf.Empty){}
   rpc TriggerOta(pw.protobuf.Empty) returns (pw.protobuf.Empty){}
   rpc SetOtaMetadataForProvider(MetadataForProvider) returns (pw.protobuf.Empty){}
   rpc GetDeviceInfo(pw.protobuf.Empty) returns (DeviceInfo){}

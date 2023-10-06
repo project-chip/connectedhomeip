@@ -115,10 +115,13 @@ CHIP_ERROR ScenesServer::Init()
 
     for (auto endpoint : EnabledEndpointsWithServerCluster(Id))
     {
-        EmberAfStatus status = Attributes::FeatureMap::Set(endpoint, to_underlying(Feature::kSceneNames));
+        // Explicit AttributeValuePairs is mandatory for matter so we force it here, ScenesName is not but it is forced for now
+        // TODO: We currently force SceneNames on but this needs to be modified to read the value generated from Zap instead.
+        uint32_t featureMap  = to_underlying(Feature::kExplicit) | to_underlying(Feature::kSceneNames);
+        EmberAfStatus status = Attributes::FeatureMap::Set(endpoint, featureMap);
         if (EMBER_ZCL_STATUS_SUCCESS != status)
         {
-            ChipLogDetail(Zcl, "ERR: setting feature map on Endpoint %hu Status: %x", endpoint, status);
+            ChipLogDetail(Zcl, "ERR: setting the scenes FeatureMap on Endpoint %hu Status: %x", endpoint, status);
         }
         //  The bit of 7 the NameSupport attribute indicates whether or not scene names are supported
         //

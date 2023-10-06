@@ -14674,13 +14674,11 @@ class IcdManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="checkInNodeID", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="monitoredSubject", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="key", Tag=3, Type=bytes),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             checkInNodeID: 'uint' = 0
             monitoredSubject: 'uint' = 0
-            key: 'bytes' = b""
             fabricIndex: 'uint' = 0
 
     class Commands:

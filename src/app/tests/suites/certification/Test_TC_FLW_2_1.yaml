@@ -50,7 +50,7 @@ tests:
           saveAs: MaxMeasuredVariable
           constraints:
               type: int16u
-              minValue: MinMeasuredVariable
+              minValue: MinMeasuredVariable + 1
               maxValue: 65534
 
     - label: "Step 4: Read the mandatory attribute: MeasuredValue"
