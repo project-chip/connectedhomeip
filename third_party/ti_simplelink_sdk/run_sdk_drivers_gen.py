@@ -28,4 +28,3 @@ else:
     print("Compiler Path is invalid: " + GCC_ARMCOMPILER_PATH)
 
 sys.exit(ret)
-
