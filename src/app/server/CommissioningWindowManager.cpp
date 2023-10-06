@@ -544,8 +544,15 @@ void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatusEnu
     {
         mWindowStatus = aNewStatus;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-        bool isOpen = (mWindowStatus != CommissioningWindowStatusEnum::kWindowNotOpen);
-        app::GetICDNotifier()->ActiveRequest(app::ICDNotify::KeepActiveFlags::kCommissioningWindowOpen, isOpen);
+        app::ICDSubscriber::KeepActiveFlags request = app::ICDSubscriber::KeepActiveFlags::kCommissioningWindowOpen;
+        if (mWindowStatus != CommissioningWindowStatusEnum::kWindowNotOpen)
+        {
+            app::ICDNotifier::GetInstance().BroadcastActiveRequestNotification(request);
+        }
+        else
+        {
+            app::ICDNotifier::GetInstance().BroadcastActiveRequestWithdrawal(request);
+        }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     }
 

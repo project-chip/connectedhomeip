@@ -16,18 +16,18 @@ import("//build_overrides/chip.gni")
 import("icd.gni")
 
 # ICD Server sources and configurations
-config("notifier-config") {
-  defines =
-      [ "ICD_MAX_NOTIFICATION_SUBSCRIBERS=${icd_max_notification_subscribers}" ]
-}
-
 source_set("observer-srcs") {
   sources = [ "ICDStateObserver.h" ]
 }
 
-source_set("notifier-srcs") {
-  sources = [ "ICDNotifier.h" ]
-  public_configs = [ ":notifier-config" ]
+source_set("notifier") {
+  sources = [
+    "ICDNotifier.cpp",
+    "ICDNotifier.h",
+  ]
+
+  deps = [ "${chip_root}/src/lib/core" ]
+  public_deps = [ "${chip_root}/src/app:app_config" ]
 }
 
 # ICD Manager source-set is broken out of the main source-set to enable unit tests
@@ -40,7 +40,7 @@ source_set("manager-srcs") {
 
   public_deps = [
     ":cluster-srcs",
-    ":notifier-srcs",
+    ":notifier",
     ":observer-srcs",
     "${chip_root}/src/credentials:credentials",
   ]

@@ -17,19 +17,25 @@
 #pragma once
 
 #include <app/AppConfig.h>
-#include <cstdint>
-#include <cstring>
+#include <lib/core/CHIPError.h>
 
-#ifndef ICD_MAX_NOTIFICATION_SUBSCRIBERS
-#define ICD_MAX_NOTIFICATION_SUBSCRIBERS 1
-#endif
-
-class ICDNotify;
+class ICDSubscriber;
 
 namespace chip {
 namespace app {
 
-class ICDNotify
+/**
+ * The ICDManager implements the ICDSubscriber functions and is always subscribed to the ICDNotifier
+ * This allows other Matter modules to inform the ICDManager that it needs to go and may have to stay in Active Mode,
+ * outside of its standard ActiveModeInterval and IdleModeInterval, without being tightly coupled the  application data model
+ *
+ * This implementation also allows other modules to implement an ICDSubscriber and subscribe to ICDNotifier
+ * to couple behaviours with the ICD cycles. In such cases, ICD_MAX_NOTIFICATION_SUBSCRIBERS need to be adjusted
+ */
+
+static_assert(ICD_MAX_NOTIFICATION_SUBSCRIBERS > 0, "At least 1 Subscriber is required for the ICD Manager");
+
+class ICDSubscriber
 {
 public:
     enum class KeepActiveFlags : uint8_t
@@ -39,68 +45,53 @@ public:
         kExchangeContextOpen     = 0x03,
     };
 
-    virtual ~ICDNotify() {}
-    virtual void NotifyNetworkActivity()                              = 0;
-    virtual void KeepActiveRequest(KeepActiveFlags request, bool set) = 0;
+    virtual ~ICDSubscriber() {}
+
+    /**
+     * @brief This function is called for all subscribers of the ICDNotifier when it calls BroadcastNetworkActivityNotification
+     * It notifies the subscriber that a NetworkActivity occurred. For example, a message sent or received.
+     */
+    virtual void OnNetworkActivity() = 0;
+
+    /**
+     * @brief This function is called for all subscribers of the ICDNotifier when it calls BroadcastActiveRequestNotification
+     * It informs the subscriber that there is a need to place and keep the ICD in its Active Mode.
+     *
+     * @param request : Identity the request source
+     */
+    virtual void OnKeepActiveRequest(KeepActiveFlags request) = 0;
+
+    /**
+     * @brief This function is called for all subscribers of the ICDNotifier when it calls BroadcastActiveRequestWithdrawal
+     * It informs the subscriber that a previous request no longer needs ICD to maintain its Active Mode.
+     *
+     * @param request : The request source
+     */
+    virtual void OnActiveRequestWithdrawal(KeepActiveFlags request) = 0;
 };
 
 class ICDNotifier
 {
 public:
-    ICDNotifier() { memset(subscribers, 0, sizeof(subscribers)); }
-    ~ICDNotifier() { memset(subscribers, 0, sizeof(subscribers)); }
+    ~ICDNotifier();
+    CHIP_ERROR Subscribe(ICDSubscriber * subscriber);
+    void Unsubscribe(ICDSubscriber * subscriber);
 
-    void Subscribe(ICDNotify * subscriber)
-    {
-        for (auto & sub : subscribers)
-        {
-            if (sub == nullptr)
-            {
-                sub = subscriber;
-                break;
-            }
-        }
-    }
+    /**
+     * The following Broacast* methods triggers all the registered ICDSubscribers related callback
+     * For thread-safety reason (mostly of the ICDManager, which is a full time subscriber),
+     * Those functions require to be called from the Chip Task Context, or by holding the chip stack lock.
+     */
+    void BroadcastNetworkActivityNotification();
+    void BroadcastActiveRequestNotification(ICDSubscriber::KeepActiveFlags request);
+    void BroadcastActiveRequestWithdrawal(ICDSubscriber::KeepActiveFlags request);
 
-    void Unsubscribe(ICDNotify * subscriber)
-    {
-        for (auto & sub : subscribers)
-        {
-            if (sub == subscriber)
-            {
-                sub = nullptr;
-                break;
-            }
-        }
-    }
-
-    void NetworkActivity() const
-    {
-        for (auto subscriber : subscribers)
-        {
-            if (subscriber != nullptr)
-            {
-                subscriber->NotifyNetworkActivity();
-            }
-        }
-    }
-
-    void ActiveRequest(ICDNotify::KeepActiveFlags request, bool set) const
-    {
-        for (auto subscriber : subscribers)
-        {
-            if (subscriber != nullptr)
-            {
-                subscriber->KeepActiveRequest(request, set);
-            }
-        }
-    }
+    static ICDNotifier & GetInstance() { return sICDNotifier; }
 
 private:
-    ICDNotify * subscribers[ICD_MAX_NOTIFICATION_SUBSCRIBERS];
+    static ICDNotifier sICDNotifier;
+    ICDSubscriber * mSubscribers[ICD_MAX_NOTIFICATION_SUBSCRIBERS] = {};
 };
-
-ICDNotifier * GetICDNotifier();
 
 } // namespace app
 } // namespace chip

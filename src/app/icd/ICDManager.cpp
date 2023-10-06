@@ -44,12 +44,6 @@ uint8_t ICDManager::OpenExchangeContextCount = 0;
 static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
               "ICDManager::OpenExchangeContextCount cannot hold count for the max exchange count");
 
-ICDNotifier * GetICDNotifier()
-{
-    static ICDNotifier mICDNotifier;
-    return &mICDNotifier;
-}
-
 void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, ICDStateObserver * stateObserver)
 {
     VerifyOrDie(storage != nullptr);
@@ -59,7 +53,7 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     mStorage       = storage;
     mFabricTable   = fabricTable;
     mStateObserver = stateObserver;
-    GetICDNotifier()->Subscribe(this);
+    VerifyOrDie(ICDNotifier::GetInstance().Subscribe(this) == CHIP_NO_ERROR);
 
     uint32_t activeModeInterval = IcdManagementServer::GetInstance().GetActiveModeIntervalMs();
     VerifyOrDie(kFastPollingInterval.count() < activeModeInterval);
@@ -70,7 +64,7 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
 
 void ICDManager::Shutdown()
 {
-    GetICDNotifier()->Unsubscribe(this);
+    ICDNotifier::GetInstance().Unsubscribe(this);
     // cancel any running timer of the icd
     DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
     DeviceLayer::SystemLayer().CancelTimer(OnActiveModeDone, this);
@@ -136,7 +130,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
     {
         mOperationalState = OperationalState::IdleMode;
 
-        // When the active mode interval is 0, we stay in idleMode until a notification brings the icd in active mode
+        // When the active mode interval is 0, we stay in idleMode until a notification brings the icd into active mode
         if (IcdManagementServer::GetInstance().GetActiveModeIntervalMs() > 0)
         {
             uint32_t idleModeInterval = IcdManagementServer::GetInstance().GetIdleModeIntervalSec();
@@ -172,7 +166,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
 
             if (activeModeInterval == 0 && !mKeepActiveFlags.HasAny())
             {
-                // A NetworkActivity triggered the active mode and activeModeInterval is 0.
+                // A Network Activity triggered the active mode and activeModeInterval is 0.
                 // Stay active for at least Active Mode Threshold.
                 activeModeInterval = IcdManagementServer::GetInstance().GetActiveModeThresholdMs();
             }
@@ -254,74 +248,59 @@ void ICDManager::OnTransitionToIdle(System::Layer * aLayer, void * appState)
     pIcdManager->mStateObserver->OnTransitionToIdle();
 }
 
-bool ICDManager::EnsureChipStackLock()
+/* ICDSubscriber functions. */
+void ICDManager::OnKeepActiveRequest(KeepActiveFlags request)
 {
-    // TODO implement platform agnostic lock creation/mechanism that can be used for ICD without locking the chip stack
-    bool requireLock = false;
-
-#if CHIP_STACK_LOCK_TRACKING_ENABLED
-    requireLock = !DeviceLayer::PlatformMgr().IsChipStackLockedByCurrentThread();
-#endif
-
-    if (requireLock)
-    {
-        DeviceLayer::PlatformMgr().LockChipStack();
-    }
-    return requireLock;
-}
-
-/* ICDNotify observer functions. */
-void ICDManager::KeepActiveRequest(KeepActiveFlags request, bool set)
-{
-    bool requiresUnlock = this->EnsureChipStackLock();
+    assertChipStackLockedByCurrentThread();
 
     if (request == KeepActiveFlags::kExchangeContextOpen)
     {
-        // There can be multiple open exchange context at the same time.
+        // There can be multiple open exchange contexts at the same time.
         // Keep track of the requests count.
-        if (set)
-        {
-            this->OpenExchangeContextCount++;
-            this->SetKeepActiveModeRequirements(request, set);
-        }
-        else
-        {
-            if (this->OpenExchangeContextCount > 0)
-            {
-                this->OpenExchangeContextCount--;
-            }
-            else
-            {
-                ChipLogError(DeviceLayer, "The ICD Manager did not account for ExchangeContext closure");
-            }
-
-            if (this->OpenExchangeContextCount == 0)
-            {
-                this->SetKeepActiveModeRequirements(request, set);
-            }
-        }
+        this->OpenExchangeContextCount++;
+        this->SetKeepActiveModeRequirements(request, true /* state */);
     }
-    else /* kCommissioningWindowOpen, kFailSafeArmed */
+    else /* !kExchangeContextOpen */
     {
-        // Only 1 request per type - apply request directly
-        this->SetKeepActiveModeRequirements(request, set);
-    }
-
-    if (requiresUnlock)
-    {
-        DeviceLayer::PlatformMgr().UnlockChipStack();
+        // Only 1 request per type (kCommissioningWindowOpen, kFailSafeArmed)
+        // set requirement directly
+        this->SetKeepActiveModeRequirements(request, true /* state */);
     }
 }
 
-void ICDManager::NotifyNetworkActivity()
+void ICDManager::OnActiveRequestWithdrawal(KeepActiveFlags request)
 {
-    bool requiresUnlock = this->EnsureChipStackLock();
-    this->UpdateOperationState(OperationalState::ActiveMode);
+    assertChipStackLockedByCurrentThread();
 
-    if (requiresUnlock)
+    if (request == KeepActiveFlags::kExchangeContextOpen)
     {
-        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+        // There can be multiple open exchange contexts at the same time.
+        // Keep track of the requests count.
+        if (this->OpenExchangeContextCount > 0)
+        {
+            this->OpenExchangeContextCount--;
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "The ICD Manager did not account for ExchangeContext closure");
+        }
+
+        if (this->OpenExchangeContextCount == 0)
+        {
+            this->SetKeepActiveModeRequirements(request, false /* state */);
+        }
     }
+    else /* !kExchangeContextOpen */
+    {
+        // Only 1 request per type (kCommissioningWindowOpen, kFailSafeArmed)
+        // remove requirement directly
+        this->SetKeepActiveModeRequirements(request, false /* state */);
+    }
+}
+
+void ICDManager::OnNetworkActivity()
+{
+    this->UpdateOperationState(OperationalState::ActiveMode);
 }
 } // namespace app
 } // namespace chip

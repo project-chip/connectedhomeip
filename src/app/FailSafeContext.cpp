@@ -56,7 +56,9 @@ void FailSafeContext::SetFailSafeArmed(bool armed)
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     if (IsFailSafeArmed() != armed)
     {
-        chip::app::GetICDNotifier()->ActiveRequest(app::ICDNotify::KeepActiveFlags::kFailSafeArmed, armed);
+        ICDSubscriber::KeepActiveFlags activeRequest = ICDSubscriber::KeepActiveFlags::kFailSafeArmed;
+        armed ? ICDNotifier::GetInstance().BroadcastActiveRequestNotification(activeRequest)
+              : ICDNotifier::GetInstance().BroadcastActiveRequestWithdrawal(activeRequest);
     }
 #endif
     mFailSafeArmed = armed;

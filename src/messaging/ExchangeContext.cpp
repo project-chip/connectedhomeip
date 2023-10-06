@@ -200,7 +200,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         else
         {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-            chip::app::GetICDNotifier()->NetworkActivity();
+            app::ICDNotifier::GetInstance().BroadcastNetworkActivityNotification();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
             // Standalone acks are not application-level message sends.
@@ -326,7 +326,7 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, cons
     SetAutoRequestAck(!session->IsGroupSession());
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    app::GetICDNotifier()->ActiveRequest(app::ICDNotify::KeepActiveFlags::kExchangeContextOpen, true);
+    app::ICDNotifier::GetInstance().BroadcastActiveRequestNotification(app::ICDSubscriber::KeepActiveFlags::kExchangeContextOpen);
 #endif
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
@@ -345,7 +345,7 @@ ExchangeContext::~ExchangeContext()
     VerifyOrDie(mFlags.Has(Flags::kFlagClosed));
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    app::GetICDNotifier()->ActiveRequest(app::ICDNotify::KeepActiveFlags::kExchangeContextOpen, false);
+    app::ICDNotifier::GetInstance().BroadcastActiveRequestWithdrawal(app::ICDSubscriber::KeepActiveFlags::kExchangeContextOpen);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     // Ideally, in this scenario, the retransmit table should
@@ -587,7 +587,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     // message received
-    chip::app::GetICDNotifier()->NetworkActivity();
+    app::ICDNotifier::GetInstance().BroadcastNetworkActivityNotification();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     if (IsResponseExpected())

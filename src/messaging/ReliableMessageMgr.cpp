@@ -322,7 +322,7 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
     if (err == CHIP_NO_ERROR)
     {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-        chip::app::GetICDNotifier()->NetworkActivity();
+        app::ICDNotifier::GetInstance().BroadcastNetworkActivityNotification();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #if CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE
         const ExchangeManager * exchangeMgr = entry->ec->GetExchangeMgr();

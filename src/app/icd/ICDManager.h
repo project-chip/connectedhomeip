@@ -34,7 +34,7 @@ class TestICDManager;
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
  */
-class ICDManager : public ICDNotify
+class ICDManager : public ICDSubscriber
 {
 public:
     enum class OperationalState : uint8_t
@@ -54,7 +54,7 @@ public:
     void Shutdown();
     void UpdateIcdMode();
     void UpdateOperationState(OperationalState state);
-    void SetKeepActiveModeRequirements(ICDNotify::KeepActiveFlags flag, bool state);
+    void SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state);
     bool IsKeepActive() { return mKeepActiveFlags.HasAny(); }
     ICDMode GetICDMode() { return mICDMode; }
     OperationalState GetOperationalState() { return mOperationalState; }
@@ -63,9 +63,11 @@ public:
     static System::Clock::Milliseconds32 GetSlowPollingInterval() { return kSlowPollingInterval; }
     static System::Clock::Milliseconds32 GetFastPollingInterval() { return kFastPollingInterval; }
 
-    // Implementation of ICDNotify observer functions.
-    void NotifyNetworkActivity() override;
-    void KeepActiveRequest(ICDNotify::KeepActiveFlags request, bool set) override;
+    // Implementation of ICDSubscriber functions.
+    // Callers must origin from the chip task context or be holding the ChipStack lock.
+    void OnNetworkActivity() override;
+    void OnKeepActiveRequest(KeepActiveFlags request) override;
+    void OnActiveRequestWithdrawal(KeepActiveFlags request) override;
 
 protected:
     friend class TestICDManager;
@@ -80,16 +82,6 @@ protected:
      */
     static void OnTransitionToIdle(System::Layer * aLayer, void * appState);
 
-    /**
-     * @brief This function locks the ChipStack if the current thread didn't already do so.
-     *
-     *  Use case: Requests or notifications from the ICDNotifier can occur from a thread owning the lock already
-     *  In those cases, we don't lock/unlock as it will cause a deadlock.
-     *
-     * @return True when the ChipStack was locked by this call
-     *         False when the ChipStask was already locked by the running thread
-     */
-    static bool EnsureChipStackLock();
     static uint8_t OpenExchangeContextCount;
 
 private:
@@ -105,7 +97,7 @@ private:
 
     bool SupportsCheckInProtocol();
 
-    BitFlags<ICDNotify::KeepActiveFlags> mKeepActiveFlags{ 0 };
+    BitFlags<KeepActiveFlags> mKeepActiveFlags{ 0 };
 
     OperationalState mOperationalState   = OperationalState::IdleMode;
     ICDMode mICDMode                     = ICDMode::SIT;

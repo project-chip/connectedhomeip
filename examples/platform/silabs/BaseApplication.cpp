@@ -507,7 +507,10 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             {
                 SILABS_LOG("Network is already provisioned, Ble advertissement not enabled");
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-                GetICDNotifier()->NetworkActivity();
+                // Temporarly used to cause a user trigger and ICD Active Mode Interval/Threshold
+                PlatformMgr().LockChipStack();
+                ICDNotifier::GetInstance().BroadcastNetworkActivityNotification();
+                PlatformMgr().UnlockChipStack();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
             }
         }
