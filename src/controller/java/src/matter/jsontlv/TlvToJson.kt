@@ -16,13 +16,13 @@
  *    limitations under the License.
  */
 
-package chip.jsontlv
+package matter.jsontlv
 
-import chip.tlv.*
 import com.google.gson.JsonArray
 import com.google.gson.JsonNull
 import com.google.gson.JsonObject
 import java.util.Base64
+import matter.tlv.*
 
 /**
  * Implements Matter TLV to JSON converter.

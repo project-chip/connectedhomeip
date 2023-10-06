@@ -17,10 +17,10 @@
 
 package matter.onboardingpayload
 
-import chip.tlv.AnonymousTag
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvWriter
+import matter.tlv.AnonymousTag
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvWriter
 
 class QRCodeOnboardingPayloadGenerator(private val onboardingPayload: OnboardingPayload) {
   private var allowInvalidPayload = false

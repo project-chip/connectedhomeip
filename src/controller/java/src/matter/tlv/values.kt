@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-package chip.tlv
+package matter.tlv
 
 import java.lang.Double.doubleToLongBits
 import java.lang.Float.floatToIntBits
