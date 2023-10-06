@@ -27,7 +27,7 @@ limitations under the License.
         <cluster code="0x0046"/>
         <item fieldId="1" name="CheckInNodeID" type="node_id" isFabricSensitive="true"/>
         <item fieldId="2" name="MonitoredSubject" type="INT64U" isFabricSensitive="true"/>
-        <item fieldId="3" name="Key" type="OCTET_STRING" length="16" isFabricSensitive="true"/>
+        <!-- RESERVED = 0x03 -->
     </struct>
 
     <cluster>
