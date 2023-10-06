@@ -254,9 +254,9 @@ def tests_with_command(chip_tool: str, is_manual: bool):
         # useful for debugging
         print("!!!!!!!!!!!!!!!!! Execution exception !!!!!!!!!!!!!!!!!!!")
         print("----------------------- STDOUT --------------------------")
-        print("%s" % err.stdout)
+        print("%s" % err.stdout.decode("utf8", errors="replace'"))
         print("----------------------- STDERR --------------------------")
-        print("%s" % err.stderr)
+        print("%s" % err.stderr.decode("utf8", errors="replace"))
         print("---------------------------------------------------------")
         raise
 
