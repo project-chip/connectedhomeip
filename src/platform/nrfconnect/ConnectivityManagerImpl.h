@@ -35,7 +35,7 @@
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
 
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI)
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include "wifi/ConnectivityManagerImplWiFi.h"
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
@@ -71,7 +71,7 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 #else
                                       public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>,
 #endif
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI)
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
                                       public ConnectivityManagerImplWiFi
 #else
                                       public Internal::GenericConnectivityManagerImpl_NoWiFi<ConnectivityManagerImpl>

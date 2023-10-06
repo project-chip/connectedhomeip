@@ -51,7 +51,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
 #endif
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI)
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
     ReturnErrorOnFailure(InitWiFi());
 #endif
     return CHIP_NO_ERROR;

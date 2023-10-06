@@ -25,7 +25,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemError.h>
 
-#if defined(CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE)
+#if defined(CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE) && CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE
 #include <credentials/CertificationDeclaration.h>
 #include <platform/Zephyr/ZephyrConfig.h>
 #include <zephyr/settings/settings.h>
@@ -40,7 +40,7 @@
 
 namespace chip {
 namespace {
-#if defined(CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE)
+#if defined(CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE) && CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE
 // Cd globals are needed to be accessed from dfu image writer lambdas
 uint8_t sCdBuf[chip::Credentials::kMaxCMSSignedCDMessage] = { 0 };
 size_t sCdSavedBytes                                      = 0;
@@ -89,7 +89,7 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
         ReturnErrorOnFailure(System::MapErrorZephyr(dfu_multi_image_register_writer(&writer)));
     };
 
-#if defined(CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE)
+#if defined(CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE) && CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE
     dfu_image_writer cdWriter;
     cdWriter.image_id = CONFIG_CHIP_CERTIFiCATION_DECLARATION_OTA_IMAGE_ID;
     cdWriter.open     = [](int id, size_t size) { return size <= sizeof(sCdBuf) ? 0 : -EFBIG; };
