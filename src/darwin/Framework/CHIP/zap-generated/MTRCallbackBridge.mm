@@ -8124,7 +8124,6 @@ void MTRICDManagementRegisteredClientsListAttributeCallbackBridge::OnSuccessFn(v
             newElement_0 = [MTRICDManagementClusterMonitoringRegistrationStruct new];
             newElement_0.checkInNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.checkInNodeID];
             newElement_0.monitoredSubject = [NSNumber numberWithUnsignedLongLong:entry_0.monitoredSubject];
-            newElement_0.key = AsData(entry_0.key);
             newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
             [array_0 addObject:newElement_0];
         }

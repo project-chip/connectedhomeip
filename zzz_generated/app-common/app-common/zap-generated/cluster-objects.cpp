@@ -10356,10 +10356,6 @@ CHIP_ERROR Type::DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optiona
     {
         ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kMonitoredSubject), monitoredSubject));
     }
-    if (includeSensitive)
-    {
-        ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kKey), key));
-    }
     if (aAccessingFabricIndex.HasValue())
     {
         ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::kFabricIndex), fabricIndex));
@@ -10389,10 +10385,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kMonitoredSubject))
         {
             err = DataModel::Decode(reader, monitoredSubject);
-        }
-        else if (__context_tag == to_underlying(Fields::kKey))
-        {
-            err = DataModel::Decode(reader, key);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
