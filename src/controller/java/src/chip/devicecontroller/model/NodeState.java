@@ -26,8 +26,8 @@ import javax.annotation.Nullable;
 public final class NodeState {
   private Map<Integer, EndpointState> endpoints;
 
-  public NodeState(Map<Integer, EndpointState> endpoints) {
-    this.endpoints = endpoints;
+  public NodeState() {
+    this.endpoints = new HashMap<>();
   }
 
   public Map<Integer, EndpointState> getEndpointStates() {

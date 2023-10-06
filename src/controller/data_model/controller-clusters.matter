@@ -2713,7 +2713,6 @@ client cluster IcdManagement = 70 {
   fabric_scoped struct MonitoringRegistrationStruct {
     fabric_sensitive node_id checkInNodeID = 1;
     fabric_sensitive int64u monitoredSubject = 2;
-    fabric_sensitive octet_string<16> key = 3;
     fabric_idx fabricIndex = 254;
   }
 

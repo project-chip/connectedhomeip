@@ -1545,18 +1545,15 @@ public String value;
 public static class IcdManagementClusterMonitoringRegistrationStruct {
 public Long checkInNodeID;
 public Long monitoredSubject;
-public byte[] key;
 public Integer fabricIndex;
 
   public IcdManagementClusterMonitoringRegistrationStruct(
     Long checkInNodeID
       , Long monitoredSubject
-      , byte[] key
       , Integer fabricIndex
   ) {
     this.checkInNodeID = checkInNodeID;
     this.monitoredSubject = monitoredSubject;
-    this.key = key;
     this.fabricIndex = fabricIndex;
   }
 
@@ -1570,9 +1567,6 @@ public Integer fabricIndex;
     output.append("\tmonitoredSubject: ");
     output.append(monitoredSubject);
         output.append("\n");
-    output.append("\tkey: ");
-    output.append(Arrays.toString(key));
-    output.append("\n");
     output.append("\tfabricIndex: ");
     output.append(fabricIndex);
         output.append("\n");

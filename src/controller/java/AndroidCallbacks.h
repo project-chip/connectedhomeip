@@ -89,7 +89,6 @@ struct ReportCallback : public app::ClusterStateCache::Callback
     jobject mReportCallbackRef                  = nullptr;
     // NodeState Java object that will be returned to the application.
     jobject mNodeStateObj = nullptr;
-    jclass mNodeStateCls  = nullptr;
 };
 
 struct WriteAttributesCallback : public app::WriteClient::Callback
@@ -127,7 +126,7 @@ struct InvokeCallback : public app::CommandSender::Callback
 
     void OnDone(app::CommandSender * apCommandSender) override;
 
-    CHIP_ERROR CreateInvokeElement(const app::ConcreteCommandPath & aPath, TLV::TLVReader * apData, jobject & outObj);
+    CHIP_ERROR CreateInvokeElement(JNIEnv * env, const app::ConcreteCommandPath & aPath, TLV::TLVReader * apData, jobject & outObj);
     void ReportError(CHIP_ERROR err);
     void ReportError(Protocols::InteractionModel::Status status);
     void ReportError(const char * message, ChipError::StorageType errorCode);
