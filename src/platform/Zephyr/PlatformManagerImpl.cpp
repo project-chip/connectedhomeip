@@ -21,7 +21,7 @@
  *          for Zephyr platforms.
  */
 
-#if !CONFIG_NORDIC_SECURITY_BACKEND
+#if !defined(CONFIG_NORDIC_SECURITY_BACKEND)
 #include <crypto/CHIPCryptoPAL.h> // nogncheck
 #endif                            // !CONFIG_NORDIC_SECURITY_BACKEND
 
@@ -45,7 +45,7 @@ PlatformManagerImpl PlatformManagerImpl::sInstance{ sChipThreadStack };
 
 static k_timer sOperationalHoursSavingTimer;
 
-#if !CONFIG_NORDIC_SECURITY_BACKEND && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY)
+#if !defined(CONFIG_NORDIC_SECURITY_BACKEND) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY)
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
     const struct device * entropy = DEVICE_DT_GET(DT_CHOSEN(zephyr_entropy));
@@ -108,7 +108,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
 
-#if !CONFIG_NORDIC_SECURITY_BACKEND && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY)
+#if !defined(CONFIG_NORDIC_SECURITY_BACKEND) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY)
     // Minimum required from source before entropy is released ( with mbedtls_entropy_func() ) (in bytes)
     const size_t kThreshold = 16;
 #endif // !CONFIG_NORDIC_SECURITY_BACKEND && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY)
@@ -117,7 +117,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = Internal::ZephyrConfig::Init();
     SuccessOrExit(err);
 
-#if !CONFIG_NORDIC_SECURITY_BACKEND && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY)
+#if !defined(CONFIG_NORDIC_SECURITY_BACKEND) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY)
     // Add entropy source based on Zephyr entropy driver
     err = chip::Crypto::add_entropy_source(app_entropy_source, NULL, kThreshold);
     SuccessOrExit(err);

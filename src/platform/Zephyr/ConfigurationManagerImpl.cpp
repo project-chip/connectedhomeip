@@ -206,7 +206,7 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI)
     const net_if * const iface = InetUtils::GetInterface();
     VerifyOrReturnError(iface != nullptr && iface->if_dev != nullptr, CHIP_ERROR_INTERNAL);
 

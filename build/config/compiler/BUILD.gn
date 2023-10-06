@@ -259,7 +259,6 @@ config("strict_warnings") {
   # we can access that here.
   if (current_os != "android" && current_os != "freertos" &&
       current_os != "linux" && current_os != "mbed" && current_os != "tizen" &&
-      current_os != "zephyr" &&
       # cmsis-rtos is OpenIOT
       current_os != "cmsis-rtos" &&
       # cyw30739 is one of the Infineon builds
