@@ -243,8 +243,6 @@ tests:
                 value: G1
               - name: "SceneID"
                 value: 0x01
-      response:
-          error: ""
 
     - label: "Step 3c: TH reads the SceneCount attribute from DUT."
       PICS: S.S.A0000 && S.S.A0001 && S.S.A0002 && S.S.A0003 && !S.S.F03

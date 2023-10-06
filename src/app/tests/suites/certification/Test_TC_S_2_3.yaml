@@ -175,7 +175,8 @@ tests:
           "Step 2b: TH sends a AddScene command to DUT with the GroupID field
           set to G1, the SceneID field set to 0x01, the TransitionTime field set
           to 0x0001 (1s) and a set of extension fields appropriate to AC1."
-      PICS: (!S.S.C40.Rsp) && PICS_SDK_CI_ONLY
+      # This step is overwriting Step 2a, we need to add PICS !S.S.C40.Rsp here, see issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3509
+      PICS: S.S.C00.Rsp && PICS_SDK_CI_ONLY
       command: "AddScene"
       arguments:
           values:
@@ -323,7 +324,8 @@ tests:
           [1670970505.890774][5742:5744] CHIP:TOO:    }
       cluster: "LogCommands"
       command: "UserPrompt"
-      PICS: (!S.S.C40.Rsp) && PICS_SKIP_SAMPLE_APP
+      # This step is overwriting Step 2a, we need to add PICS !S.S.C40.Rsp here, see issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3509
+      PICS: S.S.C00.Rsp && PICS_SKIP_SAMPLE_APP
       arguments:
           values:
               - name: "message"
@@ -373,7 +375,8 @@ tests:
     - label:
           "Step 3b: TH sends a ViewScene command to DUT with the GroupID field
           set to G1 and the SceneID field set to 0x01."
-      PICS: (!S.S.C41.Rsp) && PICS_SDK_CI_ONLY
+      # This step is redundant with Step 3a, we should add PICS !S.S.C41.Rsp here, see issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3509
+      PICS: S.S.C01.Rsp && PICS_SDK_CI_ONLY
       command: "ViewScene"
       arguments:
           values:
@@ -437,7 +440,8 @@ tests:
     - label:
           "Step 3b: TH sends a ViewScene command to DUT with the GroupID field
           set to G1 and the SceneID field set to 0x01."
-      PICS: (!S.S.C41.Rsp) && PICS_SKIP_SAMPLE_APP
+      # This step is redundant with Step 3a, we should add PICS !S.S.C41.Rsp here, see issue: https://github.com/CHIP-Specifications/chip-test-plans/issues/3509
+      PICS: S.S.C01.Rsp && PICS_SKIP_SAMPLE_APP
       verification: |
           Execute the following command in TH to generate the pre-condition to execute this test case:
 
@@ -522,6 +526,7 @@ tests:
           field set to G1 and the scene ID field set to 0x01."
       PICS: S.S.C05.Rsp
       command: "RecallScene"
+      # This value should be changed to G1 instead of 0x101 when it is supported, Issue opened here https://github.com/project-chip/connectedhomeip/issues/29637
       groupId: 0x101
       arguments:
           values:
