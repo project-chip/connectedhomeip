@@ -376,7 +376,6 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
     char * errStr;
 #endif // CHIP_ERROR_LOGGING
     BluezConnection * conn = nullptr;
-    GAutoPtr<GVariantDict> options;
     GAutoPtr<GVariant> option_mtu;
 
     BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apEndpoint);
@@ -443,7 +442,6 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
     char * errStr;
 #endif // CHIP_ERROR_LOGGING
     BluezConnection * conn = nullptr;
-    GAutoPtr<GVariantDict> options;
     GAutoPtr<GVariant> option_mtu;
 
     BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apEndpoint);
