@@ -23,8 +23,8 @@
 #include <setup_payload/Base38Encode.h>
 #include <setup_payload/SetupPayload.h>
 
-#include <setup_payload/Base38Decode.h>
 #include "silabs_utils.h"
+#include <setup_payload/Base38Decode.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 namespace chip {
@@ -38,10 +38,10 @@ CHIP_ERROR SilabsDeviceDataProvider::generatePayload(uint8_t * outBuf)
 {
     SetupPayload payload;
     std::string result;
-    ChipError err   = CHIP_NO_ERROR;
+    ChipError err = CHIP_NO_ERROR;
 
     uint16_t setupDiscriminator32;
-    uint8_t rendezvousFlag = 2; // Rendez-vous flag: 1=SoftAP, 2=BLE 4=OnNetwork (Default=BLE Only)
+    uint8_t rendezvousFlag     = 2; // Rendez-vous flag: 1=SoftAP, 2=BLE 4=OnNetwork (Default=BLE Only)
     uint8_t commissionableFlow = 0; // Commissioning Flow: 0=Standard, 1=kUserActionRequired, 2=Custom (Default:Standard)
     uint16_t vendorId32;
     uint16_t productId32;
@@ -193,14 +193,18 @@ CHIP_ERROR SilabsDeviceDataProvider::GetSetupPayload(MutableCharSpan & payloadBu
     {
         static uint8_t kTestSetupPayloadBitset[kTotalPayloadDataSizeInBytes];
         err = generatePayload(kTestSetupPayloadBitset);
-        if (err != CHIP_NO_ERROR) {
+        if (err != CHIP_NO_ERROR)
+        {
             // If payload generation failed use the default payload
-            static constexpr uint8_t defaultSetupPayloadBitset[] = { 0x88, 0xFF, 0x2F, 0x00, 0x44, 0x00, 0xE0, 0x4B, 0x84, 0x68, 0x02 };
-            bitSetLen                                          = sizeof(defaultSetupPayloadBitset);
+            static constexpr uint8_t defaultSetupPayloadBitset[] = { 0x88, 0xFF, 0x2F, 0x00, 0x44, 0x00,
+                                                                     0xE0, 0x4B, 0x84, 0x68, 0x02 };
+            bitSetLen                                            = sizeof(defaultSetupPayloadBitset);
             ReturnErrorCodeIf(bitSetLen > kTotalPayloadDataSizeInBytes, CHIP_ERROR_BUFFER_TOO_SMALL);
             memcpy(payloadBitSet, defaultSetupPayloadBitset, bitSetLen);
-        } else {
-            bitSetLen                                          = sizeof(kTestSetupPayloadBitset);
+        }
+        else
+        {
+            bitSetLen = sizeof(kTestSetupPayloadBitset);
             ReturnErrorCodeIf(bitSetLen > kTotalPayloadDataSizeInBytes, CHIP_ERROR_BUFFER_TOO_SMALL);
             memcpy(payloadBitSet, kTestSetupPayloadBitset, bitSetLen);
         }
