@@ -1,0 +1,56 @@
+# Copyright (c) 2022-2023 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/chip/java/rules.gni")
+import("${chip_root}/build/chip/tools.gni")
+
+kotlin_binary("kotlin-matter-controller") {
+  output_name = "kotlin-matter-controller"
+  deps = [
+    "${chip_root}/src/controller/java:kotlin_matter_controller",
+    "${chip_root}/src/controller/java:onboarding_payload",
+    "${chip_root}/third_party/java_deps:annotation",
+  ]
+
+  sources = [
+    "java/src/com/matter/controller/Main.kt",
+    "java/src/com/matter/controller/commands/common/Argument.kt",
+    "java/src/com/matter/controller/commands/common/ArgumentType.kt",
+    "java/src/com/matter/controller/commands/common/Command.kt",
+    "java/src/com/matter/controller/commands/common/CommandManager.kt",
+    "java/src/com/matter/controller/commands/common/CredentialsIssuer.kt",
+    "java/src/com/matter/controller/commands/common/FutureResult.kt",
+    "java/src/com/matter/controller/commands/common/IPAddress.kt",
+    "java/src/com/matter/controller/commands/common/MatterCommand.kt",
+    "java/src/com/matter/controller/commands/common/RealResult.kt",
+    "java/src/com/matter/controller/commands/pairing/DiscoveryFilterType.kt",
+    "java/src/com/matter/controller/commands/pairing/PairOnNetworkLongCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImInvokeCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImReadCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImSubscribeCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImWriteCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairingCommand.kt",
+    "java/src/com/matter/controller/commands/pairing/PairingModeType.kt",
+    "java/src/com/matter/controller/commands/pairing/PairingNetworkType.kt",
+  ]
+
+  kotlinc_flags = [ "-Xlint:deprecation" ]
+}
+
+group("default") {
+  deps = [ ":kotlin-matter-controller" ]
+}
