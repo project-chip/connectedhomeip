@@ -1419,3 +1419,11 @@
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_NFC
 #define CHIP_DEVICE_CONFIG_ENABLE_NFC 0
 #endif
+
+/**
+ * CHIP_DEVICE_ENABLE_PORT_PARAMS enables command-line parameters to set the
+ * port to use for POSIX example applications.
+ */
+#ifndef CHIP_DEVICE_ENABLE_PORT_PARAMS
+#define CHIP_DEVICE_ENABLE_PORT_PARAMS 0
+#endif // CHIP_DEVICE_ENABLE_PORT_PARAMS

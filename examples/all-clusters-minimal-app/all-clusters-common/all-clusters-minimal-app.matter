@@ -4285,15 +4285,15 @@ endpoint 1 {
     ram      attribute currentScene default = 0x00;
     ram      attribute currentGroup default = 0x0000;
     ram      attribute sceneValid default = 0x00;
-    ram      attribute nameSupport;
+    ram      attribute nameSupport default = 0x80;
     ram      attribute lastConfiguredBy;
-    ram      attribute sceneTableSize;
-    callback attribute remainingCapacity;
+    ram      attribute sceneTableSize default = 16;
+    callback attribute remainingCapacity default = 8;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 5;
   }
 
@@ -4733,14 +4733,14 @@ endpoint 2 {
     ram      attribute currentScene default = 0x00;
     ram      attribute currentGroup default = 0x0000;
     ram      attribute sceneValid default = 0x00;
-    ram      attribute nameSupport;
-    ram      attribute sceneTableSize;
-    callback attribute remainingCapacity;
+    ram      attribute nameSupport default = 0x80;
+    ram      attribute sceneTableSize default = 16;
+    callback attribute remainingCapacity default = 8;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 5;
   }
 

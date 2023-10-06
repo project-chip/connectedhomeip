@@ -25,7 +25,7 @@ package com.matter.controller.commands.common
  * contain either a `true` value for `Success` or a `false` value in which case the failure will
  * also have an error string explaining the reason of the failure associated with it.
  */
-class RealResult(private val result: Boolean, private val error: String?) {
+class RealResult(val result: Boolean, val error: String?) {
   constructor() : this(true, null)
 
   constructor(error: String?) : this(false, error)
@@ -38,13 +38,5 @@ class RealResult(private val result: Boolean, private val error: String?) {
     fun error(error: String?): RealResult {
       return RealResult(error)
     }
-  }
-
-  fun getResult(): Boolean {
-    return result
-  }
-
-  fun getError(): String? {
-    return error
   }
 }

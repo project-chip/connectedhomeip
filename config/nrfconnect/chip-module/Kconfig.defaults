@@ -194,7 +194,7 @@ endif # BOARD_NRF7002DK_NRF5340_CPUAPP
 
 # Enable extended discovery
 config CHIP_EXTENDED_DISCOVERY
-    default y
+    default n
 
 config NVS_LOOKUP_CACHE
     default y

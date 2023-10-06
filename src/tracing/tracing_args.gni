@@ -23,7 +23,7 @@ declare_args() {
   #
   # Additionally, if tracing is enabled, the main() function has to add
   # backends explicitly
-  matter_enable_tracing_support = false
+  matter_enable_tracing_support = current_os == "android"
 
   # Defines the trace backend. Current matter tracing splits the logic
   # into two parts:
@@ -44,20 +44,9 @@ declare_args() {
   # since tracing is very noisy, we generally expect it to be explicitly
   # set up.
   #
-  matter_trace_config = ""
-  matter_enable_esp_insights_trace = false
-}
-
-if (current_os == "android" ||
-    (chip_device_platform == "esp32" && matter_enable_esp_insights_trace)) {
-  matter_enable_tracing_support = true
-}
-
-if (current_os == "linux" || current_os == "android") {
-  matter_trace_config = "${chip_root}/src/tracing/perfetto:perfetto_tracing"
-} else if (chip_device_platform == "esp32" &&
-           matter_enable_esp_insights_trace) {
-  matter_trace_config = "${chip_root}/src/tracing/esp32_trace"
-} else {
-  matter_trace_config = "${chip_root}/src/tracing/none"
+  if (current_os == "linux" || current_os == "android") {
+    matter_trace_config = "${chip_root}/src/tracing/perfetto:perfetto_tracing"
+  } else {
+    matter_trace_config = "${chip_root}/src/tracing/none"
+  }
 }

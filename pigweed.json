@@ -1,0 +1,122 @@
+{
+  "packages": [
+    {
+      "path": "gn/gn/${platform}",
+      "platforms": [
+        "linux-amd64",
+        "linux-arm64",
+        "mac-amd64",
+        "mac-arm64",
+        "windows-amd64"
+      ],
+      "tags": [
+        "git_revision:991530ce394efb58fcd848195469022fa17ae126"
+      ],
+      "version_file": ".versions/gn.cipd_version"
+    },
+    {
+      "path": "infra/3pp/tools/ninja/${platform}",
+      "platforms": [
+        "linux-amd64",
+        "linux-arm64",
+        "mac-amd64",
+        "mac-arm64",
+        "windows-amd64"
+      ],
+      "tags": [
+        "version:2@1.11.1.chromium.7"
+      ]
+    },
+    {
+      "path": "fuchsia/third_party/bloaty/${platform}",
+      "platforms": [
+        "linux-amd64",
+        "mac-amd64"
+      ],
+      "tags": [
+        "git_revision:c057ba4f43db0506d4ba8c096925b054b02a8bd3"
+      ],
+      "version_file": ".versions/bloaty.cipd_version"
+    },
+    {
+      "path": "infra/3pp/tools/protoc/${platform}",
+      "platforms": [
+        "linux-amd64",
+        "linux-arm64",
+        "mac-amd64",
+        "windows-amd64"
+      ],
+      "tags": [
+        "version:2@3.17.3"
+      ]
+    },
+    {
+      "_comment": "Always get the amd64 version on Mac until there's an arm64 version",
+      "path": "infra/3pp/tools/protoc/mac-amd64",
+      "platforms": [
+        "mac-arm64"
+      ],
+      "tags": [
+        "version:2@3.17.3"
+      ]
+    },
+    {
+      "path": "fuchsia/third_party/clang/${platform}",
+      "platforms": [
+        "linux-amd64",
+        "linux-arm64",
+        "mac-amd64",
+        "mac-arm64",
+        "windows-amd64"
+      ],
+      "tags": [
+        "git_revision:576b184d6e3b633f51b908b61ebd281d2ecbf66f"
+      ],
+      "version_file": ".versions/clang.cipd_version"
+    },
+    {
+      "path": "infra/3pp/tools/openocd/${platform}",
+      "platforms": [
+        "linux-amd64",
+        "linux-arm64",
+        "mac-amd64",
+        "mac-arm64"
+      ],
+      "tags": [
+        "version:2@0.11.0-3"
+      ]
+    },
+    {
+      "path": "pigweed/third_party/mingw64-x86_64-win32-seh/${platform}",
+      "platforms": [
+        "windows-amd64"
+      ],
+      "tags": [
+        "version:10.2.0-11"
+      ]
+    },
+    {
+      "path": "fuchsia/third_party/qemu/${platform}",
+      "platforms": [
+        "linux-amd64",
+        "linux-arm64",
+        "mac-amd64"
+      ],
+      "tags": [
+        "git_revision:a342ce9dfeed8088c426e5d51d4a7e47f3764b84"
+      ],
+      "version_file": ".versions/qemu.cipd_version"
+    },
+    {
+      "path": "fuchsia/third_party/sysroot/linux",
+      "platforms": [
+        "linux-amd64",
+        "linux-arm64"
+      ],
+      "subdir": "clang_sysroot",
+      "tags": [
+        "git_revision:d342388843734b6c5c50fb7e18cd3a76476b93aa"
+      ]
+    }
+  ]
+}
