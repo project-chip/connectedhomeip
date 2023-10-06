@@ -186,20 +186,6 @@ protected:
 
     BitFlags<Flags> mFlags; // Internal state flags
 
-    /**
-     * Function checks with information available in the ExchangeContext if the peer should be active or not
-     * API should only be used when we are determining if we need to use the Active or Idle retransmission timeout
-     *
-     * If we are not initiator                          -> peer is active
-     * If ephemeral context                             -> peer is active
-     * else we default to information provided by the client
-     *
-     * @return true Based on available information, Peer should be active
-     * @return false We weren't able to determine if the peer is active.
-     *               We don't know in which state the peer is.
-     */
-    bool IsPeerLikelyActiveHint();
-
 private:
     void HandleRcvdAck(uint32_t ackMessageCounter);
     CHIP_ERROR HandleNeedsAck(uint32_t messageCounter, BitFlags<MessageFlagValues> messageFlags);

@@ -212,7 +212,7 @@ private:
      *
      * @param[in,out] entry RetransTableEntry for which we need to calculate the nextRetransTime
      */
-    void CalculateNextRetransTime(RetransTableEntry *& entry);
+    void CalculateNextRetransTime(RetransTableEntry & entry);
 
     ObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & mContextPool;
     chip::System::Layer * mSystemLayer;
