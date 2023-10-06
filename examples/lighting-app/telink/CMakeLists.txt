@@ -48,13 +48,19 @@ else()
   unset(GLOBAL_DTC_OVERLAY_FILE)
 endif()
 
+if(EXISTS "${CHIP_ROOT}/src/platform/telink/flash_overlays/${FLASH_SIZE}_flash.overlay")
+    set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/flash_overlays/${FLASH_SIZE}_flash.overlay")
+  else()
+    set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/flash_overlays/2m_flash.overlay")
+  endif()
+
 if(DTC_OVERLAY_FILE)
   set(DTC_OVERLAY_FILE
-    "${DTC_OVERLAY_FILE} ${GLOBAL_DTC_OVERLAY_FILE} ${USB_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE}"
+    "${DTC_OVERLAY_FILE} ${GLOBAL_DTC_OVERLAY_FILE} ${USB_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE}"
     CACHE STRING "" FORCE
   )
 else()
-  set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${USB_DTC_OVERLAY_FILE}  ${LOCAL_DTC_OVERLAY_FILE})
+  set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${USB_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE})
 endif()
 
 set(CONF_FILE ${USB_CONF_OVERLAY_FILE} prj.conf)
