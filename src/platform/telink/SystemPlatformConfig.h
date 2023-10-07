@@ -48,7 +48,7 @@ struct ChipDeviceEvent;
 #define CHIP_SYSTEM_CONFIG_USE_SOCKETS 1
 
 // Reduce packet buffer pool size (default 15) to reduce ram consumption
-#ifdef CONFIG_PM
+#if CONFIG_PM
 #define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 0
 #else
 #define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 8

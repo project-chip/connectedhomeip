@@ -724,8 +724,6 @@ struct LwIPEvent;
 #endif
 #endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
-// #include "CHIPDevicePlatformConfig.h"
-// #include "CHIPPlatformConfig.h"
 /**
  *  @def CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
  *

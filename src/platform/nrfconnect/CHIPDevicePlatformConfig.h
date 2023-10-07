@@ -268,7 +268,7 @@
 #endif
 
 #ifndef CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH
-#ifdef CONFIG_CHIP_FACTORY_DATA
+#if CONFIG_CHIP_FACTORY_DATA
 // UID will be copied from the externally programmed factory data, so we don't know the actual length and we need to assume some max
 // boundary.
 #define CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID_LENGTH CONFIG_CHIP_FACTORY_DATA_ROTATING_DEVICE_UID_MAX_LEN
