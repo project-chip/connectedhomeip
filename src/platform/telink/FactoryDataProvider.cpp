@@ -19,7 +19,7 @@
 #include "CHIPDevicePlatformConfig.h"
 #include <crypto/CHIPCryptoPAL.h>
 
-#if defined(CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE) && CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE
+#if CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE
 #include <credentials/CertificationDeclaration.h>
 #include <platform/Zephyr/ZephyrConfig.h>
 #endif
@@ -101,7 +101,7 @@ CHIP_ERROR FactoryDataProvider<FlashFactoryData>::Init()
 template <class FlashFactoryData>
 CHIP_ERROR FactoryDataProvider<FlashFactoryData>::GetCertificationDeclaration(MutableByteSpan & outBuffer)
 {
-#if defined(CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE) && CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE
+#if CONFIG_CHIP_CERTIFICATION_DECLARATION_STORAGE
     ReturnErrorCodeIf(outBuffer.size() < mFactoryData.certificate_declaration.len, CHIP_ERROR_BUFFER_TOO_SMALL);
     ReturnErrorCodeIf(!mFactoryData.certificate_declaration.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 

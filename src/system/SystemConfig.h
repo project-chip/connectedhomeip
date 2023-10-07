@@ -724,6 +724,8 @@ struct LwIPEvent;
 #endif
 #endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
+// #include "CHIPDevicePlatformConfig.h"
+// #include "CHIPPlatformConfig.h"
 /**
  *  @def CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
  *
@@ -732,8 +734,11 @@ struct LwIPEvent;
  *
  *  Defaults to enabled on Zephyr platforms that do not enable Zephyr POSIX layer.
  */
+#ifndef CONFIG_NET_SOCKETS_POSIX_NAMES
+#define CONFIG_NET_SOCKETS_POSIX_NAMES 0
+#endif
 #ifndef CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && defined(__ZEPHYR__) && defined(CONFIG_NET_SOCKETS_POSIX_NAMES)
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && defined(__ZEPHYR__) && CONFIG_NET_SOCKETS_POSIX_NAMES
 #define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS 1
 #else
 #define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKETS 0
@@ -764,8 +769,11 @@ struct LwIPEvent;
  *
  *  Defaults to enabled on Zephyr platforms that enable CONFIG_EVENTFD.
  */
+#ifndef CONFIG_EVENTFD
+#define CONFIG_EVENTFD 0
+#endif
 #ifndef CHIP_SYSTEM_CONFIG_USE_ZEPHYR_EVENTFD
-#if defined(__ZEPHYR__) && defined(CONFIG_EVENTFD)
+#if defined(__ZEPHYR__) && CONFIG_EVENTFD
 #define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_EVENTFD 1
 #else
 #define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_EVENTFD 0
