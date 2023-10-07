@@ -16,7 +16,7 @@
  */
 #include "AndroidCallbacks.h"
 #include <controller/java/AndroidControllerExceptions.h>
-#if USE_JAVA_TLV_ENCODE_DECODE
+#ifdef USE_JAVA_TLV_ENCODE_DECODE
 #include <controller/java/CHIPAttributeTLVValueDecoder.h>
 #include <controller/java/CHIPEventTLVValueDecoder.h>
 #endif
@@ -384,7 +384,7 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     readerForJavaTLV.Init(*apData);
 
     jobject value = nullptr;
-#if USE_JAVA_TLV_ENCODE_DECODE
+#ifdef USE_JAVA_TLV_ENCODE_DECODE
     TLV::TLVReader readerForJavaObject;
     readerForJavaObject.Init(*apData);
 
@@ -518,7 +518,7 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     }
 
     jobject value = nullptr;
-#if USE_JAVA_TLV_ENCODE_DECODE
+#ifdef USE_JAVA_TLV_ENCODE_DECODE
     TLV::TLVReader readerForJavaObject;
     readerForJavaObject.Init(*apData);
     value = DecodeEventValue(aEventHeader.mPath, readerForJavaObject, &err);
