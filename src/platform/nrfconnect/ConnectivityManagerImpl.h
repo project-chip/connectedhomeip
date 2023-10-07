@@ -23,7 +23,7 @@
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <platform/internal/GenericConnectivityManagerImpl_TCP.h>
 #endif
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.h>
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoBLE.h>
@@ -35,7 +35,7 @@
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
 
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include "wifi/ConnectivityManagerImplWiFi.h"
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
@@ -61,7 +61,7 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
                                       public Internal::GenericConnectivityManagerImpl_TCP<ConnectivityManagerImpl>,
 #endif
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
                                       public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
 #else
                                       public Internal::GenericConnectivityManagerImpl_NoBLE<ConnectivityManagerImpl>,
@@ -71,7 +71,7 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 #else
                                       public Internal::GenericConnectivityManagerImpl_NoThread<ConnectivityManagerImpl>,
 #endif
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
                                       public ConnectivityManagerImplWiFi
 #else
                                       public Internal::GenericConnectivityManagerImpl_NoWiFi<ConnectivityManagerImpl>
