@@ -71,7 +71,7 @@ private:
     CastingApp();
     static CastingApp * _castingApp;
 
-    CastingApp(CastingApp & other) = delete;
+    CastingApp(CastingApp & other)     = delete;
     void operator=(const CastingApp &) = delete;
 
     /**

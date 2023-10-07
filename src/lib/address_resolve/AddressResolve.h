@@ -75,7 +75,7 @@ public:
     // While active, resolve handles are maintained in an internal list
     // to be processed, so copying their values (i.e. pointers) is not
     // allowed.
-    NodeLookupHandleBase(const NodeLookupHandleBase &) = delete;
+    NodeLookupHandleBase(const NodeLookupHandleBase &)             = delete;
     NodeLookupHandleBase & operator=(const NodeLookupHandleBase &) = delete;
 
     void SetListener(NodeListener * listener) { mListener = listener; }
@@ -97,7 +97,7 @@ public:
     NodeLookupRequest() {}
     NodeLookupRequest(const PeerId & peerId) : mPeerId(peerId) {}
 
-    NodeLookupRequest(const NodeLookupRequest &) = default;
+    NodeLookupRequest(const NodeLookupRequest &)             = default;
     NodeLookupRequest & operator=(const NodeLookupRequest &) = default;
 
     const PeerId & GetPeerId() const { return mPeerId; }

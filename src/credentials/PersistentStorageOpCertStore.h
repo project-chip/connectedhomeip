@@ -44,7 +44,7 @@ public:
 
     // Non-copyable
     PersistentStorageOpCertStore(PersistentStorageOpCertStore const &) = delete;
-    void operator=(PersistentStorageOpCertStore const &) = delete;
+    void operator=(PersistentStorageOpCertStore const &)               = delete;
 
     /**
      * @brief Initialize the certificate store to map to a given storage delegate.

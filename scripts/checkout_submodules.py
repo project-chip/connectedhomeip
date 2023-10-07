@@ -36,7 +36,7 @@ ALL_PLATFORMS = set([
     'efr32',
     'esp32',
     'infineon',
-    'k32w0',
+    'k32w',
     'linux',
     'mbed',
     'nrfconnect',

@@ -55,7 +55,7 @@ public:
 
     // Non-copyable
     Efr32PsaOperationalKeystore(Efr32PsaOperationalKeystore const &) = delete;
-    void operator=(Efr32PsaOperationalKeystore const &) = delete;
+    void operator=(Efr32PsaOperationalKeystore const &)              = delete;
 
     /**
      * @brief Initialize the Operational Keystore

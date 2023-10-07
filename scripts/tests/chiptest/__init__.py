@@ -15,6 +15,7 @@
 #
 
 import json
+import logging
 import os
 import subprocess
 from dataclasses import dataclass
@@ -143,8 +144,6 @@ def _GetExtraSlowTests() -> Set[str]:
 def _GetInDevelopmentTests() -> Set[str]:
     """Tests that fail in YAML for some reason."""
     return {
-        "Test_TC_TIMESYNC_1_1.yaml",         # Time sync SDK is not yet ready
-        "Test_TC_TIMESYNC_2_3.yaml",         # Time sync SDK is not yet ready
         "Test_TC_PSCFG_1_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
         "Test_TC_PSCFG_2_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
         "Test_TC_PSCFG_2_2.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
@@ -197,6 +196,7 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "TestClusterMultiFabric.yaml",
         "Test_TC_ACL_2_5.yaml",            # chip-repl does not support LastReceivedEventNumber : https://github.com/project-chip/connectedhomeip/issues/28884
         "Test_TC_ACL_2_6.yaml",            # chip-repl does not support LastReceivedEventNumber : https://github.com/project-chip/connectedhomeip/issues/28884
+        "Test_TC_RVCCLEANM_3_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
     }
 
 
@@ -247,8 +247,13 @@ def tests_with_command(chip_tool: str, is_manual: bool):
     if is_manual:
         cmd += "-manual"
 
-    result = subprocess.run([chip_tool, "tests", cmd], capture_output=True)
-    result.check_returncode()
+    cmd = [chip_tool, "tests", cmd]
+    result = subprocess.run(cmd, capture_output=True, encoding="utf-8")
+    if result.returncode != 0:
+        logging.error(f'Failed to run {cmd}:')
+        logging.error('STDOUT: ' + result.stdout)
+        logging.error('STDERR: ' + result.stderr)
+        result.check_returncode()
 
     test_tags = set()
     if is_manual:
@@ -256,7 +261,7 @@ def tests_with_command(chip_tool: str, is_manual: bool):
 
     in_development_tests = [s.replace(".yaml", "") for s in _GetInDevelopmentTests()]
 
-    for name in result.stdout.decode("utf8").split("\n"):
+    for name in result.stdout.split("\n"):
         if not name:
             continue
 

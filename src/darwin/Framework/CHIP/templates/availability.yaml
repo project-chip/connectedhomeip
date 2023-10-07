@@ -6331,6 +6331,13 @@
       commands:
           BasicInformation:
               - MfgSpecificPing
+      command fields:
+          # Cases where the cluster/command got renamed and the fields got
+          # renamed, so the old command name never had the new fields.
+          OtaSoftwareUpdateProvider:
+              QueryImage:
+                  - vendorID
+                  - productID
       enums:
           # DoorLockUserStatus (non-spec) and UserStatusEnum (from the spec) end
           # up with the same enum name (MTRDoorLockUserStatus), so just remove
@@ -7577,6 +7584,15 @@
 - release: "Future"
   versions: "future"
   introduced:
+      command payloads:
+          TimeSynchronization:
+              - SetUTCTime
+      command fields:
+          TimeSynchronization:
+              SetUTCTime:
+                  - utcTime
+                  - granularity
+                  - timeSource
       enum values:
           OnOff:
               DelayedAllOffEffectVariantEnum:

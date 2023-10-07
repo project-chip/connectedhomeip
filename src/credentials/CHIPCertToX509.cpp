@@ -469,7 +469,10 @@ static CHIP_ERROR DecodeConvertECDSASignature(TLVReader & reader, ASN1Writer & w
 
     // signatureValue BIT STRING
     // Per RFC3279, the ECDSA signature value is encoded in DER encapsulated in the signatureValue BIT STRING.
-    ASN1_START_BIT_STRING_ENCAPSULATED { ReturnErrorOnFailure(ConvertECDSASignatureRawToDER(certData.mSignature, writer)); }
+    ASN1_START_BIT_STRING_ENCAPSULATED
+    {
+        ReturnErrorOnFailure(ConvertECDSASignatureRawToDER(certData.mSignature, writer));
+    }
     ASN1_END_ENCAPSULATED;
 
 exit:
@@ -569,7 +572,10 @@ static CHIP_ERROR DecodeConvertCert(TLVReader & reader, ASN1Writer & writer, Chi
 
         // signatureAlgorithm   AlgorithmIdentifier
         // AlgorithmIdentifier ::= SEQUENCE
-        ASN1_START_SEQUENCE { ASN1_ENCODE_OBJECT_ID(static_cast<OID>(certData.mSigAlgoOID)); }
+        ASN1_START_SEQUENCE
+        {
+            ASN1_ENCODE_OBJECT_ID(static_cast<OID>(certData.mSigAlgoOID));
+        }
         ASN1_END_SEQUENCE;
 
         // signatureValue BIT STRING

@@ -56,7 +56,7 @@ void PrettyPrintIMBlankLine()
         if (sizeof(gLineBuffer) > gCurLineBufferSize)
         {
             size_t sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
-            size_t ret      = (size_t)(snprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, "\t"));
+            size_t ret      = (size_t) (snprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, "\t"));
             if (ret > 0)
             {
                 gCurLineBufferSize += std::min(ret, sizeLeft);
@@ -78,7 +78,7 @@ void PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
     if (sizeof(gLineBuffer) > gCurLineBufferSize)
     {
         size_t sizeLeft = sizeof(gLineBuffer) - gCurLineBufferSize;
-        size_t ret      = (size_t)(vsnprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, aFmt, args));
+        size_t ret      = (size_t) (vsnprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, aFmt, args));
         if (ret > 0)
         {
             gCurLineBufferSize += std::min(ret, sizeLeft);

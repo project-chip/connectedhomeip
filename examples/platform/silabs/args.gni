@@ -20,6 +20,9 @@ chip_project_config_include = "<CHIPProjectConfig.h>"
 chip_inet_project_config_include = "<CHIPProjectConfig.h>"
 chip_system_project_config_include = "<CHIPProjectConfig.h>"
 
+segger_rtt_buffer_size_up = 1024
+segger_rtt_buffer_size_down = 1024
+
 declare_args() {
   app_data_model = ""
 }

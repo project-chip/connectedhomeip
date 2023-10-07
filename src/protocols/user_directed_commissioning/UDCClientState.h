@@ -58,10 +58,10 @@ class UDCClientState
 public:
     UDCClientState() : mPeerAddress(PeerAddress::Uninitialized()) {}
 
-    UDCClientState(UDCClientState &&)      = default;
-    UDCClientState(const UDCClientState &) = default;
+    UDCClientState(UDCClientState &&)                  = default;
+    UDCClientState(const UDCClientState &)             = default;
     UDCClientState & operator=(const UDCClientState &) = default;
-    UDCClientState & operator=(UDCClientState &&) = default;
+    UDCClientState & operator=(UDCClientState &&)      = default;
 
     const PeerAddress GetPeerAddress() const { return mPeerAddress; }
     void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }

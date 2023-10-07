@@ -35,6 +35,12 @@ void MTRBaseSubscriptionCallback::OnReportBegin()
 // Reports attribute and event data if any exists
 void MTRBaseSubscriptionCallback::ReportData()
 {
+    // At data reporting time, nil out scheduled or currently running interimReportBlock
+    if (mInterimReportBlock) {
+        dispatch_block_cancel(mInterimReportBlock); // no-op when running from mInterimReportBlock
+        mInterimReportBlock = nil;
+    }
+
     __block NSArray * attributeReports = mAttributeReports;
     mAttributeReports = nil;
     auto attributeCallback = mAttributeReportCallback;
@@ -59,7 +65,6 @@ void MTRBaseSubscriptionCallback::QueueInterimReport()
     }
 
     mInterimReportBlock = dispatch_block_create(DISPATCH_BLOCK_INHERIT_QOS_CLASS, ^{
-        mInterimReportBlock = nil;
         ReportData();
         // Allocate reports arrays to continue accumulation
         mAttributeReports = [NSMutableArray new];
@@ -71,10 +76,6 @@ void MTRBaseSubscriptionCallback::QueueInterimReport()
 
 void MTRBaseSubscriptionCallback::OnReportEnd()
 {
-    if (mInterimReportBlock) {
-        dispatch_block_cancel(mInterimReportBlock);
-        mInterimReportBlock = nil;
-    }
     ReportData();
     if (mReportEndHandler) {
         mReportEndHandler();

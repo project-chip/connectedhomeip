@@ -20,7 +20,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <platform/CHIPDeviceLayer.h>
-//#include <lib/support/logging/CHIPLogging.h>
+// #include <lib/support/logging/CHIPLogging.h>
 
 #include <mbedtls/platform.h>
 

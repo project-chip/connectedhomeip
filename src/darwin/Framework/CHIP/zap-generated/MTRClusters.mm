@@ -16,12 +16,8 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <Matter/MTRBaseClusters.h>
+#import <Matter/MTRError.h>
 
-#import "MTRAsyncWorkQueue.h"
-#import "MTRBaseClusterUtils.h"
-#import "MTRBaseDevice_Internal.h"
-#import "MTRCallbackBridge.h"
 #import "MTRClusterConstants.h"
 #import "MTRCluster_Internal.h"
 #import "MTRClusters_Internal.h"
@@ -30,8 +26,9 @@
 #import "MTRLogging_Internal.h"
 #import "MTRStructsObjc.h"
 
-#include <lib/support/CHIPListUtils.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <platform/CHIPDeviceLayer.h>
+
 #include <type_traits>
 
 using chip::Callback::Callback;
@@ -42,24 +39,6 @@ using chip::SessionHandle;
 using chip::Messaging::ExchangeManager;
 using chip::System::Clock::Seconds16;
 using chip::System::Clock::Timeout;
-
-static void MTRClustersLogEnqueue(NSString * logPrefix, MTRAsyncWorkQueue * workQueue)
-{
-    MTR_LOG_DEFAULT("%@ enqueueWorkItem %@", logPrefix, workQueue);
-}
-
-static void MTRClustersLogDequeue(NSString * logPrefix, MTRAsyncWorkQueue * workQueue)
-{
-    MTR_LOG_DEFAULT("%@ dequeueWorkItem %@", logPrefix, workQueue);
-}
-
-static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * error)
-{
-    // Log the data at the INFO level (not usually persisted permanently),
-    // but make sure we log the work completion at the DEFAULT level.
-    MTR_LOG_INFO("%@ received response: %@ error: %@", logPrefix, value, error);
-    MTR_LOG_DEFAULT("%@ endWork", logPrefix);
-}
 
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.
 @implementation MTRClusterIdentify
@@ -78,74 +57,56 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)identifyWithParams:(MTRIdentifyClusterIdentifyParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeIdentifyID, (unsigned int) MTRCommandIDTypeClusterIdentifyCommandIdentifyID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterIdentify
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster identifyWithParams:params completion:
-                                               ^(NSError * _Nullable error) {
-                                                   MTRClustersLogCompletion(logPrefix, nil, error);
-                                                   dispatch_async(self.callbackQueue, ^{
-                                                       completion(error);
-                                                   });
-                                                   [workItem endWork];
-                                               }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRIdentifyClusterIdentifyParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Identify::Commands::Identify::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)triggerEffectWithParams:(MTRIdentifyClusterTriggerEffectParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeIdentifyID, (unsigned int) MTRCommandIDTypeClusterIdentifyCommandTriggerEffectID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterIdentify
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster triggerEffectWithParams:params completion:
-                                                    ^(NSError * _Nullable error) {
-                                                        MTRClustersLogCompletion(logPrefix, nil, error);
-                                                        dispatch_async(self.callbackQueue, ^{
-                                                            completion(error);
-                                                        });
-                                                        [workItem endWork];
-                                                    }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRIdentifyClusterTriggerEffectParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Identify::Commands::TriggerEffect::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeIdentifyTimeWithParams:(MTRReadParams * _Nullable)params
@@ -236,146 +197,110 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)addGroupWithParams:(MTRGroupsClusterAddGroupParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRGroupsClusterAddGroupResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeGroupsID, (unsigned int) MTRCommandIDTypeClusterGroupsCommandAddGroupID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterGroups
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster addGroupWithParams:params completion:
-                                               ^(MTRGroupsClusterAddGroupResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                   MTRClustersLogCompletion(logPrefix, value, error);
-                                                   dispatch_async(self.callbackQueue, ^{
-                                                       completion(value, error);
-                                                   });
-                                                   [workItem endWork];
-                                               }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRGroupsClusterAddGroupParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Groups::Commands::AddGroup::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRGroupsClusterAddGroupResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)viewGroupWithParams:(MTRGroupsClusterViewGroupParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRGroupsClusterViewGroupResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeGroupsID, (unsigned int) MTRCommandIDTypeClusterGroupsCommandViewGroupID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterGroups
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster viewGroupWithParams:params completion:
-                                                ^(MTRGroupsClusterViewGroupResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                    MTRClustersLogCompletion(logPrefix, value, error);
-                                                    dispatch_async(self.callbackQueue, ^{
-                                                        completion(value, error);
-                                                    });
-                                                    [workItem endWork];
-                                                }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRGroupsClusterViewGroupParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Groups::Commands::ViewGroup::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRGroupsClusterViewGroupResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)getGroupMembershipWithParams:(MTRGroupsClusterGetGroupMembershipParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRGroupsClusterGetGroupMembershipResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeGroupsID, (unsigned int) MTRCommandIDTypeClusterGroupsCommandGetGroupMembershipID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterGroups
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster getGroupMembershipWithParams:params completion:
-                                                         ^(MTRGroupsClusterGetGroupMembershipResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                             MTRClustersLogCompletion(logPrefix, value, error);
-                                                             dispatch_async(self.callbackQueue, ^{
-                                                                 completion(value, error);
-                                                             });
-                                                             [workItem endWork];
-                                                         }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRGroupsClusterGetGroupMembershipParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Groups::Commands::GetGroupMembership::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRGroupsClusterGetGroupMembershipResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)removeGroupWithParams:(MTRGroupsClusterRemoveGroupParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRGroupsClusterRemoveGroupResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeGroupsID, (unsigned int) MTRCommandIDTypeClusterGroupsCommandRemoveGroupID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterGroups
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster removeGroupWithParams:params completion:
-                                                  ^(MTRGroupsClusterRemoveGroupResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                      MTRClustersLogCompletion(logPrefix, value, error);
-                                                      dispatch_async(self.callbackQueue, ^{
-                                                          completion(value, error);
-                                                      });
-                                                      [workItem endWork];
-                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRGroupsClusterRemoveGroupParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Groups::Commands::RemoveGroup::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRGroupsClusterRemoveGroupResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)removeAllGroupsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
@@ -384,74 +309,56 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)removeAllGroupsWithParams:(MTRGroupsClusterRemoveAllGroupsParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeGroupsID, (unsigned int) MTRCommandIDTypeClusterGroupsCommandRemoveAllGroupsID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterGroups
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster removeAllGroupsWithParams:params completion:
-                                                      ^(NSError * _Nullable error) {
-                                                          MTRClustersLogCompletion(logPrefix, nil, error);
-                                                          dispatch_async(self.callbackQueue, ^{
-                                                              completion(error);
-                                                          });
-                                                          [workItem endWork];
-                                                      }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRGroupsClusterRemoveAllGroupsParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Groups::Commands::RemoveAllGroups::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)addGroupIfIdentifyingWithParams:(MTRGroupsClusterAddGroupIfIdentifyingParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeGroupsID, (unsigned int) MTRCommandIDTypeClusterGroupsCommandAddGroupIfIdentifyingID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterGroups
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster addGroupIfIdentifyingWithParams:params completion:
-                                                            ^(NSError * _Nullable error) {
-                                                                MTRClustersLogCompletion(logPrefix, nil, error);
-                                                                dispatch_async(self.callbackQueue, ^{
-                                                                    completion(error);
-                                                                });
-                                                                [workItem endWork];
-                                                            }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRGroupsClusterAddGroupIfIdentifyingParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Groups::Commands::AddGroupIfIdentifying::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNameSupportWithParams:(MTRReadParams * _Nullable)params
@@ -562,362 +469,272 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)addSceneWithParams:(MTRScenesClusterAddSceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRScenesClusterAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandAddSceneID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterScenes
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster addSceneWithParams:params completion:
-                                               ^(MTRScenesClusterAddSceneResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                   MTRClustersLogCompletion(logPrefix, value, error);
-                                                   dispatch_async(self.callbackQueue, ^{
-                                                       completion(value, error);
-                                                   });
-                                                   [workItem endWork];
-                                               }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRScenesClusterAddSceneParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Scenes::Commands::AddScene::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRScenesClusterAddSceneResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)viewSceneWithParams:(MTRScenesClusterViewSceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRScenesClusterViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandViewSceneID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterScenes
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster viewSceneWithParams:params completion:
-                                                ^(MTRScenesClusterViewSceneResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                    MTRClustersLogCompletion(logPrefix, value, error);
-                                                    dispatch_async(self.callbackQueue, ^{
-                                                        completion(value, error);
-                                                    });
-                                                    [workItem endWork];
-                                                }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRScenesClusterViewSceneParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Scenes::Commands::ViewScene::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRScenesClusterViewSceneResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)removeSceneWithParams:(MTRScenesClusterRemoveSceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRScenesClusterRemoveSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandRemoveSceneID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterScenes
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster removeSceneWithParams:params completion:
-                                                  ^(MTRScenesClusterRemoveSceneResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                      MTRClustersLogCompletion(logPrefix, value, error);
-                                                      dispatch_async(self.callbackQueue, ^{
-                                                          completion(value, error);
-                                                      });
-                                                      [workItem endWork];
-                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRScenesClusterRemoveSceneParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Scenes::Commands::RemoveScene::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRScenesClusterRemoveSceneResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)removeAllScenesWithParams:(MTRScenesClusterRemoveAllScenesParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRScenesClusterRemoveAllScenesResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandRemoveAllScenesID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterScenes
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster removeAllScenesWithParams:params completion:
-                                                      ^(MTRScenesClusterRemoveAllScenesResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                          MTRClustersLogCompletion(logPrefix, value, error);
-                                                          dispatch_async(self.callbackQueue, ^{
-                                                              completion(value, error);
-                                                          });
-                                                          [workItem endWork];
-                                                      }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRScenesClusterRemoveAllScenesParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Scenes::Commands::RemoveAllScenes::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRScenesClusterRemoveAllScenesResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)storeSceneWithParams:(MTRScenesClusterStoreSceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRScenesClusterStoreSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandStoreSceneID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterScenes
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster storeSceneWithParams:params completion:
-                                                 ^(MTRScenesClusterStoreSceneResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                     MTRClustersLogCompletion(logPrefix, value, error);
-                                                     dispatch_async(self.callbackQueue, ^{
-                                                         completion(value, error);
-                                                     });
-                                                     [workItem endWork];
-                                                 }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRScenesClusterStoreSceneParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Scenes::Commands::StoreScene::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRScenesClusterStoreSceneResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)recallSceneWithParams:(MTRScenesClusterRecallSceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandRecallSceneID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterScenes
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster recallSceneWithParams:params completion:
-                                                  ^(NSError * _Nullable error) {
-                                                      MTRClustersLogCompletion(logPrefix, nil, error);
-                                                      dispatch_async(self.callbackQueue, ^{
-                                                          completion(error);
-                                                      });
-                                                      [workItem endWork];
-                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRScenesClusterRecallSceneParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Scenes::Commands::RecallScene::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)getSceneMembershipWithParams:(MTRScenesClusterGetSceneMembershipParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRScenesClusterGetSceneMembershipResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandGetSceneMembershipID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterScenes
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster getSceneMembershipWithParams:params completion:
-                                                         ^(MTRScenesClusterGetSceneMembershipResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                             MTRClustersLogCompletion(logPrefix, value, error);
-                                                             dispatch_async(self.callbackQueue, ^{
-                                                                 completion(value, error);
-                                                             });
-                                                             [workItem endWork];
-                                                         }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRScenesClusterGetSceneMembershipParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Scenes::Commands::GetSceneMembership::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRScenesClusterGetSceneMembershipResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)enhancedAddSceneWithParams:(MTRScenesClusterEnhancedAddSceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRScenesClusterEnhancedAddSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandEnhancedAddSceneID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterScenes
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster enhancedAddSceneWithParams:params completion:
-                                                       ^(MTRScenesClusterEnhancedAddSceneResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                           MTRClustersLogCompletion(logPrefix, value, error);
-                                                           dispatch_async(self.callbackQueue, ^{
-                                                               completion(value, error);
-                                                           });
-                                                           [workItem endWork];
-                                                       }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRScenesClusterEnhancedAddSceneParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Scenes::Commands::EnhancedAddScene::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRScenesClusterEnhancedAddSceneResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)enhancedViewSceneWithParams:(MTRScenesClusterEnhancedViewSceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRScenesClusterEnhancedViewSceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandEnhancedViewSceneID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterScenes
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster enhancedViewSceneWithParams:params completion:
-                                                        ^(MTRScenesClusterEnhancedViewSceneResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                            MTRClustersLogCompletion(logPrefix, value, error);
-                                                            dispatch_async(self.callbackQueue, ^{
-                                                                completion(value, error);
-                                                            });
-                                                            [workItem endWork];
-                                                        }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRScenesClusterEnhancedViewSceneParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Scenes::Commands::EnhancedViewScene::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRScenesClusterEnhancedViewSceneResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)copySceneWithParams:(MTRScenesClusterCopySceneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRScenesClusterCopySceneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeScenesID, (unsigned int) MTRCommandIDTypeClusterScenesCommandCopySceneID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterScenes
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster copySceneWithParams:params completion:
-                                                ^(MTRScenesClusterCopySceneResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                    MTRClustersLogCompletion(logPrefix, value, error);
-                                                    dispatch_async(self.callbackQueue, ^{
-                                                        completion(value, error);
-                                                    });
-                                                    [workItem endWork];
-                                                }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRScenesClusterCopySceneParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Scenes::Commands::CopyScene::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRScenesClusterCopySceneResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSceneCountWithParams:(MTRReadParams * _Nullable)params
@@ -1098,38 +915,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)offWithParams:(MTROnOffClusterOffParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeOnOffID, (unsigned int) MTRCommandIDTypeClusterOnOffCommandOffID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterOnOff
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster offWithParams:params completion:
-                                          ^(NSError * _Nullable error) {
-                                              MTRClustersLogCompletion(logPrefix, nil, error);
-                                              dispatch_async(self.callbackQueue, ^{
-                                                  completion(error);
-                                              });
-                                              [workItem endWork];
-                                          }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTROnOffClusterOffParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OnOff::Commands::Off::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)onWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
@@ -1138,38 +946,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)onWithParams:(MTROnOffClusterOnParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeOnOffID, (unsigned int) MTRCommandIDTypeClusterOnOffCommandOnID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterOnOff
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster onWithParams:params completion:
-                                         ^(NSError * _Nullable error) {
-                                             MTRClustersLogCompletion(logPrefix, nil, error);
-                                             dispatch_async(self.callbackQueue, ^{
-                                                 completion(error);
-                                             });
-                                             [workItem endWork];
-                                         }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTROnOffClusterOnParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OnOff::Commands::On::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)toggleWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
@@ -1178,74 +977,56 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)toggleWithParams:(MTROnOffClusterToggleParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeOnOffID, (unsigned int) MTRCommandIDTypeClusterOnOffCommandToggleID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterOnOff
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster toggleWithParams:params completion:
-                                             ^(NSError * _Nullable error) {
-                                                 MTRClustersLogCompletion(logPrefix, nil, error);
-                                                 dispatch_async(self.callbackQueue, ^{
-                                                     completion(error);
-                                                 });
-                                                 [workItem endWork];
-                                             }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTROnOffClusterToggleParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OnOff::Commands::Toggle::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)offWithEffectWithParams:(MTROnOffClusterOffWithEffectParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeOnOffID, (unsigned int) MTRCommandIDTypeClusterOnOffCommandOffWithEffectID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterOnOff
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster offWithEffectWithParams:params completion:
-                                                    ^(NSError * _Nullable error) {
-                                                        MTRClustersLogCompletion(logPrefix, nil, error);
-                                                        dispatch_async(self.callbackQueue, ^{
-                                                            completion(error);
-                                                        });
-                                                        [workItem endWork];
-                                                    }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTROnOffClusterOffWithEffectParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OnOff::Commands::OffWithEffect::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)onWithRecallGlobalSceneWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
@@ -1254,74 +1035,56 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)onWithRecallGlobalSceneWithParams:(MTROnOffClusterOnWithRecallGlobalSceneParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeOnOffID, (unsigned int) MTRCommandIDTypeClusterOnOffCommandOnWithRecallGlobalSceneID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterOnOff
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster onWithRecallGlobalSceneWithParams:params completion:
-                                                              ^(NSError * _Nullable error) {
-                                                                  MTRClustersLogCompletion(logPrefix, nil, error);
-                                                                  dispatch_async(self.callbackQueue, ^{
-                                                                      completion(error);
-                                                                  });
-                                                                  [workItem endWork];
-                                                              }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTROnOffClusterOnWithRecallGlobalSceneParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OnOff::Commands::OnWithRecallGlobalScene::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)onWithTimedOffWithParams:(MTROnOffClusterOnWithTimedOffParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeOnOffID, (unsigned int) MTRCommandIDTypeClusterOnOffCommandOnWithTimedOffID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterOnOff
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster onWithTimedOffWithParams:params completion:
-                                                     ^(NSError * _Nullable error) {
-                                                         MTRClustersLogCompletion(logPrefix, nil, error);
-                                                         dispatch_async(self.callbackQueue, ^{
-                                                             completion(error);
-                                                         });
-                                                         [workItem endWork];
-                                                     }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTROnOffClusterOnWithTimedOffParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OnOff::Commands::OnWithTimedOff::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOnOffWithParams:(MTRReadParams * _Nullable)params
@@ -1561,326 +1324,245 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)moveToLevelWithParams:(MTRLevelControlClusterMoveToLevelParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeLevelControlID, (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveToLevelID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterLevelControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster moveToLevelWithParams:params completion:
-                                                  ^(NSError * _Nullable error) {
-                                                      MTRClustersLogCompletion(logPrefix, nil, error);
-                                                      dispatch_async(self.callbackQueue, ^{
-                                                          completion(error);
-                                                      });
-                                                      [workItem endWork];
-                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRLevelControlClusterMoveToLevelParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = LevelControl::Commands::MoveToLevel::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)moveWithParams:(MTRLevelControlClusterMoveParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeLevelControlID, (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterLevelControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster moveWithParams:params completion:
-                                           ^(NSError * _Nullable error) {
-                                               MTRClustersLogCompletion(logPrefix, nil, error);
-                                               dispatch_async(self.callbackQueue, ^{
-                                                   completion(error);
-                                               });
-                                               [workItem endWork];
-                                           }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRLevelControlClusterMoveParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = LevelControl::Commands::Move::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)stepWithParams:(MTRLevelControlClusterStepParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeLevelControlID, (unsigned int) MTRCommandIDTypeClusterLevelControlCommandStepID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterLevelControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster stepWithParams:params completion:
-                                           ^(NSError * _Nullable error) {
-                                               MTRClustersLogCompletion(logPrefix, nil, error);
-                                               dispatch_async(self.callbackQueue, ^{
-                                                   completion(error);
-                                               });
-                                               [workItem endWork];
-                                           }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRLevelControlClusterStepParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = LevelControl::Commands::Step::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)stopWithParams:(MTRLevelControlClusterStopParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeLevelControlID, (unsigned int) MTRCommandIDTypeClusterLevelControlCommandStopID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterLevelControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster stopWithParams:params completion:
-                                           ^(NSError * _Nullable error) {
-                                               MTRClustersLogCompletion(logPrefix, nil, error);
-                                               dispatch_async(self.callbackQueue, ^{
-                                                   completion(error);
-                                               });
-                                               [workItem endWork];
-                                           }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRLevelControlClusterStopParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = LevelControl::Commands::Stop::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)moveToLevelWithOnOffWithParams:(MTRLevelControlClusterMoveToLevelWithOnOffParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeLevelControlID, (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveToLevelWithOnOffID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterLevelControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster moveToLevelWithOnOffWithParams:params completion:
-                                                           ^(NSError * _Nullable error) {
-                                                               MTRClustersLogCompletion(logPrefix, nil, error);
-                                                               dispatch_async(self.callbackQueue, ^{
-                                                                   completion(error);
-                                                               });
-                                                               [workItem endWork];
-                                                           }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRLevelControlClusterMoveToLevelWithOnOffParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = LevelControl::Commands::MoveToLevelWithOnOff::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)moveWithOnOffWithParams:(MTRLevelControlClusterMoveWithOnOffParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeLevelControlID, (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveWithOnOffID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterLevelControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster moveWithOnOffWithParams:params completion:
-                                                    ^(NSError * _Nullable error) {
-                                                        MTRClustersLogCompletion(logPrefix, nil, error);
-                                                        dispatch_async(self.callbackQueue, ^{
-                                                            completion(error);
-                                                        });
-                                                        [workItem endWork];
-                                                    }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRLevelControlClusterMoveWithOnOffParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = LevelControl::Commands::MoveWithOnOff::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)stepWithOnOffWithParams:(MTRLevelControlClusterStepWithOnOffParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeLevelControlID, (unsigned int) MTRCommandIDTypeClusterLevelControlCommandStepWithOnOffID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterLevelControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster stepWithOnOffWithParams:params completion:
-                                                    ^(NSError * _Nullable error) {
-                                                        MTRClustersLogCompletion(logPrefix, nil, error);
-                                                        dispatch_async(self.callbackQueue, ^{
-                                                            completion(error);
-                                                        });
-                                                        [workItem endWork];
-                                                    }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRLevelControlClusterStepWithOnOffParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = LevelControl::Commands::StepWithOnOff::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)stopWithOnOffWithParams:(MTRLevelControlClusterStopWithOnOffParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeLevelControlID, (unsigned int) MTRCommandIDTypeClusterLevelControlCommandStopWithOnOffID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterLevelControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster stopWithOnOffWithParams:params completion:
-                                                    ^(NSError * _Nullable error) {
-                                                        MTRClustersLogCompletion(logPrefix, nil, error);
-                                                        dispatch_async(self.callbackQueue, ^{
-                                                            completion(error);
-                                                        });
-                                                        [workItem endWork];
-                                                    }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRLevelControlClusterStopWithOnOffParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = LevelControl::Commands::StopWithOnOff::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)moveToClosestFrequencyWithParams:(MTRLevelControlClusterMoveToClosestFrequencyParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeLevelControlID, (unsigned int) MTRCommandIDTypeClusterLevelControlCommandMoveToClosestFrequencyID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterLevelControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster moveToClosestFrequencyWithParams:params completion:
-                                                             ^(NSError * _Nullable error) {
-                                                                 MTRClustersLogCompletion(logPrefix, nil, error);
-                                                                 dispatch_async(self.callbackQueue, ^{
-                                                                     completion(error);
-                                                                 });
-                                                                 [workItem endWork];
-                                                             }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRLevelControlClusterMoveToClosestFrequencyParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = LevelControl::Commands::MoveToClosestFrequency::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentLevelWithParams:(MTRReadParams * _Nullable)params
@@ -2613,434 +2295,326 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)instantActionWithParams:(MTRActionsClusterInstantActionParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandInstantActionID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterActions
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster instantActionWithParams:params completion:
-                                                    ^(NSError * _Nullable error) {
-                                                        MTRClustersLogCompletion(logPrefix, nil, error);
-                                                        dispatch_async(self.callbackQueue, ^{
-                                                            completion(error);
-                                                        });
-                                                        [workItem endWork];
-                                                    }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRActionsClusterInstantActionParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Actions::Commands::InstantAction::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)instantActionWithTransitionWithParams:(MTRActionsClusterInstantActionWithTransitionParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandInstantActionWithTransitionID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterActions
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster instantActionWithTransitionWithParams:params completion:
-                                                                  ^(NSError * _Nullable error) {
-                                                                      MTRClustersLogCompletion(logPrefix, nil, error);
-                                                                      dispatch_async(self.callbackQueue, ^{
-                                                                          completion(error);
-                                                                      });
-                                                                      [workItem endWork];
-                                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRActionsClusterInstantActionWithTransitionParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Actions::Commands::InstantActionWithTransition::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)startActionWithParams:(MTRActionsClusterStartActionParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandStartActionID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterActions
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster startActionWithParams:params completion:
-                                                  ^(NSError * _Nullable error) {
-                                                      MTRClustersLogCompletion(logPrefix, nil, error);
-                                                      dispatch_async(self.callbackQueue, ^{
-                                                          completion(error);
-                                                      });
-                                                      [workItem endWork];
-                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRActionsClusterStartActionParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Actions::Commands::StartAction::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)startActionWithDurationWithParams:(MTRActionsClusterStartActionWithDurationParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandStartActionWithDurationID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterActions
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster startActionWithDurationWithParams:params completion:
-                                                              ^(NSError * _Nullable error) {
-                                                                  MTRClustersLogCompletion(logPrefix, nil, error);
-                                                                  dispatch_async(self.callbackQueue, ^{
-                                                                      completion(error);
-                                                                  });
-                                                                  [workItem endWork];
-                                                              }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRActionsClusterStartActionWithDurationParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Actions::Commands::StartActionWithDuration::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)stopActionWithParams:(MTRActionsClusterStopActionParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandStopActionID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterActions
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster stopActionWithParams:params completion:
-                                                 ^(NSError * _Nullable error) {
-                                                     MTRClustersLogCompletion(logPrefix, nil, error);
-                                                     dispatch_async(self.callbackQueue, ^{
-                                                         completion(error);
-                                                     });
-                                                     [workItem endWork];
-                                                 }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRActionsClusterStopActionParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Actions::Commands::StopAction::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)pauseActionWithParams:(MTRActionsClusterPauseActionParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandPauseActionID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterActions
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster pauseActionWithParams:params completion:
-                                                  ^(NSError * _Nullable error) {
-                                                      MTRClustersLogCompletion(logPrefix, nil, error);
-                                                      dispatch_async(self.callbackQueue, ^{
-                                                          completion(error);
-                                                      });
-                                                      [workItem endWork];
-                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRActionsClusterPauseActionParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Actions::Commands::PauseAction::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)pauseActionWithDurationWithParams:(MTRActionsClusterPauseActionWithDurationParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandPauseActionWithDurationID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterActions
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster pauseActionWithDurationWithParams:params completion:
-                                                              ^(NSError * _Nullable error) {
-                                                                  MTRClustersLogCompletion(logPrefix, nil, error);
-                                                                  dispatch_async(self.callbackQueue, ^{
-                                                                      completion(error);
-                                                                  });
-                                                                  [workItem endWork];
-                                                              }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRActionsClusterPauseActionWithDurationParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Actions::Commands::PauseActionWithDuration::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)resumeActionWithParams:(MTRActionsClusterResumeActionParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandResumeActionID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterActions
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster resumeActionWithParams:params completion:
-                                                   ^(NSError * _Nullable error) {
-                                                       MTRClustersLogCompletion(logPrefix, nil, error);
-                                                       dispatch_async(self.callbackQueue, ^{
-                                                           completion(error);
-                                                       });
-                                                       [workItem endWork];
-                                                   }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRActionsClusterResumeActionParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Actions::Commands::ResumeAction::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)enableActionWithParams:(MTRActionsClusterEnableActionParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandEnableActionID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterActions
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster enableActionWithParams:params completion:
-                                                   ^(NSError * _Nullable error) {
-                                                       MTRClustersLogCompletion(logPrefix, nil, error);
-                                                       dispatch_async(self.callbackQueue, ^{
-                                                           completion(error);
-                                                       });
-                                                       [workItem endWork];
-                                                   }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRActionsClusterEnableActionParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Actions::Commands::EnableAction::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)enableActionWithDurationWithParams:(MTRActionsClusterEnableActionWithDurationParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandEnableActionWithDurationID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterActions
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster enableActionWithDurationWithParams:params completion:
-                                                               ^(NSError * _Nullable error) {
-                                                                   MTRClustersLogCompletion(logPrefix, nil, error);
-                                                                   dispatch_async(self.callbackQueue, ^{
-                                                                       completion(error);
-                                                                   });
-                                                                   [workItem endWork];
-                                                               }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRActionsClusterEnableActionWithDurationParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Actions::Commands::EnableActionWithDuration::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)disableActionWithParams:(MTRActionsClusterDisableActionParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandDisableActionID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterActions
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster disableActionWithParams:params completion:
-                                                    ^(NSError * _Nullable error) {
-                                                        MTRClustersLogCompletion(logPrefix, nil, error);
-                                                        dispatch_async(self.callbackQueue, ^{
-                                                            completion(error);
-                                                        });
-                                                        [workItem endWork];
-                                                    }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRActionsClusterDisableActionParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Actions::Commands::DisableAction::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)disableActionWithDurationWithParams:(MTRActionsClusterDisableActionWithDurationParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeActionsID, (unsigned int) MTRCommandIDTypeClusterActionsCommandDisableActionWithDurationID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterActions
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster disableActionWithDurationWithParams:params completion:
-                                                                ^(NSError * _Nullable error) {
-                                                                    MTRClustersLogCompletion(logPrefix, nil, error);
-                                                                    dispatch_async(self.callbackQueue, ^{
-                                                                        completion(error);
-                                                                    });
-                                                                    [workItem endWork];
-                                                                }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRActionsClusterDisableActionWithDurationParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Actions::Commands::DisableActionWithDuration::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeActionListWithParams:(MTRReadParams * _Nullable)params
@@ -3179,38 +2753,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)mfgSpecificPingWithParams:(MTRBasicClusterMfgSpecificPingParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) 0x00000028, (unsigned int) 0x10020000];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterBasic
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster mfgSpecificPingWithParams:params completionHandler:
-                                                      ^(NSError * _Nullable error) {
-                                                          MTRClustersLogCompletion(logPrefix, nil, error);
-                                                          dispatch_async(self.callbackQueue, ^{
-                                                              completion(error);
-                                                          });
-                                                          [workItem endWork];
-                                                      }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRBasicClusterMfgSpecificPingParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = BasicInformation::Commands::MfgSpecificPing::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDataModelRevisionWithParams:(MTRReadParams * _Nullable)params
@@ -3419,110 +2984,83 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)queryImageWithParams:(MTROTASoftwareUpdateProviderClusterQueryImageParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeOTASoftwareUpdateProviderID, (unsigned int) MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandQueryImageID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterOTASoftwareUpdateProvider
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster queryImageWithParams:params completion:
-                                                 ^(MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                     MTRClustersLogCompletion(logPrefix, value, error);
-                                                     dispatch_async(self.callbackQueue, ^{
-                                                         completion(value, error);
-                                                     });
-                                                     [workItem endWork];
-                                                 }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTROTASoftwareUpdateProviderClusterQueryImageParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OtaSoftwareUpdateProvider::Commands::QueryImage::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTROTASoftwareUpdateProviderClusterQueryImageResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)applyUpdateRequestWithParams:(MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeOTASoftwareUpdateProviderID, (unsigned int) MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandApplyUpdateRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterOTASoftwareUpdateProvider
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster applyUpdateRequestWithParams:params completion:
-                                                         ^(MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                             MTRClustersLogCompletion(logPrefix, value, error);
-                                                             dispatch_async(self.callbackQueue, ^{
-                                                                 completion(value, error);
-                                                             });
-                                                             [workItem endWork];
-                                                         }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)notifyUpdateAppliedWithParams:(MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeOTASoftwareUpdateProviderID, (unsigned int) MTRCommandIDTypeClusterOTASoftwareUpdateProviderCommandNotifyUpdateAppliedID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterOTASoftwareUpdateProvider
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster notifyUpdateAppliedWithParams:params completion:
-                                                          ^(NSError * _Nullable error) {
-                                                              MTRClustersLogCompletion(logPrefix, nil, error);
-                                                              dispatch_async(self.callbackQueue, ^{
-                                                                  completion(error);
-                                                              });
-                                                              [workItem endWork];
-                                                          }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -3605,38 +3143,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)announceOTAProviderWithParams:(MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeOTASoftwareUpdateRequestorID, (unsigned int) MTRCommandIDTypeClusterOTASoftwareUpdateRequestorCommandAnnounceOTAProviderID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterOTASoftwareUpdateRequestor
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster announceOTAProviderWithParams:params completion:
-                                                          ^(NSError * _Nullable error) {
-                                                              MTRClustersLogCompletion(logPrefix, nil, error);
-                                                              dispatch_async(self.callbackQueue, ^{
-                                                                  completion(error);
-                                                              });
-                                                              [workItem endWork];
-                                                          }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDefaultOTAProvidersWithParams:(MTRReadParams * _Nullable)params
@@ -4260,74 +3789,56 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)armFailSafeWithParams:(MTRGeneralCommissioningClusterArmFailSafeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRGeneralCommissioningClusterArmFailSafeResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeGeneralCommissioningID, (unsigned int) MTRCommandIDTypeClusterGeneralCommissioningCommandArmFailSafeID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterGeneralCommissioning
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster armFailSafeWithParams:params completion:
-                                                  ^(MTRGeneralCommissioningClusterArmFailSafeResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                      MTRClustersLogCompletion(logPrefix, value, error);
-                                                      dispatch_async(self.callbackQueue, ^{
-                                                          completion(value, error);
-                                                      });
-                                                      [workItem endWork];
-                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRGeneralCommissioningClusterArmFailSafeParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = GeneralCommissioning::Commands::ArmFailSafe::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRGeneralCommissioningClusterArmFailSafeResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)setRegulatoryConfigWithParams:(MTRGeneralCommissioningClusterSetRegulatoryConfigParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeGeneralCommissioningID, (unsigned int) MTRCommandIDTypeClusterGeneralCommissioningCommandSetRegulatoryConfigID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterGeneralCommissioning
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster setRegulatoryConfigWithParams:params completion:
-                                                          ^(MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                              MTRClustersLogCompletion(logPrefix, value, error);
-                                                              dispatch_async(self.callbackQueue, ^{
-                                                                  completion(value, error);
-                                                              });
-                                                              [workItem endWork];
-                                                          }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRGeneralCommissioningClusterSetRegulatoryConfigParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = GeneralCommissioning::Commands::SetRegulatoryConfig::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)commissioningCompleteWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -4336,38 +3847,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)commissioningCompleteWithParams:(MTRGeneralCommissioningClusterCommissioningCompleteParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeGeneralCommissioningID, (unsigned int) MTRCommandIDTypeClusterGeneralCommissioningCommandCommissioningCompleteID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterGeneralCommissioning
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster commissioningCompleteWithParams:params completion:
-                                                            ^(MTRGeneralCommissioningClusterCommissioningCompleteResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                                MTRClustersLogCompletion(logPrefix, value, error);
-                                                                dispatch_async(self.callbackQueue, ^{
-                                                                    completion(value, error);
-                                                                });
-                                                                [workItem endWork];
-                                                            }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRGeneralCommissioningClusterCommissioningCompleteParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = GeneralCommissioning::Commands::CommissioningComplete::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRGeneralCommissioningClusterCommissioningCompleteResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBreadcrumbWithParams:(MTRReadParams * _Nullable)params
@@ -4491,218 +3993,164 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)scanNetworksWithParams:(MTRNetworkCommissioningClusterScanNetworksParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeNetworkCommissioningID, (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandScanNetworksID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterNetworkCommissioning
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster scanNetworksWithParams:params completion:
-                                                   ^(MTRNetworkCommissioningClusterScanNetworksResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                       MTRClustersLogCompletion(logPrefix, value, error);
-                                                       dispatch_async(self.callbackQueue, ^{
-                                                           completion(value, error);
-                                                       });
-                                                       [workItem endWork];
-                                                   }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRNetworkCommissioningClusterScanNetworksParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = NetworkCommissioning::Commands::ScanNetworks::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRNetworkCommissioningClusterScanNetworksResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)addOrUpdateWiFiNetworkWithParams:(MTRNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeNetworkCommissioningID, (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandAddOrUpdateWiFiNetworkID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterNetworkCommissioning
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster addOrUpdateWiFiNetworkWithParams:params completion:
-                                                             ^(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                                 MTRClustersLogCompletion(logPrefix, value, error);
-                                                                 dispatch_async(self.callbackQueue, ^{
-                                                                     completion(value, error);
-                                                                 });
-                                                                 [workItem endWork];
-                                                             }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRNetworkCommissioningClusterNetworkConfigResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)addOrUpdateThreadNetworkWithParams:(MTRNetworkCommissioningClusterAddOrUpdateThreadNetworkParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeNetworkCommissioningID, (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandAddOrUpdateThreadNetworkID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterNetworkCommissioning
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster addOrUpdateThreadNetworkWithParams:params completion:
-                                                               ^(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                                   MTRClustersLogCompletion(logPrefix, value, error);
-                                                                   dispatch_async(self.callbackQueue, ^{
-                                                                       completion(value, error);
-                                                                   });
-                                                                   [workItem endWork];
-                                                               }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRNetworkCommissioningClusterAddOrUpdateThreadNetworkParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRNetworkCommissioningClusterNetworkConfigResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)removeNetworkWithParams:(MTRNetworkCommissioningClusterRemoveNetworkParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeNetworkCommissioningID, (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandRemoveNetworkID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterNetworkCommissioning
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster removeNetworkWithParams:params completion:
-                                                    ^(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                        MTRClustersLogCompletion(logPrefix, value, error);
-                                                        dispatch_async(self.callbackQueue, ^{
-                                                            completion(value, error);
-                                                        });
-                                                        [workItem endWork];
-                                                    }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRNetworkCommissioningClusterRemoveNetworkParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = NetworkCommissioning::Commands::RemoveNetwork::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRNetworkCommissioningClusterNetworkConfigResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)connectNetworkWithParams:(MTRNetworkCommissioningClusterConnectNetworkParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRNetworkCommissioningClusterConnectNetworkResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeNetworkCommissioningID, (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandConnectNetworkID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterNetworkCommissioning
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster connectNetworkWithParams:params completion:
-                                                     ^(MTRNetworkCommissioningClusterConnectNetworkResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                         MTRClustersLogCompletion(logPrefix, value, error);
-                                                         dispatch_async(self.callbackQueue, ^{
-                                                             completion(value, error);
-                                                         });
-                                                         [workItem endWork];
-                                                     }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRNetworkCommissioningClusterConnectNetworkParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = NetworkCommissioning::Commands::ConnectNetwork::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRNetworkCommissioningClusterConnectNetworkResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)reorderNetworkWithParams:(MTRNetworkCommissioningClusterReorderNetworkParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeNetworkCommissioningID, (unsigned int) MTRCommandIDTypeClusterNetworkCommissioningCommandReorderNetworkID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterNetworkCommissioning
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster reorderNetworkWithParams:params completion:
-                                                     ^(MTRNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                         MTRClustersLogCompletion(logPrefix, value, error);
-                                                         dispatch_async(self.callbackQueue, ^{
-                                                             completion(value, error);
-                                                         });
-                                                         [workItem endWork];
-                                                     }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRNetworkCommissioningClusterReorderNetworkParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = NetworkCommissioning::Commands::ReorderNetwork::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRNetworkCommissioningClusterNetworkConfigResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaxNetworksWithParams:(MTRReadParams * _Nullable)params
@@ -4861,38 +4309,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)retrieveLogsRequestWithParams:(MTRDiagnosticLogsClusterRetrieveLogsRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDiagnosticLogsID, (unsigned int) MTRCommandIDTypeClusterDiagnosticLogsCommandRetrieveLogsRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDiagnosticLogs
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster retrieveLogsRequestWithParams:params completion:
-                                                          ^(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                              MTRClustersLogCompletion(logPrefix, value, error);
-                                                              dispatch_async(self.callbackQueue, ^{
-                                                                  completion(value, error);
-                                                              });
-                                                              [workItem endWork];
-                                                          }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDiagnosticLogsClusterRetrieveLogsRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = DiagnosticLogs::Commands::RetrieveLogsRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRDiagnosticLogsClusterRetrieveLogsResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -4960,38 +4399,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)testEventTriggerWithParams:(MTRGeneralDiagnosticsClusterTestEventTriggerParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeGeneralDiagnosticsID, (unsigned int) MTRCommandIDTypeClusterGeneralDiagnosticsCommandTestEventTriggerID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterGeneralDiagnostics
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster testEventTriggerWithParams:params completion:
-                                                       ^(NSError * _Nullable error) {
-                                                           MTRClustersLogCompletion(logPrefix, nil, error);
-                                                           dispatch_async(self.callbackQueue, ^{
-                                                               completion(error);
-                                                           });
-                                                           [workItem endWork];
-                                                       }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRGeneralDiagnosticsClusterTestEventTriggerParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = GeneralDiagnostics::Commands::TestEventTrigger::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNetworkInterfacesWithParams:(MTRReadParams * _Nullable)params
@@ -5114,38 +4544,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)resetWatermarksWithParams:(MTRSoftwareDiagnosticsClusterResetWatermarksParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeSoftwareDiagnosticsID, (unsigned int) MTRCommandIDTypeClusterSoftwareDiagnosticsCommandResetWatermarksID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterSoftwareDiagnostics
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster resetWatermarksWithParams:params completion:
-                                                      ^(NSError * _Nullable error) {
-                                                          MTRClustersLogCompletion(logPrefix, nil, error);
-                                                          dispatch_async(self.callbackQueue, ^{
-                                                              completion(error);
-                                                          });
-                                                          [workItem endWork];
-                                                      }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRSoftwareDiagnosticsClusterResetWatermarksParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = SoftwareDiagnostics::Commands::ResetWatermarks::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeThreadMetricsWithParams:(MTRReadParams * _Nullable)params
@@ -5238,38 +4659,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)resetCountsWithParams:(MTRThreadNetworkDiagnosticsClusterResetCountsParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeThreadNetworkDiagnosticsID, (unsigned int) MTRCommandIDTypeClusterThreadNetworkDiagnosticsCommandResetCountsID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterThreadNetworkDiagnostics
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster resetCountsWithParams:params completion:
-                                                  ^(NSError * _Nullable error) {
-                                                      MTRClustersLogCompletion(logPrefix, nil, error);
-                                                      dispatch_async(self.callbackQueue, ^{
-                                                          completion(error);
-                                                      });
-                                                      [workItem endWork];
-                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRThreadNetworkDiagnosticsClusterResetCountsParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ThreadNetworkDiagnostics::Commands::ResetCounts::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeChannelWithParams:(MTRReadParams * _Nullable)params
@@ -5665,38 +5077,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)resetCountsWithParams:(MTRWiFiNetworkDiagnosticsClusterResetCountsParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeWiFiNetworkDiagnosticsID, (unsigned int) MTRCommandIDTypeClusterWiFiNetworkDiagnosticsCommandResetCountsID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterWiFiNetworkDiagnostics
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster resetCountsWithParams:params completion:
-                                                  ^(NSError * _Nullable error) {
-                                                      MTRClustersLogCompletion(logPrefix, nil, error);
-                                                      dispatch_async(self.callbackQueue, ^{
-                                                          completion(error);
-                                                      });
-                                                      [workItem endWork];
-                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRWiFiNetworkDiagnosticsClusterResetCountsParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = WiFiNetworkDiagnostics::Commands::ResetCounts::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBSSIDWithParams:(MTRReadParams * _Nullable)params
@@ -5842,38 +5245,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)resetCountsWithParams:(MTREthernetNetworkDiagnosticsClusterResetCountsParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeEthernetNetworkDiagnosticsID, (unsigned int) MTRCommandIDTypeClusterEthernetNetworkDiagnosticsCommandResetCountsID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterEthernetNetworkDiagnostics
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster resetCountsWithParams:params completion:
-                                                  ^(NSError * _Nullable error) {
-                                                      MTRClustersLogCompletion(logPrefix, nil, error);
-                                                      dispatch_async(self.callbackQueue, ^{
-                                                          completion(error);
-                                                      });
-                                                      [workItem endWork];
-                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTREthernetNetworkDiagnosticsClusterResetCountsParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = EthernetNetworkDiagnostics::Commands::ResetCounts::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePHYRateWithParams:(MTRReadParams * _Nullable)params
@@ -5987,182 +5381,137 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)setUTCTimeWithParams:(MTRTimeSynchronizationClusterSetUTCTimeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeTimeSynchronizationID, (unsigned int) MTRCommandIDTypeClusterTimeSynchronizationCommandSetUTCTimeID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterTimeSynchronization
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster setUTCTimeWithParams:params completion:
-                                                 ^(NSError * _Nullable error) {
-                                                     MTRClustersLogCompletion(logPrefix, nil, error);
-                                                     dispatch_async(self.callbackQueue, ^{
-                                                         completion(error);
-                                                     });
-                                                     [workItem endWork];
-                                                 }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRTimeSynchronizationClusterSetUTCTimeParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = TimeSynchronization::Commands::SetUTCTime::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)setTrustedTimeSourceWithParams:(MTRTimeSynchronizationClusterSetTrustedTimeSourceParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeTimeSynchronizationID, (unsigned int) MTRCommandIDTypeClusterTimeSynchronizationCommandSetTrustedTimeSourceID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterTimeSynchronization
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster setTrustedTimeSourceWithParams:params completion:
-                                                           ^(NSError * _Nullable error) {
-                                                               MTRClustersLogCompletion(logPrefix, nil, error);
-                                                               dispatch_async(self.callbackQueue, ^{
-                                                                   completion(error);
-                                                               });
-                                                               [workItem endWork];
-                                                           }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRTimeSynchronizationClusterSetTrustedTimeSourceParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = TimeSynchronization::Commands::SetTrustedTimeSource::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)setTimeZoneWithParams:(MTRTimeSynchronizationClusterSetTimeZoneParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRTimeSynchronizationClusterSetTimeZoneResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeTimeSynchronizationID, (unsigned int) MTRCommandIDTypeClusterTimeSynchronizationCommandSetTimeZoneID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterTimeSynchronization
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster setTimeZoneWithParams:params completion:
-                                                  ^(MTRTimeSynchronizationClusterSetTimeZoneResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                      MTRClustersLogCompletion(logPrefix, value, error);
-                                                      dispatch_async(self.callbackQueue, ^{
-                                                          completion(value, error);
-                                                      });
-                                                      [workItem endWork];
-                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRTimeSynchronizationClusterSetTimeZoneParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = TimeSynchronization::Commands::SetTimeZone::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRTimeSynchronizationClusterSetTimeZoneResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)setDSTOffsetWithParams:(MTRTimeSynchronizationClusterSetDSTOffsetParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeTimeSynchronizationID, (unsigned int) MTRCommandIDTypeClusterTimeSynchronizationCommandSetDSTOffsetID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterTimeSynchronization
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster setDSTOffsetWithParams:params completion:
-                                                   ^(NSError * _Nullable error) {
-                                                       MTRClustersLogCompletion(logPrefix, nil, error);
-                                                       dispatch_async(self.callbackQueue, ^{
-                                                           completion(error);
-                                                       });
-                                                       [workItem endWork];
-                                                   }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRTimeSynchronizationClusterSetDSTOffsetParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = TimeSynchronization::Commands::SetDSTOffset::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)setDefaultNTPWithParams:(MTRTimeSynchronizationClusterSetDefaultNTPParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeTimeSynchronizationID, (unsigned int) MTRCommandIDTypeClusterTimeSynchronizationCommandSetDefaultNTPID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterTimeSynchronization
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster setDefaultNTPWithParams:params completion:
-                                                    ^(NSError * _Nullable error) {
-                                                        MTRClustersLogCompletion(logPrefix, nil, error);
-                                                        dispatch_async(self.callbackQueue, ^{
-                                                            completion(error);
-                                                        });
-                                                        [workItem endWork];
-                                                    }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRTimeSynchronizationClusterSetDefaultNTPParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = TimeSynchronization::Commands::SetDefaultNTP::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeUTCTimeWithParams:(MTRReadParams * _Nullable)params
@@ -6496,74 +5845,62 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)openCommissioningWindowWithParams:(MTRAdministratorCommissioningClusterOpenCommissioningWindowParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeAdministratorCommissioningID, (unsigned int) MTRCommandIDTypeClusterAdministratorCommissioningCommandOpenCommissioningWindowID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterAdministratorCommissioning
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster openCommissioningWindowWithParams:params completion:
-                                                              ^(NSError * _Nullable error) {
-                                                                  MTRClustersLogCompletion(logPrefix, nil, error);
-                                                                  dispatch_async(self.callbackQueue, ^{
-                                                                      completion(error);
-                                                                  });
-                                                                  [workItem endWork];
-                                                              }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRAdministratorCommissioningClusterOpenCommissioningWindowParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(10000);
     }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+
+    using RequestType = AdministratorCommissioning::Commands::OpenCommissioningWindow::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)openBasicCommissioningWindowWithParams:(MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeAdministratorCommissioningID, (unsigned int) MTRCommandIDTypeClusterAdministratorCommissioningCommandOpenBasicCommissioningWindowID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterAdministratorCommissioning
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster openBasicCommissioningWindowWithParams:params completion:
-                                                                   ^(NSError * _Nullable error) {
-                                                                       MTRClustersLogCompletion(logPrefix, nil, error);
-                                                                       dispatch_async(self.callbackQueue, ^{
-                                                                           completion(error);
-                                                                       });
-                                                                       [workItem endWork];
-                                                                   }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRAdministratorCommissioningClusterOpenBasicCommissioningWindowParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(10000);
     }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+
+    using RequestType = AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)revokeCommissioningWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
@@ -6572,38 +5909,32 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)revokeCommissioningWithParams:(MTRAdministratorCommissioningClusterRevokeCommissioningParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeAdministratorCommissioningID, (unsigned int) MTRCommandIDTypeClusterAdministratorCommissioningCommandRevokeCommissioningID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterAdministratorCommissioning
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster revokeCommissioningWithParams:params completion:
-                                                          ^(NSError * _Nullable error) {
-                                                              MTRClustersLogCompletion(logPrefix, nil, error);
-                                                              dispatch_async(self.callbackQueue, ^{
-                                                                  completion(error);
-                                                              });
-                                                              [workItem endWork];
-                                                          }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRAdministratorCommissioningClusterRevokeCommissioningParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(10000);
     }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+
+    using RequestType = AdministratorCommissioning::Commands::RevokeCommissioning::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeWindowStatusWithParams:(MTRReadParams * _Nullable)params
@@ -6697,290 +6028,218 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)attestationRequestWithParams:(MTROperationalCredentialsClusterAttestationRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID, (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandAttestationRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterOperationalCredentials
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster attestationRequestWithParams:params completion:
-                                                         ^(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                             MTRClustersLogCompletion(logPrefix, value, error);
-                                                             dispatch_async(self.callbackQueue, ^{
-                                                                 completion(value, error);
-                                                             });
-                                                             [workItem endWork];
-                                                         }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTROperationalCredentialsClusterAttestationRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OperationalCredentials::Commands::AttestationRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTROperationalCredentialsClusterAttestationResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)certificateChainRequestWithParams:(MTROperationalCredentialsClusterCertificateChainRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTROperationalCredentialsClusterCertificateChainResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID, (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandCertificateChainRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterOperationalCredentials
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster certificateChainRequestWithParams:params completion:
-                                                              ^(MTROperationalCredentialsClusterCertificateChainResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                                  MTRClustersLogCompletion(logPrefix, value, error);
-                                                                  dispatch_async(self.callbackQueue, ^{
-                                                                      completion(value, error);
-                                                                  });
-                                                                  [workItem endWork];
-                                                              }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTROperationalCredentialsClusterCertificateChainRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OperationalCredentials::Commands::CertificateChainRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTROperationalCredentialsClusterCertificateChainResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)CSRRequestWithParams:(MTROperationalCredentialsClusterCSRRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTROperationalCredentialsClusterCSRResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID, (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandCSRRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterOperationalCredentials
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster CSRRequestWithParams:params completion:
-                                                 ^(MTROperationalCredentialsClusterCSRResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                     MTRClustersLogCompletion(logPrefix, value, error);
-                                                     dispatch_async(self.callbackQueue, ^{
-                                                         completion(value, error);
-                                                     });
-                                                     [workItem endWork];
-                                                 }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTROperationalCredentialsClusterCSRRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OperationalCredentials::Commands::CSRRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTROperationalCredentialsClusterCSRResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)addNOCWithParams:(MTROperationalCredentialsClusterAddNOCParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID, (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandAddNOCID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterOperationalCredentials
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster addNOCWithParams:params completion:
-                                             ^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                 MTRClustersLogCompletion(logPrefix, value, error);
-                                                 dispatch_async(self.callbackQueue, ^{
-                                                     completion(value, error);
-                                                 });
-                                                 [workItem endWork];
-                                             }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTROperationalCredentialsClusterAddNOCParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OperationalCredentials::Commands::AddNOC::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTROperationalCredentialsClusterNOCResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)updateNOCWithParams:(MTROperationalCredentialsClusterUpdateNOCParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID, (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandUpdateNOCID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterOperationalCredentials
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster updateNOCWithParams:params completion:
-                                                ^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                    MTRClustersLogCompletion(logPrefix, value, error);
-                                                    dispatch_async(self.callbackQueue, ^{
-                                                        completion(value, error);
-                                                    });
-                                                    [workItem endWork];
-                                                }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTROperationalCredentialsClusterUpdateNOCParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OperationalCredentials::Commands::UpdateNOC::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTROperationalCredentialsClusterNOCResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)updateFabricLabelWithParams:(MTROperationalCredentialsClusterUpdateFabricLabelParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID, (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandUpdateFabricLabelID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterOperationalCredentials
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster updateFabricLabelWithParams:params completion:
-                                                        ^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                            MTRClustersLogCompletion(logPrefix, value, error);
-                                                            dispatch_async(self.callbackQueue, ^{
-                                                                completion(value, error);
-                                                            });
-                                                            [workItem endWork];
-                                                        }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTROperationalCredentialsClusterUpdateFabricLabelParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OperationalCredentials::Commands::UpdateFabricLabel::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTROperationalCredentialsClusterNOCResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)removeFabricWithParams:(MTROperationalCredentialsClusterRemoveFabricParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID, (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandRemoveFabricID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterOperationalCredentials
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster removeFabricWithParams:params completion:
-                                                   ^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                       MTRClustersLogCompletion(logPrefix, value, error);
-                                                       dispatch_async(self.callbackQueue, ^{
-                                                           completion(value, error);
-                                                       });
-                                                       [workItem endWork];
-                                                   }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTROperationalCredentialsClusterRemoveFabricParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OperationalCredentials::Commands::RemoveFabric::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTROperationalCredentialsClusterNOCResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)addTrustedRootCertificateWithParams:(MTROperationalCredentialsClusterAddTrustedRootCertificateParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeOperationalCredentialsID, (unsigned int) MTRCommandIDTypeClusterOperationalCredentialsCommandAddTrustedRootCertificateID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterOperationalCredentials
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster addTrustedRootCertificateWithParams:params completion:
-                                                                ^(NSError * _Nullable error) {
-                                                                    MTRClustersLogCompletion(logPrefix, nil, error);
-                                                                    dispatch_async(self.callbackQueue, ^{
-                                                                        completion(error);
-                                                                    });
-                                                                    [workItem endWork];
-                                                                }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTROperationalCredentialsClusterAddTrustedRootCertificateParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OperationalCredentials::Commands::AddTrustedRootCertificate::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeNOCsWithParams:(MTRReadParams * _Nullable)params
@@ -7131,110 +6390,83 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)keySetWriteWithParams:(MTRGroupKeyManagementClusterKeySetWriteParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeGroupKeyManagementID, (unsigned int) MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetWriteID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterGroupKeyManagement
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster keySetWriteWithParams:params completion:
-                                                  ^(NSError * _Nullable error) {
-                                                      MTRClustersLogCompletion(logPrefix, nil, error);
-                                                      dispatch_async(self.callbackQueue, ^{
-                                                          completion(error);
-                                                      });
-                                                      [workItem endWork];
-                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRGroupKeyManagementClusterKeySetWriteParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = GroupKeyManagement::Commands::KeySetWrite::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)keySetReadWithParams:(MTRGroupKeyManagementClusterKeySetReadParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRGroupKeyManagementClusterKeySetReadResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeGroupKeyManagementID, (unsigned int) MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetReadID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterGroupKeyManagement
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster keySetReadWithParams:params completion:
-                                                 ^(MTRGroupKeyManagementClusterKeySetReadResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                     MTRClustersLogCompletion(logPrefix, value, error);
-                                                     dispatch_async(self.callbackQueue, ^{
-                                                         completion(value, error);
-                                                     });
-                                                     [workItem endWork];
-                                                 }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRGroupKeyManagementClusterKeySetReadParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = GroupKeyManagement::Commands::KeySetRead::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRGroupKeyManagementClusterKeySetReadResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)keySetRemoveWithParams:(MTRGroupKeyManagementClusterKeySetRemoveParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeGroupKeyManagementID, (unsigned int) MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetRemoveID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterGroupKeyManagement
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster keySetRemoveWithParams:params completion:
-                                                   ^(NSError * _Nullable error) {
-                                                       MTRClustersLogCompletion(logPrefix, nil, error);
-                                                       dispatch_async(self.callbackQueue, ^{
-                                                           completion(error);
-                                                       });
-                                                       [workItem endWork];
-                                                   }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRGroupKeyManagementClusterKeySetRemoveParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = GroupKeyManagement::Commands::KeySetRemove::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)keySetReadAllIndicesWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -7243,38 +6475,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)keySetReadAllIndicesWithParams:(MTRGroupKeyManagementClusterKeySetReadAllIndicesParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeGroupKeyManagementID, (unsigned int) MTRCommandIDTypeClusterGroupKeyManagementCommandKeySetReadAllIndicesID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterGroupKeyManagement
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster keySetReadAllIndicesWithParams:params completion:
-                                                           ^(MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                               MTRClustersLogCompletion(logPrefix, value, error);
-                                                               dispatch_async(self.callbackQueue, ^{
-                                                                   completion(value, error);
-                                                               });
-                                                               [workItem endWork];
-                                                           }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRGroupKeyManagementClusterKeySetReadAllIndicesParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = GroupKeyManagement::Commands::KeySetReadAllIndices::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGroupKeyMapWithParams:(MTRReadParams * _Nullable)params
@@ -7582,74 +6805,56 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)registerClientWithParams:(MTRICDManagementClusterRegisterClientParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRICDManagementClusterRegisterClientResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeICDManagementID, (unsigned int) MTRCommandIDTypeClusterICDManagementCommandRegisterClientID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterICDManagement
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster registerClientWithParams:params completion:
-                                                     ^(MTRICDManagementClusterRegisterClientResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                         MTRClustersLogCompletion(logPrefix, value, error);
-                                                         dispatch_async(self.callbackQueue, ^{
-                                                             completion(value, error);
-                                                         });
-                                                         [workItem endWork];
-                                                     }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRICDManagementClusterRegisterClientParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = IcdManagement::Commands::RegisterClient::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRICDManagementClusterRegisterClientResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)unregisterClientWithParams:(MTRICDManagementClusterUnregisterClientParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeICDManagementID, (unsigned int) MTRCommandIDTypeClusterICDManagementCommandUnregisterClientID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterICDManagement
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster unregisterClientWithParams:params completion:
-                                                       ^(NSError * _Nullable error) {
-                                                           MTRClustersLogCompletion(logPrefix, nil, error);
-                                                           dispatch_async(self.callbackQueue, ^{
-                                                               completion(error);
-                                                           });
-                                                           [workItem endWork];
-                                                       }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRICDManagementClusterUnregisterClientParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = IcdManagement::Commands::UnregisterClient::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)stayActiveRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
@@ -7658,38 +6863,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)stayActiveRequestWithParams:(MTRICDManagementClusterStayActiveRequestParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeICDManagementID, (unsigned int) MTRCommandIDTypeClusterICDManagementCommandStayActiveRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterICDManagement
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster stayActiveRequestWithParams:params completion:
-                                                        ^(NSError * _Nullable error) {
-                                                            MTRClustersLogCompletion(logPrefix, nil, error);
-                                                            dispatch_async(self.callbackQueue, ^{
-                                                                completion(error);
-                                                            });
-                                                            [workItem endWork];
-                                                        }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRICDManagementClusterStayActiveRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = IcdManagement::Commands::StayActiveRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeIdleModeIntervalWithParams:(MTRReadParams * _Nullable)params
@@ -7770,38 +6966,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)changeToModeWithParams:(MTRModeSelectClusterChangeToModeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeModeSelectID, (unsigned int) MTRCommandIDTypeClusterModeSelectCommandChangeToModeID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterModeSelect
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster changeToModeWithParams:params completion:
-                                                   ^(NSError * _Nullable error) {
-                                                       MTRClustersLogCompletion(logPrefix, nil, error);
-                                                       dispatch_async(self.callbackQueue, ^{
-                                                           completion(error);
-                                                       });
-                                                       [workItem endWork];
-                                                   }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRModeSelectClusterChangeToModeParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ModeSelect::Commands::ChangeToMode::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeDescriptionWithParams:(MTRReadParams * _Nullable)params
@@ -7918,38 +7105,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)changeToModeWithParams:(MTRLaundryWasherModeClusterChangeToModeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRLaundryWasherModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeLaundryWasherModeID, (unsigned int) MTRCommandIDTypeClusterLaundryWasherModeCommandChangeToModeID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterLaundryWasherMode
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster changeToModeWithParams:params completion:
-                                                   ^(MTRLaundryWasherModeClusterChangeToModeResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                       MTRClustersLogCompletion(logPrefix, value, error);
-                                                       dispatch_async(self.callbackQueue, ^{
-                                                           completion(value, error);
-                                                       });
-                                                       [workItem endWork];
-                                                   }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRLaundryWasherModeClusterChangeToModeParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = LaundryWasherMode::Commands::ChangeToMode::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRLaundryWasherModeClusterChangeToModeResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
@@ -8042,38 +7220,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)changeToModeWithParams:(MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeRefrigeratorAndTemperatureControlledCabinetModeID, (unsigned int) MTRCommandIDTypeClusterRefrigeratorAndTemperatureControlledCabinetModeCommandChangeToModeID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterRefrigeratorAndTemperatureControlledCabinetMode
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster changeToModeWithParams:params completion:
-                                                   ^(MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                       MTRClustersLogCompletion(logPrefix, value, error);
-                                                       dispatch_async(self.callbackQueue, ^{
-                                                           completion(value, error);
-                                                       });
-                                                       [workItem endWork];
-                                                   }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToMode::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
@@ -8254,38 +7423,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)changeToModeWithParams:(MTRRVCRunModeClusterChangeToModeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRRVCRunModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeRVCRunModeID, (unsigned int) MTRCommandIDTypeClusterRVCRunModeCommandChangeToModeID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterRVCRunMode
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster changeToModeWithParams:params completion:
-                                                   ^(MTRRVCRunModeClusterChangeToModeResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                       MTRClustersLogCompletion(logPrefix, value, error);
-                                                       dispatch_async(self.callbackQueue, ^{
-                                                           completion(value, error);
-                                                       });
-                                                       [workItem endWork];
-                                                   }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRRVCRunModeClusterChangeToModeParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = RvcRunMode::Commands::ChangeToMode::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRRVCRunModeClusterChangeToModeResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
@@ -8378,38 +7538,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)changeToModeWithParams:(MTRRVCCleanModeClusterChangeToModeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRRVCCleanModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeRVCCleanModeID, (unsigned int) MTRCommandIDTypeClusterRVCCleanModeCommandChangeToModeID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterRVCCleanMode
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster changeToModeWithParams:params completion:
-                                                   ^(MTRRVCCleanModeClusterChangeToModeResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                       MTRClustersLogCompletion(logPrefix, value, error);
-                                                       dispatch_async(self.callbackQueue, ^{
-                                                           completion(value, error);
-                                                       });
-                                                       [workItem endWork];
-                                                   }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRRVCCleanModeClusterChangeToModeParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = RvcCleanMode::Commands::ChangeToMode::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRRVCCleanModeClusterChangeToModeResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
@@ -8502,38 +7653,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)setTemperatureWithParams:(MTRTemperatureControlClusterSetTemperatureParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeTemperatureControlID, (unsigned int) MTRCommandIDTypeClusterTemperatureControlCommandSetTemperatureID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterTemperatureControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster setTemperatureWithParams:params completion:
-                                                     ^(NSError * _Nullable error) {
-                                                         MTRClustersLogCompletion(logPrefix, nil, error);
-                                                         dispatch_async(self.callbackQueue, ^{
-                                                             completion(error);
-                                                         });
-                                                         [workItem endWork];
-                                                     }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRTemperatureControlClusterSetTemperatureParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = TemperatureControl::Commands::SetTemperature::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTemperatureSetpointWithParams:(MTRReadParams * _Nullable)params
@@ -8675,38 +7817,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)changeToModeWithParams:(MTRDishwasherModeClusterChangeToModeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRDishwasherModeClusterChangeToModeResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDishwasherModeID, (unsigned int) MTRCommandIDTypeClusterDishwasherModeCommandChangeToModeID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDishwasherMode
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster changeToModeWithParams:params completion:
-                                                   ^(MTRDishwasherModeClusterChangeToModeResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                       MTRClustersLogCompletion(logPrefix, value, error);
-                                                       dispatch_async(self.callbackQueue, ^{
-                                                           completion(value, error);
-                                                       });
-                                                       [workItem endWork];
-                                                   }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDishwasherModeClusterChangeToModeParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = DishwasherMode::Commands::ChangeToMode::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRDishwasherModeClusterChangeToModeResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeSupportedModesWithParams:(MTRReadParams * _Nullable)params
@@ -8854,38 +7987,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)selfTestRequestWithParams:(MTRSmokeCOAlarmClusterSelfTestRequestParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeSmokeCOAlarmID, (unsigned int) MTRCommandIDTypeClusterSmokeCOAlarmCommandSelfTestRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterSmokeCOAlarm
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster selfTestRequestWithParams:params completion:
-                                                      ^(NSError * _Nullable error) {
-                                                          MTRClustersLogCompletion(logPrefix, nil, error);
-                                                          dispatch_async(self.callbackQueue, ^{
-                                                              completion(error);
-                                                          });
-                                                          [workItem endWork];
-                                                      }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRSmokeCOAlarmClusterSelfTestRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = SmokeCoAlarm::Commands::SelfTestRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeExpressedStateWithParams:(MTRReadParams * _Nullable)params
@@ -9012,74 +8136,56 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)resetWithParams:(MTRDishwasherAlarmClusterResetParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDishwasherAlarmID, (unsigned int) MTRCommandIDTypeClusterDishwasherAlarmCommandResetID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDishwasherAlarm
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster resetWithParams:params completion:
-                                            ^(NSError * _Nullable error) {
-                                                MTRClustersLogCompletion(logPrefix, nil, error);
-                                                dispatch_async(self.callbackQueue, ^{
-                                                    completion(error);
-                                                });
-                                                [workItem endWork];
-                                            }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDishwasherAlarmClusterResetParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = DishwasherAlarm::Commands::Reset::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)modifyEnabledAlarmsWithParams:(MTRDishwasherAlarmClusterModifyEnabledAlarmsParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDishwasherAlarmID, (unsigned int) MTRCommandIDTypeClusterDishwasherAlarmCommandModifyEnabledAlarmsID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDishwasherAlarm
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster modifyEnabledAlarmsWithParams:params completion:
-                                                          ^(NSError * _Nullable error) {
-                                                              MTRClustersLogCompletion(logPrefix, nil, error);
-                                                              dispatch_async(self.callbackQueue, ^{
-                                                                  completion(error);
-                                                              });
-                                                              [workItem endWork];
-                                                          }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDishwasherAlarmClusterModifyEnabledAlarmsParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = DishwasherAlarm::Commands::ModifyEnabledAlarms::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMaskWithParams:(MTRReadParams * _Nullable)params
@@ -9154,38 +8260,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)pauseWithParams:(MTROperationalStateClusterPauseParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTROperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeOperationalStateID, (unsigned int) MTRCommandIDTypeClusterOperationalStateCommandPauseID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterOperationalState
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster pauseWithParams:params completion:
-                                            ^(MTROperationalStateClusterOperationalCommandResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                MTRClustersLogCompletion(logPrefix, value, error);
-                                                dispatch_async(self.callbackQueue, ^{
-                                                    completion(value, error);
-                                                });
-                                                [workItem endWork];
-                                            }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTROperationalStateClusterPauseParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OperationalState::Commands::Pause::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTROperationalStateClusterOperationalCommandResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)stopWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTROperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -9194,38 +8291,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)stopWithParams:(MTROperationalStateClusterStopParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTROperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeOperationalStateID, (unsigned int) MTRCommandIDTypeClusterOperationalStateCommandStopID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterOperationalState
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster stopWithParams:params completion:
-                                           ^(MTROperationalStateClusterOperationalCommandResponseParams * _Nullable value, NSError * _Nullable error) {
-                                               MTRClustersLogCompletion(logPrefix, value, error);
-                                               dispatch_async(self.callbackQueue, ^{
-                                                   completion(value, error);
-                                               });
-                                               [workItem endWork];
-                                           }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTROperationalStateClusterStopParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OperationalState::Commands::Stop::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTROperationalStateClusterOperationalCommandResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)startWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTROperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -9234,38 +8322,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)startWithParams:(MTROperationalStateClusterStartParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTROperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeOperationalStateID, (unsigned int) MTRCommandIDTypeClusterOperationalStateCommandStartID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterOperationalState
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster startWithParams:params completion:
-                                            ^(MTROperationalStateClusterOperationalCommandResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                MTRClustersLogCompletion(logPrefix, value, error);
-                                                dispatch_async(self.callbackQueue, ^{
-                                                    completion(value, error);
-                                                });
-                                                [workItem endWork];
-                                            }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTROperationalStateClusterStartParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OperationalState::Commands::Start::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTROperationalStateClusterOperationalCommandResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)resumeWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTROperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -9274,38 +8353,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)resumeWithParams:(MTROperationalStateClusterResumeParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTROperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeOperationalStateID, (unsigned int) MTRCommandIDTypeClusterOperationalStateCommandResumeID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterOperationalState
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster resumeWithParams:params completion:
-                                             ^(MTROperationalStateClusterOperationalCommandResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                 MTRClustersLogCompletion(logPrefix, value, error);
-                                                 dispatch_async(self.callbackQueue, ^{
-                                                     completion(value, error);
-                                                 });
-                                                 [workItem endWork];
-                                             }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTROperationalStateClusterResumeParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = OperationalState::Commands::Resume::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTROperationalStateClusterOperationalCommandResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePhaseListWithParams:(MTRReadParams * _Nullable)params
@@ -9390,38 +8460,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)pauseWithParams:(MTRRVCOperationalStateClusterPauseParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeRVCOperationalStateID, (unsigned int) MTRCommandIDTypeClusterRVCOperationalStateCommandPauseID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterRVCOperationalState
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster pauseWithParams:params completion:
-                                            ^(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                MTRClustersLogCompletion(logPrefix, value, error);
-                                                dispatch_async(self.callbackQueue, ^{
-                                                    completion(value, error);
-                                                });
-                                                [workItem endWork];
-                                            }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRRVCOperationalStateClusterPauseParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = RvcOperationalState::Commands::Pause::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRRVCOperationalStateClusterOperationalCommandResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)stopWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -9430,38 +8491,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)stopWithParams:(MTRRVCOperationalStateClusterStopParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeRVCOperationalStateID, (unsigned int) MTRCommandIDTypeClusterRVCOperationalStateCommandStopID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterRVCOperationalState
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster stopWithParams:params completion:
-                                           ^(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable value, NSError * _Nullable error) {
-                                               MTRClustersLogCompletion(logPrefix, value, error);
-                                               dispatch_async(self.callbackQueue, ^{
-                                                   completion(value, error);
-                                               });
-                                               [workItem endWork];
-                                           }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRRVCOperationalStateClusterStopParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = RvcOperationalState::Commands::Stop::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRRVCOperationalStateClusterOperationalCommandResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)startWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -9470,38 +8522,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)startWithParams:(MTRRVCOperationalStateClusterStartParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeRVCOperationalStateID, (unsigned int) MTRCommandIDTypeClusterRVCOperationalStateCommandStartID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterRVCOperationalState
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster startWithParams:params completion:
-                                            ^(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                MTRClustersLogCompletion(logPrefix, value, error);
-                                                dispatch_async(self.callbackQueue, ^{
-                                                    completion(value, error);
-                                                });
-                                                [workItem endWork];
-                                            }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRRVCOperationalStateClusterStartParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = RvcOperationalState::Commands::Start::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRRVCOperationalStateClusterOperationalCommandResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)resumeWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -9510,38 +8553,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)resumeWithParams:(MTRRVCOperationalStateClusterResumeParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeRVCOperationalStateID, (unsigned int) MTRCommandIDTypeClusterRVCOperationalStateCommandResumeID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterRVCOperationalState
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster resumeWithParams:params completion:
-                                             ^(MTRRVCOperationalStateClusterOperationalCommandResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                 MTRClustersLogCompletion(logPrefix, value, error);
-                                                 dispatch_async(self.callbackQueue, ^{
-                                                     completion(value, error);
-                                                 });
-                                                 [workItem endWork];
-                                             }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRRVCOperationalStateClusterResumeParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = RvcOperationalState::Commands::Resume::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRRVCOperationalStateClusterOperationalCommandResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributePhaseListWithParams:(MTRReadParams * _Nullable)params
@@ -9626,38 +8660,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)resetConditionWithParams:(MTRHEPAFilterMonitoringClusterResetConditionParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeHEPAFilterMonitoringID, (unsigned int) MTRCommandIDTypeClusterHEPAFilterMonitoringCommandResetConditionID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterHEPAFilterMonitoring
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster resetConditionWithParams:params completion:
-                                                     ^(NSError * _Nullable error) {
-                                                         MTRClustersLogCompletion(logPrefix, nil, error);
-                                                         dispatch_async(self.callbackQueue, ^{
-                                                             completion(error);
-                                                         });
-                                                         [workItem endWork];
-                                                     }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRHEPAFilterMonitoringClusterResetConditionParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = HepaFilterMonitoring::Commands::ResetCondition::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeConditionWithParams:(MTRReadParams * _Nullable)params
@@ -9753,38 +8778,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)resetConditionWithParams:(MTRActivatedCarbonFilterMonitoringClusterResetConditionParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeActivatedCarbonFilterMonitoringID, (unsigned int) MTRCommandIDTypeClusterActivatedCarbonFilterMonitoringCommandResetConditionID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterActivatedCarbonFilterMonitoring
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster resetConditionWithParams:params completion:
-                                                     ^(NSError * _Nullable error) {
-                                                         MTRClustersLogCompletion(logPrefix, nil, error);
-                                                         dispatch_async(self.callbackQueue, ^{
-                                                             completion(error);
-                                                         });
-                                                         [workItem endWork];
-                                                     }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRActivatedCarbonFilterMonitoringClusterResetConditionParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ActivatedCarbonFilterMonitoring::Commands::ResetCondition::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeConditionWithParams:(MTRReadParams * _Nullable)params
@@ -9876,686 +8892,539 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)lockDoorWithParams:(MTRDoorLockClusterLockDoorParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandLockDoorID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDoorLock
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster lockDoorWithParams:params completion:
-                                               ^(NSError * _Nullable error) {
-                                                   MTRClustersLogCompletion(logPrefix, nil, error);
-                                                   dispatch_async(self.callbackQueue, ^{
-                                                       completion(error);
-                                                   });
-                                                   [workItem endWork];
-                                               }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDoorLockClusterLockDoorParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(10000);
     }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+
+    using RequestType = DoorLock::Commands::LockDoor::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)unlockDoorWithParams:(MTRDoorLockClusterUnlockDoorParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandUnlockDoorID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDoorLock
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster unlockDoorWithParams:params completion:
-                                                 ^(NSError * _Nullable error) {
-                                                     MTRClustersLogCompletion(logPrefix, nil, error);
-                                                     dispatch_async(self.callbackQueue, ^{
-                                                         completion(error);
-                                                     });
-                                                     [workItem endWork];
-                                                 }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDoorLockClusterUnlockDoorParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(10000);
     }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+
+    using RequestType = DoorLock::Commands::UnlockDoor::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)unlockWithTimeoutWithParams:(MTRDoorLockClusterUnlockWithTimeoutParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandUnlockWithTimeoutID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDoorLock
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster unlockWithTimeoutWithParams:params completion:
-                                                        ^(NSError * _Nullable error) {
-                                                            MTRClustersLogCompletion(logPrefix, nil, error);
-                                                            dispatch_async(self.callbackQueue, ^{
-                                                                completion(error);
-                                                            });
-                                                            [workItem endWork];
-                                                        }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDoorLockClusterUnlockWithTimeoutParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(10000);
     }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+
+    using RequestType = DoorLock::Commands::UnlockWithTimeout::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)setWeekDayScheduleWithParams:(MTRDoorLockClusterSetWeekDayScheduleParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandSetWeekDayScheduleID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDoorLock
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster setWeekDayScheduleWithParams:params completion:
-                                                         ^(NSError * _Nullable error) {
-                                                             MTRClustersLogCompletion(logPrefix, nil, error);
-                                                             dispatch_async(self.callbackQueue, ^{
-                                                                 completion(error);
-                                                             });
-                                                             [workItem endWork];
-                                                         }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDoorLockClusterSetWeekDayScheduleParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = DoorLock::Commands::SetWeekDaySchedule::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)getWeekDayScheduleWithParams:(MTRDoorLockClusterGetWeekDayScheduleParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRDoorLockClusterGetWeekDayScheduleResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandGetWeekDayScheduleID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDoorLock
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster getWeekDayScheduleWithParams:params completion:
-                                                         ^(MTRDoorLockClusterGetWeekDayScheduleResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                             MTRClustersLogCompletion(logPrefix, value, error);
-                                                             dispatch_async(self.callbackQueue, ^{
-                                                                 completion(value, error);
-                                                             });
-                                                             [workItem endWork];
-                                                         }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDoorLockClusterGetWeekDayScheduleParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = DoorLock::Commands::GetWeekDaySchedule::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRDoorLockClusterGetWeekDayScheduleResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)clearWeekDayScheduleWithParams:(MTRDoorLockClusterClearWeekDayScheduleParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandClearWeekDayScheduleID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDoorLock
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster clearWeekDayScheduleWithParams:params completion:
-                                                           ^(NSError * _Nullable error) {
-                                                               MTRClustersLogCompletion(logPrefix, nil, error);
-                                                               dispatch_async(self.callbackQueue, ^{
-                                                                   completion(error);
-                                                               });
-                                                               [workItem endWork];
-                                                           }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDoorLockClusterClearWeekDayScheduleParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = DoorLock::Commands::ClearWeekDaySchedule::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)setYearDayScheduleWithParams:(MTRDoorLockClusterSetYearDayScheduleParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandSetYearDayScheduleID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDoorLock
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster setYearDayScheduleWithParams:params completion:
-                                                         ^(NSError * _Nullable error) {
-                                                             MTRClustersLogCompletion(logPrefix, nil, error);
-                                                             dispatch_async(self.callbackQueue, ^{
-                                                                 completion(error);
-                                                             });
-                                                             [workItem endWork];
-                                                         }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDoorLockClusterSetYearDayScheduleParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = DoorLock::Commands::SetYearDaySchedule::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)getYearDayScheduleWithParams:(MTRDoorLockClusterGetYearDayScheduleParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRDoorLockClusterGetYearDayScheduleResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandGetYearDayScheduleID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDoorLock
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster getYearDayScheduleWithParams:params completion:
-                                                         ^(MTRDoorLockClusterGetYearDayScheduleResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                             MTRClustersLogCompletion(logPrefix, value, error);
-                                                             dispatch_async(self.callbackQueue, ^{
-                                                                 completion(value, error);
-                                                             });
-                                                             [workItem endWork];
-                                                         }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDoorLockClusterGetYearDayScheduleParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = DoorLock::Commands::GetYearDaySchedule::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRDoorLockClusterGetYearDayScheduleResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)clearYearDayScheduleWithParams:(MTRDoorLockClusterClearYearDayScheduleParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandClearYearDayScheduleID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDoorLock
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster clearYearDayScheduleWithParams:params completion:
-                                                           ^(NSError * _Nullable error) {
-                                                               MTRClustersLogCompletion(logPrefix, nil, error);
-                                                               dispatch_async(self.callbackQueue, ^{
-                                                                   completion(error);
-                                                               });
-                                                               [workItem endWork];
-                                                           }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDoorLockClusterClearYearDayScheduleParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = DoorLock::Commands::ClearYearDaySchedule::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)setHolidayScheduleWithParams:(MTRDoorLockClusterSetHolidayScheduleParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandSetHolidayScheduleID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDoorLock
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster setHolidayScheduleWithParams:params completion:
-                                                         ^(NSError * _Nullable error) {
-                                                             MTRClustersLogCompletion(logPrefix, nil, error);
-                                                             dispatch_async(self.callbackQueue, ^{
-                                                                 completion(error);
-                                                             });
-                                                             [workItem endWork];
-                                                         }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDoorLockClusterSetHolidayScheduleParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = DoorLock::Commands::SetHolidaySchedule::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)getHolidayScheduleWithParams:(MTRDoorLockClusterGetHolidayScheduleParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRDoorLockClusterGetHolidayScheduleResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandGetHolidayScheduleID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDoorLock
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster getHolidayScheduleWithParams:params completion:
-                                                         ^(MTRDoorLockClusterGetHolidayScheduleResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                             MTRClustersLogCompletion(logPrefix, value, error);
-                                                             dispatch_async(self.callbackQueue, ^{
-                                                                 completion(value, error);
-                                                             });
-                                                             [workItem endWork];
-                                                         }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDoorLockClusterGetHolidayScheduleParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = DoorLock::Commands::GetHolidaySchedule::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRDoorLockClusterGetHolidayScheduleResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)clearHolidayScheduleWithParams:(MTRDoorLockClusterClearHolidayScheduleParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandClearHolidayScheduleID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDoorLock
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster clearHolidayScheduleWithParams:params completion:
-                                                           ^(NSError * _Nullable error) {
-                                                               MTRClustersLogCompletion(logPrefix, nil, error);
-                                                               dispatch_async(self.callbackQueue, ^{
-                                                                   completion(error);
-                                                               });
-                                                               [workItem endWork];
-                                                           }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDoorLockClusterClearHolidayScheduleParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = DoorLock::Commands::ClearHolidaySchedule::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)setUserWithParams:(MTRDoorLockClusterSetUserParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandSetUserID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDoorLock
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster setUserWithParams:params completion:
-                                              ^(NSError * _Nullable error) {
-                                                  MTRClustersLogCompletion(logPrefix, nil, error);
-                                                  dispatch_async(self.callbackQueue, ^{
-                                                      completion(error);
-                                                  });
-                                                  [workItem endWork];
-                                              }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDoorLockClusterSetUserParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(10000);
     }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+
+    using RequestType = DoorLock::Commands::SetUser::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)getUserWithParams:(MTRDoorLockClusterGetUserParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRDoorLockClusterGetUserResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandGetUserID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDoorLock
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster getUserWithParams:params completion:
-                                              ^(MTRDoorLockClusterGetUserResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                  MTRClustersLogCompletion(logPrefix, value, error);
-                                                  dispatch_async(self.callbackQueue, ^{
-                                                      completion(value, error);
-                                                  });
-                                                  [workItem endWork];
-                                              }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDoorLockClusterGetUserParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = DoorLock::Commands::GetUser::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRDoorLockClusterGetUserResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)clearUserWithParams:(MTRDoorLockClusterClearUserParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandClearUserID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDoorLock
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster clearUserWithParams:params completion:
-                                                ^(NSError * _Nullable error) {
-                                                    MTRClustersLogCompletion(logPrefix, nil, error);
-                                                    dispatch_async(self.callbackQueue, ^{
-                                                        completion(error);
-                                                    });
-                                                    [workItem endWork];
-                                                }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDoorLockClusterClearUserParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(10000);
     }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+
+    using RequestType = DoorLock::Commands::ClearUser::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)setCredentialWithParams:(MTRDoorLockClusterSetCredentialParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRDoorLockClusterSetCredentialResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandSetCredentialID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDoorLock
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster setCredentialWithParams:params completion:
-                                                    ^(MTRDoorLockClusterSetCredentialResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                        MTRClustersLogCompletion(logPrefix, value, error);
-                                                        dispatch_async(self.callbackQueue, ^{
-                                                            completion(value, error);
-                                                        });
-                                                        [workItem endWork];
-                                                    }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDoorLockClusterSetCredentialParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(10000);
     }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+
+    using RequestType = DoorLock::Commands::SetCredential::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRDoorLockClusterSetCredentialResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)getCredentialStatusWithParams:(MTRDoorLockClusterGetCredentialStatusParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRDoorLockClusterGetCredentialStatusResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandGetCredentialStatusID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDoorLock
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster getCredentialStatusWithParams:params completion:
-                                                          ^(MTRDoorLockClusterGetCredentialStatusResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                              MTRClustersLogCompletion(logPrefix, value, error);
-                                                              dispatch_async(self.callbackQueue, ^{
-                                                                  completion(value, error);
-                                                              });
-                                                              [workItem endWork];
-                                                          }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDoorLockClusterGetCredentialStatusParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = DoorLock::Commands::GetCredentialStatus::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRDoorLockClusterGetCredentialStatusResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)clearCredentialWithParams:(MTRDoorLockClusterClearCredentialParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandClearCredentialID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDoorLock
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster clearCredentialWithParams:params completion:
-                                                      ^(NSError * _Nullable error) {
-                                                          MTRClustersLogCompletion(logPrefix, nil, error);
-                                                          dispatch_async(self.callbackQueue, ^{
-                                                              completion(error);
-                                                          });
-                                                          [workItem endWork];
-                                                      }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDoorLockClusterClearCredentialParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(10000);
     }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+
+    using RequestType = DoorLock::Commands::ClearCredential::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)unboltDoorWithParams:(MTRDoorLockClusterUnboltDoorParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeDoorLockID, (unsigned int) MTRCommandIDTypeClusterDoorLockCommandUnboltDoorID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterDoorLock
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster unboltDoorWithParams:params completion:
-                                                 ^(NSError * _Nullable error) {
-                                                     MTRClustersLogCompletion(logPrefix, nil, error);
-                                                     dispatch_async(self.callbackQueue, ^{
-                                                         completion(error);
-                                                     });
-                                                     [workItem endWork];
-                                                 }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRDoorLockClusterUnboltDoorParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(10000);
     }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+
+    using RequestType = DoorLock::Commands::UnboltDoor::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLockStateWithParams:(MTRReadParams * _Nullable)params
@@ -11105,38 +9974,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)upOrOpenWithParams:(MTRWindowCoveringClusterUpOrOpenParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeWindowCoveringID, (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandUpOrOpenID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterWindowCovering
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster upOrOpenWithParams:params completion:
-                                               ^(NSError * _Nullable error) {
-                                                   MTRClustersLogCompletion(logPrefix, nil, error);
-                                                   dispatch_async(self.callbackQueue, ^{
-                                                       completion(error);
-                                                   });
-                                                   [workItem endWork];
-                                               }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRWindowCoveringClusterUpOrOpenParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = WindowCovering::Commands::UpOrOpen::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)downOrCloseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
@@ -11145,38 +10005,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)downOrCloseWithParams:(MTRWindowCoveringClusterDownOrCloseParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeWindowCoveringID, (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandDownOrCloseID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterWindowCovering
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster downOrCloseWithParams:params completion:
-                                                  ^(NSError * _Nullable error) {
-                                                      MTRClustersLogCompletion(logPrefix, nil, error);
-                                                      dispatch_async(self.callbackQueue, ^{
-                                                          completion(error);
-                                                      });
-                                                      [workItem endWork];
-                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRWindowCoveringClusterDownOrCloseParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = WindowCovering::Commands::DownOrClose::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)stopMotionWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
@@ -11185,182 +10036,137 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)stopMotionWithParams:(MTRWindowCoveringClusterStopMotionParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeWindowCoveringID, (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandStopMotionID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterWindowCovering
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster stopMotionWithParams:params completion:
-                                                 ^(NSError * _Nullable error) {
-                                                     MTRClustersLogCompletion(logPrefix, nil, error);
-                                                     dispatch_async(self.callbackQueue, ^{
-                                                         completion(error);
-                                                     });
-                                                     [workItem endWork];
-                                                 }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRWindowCoveringClusterStopMotionParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = WindowCovering::Commands::StopMotion::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)goToLiftValueWithParams:(MTRWindowCoveringClusterGoToLiftValueParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeWindowCoveringID, (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandGoToLiftValueID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterWindowCovering
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster goToLiftValueWithParams:params completion:
-                                                    ^(NSError * _Nullable error) {
-                                                        MTRClustersLogCompletion(logPrefix, nil, error);
-                                                        dispatch_async(self.callbackQueue, ^{
-                                                            completion(error);
-                                                        });
-                                                        [workItem endWork];
-                                                    }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRWindowCoveringClusterGoToLiftValueParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = WindowCovering::Commands::GoToLiftValue::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)goToLiftPercentageWithParams:(MTRWindowCoveringClusterGoToLiftPercentageParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeWindowCoveringID, (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandGoToLiftPercentageID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterWindowCovering
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster goToLiftPercentageWithParams:params completion:
-                                                         ^(NSError * _Nullable error) {
-                                                             MTRClustersLogCompletion(logPrefix, nil, error);
-                                                             dispatch_async(self.callbackQueue, ^{
-                                                                 completion(error);
-                                                             });
-                                                             [workItem endWork];
-                                                         }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRWindowCoveringClusterGoToLiftPercentageParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = WindowCovering::Commands::GoToLiftPercentage::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)goToTiltValueWithParams:(MTRWindowCoveringClusterGoToTiltValueParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeWindowCoveringID, (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandGoToTiltValueID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterWindowCovering
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster goToTiltValueWithParams:params completion:
-                                                    ^(NSError * _Nullable error) {
-                                                        MTRClustersLogCompletion(logPrefix, nil, error);
-                                                        dispatch_async(self.callbackQueue, ^{
-                                                            completion(error);
-                                                        });
-                                                        [workItem endWork];
-                                                    }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRWindowCoveringClusterGoToTiltValueParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = WindowCovering::Commands::GoToTiltValue::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)goToTiltPercentageWithParams:(MTRWindowCoveringClusterGoToTiltPercentageParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeWindowCoveringID, (unsigned int) MTRCommandIDTypeClusterWindowCoveringCommandGoToTiltPercentageID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterWindowCovering
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster goToTiltPercentageWithParams:params completion:
-                                                         ^(NSError * _Nullable error) {
-                                                             MTRClustersLogCompletion(logPrefix, nil, error);
-                                                             dispatch_async(self.callbackQueue, ^{
-                                                                 completion(error);
-                                                             });
-                                                             [workItem endWork];
-                                                         }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRWindowCoveringClusterGoToTiltPercentageParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = WindowCovering::Commands::GoToTiltPercentage::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTypeWithParams:(MTRReadParams * _Nullable)params
@@ -11588,38 +10394,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)barrierControlGoToPercentWithParams:(MTRBarrierControlClusterBarrierControlGoToPercentParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeBarrierControlID, (unsigned int) MTRCommandIDTypeClusterBarrierControlCommandBarrierControlGoToPercentID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterBarrierControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster barrierControlGoToPercentWithParams:params completion:
-                                                                ^(NSError * _Nullable error) {
-                                                                    MTRClustersLogCompletion(logPrefix, nil, error);
-                                                                    dispatch_async(self.callbackQueue, ^{
-                                                                        completion(error);
-                                                                    });
-                                                                    [workItem endWork];
-                                                                }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRBarrierControlClusterBarrierControlGoToPercentParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = BarrierControl::Commands::BarrierControlGoToPercent::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)barrierControlStopWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
@@ -11628,38 +10425,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)barrierControlStopWithParams:(MTRBarrierControlClusterBarrierControlStopParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeBarrierControlID, (unsigned int) MTRCommandIDTypeClusterBarrierControlCommandBarrierControlStopID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterBarrierControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster barrierControlStopWithParams:params completion:
-                                                         ^(NSError * _Nullable error) {
-                                                             MTRClustersLogCompletion(logPrefix, nil, error);
-                                                             dispatch_async(self.callbackQueue, ^{
-                                                                 completion(error);
-                                                             });
-                                                             [workItem endWork];
-                                                         }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRBarrierControlClusterBarrierControlStopParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = BarrierControl::Commands::BarrierControlStop::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBarrierMovingStateWithParams:(MTRReadParams * _Nullable)params
@@ -12063,110 +10851,83 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)setpointRaiseLowerWithParams:(MTRThermostatClusterSetpointRaiseLowerParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeThermostatID, (unsigned int) MTRCommandIDTypeClusterThermostatCommandSetpointRaiseLowerID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterThermostat
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster setpointRaiseLowerWithParams:params completion:
-                                                         ^(NSError * _Nullable error) {
-                                                             MTRClustersLogCompletion(logPrefix, nil, error);
-                                                             dispatch_async(self.callbackQueue, ^{
-                                                                 completion(error);
-                                                             });
-                                                             [workItem endWork];
-                                                         }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRThermostatClusterSetpointRaiseLowerParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Thermostat::Commands::SetpointRaiseLower::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)setWeeklyScheduleWithParams:(MTRThermostatClusterSetWeeklyScheduleParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeThermostatID, (unsigned int) MTRCommandIDTypeClusterThermostatCommandSetWeeklyScheduleID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterThermostat
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster setWeeklyScheduleWithParams:params completion:
-                                                        ^(NSError * _Nullable error) {
-                                                            MTRClustersLogCompletion(logPrefix, nil, error);
-                                                            dispatch_async(self.callbackQueue, ^{
-                                                                completion(error);
-                                                            });
-                                                            [workItem endWork];
-                                                        }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRThermostatClusterSetWeeklyScheduleParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Thermostat::Commands::SetWeeklySchedule::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)getWeeklyScheduleWithParams:(MTRThermostatClusterGetWeeklyScheduleParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRThermostatClusterGetWeeklyScheduleResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeThermostatID, (unsigned int) MTRCommandIDTypeClusterThermostatCommandGetWeeklyScheduleID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterThermostat
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster getWeeklyScheduleWithParams:params completion:
-                                                        ^(MTRThermostatClusterGetWeeklyScheduleResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                            MTRClustersLogCompletion(logPrefix, value, error);
-                                                            dispatch_async(self.callbackQueue, ^{
-                                                                completion(value, error);
-                                                            });
-                                                            [workItem endWork];
-                                                        }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRThermostatClusterGetWeeklyScheduleParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Thermostat::Commands::GetWeeklySchedule::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRThermostatClusterGetWeeklyScheduleResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)clearWeeklyScheduleWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
@@ -12175,38 +10936,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)clearWeeklyScheduleWithParams:(MTRThermostatClusterClearWeeklyScheduleParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeThermostatID, (unsigned int) MTRCommandIDTypeClusterThermostatCommandClearWeeklyScheduleID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterThermostat
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster clearWeeklyScheduleWithParams:params completion:
-                                                          ^(NSError * _Nullable error) {
-                                                              MTRClustersLogCompletion(logPrefix, nil, error);
-                                                              dispatch_async(self.callbackQueue, ^{
-                                                                  completion(error);
-                                                              });
-                                                              [workItem endWork];
-                                                          }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRThermostatClusterClearWeeklyScheduleParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Thermostat::Commands::ClearWeeklySchedule::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeLocalTemperatureWithParams:(MTRReadParams * _Nullable)params
@@ -12835,38 +11587,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)stepWithParams:(MTRFanControlClusterStepParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeFanControlID, (unsigned int) MTRCommandIDTypeClusterFanControlCommandStepID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterFanControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster stepWithParams:params completion:
-                                           ^(NSError * _Nullable error) {
-                                               MTRClustersLogCompletion(logPrefix, nil, error);
-                                               dispatch_async(self.callbackQueue, ^{
-                                                   completion(error);
-                                               });
-                                               [workItem endWork];
-                                           }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRFanControlClusterStepParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = FanControl::Commands::Step::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFanModeWithParams:(MTRReadParams * _Nullable)params
@@ -13166,686 +11909,515 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)moveToHueWithParams:(MTRColorControlClusterMoveToHueParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToHueID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterColorControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster moveToHueWithParams:params completion:
-                                                ^(NSError * _Nullable error) {
-                                                    MTRClustersLogCompletion(logPrefix, nil, error);
-                                                    dispatch_async(self.callbackQueue, ^{
-                                                        completion(error);
-                                                    });
-                                                    [workItem endWork];
-                                                }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRColorControlClusterMoveToHueParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ColorControl::Commands::MoveToHue::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)moveHueWithParams:(MTRColorControlClusterMoveHueParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveHueID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterColorControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster moveHueWithParams:params completion:
-                                              ^(NSError * _Nullable error) {
-                                                  MTRClustersLogCompletion(logPrefix, nil, error);
-                                                  dispatch_async(self.callbackQueue, ^{
-                                                      completion(error);
-                                                  });
-                                                  [workItem endWork];
-                                              }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRColorControlClusterMoveHueParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ColorControl::Commands::MoveHue::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)stepHueWithParams:(MTRColorControlClusterStepHueParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandStepHueID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterColorControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster stepHueWithParams:params completion:
-                                              ^(NSError * _Nullable error) {
-                                                  MTRClustersLogCompletion(logPrefix, nil, error);
-                                                  dispatch_async(self.callbackQueue, ^{
-                                                      completion(error);
-                                                  });
-                                                  [workItem endWork];
-                                              }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRColorControlClusterStepHueParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ColorControl::Commands::StepHue::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)moveToSaturationWithParams:(MTRColorControlClusterMoveToSaturationParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToSaturationID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterColorControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster moveToSaturationWithParams:params completion:
-                                                       ^(NSError * _Nullable error) {
-                                                           MTRClustersLogCompletion(logPrefix, nil, error);
-                                                           dispatch_async(self.callbackQueue, ^{
-                                                               completion(error);
-                                                           });
-                                                           [workItem endWork];
-                                                       }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRColorControlClusterMoveToSaturationParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ColorControl::Commands::MoveToSaturation::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)moveSaturationWithParams:(MTRColorControlClusterMoveSaturationParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveSaturationID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterColorControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster moveSaturationWithParams:params completion:
-                                                     ^(NSError * _Nullable error) {
-                                                         MTRClustersLogCompletion(logPrefix, nil, error);
-                                                         dispatch_async(self.callbackQueue, ^{
-                                                             completion(error);
-                                                         });
-                                                         [workItem endWork];
-                                                     }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRColorControlClusterMoveSaturationParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ColorControl::Commands::MoveSaturation::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)stepSaturationWithParams:(MTRColorControlClusterStepSaturationParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandStepSaturationID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterColorControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster stepSaturationWithParams:params completion:
-                                                     ^(NSError * _Nullable error) {
-                                                         MTRClustersLogCompletion(logPrefix, nil, error);
-                                                         dispatch_async(self.callbackQueue, ^{
-                                                             completion(error);
-                                                         });
-                                                         [workItem endWork];
-                                                     }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRColorControlClusterStepSaturationParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ColorControl::Commands::StepSaturation::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)moveToHueAndSaturationWithParams:(MTRColorControlClusterMoveToHueAndSaturationParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToHueAndSaturationID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterColorControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster moveToHueAndSaturationWithParams:params completion:
-                                                             ^(NSError * _Nullable error) {
-                                                                 MTRClustersLogCompletion(logPrefix, nil, error);
-                                                                 dispatch_async(self.callbackQueue, ^{
-                                                                     completion(error);
-                                                                 });
-                                                                 [workItem endWork];
-                                                             }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRColorControlClusterMoveToHueAndSaturationParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ColorControl::Commands::MoveToHueAndSaturation::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)moveToColorWithParams:(MTRColorControlClusterMoveToColorParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToColorID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterColorControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster moveToColorWithParams:params completion:
-                                                  ^(NSError * _Nullable error) {
-                                                      MTRClustersLogCompletion(logPrefix, nil, error);
-                                                      dispatch_async(self.callbackQueue, ^{
-                                                          completion(error);
-                                                      });
-                                                      [workItem endWork];
-                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRColorControlClusterMoveToColorParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ColorControl::Commands::MoveToColor::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)moveColorWithParams:(MTRColorControlClusterMoveColorParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveColorID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterColorControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster moveColorWithParams:params completion:
-                                                ^(NSError * _Nullable error) {
-                                                    MTRClustersLogCompletion(logPrefix, nil, error);
-                                                    dispatch_async(self.callbackQueue, ^{
-                                                        completion(error);
-                                                    });
-                                                    [workItem endWork];
-                                                }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRColorControlClusterMoveColorParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ColorControl::Commands::MoveColor::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)stepColorWithParams:(MTRColorControlClusterStepColorParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandStepColorID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterColorControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster stepColorWithParams:params completion:
-                                                ^(NSError * _Nullable error) {
-                                                    MTRClustersLogCompletion(logPrefix, nil, error);
-                                                    dispatch_async(self.callbackQueue, ^{
-                                                        completion(error);
-                                                    });
-                                                    [workItem endWork];
-                                                }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRColorControlClusterStepColorParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ColorControl::Commands::StepColor::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)moveToColorTemperatureWithParams:(MTRColorControlClusterMoveToColorTemperatureParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveToColorTemperatureID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterColorControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster moveToColorTemperatureWithParams:params completion:
-                                                             ^(NSError * _Nullable error) {
-                                                                 MTRClustersLogCompletion(logPrefix, nil, error);
-                                                                 dispatch_async(self.callbackQueue, ^{
-                                                                     completion(error);
-                                                                 });
-                                                                 [workItem endWork];
-                                                             }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRColorControlClusterMoveToColorTemperatureParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ColorControl::Commands::MoveToColorTemperature::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)enhancedMoveToHueWithParams:(MTRColorControlClusterEnhancedMoveToHueParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandEnhancedMoveToHueID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterColorControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster enhancedMoveToHueWithParams:params completion:
-                                                        ^(NSError * _Nullable error) {
-                                                            MTRClustersLogCompletion(logPrefix, nil, error);
-                                                            dispatch_async(self.callbackQueue, ^{
-                                                                completion(error);
-                                                            });
-                                                            [workItem endWork];
-                                                        }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRColorControlClusterEnhancedMoveToHueParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ColorControl::Commands::EnhancedMoveToHue::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)enhancedMoveHueWithParams:(MTRColorControlClusterEnhancedMoveHueParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandEnhancedMoveHueID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterColorControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster enhancedMoveHueWithParams:params completion:
-                                                      ^(NSError * _Nullable error) {
-                                                          MTRClustersLogCompletion(logPrefix, nil, error);
-                                                          dispatch_async(self.callbackQueue, ^{
-                                                              completion(error);
-                                                          });
-                                                          [workItem endWork];
-                                                      }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRColorControlClusterEnhancedMoveHueParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ColorControl::Commands::EnhancedMoveHue::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)enhancedStepHueWithParams:(MTRColorControlClusterEnhancedStepHueParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandEnhancedStepHueID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterColorControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster enhancedStepHueWithParams:params completion:
-                                                      ^(NSError * _Nullable error) {
-                                                          MTRClustersLogCompletion(logPrefix, nil, error);
-                                                          dispatch_async(self.callbackQueue, ^{
-                                                              completion(error);
-                                                          });
-                                                          [workItem endWork];
-                                                      }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRColorControlClusterEnhancedStepHueParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ColorControl::Commands::EnhancedStepHue::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)enhancedMoveToHueAndSaturationWithParams:(MTRColorControlClusterEnhancedMoveToHueAndSaturationParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandEnhancedMoveToHueAndSaturationID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterColorControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster enhancedMoveToHueAndSaturationWithParams:params completion:
-                                                                     ^(NSError * _Nullable error) {
-                                                                         MTRClustersLogCompletion(logPrefix, nil, error);
-                                                                         dispatch_async(self.callbackQueue, ^{
-                                                                             completion(error);
-                                                                         });
-                                                                         [workItem endWork];
-                                                                     }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRColorControlClusterEnhancedMoveToHueAndSaturationParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)colorLoopSetWithParams:(MTRColorControlClusterColorLoopSetParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandColorLoopSetID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterColorControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster colorLoopSetWithParams:params completion:
-                                                   ^(NSError * _Nullable error) {
-                                                       MTRClustersLogCompletion(logPrefix, nil, error);
-                                                       dispatch_async(self.callbackQueue, ^{
-                                                           completion(error);
-                                                       });
-                                                       [workItem endWork];
-                                                   }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRColorControlClusterColorLoopSetParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ColorControl::Commands::ColorLoopSet::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)stopMoveStepWithParams:(MTRColorControlClusterStopMoveStepParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandStopMoveStepID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterColorControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster stopMoveStepWithParams:params completion:
-                                                   ^(NSError * _Nullable error) {
-                                                       MTRClustersLogCompletion(logPrefix, nil, error);
-                                                       dispatch_async(self.callbackQueue, ^{
-                                                           completion(error);
-                                                       });
-                                                       [workItem endWork];
-                                                   }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRColorControlClusterStopMoveStepParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ColorControl::Commands::StopMoveStep::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)moveColorTemperatureWithParams:(MTRColorControlClusterMoveColorTemperatureParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandMoveColorTemperatureID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterColorControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster moveColorTemperatureWithParams:params completion:
-                                                           ^(NSError * _Nullable error) {
-                                                               MTRClustersLogCompletion(logPrefix, nil, error);
-                                                               dispatch_async(self.callbackQueue, ^{
-                                                                   completion(error);
-                                                               });
-                                                               [workItem endWork];
-                                                           }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRColorControlClusterMoveColorTemperatureParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ColorControl::Commands::MoveColorTemperature::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)stepColorTemperatureWithParams:(MTRColorControlClusterStepColorTemperatureParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeColorControlID, (unsigned int) MTRCommandIDTypeClusterColorControlCommandStepColorTemperatureID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterColorControl
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster stepColorTemperatureWithParams:params completion:
-                                                           ^(NSError * _Nullable error) {
-                                                               MTRClustersLogCompletion(logPrefix, nil, error);
-                                                               dispatch_async(self.callbackQueue, ^{
-                                                                   completion(error);
-                                                               });
-                                                               [workItem endWork];
-                                                           }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRColorControlClusterStepColorTemperatureParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ColorControl::Commands::StepColorTemperature::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentHueWithParams:(MTRReadParams * _Nullable)params
@@ -16377,110 +14949,83 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)changeChannelWithParams:(MTRChannelClusterChangeChannelParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRChannelClusterChangeChannelResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeChannelID, (unsigned int) MTRCommandIDTypeClusterChannelCommandChangeChannelID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterChannel
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster changeChannelWithParams:params completion:
-                                                    ^(MTRChannelClusterChangeChannelResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                        MTRClustersLogCompletion(logPrefix, value, error);
-                                                        dispatch_async(self.callbackQueue, ^{
-                                                            completion(value, error);
-                                                        });
-                                                        [workItem endWork];
-                                                    }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRChannelClusterChangeChannelParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Channel::Commands::ChangeChannel::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRChannelClusterChangeChannelResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)changeChannelByNumberWithParams:(MTRChannelClusterChangeChannelByNumberParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeChannelID, (unsigned int) MTRCommandIDTypeClusterChannelCommandChangeChannelByNumberID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterChannel
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster changeChannelByNumberWithParams:params completion:
-                                                            ^(NSError * _Nullable error) {
-                                                                MTRClustersLogCompletion(logPrefix, nil, error);
-                                                                dispatch_async(self.callbackQueue, ^{
-                                                                    completion(error);
-                                                                });
-                                                                [workItem endWork];
-                                                            }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRChannelClusterChangeChannelByNumberParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Channel::Commands::ChangeChannelByNumber::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)skipChannelWithParams:(MTRChannelClusterSkipChannelParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeChannelID, (unsigned int) MTRCommandIDTypeClusterChannelCommandSkipChannelID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterChannel
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster skipChannelWithParams:params completion:
-                                                  ^(NSError * _Nullable error) {
-                                                      MTRClustersLogCompletion(logPrefix, nil, error);
-                                                      dispatch_async(self.callbackQueue, ^{
-                                                          completion(error);
-                                                      });
-                                                      [workItem endWork];
-                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRChannelClusterSkipChannelParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Channel::Commands::SkipChannel::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeChannelListWithParams:(MTRReadParams * _Nullable)params
@@ -16573,38 +15118,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)navigateTargetWithParams:(MTRTargetNavigatorClusterNavigateTargetParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeTargetNavigatorID, (unsigned int) MTRCommandIDTypeClusterTargetNavigatorCommandNavigateTargetID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterTargetNavigator
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster navigateTargetWithParams:params completion:
-                                                     ^(MTRTargetNavigatorClusterNavigateTargetResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                         MTRClustersLogCompletion(logPrefix, value, error);
-                                                         dispatch_async(self.callbackQueue, ^{
-                                                             completion(value, error);
-                                                         });
-                                                         [workItem endWork];
-                                                     }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRTargetNavigatorClusterNavigateTargetParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = TargetNavigator::Commands::NavigateTarget::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRTargetNavigatorClusterNavigateTargetResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeTargetListWithParams:(MTRReadParams * _Nullable)params
@@ -16686,38 +15222,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)playWithParams:(MTRMediaPlaybackClusterPlayParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandPlayID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterMediaPlayback
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster playWithParams:params completion:
-                                           ^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable value, NSError * _Nullable error) {
-                                               MTRClustersLogCompletion(logPrefix, value, error);
-                                               dispatch_async(self.callbackQueue, ^{
-                                                   completion(value, error);
-                                               });
-                                               [workItem endWork];
-                                           }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRMediaPlaybackClusterPlayParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = MediaPlayback::Commands::Play::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRMediaPlaybackClusterPlaybackResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)pauseWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -16726,38 +15253,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)pauseWithParams:(MTRMediaPlaybackClusterPauseParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandPauseID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterMediaPlayback
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster pauseWithParams:params completion:
-                                            ^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                MTRClustersLogCompletion(logPrefix, value, error);
-                                                dispatch_async(self.callbackQueue, ^{
-                                                    completion(value, error);
-                                                });
-                                                [workItem endWork];
-                                            }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRMediaPlaybackClusterPauseParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = MediaPlayback::Commands::Pause::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRMediaPlaybackClusterPlaybackResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)stopWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -16766,38 +15284,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)stopWithParams:(MTRMediaPlaybackClusterStopParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandStopID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterMediaPlayback
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster stopWithParams:params completion:
-                                           ^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable value, NSError * _Nullable error) {
-                                               MTRClustersLogCompletion(logPrefix, value, error);
-                                               dispatch_async(self.callbackQueue, ^{
-                                                   completion(value, error);
-                                               });
-                                               [workItem endWork];
-                                           }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRMediaPlaybackClusterStopParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = MediaPlayback::Commands::Stop::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRMediaPlaybackClusterPlaybackResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)startOverWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -16806,38 +15315,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)startOverWithParams:(MTRMediaPlaybackClusterStartOverParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandStartOverID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterMediaPlayback
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster startOverWithParams:params completion:
-                                                ^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                    MTRClustersLogCompletion(logPrefix, value, error);
-                                                    dispatch_async(self.callbackQueue, ^{
-                                                        completion(value, error);
-                                                    });
-                                                    [workItem endWork];
-                                                }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRMediaPlaybackClusterStartOverParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = MediaPlayback::Commands::StartOver::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRMediaPlaybackClusterPlaybackResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)previousWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -16846,38 +15346,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)previousWithParams:(MTRMediaPlaybackClusterPreviousParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandPreviousID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterMediaPlayback
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster previousWithParams:params completion:
-                                               ^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                   MTRClustersLogCompletion(logPrefix, value, error);
-                                                   dispatch_async(self.callbackQueue, ^{
-                                                       completion(value, error);
-                                                   });
-                                                   [workItem endWork];
-                                               }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRMediaPlaybackClusterPreviousParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = MediaPlayback::Commands::Previous::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRMediaPlaybackClusterPlaybackResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)nextWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -16886,38 +15377,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)nextWithParams:(MTRMediaPlaybackClusterNextParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandNextID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterMediaPlayback
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster nextWithParams:params completion:
-                                           ^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable value, NSError * _Nullable error) {
-                                               MTRClustersLogCompletion(logPrefix, value, error);
-                                               dispatch_async(self.callbackQueue, ^{
-                                                   completion(value, error);
-                                               });
-                                               [workItem endWork];
-                                           }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRMediaPlaybackClusterNextParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = MediaPlayback::Commands::Next::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRMediaPlaybackClusterPlaybackResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)rewindWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -16926,38 +15408,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)rewindWithParams:(MTRMediaPlaybackClusterRewindParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandRewindID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterMediaPlayback
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster rewindWithParams:params completion:
-                                             ^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                 MTRClustersLogCompletion(logPrefix, value, error);
-                                                 dispatch_async(self.callbackQueue, ^{
-                                                     completion(value, error);
-                                                 });
-                                                 [workItem endWork];
-                                             }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRMediaPlaybackClusterRewindParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = MediaPlayback::Commands::Rewind::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRMediaPlaybackClusterPlaybackResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)fastForwardWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -16966,146 +15439,110 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)fastForwardWithParams:(MTRMediaPlaybackClusterFastForwardParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandFastForwardID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterMediaPlayback
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster fastForwardWithParams:params completion:
-                                                  ^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                      MTRClustersLogCompletion(logPrefix, value, error);
-                                                      dispatch_async(self.callbackQueue, ^{
-                                                          completion(value, error);
-                                                      });
-                                                      [workItem endWork];
-                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRMediaPlaybackClusterFastForwardParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = MediaPlayback::Commands::FastForward::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRMediaPlaybackClusterPlaybackResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)skipForwardWithParams:(MTRMediaPlaybackClusterSkipForwardParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandSkipForwardID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterMediaPlayback
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster skipForwardWithParams:params completion:
-                                                  ^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                      MTRClustersLogCompletion(logPrefix, value, error);
-                                                      dispatch_async(self.callbackQueue, ^{
-                                                          completion(value, error);
-                                                      });
-                                                      [workItem endWork];
-                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRMediaPlaybackClusterSkipForwardParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = MediaPlayback::Commands::SkipForward::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRMediaPlaybackClusterPlaybackResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)skipBackwardWithParams:(MTRMediaPlaybackClusterSkipBackwardParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandSkipBackwardID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterMediaPlayback
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster skipBackwardWithParams:params completion:
-                                                   ^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                       MTRClustersLogCompletion(logPrefix, value, error);
-                                                       dispatch_async(self.callbackQueue, ^{
-                                                           completion(value, error);
-                                                       });
-                                                       [workItem endWork];
-                                                   }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRMediaPlaybackClusterSkipBackwardParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = MediaPlayback::Commands::SkipBackward::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRMediaPlaybackClusterPlaybackResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)seekWithParams:(MTRMediaPlaybackClusterSeekParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeMediaPlaybackID, (unsigned int) MTRCommandIDTypeClusterMediaPlaybackCommandSeekID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterMediaPlayback
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster seekWithParams:params completion:
-                                           ^(MTRMediaPlaybackClusterPlaybackResponseParams * _Nullable value, NSError * _Nullable error) {
-                                               MTRClustersLogCompletion(logPrefix, value, error);
-                                               dispatch_async(self.callbackQueue, ^{
-                                                   completion(value, error);
-                                               });
-                                               [workItem endWork];
-                                           }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRMediaPlaybackClusterSeekParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = MediaPlayback::Commands::Seek::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRMediaPlaybackClusterPlaybackResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCurrentStateWithParams:(MTRReadParams * _Nullable)params
@@ -17320,38 +15757,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)selectInputWithParams:(MTRMediaInputClusterSelectInputParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeMediaInputID, (unsigned int) MTRCommandIDTypeClusterMediaInputCommandSelectInputID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterMediaInput
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster selectInputWithParams:params completion:
-                                                  ^(NSError * _Nullable error) {
-                                                      MTRClustersLogCompletion(logPrefix, nil, error);
-                                                      dispatch_async(self.callbackQueue, ^{
-                                                          completion(error);
-                                                      });
-                                                      [workItem endWork];
-                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRMediaInputClusterSelectInputParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = MediaInput::Commands::SelectInput::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)showInputStatusWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
@@ -17360,38 +15788,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)showInputStatusWithParams:(MTRMediaInputClusterShowInputStatusParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeMediaInputID, (unsigned int) MTRCommandIDTypeClusterMediaInputCommandShowInputStatusID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterMediaInput
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster showInputStatusWithParams:params completion:
-                                                      ^(NSError * _Nullable error) {
-                                                          MTRClustersLogCompletion(logPrefix, nil, error);
-                                                          dispatch_async(self.callbackQueue, ^{
-                                                              completion(error);
-                                                          });
-                                                          [workItem endWork];
-                                                      }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRMediaInputClusterShowInputStatusParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = MediaInput::Commands::ShowInputStatus::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)hideInputStatusWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
@@ -17400,74 +15819,56 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)hideInputStatusWithParams:(MTRMediaInputClusterHideInputStatusParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeMediaInputID, (unsigned int) MTRCommandIDTypeClusterMediaInputCommandHideInputStatusID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterMediaInput
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster hideInputStatusWithParams:params completion:
-                                                      ^(NSError * _Nullable error) {
-                                                          MTRClustersLogCompletion(logPrefix, nil, error);
-                                                          dispatch_async(self.callbackQueue, ^{
-                                                              completion(error);
-                                                          });
-                                                          [workItem endWork];
-                                                      }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRMediaInputClusterHideInputStatusParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = MediaInput::Commands::HideInputStatus::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)renameInputWithParams:(MTRMediaInputClusterRenameInputParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeMediaInputID, (unsigned int) MTRCommandIDTypeClusterMediaInputCommandRenameInputID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterMediaInput
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster renameInputWithParams:params completion:
-                                                  ^(NSError * _Nullable error) {
-                                                      MTRClustersLogCompletion(logPrefix, nil, error);
-                                                      dispatch_async(self.callbackQueue, ^{
-                                                          completion(error);
-                                                      });
-                                                      [workItem endWork];
-                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRMediaInputClusterRenameInputParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = MediaInput::Commands::RenameInput::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeInputListWithParams:(MTRReadParams * _Nullable)params
@@ -17569,38 +15970,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)sleepWithParams:(MTRLowPowerClusterSleepParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeLowPowerID, (unsigned int) MTRCommandIDTypeClusterLowPowerCommandSleepID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterLowPower
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster sleepWithParams:params completion:
-                                            ^(NSError * _Nullable error) {
-                                                MTRClustersLogCompletion(logPrefix, nil, error);
-                                                dispatch_async(self.callbackQueue, ^{
-                                                    completion(error);
-                                                });
-                                                [workItem endWork];
-                                            }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRLowPowerClusterSleepParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = LowPower::Commands::Sleep::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -17669,38 +16061,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)sendKeyWithParams:(MTRKeypadInputClusterSendKeyParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeKeypadInputID, (unsigned int) MTRCommandIDTypeClusterKeypadInputCommandSendKeyID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterKeypadInput
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster sendKeyWithParams:params completion:
-                                              ^(MTRKeypadInputClusterSendKeyResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                  MTRClustersLogCompletion(logPrefix, value, error);
-                                                  dispatch_async(self.callbackQueue, ^{
-                                                      completion(value, error);
-                                                  });
-                                                  [workItem endWork];
-                                              }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRKeypadInputClusterSendKeyParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = KeypadInput::Commands::SendKey::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRKeypadInputClusterSendKeyResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -17768,74 +16151,56 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)launchContentWithParams:(MTRContentLauncherClusterLaunchContentParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRContentLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeContentLauncherID, (unsigned int) MTRCommandIDTypeClusterContentLauncherCommandLaunchContentID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterContentLauncher
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster launchContentWithParams:params completion:
-                                                    ^(MTRContentLauncherClusterLauncherResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                        MTRClustersLogCompletion(logPrefix, value, error);
-                                                        dispatch_async(self.callbackQueue, ^{
-                                                            completion(value, error);
-                                                        });
-                                                        [workItem endWork];
-                                                    }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRContentLauncherClusterLaunchContentParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ContentLauncher::Commands::LaunchContent::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRContentLauncherClusterLauncherResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)launchURLWithParams:(MTRContentLauncherClusterLaunchURLParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRContentLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeContentLauncherID, (unsigned int) MTRCommandIDTypeClusterContentLauncherCommandLaunchURLID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterContentLauncher
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster launchURLWithParams:params completion:
-                                                ^(MTRContentLauncherClusterLauncherResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                    MTRClustersLogCompletion(logPrefix, value, error);
-                                                    dispatch_async(self.callbackQueue, ^{
-                                                        completion(value, error);
-                                                    });
-                                                    [workItem endWork];
-                                                }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRContentLauncherClusterLaunchURLParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ContentLauncher::Commands::LaunchURL::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRContentLauncherClusterLauncherResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeAcceptHeaderWithParams:(MTRReadParams * _Nullable)params
@@ -17932,74 +16297,56 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)selectOutputWithParams:(MTRAudioOutputClusterSelectOutputParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeAudioOutputID, (unsigned int) MTRCommandIDTypeClusterAudioOutputCommandSelectOutputID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterAudioOutput
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster selectOutputWithParams:params completion:
-                                                   ^(NSError * _Nullable error) {
-                                                       MTRClustersLogCompletion(logPrefix, nil, error);
-                                                       dispatch_async(self.callbackQueue, ^{
-                                                           completion(error);
-                                                       });
-                                                       [workItem endWork];
-                                                   }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRAudioOutputClusterSelectOutputParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = AudioOutput::Commands::SelectOutput::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)renameOutputWithParams:(MTRAudioOutputClusterRenameOutputParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeAudioOutputID, (unsigned int) MTRCommandIDTypeClusterAudioOutputCommandRenameOutputID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterAudioOutput
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster renameOutputWithParams:params completion:
-                                                   ^(NSError * _Nullable error) {
-                                                       MTRClustersLogCompletion(logPrefix, nil, error);
-                                                       dispatch_async(self.callbackQueue, ^{
-                                                           completion(error);
-                                                       });
-                                                       [workItem endWork];
-                                                   }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRAudioOutputClusterRenameOutputParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = AudioOutput::Commands::RenameOutput::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeOutputListWithParams:(MTRReadParams * _Nullable)params
@@ -18079,110 +16426,83 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)launchAppWithParams:(MTRApplicationLauncherClusterLaunchAppParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeApplicationLauncherID, (unsigned int) MTRCommandIDTypeClusterApplicationLauncherCommandLaunchAppID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterApplicationLauncher
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster launchAppWithParams:params completion:
-                                                ^(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                    MTRClustersLogCompletion(logPrefix, value, error);
-                                                    dispatch_async(self.callbackQueue, ^{
-                                                        completion(value, error);
-                                                    });
-                                                    [workItem endWork];
-                                                }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRApplicationLauncherClusterLaunchAppParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ApplicationLauncher::Commands::LaunchApp::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRApplicationLauncherClusterLauncherResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)stopAppWithParams:(MTRApplicationLauncherClusterStopAppParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeApplicationLauncherID, (unsigned int) MTRCommandIDTypeClusterApplicationLauncherCommandStopAppID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterApplicationLauncher
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster stopAppWithParams:params completion:
-                                              ^(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                  MTRClustersLogCompletion(logPrefix, value, error);
-                                                  dispatch_async(self.callbackQueue, ^{
-                                                      completion(value, error);
-                                                  });
-                                                  [workItem endWork];
-                                              }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRApplicationLauncherClusterStopAppParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ApplicationLauncher::Commands::StopApp::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRApplicationLauncherClusterLauncherResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)hideAppWithParams:(MTRApplicationLauncherClusterHideAppParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeApplicationLauncherID, (unsigned int) MTRCommandIDTypeClusterApplicationLauncherCommandHideAppID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterApplicationLauncher
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster hideAppWithParams:params completion:
-                                              ^(MTRApplicationLauncherClusterLauncherResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                  MTRClustersLogCompletion(logPrefix, value, error);
-                                                  dispatch_async(self.callbackQueue, ^{
-                                                      completion(value, error);
-                                                  });
-                                                  [workItem endWork];
-                                              }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRApplicationLauncherClusterHideAppParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ApplicationLauncher::Commands::HideApp::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRApplicationLauncherClusterLauncherResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeCatalogListWithParams:(MTRReadParams * _Nullable)params
@@ -18382,74 +16702,62 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 
 - (void)getSetupPINWithParams:(MTRAccountLoginClusterGetSetupPINParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRAccountLoginClusterGetSetupPINResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeAccountLoginID, (unsigned int) MTRCommandIDTypeClusterAccountLoginCommandGetSetupPINID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterAccountLogin
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster getSetupPINWithParams:params completion:
-                                                  ^(MTRAccountLoginClusterGetSetupPINResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                      MTRClustersLogCompletion(logPrefix, value, error);
-                                                      dispatch_async(self.callbackQueue, ^{
-                                                          completion(value, error);
-                                                      });
-                                                      [workItem endWork];
-                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRAccountLoginClusterGetSetupPINParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(10000);
     }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+
+    using RequestType = AccountLogin::Commands::GetSetupPIN::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRAccountLoginClusterGetSetupPINResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)loginWithParams:(MTRAccountLoginClusterLoginParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeAccountLoginID, (unsigned int) MTRCommandIDTypeClusterAccountLoginCommandLoginID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterAccountLogin
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster loginWithParams:params completion:
-                                            ^(NSError * _Nullable error) {
-                                                MTRClustersLogCompletion(logPrefix, nil, error);
-                                                dispatch_async(self.callbackQueue, ^{
-                                                    completion(error);
-                                                });
-                                                [workItem endWork];
-                                            }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRAccountLoginClusterLoginParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(10000);
     }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+
+    using RequestType = AccountLogin::Commands::Login::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)logoutWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
@@ -18458,38 +16766,32 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)logoutWithParams:(MTRAccountLoginClusterLogoutParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeAccountLoginID, (unsigned int) MTRCommandIDTypeClusterAccountLoginCommandLogoutID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterAccountLogin
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster logoutWithParams:params completion:
-                                             ^(NSError * _Nullable error) {
-                                                 MTRClustersLogCompletion(logPrefix, nil, error);
-                                                 dispatch_async(self.callbackQueue, ^{
-                                                     completion(error);
-                                                 });
-                                                 [workItem endWork];
-                                             }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRAccountLoginClusterLogoutParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(10000);
     }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+
+    using RequestType = AccountLogin::Commands::Logout::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -18575,74 +16877,56 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)getProfileInfoCommandWithParams:(MTRElectricalMeasurementClusterGetProfileInfoCommandParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeElectricalMeasurementID, (unsigned int) MTRCommandIDTypeClusterElectricalMeasurementCommandGetProfileInfoCommandID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterElectricalMeasurement
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster getProfileInfoCommandWithParams:params completion:
-                                                            ^(NSError * _Nullable error) {
-                                                                MTRClustersLogCompletion(logPrefix, nil, error);
-                                                                dispatch_async(self.callbackQueue, ^{
-                                                                    completion(error);
-                                                                });
-                                                                [workItem endWork];
-                                                            }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRElectricalMeasurementClusterGetProfileInfoCommandParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ElectricalMeasurement::Commands::GetProfileInfoCommand::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)getMeasurementProfileCommandWithParams:(MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeElectricalMeasurementID, (unsigned int) MTRCommandIDTypeClusterElectricalMeasurementCommandGetMeasurementProfileCommandID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterElectricalMeasurement
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster getMeasurementProfileCommandWithParams:params completion:
-                                                                   ^(NSError * _Nullable error) {
-                                                                       MTRClustersLogCompletion(logPrefix, nil, error);
-                                                                       dispatch_async(self.callbackQueue, ^{
-                                                                           completion(error);
-                                                                       });
-                                                                       [workItem endWork];
-                                                                   }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRElectricalMeasurementClusterGetMeasurementProfileCommandParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ElectricalMeasurement::Commands::GetMeasurementProfileCommand::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeMeasurementTypeWithParams:(MTRReadParams * _Nullable)params
@@ -19448,38 +17732,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)testWithParams:(MTRUnitTestingClusterTestParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterUnitTesting
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster testWithParams:params completion:
-                                           ^(NSError * _Nullable error) {
-                                               MTRClustersLogCompletion(logPrefix, nil, error);
-                                               dispatch_async(self.callbackQueue, ^{
-                                                   completion(error);
-                                               });
-                                               [workItem endWork];
-                                           }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::Test::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)testNotHandledWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
@@ -19488,38 +17763,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)testNotHandledWithParams:(MTRUnitTestingClusterTestNotHandledParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestNotHandledID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterUnitTesting
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster testNotHandledWithParams:params completion:
-                                                     ^(NSError * _Nullable error) {
-                                                         MTRClustersLogCompletion(logPrefix, nil, error);
-                                                         dispatch_async(self.callbackQueue, ^{
-                                                             completion(error);
-                                                         });
-                                                         [workItem endWork];
-                                                     }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestNotHandledParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::TestNotHandled::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)testSpecificWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterTestSpecificResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -19528,38 +17794,29 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)testSpecificWithParams:(MTRUnitTestingClusterTestSpecificParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterTestSpecificResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestSpecificID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterUnitTesting
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster testSpecificWithParams:params completion:
-                                                   ^(MTRUnitTestingClusterTestSpecificResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                       MTRClustersLogCompletion(logPrefix, value, error);
-                                                       dispatch_async(self.callbackQueue, ^{
-                                                           completion(value, error);
-                                                       });
-                                                       [workItem endWork];
-                                                   }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestSpecificParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::TestSpecific::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRUnitTestingClusterTestSpecificResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)testUnknownCommandWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
@@ -19568,542 +17825,407 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)testUnknownCommandWithParams:(MTRUnitTestingClusterTestUnknownCommandParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestUnknownCommandID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterUnitTesting
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster testUnknownCommandWithParams:params completion:
-                                                         ^(NSError * _Nullable error) {
-                                                             MTRClustersLogCompletion(logPrefix, nil, error);
-                                                             dispatch_async(self.callbackQueue, ^{
-                                                                 completion(error);
-                                                             });
-                                                             [workItem endWork];
-                                                         }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestUnknownCommandParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::TestUnknownCommand::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)testAddArgumentsWithParams:(MTRUnitTestingClusterTestAddArgumentsParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterTestAddArgumentsResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestAddArgumentsID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterUnitTesting
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster testAddArgumentsWithParams:params completion:
-                                                       ^(MTRUnitTestingClusterTestAddArgumentsResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                           MTRClustersLogCompletion(logPrefix, value, error);
-                                                           dispatch_async(self.callbackQueue, ^{
-                                                               completion(value, error);
-                                                           });
-                                                           [workItem endWork];
-                                                       }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestAddArgumentsParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::TestAddArguments::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRUnitTestingClusterTestAddArgumentsResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)testSimpleArgumentRequestWithParams:(MTRUnitTestingClusterTestSimpleArgumentRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterTestSimpleArgumentResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestSimpleArgumentRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterUnitTesting
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster testSimpleArgumentRequestWithParams:params completion:
-                                                                ^(MTRUnitTestingClusterTestSimpleArgumentResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                                    MTRClustersLogCompletion(logPrefix, value, error);
-                                                                    dispatch_async(self.callbackQueue, ^{
-                                                                        completion(value, error);
-                                                                    });
-                                                                    [workItem endWork];
-                                                                }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestSimpleArgumentRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::TestSimpleArgumentRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRUnitTestingClusterTestSimpleArgumentResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)testStructArrayArgumentRequestWithParams:(MTRUnitTestingClusterTestStructArrayArgumentRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterTestStructArrayArgumentResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestStructArrayArgumentRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterUnitTesting
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster testStructArrayArgumentRequestWithParams:params completion:
-                                                                     ^(MTRUnitTestingClusterTestStructArrayArgumentResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                                         MTRClustersLogCompletion(logPrefix, value, error);
-                                                                         dispatch_async(self.callbackQueue, ^{
-                                                                             completion(value, error);
-                                                                         });
-                                                                         [workItem endWork];
-                                                                     }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestStructArrayArgumentRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::TestStructArrayArgumentRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRUnitTestingClusterTestStructArrayArgumentResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)testStructArgumentRequestWithParams:(MTRUnitTestingClusterTestStructArgumentRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestStructArgumentRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterUnitTesting
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster testStructArgumentRequestWithParams:params completion:
-                                                                ^(MTRUnitTestingClusterBooleanResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                                    MTRClustersLogCompletion(logPrefix, value, error);
-                                                                    dispatch_async(self.callbackQueue, ^{
-                                                                        completion(value, error);
-                                                                    });
-                                                                    [workItem endWork];
-                                                                }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestStructArgumentRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::TestStructArgumentRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRUnitTestingClusterBooleanResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)testNestedStructArgumentRequestWithParams:(MTRUnitTestingClusterTestNestedStructArgumentRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestNestedStructArgumentRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterUnitTesting
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster testNestedStructArgumentRequestWithParams:params completion:
-                                                                      ^(MTRUnitTestingClusterBooleanResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                                          MTRClustersLogCompletion(logPrefix, value, error);
-                                                                          dispatch_async(self.callbackQueue, ^{
-                                                                              completion(value, error);
-                                                                          });
-                                                                          [workItem endWork];
-                                                                      }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestNestedStructArgumentRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::TestNestedStructArgumentRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRUnitTestingClusterBooleanResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)testListStructArgumentRequestWithParams:(MTRUnitTestingClusterTestListStructArgumentRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestListStructArgumentRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterUnitTesting
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster testListStructArgumentRequestWithParams:params completion:
-                                                                    ^(MTRUnitTestingClusterBooleanResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                                        MTRClustersLogCompletion(logPrefix, value, error);
-                                                                        dispatch_async(self.callbackQueue, ^{
-                                                                            completion(value, error);
-                                                                        });
-                                                                        [workItem endWork];
-                                                                    }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestListStructArgumentRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::TestListStructArgumentRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRUnitTestingClusterBooleanResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)testListInt8UArgumentRequestWithParams:(MTRUnitTestingClusterTestListInt8UArgumentRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestListInt8UArgumentRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterUnitTesting
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster testListInt8UArgumentRequestWithParams:params completion:
-                                                                   ^(MTRUnitTestingClusterBooleanResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                                       MTRClustersLogCompletion(logPrefix, value, error);
-                                                                       dispatch_async(self.callbackQueue, ^{
-                                                                           completion(value, error);
-                                                                       });
-                                                                       [workItem endWork];
-                                                                   }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestListInt8UArgumentRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::TestListInt8UArgumentRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRUnitTestingClusterBooleanResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)testNestedStructListArgumentRequestWithParams:(MTRUnitTestingClusterTestNestedStructListArgumentRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestNestedStructListArgumentRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterUnitTesting
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster testNestedStructListArgumentRequestWithParams:params completion:
-                                                                          ^(MTRUnitTestingClusterBooleanResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                                              MTRClustersLogCompletion(logPrefix, value, error);
-                                                                              dispatch_async(self.callbackQueue, ^{
-                                                                                  completion(value, error);
-                                                                              });
-                                                                              [workItem endWork];
-                                                                          }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestNestedStructListArgumentRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::TestNestedStructListArgumentRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRUnitTestingClusterBooleanResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)testListNestedStructListArgumentRequestWithParams:(MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterBooleanResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestListNestedStructListArgumentRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterUnitTesting
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster testListNestedStructListArgumentRequestWithParams:params completion:
-                                                                              ^(MTRUnitTestingClusterBooleanResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                                                  MTRClustersLogCompletion(logPrefix, value, error);
-                                                                                  dispatch_async(self.callbackQueue, ^{
-                                                                                      completion(value, error);
-                                                                                  });
-                                                                                  [workItem endWork];
-                                                                              }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestListNestedStructListArgumentRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::TestListNestedStructListArgumentRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRUnitTestingClusterBooleanResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)testListInt8UReverseRequestWithParams:(MTRUnitTestingClusterTestListInt8UReverseRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterTestListInt8UReverseResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestListInt8UReverseRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterUnitTesting
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster testListInt8UReverseRequestWithParams:params completion:
-                                                                  ^(MTRUnitTestingClusterTestListInt8UReverseResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                                      MTRClustersLogCompletion(logPrefix, value, error);
-                                                                      dispatch_async(self.callbackQueue, ^{
-                                                                          completion(value, error);
-                                                                      });
-                                                                      [workItem endWork];
-                                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestListInt8UReverseRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::TestListInt8UReverseRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRUnitTestingClusterTestListInt8UReverseResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)testEnumsRequestWithParams:(MTRUnitTestingClusterTestEnumsRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterTestEnumsResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestEnumsRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterUnitTesting
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster testEnumsRequestWithParams:params completion:
-                                                       ^(MTRUnitTestingClusterTestEnumsResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                           MTRClustersLogCompletion(logPrefix, value, error);
-                                                           dispatch_async(self.callbackQueue, ^{
-                                                               completion(value, error);
-                                                           });
-                                                           [workItem endWork];
-                                                       }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestEnumsRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::TestEnumsRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRUnitTestingClusterTestEnumsResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)testNullableOptionalRequestWithParams:(MTRUnitTestingClusterTestNullableOptionalRequestParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterTestNullableOptionalResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestNullableOptionalRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterUnitTesting
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster testNullableOptionalRequestWithParams:params completion:
-                                                                  ^(MTRUnitTestingClusterTestNullableOptionalResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                                      MTRClustersLogCompletion(logPrefix, value, error);
-                                                                      dispatch_async(self.callbackQueue, ^{
-                                                                          completion(value, error);
-                                                                      });
-                                                                      [workItem endWork];
-                                                                  }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestNullableOptionalRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::TestNullableOptionalRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRUnitTestingClusterTestNullableOptionalResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)testComplexNullableOptionalRequestWithParams:(MTRUnitTestingClusterTestComplexNullableOptionalRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterTestComplexNullableOptionalResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestComplexNullableOptionalRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterUnitTesting
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster testComplexNullableOptionalRequestWithParams:params completion:
-                                                                         ^(MTRUnitTestingClusterTestComplexNullableOptionalResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                                             MTRClustersLogCompletion(logPrefix, value, error);
-                                                                             dispatch_async(self.callbackQueue, ^{
-                                                                                 completion(value, error);
-                                                                             });
-                                                                             [workItem endWork];
-                                                                         }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestComplexNullableOptionalRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::TestComplexNullableOptionalRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRUnitTestingClusterTestComplexNullableOptionalResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)simpleStructEchoRequestWithParams:(MTRUnitTestingClusterSimpleStructEchoRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterSimpleStructResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandSimpleStructEchoRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterUnitTesting
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster simpleStructEchoRequestWithParams:params completion:
-                                                              ^(MTRUnitTestingClusterSimpleStructResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                                  MTRClustersLogCompletion(logPrefix, value, error);
-                                                                  dispatch_async(self.callbackQueue, ^{
-                                                                      completion(value, error);
-                                                                  });
-                                                                  [workItem endWork];
-                                                              }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterSimpleStructEchoRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::SimpleStructEchoRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRUnitTestingClusterSimpleStructResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)timedInvokeRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
@@ -20112,146 +18234,113 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)timedInvokeRequestWithParams:(MTRUnitTestingClusterTimedInvokeRequestParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTimedInvokeRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterUnitTesting
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster timedInvokeRequestWithParams:params completion:
-                                                         ^(NSError * _Nullable error) {
-                                                             MTRClustersLogCompletion(logPrefix, nil, error);
-                                                             dispatch_async(self.callbackQueue, ^{
-                                                                 completion(error);
-                                                             });
-                                                             [workItem endWork];
-                                                         }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTimedInvokeRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(10000);
     }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+
+    using RequestType = UnitTesting::Commands::TimedInvokeRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)testSimpleOptionalArgumentRequestWithParams:(MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestSimpleOptionalArgumentRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterUnitTesting
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster testSimpleOptionalArgumentRequestWithParams:params completion:
-                                                                        ^(NSError * _Nullable error) {
-                                                                            MTRClustersLogCompletion(logPrefix, nil, error);
-                                                                            dispatch_async(self.callbackQueue, ^{
-                                                                                completion(error);
-                                                                            });
-                                                                            [workItem endWork];
-                                                                        }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestSimpleOptionalArgumentRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::TestSimpleOptionalArgumentRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)testEmitTestEventRequestWithParams:(MTRUnitTestingClusterTestEmitTestEventRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterTestEmitTestEventResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestEventRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterUnitTesting
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster testEmitTestEventRequestWithParams:params completion:
-                                                               ^(MTRUnitTestingClusterTestEmitTestEventResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                                   MTRClustersLogCompletion(logPrefix, value, error);
-                                                                   dispatch_async(self.callbackQueue, ^{
-                                                                       completion(value, error);
-                                                                   });
-                                                                   [workItem endWork];
-                                                               }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestEmitTestEventRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::TestEmitTestEventRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRUnitTestingClusterTestEmitTestEventResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)testEmitTestFabricScopedEventRequestWithParams:(MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeUnitTestingID, (unsigned int) MTRCommandIDTypeClusterUnitTestingCommandTestEmitTestFabricScopedEventRequestID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterUnitTesting
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster testEmitTestFabricScopedEventRequestWithParams:params completion:
-                                                                           ^(MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                                               MTRClustersLogCompletion(logPrefix, value, error);
-                                                                               dispatch_async(self.callbackQueue, ^{
-                                                                                   completion(value, error);
-                                                                               });
-                                                                               [workItem endWork];
-                                                                           }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestEmitTestFabricScopedEventRequestParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = UnitTesting::Commands::TestEmitTestFabricScopedEventRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeBooleanWithParams:(MTRReadParams * _Nullable)params
@@ -20970,6 +19059,9 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 - (void)writeAttributeTimedWriteBooleanWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
+    if (!timedWriteTimeout) {
+        timedWriteTimeout = @(10000);
+    }
 
     [self.device writeAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(MTRAttributeIDTypeClusterUnitTestingAttributeTimedWriteBooleanID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
@@ -21810,74 +19902,56 @@ static void MTRClustersLogCompletion(NSString * logPrefix, id value, NSError * e
 }
 - (void)pingWithParams:(MTRSampleMEIClusterPingParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeSampleMEIID, (unsigned int) MTRCommandIDTypeClusterSampleMEICommandPingID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterSampleMEI
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster pingWithParams:params completion:
-                                           ^(NSError * _Nullable error) {
-                                               MTRClustersLogCompletion(logPrefix, nil, error);
-                                               dispatch_async(self.callbackQueue, ^{
-                                                   completion(error);
-                                               });
-                                               [workItem endWork];
-                                           }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRSampleMEIClusterPingParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = SampleMei::Commands::Ping::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (void)addArgumentsWithParams:(MTRSampleMEIClusterAddArgumentsParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRSampleMEIClusterAddArgumentsResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
-    NSString * logPrefix = [NSString stringWithFormat:@"MTRDevice command %u %u %u %u", self.device.deviceController.fabricIndex, self.endpoint, (unsigned int) MTRClusterIDTypeSampleMEIID, (unsigned int) MTRCommandIDTypeClusterSampleMEICommandAddArgumentsID];
-    // Make a copy of params before we go async.
-    params = [params copy];
-    MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.device.queue];
-    MTRAsyncWorkReadyHandler readyHandler = ^(MTRDevice * device, NSUInteger retryCount) {
-        MTRClustersLogDequeue(logPrefix, self.device.asyncCallbackWorkQueue);
-        auto * baseDevice = [[MTRBaseDevice alloc] initWithNodeID:self.device.nodeID controller:self.device.deviceController];
-        auto * cluster = [[MTRBaseClusterSampleMEI
-            alloc] initWithDevice:baseDevice
-                       endpointID:@(self.endpoint)
-                            queue:self.device.queue];
-        [cluster addArgumentsWithParams:params completion:
-                                                   ^(MTRSampleMEIClusterAddArgumentsResponseParams * _Nullable value, NSError * _Nullable error) {
-                                                       MTRClustersLogCompletion(logPrefix, value, error);
-                                                       dispatch_async(self.callbackQueue, ^{
-                                                           completion(value, error);
-                                                       });
-                                                       [workItem endWork];
-                                                   }];
-    };
-    workItem.readyHandler = readyHandler;
-    MTRClustersLogEnqueue(logPrefix, self.device.asyncCallbackWorkQueue);
-    [self.device.asyncCallbackWorkQueue enqueueWorkItem:workItem];
+    if (params == nil) {
+        params = [[MTRSampleMEIClusterAddArgumentsParams
+            alloc] init];
+    }
 
-    if (!expectedValueIntervalMs || ([expectedValueIntervalMs compare:@(0)] == NSOrderedAscending)) {
-        expectedValues = nil;
-    } else {
-        expectedValueIntervalMs = MTRClampedNumber(expectedValueIntervalMs, @(1), @(UINT32_MAX));
-    }
-    if (expectedValues) {
-        [self.device setExpectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs];
-    }
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = SampleMei::Commands::AddArguments::Type;
+    [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRSampleMEIClusterAddArgumentsResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
 }
 
 - (NSDictionary<NSString *, id> *)readAttributeFlipFlopWithParams:(MTRReadParams * _Nullable)params

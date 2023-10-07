@@ -75,7 +75,7 @@ private:
 
     DiscoveryImplPlatform() = default;
 
-    DiscoveryImplPlatform(const DiscoveryImplPlatform &) = delete;
+    DiscoveryImplPlatform(const DiscoveryImplPlatform &)             = delete;
     DiscoveryImplPlatform & operator=(const DiscoveryImplPlatform &) = delete;
 
     CHIP_ERROR InitImpl();

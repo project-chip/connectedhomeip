@@ -29,7 +29,7 @@ import unittest
 from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeInstantiation, AttributeQuality, AttributeStorage,
                                          Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType, DeviceType,
                                          Endpoint, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
-                                         ParseMetaData, ServerClusterInstantiation, Struct, StructQuality, StructTag)
+                                         ParseMetaData, ServerClusterInstantiation, Struct, StructTag)
 
 
 def parseText(txt, skip_meta=True):
@@ -49,71 +49,6 @@ class TestParser(unittest.TestCase):
         """)
         expected = Idl()
 
-        self.assertEqual(actual, expected)
-
-    def test_global_enum(self):
-        actual = parseText("""
-            enum GlobalEnum : ENUM8 {
-               kValue1 = 1;
-               kOther = 0x12; /* hex numbers tested sporadically */
-            }
-        """)
-
-        expected = Idl(enums=[
-            Enum(name='GlobalEnum', base_type='ENUM8',
-                 entries=[
-                     ConstantEntry(name="kValue1", code=1),
-                     ConstantEntry(name="kOther", code=0x12),
-                 ])]
-        )
-        self.assertEqual(actual, expected)
-
-    def test_global_struct(self):
-        actual = parseText("""
-            struct Something {
-                CHAR_STRING astring = 1;
-                optional CLUSTER_ID idlist[] = 2;
-                nullable int valueThatIsNullable = 0x123;
-                char_string<123> sized_string = 222;
-            }
-        """)
-
-        expected = Idl(structs=[
-            Struct(name='Something',
-                   fields=[
-                        Field(
-                            data_type=DataType(name="CHAR_STRING"), code=1, name="astring", ),
-                        Field(data_type=DataType(name="CLUSTER_ID"), code=2, name="idlist",
-                              is_list=True, qualities=FieldQuality.OPTIONAL),
-                        Field(data_type=DataType(name="int"), code=0x123,
-                              name="valueThatIsNullable", qualities=FieldQuality.NULLABLE),
-                        Field(data_type=DataType(name="char_string", max_length=123),
-                              code=222, name="sized_string"),
-                   ])]
-        )
-        self.assertEqual(actual, expected)
-
-    def test_fabric_scoped_struct(self):
-        actual = parseText("""
-            fabric_scoped struct FabricStruct {
-                CHAR_STRING astring = 1;
-                optional CLUSTER_ID idlist[] = 2;
-                nullable fabric_sensitive int nullablesensitive = 0x123;
-            }
-        """)
-
-        expected = Idl(structs=[
-            Struct(name='FabricStruct',
-                   qualities=StructQuality.FABRIC_SCOPED,
-                   fields=[
-                        Field(
-                            data_type=DataType(name="CHAR_STRING"), code=1, name="astring", ),
-                        Field(data_type=DataType(name="CLUSTER_ID"), code=2, name="idlist",
-                              is_list=True, qualities=FieldQuality.OPTIONAL),
-                        Field(data_type=DataType(name="int"), code=0x123, name="nullablesensitive",
-                              qualities=FieldQuality.NULLABLE | FieldQuality.FABRIC_SENSITIVE),
-                   ])]
-        )
         self.assertEqual(actual, expected)
 
     def test_cluster_attribute(self):
