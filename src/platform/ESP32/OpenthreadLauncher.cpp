@@ -38,6 +38,8 @@ static esp_netif_t * openthread_netif                       = NULL;
 static esp_openthread_platform_config_t * s_platform_config = NULL;
 static TaskHandle_t cli_transmit_task                       = NULL;
 static QueueHandle_t cli_transmit_task_queue                = NULL;
+static constexpr uint16_t OTCLI_TRANSMIT_TASK_STACK_SIZE    = 1024;
+static constexpr UBaseType_t OTCLI_TRANSMIT_TASK_PRIORITY   = 5;
 
 CHIP_ERROR cli_transmit_task_post(std::unique_ptr<char[]> && cli_str)
 {
@@ -103,7 +105,8 @@ static void cli_transmit_worker(void * context)
 
 static esp_err_t cli_command_transmit_task(void)
 {
-    xTaskCreate(cli_transmit_worker, "ocli_trans", 3072, xTaskGetCurrentTaskHandle(), 5, &cli_transmit_task);
+    xTaskCreate(cli_transmit_worker, "otcli_trans", OTCLI_TRANSMIT_TASK_STACK_SIZE, xTaskGetCurrentTaskHandle(),
+                OTCLI_TRANSMIT_TASK_PRIORITY, &cli_transmit_task);
     return ESP_OK;
 }
 

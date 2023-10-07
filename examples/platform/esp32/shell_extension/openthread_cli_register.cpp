@@ -30,7 +30,7 @@ namespace chip {
 
 static CHIP_ERROR OtcliHandler(int argc, char * argv[])
 {
-    /* the beginning of command "matter esp ot cli" has already been removed */
+    /* the beginning of command "matter otcli" has already been removed */
     std::unique_ptr<char[]> cli_str(new char[CLI_INPUT_BUFF_LENGTH]);
     memset(cli_str.get(), 0, CLI_INPUT_BUFF_LENGTH);
     uint8_t len = 0;
