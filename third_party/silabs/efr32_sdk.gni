@@ -21,16 +21,15 @@ import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("silabs_board.gni")
 
-if (use_rs9116) {
-  wifi_sapi_root = "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
-} else if (use_SiWx917) {
-  wifi_sdk_root = "${chip_root}/third_party/silabs/wifi_sdk"
-}
-
 declare_args() {
   # Location of the efr32 SDK.
   efr32_sdk_root = "${chip_root}/third_party/silabs/gecko_sdk"
   sdk_support_root = "${chip_root}/third_party/silabs/matter_support"
+  wiseconnect_sdk_root =
+      "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
+  wifi_sdk_root = "${chip_root}/third_party/silabs/wifi_sdk"
+  examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
+  wifi_sdk_dir = "${chip_root}/src/platform/silabs/efr32/wifi"
 
   # Build openthread with prebuilt silabs lib
   use_silabs_thread_lib = false
@@ -74,6 +73,14 @@ declare_args() {
 }
 
 assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
+
+if (use_rs9116) {
+  assert(wiseconnect_sdk_root != "", "wiseconnect_sdk_root must be specified")
+}
+
+if (use_SiWx917) {
+  assert(wifi_sdk_root != "", "wifi_sdk_root must be specified")
+}
 
 declare_args() {
   sl_ot_libs_path = "${efr32_sdk_root}/protocol/openthread"
@@ -229,7 +236,7 @@ template("efr32_sdk") {
 
     if (chip_enable_ble_rs911x) {
       if (use_rs9116) {
-        _include_dirs += [ "${wifi_sapi_root}/sapi/include" ]
+        _include_dirs += [ "${wiseconnect_sdk_root}/sapi/include" ]
       } else {
         _include_dirs += [ "${wifi_sdk_root}/components/si91x/ble/inc" ]
       }
@@ -744,10 +751,10 @@ template("efr32_sdk") {
     if (chip_enable_ble_rs911x) {
       if (use_rs9116) {
         sources += [
-          "${wifi_sapi_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
-          "${wifi_sapi_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
-          "${wifi_sapi_root}/sapi/bluetooth/rsi_bt_common_apis.c",
-          "${wifi_sapi_root}/sapi/driver/rsi_bt_ble.c",
+          "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
+          "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
+          "${wiseconnect_sdk_root}/sapi/bluetooth/rsi_bt_common_apis.c",
+          "${wiseconnect_sdk_root}/sapi/driver/rsi_bt_ble.c",
         ]
       } else {
         sources += [
