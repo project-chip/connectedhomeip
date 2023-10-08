@@ -23,7 +23,8 @@
 #include <platform/nxp/k32w/common/OTAImageProcessorImpl.h>
 #include <platform/nxp/k32w/common/OTATlvProcessor.h>
 #if OTA_ENCRYPTION_ENABLE
-#include "fsl_aes.h"
+#include "rom_aes.h"
+#include "OtaUtils.h"
 #endif
 namespace chip {
 
@@ -111,6 +112,7 @@ CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & bloc
     uint32_t Offset = 0;
     uint8_t data;
     tsReg128 sKey;
+    aesContext_t Context;
 
     memcpy(iv, au8Iv, sizeof(au8Iv));
 
@@ -139,8 +141,9 @@ CHIP_ERROR OTATlvProcessor::vOtaProcessInternalEncryption(MutableByteSpan & bloc
     while (Offset+16 <= block.size())
     {
         /*Encrypt the IV*/
-        AES_SetKey(AES0, (uint8_t*)&sKey, AESSW_BLK_SIZE);
-        AES_EncryptEcb(AES0, iv, dataOut, AESSW_BLK_SIZE);
+        Context.mode = AES_MODE_ECB_ENCRYPT;
+        Context.pSoftwareKey = (uint32_t*)&sKey;
+        AES_128_ProcessBlocks(&Context, (uint32_t*)&iv[0], (uint32_t*)&dataOut[0], 1);
 
         /* Decrypt a block of the buffer */
         for(uint8_t i=0;i<16;i++)
