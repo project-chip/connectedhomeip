@@ -22,6 +22,8 @@
 #import <atomic>
 #import <os/lock.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 typedef NS_ENUM(NSInteger, MTRAsyncWorkItemState) {
     MTRAsyncWorkItemMutable,
     MTRAsyncWorkItemComplete,
@@ -36,11 +38,11 @@ typedef NS_ENUM(NSInteger, MTRAsyncWorkItemState) {
 //  - avoiding calls to `[context description]` under our lock
 struct ContextSnapshot {
     id _Nullable reference;
-    NSString * description;
+    NSString * _Nullable description;
     ContextSnapshot(id _Nullable context)
     {
         reference = context;
-        description = [context description] ?: @"?";
+        description = [context description];
     }
 };
 
@@ -64,13 +66,13 @@ MTR_DIRECT_MEMBERS
     return self;
 }
 
-- (void)setReadyHandler:(void (^)(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion))readyHandler
+- (void)setReadyHandler:(nullable void (^)(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion))readyHandler
 {
     [self assertMutable];
     _readyHandler = readyHandler;
 }
 
-- (void)setCancelHandler:(void (^)(void))cancelHandler
+- (void)setCancelHandler:(nullable void (^)(void))cancelHandler
 {
     [self assertMutable];
     _cancelHandler = cancelHandler;
@@ -137,9 +139,9 @@ MTR_DIRECT_MEMBERS
     auto readyHandler = _readyHandler;
     dispatch_async(_queue, ^{
         if (!retryCount) {
-            MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> executing work item %tu", context, uniqueID);
+            MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> executing work item [%llu]", context, uniqueID);
         } else {
-            MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> executing work item %tu (retry %zd)", context, uniqueID, retryCount);
+            MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> executing work item [%llu] (retry %zd)", context, uniqueID, retryCount);
         }
         if (readyHandler) {
             readyHandler(context, retryCount, completion);
@@ -196,9 +198,9 @@ MTR_DIRECT_MEMBERS
         state = @"enqueued";
         break;
     default:
-        return [NSString stringWithFormat:@"<%@ %tu running retry: %tu>", self.class, _uniqueID, self.retryCount];
+        return [NSString stringWithFormat:@"<%@ %llu running retry: %tu>", self.class, _uniqueID, self.retryCount];
     }
-    return [NSString stringWithFormat:@"<%@ %tu %@>", self.class, _uniqueID, state];
+    return [NSString stringWithFormat:@"<%@ %llu %@>", self.class, _uniqueID, state];
 }
 
 @end
@@ -259,9 +261,9 @@ MTR_DIRECT_MEMBERS
         // Logging the description once is enough because other log messages
         // related to the work item (execution, completion etc) can easily be
         // correlated using the unique id.
-        MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> enqueued work item %tu: %@", context.description, item.uniqueID, description);
+        MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> enqueued work item [%llu]: %@", context.description, item.uniqueID, description);
     } else {
-        MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> enqueued work item %tu", context.description, item.uniqueID);
+        MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> enqueued work item [%llu]", context.description, item.uniqueID);
     }
 
     [self _callNextReadyWorkItemWithContext:context];
@@ -293,11 +295,11 @@ MTR_DIRECT_MEMBERS
     }
 
     if (retry) {
-        MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> retry needed for work item %tu", context.description, workItem.uniqueID);
+        MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> retry needed for work item [%llu]", context.description, workItem.uniqueID);
     } else {
         [workItem markComplete];
         [_items removeObjectAtIndex:0];
-        MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> completed work item %tu", context.description, workItem.uniqueID);
+        MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> completed work item [%llu]", context.description, workItem.uniqueID);
     }
 
     // when "concurrency width" is implemented this will be decremented instead
@@ -319,7 +321,7 @@ MTR_DIRECT_MEMBERS
     }
 
     if (!context.reference) {
-        MTR_LOG_ERROR("MTRAsyncWorkQueue<?> context has been lost, dropping queued work items");
+        MTR_LOG_ERROR("MTRAsyncWorkQueue<%@> context has been lost, dropping queued work items", (id)nil);
         [_items removeAllObjects];
         return;
     }
@@ -342,11 +344,11 @@ MTR_DIRECT_MEMBERS
             case MTRNotBatched:
                 goto done; // can't merge anything else
             case MTRBatchedPartially:
-                MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> partially merged work item %tu into %tu",
+                MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> partially merged work item [%llu] into %llu",
                     context.description, nextWorkItem.uniqueID, workItem.uniqueID);
                 goto done; // can't merge anything else
             case MTRBatchedFully:
-                MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> fully merged work item %tu into %tu",
+                MTR_LOG_DEFAULT("MTRAsyncWorkQueue<%@> fully merged work item [%llu] into %llu",
                     context.description, nextWorkItem.uniqueID, workItem.uniqueID);
                 [_items removeObjectAtIndex:1];
                 continue; // try to batch the next item (if any)
@@ -394,3 +396,5 @@ MTR_DIRECT_MEMBERS
 }
 
 @end
+
+NS_ASSUME_NONNULL_END

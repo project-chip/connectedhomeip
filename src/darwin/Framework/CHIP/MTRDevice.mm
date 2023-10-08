@@ -893,7 +893,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
         // Create work item, set ready handler to perform task, then enqueue the work
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
-        NSUInteger workItemID = workItem.uniqueID; // capture only the ID, not the work item
+        uint64_t workItemID = workItem.uniqueID; // capture only the ID, not the work item
         [workItem setBatchingID:MTRDeviceWorkItemBatchingReadID data:readRequests handler:^(id opaqueDataCurrent, id opaqueDataNext) {
             mtr_hide(self); // don't capture self accidentally
             NSMutableArray<NSArray *> * readRequestsCurrent = opaqueDataCurrent;
@@ -903,14 +903,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             while (readRequestsNext.count) {
                 // Can only read up to 9 paths at a time, per spec
                 if (readRequestsCurrent.count >= 9) {
-                    MTR_LOG_INFO("Batching read attribute work %tu: cannot add more work, item is full", workItemID);
+                    MTR_LOG_INFO("Batching read attribute work item [%llu]: cannot add more work, item is full", workItemID);
                     return outcome;
                 }
 
                 // if params don't match then they cannot be merged
                 if (![readRequestsNext[0][MTRDeviceReadRequestFieldParamsIndex]
                         isEqual:readRequestsCurrent[0][MTRDeviceReadRequestFieldParamsIndex]]) {
-                    MTR_LOG_INFO("Batching read attribute work %tu: cannot add more work, parameter mismatch", workItemID);
+                    MTR_LOG_INFO("Batching read attribute work item [%llu]: cannot add more work, parameter mismatch", workItemID);
                     return outcome;
                 }
 
@@ -918,7 +918,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 auto readItem = readRequestsNext.firstObject;
                 [readRequestsNext removeObjectAtIndex:0];
                 [readRequestsCurrent addObject:readItem];
-                MTR_LOG_INFO("Batching read attribute work %tu: added %@ (now %tu requests total)",
+                MTR_LOG_INFO("Batching read attribute work item [%llu]: added %@ (now %tu requests total)",
                     workItemID, readItem, readRequestsCurrent.count);
                 outcome = MTRBatchedPartially;
             }
@@ -929,7 +929,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             mtr_hide(self); // don't capture self accidentally
             for (NSArray * readItem in readRequests) {
                 if ([readItem isEqual:opaqueItemData]) {
-                    MTR_LOG_DEFAULT("Read attribute work %tu report duplicate %@", workItemID, readItem);
+                    MTR_LOG_DEFAULT("Read attribute work item [%llu] report duplicate %@", workItemID, readItem);
                     *isDuplicate = YES;
                     *stop = YES;
                     return;
@@ -940,7 +940,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         [workItem setReadyHandler:^(MTRDevice * self, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
             // Sanity check
             if (readRequests.count == 0) {
-                MTR_LOG_ERROR("Read attribute work %tu contained no read requests", workItemID);
+                MTR_LOG_ERROR("Read attribute work item [%llu] contained no read requests", workItemID);
                 completion(MTRAsyncWorkComplete);
                 return;
             }
@@ -965,16 +965,16 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                             if (values) {
                                 // Since the format is the same data-value dictionary, this looks like an
                                 // attribute report
-                                MTR_LOG_INFO("Read attribute work %tu result: %@", workItemID, values);
+                                MTR_LOG_INFO("Read attribute work item [%llu] result: %@", workItemID, values);
                                 [self _handleAttributeReport:values];
                             }
 
                             // TODO: better retry logic
                             if (error && (retryCount < 2)) {
-                                MTR_LOG_ERROR("Read attribute work %tu failed (will retry): %@", workItemID, error);
+                                MTR_LOG_ERROR("Read attribute work item [%llu] failed (will retry): %@", workItemID, error);
                                 completion(MTRAsyncWorkNeedsRetry);
                             } else {
-                                MTR_LOG_DEFAULT("Read attribute work %tu failed (giving up): %@", workItemID, error);
+                                MTR_LOG_DEFAULT("Read attribute work item [%llu] failed (giving up): %@", workItemID, error);
                                 completion(MTRAsyncWorkComplete);
                             }
                         }];
@@ -1007,7 +1007,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
               expectedValueID:&expectedValueID];
 
     MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
-    NSUInteger workItemID = workItem.uniqueID; // capture only the ID, not the work item
+    uint64_t workItemID = workItem.uniqueID; // capture only the ID, not the work item
     // The write operation will install a duplicate check handler, to return NO for "isDuplicate". Since a write operation may
     // change values, only read requests after this should be considered for duplicate requests.
     [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
@@ -1025,7 +1025,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                                    queue:self.queue
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                   if (error) {
-                                      MTR_LOG_ERROR("Write attribute work %tu failed: %@", workItemID, error);
+                                      MTR_LOG_ERROR("Write attribute work item [%llu] failed: %@", workItemID, error);
                                       [self removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
                                   }
                                   completion(MTRAsyncWorkComplete);
@@ -1090,7 +1090,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }
     }
     MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
-    NSUInteger workItemID = workItem.uniqueID; // capture only the ID, not the work item
+    uint64_t workItemID = workItem.uniqueID; // capture only the ID, not the work item
     // The command operation will install a duplicate check handler, to return NO for "isDuplicate". Since a command operation may
     // change values, only read requests after this should be considered for duplicate requests.
     [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
@@ -1110,7 +1110,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                   // Log the data at the INFO level (not usually persisted permanently),
                                   // but make sure we log the work completion at the DEFAULT level.
-                                  MTR_LOG_INFO("Invoke work %tu received command response: %@ error: %@", workItemID, values, error);
+                                  MTR_LOG_INFO("Invoke work item [%llu] received command response: %@ error: %@", workItemID, values, error);
                                   dispatch_async(queue, ^{
                                       completion(values, error);
                                   });

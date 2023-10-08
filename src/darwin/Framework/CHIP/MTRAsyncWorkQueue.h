@@ -109,7 +109,7 @@ MTR_TESTABLE
 
 /// A unique (modulo overflow) ID automatically assigned to each work item for
 /// the purpose of correlating log messages from the work queue.
-@property (readonly, nonatomic) NSUInteger uniqueID;
+@property (readonly, nonatomic) uint64_t uniqueID;
 
 /// Called by the work queue to start this work item.
 ///

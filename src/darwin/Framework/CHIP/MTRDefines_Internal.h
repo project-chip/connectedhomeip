@@ -53,7 +53,7 @@
 #define mtr_hide(local)                                         \
     _Pragma("clang diagnostic push")                            \
     _Pragma("clang diagnostic ignored \"-Wshadow\"")            \
-    __attribute__((unused)) _mtr_hidden local;                  \
+    __attribute__((unused)) variable_hidden_by_mtr_hide local;  \
     _Pragma("clang diagnostic pop")
-typedef struct {} _mtr_hidden;
+typedef struct {} variable_hidden_by_mtr_hide;
 // clang-format on
