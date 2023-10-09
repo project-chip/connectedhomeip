@@ -35,3 +35,12 @@
 //  Until this is improved in OpenThread we need to increase the retransmission
 //  interval to survive the stall.
 #define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL (1000_ms32)
+
+/**
+ * @def CHIP_DEVICE_CONFIG_ENABLE_SED
+ *
+ * @brief Defines if a matter device is acting as a Sleepy End Device(SED)
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_SED
+#define CHIP_DEVICE_CONFIG_ENABLE_SED 0
+#endif

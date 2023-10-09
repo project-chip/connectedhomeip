@@ -33,3 +33,12 @@
 // All clusters app has 3 group endpoints. This needs to defined here so that
 // CHIP_CONFIG_MAX_GROUPS_PER_FABRIC is properly configured.
 #define CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC 3
+
+/**
+ * @def CHIP_DEVICE_CONFIG_ENABLE_SED
+ *
+ * @brief Defines if a matter device is acting as a Sleepy End Device(SED)
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_SED
+#define CHIP_DEVICE_CONFIG_ENABLE_SED 0
+#endif
