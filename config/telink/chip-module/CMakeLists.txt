@@ -189,10 +189,31 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
 endif()
 
 if (CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE)
-    add_custom_target(merge_factory_data ALL
+  if(EXISTS "${CHIP_ROOT}/src/platform/telink/flash_overlays/${FLASH_SIZE}_flash.overlay")
+    if(${FLASH_SIZE} MATCHES 1m)
+      add_custom_target(merge_factory_data ALL
         COMMAND
+        dd if=${PROJECT_BINARY_DIR}/factory/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=540
+      )
+    elseif(${FLASH_SIZE} MATCHES 2m)
+      add_custom_target(merge_factory_data ALL
+      COMMAND
         dd if=${PROJECT_BINARY_DIR}/factory/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=1052
+      )
+    elseif(${FLASH_SIZE} MATCHES 4m)
+      add_custom_target(merge_factory_data ALL
+      COMMAND
+      dd if=${PROJECT_BINARY_DIR}/factory/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=2076
+      )    
+    endif()
+  else()
+    add_custom_target(merge_factory_data ALL
+      COMMAND
+      dd if=${PROJECT_BINARY_DIR}/factory/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=1052
     )
+  endif()
+
+
 if (CONFIG_CHIP_OTA_IMAGE_BUILD)
     add_dependencies(merge_factory_data merge_mcuboot)
 else()

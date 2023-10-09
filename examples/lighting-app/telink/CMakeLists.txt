@@ -49,10 +49,12 @@ else()
 endif()
 
 if(EXISTS "${CHIP_ROOT}/src/platform/telink/flash_overlays/${FLASH_SIZE}_flash.overlay")
-    set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/flash_overlays/${FLASH_SIZE}_flash.overlay")
-  else()
-    set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/flash_overlays/2m_flash.overlay")
-  endif()
+  set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/flash_overlays/${FLASH_SIZE}_flash.overlay")
+  message(STATUS "Flash memory size is set to: " ${FLASH_SIZE} "b")
+else()
+  set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/flash_overlays/2m_flash.overlay")
+  message(STATUS "Flash memory size is set to: 2mb")
+endif()
 
 if(DTC_OVERLAY_FILE)
   set(DTC_OVERLAY_FILE
