@@ -64,15 +64,15 @@ struct BluezConnection
     BluezEndpoint * mpEndpoint;
 };
 
-CHIP_ERROR SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf);
-CHIP_ERROR CloseBluezConnection(BLE_CONNECTION_OBJECT apConn);
+CHIP_ERROR SendBluezIndication(BluezConnection * apConn, chip::System::PacketBufferHandle apBuf);
+CHIP_ERROR CloseBluezConnection(BluezConnection * apConn);
 
 /// Write to the CHIP RX characteristic on the remote peripheral device
-CHIP_ERROR BluezSendWriteRequest(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf);
+CHIP_ERROR BluezSendWriteRequest(BluezConnection * apConn, chip::System::PacketBufferHandle apBuf);
 /// Subscribe to the CHIP TX characteristic on the remote peripheral device
-CHIP_ERROR BluezSubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn);
+CHIP_ERROR BluezSubscribeCharacteristic(BluezConnection * apConn);
 /// Unsubscribe from the CHIP TX characteristic on the remote peripheral device
-CHIP_ERROR BluezUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn);
+CHIP_ERROR BluezUnsubscribeCharacteristic(BluezConnection * apConn);
 
 } // namespace Internal
 } // namespace DeviceLayer

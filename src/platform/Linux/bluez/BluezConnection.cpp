@@ -85,13 +85,13 @@ static BluezConnection::ConnectionDataBundle * MakeConnectionDataBundle(BLE_CONN
                                                                         const chip::System::PacketBufferHandle & apBuf)
 {
     auto * bundle  = g_new(BluezConnection::ConnectionDataBundle, 1);
-    bundle->mpConn = static_cast<BluezConnection *>(apConn);
+    bundle->mpConn = apConn;
     bundle->mpVal =
         g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, apBuf->Start(), apBuf->DataLength() * sizeof(uint8_t), sizeof(uint8_t));
     return bundle;
 }
 
-CHIP_ERROR SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf)
+CHIP_ERROR SendBluezIndication(BluezConnection * apConn, chip::System::PacketBufferHandle apBuf)
 {
     VerifyOrReturnError(!apBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT, ChipLogError(DeviceLayer, "apBuf is NULL in %s", __func__));
     return PlatformMgrImpl().GLibMatterContextInvokeSync(BluezC2Indicate, MakeConnectionDataBundle(apConn, apBuf));
@@ -114,9 +114,9 @@ exit:
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CloseBluezConnection(BLE_CONNECTION_OBJECT apConn)
+CHIP_ERROR CloseBluezConnection(BluezConnection * apConn)
 {
-    return PlatformMgrImpl().GLibMatterContextInvokeSync(BluezDisconnect, static_cast<BluezConnection *>(apConn));
+    return PlatformMgrImpl().GLibMatterContextInvokeSync(BluezDisconnect, apConn);
 }
 
 // BluezSendWriteRequest callbacks
@@ -152,7 +152,7 @@ exit:
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BluezSendWriteRequest(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf)
+CHIP_ERROR BluezSendWriteRequest(BluezConnection * apConn, chip::System::PacketBufferHandle apBuf)
 {
     VerifyOrReturnError(!apBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT, ChipLogError(DeviceLayer, "apBuf is NULL in %s", __func__));
     return PlatformMgrImpl().GLibMatterContextInvokeSync(SendWriteRequestImpl, MakeConnectionDataBundle(apConn, apBuf));
@@ -200,9 +200,9 @@ exit:
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BluezSubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn)
+CHIP_ERROR BluezSubscribeCharacteristic(BluezConnection * apConn)
 {
-    return PlatformMgrImpl().GLibMatterContextInvokeSync(SubscribeCharacteristicImpl, static_cast<BluezConnection *>(apConn));
+    return PlatformMgrImpl().GLibMatterContextInvokeSync(SubscribeCharacteristicImpl, apConn);
 }
 
 // BluezUnsubscribeCharacteristic callbacks
@@ -231,9 +231,9 @@ exit:
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BluezUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn)
+CHIP_ERROR BluezUnsubscribeCharacteristic(BluezConnection * apConn)
 {
-    return PlatformMgrImpl().GLibMatterContextInvokeSync(UnsubscribeCharacteristicImpl, static_cast<BluezConnection *>(apConn));
+    return PlatformMgrImpl().GLibMatterContextInvokeSync(UnsubscribeCharacteristicImpl, apConn);
 }
 
 } // namespace Internal
