@@ -223,9 +223,9 @@ CHIP_ERROR convertTargetVideoPlayerInfoToJVideoPlayer(TargetVideoPlayerInfo * ta
         jclass jVideoPlayerClass;
         ReturnErrorOnFailure(
             chip::JniReferences::GetInstance().GetClassRef(env, "com/chip/casting/VideoPlayer", jVideoPlayerClass));
-        jmethodID jVideoPlayerConstructor = env->GetMethodID(
-            jVideoPlayerClass, "<init>",
-            "(JBLjava/lang/String;IIILjava/util/List;ILjava/util/List;Ljava/lang/String;Ljava/lang/String;IJLjava/lang/String;Z)V");
+        jmethodID jVideoPlayerConstructor = env->GetMethodID(jVideoPlayerClass, "<init>",
+                                                             "(JBLjava/lang/String;IIILjava/util/List;ILjava/util/List;Ljava/lang/"
+                                                             "String;Ljava/lang/String;IJLjava/lang/String;ZZ)V");
 
         jobject jContentAppList        = nullptr;
         TargetEndpointInfo * endpoints = targetVideoPlayerInfo->GetEndpoints();
