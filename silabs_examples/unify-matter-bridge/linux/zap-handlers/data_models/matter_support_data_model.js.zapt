@@ -17,6 +17,13 @@ exports.model = {
       {{code}} : "{{asUpperCamelCase label}}",
       {{/zcl_attributes_server}}
     },
+    {{#if (supportedClusterEvents code)}}
+    events: {
+      {{#zcl_events}}
+      {{code}} : "{{asUpperCamelCase name}}",
+      {{/zcl_events}}
+    },
+    {{/if}}
   },
 {{/zcl_clusters}}
 

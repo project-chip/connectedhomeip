@@ -139,6 +139,34 @@ CHIP_ERROR {{asUpperCamelCase label}}AttributeAccess::Write(const ConcreteDataAt
   return CHIP_ERROR_NO_MESSAGE_HANDLER;
 }
 
+{{#if (supportedClusterEvents code)}}
+void {{asUpperCamelCase label}}AttributeAccess::trigger_event(const bridged_endpoint *ep,
+                                            const chip::EventId &eventid,
+                                            const nlohmann::json &unify_value)
+{
+  namespace ME = chip::app::Clusters::{{asUpperCamelCase label}}::Events;
+
+  EventNumber eventNumber;
+  chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
+  bool event_valid = false;
+  
+  switch (eventid) {
+    {{#zcl_events}}
+    case ME::{{asUpperCamelCase name}}::Id: {
+      chip::app::Clusters::{{asUpperCamelCase parent.label}}::Events::{{asUpperCamelCase name}}::Type event;
+      {{getMatterEventEnum parent.code code 'unify_value'}}
+      if (event_valid) {
+        if (CHIP_NO_ERROR != LogEvent(event, node_matter_endpoint, eventNumber)) {
+          sl_log_warning(LOG_TAG, "{{asUpperCamelCase name}}: Failed to trigger event");
+        }
+      }
+      break;
+    }
+    {{/zcl_events}}
+    }
+}
+{{/if}}
+
 void {{asUpperCamelCase label}}AttributeAccess::reported_updated(const bridged_endpoint *ep,
                                             const std::string &cluster,
                                             const std::string &attribute,
@@ -194,6 +222,13 @@ void {{asUpperCamelCase label}}AttributeAccess::reported_updated(const bridged_e
           node_matter_endpoint,
           Clusters::{{asUpperCamelCase parent.label}}::Id,
           MN::{{asUpperCamelCase label}}::Id);
+          {{#if (supportedClusterEvents parent.code)}}
+          {{#if (unifySupportedClusterEvents parent.label code)}}
+          trigger_event(ep,
+          chip::app::Clusters::{{asUpperCamelCase parent.label}}::Events::{{getMatterEventNameForAttribute parent.label code}}::Id,
+          unify_value);
+          {{/if}}
+          {{/if}}
       }
       break;
     }

@@ -2972,6 +2972,13 @@ exports.model = {
       65532 : "FeatureMap",
       65533 : "ClusterRevision",
     },
+    events : {
+      0 : "DoorLockAlarm",
+      1 : "DoorStateChange",
+      2 : "LockOperation",
+      3 : "LockOperationError",
+      4 : "LockUserChange",
+    },
   },
   258 : {
     name : "WindowCovering",
@@ -5968,12 +5975,6 @@ exports.model = {
       "Other",
     ], //
     "ErrorStateEnum" : [
-      "NoError",
-      "UnableToStartOrResume",
-      "UnableToCompleteOperation",
-      "CommandInvalidInState",
-    ], //
-    "ErrorStateEnum" : [
       "FailedToFindChargingDock",
       "Stuck",
       "DustBinMissing",
@@ -5982,6 +5983,12 @@ exports.model = {
       "WaterTankMissing",
       "WaterTankLidOpen",
       "MopCleaningPadMissing",
+    ], //
+    "ErrorStateEnum" : [
+      "NoError",
+      "UnableToStartOrResume",
+      "UnableToCompleteOperation",
+      "CommandInvalidInState",
     ], //
     "ExpressedStateEnum" : [
       "Normal",
@@ -6227,13 +6234,8 @@ exports.model = {
     ], //
     "ModeTag" : [
       "Normal",
-      "Defrost",
-    ], //
-    "ModeTag" : [
-      "NoOptimization",
-      "DeviceOptimization",
-      "LocalOptimization",
-      "GridOptimization",
+      "Heavy",
+      "Light",
     ], //
     "ModeTag" : [
       "Normal",
@@ -6251,32 +6253,15 @@ exports.model = {
       "RapidFreeze",
     ], //
     "ModeTag" : [
-      "Bake",
-      "Convection",
-      "Grill",
-      "Roast",
-      "Clean",
-      "ConvectionBake",
-      "ConvectionRoast",
-      "Warming",
-      "Proofing",
-    ], //
-    "ModeTag" : [
-      "Manual",
-      "TimeOfUse",
-      "SolarCharging",
+      "Idle",
+      "Cleaning",
     ], //
     "ModeTag" : [
       "DeepClean",
       "Vacuum",
       "Mop",
     ], //
-    "ModeTag" : [
-      "Idle",
-      "Cleaning",
-      "Mapping",
-    ], //
-    "MoveModeEnum" : [
+    "MoveMode" : [
       "Up",
       "Down",
     ], //
@@ -6373,21 +6358,15 @@ exports.model = {
       "Aliro",
     ], //
     "OperationalStateEnum" : [
-      "Stopped",
-      "Running",
-      "Paused",
-      "Error",
-    ], //
-    "OperationalStateEnum" : [
       "SeekingCharger",
       "Charging",
       "Docked",
     ], //
-    "OptOutStateEnum" : [
-      "NoOptOut",
-      "LocalOptOut",
-      "GridOptOut",
-      "OptOut",
+    "OperationalStateEnum" : [
+      "Stopped",
+      "Running",
+      "Paused",
+      "Error",
     ], //
     "OutputTypeEnum" : [
       "Hdmi",
@@ -6561,9 +6540,6 @@ exports.model = {
       "Fault",
     ], //
     "StatusCode" : [
-      "CleaningInProgress",
-    ], //
-    "StatusCode" : [
       "Stuck",
       "DustBinMissing",
       "DustBinFull",
@@ -6572,6 +6548,9 @@ exports.model = {
       "WaterTankLidOpen",
       "MopCleaningPadMissing",
       "BatteryLow",
+    ], //
+    "StatusCode" : [
+      "CleaningInProgress",
     ], //
     "StatusCode" : [
       "Busy",
@@ -7044,12 +7023,7 @@ exports.model = {
       1 : "TagList",
     },
     "Feature" : {
-      1 : "OnOff",
-    },
-    "Feature" : {
-      1 : "NavigationKeyCodes",
-      2 : "LocationKeys",
-      4 : "NumberKeys",
+      1 : "WaterMarks",
     },
     "Feature" : {
       1 : "TemperatureNumber",
@@ -7057,50 +7031,32 @@ exports.model = {
       4 : "TemperatureStep",
     },
     "Feature" : {
+      1 : "OnOff",
+    },
+    "Feature" : {
       1 : "TemperatureUnit",
     },
     "Feature" : {
-      1 : "Visual",
-      2 : "Audible",
-      4 : "AlarmSuppress",
-      8 : "SensitivityLevel",
-    },
-    "Feature" : {
-      1 : "Reset",
+      1 : "NavigationKeyCodes",
+      2 : "LocationKeys",
+      4 : "NumberKeys",
     },
     "Feature" : {
       1 : "PacketCounts",
       2 : "ErrorCounts",
     },
     "Feature" : {
-      1 : "ImportedEnergy",
-      2 : "ExportedEnergy",
-      4 : "CumulativeEnergy",
-      8 : "PeriodicEnergy",
+      1 : "NameUpdates",
     },
     "Feature" : {
       1 : "Extended",
     },
     "Feature" : {
-      1 : "Reset",
-    },
-    "Feature" : {
-      1 : "Watermarks",
-    },
-    "Feature" : {
-      1 : "PowerAsNumber",
-      2 : "PowerInWatts",
-      4 : "PowerNumberLimits",
-    },
-    "Feature" : {
-      1 : "CalendarFormat",
+      1 : "TimeSync",
+      2 : "Level",
     },
     "Feature" : {
       1 : "ApplicationPlatform",
-    },
-    "Feature" : {
-      1 : "TimeSync",
-      2 : "Level",
     },
     "Feature" : {
       1 : "MultiSpeed",
@@ -7109,9 +7065,6 @@ exports.model = {
       8 : "Wind",
       16 : "Step",
       32 : "AirflowDirection",
-    },
-    "Feature" : {
-      1 : "NameUpdates",
     },
     "Feature" : {
       1 : "Condition",
@@ -7131,6 +7084,10 @@ exports.model = {
       1 : "NameUpdates",
     },
     "Feature" : {
+      1 : "PacketCounts",
+      2 : "ErrorCounts",
+    },
+    "Feature" : {
       1 : "ContentSearch",
       2 : "URLPlayback",
       3 : "AdvancedSeek",
@@ -7142,6 +7099,10 @@ exports.model = {
       2 : "LowPowerModeSensitivity",
     },
     "Feature" : {
+      1 : "SmokeAlarm",
+      2 : "CoAlarm",
+    },
+    "Feature" : {
       1 : "LatchingSwitch",
       2 : "MomentarySwitch",
       4 : "MomentarySwitchRelease",
@@ -7149,36 +7110,8 @@ exports.model = {
       16 : "MomentarySwitchMultiPress",
     },
     "Feature" : {
-      1 : "SmokeAlarm",
-      2 : "CoAlarm",
-    },
-    "Feature" : {
-      1 : "EnrollmentGroups",
-      2 : "TemperatureOffset",
-      4 : "TemperatureSetpoint",
-      8 : "LoadAdjustment",
-      16 : "DutyCycle",
-      32 : "PowerSavings",
-      64 : "HeatingSource",
-    },
-    "Feature" : {
-      1 : "Basic",
-    },
-    "Feature" : {
-      1 : "ScreenTime",
-      2 : "PINManagement",
-      3 : "BlockUnrated",
-      4 : "OnDemandContentRating",
-      5 : "ScheduledContentRating",
-    },
-    "Feature" : {
-      1 : "PowerAdjustment",
-      2 : "PowerForecastReporting",
-      4 : "StateForecastReporting",
-      8 : "StartTimeAdjustment",
-      16 : "Pausable",
-      32 : "ForecastAdjustment",
-      64 : "ConstraintBasedAdjustment",
+      1 : "AdvancedSeek",
+      2 : "VariableSpeed",
     },
     "Feature" : {
       1 : "CheckInProtocolSupport",

@@ -169,6 +169,34 @@ function getSpecialValues(cluster, attribute, modified_value) {
   }
 }
 
+// List of Cluster whose attributes support events
+const cluster_attributes_support_events = {
+  "Door Lock": {
+      "0": true,
+      "3": true,
+  },
+};
+
+function unifySupportedClusterEvents(cluster_name, attribute_id) {
+  if (cluster_attributes_support_events.hasOwnProperty(cluster_name)) {
+    const cluster = cluster_attributes_support_events[cluster_name];
+    const attributeid = String(attribute_id);
+
+    if (cluster.hasOwnProperty(attributeid)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function getMatterEventNameForAttribute(cluster_name, attribute_id) {
+  return unify_matter_mapping.matter_event_name(cluster_name, attribute_id)
+}
+
+function getMatterEventEnum(clusterID, eventID, value) {
+  return unify_matter_mapping.matter_event_enum(clusterID, eventID, value)
+}
+
 exports.getSpecialValues = getSpecialValues
 exports.attributeHasSpecialValues = attributeHasSpecialValues
 exports.unifySupportedCluster = unifySupportedCluster
@@ -184,3 +212,7 @@ exports.unifyClusterCommandArgument = unifyClusterCommandArgument
 exports.unifyTypeExists = unifyTypeExists
 exports.unifyCanPassThroughEnumValue = unifyCanPassThroughEnumValue
 exports.unifyCanUseChipBitMap = unifyCanUseChipBitMap
+exports.unifyAppendClusterToAttrType = unifyAppendClusterToAttrType
+exports.unifySupportedClusterEvents = unifySupportedClusterEvents
+exports.getMatterEventNameForAttribute = getMatterEventNameForAttribute
+exports.getMatterEventEnum = getMatterEventEnum

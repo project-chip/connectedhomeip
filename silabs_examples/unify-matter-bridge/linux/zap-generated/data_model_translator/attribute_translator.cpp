@@ -1504,6 +1504,80 @@ CHIP_ERROR DoorLockAttributeAccess::Write(const ConcreteDataAttributePath& aPath
     return CHIP_ERROR_NO_MESSAGE_HANDLER;
 }
 
+void DoorLockAttributeAccess::trigger_event(const bridged_endpoint* ep, const chip::EventId& eventid,
+    const nlohmann::json& unify_value)
+{
+    namespace ME = chip::app::Clusters::DoorLock::Events;
+
+    EventNumber eventNumber;
+    chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
+    bool event_valid = false;
+
+    switch (eventid) {
+    case ME::DoorLockAlarm::Id: {
+        chip::app::Clusters::DoorLock::Events::DoorLockAlarm::Type event;
+
+        if (strcmp(unify_value.dump().c_str(), "\"ErrorJammed\"") == 0) { // DoorJammed
+            event.alarmCode = chip::app::Clusters::DoorLock::AlarmCodeEnum::kLockJammed;
+            event_valid = true;
+        }
+        if (event_valid) {
+            if (CHIP_NO_ERROR != LogEvent(event, node_matter_endpoint, eventNumber)) {
+                sl_log_warning(LOG_TAG, "DoorLockAlarm: Failed to trigger event");
+            }
+        }
+        break;
+    }
+    case ME::DoorStateChange::Id: {
+        chip::app::Clusters::DoorLock::Events::DoorStateChange::Type event;
+
+        if (event_valid) {
+            if (CHIP_NO_ERROR != LogEvent(event, node_matter_endpoint, eventNumber)) {
+                sl_log_warning(LOG_TAG, "DoorStateChange: Failed to trigger event");
+            }
+        }
+        break;
+    }
+    case ME::LockOperation::Id: {
+        chip::app::Clusters::DoorLock::Events::LockOperation::Type event;
+
+        if (strcmp(unify_value.dump().c_str(), "\"Locked\"") == 0) { // Door locked event
+            event.lockOperationType = chip::app::Clusters::DoorLock::LockOperationTypeEnum::kLock;
+            event_valid = true;
+        } else if (strcmp(unify_value.dump().c_str(), "\"Unlocked\"") == 0) { // Door unlocked event
+            event.lockOperationType = chip::app::Clusters::DoorLock::LockOperationTypeEnum::kUnlock;
+            event_valid = true;
+        }
+        if (event_valid) {
+            if (CHIP_NO_ERROR != LogEvent(event, node_matter_endpoint, eventNumber)) {
+                sl_log_warning(LOG_TAG, "LockOperation: Failed to trigger event");
+            }
+        }
+        break;
+    }
+    case ME::LockOperationError::Id: {
+        chip::app::Clusters::DoorLock::Events::LockOperationError::Type event;
+
+        if (event_valid) {
+            if (CHIP_NO_ERROR != LogEvent(event, node_matter_endpoint, eventNumber)) {
+                sl_log_warning(LOG_TAG, "LockOperationError: Failed to trigger event");
+            }
+        }
+        break;
+    }
+    case ME::LockUserChange::Id: {
+        chip::app::Clusters::DoorLock::Events::LockUserChange::Type event;
+
+        if (event_valid) {
+            if (CHIP_NO_ERROR != LogEvent(event, node_matter_endpoint, eventNumber)) {
+                sl_log_warning(LOG_TAG, "LockUserChange: Failed to trigger event");
+            }
+        }
+        break;
+    }
+    }
+}
+
 void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const std::string& cluster,
     const std::string& attribute, const nlohmann::json& unify_value)
 {
@@ -1535,6 +1609,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
             sl_log_debug(LOG_TAG, "LockState attribute value is %s", unify_value.dump().c_str());
             attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::LockState::Id);
+            trigger_event(ep, chip::app::Clusters::DoorLock::Events::LockOperation::Id, unify_value);
         }
         break;
     }
@@ -1571,6 +1646,7 @@ void DoorLockAttributeAccess::reported_updated(const bridged_endpoint* ep, const
             sl_log_debug(LOG_TAG, "DoorState attribute value is %s", unify_value.dump().c_str());
             attribute_state_cache::get_instance().set<T>(attrpath, value.value());
             MatterReportingAttributeChangeCallback(node_matter_endpoint, Clusters::DoorLock::Id, MN::DoorState::Id);
+            trigger_event(ep, chip::app::Clusters::DoorLock::Events::DoorLockAlarm::Id, unify_value);
         }
         break;
     }

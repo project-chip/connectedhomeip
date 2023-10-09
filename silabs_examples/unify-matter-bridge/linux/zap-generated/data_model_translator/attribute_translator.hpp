@@ -271,6 +271,7 @@ public:
     CHIP_ERROR Write(const chip::app::ConcreteDataAttributePath& aPath, chip::app::AttributeValueDecoder& aDecoder) override;
 
 private:
+    void trigger_event(const bridged_endpoint* ep, const chip::EventId& event, const nlohmann::json& unify_value);
     void reported_updated(const bridged_endpoint* ep, const std::string& cluster, const std::string& attribute,
         const nlohmann::json& unify_value) override;
 

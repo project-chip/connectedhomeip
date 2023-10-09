@@ -52,6 +52,11 @@ class {{asUpperCamelCase label}}AttributeAccess : public attribute_translator_in
                    chip::app::AttributeValueDecoder &aDecoder) override;
 
   private:
+    {{#if (supportedClusterEvents code)}}
+    void trigger_event(const bridged_endpoint *ep,
+                          const chip::EventId &event,
+                          const nlohmann::json &unify_value);
+    {{/if}}
     void reported_updated(const bridged_endpoint *ep,
                           const std::string& cluster,
                           const std::string& attribute,

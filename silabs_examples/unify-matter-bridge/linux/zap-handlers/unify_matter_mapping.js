@@ -255,8 +255,53 @@ function matter_enum_name(unify_enum_name) {
     }
 }
 
+// List of mapping from unify attribute to matter event name
+const eventsmap_unify_to_matter = {
+    "Door Lock": {
+        "0": "LockOperation",
+        "3": "DoorLockAlarm",
+    },
+};
+
+function matter_event_name(cluster_name, attribute_id) {
+    if (eventsmap_unify_to_matter.hasOwnProperty(cluster_name)) {
+        const cluster = eventsmap_unify_to_matter[cluster_name];
+        const attributeid = String(attribute_id);
+
+        if (cluster.hasOwnProperty(attributeid)) {
+            return cluster[attributeid];
+        }
+    }
+    return null;
+}
+  
+function matter_event_enum(cluster_id, event_id, value) {
+    if (cluster_id == 257) {
+        switch (event_id) {
+            case 0:
+            return `
+            if (strcmp(${value}.dump().c_str(), "\\"ErrorJammed\\"") == 0) { // DoorJammed
+                event.alarmCode = chip::app::Clusters::DoorLock::AlarmCodeEnum::kLockJammed;
+                event_valid = true;
+            }`;
+            case 2:
+            return `
+            if (strcmp(${value}.dump().c_str(), "\\"Locked\\"") == 0) { // Door locked event
+                event.lockOperationType = chip::app::Clusters::DoorLock::LockOperationTypeEnum::kLock;
+                event_valid = true;
+            } else if (strcmp(${value}.dump().c_str(), "\\"Unlocked\\"") == 0) { // Door unlocked event
+                event.lockOperationType = chip::app::Clusters::DoorLock::LockOperationTypeEnum::kUnlock;
+                event_valid = true;
+            }`;
+        }
+    }
+  }
+  
+
 
 exports.unify_bitmap_name = unify_bitmap_name
 exports.matter_bitmap_name = matter_bitmap_name
 exports.unify_enum_name = unify_enum_name
 exports.matter_enum_name = matter_enum_name
+exports.matter_event_name = matter_event_name
+exports.matter_event_enum = matter_event_enum
