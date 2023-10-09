@@ -1,6 +1,6 @@
 {
   "fileFormat": 2,
-  "featureLevel": 98,
+  "featureLevel": 99,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -476,17 +476,7 @@
           "mfgCode": null,
           "define": "DIAGNOSTIC_LOGS_CLUSTER",
           "side": "client",
-          "enabled": 1,
-          "commands": [
-            {
-              "name": "RetrieveLogsResponse",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "isIncoming": 0,
-              "isEnabled": 1
-            }
-          ]
+          "enabled": 1
         },
         {
           "name": "Diagnostic Logs",
@@ -502,6 +492,14 @@
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "RetrieveLogsResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 0,
               "isEnabled": 1
             }
           ],
@@ -747,5 +745,6 @@
       "endpointId": 0,
       "networkId": 0
     }
-  ]
+  ],
+  "log": []
 }
