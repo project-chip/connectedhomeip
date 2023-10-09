@@ -7,9 +7,9 @@
  *
  * If 1, enable then assume esp32 device.
 */
-//#ifndef CHIP_DEVICE_IS_ESP32
-//#define CHIP_DEVICE_IS_ESP32 1
-//#endif
+#ifndef CHIP_DEVICE_IS_ESP32
+#define CHIP_DEVICE_IS_ESP32 1
+#endif
  
 /**
  * CHIP_DEVICE_IS_NRF
@@ -17,10 +17,10 @@
  * If 1, enable then assume nRF device.
 */ 
 
-#ifndef CHIP_DEVICE_IS_NRF
-#define CHIP_DEVICE_IS_NRF 1
-#undef CHIP_DEVICE_IS_ESP32
-#endif
+//#ifndef CHIP_DEVICE_IS_NRF
+//#define CHIP_DEVICE_IS_NRF 1
+//#undef CHIP_DEVICE_IS_ESP32
+//#endif
 
 #if defined  (CHIP_DEVICE_IS_NRF)  
 #include <system/SystemClock.h>
