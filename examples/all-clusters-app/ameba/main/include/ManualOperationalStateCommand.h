@@ -67,14 +67,15 @@ CHIP_ERROR ManualOperationalStateSetStateCommandHandler(int argc, char ** argv)
     {
         return ManualOperationalStateCommandHelpHandler(argc, argv);
     }
-	uint32_t state = atoi(argv[0]);
+    uint32_t state = atoi(argv[0]);
 
     CHIP_ERROR err;
-    err = GetOperationalStateInstance()->SetOperationalState(state); 
+    err = GetOperationalStateInstance()->SetOperationalState(state);
 
-    if (err != CHIP_NO_ERROR) {
-		ChipLogError(DeviceLayer, "ManualOperationalStateSetStateCommandHandler Failed!\r\n");
-	}
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "ManualOperationalStateSetStateCommandHandler Failed!\r\n");
+    }
 
     return err;
 }
@@ -86,11 +87,11 @@ CHIP_ERROR ManualOperationalStateSetErrorCommandHandler(int argc, char ** argv)
         return ManualOperationalStateCommandHelpHandler(argc, argv);
     }
 
-	GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
+    GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
     uint32_t error = atoi(argv[0]);
-   
-	switch(error)
-	{
+
+    switch (error)
+    {
     case to_underlying(OperationalState::ErrorStateEnum::kNoError):
         err.errorStateID = to_underlying(OperationalState::ErrorStateEnum::kNoError);
         break;
@@ -139,14 +140,15 @@ CHIP_ERROR ManualRVCOperationalStateSetStateCommandHandler(int argc, char ** arg
     {
         return ManualRVCOperationalStateCommandHelpHandler(argc, argv);
     }
-	uint32_t state = atoi(argv[0]);
+    uint32_t state = atoi(argv[0]);
 
     CHIP_ERROR err;
     err = GetRVCOperationalStateInstance()->SetOperationalState(state);
 
-    if (err != CHIP_NO_ERROR) {
-		ChipLogError(DeviceLayer, "ManualRVCOperationalStateSetStateCommandHandler Failed!\r\n");
-	} 
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "ManualRVCOperationalStateSetStateCommandHandler Failed!\r\n");
+    }
 
     return err;
 }
@@ -158,45 +160,45 @@ CHIP_ERROR ManualRVCOperationalStateSetErrorCommandHandler(int argc, char ** arg
         return ManualRVCOperationalStateCommandHelpHandler(argc, argv);
     }
 
-	GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
+    GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
     uint32_t error = atoi(argv[0]);
-   
-	switch(error)
-	{
-    case to_underlying(OperationalState::ErrorStateEnum::kNoError): //0x00, 0
+
+    switch (error)
+    {
+    case to_underlying(OperationalState::ErrorStateEnum::kNoError): // 0x00, 0
         err.errorStateID = to_underlying(OperationalState::ErrorStateEnum::kNoError);
         break;
-    case to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume): //0x01, 1
+    case to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume): // 0x01, 1
         err.errorStateID = to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume);
         break;
-    case to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation): //0x02, 2
+    case to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation): // 0x02, 2
         err.errorStateID = to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation);
         break;
-    case to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState): //0x03, 3
+    case to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState): // 0x03, 3
         err.errorStateID = to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState);
         break;
-    case to_underlying(RvcOperationalState::ErrorStateEnum::kFailedToFindChargingDock): //0x40, 64
+    case to_underlying(RvcOperationalState::ErrorStateEnum::kFailedToFindChargingDock): // 0x40, 64
         err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kFailedToFindChargingDock);
         break;
-    case to_underlying(RvcOperationalState::ErrorStateEnum::kStuck): //0x41, 65
+    case to_underlying(RvcOperationalState::ErrorStateEnum::kStuck): // 0x41, 65
         err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kStuck);
         break;
-    case to_underlying(RvcOperationalState::ErrorStateEnum::kDustBinMissing): //0x42, 66
+    case to_underlying(RvcOperationalState::ErrorStateEnum::kDustBinMissing): // 0x42, 66
         err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kDustBinMissing);
         break;
-    case to_underlying(RvcOperationalState::ErrorStateEnum::kDustBinFull): //0x43, 67
+    case to_underlying(RvcOperationalState::ErrorStateEnum::kDustBinFull): // 0x43, 67
         err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kDustBinFull);
         break;
-    case to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankEmpty): //0x44, 68
+    case to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankEmpty): // 0x44, 68
         err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankEmpty);
         break;
-    case to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankMissing): //0x45, 69
+    case to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankMissing): // 0x45, 69
         err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankMissing);
         break;
-    case to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankLidOpen): //0x46, 70
+    case to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankLidOpen): // 0x46, 70
         err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankLidOpen);
         break;
-    case to_underlying(RvcOperationalState::ErrorStateEnum::kMopCleaningPadMissing): //0x47, 71
+    case to_underlying(RvcOperationalState::ErrorStateEnum::kMopCleaningPadMissing): // 0x47, 71
         err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kMopCleaningPadMissing);
         break;
     default:

@@ -61,29 +61,33 @@ CHIP_ERROR ManualDishWasherAlarmSetRaiseCommandHandler(int argc, char ** argv)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     EmberAfStatus status;
-    DishwasherAlarmServer& serverInstance = DishwasherAlarmServer::Instance();
+    DishwasherAlarmServer & serverInstance = DishwasherAlarmServer::Instance();
 
-	status = serverInstance.SetSupportedValue(1,47);
-	if (status != EMBER_ZCL_STATUS_SUCCESS) {
-		err = CHIP_ERROR_INTERNAL;
-		goto exit;
-	}
+    status = serverInstance.SetSupportedValue(1, 47);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        err = CHIP_ERROR_INTERNAL;
+        goto exit;
+    }
 
-	status = serverInstance.SetMaskValue(1, 47);
-	if (status != EMBER_ZCL_STATUS_SUCCESS) {
-		err = CHIP_ERROR_INTERNAL;
-		goto exit;
-	}
+    status = serverInstance.SetMaskValue(1, 47);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        err = CHIP_ERROR_INTERNAL;
+        goto exit;
+    }
 
-	status = serverInstance.SetStateValue(1, 14, 0);
-	if (status != EMBER_ZCL_STATUS_SUCCESS) {
-		err = CHIP_ERROR_INTERNAL;
-		goto exit;
-	}
+    status = serverInstance.SetStateValue(1, 14, 0);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        err = CHIP_ERROR_INTERNAL;
+        goto exit;
+    }
 exit:
-	if (err != CHIP_NO_ERROR) {
-		ChipLogError(DeviceLayer, "ManualDishWasherAlarmSetRaiseCommandHandler Failed!\r\n");
-	}
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "ManualDishWasherAlarmSetRaiseCommandHandler Failed!\r\n");
+    }
 
     return err;
 }
@@ -92,29 +96,33 @@ CHIP_ERROR ManualDishWasherAlarmSetLowerCommandHandler(int argc, char ** argv)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     EmberAfStatus status;
-    DishwasherAlarmServer& serverInstance = DishwasherAlarmServer::Instance();
+    DishwasherAlarmServer & serverInstance = DishwasherAlarmServer::Instance();
 
-	status = serverInstance.SetSupportedValue(1,47);
-	if (status != EMBER_ZCL_STATUS_SUCCESS) {
-		err = CHIP_ERROR_INTERNAL;
-		goto exit;
-	}
+    status = serverInstance.SetSupportedValue(1, 47);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        err = CHIP_ERROR_INTERNAL;
+        goto exit;
+    }
 
-	status = serverInstance.SetMaskValue(1, 47);
-	if (status != EMBER_ZCL_STATUS_SUCCESS) {
-		err = CHIP_ERROR_INTERNAL;
-		goto exit;
-	}
+    status = serverInstance.SetMaskValue(1, 47);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        err = CHIP_ERROR_INTERNAL;
+        goto exit;
+    }
 
-	status = serverInstance.SetStateValue(1, 14, 0);
-	if (status != EMBER_ZCL_STATUS_SUCCESS) {
-		err = CHIP_ERROR_INTERNAL;
-		goto exit;
-	}
+    status = serverInstance.SetStateValue(1, 14, 0);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        err = CHIP_ERROR_INTERNAL;
+        goto exit;
+    }
 exit:
-	if (err != CHIP_NO_ERROR) {
-		ChipLogError(DeviceLayer, "ManualDishWasherAlarmSetLowerCommandHandler Failed!\r\n");
-	}
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "ManualDishWasherAlarmSetLowerCommandHandler Failed!\r\n");
+    }
 
     return err;
 }

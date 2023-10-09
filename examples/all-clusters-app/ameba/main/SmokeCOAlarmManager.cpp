@@ -36,7 +36,7 @@ CHIP_ERROR SmokeCoAlarmManager::Init()
 
 void SmokeCoAlarmManager::StartSelfTesting()
 {
-    //Currently selftest is not implemented
+    // Currently selftest is not implemented
 }
 
 bool emberAfHandleEventTrigger(uint64_t eventTrigger)

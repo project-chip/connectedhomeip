@@ -31,8 +31,8 @@ namespace Clusters {
 
 namespace OperationalState {
 
-    Instance *GetOperationalStateInstance();
-    Instance *GetRVCOperationalStateInstance();
+Instance * GetOperationalStateInstance();
+Instance * GetRVCOperationalStateInstance();
 
 // This is an application level delegate to handle operational state commands according to the specific business logic.
 class GenericOperationalStateDelegateImpl : public Delegate
@@ -52,7 +52,7 @@ public:
      * @param index The index of the state, with 0 representing the first state.
      * @param operationalState  The GenericOperationalState is filled.
      */
-    CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState &operationalState) override;
+    CHIP_ERROR GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState) override;
 
     /**
      * Fills in the provided GenericOperationalPhase with the phase at index `index` if there is one,
@@ -62,32 +62,32 @@ public:
      * @param index The index of the phase, with 0 representing the first phase.
      * @param operationalPhase  The GenericOperationalPhase is filled.
      */
-    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase &operationalPhase) override;
+    CHIP_ERROR GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase) override;
 
     // command callback
     /**
      * Handle Command Callback in application: Pause
      * @param[out] get operational error after callback.
      */
-    void HandlePauseStateCallback(GenericOperationalError &err) override;
+    void HandlePauseStateCallback(GenericOperationalError & err) override;
 
     /**
      * Handle Command Callback in application: Resume
      * @param[out] get operational error after callback.
      */
-    void HandleResumeStateCallback(GenericOperationalError &err) override;
+    void HandleResumeStateCallback(GenericOperationalError & err) override;
 
     /**
      * Handle Command Callback in application: Start
      * @param[out] get operational error after callback.
      */
-    void HandleStartStateCallback(GenericOperationalError &err) override;
+    void HandleStartStateCallback(GenericOperationalError & err) override;
 
     /**
      * Handle Command Callback in application: Stop
      * @param[out] get operational error after callback.
      */
-    void HandleStopStateCallback(GenericOperationalError &err) override;
+    void HandleStopStateCallback(GenericOperationalError & err) override;
 
 protected:
     Span<const GenericOperationalState> mOperationalStateList;

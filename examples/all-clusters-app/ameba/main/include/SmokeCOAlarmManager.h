@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include <stdbool.h>
-#include <stdint.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
 #include <lib/core/CHIPError.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 bool emberAfHandleEventTrigger(uint64_t eventTrigger);
 

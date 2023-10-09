@@ -17,10 +17,10 @@
  */
 
 #include "ManualOperationCommand.h"
+#include "ManualDishWasherAlarmCommand.h"
 #include "ManualOperationalStateCommand.h"
 #include "ManualRVCModesCommand.h"
 #include "ManualRefrigeratorAlarmCommand.h"
-#include "ManualDishWasherAlarmCommand.h"
 
 #include "app/server/Server.h"
 #include "platform/CHIPDeviceLayer.h"
@@ -109,32 +109,36 @@ static void RegisterManualOperationCommands()
         { &ManualRVCCleanModeCommandHelpHandler, "help", "Usage: manual rvc cleanmode <subcommand>" },
         { &ManualRVCCleanModeSetModeCommandHandler, "set-mode", "set-mode Usage: manual rvc cleanmode set-mode <mode>" },
     };
-    
-     static const shell_command_t sManualRefrigeratorAlarmStateSubCommands[] = {
-         { &ManualRefrigeratorAlarmCommandHelpHandler, "help", "Usage: manual refalm <subcommand>" },
-         { &ManualRefrigeratorAlarmDoorOpenCommandHandler, "door-open", "door-open Usage: manual refalm door-open" },
-         { &ManualRefrigeratorAlarmDoorCloseCommandHandler, "door-close", "door-close Usage: manual refalm door-close" },
-         { &ManualRefrigeratorAlarmSuppressCommandHandler, "suppress-alarm", "suppress-alarm Usage: manual refalm suppress-alarm" },
-     };
 
-     static const shell_command_t sManualDishWasherAlarmSubCommands[] = {
-         { &ManualDishWasherAlarmCommandHelpHandler, "help", "Usage: manual dishalm <subcommand>" },
-         { &ManualDishWasherAlarmSetRaiseCommandHandler, "raise", "raise Usage: manual dishalm raise"},
-         { &ManualDishWasherAlarmSetLowerCommandHandler, "lower", "lower Usage: manual dishalm lower" },
-     };
+    static const shell_command_t sManualRefrigeratorAlarmStateSubCommands[] = {
+        { &ManualRefrigeratorAlarmCommandHelpHandler, "help", "Usage: manual refalm <subcommand>" },
+        { &ManualRefrigeratorAlarmDoorOpenCommandHandler, "door-open", "door-open Usage: manual refalm door-open" },
+        { &ManualRefrigeratorAlarmDoorCloseCommandHandler, "door-close", "door-close Usage: manual refalm door-close" },
+        { &ManualRefrigeratorAlarmSuppressCommandHandler, "suppress-alarm", "suppress-alarm Usage: manual refalm suppress-alarm" },
+    };
+
+    static const shell_command_t sManualDishWasherAlarmSubCommands[] = {
+        { &ManualDishWasherAlarmCommandHelpHandler, "help", "Usage: manual dishalm <subcommand>" },
+        { &ManualDishWasherAlarmSetRaiseCommandHandler, "raise", "raise Usage: manual dishalm raise" },
+        { &ManualDishWasherAlarmSetLowerCommandHandler, "lower", "lower Usage: manual dishalm lower" },
+    };
 
     static const shell_command_t sManualOperationCommand = { &ManualOperationCommandHandler, "manual",
                                                              "Manual Operation commands. Usage: manual <subcommand>" };
 
     // Register commands
     sShellManualOperationSubCommands.RegisterCommands(sManualOperationSubCommands, ArraySize(sManualOperationSubCommands));
-    sShellManualOperationalStateSubCommands.RegisterCommands(sManualOperationalStateSubCommands, ArraySize(sManualOperationalStateSubCommands));
+    sShellManualOperationalStateSubCommands.RegisterCommands(sManualOperationalStateSubCommands,
+                                                             ArraySize(sManualOperationalStateSubCommands));
     sShellManualRVCSubCommands.RegisterCommands(sManualRVCSubCommands, ArraySize(sManualRVCSubCommands));
-    sShellManualRVCOperationalStateSubCommands.RegisterCommands(sManualRVCOperationalStateSubCommands, ArraySize(sManualRVCOperationalStateSubCommands));
+    sShellManualRVCOperationalStateSubCommands.RegisterCommands(sManualRVCOperationalStateSubCommands,
+                                                                ArraySize(sManualRVCOperationalStateSubCommands));
     sShellManualRVCRunModeSubCommands.RegisterCommands(sManualRVCRunModeSubCommands, ArraySize(sManualRVCRunModeSubCommands));
     sShellManualRVCCleanModeSubCommands.RegisterCommands(sManualRVCCleanModeSubCommands, ArraySize(sManualRVCCleanModeSubCommands));
-    sShellManualRefrigeratorAlarmStateSubCommands.RegisterCommands(sManualRefrigeratorAlarmStateSubCommands, ArraySize(sManualRefrigeratorAlarmStateSubCommands));
-    sShellManualDishWasherAlarmStateSubCommands.RegisterCommands(sManualDishWasherAlarmSubCommands, ArraySize(sManualDishWasherAlarmSubCommands));
+    sShellManualRefrigeratorAlarmStateSubCommands.RegisterCommands(sManualRefrigeratorAlarmStateSubCommands,
+                                                                   ArraySize(sManualRefrigeratorAlarmStateSubCommands));
+    sShellManualDishWasherAlarmStateSubCommands.RegisterCommands(sManualDishWasherAlarmSubCommands,
+                                                                 ArraySize(sManualDishWasherAlarmSubCommands));
 
     Engine::Root().RegisterCommands(&sManualOperationCommand, 1);
 }

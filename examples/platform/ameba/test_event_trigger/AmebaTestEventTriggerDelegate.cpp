@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-#include "SmokeCOAlarmManager.h"
 #include "AmebaTestEventTriggerDelegate.h"
+#include "SmokeCOAlarmManager.h"
 
 using namespace ::chip::DeviceLayer;
 

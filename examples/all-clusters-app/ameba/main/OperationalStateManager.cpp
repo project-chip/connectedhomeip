@@ -23,7 +23,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalState;
 using namespace chip::app::Clusters::RvcOperationalState;
 
-CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalStateAtIndex(size_t index, GenericOperationalState &operationalState)
+CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
 {
     if (index >= mOperationalStateList.size())
     {
@@ -33,7 +33,7 @@ CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalStateAtIndex(size_
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase &operationalPhase)
+CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalPhaseAtIndex(size_t index, GenericOperationalPhase & operationalPhase)
 {
     if (index >= mOperationalPhaseList.size())
     {
@@ -43,7 +43,7 @@ CHIP_ERROR GenericOperationalStateDelegateImpl::GetOperationalPhaseAtIndex(size_
     return CHIP_NO_ERROR;
 }
 
-void GenericOperationalStateDelegateImpl::HandlePauseStateCallback(GenericOperationalError &err)
+void GenericOperationalStateDelegateImpl::HandlePauseStateCallback(GenericOperationalError & err)
 {
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
     if (error == CHIP_NO_ERROR)
@@ -56,7 +56,7 @@ void GenericOperationalStateDelegateImpl::HandlePauseStateCallback(GenericOperat
     }
 }
 
-void GenericOperationalStateDelegateImpl::HandleResumeStateCallback(GenericOperationalError &err)
+void GenericOperationalStateDelegateImpl::HandleResumeStateCallback(GenericOperationalError & err)
 {
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
@@ -69,7 +69,7 @@ void GenericOperationalStateDelegateImpl::HandleResumeStateCallback(GenericOpera
     }
 }
 
-void GenericOperationalStateDelegateImpl::HandleStartStateCallback(GenericOperationalError &err)
+void GenericOperationalStateDelegateImpl::HandleStartStateCallback(GenericOperationalError & err)
 {
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
@@ -82,7 +82,7 @@ void GenericOperationalStateDelegateImpl::HandleStartStateCallback(GenericOperat
     }
 }
 
-void GenericOperationalStateDelegateImpl::HandleStopStateCallback(GenericOperationalError &err)
+void GenericOperationalStateDelegateImpl::HandleStopStateCallback(GenericOperationalError & err)
 {
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
     if (error == CHIP_NO_ERROR)
@@ -97,8 +97,8 @@ void GenericOperationalStateDelegateImpl::HandleStopStateCallback(GenericOperati
 
 // Init Operational State cluster
 
-static OperationalState::Instance *gOperationalStateInstance = nullptr;
-static OperationalStateDelegate *gOperationalStateDelegate   = nullptr;
+static OperationalState::Instance * gOperationalStateInstance = nullptr;
+static OperationalStateDelegate * gOperationalStateDelegate   = nullptr;
 
 void OperationalState::Shutdown()
 {
@@ -114,7 +114,7 @@ void OperationalState::Shutdown()
     }
 }
 
-OperationalState::Instance *OperationalState::GetOperationalStateInstance()
+OperationalState::Instance * OperationalState::GetOperationalStateInstance()
 {
     return gOperationalStateInstance;
 }
@@ -135,10 +135,10 @@ void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 
 // Init RVC Operational State cluster
 
-static OperationalState::Instance *gRvcOperationalStateInstance  = nullptr;
-static RvcOperationalStateDelegate *gRvcOperationalStateDelegate = nullptr;
+static OperationalState::Instance * gRvcOperationalStateInstance  = nullptr;
+static RvcOperationalStateDelegate * gRvcOperationalStateDelegate = nullptr;
 
-OperationalState::Instance *OperationalState::GetRVCOperationalStateInstance()
+OperationalState::Instance * OperationalState::GetRVCOperationalStateInstance()
 {
     return gRvcOperationalStateInstance;
 }
