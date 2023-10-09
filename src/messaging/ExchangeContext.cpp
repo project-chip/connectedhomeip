@@ -491,7 +491,7 @@ void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
 #endif // CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
 
     // Grab the value of WaitingForResponseOrAck() before we mess with our state.
-    bool mrpTimedOut = WaitingForResponseOrAck();
+    bool gotMRPAck = !WaitingForResponseOrAck();
 
     SetResponseExpected(false);
 
@@ -506,8 +506,8 @@ void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
     {
         // If we timed out _after_ getting an ack for the message, that means
         // the session is probably fine (since our message and the ack got
-        // through), so don't mark the session defunct unless MRP also timed out.
-        if (mrpTimedOut)
+        // through), so don't mark the session defunct if we got an MRP ack.
+        if (!gotMRPAck)
         {
             if (mSession->IsSecureSession() && mSession->AsSecureSession()->IsCASESession())
             {
