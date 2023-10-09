@@ -321,7 +321,7 @@ MTR_DIRECT_MEMBERS
     }
 
     if (!context.reference) {
-        MTR_LOG_ERROR("MTRAsyncWorkQueue<%@> context has been lost, dropping queued work items", (id)nil);
+        MTR_LOG_ERROR("MTRAsyncWorkQueue<%@> context has been lost, dropping queued work items", (id) nil);
         [_items removeAllObjects];
         return;
     }
