@@ -143,7 +143,7 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
     certElements.ProductIdsCount = 0;
     while ((err = reader.Next(AnonymousTag())) == CHIP_NO_ERROR)
     {
-        VerifyOrReturnError(certElements.ProductIdsCount < kMaxProductIdsCount,CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(certElements.ProductIdsCount < kMaxProductIdsCount, CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(reader.Get(certElements.ProductIds[certElements.ProductIdsCount++]));
     }
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
