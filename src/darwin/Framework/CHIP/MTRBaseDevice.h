@@ -79,7 +79,12 @@ NS_ASSUME_NONNULL_BEGIN
  *                A structure-value is an NSArray object with NSDictionary objects as its elements. Each dictionary element will
  *                contain the following key values.
  *
- *                MTRContextTagKey : NSNumber object as context tag.
+ *                MTRContextTagKey : NSNumber object as context tag.  This can
+ *                                   actually be a fully-qualified profile tag,
+ *                                   but for compatibility it's using the same
+ *                                   key name.  The two types of tags can be
+ *                                   told apart by checking whether the value is
+ *                                   in the context tag range (0 <= tag <= 0xFF).
  *                MTRDataKey : Data-value NSDictionary object.
  *
  *                An array-value is an NSArray object with NSDictionary objects as its elements. Each dictionary element will
