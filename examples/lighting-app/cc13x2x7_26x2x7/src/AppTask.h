@@ -65,6 +65,7 @@ private:
     static void ActionCompleted(LightingManager::Action_t aAction);
 
     void DispatchEvent(AppEvent * event);
+    void uiInit(void);
     static void UpdateClusterState(intptr_t context);
     static void SingleButtonEventHandler(AppEvent * aEvent);
     static void ButtonTimerEventHandler(AppEvent * aEvent);

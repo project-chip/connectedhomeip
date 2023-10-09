@@ -49,7 +49,8 @@
 
 /* Constants related to the behaviour or the scheduler. */
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION 1
-#define configTICK_RATE_HZ ((TickType_t) 100000)
+//#define configTICK_RATE_HZ ((TickType_t) 100000)
+#define configTICK_RATE_HZ ((TickType_t) 10000)
 #define configUSE_PREEMPTION 1
 #define configUSE_TIME_SLICING 0
 #define configMAX_PRIORITIES (10UL)

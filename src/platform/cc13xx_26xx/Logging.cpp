@@ -50,8 +50,13 @@ extern "C" void cc13xx_26xxVLog(const char * msg, va_list v)
 #else
 
 /* log functins defined somewhere else */
-extern "C" int cc13xx_26xxLogInit(void);
-extern "C" void cc13xx_26xxVLog(const char * msg, va_list v);
+extern "C" int cc13xx_26xxLogInit(void){
+    return 0;
+}
+extern "C" void cc13xx_26xxVLog(const char * msg, va_list v)
+{
+
+}
 
 #endif // MATTER_CC13XX_26XX_PLATFORM_LOG_ENABLED
 
