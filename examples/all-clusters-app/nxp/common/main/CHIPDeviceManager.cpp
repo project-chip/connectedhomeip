@@ -29,7 +29,7 @@
 #include <setup_payload/SetupPayload.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
+#include <lib/core/ErrorStr.h>
 
 using namespace ::chip;
 

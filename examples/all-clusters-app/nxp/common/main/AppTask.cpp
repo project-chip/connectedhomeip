@@ -22,7 +22,7 @@
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
 #include "binding-handler.h"
-#include "lib/support/ErrorStr.h"
+#include "lib/core/ErrorStr.h"
 #include <app/server/Server.h>
 #include <app/server/Dnssd.h>
 #include <lib/dnssd/Advertiser.h>
