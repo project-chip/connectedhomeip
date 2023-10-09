@@ -764,11 +764,8 @@ struct LwIPEvent;
  *
  *  Defaults to enabled on Zephyr platforms that enable CONFIG_EVENTFD.
  */
-#ifndef CONFIG_EVENTFD
-#define CONFIG_EVENTFD 0
-#endif
 #ifndef CHIP_SYSTEM_CONFIG_USE_ZEPHYR_EVENTFD
-#if defined(__ZEPHYR__) && CONFIG_EVENTFD
+#if defined(__ZEPHYR__) && defined(CONFIG_EVENTFD)
 #define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_EVENTFD 1
 #else
 #define CHIP_SYSTEM_CONFIG_USE_ZEPHYR_EVENTFD 0
