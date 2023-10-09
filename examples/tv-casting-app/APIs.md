@@ -405,7 +405,7 @@ func initialize() -> MatterError {
 
 ### Discover Casting Players
 
-_{Complete Discovery examples: [Linux](linux/simple-app.cpp)}_
+_{Complete Discovery examples: [Linux](linux/simple-app-helper.cpp)}_
 
 The Casting Client discovers `CastingPlayers` using Matter Commissioner
 discovery over DNS-SD by listening for `CastingPlayer` events as they are
@@ -444,12 +444,14 @@ singleton instance. Then, call `StartDiscovery` by optionally specifying the
 `kTargetPlayerDeviceType` to filter results by.
 
 ```c
+const uint64_t kTargetPlayerDeviceType = 35; // 35 represents device type of Matter Video Player
+...
+...
 DiscoveryDelegateImpl delegate;
 CastingPlayerDiscovery::GetInstance()->SetDelegate(&delegate);
 VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
                     ChipLogError(AppServer, "CastingPlayerDiscovery::SetDelegate failed %" CHIP_ERROR_FORMAT, err.Format()));
 
-const uint64_t kTargetPlayerDeviceType = 35; // 35 represents device type of Matter Video Player
 err = CastingPlayerDiscovery::GetInstance()->StartDiscovery(kTargetPlayerDeviceType);
 VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
                     ChipLogError(AppServer, "CastingPlayerDiscovery::StartDiscovery failed %" CHIP_ERROR_FORMAT, err.Format()));
@@ -458,6 +460,35 @@ chip::DeviceLayer::PlatformMgr().RunEventLoop();
 ```
 
 ### Connect to a Casting Player
+
+_{Complete Connection examples: [Linux](linux/simple-app-helper.cpp)}_
+
+Each `CastingPlayer` object created during
+[Discovery](#discover-casting-players) contains information such as
+`deviceName`, `vendorId`, `productId`, etc. which can help the user pick the
+right `CastingPlayer`. A Casting Client can attempt to connect to the
+`selectedCastingPlayer` using
+[Matter User Directed Commissioning (UDC)](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/rendezvous/UserDirectedCommissioning.adoc).
+The Matter TV Casting library locally caches information required to reconnect
+to a `CastingPlayer`, once the Casting client has been commissioned by it. After
+that, the Casting client is able to skip the full UDC process by establishing
+CASE with the `CastingPlayer` directly. Once connected, the `CastingPlayer`
+object will contain the list of available Endpoints on that `CastingPlayer`.
+
+On Linux, the Casting Client can connect to a `CastingPlayer` by successfully
+calling `VerifyOrEstablishConnection` on it.
+
+```c
+void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * castingPlayer)
+{
+    ChipLogProgress(AppServer, "ConnectionHandler called with %" CHIP_ERROR_FORMAT, err.Format());
+}
+
+...
+// targetCastingPlayer is a discovered CastingPlayer
+targetCastingPlayer->VerifyOrEstablishConnection(ConnectionHandler);
+...
+```
 
 ### Select an Endpoint on the Casting Player
 
