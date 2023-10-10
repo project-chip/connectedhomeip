@@ -104,7 +104,7 @@ tests:
               contains: [6]
 
     - label:
-          "Step 4e: Read optionnal attribute(FabricSceneInfo) in AttributeList
+          "Step 4e: Read optional attribute(FabricSceneInfo) in AttributeList
           (global attribute 65531)"
       PICS: S.S.F03
       command: "readAttribute"
