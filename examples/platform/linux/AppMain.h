@@ -88,11 +88,6 @@ public:
  */
 void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl = nullptr);
 
-// This function supports initializing the Network Commissioning cluster for the
-// Linux app that does not call ChipLinuxAppMainLoop. This function should be
-// called before calling the ApplicationInit function.
-void ChipLinuxAppInitNetworkCommissioning();
-
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 using chip::Controller::DeviceCommissioner;

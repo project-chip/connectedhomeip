@@ -177,9 +177,8 @@ void EnableWiFiNetworkCommissioning(EndpointId endpoint)
     sWiFiNetworkCommissioningInstance.Value().Init();
 #endif // CHIP_APP_MAIN_HAS_WIFI_DRIVER
 }
-} // anonymous namespace
 
-void ChipLinuxAppInitNetworkCommissioning()
+void InitNetworkCommissioning()
 {
     if (sSecondaryNetworkCommissioningEndpoint.HasValue())
     {
@@ -233,6 +232,7 @@ void ChipLinuxAppInitNetworkCommissioning()
 #endif // CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
     }
 }
+} // anonymous namespace
 
 #if defined(ENABLE_CHIP_SHELL)
 using chip::Shell::Engine;
@@ -582,7 +582,7 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #endif // defined(ENABLE_CHIP_SHELL)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
-    ChipLinuxAppInitNetworkCommissioning();
+    InitNetworkCommissioning();
 
     ApplicationInit();
 
