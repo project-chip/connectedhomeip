@@ -215,45 +215,12 @@ public:
     bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
 
     /**
-     * Notifies the exchange that our consummer is going to send a message where it knows the peer (receiver) should be active
+     * Tracks if we have received at least one application level message
+     * during the life-time of this exchange
      *
-     * This API is used to set the IsPeerLikelyActiveHint flag.
-     * The IsPeerLikelyActiveHint flag allows the consummer of the exchange to notify the exchange that the peer (receiver)
-     * will be active for the next message the consummer will send.
-     * This allows the consummer to notify the exchange on the state of the peer with the context of the messages being sent.
-     *
-     * The IsPeerLikelyActiveHint flag is only used when calculating the next retransmission time in the ReliableMessageMgr.
-     * If the IsPeerLikelyActiveHint flag is true, we will used the Active Retransmission timeout when calculating the next
-     * retransmission time. If the IsPeerLikelyActiveHint flag is false, we will rely on other information to determine which
-     * retransmission timeout should be used. See the IsPeerLikelyActiveHint API for the alternative means to determine if the Peer
-     * (receiver) is active.
-     *
-     * The first message of the exchange set as the initiator should never have the IsPeerLikelyActiveHint flag to true.
-     * The API should only be called after receiving a message from the peer and after calling the WillSendMessage API.
-     * The next message sent will then use the active retransmission time out.
-     * The flag is reset to false each time we receive the response from our peer (receiver).
-     * As such, the API needs to be called each time we send another message over the exchange.
-     *
-     * The API call is not mandatory for the communication to be successful.
-     * If the call is not done, we will rely on information within the exchange context.
-     *
-     * @param IsPeerLikelyActiveHint true if the peer should be active, false if we don't know or it should not be
+     * @return Returns 'true' if we have received at least one message, else 'false'
      */
-    void SetPeerActiveStateHint(bool IsPeerLikelyActiveHint) { mFlags.Set(Flags::kPeerShouldBeActive, IsPeerLikelyActiveHint); }
-
-    /**
-     * Function checks with information available in the ExchangeContext if the peer should be active or not
-     * API should only be used when we are determining if we need to use the Active or Idle retransmission timeout
-     *
-     * If we are not initiator                          -> peer is active
-     * If ephemeral context                             -> peer is active
-     * else we default to information provided by the consummer
-     *
-     * @return true Based on available information, Peer should be active
-     * @return false We weren't able to determine if the peer is active.
-     *               We don't know in which state the peer is.
-     */
-    bool IsPeerLikelyActiveHint();
+    inline bool HasReceivedAtLeastOneMessage() { return mFlags.Has(Flags::kFlagReceivedAtLeastOneMessage); }
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     SessionHolder & GetSessionHolder() { return mSession; }
@@ -337,19 +304,15 @@ private:
 
     // If SetAutoReleaseSession() is called, this exchange must be using a SecureSession, and should
     // evict it when the exchange is done with all its work (including any MRP traffic).
-    inline void SetIgnoreSessionRelease(bool ignore);
-    inline bool ShouldIgnoreSessionRelease();
+    inline void SetIgnoreSessionRelease(bool ignore) { mFlags.Set(Flags::kFlagIgnoreSessionRelease, ignore); }
+
+    inline bool ShouldIgnoreSessionRelease() { return mFlags.Has(Flags::kFlagIgnoreSessionRelease); }
+
+    inline void SetHasReceivedAtLeastOneMessage(bool hasReceivedMessage)
+    {
+        mFlags.Set(Flags::kFlagReceivedAtLeastOneMessage, hasReceivedMessage);
+    }
 };
-
-inline void ExchangeContext::SetIgnoreSessionRelease(bool ignore)
-{
-    mFlags.Set(Flags::kFlagIgnoreSessionRelease, ignore);
-}
-
-inline bool ExchangeContext::ShouldIgnoreSessionRelease()
-{
-    return mFlags.Has(Flags::kFlagIgnoreSessionRelease);
-}
 
 } // namespace Messaging
 } // namespace chip

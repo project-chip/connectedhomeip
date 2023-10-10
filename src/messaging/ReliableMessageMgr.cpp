@@ -454,14 +454,15 @@ void ReliableMessageMgr::CalculateNextRetransTime(RetransTableEntry & entry)
 {
     System::Clock::Timestamp baseTimeout = System::Clock::Milliseconds64(0);
 
-    if (entry.ec->IsPeerLikelyActiveHint())
+    // Check if we have received at least one application-level message
+    if (entry.ec->HasReceivedAtLeastOneMessage())
     {
-        // If we know the peer is active with the exchangeContext, use the Active Retrans timeout
+        // If we have received at least one message, assume peer is active and use ActiveRetransTimeout
         baseTimeout = entry.ec->GetSessionHandle()->GetRemoteMRPConfig().mActiveRetransTimeout;
     }
     else
     {
-        // If the exchange context doesn't know if the peer is active or not.
+        // If we haven't received at least one message
         // Choose active/idle timeout from PeerActiveMode of session per 4.11.2.1. Retransmissions.
         baseTimeout = entry.ec->GetSessionHandle()->GetMRPBaseTimeout();
     }

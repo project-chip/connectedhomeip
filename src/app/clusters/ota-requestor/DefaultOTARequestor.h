@@ -165,7 +165,6 @@ private:
             if (!payloadHeader.HasMessageType(chip::Protocols::SecureChannel::MsgType::StatusReport))
             {
                 ec->WillSendMessage();
-                ec->SetPeerActiveStateHint(true);
             }
 
             return CHIP_NO_ERROR;

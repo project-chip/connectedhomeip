@@ -514,14 +514,6 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
     // layer has completed its work on the ExchangeContext.
     ExchangeHandle ref(*this);
 
-    // If we receive a message while we are expecting a response for our previous message,
-    // we assume that the peer is likely active, since it has not sent us that response yet and hence
-    // still has an active exchange corresponding to this one.  If this message is in fact the response,
-    // the flag will be reset to false when we process the message later in the function.
-    // If we receive a message while we are not expecting a response,
-    // we reset the flag to false because we don't know whether the peer should still be active or not.
-    SetPeerActiveStateHint(IsResponseExpected());
-
     bool isStandaloneAck = payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck);
     bool isDuplicate     = msgFlags.Has(MessageFlagValues::kDuplicateMessage);
 
@@ -597,6 +589,9 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
     app::ICDNotifier::GetInstance().BroadcastNetworkActivityNotification();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
+    // Set kFlagReceivedAtLeastOneMessage to true since we have received at least one new application level message
+    SetHasReceivedAtLeastOneMessage(true);
+
     if (IsResponseExpected())
     {
         // Since we got the response, cancel the response timer.
@@ -605,9 +600,6 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         // If the context was expecting a response to a previously sent message, this message
         // is implicitly that response.
         SetResponseExpected(false);
-
-        // If we received the expected response, we don't if the peer is still active after having sent the response
-        SetPeerActiveStateHint(false);
     }
 
     // Don't send messages on to our delegate if our dispatch does not allow
@@ -667,22 +659,6 @@ void ExchangeContext::ExchangeSessionHolder::GrabExpiredSession(const SessionHan
 {
     VerifyOrDie(session->AsSecureSession()->IsPendingEviction());
     GrabUnchecked(session);
-}
-
-bool ExchangeContext::IsPeerLikelyActiveHint()
-{
-    // If we are not the initiator, it means the peer sent the first message.
-    // This means our peer is active if we are sending a message to them.
-    if (!IsInitiator())
-        return true;
-
-    // If we create an Ephemeral Exchange, it was just to generate a StandaloneAck.
-    // Since we are sending an ack, we know the peer is active.
-    if (IsEphemeralExchange())
-        return true;
-
-    // Return previously stored state if we have no absolute answer.
-    return mFlags.Has(Flags::kPeerShouldBeActive);
 }
 
 } // namespace Messaging

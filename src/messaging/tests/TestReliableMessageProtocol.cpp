@@ -1620,7 +1620,7 @@ void TestReliableMessageProtocol::CheckIsPeerActiveNotInitiator(nlTestSuite * in
     mockReceiver.mRetainExchange = true;
     mockSender.mRetainExchange   = true;
 
-    NL_TEST_ASSERT(inSuite, !exchange->IsPeerLikelyActiveHint());
+    NL_TEST_ASSERT(inSuite, !exchange->HasReceivedAtLeastOneMessage());
 
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendFlags(SendMessageFlags::kExpectResponse));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -1635,7 +1635,7 @@ void TestReliableMessageProtocol::CheckIsPeerActiveNotInitiator(nlTestSuite * in
     ctx.GetIOContext().DriveIOUntil(500_ms32, [&] { return loopback.mSentMessageCount >= 1; });
     ctx.DrainAndServiceIO();
 
-    NL_TEST_ASSERT(inSuite, !exchange->IsPeerLikelyActiveHint());
+    NL_TEST_ASSERT(inSuite, !exchange->HasReceivedAtLeastOneMessage());
 
     // // Make sure nothing happened
     NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == 1);
@@ -1645,15 +1645,15 @@ void TestReliableMessageProtocol::CheckIsPeerActiveNotInitiator(nlTestSuite * in
     ctx.GetIOContext().DriveIOUntil(2000_ms32, [&] { return loopback.mSentMessageCount >= 2; });
     ctx.DrainAndServiceIO();
 
-    NL_TEST_ASSERT(inSuite, !exchange->IsPeerLikelyActiveHint());
+    NL_TEST_ASSERT(inSuite, !exchange->HasReceivedAtLeastOneMessage());
 
     // // Make sure nothing happened
     NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == 2);
     NL_TEST_ASSERT(inSuite, mockReceiver.IsOnMessageReceivedCalled);
 
     // // Verify that the receiver considers the sender is active
-    NL_TEST_ASSERT(inSuite, !exchange->IsPeerLikelyActiveHint());
-    NL_TEST_ASSERT(inSuite, mockReceiver.mExchange->IsPeerLikelyActiveHint());
+    NL_TEST_ASSERT(inSuite, !exchange->HasReceivedAtLeastOneMessage());
+    NL_TEST_ASSERT(inSuite, mockReceiver.mExchange->HasReceivedAtLeastOneMessage());
 
     mockReceiver.mExchange->GetSessionHandle()->AsSecureSession()->SetRemoteMRPConfig({
         1000_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
@@ -2182,7 +2182,8 @@ const nlTest sTests[] = {
                 TestReliableMessageProtocol::CheckLostStandaloneAck),
     NL_TEST_DEF("Test Is Peer Active Retry logic", TestReliableMessageProtocol::CheckIsPeerActiveNotInitiator),
     NL_TEST_DEF("Test MRP backoff algorithm", TestReliableMessageProtocol::CheckGetBackoff),
-    NL_TEST_DEF("Test an application response that comes after MRP retransmits run out", TestReliableMessageProtocol::CheckApplicationResponseDelayed),
+    NL_TEST_DEF("Test an application response that comes after MRP retransmits run out",
+                TestReliableMessageProtocol::CheckApplicationResponseDelayed),
     NL_TEST_DEF("Test an application response that never comes, so MRP retransmits run out and then exchange times out",
                 TestReliableMessageProtocol::CheckApplicationResponseNeverComes),
     NL_TEST_SENTINEL(),

@@ -172,9 +172,11 @@ protected:
         /// When set, ignore session being released, because we are releasing it ourselves.
         kFlagIgnoreSessionRelease = (1u << 9),
 
-        // When set, sender knows that the peer (receiver) should currently be active
-        // When bit is not set, we don't know if the peer (receiver) is active or not
-        kPeerShouldBeActive = (1u << 10),
+        // This flag is used to determine if the peer (receiver) should be active or not
+        // When set, sender knows it has received at least one application-level message
+        // from the peer and can assume the peer (receiver) is active
+        // If the flag is not set, we don't know if the peer (receiver) is active or not
+        kFlagReceivedAtLeastOneMessage = (1u << 10),
 
         /// When set:
         ///
