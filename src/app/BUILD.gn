@@ -238,7 +238,7 @@ static_library("app") {
     ":app_config",
     "${chip_root}/src/access",
     "${chip_root}/src/app/icd:notifier",
-    "${chip_root}/src/app/icd:observer-srcs",
+    "${chip_root}/src/app/icd:observer",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
@@ -248,7 +248,7 @@ static_library("app") {
   ]
 
   if (chip_enable_icd_server) {
-    public_deps += [ "${chip_root}/src/app/icd:manager-srcs" ]
+    public_deps += [ "${chip_root}/src/app/icd:manager" ]
   }
 
   cflags = [ "-Wconversion" ]
