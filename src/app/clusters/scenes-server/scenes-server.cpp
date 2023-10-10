@@ -115,23 +115,25 @@ CHIP_ERROR ScenesServer::Init()
 
     for (auto endpoint : EnabledEndpointsWithServerCluster(Id))
     {
-        uint32_t featureMap;
+        uint32_t featureMap  = 0;
         EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
+        if (EMBER_ZCL_STATUS_SUCCESS == status)
+        {
+            // Setting NameSupport attribute value to 0x80 if the feature bit is set
+            //  The bit of 7 (0x80) the NameSupport attribute indicates whether or not scene names are supported
+            //
+            //  According to spec, bit 7 (Scene Names) MUST match feature bit 0 (Scene Names)
+            uint8_t nameSupport =
+                (featureMap & to_underlying(Feature::kSceneNames)) ? static_cast<uint8_t>(0x80) : static_cast<uint8_t>(0x00);
+            status = Attributes::NameSupport::Set(endpoint, nameSupport);
+            if (EMBER_ZCL_STATUS_SUCCESS != status)
+            {
+                ChipLogDetail(Zcl, "ERR: setting NameSupport on Endpoint %hu Status: %x", endpoint, status);
+            }
+        }
+        else
         {
             ChipLogDetail(Zcl, "ERR: getting the scenes FeatureMap on Endpoint %hu Status: %x", endpoint, status);
-        }
-
-        // Setting NameSupport attribute value to 0x80 if the feature bit is set
-        //  The bit of 7 the NameSupport attribute indicates whether or not scene names are supported
-        //
-        //  According to spec, bit 7 (Scene Names) MUST match feature bit 0 (Scene Names)
-        uint8_t nameSupport =
-            (featureMap & to_underlying(Feature::kSceneNames)) ? static_cast<uint8_t>(0x80) : static_cast<uint8_t>(0x00);
-        status = Attributes::NameSupport::Set(endpoint, nameSupport);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
-        {
-            ChipLogDetail(Zcl, "ERR: setting NameSupport on Endpoint %hu Status: %x", endpoint, status);
         }
 
         // Forcing matter mandatory features on
