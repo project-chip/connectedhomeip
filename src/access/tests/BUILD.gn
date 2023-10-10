@@ -18,12 +18,17 @@ import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
-chip_test_suite_using_nltest("tests") {
+chip_test_suite("tests") {
   output_name = "libaccesstest"
-
   test_sources = [ "TestAccessControl.cpp" ]
 
-  cflags = [ "-Wconversion" ]
+  cflags = [
+    "-Wconversion",
+
+    # TODO: Fix compilation warnings and remove this
+    "-Wno-error=undef",
+    "-Wno-error=sign-compare",
+  ]
 
   public_deps = [
     "${chip_root}/src/access",
