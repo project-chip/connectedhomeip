@@ -49,6 +49,8 @@ public:
     CHIP_ERROR SendBluezIndication(chip::System::PacketBufferHandle apBuf);
     CHIP_ERROR CloseBluezConnection();
 
+    uint16_t GetMTU() const { return mMtu; }
+
     /// Write to the CHIP RX characteristic on the remote peripheral device
     CHIP_ERROR BluezSendWriteRequest(chip::System::PacketBufferHandle apBuf);
     /// Subscribe to the CHIP TX characteristic on the remote peripheral device

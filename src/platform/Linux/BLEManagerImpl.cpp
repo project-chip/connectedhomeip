@@ -344,9 +344,12 @@ exit:
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {
-    VerifyOrReturnValue(conId != BLE_CONNECTION_UNINITIALIZED, 0,
-                        ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
-    return conId->mMtu;
+    uint16_t mtu = 0;
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
+    mtu = conId->GetMTU();
+exit:
+    return mtu;
 }
 
 bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
