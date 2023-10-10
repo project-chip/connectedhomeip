@@ -33,6 +33,7 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ColorControl;
 using chip::Protocols::InteractionModel::Status;
+using chip::app::Clusters::ColorControl::EnhancedColorModeEnum;
 
 #ifdef EMBER_AF_PLUGIN_SCENES
 class DefaultColorControlSceneHandler : public scenes::DefaultSceneHandlerImpl
@@ -151,7 +152,7 @@ public:
         uint8_t modeValue;
         if (EMBER_ZCL_STATUS_SUCCESS != Attributes::EnhancedColorMode::Get(endpoint, &modeValue))
         {
-            modeValue = ColorControlServer::ColorMode::COLOR_MODE_CIE_XY; // Default mode value according to spec
+            modeValue = to_underlying(ColorControl::EnhancedColorModeEnum::kCurrentXAndCurrentY); // Default mode value according to spec
         }
         AddAttributeValuePair(pairs, Attributes::EnhancedColorMode::Id, modeValue, attributeCount);
 
@@ -198,7 +199,7 @@ public:
 #endif
 
         // Initialize action attributes to default values in case they are not in the scene
-        EnahncedColorModeEnum targetEnhancedColorMode = EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation;
+        EnhancedColorModeEnum targetEnhancedColorMode = EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation;
         uint8_t loopActiveValue    = 0x00;
         uint8_t loopDirectionValue = 0x00;
         uint16_t loopTimeValue     = 0x0019; // Default loop time value according to spec
@@ -254,7 +255,7 @@ public:
                 }
                 break;
             case Attributes::EnhancedColorMode::Id:
-                if (decodePair.attributeValue <= static_cast<uint8_t>(ColorControlServer::ColorMode::COLOR_MODE_EHSV))
+                if (decodePair.attributeValue <= to_underlying(EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation))
                 {
                     targetEnhancedColorMode = static_cast<EnhancedColorModeEnum>(decodePair.attributeValue);
                 }
@@ -269,8 +270,6 @@ public:
         // Switch to the mode saved in the scene
         if (SupportsColorMode(endpoint, targetEnhancedColorMode))
         {
-            // TODO: this seems buggy: how do we know in SupportsColorMode and handleModeSwitch
-            //       if the color mode is "ColorMode" or "EnhancedColorMode"
             ColorControlServer::Instance().handleModeSwitch(endpoint, targetEnhancedColorMode);
         }
         else
@@ -291,27 +290,27 @@ public:
         else
         {
             // Execute movement to value depending on the mode in the saved scene
-            switch (targetColorMode)
+            switch (targetEnhancedColorMode)
             {
-            case ColorControlServer::ColorMode::COLOR_MODE_HSV:
+            case EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation:
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
                 ColorControlServer::Instance().moveToSaturation(static_cast<uint8_t>(colorSaturationTransitionState->finalValue),
                                                                 transitionTime10th, endpoint);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
                 break;
-            case ColorControlServer::ColorMode::COLOR_MODE_CIE_XY:
+            case EnhancedColorModeEnum::kCurrentXAndCurrentY:
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
                 ColorControlServer::Instance().moveToColor(colorXTransitionState->finalValue, colorYTransitionState->finalValue,
                                                            transitionTime10th, endpoint);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
                 break;
-            case ColorControlServer::ColorMode::COLOR_MODE_TEMPERATURE:
+            case EnhancedColorModeEnum::kColorTemperature:
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
                 ColorControlServer::Instance().moveToColorTemp(
                     endpoint, static_cast<uint16_t>(colorTempTransitionState->finalValue), transitionTime10th);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
                 break;
-            case ColorControlServer::ColorMode::COLOR_MODE_EHSV:
+            case EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation:
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
                 ColorControlServer::Instance().moveToHueAndSaturation(
                     colorHueTransitionState->finalEnhancedHue, static_cast<uint8_t>(colorSaturationTransitionState->finalValue),
@@ -531,27 +530,27 @@ bool ColorControlServer::shouldExecuteIfOff(EndpointId endpoint, uint8_t optionM
  * @param endpoint
  * @param newColorMode
  */
-void ColorControlServer::handleModeSwitch(EndpointId endpoint, uint8_t newColorMode)
+void ColorControlServer::handleModeSwitch(EndpointId endpoint, EnhancedColorModeEnum newColorMode)
 {
     uint8_t oldColorMode = 0;
     Attributes::ColorMode::Get(endpoint, &oldColorMode);
 
     uint8_t colorModeTransition;
 
-    if (oldColorMode == newColorMode)
+    if (oldColorMode == to_underlying(newColorMode))
     {
         return;
     }
 
-    Attributes::EnhancedColorMode::Set(endpoint, newColorMode);
-    if (newColorMode == ColorControlServer::ColorMode::COLOR_MODE_EHSV)
+    Attributes::EnhancedColorMode::Set(endpoint, to_underlying(newColorMode));
+    if (newColorMode == EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation)
     {
         // Transpose COLOR_MODE_EHSV to COLOR_MODE_HSV after setting EnhancedColorMode
-        newColorMode = ColorControlServer::ColorMode::COLOR_MODE_HSV;
+        newColorMode = EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation;
     }
-    Attributes::ColorMode::Set(endpoint, newColorMode);
+    Attributes::ColorMode::Set(endpoint, to_underlying(newColorMode));
 
-    colorModeTransition = static_cast<uint8_t>((newColorMode << 4) + oldColorMode);
+    colorModeTransition = static_cast<uint8_t>((to_underlying(newColorMode) << 4) + oldColorMode);
 
     // Note:  It may be OK to not do anything here.
     switch (colorModeTransition)
@@ -1202,7 +1201,7 @@ Status ColorControlServer::moveToSaturation(uint8_t saturation, uint16_t transit
     stopAllColorTransitions(endpoint);
 
     // Handle color mode transition, if necessary.
-    handleModeSwitch(endpoint, COLOR_MODE_HSV);
+    handleModeSwitch(endpoint, EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
 
     // now, kick off the state machine.
     initSaturationTransitionState(endpoint, colorSaturationTransitionState);
@@ -1253,11 +1252,11 @@ Status ColorControlServer::moveToHueAndSaturation(uint16_t hue, uint8_t saturati
     // Handle color mode transition, if necessary.
     if (isEnhanced)
     {
-        handleModeSwitch(endpoint, ColorMode::COLOR_MODE_EHSV);
+        handleModeSwitch(endpoint, EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
     }
     else
     {
-        handleModeSwitch(endpoint, ColorMode::COLOR_MODE_HSV);
+        handleModeSwitch(endpoint, EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
     }
 
     // now, kick off the state machine.
@@ -1361,11 +1360,11 @@ bool ColorControlServer::moveHueCommand(app::CommandHandler * commandObj, const 
     // Handle color mode transition, if necessary.
     if (isEnhanced)
     {
-        handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_EHSV);
+        handleModeSwitch(endpoint, EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
     }
     else
     {
-        handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_HSV);
+        handleModeSwitch(endpoint, EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
     }
 
     if (moveMode == HueMoveMode::kUp)
@@ -1508,11 +1507,11 @@ bool ColorControlServer::moveToHueCommand(app::CommandHandler * commandObj, cons
     // Handle color mode transition, if necessary.
     if (isEnhanced)
     {
-        handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_EHSV);
+        handleModeSwitch(endpoint, EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
     }
     else
     {
-        handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_HSV);
+        handleModeSwitch(endpoint, EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
     }
 
     // now, kick off the state machine.
@@ -1629,11 +1628,11 @@ bool ColorControlServer::stepHueCommand(app::CommandHandler * commandObj, const 
     // Handle color mode transition, if necessary.
     if (isEnhanced)
     {
-        handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_EHSV);
+        handleModeSwitch(endpoint, EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation);
     }
     else
     {
-        handleModeSwitch(endpoint, ColorControlServer::ColorMode::COLOR_MODE_HSV);
+        handleModeSwitch(endpoint, EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
     }
 
     // now, kick off the state machine.
@@ -1727,7 +1726,7 @@ bool ColorControlServer::moveSaturationCommand(app::CommandHandler * commandObj,
     }
 
     // Handle color mode transition, if necessary.
-    handleModeSwitch(endpoint, COLOR_MODE_HSV);
+    handleModeSwitch(endpoint, EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
 
     if (moveMode == SaturationMoveMode::kUp)
     {
@@ -1822,7 +1821,7 @@ bool ColorControlServer::stepSaturationCommand(app::CommandHandler * commandObj,
     stopAllColorTransitions(endpoint);
 
     // Handle color mode transition, if necessary.
-    handleModeSwitch(endpoint, COLOR_MODE_HSV);
+    handleModeSwitch(endpoint, EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation);
 
     // now, kick off the state machine.
     initSaturationTransitionState(endpoint, colorSaturationTransitionState);
@@ -2135,7 +2134,7 @@ Status ColorControlServer::moveToColor(uint16_t colorX, uint16_t colorY, uint16_
     stopAllColorTransitions(endpoint);
 
     // Handle color mode transition, if necessary.
-    handleModeSwitch(endpoint, ColorMode::COLOR_MODE_CIE_XY);
+    handleModeSwitch(endpoint, EnhancedColorModeEnum::kCurrentXAndCurrentY);
 
     // now, kick off the state machine.
     Attributes::CurrentX::Get(endpoint, &(colorXTransitionState->initialValue));
@@ -2218,7 +2217,7 @@ bool ColorControlServer::moveColorCommand(app::CommandHandler * commandObj, cons
     }
 
     // Handle color mode transition, if necessary.
-    handleModeSwitch(endpoint, COLOR_MODE_CIE_XY);
+    handleModeSwitch(endpoint, EnhancedColorModeEnum::kCurrentXAndCurrentY);
 
     // now, kick off the state machine.
     Attributes::CurrentX::Get(endpoint, &(colorXTransitionState->initialValue));
@@ -2316,7 +2315,7 @@ bool ColorControlServer::stepColorCommand(app::CommandHandler * commandObj, cons
     stopAllColorTransitions(endpoint);
 
     // Handle color mode transition, if necessary.
-    handleModeSwitch(endpoint, COLOR_MODE_CIE_XY);
+    handleModeSwitch(endpoint, EnhancedColorModeEnum::kCurrentXAndCurrentY);
 
     // now, kick off the state machine.
     colorXTransitionState->initialValue   = currentColorX;
@@ -2432,7 +2431,7 @@ Status ColorControlServer::moveToColorTemp(EndpointId aEndpoint, uint16_t colorT
     stopAllColorTransitions(endpoint);
 
     // Handle color mode transition, if necessary.
-    handleModeSwitch(endpoint, COLOR_MODE_TEMPERATURE);
+    handleModeSwitch(endpoint, EnhancedColorModeEnum::kColorTemperature);
 
     if (colorTemperature < temperatureMin)
     {
@@ -2646,7 +2645,7 @@ bool ColorControlServer::moveColorTempCommand(app::CommandHandler * commandObj, 
     }
 
     // Handle color mode transition, if necessary.
-    handleModeSwitch(endpoint, COLOR_MODE_TEMPERATURE);
+    handleModeSwitch(endpoint, EnhancedColorModeEnum::kColorTemperature);
 
     // now, kick off the state machine.
     colorTempTransitionState->initialValue = 0;
@@ -2757,7 +2756,7 @@ bool ColorControlServer::stepColorTempCommand(app::CommandHandler * commandObj, 
     }
 
     // Handle color mode transition, if necessary.
-    handleModeSwitch(endpoint, COLOR_MODE_TEMPERATURE);
+    handleModeSwitch(endpoint, EnhancedColorModeEnum::kColorTemperature);
 
     // now, kick off the state machine.
     colorTempTransitionState->initialValue = 0;
@@ -2846,7 +2845,7 @@ void ColorControlServer::levelControlColorTempChangeCommand(EndpointId endpoint)
     uint8_t colorMode = 0;
     Attributes::ColorMode::Get(endpoint, &colorMode);
 
-    if (colorMode == COLOR_MODE_TEMPERATURE)
+    if (colorMode == to_underlying(EnhancedColorModeEnum::kColorTemperature))
     {
         app::DataModel::Nullable<uint8_t> currentLevel;
         EmberAfStatus status = LevelControl::Attributes::CurrentLevel::Get(endpoint, currentLevel);

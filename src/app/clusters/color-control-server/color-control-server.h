@@ -71,14 +71,6 @@ public:
     using HueDirection = chip::app::Clusters::ColorControl::HueDirection;
     using Feature      = chip::app::Clusters::ColorControl::Feature;
 
-    enum ColorMode
-    {
-        COLOR_MODE_HSV         = 0x00,
-        COLOR_MODE_CIE_XY      = 0x01,
-        COLOR_MODE_TEMPERATURE = 0x02,
-        COLOR_MODE_EHSV        = 0x03
-    };
-
     enum Conversion
     {
         HSV_TO_HSV                 = 0x00,
@@ -196,7 +188,7 @@ private:
 
     ColorControlServer() {}
     bool shouldExecuteIfOff(chip::EndpointId endpoint, uint8_t optionMask, uint8_t optionOverride);
-    void handleModeSwitch(chip::EndpointId endpoint, uint8_t newColorMode);
+    void handleModeSwitch(chip::EndpointId endpoint, chip::app::Clusters::ColorControl::EnhancedColorModeEnum newColorMode);
     uint16_t computeTransitionTimeFromStateAndRate(Color16uTransitionState * p, uint16_t rate);
     EmberEventControl * getEventControl(chip::EndpointId endpoint);
     void computePwmFromHsv(chip::EndpointId endpoint);
