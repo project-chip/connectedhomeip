@@ -71,7 +71,7 @@ enum CommissioningStage : uint8_t
     kNeedsNetworkCreds,
 };
 
-enum ICDRegistrationStrategy
+enum ICDRegistrationStrategy : uint8_t
 {
     kIgnore,         ///< Do not check whether the device is an ICD during commissioning
     kBeforeComplete, ///< Do commissioner self-registration or external controller registration,
