@@ -2734,20 +2734,20 @@ server cluster TemperatureControl = 86 {
 
 /** Attributes and commands for configuring the Refrigerator alarm. */
 server cluster RefrigeratorAlarm = 87 {
-  bitmap AlarmMap : BITMAP32 {
+  bitmap AlarmBitmap : BITMAP32 {
     kDoorOpen = 0x1;
   }
 
   info event Notify = 0 {
-    AlarmMap active = 0;
-    AlarmMap inactive = 1;
-    AlarmMap state = 2;
-    AlarmMap mask = 3;
+    AlarmBitmap active = 0;
+    AlarmBitmap inactive = 1;
+    AlarmBitmap state = 2;
+    AlarmBitmap mask = 3;
   }
 
-  readonly attribute AlarmMap mask = 0;
-  readonly attribute AlarmMap state = 2;
-  readonly attribute AlarmMap supported = 3;
+  readonly attribute AlarmBitmap mask = 0;
+  readonly attribute AlarmBitmap state = 2;
+  readonly attribute AlarmBitmap supported = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2941,7 +2941,7 @@ server cluster SmokeCoAlarm = 92 {
 
 /** Attributes and commands for configuring the Dishwasher alarm. */
 server cluster DishwasherAlarm = 93 {
-  bitmap AlarmMap : BITMAP32 {
+  bitmap AlarmBitmap : BITMAP32 {
     kInflowError = 0x1;
     kDrainError = 0x2;
     kDoorError = 0x4;
@@ -2955,16 +2955,16 @@ server cluster DishwasherAlarm = 93 {
   }
 
   info event Notify = 0 {
-    AlarmMap active = 0;
-    AlarmMap inactive = 1;
-    AlarmMap state = 2;
-    AlarmMap mask = 3;
+    AlarmBitmap active = 0;
+    AlarmBitmap inactive = 1;
+    AlarmBitmap state = 2;
+    AlarmBitmap mask = 3;
   }
 
-  readonly attribute AlarmMap mask = 0;
-  readonly attribute AlarmMap latch = 1;
-  readonly attribute AlarmMap state = 2;
-  readonly attribute AlarmMap supported = 3;
+  readonly attribute AlarmBitmap mask = 0;
+  readonly attribute AlarmBitmap latch = 1;
+  readonly attribute AlarmBitmap state = 2;
+  readonly attribute AlarmBitmap supported = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2973,11 +2973,11 @@ server cluster DishwasherAlarm = 93 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct ResetRequest {
-    AlarmMap alarms = 0;
+    AlarmBitmap alarms = 0;
   }
 
   request struct ModifyEnabledAlarmsRequest {
-    AlarmMap mask = 0;
+    AlarmBitmap mask = 0;
   }
 
   command Reset(ResetRequest): DefaultSuccess = 0;
@@ -6311,7 +6311,7 @@ endpoint 0 {
     callback attribute currentHeapFree default = 0x0000000000000000;
     callback attribute currentHeapUsed default = 0x0000000000000000;
     callback attribute currentHeapHighWatermark default = 0x0000000000000000;
-    ram      attribute featureMap default = 1;
+    callback attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6479,8 +6479,8 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision default = 1;
   }
 
   server cluster FixedLabel {
@@ -6712,7 +6712,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6724,7 +6724,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6749,7 +6749,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6761,7 +6761,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6795,7 +6795,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6804,7 +6804,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6892,7 +6892,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 7;
+    callback attribute featureMap default = 7;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6906,7 +6906,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 7;
+    callback attribute featureMap default = 7;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -7211,7 +7211,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7230,7 +7230,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7249,7 +7249,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7268,7 +7268,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7287,7 +7287,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7306,7 +7306,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7325,7 +7325,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7344,7 +7344,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7363,7 +7363,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7382,7 +7382,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 

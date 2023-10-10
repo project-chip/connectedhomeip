@@ -1651,8 +1651,8 @@ enum class Feature : uint32_t
 
 namespace RefrigeratorAlarm {
 
-// Bitmap for AlarmMap
-enum class AlarmMap : uint32_t
+// Bitmap for AlarmBitmap
+enum class AlarmBitmap : uint32_t
 {
     kDoorOpen = 0x1,
 };
@@ -1804,8 +1804,8 @@ enum class Feature : uint32_t
 
 namespace DishwasherAlarm {
 
-// Bitmap for AlarmMap
-enum class AlarmMap : uint32_t
+// Bitmap for AlarmBitmap
+enum class AlarmBitmap : uint32_t
 {
     kInflowError     = 0x1,
     kDrainError      = 0x2,

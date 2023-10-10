@@ -7642,9 +7642,9 @@ namespace Attributes {
 
 namespace Mask {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> * value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::RefrigeratorAlarm::Id, Id, readable, sizeof(temp));
@@ -7656,9 +7656,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -7673,9 +7673,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
 
 namespace State {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> * value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::RefrigeratorAlarm::Id, Id, readable, sizeof(temp));
@@ -7687,9 +7687,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -7704,9 +7704,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
 
 namespace Supported {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> * value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::RefrigeratorAlarm::Id, Id, readable, sizeof(temp));
@@ -7718,9 +7718,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -8410,9 +8410,9 @@ namespace Attributes {
 
 namespace Mask {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> * value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, readable, sizeof(temp));
@@ -8424,9 +8424,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -8441,9 +8441,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
 
 namespace Latch {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> * value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, readable, sizeof(temp));
@@ -8455,9 +8455,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -8472,9 +8472,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
 
 namespace State {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> * value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, readable, sizeof(temp));
@@ -8486,9 +8486,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
@@ -8503,9 +8503,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
 
 namespace Supported {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> * value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::DishwasherAlarm::Id, Id, readable, sizeof(temp));
@@ -8517,9 +8517,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value)
 {
-    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>;
+    using Traits = NumericAttributeTraits<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;

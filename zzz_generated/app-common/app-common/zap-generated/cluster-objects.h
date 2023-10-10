@@ -15494,9 +15494,9 @@ namespace Attributes {
 namespace Mask {
 struct TypeInfo
 {
-    using Type             = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
+    using Type             = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Mask::Id; }
@@ -15506,9 +15506,9 @@ struct TypeInfo
 namespace State {
 struct TypeInfo
 {
-    using Type             = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
+    using Type             = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::State::Id; }
@@ -15518,9 +15518,9 @@ struct TypeInfo
 namespace Supported {
 struct TypeInfo
 {
-    using Type             = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>;
+    using Type             = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Supported::Id; }
@@ -15573,11 +15573,11 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::Mask::TypeInfo::DecodableType mask =
-            static_cast<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>>(0);
+            static_cast<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>(0);
         Attributes::State::TypeInfo::DecodableType state =
-            static_cast<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>>(0);
+            static_cast<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>(0);
         Attributes::Supported::TypeInfo::DecodableType supported =
-            static_cast<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>>(0);
+            static_cast<chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -15607,10 +15607,10 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    chip::BitMask<AlarmMap> active   = static_cast<chip::BitMask<AlarmMap>>(0);
-    chip::BitMask<AlarmMap> inactive = static_cast<chip::BitMask<AlarmMap>>(0);
-    chip::BitMask<AlarmMap> state    = static_cast<chip::BitMask<AlarmMap>>(0);
-    chip::BitMask<AlarmMap> mask     = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmBitmap> active   = static_cast<chip::BitMask<AlarmBitmap>>(0);
+    chip::BitMask<AlarmBitmap> inactive = static_cast<chip::BitMask<AlarmBitmap>>(0);
+    chip::BitMask<AlarmBitmap> state    = static_cast<chip::BitMask<AlarmBitmap>>(0);
+    chip::BitMask<AlarmBitmap> mask     = static_cast<chip::BitMask<AlarmBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -15622,10 +15622,10 @@ public:
     static constexpr EventId GetEventId() { return Events::Notify::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::RefrigeratorAlarm::Id; }
 
-    chip::BitMask<AlarmMap> active   = static_cast<chip::BitMask<AlarmMap>>(0);
-    chip::BitMask<AlarmMap> inactive = static_cast<chip::BitMask<AlarmMap>>(0);
-    chip::BitMask<AlarmMap> state    = static_cast<chip::BitMask<AlarmMap>>(0);
-    chip::BitMask<AlarmMap> mask     = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmBitmap> active   = static_cast<chip::BitMask<AlarmBitmap>>(0);
+    chip::BitMask<AlarmBitmap> inactive = static_cast<chip::BitMask<AlarmBitmap>>(0);
+    chip::BitMask<AlarmBitmap> state    = static_cast<chip::BitMask<AlarmBitmap>>(0);
+    chip::BitMask<AlarmBitmap> mask     = static_cast<chip::BitMask<AlarmBitmap>>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -16551,7 +16551,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Reset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
 
-    chip::BitMask<AlarmMap> alarms = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmBitmap> alarms = static_cast<chip::BitMask<AlarmBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -16566,7 +16566,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::Reset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
 
-    chip::BitMask<AlarmMap> alarms = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmBitmap> alarms = static_cast<chip::BitMask<AlarmBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Reset
@@ -16583,7 +16583,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ModifyEnabledAlarms::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
 
-    chip::BitMask<AlarmMap> mask = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmBitmap> mask = static_cast<chip::BitMask<AlarmBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -16598,7 +16598,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ModifyEnabledAlarms::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
 
-    chip::BitMask<AlarmMap> mask = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmBitmap> mask = static_cast<chip::BitMask<AlarmBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ModifyEnabledAlarms
@@ -16609,9 +16609,9 @@ namespace Attributes {
 namespace Mask {
 struct TypeInfo
 {
-    using Type             = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
+    using Type             = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Mask::Id; }
@@ -16621,9 +16621,9 @@ struct TypeInfo
 namespace Latch {
 struct TypeInfo
 {
-    using Type             = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
+    using Type             = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Latch::Id; }
@@ -16633,9 +16633,9 @@ struct TypeInfo
 namespace State {
 struct TypeInfo
 {
-    using Type             = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
+    using Type             = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::State::Id; }
@@ -16645,9 +16645,9 @@ struct TypeInfo
 namespace Supported {
 struct TypeInfo
 {
-    using Type             = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
-    using DecodableType    = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
-    using DecodableArgType = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>;
+    using Type             = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Supported::Id; }
@@ -16700,13 +16700,13 @@ struct TypeInfo
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
         Attributes::Mask::TypeInfo::DecodableType mask =
-            static_cast<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>(0);
+            static_cast<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>(0);
         Attributes::Latch::TypeInfo::DecodableType latch =
-            static_cast<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>(0);
+            static_cast<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>(0);
         Attributes::State::TypeInfo::DecodableType state =
-            static_cast<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>(0);
+            static_cast<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>(0);
         Attributes::Supported::TypeInfo::DecodableType supported =
-            static_cast<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>>(0);
+            static_cast<chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -16736,10 +16736,10 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    chip::BitMask<AlarmMap> active   = static_cast<chip::BitMask<AlarmMap>>(0);
-    chip::BitMask<AlarmMap> inactive = static_cast<chip::BitMask<AlarmMap>>(0);
-    chip::BitMask<AlarmMap> state    = static_cast<chip::BitMask<AlarmMap>>(0);
-    chip::BitMask<AlarmMap> mask     = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmBitmap> active   = static_cast<chip::BitMask<AlarmBitmap>>(0);
+    chip::BitMask<AlarmBitmap> inactive = static_cast<chip::BitMask<AlarmBitmap>>(0);
+    chip::BitMask<AlarmBitmap> state    = static_cast<chip::BitMask<AlarmBitmap>>(0);
+    chip::BitMask<AlarmBitmap> mask     = static_cast<chip::BitMask<AlarmBitmap>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
@@ -16751,10 +16751,10 @@ public:
     static constexpr EventId GetEventId() { return Events::Notify::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
 
-    chip::BitMask<AlarmMap> active   = static_cast<chip::BitMask<AlarmMap>>(0);
-    chip::BitMask<AlarmMap> inactive = static_cast<chip::BitMask<AlarmMap>>(0);
-    chip::BitMask<AlarmMap> state    = static_cast<chip::BitMask<AlarmMap>>(0);
-    chip::BitMask<AlarmMap> mask     = static_cast<chip::BitMask<AlarmMap>>(0);
+    chip::BitMask<AlarmBitmap> active   = static_cast<chip::BitMask<AlarmBitmap>>(0);
+    chip::BitMask<AlarmBitmap> inactive = static_cast<chip::BitMask<AlarmBitmap>>(0);
+    chip::BitMask<AlarmBitmap> state    = static_cast<chip::BitMask<AlarmBitmap>>(0);
+    chip::BitMask<AlarmBitmap> mask     = static_cast<chip::BitMask<AlarmBitmap>>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

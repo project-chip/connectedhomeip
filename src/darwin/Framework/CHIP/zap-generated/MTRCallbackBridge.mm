@@ -9783,7 +9783,7 @@ void MTRTemperatureControlAttributeListListAttributeCallbackSubscriptionBridge::
     }
 }
 
-void MTRRefrigeratorAlarmMaskAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value)
+void MTRRefrigeratorAlarmMaskAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -9805,7 +9805,7 @@ void MTRRefrigeratorAlarmMaskAttributeCallbackSubscriptionBridge::OnSubscription
     }
 }
 
-void MTRRefrigeratorAlarmStateAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value)
+void MTRRefrigeratorAlarmStateAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -9827,7 +9827,7 @@ void MTRRefrigeratorAlarmStateAttributeCallbackSubscriptionBridge::OnSubscriptio
     }
 }
 
-void MTRRefrigeratorAlarmSupportedAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value)
+void MTRRefrigeratorAlarmSupportedAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -10507,7 +10507,7 @@ void MTRSmokeCOAlarmAttributeListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void MTRDishwasherAlarmMaskAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value)
+void MTRDishwasherAlarmMaskAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -10529,7 +10529,7 @@ void MTRDishwasherAlarmMaskAttributeCallbackSubscriptionBridge::OnSubscriptionEs
     }
 }
 
-void MTRDishwasherAlarmLatchAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value)
+void MTRDishwasherAlarmLatchAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -10551,7 +10551,7 @@ void MTRDishwasherAlarmLatchAttributeCallbackSubscriptionBridge::OnSubscriptionE
     }
 }
 
-void MTRDishwasherAlarmStateAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value)
+void MTRDishwasherAlarmStateAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];
@@ -10573,7 +10573,7 @@ void MTRDishwasherAlarmStateAttributeCallbackSubscriptionBridge::OnSubscriptionE
     }
 }
 
-void MTRDishwasherAlarmSupportedAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value)
+void MTRDishwasherAlarmSupportedAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value.Raw()];

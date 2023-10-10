@@ -16828,7 +16828,7 @@ class RefrigeratorAlarm(Cluster):
     clusterRevision: 'uint' = None
 
     class Bitmaps:
-        class AlarmMap(IntFlag):
+        class AlarmBitmap(IntFlag):
             kDoorOpen = 0x1
 
     class Attributes:
@@ -18100,7 +18100,7 @@ class DishwasherAlarm(Cluster):
     clusterRevision: 'uint' = None
 
     class Bitmaps:
-        class AlarmMap(IntFlag):
+        class AlarmBitmap(IntFlag):
             kInflowError = 0x1
             kDrainError = 0x2
             kDoorError = 0x4

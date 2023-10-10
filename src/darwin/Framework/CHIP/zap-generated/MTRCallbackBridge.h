@@ -1206,10 +1206,10 @@ typedef void (*TemperatureControlEventListListAttributeCallback)(void * context,
                                                                  const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*TemperatureControlAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*RefrigeratorAlarmMaskAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>);
-typedef void (*RefrigeratorAlarmStateAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>);
+typedef void (*RefrigeratorAlarmMaskAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>);
+typedef void (*RefrigeratorAlarmStateAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>);
 typedef void (*RefrigeratorAlarmSupportedAttributeCallback)(void *,
-                                                            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap>);
+                                                            chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap>);
 typedef void (*RefrigeratorAlarmGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*RefrigeratorAlarmAcceptedCommandListListAttributeCallback)(
@@ -1246,10 +1246,10 @@ typedef void (*SmokeCOAlarmEventListListAttributeCallback)(void * context,
                                                            const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*SmokeCOAlarmAttributeListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*DishwasherAlarmMaskAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>);
-typedef void (*DishwasherAlarmLatchAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>);
-typedef void (*DishwasherAlarmStateAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>);
-typedef void (*DishwasherAlarmSupportedAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap>);
+typedef void (*DishwasherAlarmMaskAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>);
+typedef void (*DishwasherAlarmLatchAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>);
+typedef void (*DishwasherAlarmStateAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>);
+typedef void (*DishwasherAlarmSupportedAttributeCallback)(void *, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap>);
 typedef void (*DishwasherAlarmGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*DishwasherAlarmAcceptedCommandListListAttributeCallback)(
@@ -10324,7 +10324,7 @@ public:
     MTRRefrigeratorAlarmMaskAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
         MTRCallbackBridge<RefrigeratorAlarmMaskAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value);
 };
 
 class MTR_PROVISIONALLY_AVAILABLE MTRRefrigeratorAlarmMaskAttributeCallbackSubscriptionBridge
@@ -10356,7 +10356,7 @@ public:
     MTRRefrigeratorAlarmStateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
         MTRCallbackBridge<RefrigeratorAlarmStateAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value);
 };
 
 class MTR_PROVISIONALLY_AVAILABLE MTRRefrigeratorAlarmStateAttributeCallbackSubscriptionBridge
@@ -10388,7 +10388,7 @@ public:
     MTRRefrigeratorAlarmSupportedAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
         MTRCallbackBridge<RefrigeratorAlarmSupportedAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> value);
 };
 
 class MTR_PROVISIONALLY_AVAILABLE MTRRefrigeratorAlarmSupportedAttributeCallbackSubscriptionBridge
@@ -10980,7 +10980,7 @@ public:
     MTRDishwasherAlarmMaskAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
         MTRCallbackBridge<DishwasherAlarmMaskAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value);
 };
 
 class MTR_PROVISIONALLY_AVAILABLE MTRDishwasherAlarmMaskAttributeCallbackSubscriptionBridge
@@ -11012,7 +11012,7 @@ public:
     MTRDishwasherAlarmLatchAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
         MTRCallbackBridge<DishwasherAlarmLatchAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value);
 };
 
 class MTR_PROVISIONALLY_AVAILABLE MTRDishwasherAlarmLatchAttributeCallbackSubscriptionBridge
@@ -11044,7 +11044,7 @@ public:
     MTRDishwasherAlarmStateAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
         MTRCallbackBridge<DishwasherAlarmStateAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value);
 };
 
 class MTR_PROVISIONALLY_AVAILABLE MTRDishwasherAlarmStateAttributeCallbackSubscriptionBridge
@@ -11076,7 +11076,7 @@ public:
     MTRDishwasherAlarmSupportedAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
         MTRCallbackBridge<DishwasherAlarmSupportedAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmMap> value);
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::DishwasherAlarm::AlarmBitmap> value);
 };
 
 class MTR_PROVISIONALLY_AVAILABLE MTRDishwasherAlarmSupportedAttributeCallbackSubscriptionBridge
