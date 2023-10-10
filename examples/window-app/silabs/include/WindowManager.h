@@ -160,7 +160,8 @@ private:
 
     LEDWidget mStatusLED;
     LEDWidget mActionLED;
-
+    // Get QR Code and emulate its content using NFC tag
+    char mQRCodeBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
 #ifdef DISPLAY_ENABLED
     Timer mIconTimer;
     LcdIcon mIcon = LcdIcon::None;

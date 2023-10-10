@@ -665,7 +665,7 @@ void WindowManager::UpdateLEDs()
 #if CHIP_ENABLE_OPENTHREAD
             if (mState.isThreadProvisioned && mState.isThreadEnabled)
 #else
-            if (mState.isWiFiProvisioned && mState.isWiFiEnabled)
+            if (ConnectivityMgr().IsWiFiStationProvisioned() && ConnectivityMgr().IsWiFiStationEnabled())
 #endif
 
         {
@@ -725,7 +725,8 @@ void WindowManager::UpdateLCD()
 #if CHIP_ENABLE_OPENTHREAD
     if (mState.isThreadProvisioned)
 #else
-    if (mState.isWiFiProvisioned)
+    // if (mState.isWiFiProvisioned)
+    if (ConnectivityMgr().IsWiFiStationProvisioned())
 #endif // CHIP_ENABLE_OPENTHREAD
     {
         Cover & cover = GetCover();
@@ -739,13 +740,22 @@ void WindowManager::UpdateLCD()
         Attributes::CurrentPositionTilt::Get(cover.mEndpoint, tilt);
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-#ifdef DISPLAY_ENABLED
         if (!tilt.IsNull() && !lift.IsNull())
         {
             LcdPainter::Paint(slLCD, type, lift.Value(), tilt.Value(), mIcon);
         }
-#endif
     }
+#ifdef QR_CODE_ENABLED
+    else
+    {
+        chip::MutableCharSpan qrCode(mQRCodeBuffer);
+        if (GetQRCode(qrCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
+        {
+            slLCD.SetQRCode((uint8_t *) qrCode.data(), qrCode.size());
+            slLCD.ShowQRCode(true);
+        }
+    }
+#endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 }
 
