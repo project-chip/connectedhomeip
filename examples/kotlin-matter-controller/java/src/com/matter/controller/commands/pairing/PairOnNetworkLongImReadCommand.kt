@@ -49,7 +49,7 @@ class PairOnNetworkLongImReadCommand(controller: MatterController, credsIssue: C
     currentCommissioner()
       .pairDevice(
         getNodeId(),
-        getRemoteAddr().getHostAddress(),
+        getRemoteAddr().address.hostAddress,
         MATTER_PORT,
         getDiscriminator(),
         getSetupPINCode(),

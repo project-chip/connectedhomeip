@@ -43,10 +43,10 @@ class PairOnNetworkLongImInvokeCommand(
     DiscoveryFilterType.LONG_DISCRIMINATOR
   ) {
   override fun runCommand() {
-    val number: UShort = 1u
+    val IdentifyTime: UShort = 1u
     val tlvWriter1 = TlvWriter()
     tlvWriter1.startStructure(AnonymousTag)
-    tlvWriter1.put(ContextSpecificTag(0), number)
+    tlvWriter1.put(ContextSpecificTag(0), IdentifyTime)
     tlvWriter1.endStructure()
 
     val element1: InvokeRequest =
@@ -59,7 +59,7 @@ class PairOnNetworkLongImInvokeCommand(
     currentCommissioner()
       .pairDevice(
         getNodeId(),
-        getRemoteAddr().getHostAddress(),
+        getRemoteAddr().address.hostAddress,
         MATTER_PORT,
         getDiscriminator(),
         getSetupPINCode(),

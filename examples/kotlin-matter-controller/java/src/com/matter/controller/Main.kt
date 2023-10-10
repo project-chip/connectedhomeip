@@ -17,8 +17,14 @@
  */
 package com.matter.controller
 
-import com.matter.controller.commands.common.*
-import com.matter.controller.commands.pairing.*
+import com.matter.controller.commands.common.Command
+import com.matter.controller.commands.common.CommandManager
+import com.matter.controller.commands.common.CredentialsIssuer
+import com.matter.controller.commands.pairing.PairOnNetworkLongCommand
+import com.matter.controller.commands.pairing.PairOnNetworkLongImInvokeCommand
+import com.matter.controller.commands.pairing.PairOnNetworkLongImReadCommand
+import com.matter.controller.commands.pairing.PairOnNetworkLongImSubscribeCommand
+import com.matter.controller.commands.pairing.PairOnNetworkLongImWriteCommand
 import matter.controller.ControllerParams
 import matter.controller.MatterController
 import matter.controller.MatterControllerImpl
@@ -56,6 +62,7 @@ fun main(args: Array<String>) {
     commandManager.run(args)
   } catch (e: Exception) {
     println("Run command failed with exception: " + e.message)
+    controller.close()
     System.exit(1)
   }
 

@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicLong
 
+// TODO Issue #29632:Refactor class Argument to have specializations for various types.
 class Argument {
   val name: String
   val type: ArgumentType
@@ -171,7 +172,7 @@ class Argument {
         isValidArgument =
           try {
             val ipAddress = this.value as IPAddress
-            ipAddress.setAddress(InetAddress.getByName(value))
+            ipAddress.address = InetAddress.getByName(value)
             true
           } catch (e: UnknownHostException) {
             false
