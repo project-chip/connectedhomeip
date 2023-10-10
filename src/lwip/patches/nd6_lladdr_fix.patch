@@ -1,5 +1,5 @@
 diff --git a/src/core/ipv6/nd6.c b/src/core/ipv6/nd6.c
-index 55b5774f..7ab0d270 100644
+index 55b5774f..8559d69b 100644
 --- a/src/core/ipv6/nd6.c
 +++ b/src/core/ipv6/nd6.c
 @@ -686,14 +686,15 @@ nd6_input(struct pbuf *p, struct netif *inp)
@@ -16,9 +16,8 @@ index 55b5774f..7ab0d270 100644
 -        lladdr_opt = (struct lladdr_option *)buffer;
 +        addr_cursor = buffer + option_type_and_length_size;
          if ((default_router_list[i].neighbor_entry != NULL) &&
--            (default_router_list[i].neighbor_entry->state == ND6_INCOMPLETE)) {
+             (default_router_list[i].neighbor_entry->state == ND6_INCOMPLETE)) {
 -          SMEMCPY(default_router_list[i].neighbor_entry->lladdr, lladdr_opt->addr, inp->hwaddr_len);
-+           (default_router_list[i].neighbor_entry->state == ND6_INCOMPLETE)) {
 +          SMEMCPY(default_router_list[i].neighbor_entry->lladdr, addr_cursor, inp->hwaddr_len);
            default_router_list[i].neighbor_entry->state = ND6_REACHABLE;
            default_router_list[i].neighbor_entry->counter.reachable_time = reachable_time;
