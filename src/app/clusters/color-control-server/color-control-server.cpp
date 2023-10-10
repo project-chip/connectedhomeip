@@ -198,7 +198,7 @@ public:
 #endif
 
         // Initialize action attributes to default values in case they are not in the scene
-        uint8_t targetColorMode    = 0x00;
+        EnahncedColorModeEnum targetEnhancedColorMode = EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation;
         uint8_t loopActiveValue    = 0x00;
         uint8_t loopDirectionValue = 0x00;
         uint16_t loopTimeValue     = 0x0019; // Default loop time value according to spec
@@ -256,7 +256,7 @@ public:
             case Attributes::EnhancedColorMode::Id:
                 if (decodePair.attributeValue <= static_cast<uint8_t>(ColorControlServer::ColorMode::COLOR_MODE_EHSV))
                 {
-                    targetColorMode = static_cast<uint8_t>(decodePair.attributeValue);
+                    targetEnhancedColorMode = static_cast<EnhancedColorModeEnum>(decodePair.attributeValue);
                 }
                 break;
             default:
@@ -267,9 +267,11 @@ public:
         ReturnErrorOnFailure(pair_iterator.GetStatus());
 
         // Switch to the mode saved in the scene
-        if (SupportsColorMode(endpoint, static_cast<EnhancedColorModeEnum>(targetColorMode)))
+        if (SupportsColorMode(endpoint, targetEnhancedColorMode))
         {
-            ColorControlServer::Instance().handleModeSwitch(endpoint, targetColorMode);
+            // TODO: this seems buggy: how do we know in SupportsColorMode and handleModeSwitch
+            //       if the color mode is "ColorMode" or "EnhancedColorMode"
+            ColorControlServer::Instance().handleModeSwitch(endpoint, targetEnhancedColorMode);
         }
         else
         {
