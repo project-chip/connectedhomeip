@@ -59,8 +59,8 @@ enum CommissioningStage : uint8_t
     kWiFiNetworkEnable,          ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
     kThreadNetworkEnable,        ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
     kFindOperational,            ///< Perform operational discovery and establish a CASE session with the device
-    kSendComplete, ///< Send CommissioningComplete (0x30:4) command to the device
-    kCleanup,      ///< Call delegates with status, free memory, clear timers and state
+    kSendComplete,               ///< Send CommissioningComplete (0x30:4) command to the device
+    kCleanup,                    ///< Call delegates with status, free memory, clear timers and state
     /// Send ScanNetworks (0x31:0) command to the device.
     /// ScanNetworks can happen anytime after kArmFailsafe.
     /// However, the cirque tests fail if it is earlier in the list

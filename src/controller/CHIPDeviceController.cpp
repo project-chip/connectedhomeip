@@ -2459,7 +2459,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         SendCommissioningReadRequest(proxy, timeout, readPaths, 9);
     }
     break;
-    case CommissioningStage::kReadCommissioningInfo: {
+    case CommissioningStage::kReadCommissioningInfo2: {
         ChipLogProgress(Controller, "Sending request for commissioning information -- Part 2");
 
         size_t numberOfAttributes = 0;

@@ -388,13 +388,6 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         }
         return CommissioningStage::kFindOperational;
     case CommissioningStage::kFindOperational:
-        if (mParams.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
-        {
-            return CommissioningStage::kICDIdentification;
-        }
-        return CommissioningStage::kSendComplete;
-    case CommissioningStage::kICDIdentification:
-        // TODO(#29385): Register to the ICD.
         return CommissioningStage::kSendComplete;
     case CommissioningStage::kSendComplete:
         return CommissioningStage::kCleanup;
