@@ -445,6 +445,7 @@ class TestParser(unittest.TestCase):
                 provisional attribute int32u rwProvisional[] = 12;
                 internal readonly attribute int8u roInternal = 21;
                 internal attribute int32u rwInternal[] = 22;
+                stable attribute int32u rwForcedStable[] = 31;
             }
         """)
         expected = Idl(clusters=[
@@ -517,6 +518,8 @@ class TestParser(unittest.TestCase):
                             data_type=DataType(name="int8u"), code=21, name="roInternal"), api_maturity=ApiMaturity.INTERNAL),
                         Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
                             data_type=DataType(name="int32u"), code=22, name="rwInternal", is_list=True), api_maturity=ApiMaturity.INTERNAL),
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE, definition=Field(
+                            data_type=DataType(name="int32u"), code=31, name="rwForcedStable", is_list=True), api_maturity=ApiMaturity.STABLE),
                     ]
                     )])
         self.assertEqual(actual, expected)

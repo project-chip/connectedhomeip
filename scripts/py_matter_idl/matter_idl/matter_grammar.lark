@@ -8,6 +8,7 @@ struct_qualities: struct_quality*
 ?maturity: "provisional"i -> provisional_api_maturity
          | "internal"i -> internal_api_maturity
          | "deprecated"i -> deprecated_api_maturity
+         | "stable"i -> stable_api_maturity
 
 enum: "enum"i id ":" type "{" constant_entry* "}"
 bitmap: "bitmap"i id ":" type "{" constant_entry* "}"
