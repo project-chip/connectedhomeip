@@ -4377,7 +4377,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 3;
+    ram      attribute featureMap default = 7;
     ram      attribute clusterRevision default = 5;
 
     handle command AddScene;
@@ -4940,7 +4940,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 3;
+    ram      attribute featureMap default = 7;
     ram      attribute clusterRevision default = 5;
 
     handle command AddScene;
