@@ -210,7 +210,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ifp->fabricConnected           = true;
     ifp->offPremiseServicesReachableIPv4.SetNonNull(false);
     ifp->offPremiseServicesReachableIPv6.SetNonNull(false);
-    ifp->type = InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD;
+    ifp->type = InterfaceTypeEnum::kThread;
 #else
     /* TODO */
 #endif
