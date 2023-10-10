@@ -162,17 +162,21 @@ CHIP_ERROR convertJVideoPlayerToTargetVideoPlayerInfo(jobject videoPlayer, Targe
 
     jfieldID getInstanceNameField = env->GetFieldID(jVideoPlayerClass, "instanceName", "Ljava/lang/String;");
     jstring jInstanceName         = static_cast<jstring>(env->GetObjectField(videoPlayer, getInstanceNameField));
-    const char * instanceName     = env->GetStringUTFChars(jInstanceName, 0);
+    const char * instanceName     = {};
+    if (jInstanceName != nullptr)
+    {
+        instanceName = env->GetStringUTFChars(jInstanceName, 0);
+    }
 
     jfieldID jLastDiscoveredMs = env->GetFieldID(jVideoPlayerClass, "lastDiscoveredMs", "J");
     long lastDiscoveredMs      = static_cast<long>(env->GetLongField(videoPlayer, jLastDiscoveredMs));
 
     jfieldID getMACAddressField = env->GetFieldID(jVideoPlayerClass, "MACAddress", "Ljava/lang/String;");
     jstring jMACAddress         = static_cast<jstring>(env->GetObjectField(videoPlayer, getMACAddressField));
-    const char * MACAddress     = env->GetStringUTFChars(jMACAddress, 0);
+    const char * MACAddress     = jMACAddress == nullptr ? nullptr : env->GetStringUTFChars(jMACAddress, 0);
 
     jfieldID jIsAsleep = env->GetFieldID(jVideoPlayerClass, "isAsleep", "Z");
-    bool isAsleep      = static_cast<bool>(env->GetLongField(videoPlayer, jIsAsleep));
+    bool isAsleep      = static_cast<bool>(env->GetBooleanField(videoPlayer, jIsAsleep));
 
     outTargetVideoPlayerInfo.Initialize(nodeId, fabricIndex, nullptr, nullptr, vendorId, productId, deviceType, deviceName,
                                         hostName, 0, nullptr, port, instanceName, chip::System::Clock::Timestamp(lastDiscoveredMs));
