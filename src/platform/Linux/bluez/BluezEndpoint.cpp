@@ -362,13 +362,9 @@ static void BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClient * aMa
     UpdateConnectionTable(device, *endpoint);
 }
 
-static void BluezHandleNewDevice(BluezDevice1 * device, BluezEndpoint * apEndpoint)
+static void BluezHandleNewDevice(BluezDevice1 * device, BluezEndpoint & aEndpoint)
 {
-    VerifyOrExit(apEndpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
-    if (apEndpoint->mIsCentral)
-    {
-        return;
-    }
+    VerifyOrReturn(!aEndpoint.mIsCentral);
 
     // We need to handle device connection both this function and BluezSignalInterfacePropertiesChanged
     // When a device is connected for first time, this function will be triggered.
@@ -378,17 +374,17 @@ static void BluezHandleNewDevice(BluezDevice1 * device, BluezEndpoint * apEndpoi
     VerifyOrExit(bluez_device1_get_connected(device), ChipLogError(DeviceLayer, "FAIL: device is not connected"));
 
     conn = static_cast<BluezConnection *>(
-        g_hash_table_lookup(apEndpoint->mpConnMap, g_dbus_proxy_get_object_path(G_DBUS_PROXY(device))));
+        g_hash_table_lookup(aEndpoint.mpConnMap, g_dbus_proxy_get_object_path(G_DBUS_PROXY(device))));
     VerifyOrExit(conn == nullptr,
                  ChipLogError(DeviceLayer, "FAIL: connection already tracked: conn: %p new device: %s", conn,
                               g_dbus_proxy_get_object_path(G_DBUS_PROXY(device))));
 
-    conn                         = chip::Platform::New<BluezConnection>(apEndpoint, device);
-    apEndpoint->mpPeerDevicePath = g_strdup(g_dbus_proxy_get_object_path(G_DBUS_PROXY(device)));
-    g_hash_table_insert(apEndpoint->mpConnMap, apEndpoint->mpPeerDevicePath, conn);
+    conn                       = chip::Platform::New<BluezConnection>(&aEndpoint, device);
+    aEndpoint.mpPeerDevicePath = g_strdup(g_dbus_proxy_get_object_path(G_DBUS_PROXY(device)));
+    g_hash_table_insert(aEndpoint.mpConnMap, aEndpoint.mpPeerDevicePath, conn);
 
     ChipLogDetail(DeviceLayer, "BLE device connected: conn %p, device %s, path %s", conn, conn->GetPeerAddress(),
-                  apEndpoint->mpPeerDevicePath);
+                  aEndpoint.mpPeerDevicePath);
 
 exit:
     return;
@@ -399,12 +395,11 @@ static void BluezSignalOnObjectAdded(GDBusObjectManager * aManager, GDBusObject 
     // TODO: right now we do not handle addition/removal of adapters
     // Primary focus here is to handle addition of a device
     GAutoPtr<BluezDevice1> device(bluez_object_get_device1(BLUEZ_OBJECT(aObject)));
-
     VerifyOrReturn(device.get() != nullptr);
 
     if (BluezIsDeviceOnAdapter(device.get(), endpoint->mpAdapter) == TRUE)
     {
-        BluezHandleNewDevice(device.get(), endpoint);
+        BluezHandleNewDevice(device.get(), *endpoint);
     }
 }
 
