@@ -30,17 +30,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 };
 
 /**
- * This bitmask is used to specify the type of logs requested from this device.
+ * This enum is used to specify the type of logs requested from this device.
  *
  * The logs types are : End User Support, Network Diagnostics and Crash logs.
  */
-typedef NS_OPTIONS(NSUInteger, MTRDiagnosticLogType) {
-    MTRDiagnosticLogTypeEndUserSupport = 1 << 0, // End user support logs are requested
-    MTRDiagnosticLogTypeNetworkDiagnostics = 1 << 1, // Network Diagnostics logs are requested
-    MTRDiagnosticLogTypeCrash = 1 << 2, // Crash logs are requested
-    MTRDiagnosticLogTypesAll = // All the above log types are requested
-    MTRDiagnosticLogTypeEndUserSupport | MTRDiagnosticLogTypeNetworkDiagnostics | MTRDiagnosticLogTypeCrash,
-    MTRDiagnosticLogTypeUnknown = 1 << 3,
+typedef NS_ENUM(NSUInteger, MTRDiagnosticLogType) {
+    MTRDiagnosticLogTypeEndUserSupport = 0, // End user support logs are requested
+    MTRDiagnosticLogTypeNetworkDiagnostics = 1, // Network Diagnostics logs are requested
+    MTRDiagnosticLogTypeCrash = 2, // Crash logs are requested
+    MTRDiagnosticLogTypeUnknown = 3
 } MTR_PROVISIONALLY_AVAILABLE;
 
 @protocol MTRDeviceDelegate;
@@ -54,10 +52,11 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (readonly, nonatomic) BOOL requestTimedOut;
 
 /**
- * Array containing the file path(s) for the desired log type(s)
+ * Array containing the file path(s) for the desired log type(s).
+ * The log type values should correspond to the enum MTRDiagnosticLogType values.
  * If there are no logs an empty array will be returned.
  */
-@property (readonly, nonatomic) NSArray<NSString *> * filePathArray;
+@property (readonly, nonatomic) NSDictionary<NSNumber *, NSString *> * filePathDictionary;
 
 @end
 
@@ -234,8 +233,8 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Requests diagnostic logs of the desired types from the device.
  *
- * @param type       The type of logs being requested.
- * @param timeout    The timeout for getting the logs.  If the timeout expires, completion
+ * @param types      The types of logs being requested. This should correspond to values in the enum MTRDiagnosticLogType.
+ * @param timeout    The timeout in minutes for getting the logs.  If the timeout expires, completion
  *                   will be called with whatever logs have been retrieved by that point
  *                   (which might be none, and might include partial logs).
  *                   If the timeout is nil, it will never expire and completion will not be called until
@@ -243,8 +242,8 @@ MTR_PROVISIONALLY_AVAILABLE
  * @param queue      The queue on which completion will be called.
  * @param completion The completion that will be called to pass in the file paths for the requested logs.
  */
-- (void)getDiagnosticLogsOfTypes:(MTRDiagnosticLogType)type
-                         timeout:(NSInteger * _Nullable)timeout
+- (void)getDiagnosticLogsOfTypes:(NSArray<NSNumber *> *)types
+                         timeout:(NSNumber * _Nullable)timeout
                            queue:(dispatch_queue_t)queue
                       completion:(void (^)(NSError * _Nullable error, MTRDiagnosticLogResult * _Nullable logResult))completion MTR_PROVISIONALLY_AVAILABLE;
 
