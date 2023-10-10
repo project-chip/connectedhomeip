@@ -25,7 +25,6 @@ extern "C" {
 
 using namespace chip;
 
-
 void OTARequestorInitiator::InitOTA(intptr_t context)
 {
     auto * otaRequestorInit = reinterpret_cast<OTARequestorInitiator *>(context);
@@ -33,7 +32,8 @@ void OTARequestorInitiator::InitOTA(intptr_t context)
     SetRequestorInstance(&otaRequestorInit->gRequestorCore);
 
     otaRequestorInit->gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
-    otaRequestorInit->gRequestorCore.Init(chip::Server::GetInstance(), otaRequestorInit->gRequestorStorage, otaRequestorInit->gRequestorUser, otaRequestorInit->gDownloader);
+    otaRequestorInit->gRequestorCore.Init(chip::Server::GetInstance(), otaRequestorInit->gRequestorStorage,
+                                          otaRequestorInit->gRequestorUser, otaRequestorInit->gDownloader);
     otaRequestorInit->gRequestorUser.Init(&otaRequestorInit->gRequestorCore, &otaRequestorInit->gImageProcessor);
     otaRequestorInit->gImageProcessor.SetOTADownloader(&otaRequestorInit->gDownloader);
 

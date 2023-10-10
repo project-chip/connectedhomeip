@@ -286,7 +286,8 @@ void BOARD_DeinitFlash(FLEXSPI_Type * base)
 
     /* Wait until FLEXSPI is not busy */
     while (!((base->STS0 & FLEXSPI_STS0_ARBIDLE_MASK) && (base->STS0 & FLEXSPI_STS0_SEQIDLE_MASK)))
-    {}
+    {
+    }
     /* Disable module during the reset procedure */
     base->MCR0 |= FLEXSPI_MCR0_MDIS_MASK;
 }
@@ -311,7 +312,8 @@ void BOARD_InitFlash(FLEXSPI_Type * base)
 
     base->MCR0 |= FLEXSPI_MCR0_SWRESET_MASK;
     while (base->MCR0 & FLEXSPI_MCR0_SWRESET_MASK)
-    {}
+    {
+    }
 
     /* Need to wait DLL locked if DLL enabled */
     if (0U != (base->DLLCR[0] & FLEXSPI_DLLCR_DLLEN_MASK))
@@ -366,7 +368,8 @@ void BOARD_SetFlexspiClock(FLEXSPI_Type * base, uint32_t src, uint32_t divider)
         CLKCTL0->FLEXSPIFCLKDIV |= CLKCTL0_FLEXSPIFCLKDIV_RESET_MASK; /* Reset the divider counter */
         CLKCTL0->FLEXSPIFCLKDIV = CLKCTL0_FLEXSPIFCLKDIV_DIV(divider - 1);
         while ((CLKCTL0->FLEXSPIFCLKDIV) & CLKCTL0_FLEXSPIFCLKDIV_REQFLAG_MASK)
-        {}
+        {
+        }
         /* Enable FLEXSPI clock again */
         CLKCTL0->PSCCTL0_SET = CLKCTL0_PSCCTL0_SET_FLEXSPI0_MASK;
 

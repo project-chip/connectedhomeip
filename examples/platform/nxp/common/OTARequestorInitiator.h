@@ -19,18 +19,18 @@
 
 #pragma once
 
-#include <stdint.h>
-#include "platform/nxp/common/OTAImageProcessorImpl.h"
 #include "app/clusters/ota-requestor/BDXDownloader.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestor.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestorDriver.h"
 #include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
+#include "platform/nxp/common/OTAImageProcessorImpl.h"
+#include <stdint.h>
 
 using namespace chip;
 
 class OTARequestorInitiator
 {
-public :
+public:
     static OTARequestorInitiator & Instance(void)
     {
         static OTARequestorInitiator gOTARequestorInitiator;
@@ -47,5 +47,4 @@ public :
     DeviceLayer::DefaultOTARequestorDriver gRequestorUser;
     BDXDownloader gDownloader;
     OTAImageProcessorImpl gImageProcessor;
-
 };

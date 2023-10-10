@@ -6,13 +6,13 @@
 #ifndef _PERIPHERALS_H_
 #define _PERIPHERALS_H_
 
-#define CHIP_PLAT_NO_NVM                0
-#define CHIP_PLAT_NVM_FWK               1
-#define CHIP_PLAT_LITTLEFS              2
-#define CHIP_PLAT_KEY_STORAGE           3
+#define CHIP_PLAT_NO_NVM 0
+#define CHIP_PLAT_NVM_FWK 1
+#define CHIP_PLAT_LITTLEFS 2
+#define CHIP_PLAT_KEY_STORAGE 3
 
 #ifndef CHIP_PLAT_NVM_SUPPORT
-#define CHIP_PLAT_NVM_SUPPORT           CHIP_PLAT_NO_NVM
+#define CHIP_PLAT_NVM_SUPPORT CHIP_PLAT_NO_NVM
 #endif
 
 /***********************************************************************************************************************
@@ -22,7 +22,7 @@
 
 #if (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_NVM_FWK || CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_LITTLEFS)
 #include "fwk_platform_flash.h"
-#elif (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_KEY_STORAGE )
+#elif (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_KEY_STORAGE)
 #include "fwk_lfs_mflash.h"
 #endif
 

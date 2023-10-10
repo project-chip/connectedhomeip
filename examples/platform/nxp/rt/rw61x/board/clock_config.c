@@ -47,7 +47,8 @@ __attribute__((weak)) void BOARD_SetFlexspiClock(FLEXSPI_Type * base, uint32_t s
     CLKCTL0->FLEXSPIFCLKDIV |= CLKCTL0_FLEXSPIFCLKDIV_RESET_MASK; /* Reset the divider counter */
     CLKCTL0->FLEXSPIFCLKDIV = CLKCTL0_FLEXSPIFCLKDIV_DIV(divider - 1);
     while ((CLKCTL0->FLEXSPIFCLKDIV) & CLKCTL0_FLEXSPIFCLKDIV_REQFLAG_MASK)
-    {}
+    {
+    }
 }
 
 /*******************************************************************************

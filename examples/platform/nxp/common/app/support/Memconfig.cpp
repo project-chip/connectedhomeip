@@ -24,11 +24,11 @@
  */
 
 #include "FreeRTOS.h"
+#include "fsl_debug_console.h"
 #include "task.h"
 #include <cstring>
 #include <stdint.h>
 #include <stdlib.h>
-#include "fsl_debug_console.h"
 
 #ifndef NDEBUG
 #include <atomic>
@@ -54,7 +54,7 @@ typedef struct A_BLOCK_LINK
 /* The size of the structure placed at the beginning of each allocated memory
 block must by correctly byte aligned. */
 static const size_t xHeapStructSize =
-    (sizeof(BlockLink_t) + ((size_t)(portBYTE_ALIGNMENT - 1))) & ~((size_t) portBYTE_ALIGNMENT_MASK);
+    (sizeof(BlockLink_t) + ((size_t) (portBYTE_ALIGNMENT - 1))) & ~((size_t) portBYTE_ALIGNMENT_MASK);
 
 /* Gets set to the top bit of an size_t type.  When this bit in the xBlockSize
 member of an BlockLink_t structure is set then the block belongs to the
@@ -115,7 +115,7 @@ void operator delete(void * p)
     vPortFree(p);
 }
 
-void operator delete(void* p , unsigned int size)
+void operator delete(void * p, unsigned int size)
 {
     vPortFree(p);
 }
@@ -196,7 +196,7 @@ void * __wrap__calloc_r(void * REENT, size_t num, size_t size)
     return __wrap_calloc(num, size);
 }
 
-int __wrap_printf(const char *fmt_s, ...)
+int __wrap_printf(const char * fmt_s, ...)
 {
     int res = 0;
     va_list args;

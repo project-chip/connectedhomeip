@@ -28,7 +28,7 @@
 // When operating in a less than ideal RF environment, having a more forgiving configuration
 // of OpenThread makes thread a great deal more reliable.
 #define OPENTHREAD_CONFIG_TMF_ADDRESS_QUERY_MAX_RETRY_DELAY 120    // default is 28800
-#define OPENTHREAD_CONFIG_MAC_DEFAULT_MAX_FRAME_RETRIES_DIRECT 30 // default is 3
+#define OPENTHREAD_CONFIG_MAC_DEFAULT_MAX_FRAME_RETRIES_DIRECT 30  // default is 3
 #define OPENTHREAD_CONFIG_MAC_DEFAULT_MAX_FRAME_RETRIES_INDIRECT 1 // default is 0
 #define OPENTHREAD_CONFIG_MAC_MAX_TX_ATTEMPTS_INDIRECT_POLLS 16    // default is 4
 
@@ -68,10 +68,10 @@
 #endif /* SPINEL_INTERFACE_RPMSG */
 
 /*
-* "ot-nxp/src/rw/rw612/platform/radio.c" has a dependency on
-* "examples/platforms/utils/link_metrics.cpp" which is not built in the Matter build system
-* for this reason, currently we are disabling this feature
-*/
+ * "ot-nxp/src/rw/rw612/platform/radio.c" has a dependency on
+ * "examples/platforms/utils/link_metrics.cpp" which is not built in the Matter build system
+ * for this reason, currently we are disabling this feature
+ */
 #define OPENTHREAD_CONFIG_MLE_LINK_METRICS_INITIATOR_ENABLE 0
 #define OPENTHREAD_CONFIG_MLE_LINK_METRICS_SUBJECT_ENABLE 0
 
