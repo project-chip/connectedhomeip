@@ -20,6 +20,7 @@
 #include <stdint.h>
 
 #include <gio/gio.h>
+#include <glib-object.h>
 #include <glib.h>
 
 #include <ble/CHIPBleServiceData.h>

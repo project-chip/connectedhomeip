@@ -17,32 +17,21 @@
 
 #include "BluezAdvertisement.h"
 
-#include <cstring>
-#include <errno.h>
 #include <memory>
-#include <sys/socket.h>
 #include <unistd.h>
 
 #include <gio/gio.h>
-#include <gio/gunixfdlist.h>
 #include <glib-object.h>
 #include <glib.h>
 
-#include <lib/support/BitFlags.h>
-#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConfigurationManager.h>
-#include <platform/ConnectivityManager.h>
-#include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 #include <platform/PlatformManager.h>
-#include <platform/internal/BLEManager.h>
-#include <setup_payload/AdditionalDataPayloadGenerator.h>
-#include <system/SystemPacketBuffer.h>
 
-#include "BluezConnection.h"
+#include "BluezEndpoint.h"
 #include "Types.h"
 
 namespace chip {
@@ -154,8 +143,8 @@ CHIP_ERROR BluezAdvertisement::Init(BluezEndpoint * apEndpoint, ChipAdvType aAdv
     VerifyOrExit(mpAdv == nullptr, err = CHIP_ERROR_INCORRECT_STATE;
                  ChipLogError(DeviceLayer, "FAIL: BLE advertisement already initialized in %s", __func__));
 
-    mpRoot        = g_object_ref(apEndpoint->mpRoot);
-    mpAdapter     = g_object_ref(apEndpoint->mpAdapter);
+    mpRoot        = reinterpret_cast<GDBusObjectManagerServer *>(g_object_ref(apEndpoint->mpRoot));
+    mpAdapter     = reinterpret_cast<BluezAdapter1 *>(g_object_ref(apEndpoint->mpAdapter));
     mpAdapterName = g_strdup(apEndpoint->mpAdapterName);
 
     g_object_get(G_OBJECT(mpRoot), "object-path", &MakeUniquePointerReceiver(rootPath).Get(), nullptr);
