@@ -1877,11 +1877,15 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
     case CommissioningStage::kReadCommissioningInfo:
         ParseCommissioningInfo();
         break;
-    case CommissioningStage::kCheckForMatchingFabric:
-        ParseFabrics();
-        break;
-    case CommissioningStage::kICDIdentification:
-        ParseICDInfo();
+    case CommissioningStage::kReadCommissioningInfo2:
+        if (param.GetCheckForMatchingFabric())
+        {
+            ParseFabrics();
+        }
+        if (param.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
+        {
+            ParseICDInfo();
+        }
         break;
     default:
         // We're not trying to read anything here, just exit
@@ -2184,7 +2188,6 @@ void DeviceCommissioner::ParseICDInfo()
     IcdInfo info;
     IcdManagement::Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
 
-    // TODO(#29382): We probably want to read "ActiveMode" attribute (to be implemented) for ICD.
     err = mAttributeCache->Get<IcdManagement::Attributes::FeatureMap::TypeInfo>(kRootEndpointId, featureMap);
     if (err == CHIP_NO_ERROR)
     {
@@ -2456,19 +2459,31 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         SendCommissioningReadRequest(proxy, timeout, readPaths, 9);
     }
     break;
-    case CommissioningStage::kCheckForMatchingFabric: {
+    case CommissioningStage::kReadCommissioningInfo: {
+        ChipLogProgress(Controller, "Sending request for commissioning information -- Part 2");
+
+        size_t numberOfAttributes = 0;
+        // This is done in a separate step since we've already used up all the available read paths in the previous read step
+        app::AttributePathParams readPaths[9];
+
         // Read the current fabrics
-        if (!params.GetCheckForMatchingFabric())
+        if (params.GetCheckForMatchingFabric())
         {
+            readPaths[numberOfAttributes++] = app::AttributePathParams(OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
+        }
+
+        if (params.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
+        {
+            readPaths[numberOfAttributes++] = app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::FeatureMap::Id);
+        }
+
+        if (numberOfAttributes == 0)
             // We don't actually want to do this step, so just bypass it
             ChipLogProgress(Controller, "kCheckForMatchingFabric step called without parameter set, skipping");
             CommissioningStageComplete(CHIP_NO_ERROR);
         }
 
-        // This is done in a separate step since we've already used up all the available read paths in the previous read step
-        app::AttributePathParams readPaths[1];
-        readPaths[0] = app::AttributePathParams(OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
-        SendCommissioningReadRequest(proxy, timeout, readPaths, 1);
+        SendCommissioningReadRequest(proxy, timeout, readPaths, numberOfAttributes);
     }
     break;
     case CommissioningStage::kConfigureUTCTime: {

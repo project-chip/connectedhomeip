@@ -242,12 +242,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             // Per the spec, we restart from after adding the NOC.
             return GetNextCommissioningStage(CommissioningStage::kSendNOC, lastErr);
         }
-        if (mParams.GetCheckForMatchingFabric())
-        {
-            return CommissioningStage::kCheckForMatchingFabric;
-        }
-        return CommissioningStage::kArmFailsafe;
-    case CommissioningStage::kCheckForMatchingFabric:
+        return CommissioningStage::kReadCommissioningInfo2;
+    case CommissioningStage::kReadCommissioningInfo2:
         return CommissioningStage::kArmFailsafe;
     case CommissioningStage::kArmFailsafe:
         return CommissioningStage::kConfigRegulatory;

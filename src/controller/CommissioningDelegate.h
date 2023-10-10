@@ -35,7 +35,7 @@ enum CommissioningStage : uint8_t
     kError,
     kSecurePairing,              ///< Establish a PASE session with the device
     kReadCommissioningInfo,      ///< Query General Commissioning Attributes, Network Features and Time Synchronization Cluster
-    kCheckForMatchingFabric,     ///< Read the current fabrics on the commissionee
+    kReadCommissioningInfo2,     ///< Query ICD state, check for matching fabric
     kArmFailsafe,                ///< Send ArmFailSafe (0x30:0) command to the device
     kConfigRegulatory,           ///< Send SetRegulatoryConfig (0x30:2) command to the device
     kConfigureUTCTime,           ///< SetUTCTime if the DUT has a time cluster
@@ -59,10 +59,6 @@ enum CommissioningStage : uint8_t
     kWiFiNetworkEnable,          ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
     kThreadNetworkEnable,        ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
     kFindOperational,            ///< Perform operational discovery and establish a CASE session with the device
-    /// Optional steps for ICD
-    kICDIdentification, ///< Check whether the device is an ICD
-    /// TODO(#29384): Finish ICD registration implementation in commissioner
-    /// End of optional steps for ICD
     kSendComplete, ///< Send CommissioningComplete (0x30:4) command to the device
     kCleanup,      ///< Call delegates with status, free memory, clear timers and state
     /// Send ScanNetworks (0x31:0) command to the device.
@@ -568,7 +564,7 @@ private:
     Optional<bool> mAttemptWiFiNetworkScan;
     Optional<bool> mAttemptThreadNetworkScan; // This automatically gets set to false when a ThreadOperationalDataset is set
     Optional<bool> mSkipCommissioningComplete;
-    ICDRegistrationStrategy mICDRegistrationStrategy = ICDRegistrationStrategy::kBeforeComplete;
+    ICDRegistrationStrategy mICDRegistrationStrategy = ICDRegistrationStrategy::kIgnore;
     bool mCheckForMatchingFabric                     = false;
 };
 
