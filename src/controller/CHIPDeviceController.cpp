@@ -2469,15 +2469,18 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // Read the current fabrics
         if (params.GetCheckForMatchingFabric())
         {
-            readPaths[numberOfAttributes++] = app::AttributePathParams(OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
+            readPaths[numberOfAttributes++] =
+                app::AttributePathParams(OperationalCredentials::Id, OperationalCredentials::Attributes::Fabrics::Id);
         }
 
         if (params.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
         {
-            readPaths[numberOfAttributes++] = app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::FeatureMap::Id);
+            readPaths[numberOfAttributes++] =
+                app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::FeatureMap::Id);
         }
 
         if (numberOfAttributes == 0)
+        {
             // We don't actually want to do this step, so just bypass it
             ChipLogProgress(Controller, "kCheckForMatchingFabric step called without parameter set, skipping");
             CommissioningStageComplete(CHIP_NO_ERROR);
