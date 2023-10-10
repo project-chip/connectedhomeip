@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <app/icd/ICDNotifier.h>
 #include <app/reporting/reporting.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Dnssd.h>
@@ -543,13 +544,14 @@ void CommissioningWindowManager::UpdateWindowStatus(CommissioningWindowStatusEnu
     {
         mWindowStatus = aNewStatus;
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-        DeviceLayer::ChipDeviceEvent event;
-        event.Type                           = DeviceLayer::DeviceEventType::kCommissioningWindowStatusChanged;
-        event.CommissioningWindowStatus.open = (mWindowStatus != CommissioningWindowStatusEnum::kWindowNotOpen);
-        CHIP_ERROR err                       = DeviceLayer::PlatformMgr().PostEvent(&event);
-        if (err != CHIP_NO_ERROR)
+        app::ICDListener::KeepActiveFlags request = app::ICDListener::KeepActiveFlags::kCommissioningWindowOpen;
+        if (mWindowStatus != CommissioningWindowStatusEnum::kWindowNotOpen)
         {
-            ChipLogError(AppServer, "Failed to post kCommissioningWindowStatusChanged event %" CHIP_ERROR_FORMAT, err.Format());
+            app::ICDNotifier::GetInstance().BroadcastActiveRequestNotification(request);
+        }
+        else
+        {
+            app::ICDNotifier::GetInstance().BroadcastActiveRequestWithdrawal(request);
         }
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     }

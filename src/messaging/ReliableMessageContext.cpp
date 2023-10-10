@@ -58,17 +58,6 @@ ReliableMessageMgr * ReliableMessageContext::GetReliableMessageMgr()
 void ReliableMessageContext::SetWaitingForAck(bool waitingForAck)
 {
     mFlags.Set(Flags::kFlagWaitingForAck, waitingForAck);
-
-#if CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
-    DeviceLayer::ChipDeviceEvent event;
-    event.Type                = DeviceLayer::DeviceEventType::kICDMsgAckSyncEvent;
-    event.AckSync.awaitingAck = waitingForAck;
-    CHIP_ERROR status         = DeviceLayer::PlatformMgr().PostEvent(&event);
-    if (status != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to post AckSync event %" CHIP_ERROR_FORMAT, status.Format());
-    }
-#endif
 }
 
 CHIP_ERROR ReliableMessageContext::FlushAcks()
