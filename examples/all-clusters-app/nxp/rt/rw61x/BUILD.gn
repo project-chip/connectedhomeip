@@ -118,8 +118,8 @@ rt_executable("all_cluster_app") {
     defines += [ "DEVICE_TYPE_ALL_CLUSTERS" ]
     sources += [
       "${chip_root}/examples/${app_common_folder}/src/bridged-actions-stub.cpp",
-      "${chip_root}/examples/${app_common_folder}/src/static-supported-modes-manager.cpp",
       "${chip_root}/examples/${app_common_folder}/src/smco-stub.cpp",
+      "${chip_root}/examples/${app_common_folder}/src/static-supported-modes-manager.cpp",
     ]
   }
 
@@ -138,7 +138,6 @@ rt_executable("all_cluster_app") {
     ]
     include_dirs += [ "${chip_root}/examples/platform/nxp/common" ]
   }
-
 
   # In case a dedicated assert function needs to be supported the flag sdk_fsl_assert_support should be set to false
   # The would add to the build a dedicated application assert implementation.

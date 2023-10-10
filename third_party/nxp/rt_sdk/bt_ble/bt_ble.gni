@@ -144,7 +144,6 @@ template("bt_ble_target") {
       #"${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/btsnoop_pl.c",
       #edgefast_bluetooth
       "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/littlefs_pl.c",
-
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/bt_db_gen.c",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/common/addr.c",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_addr.c",

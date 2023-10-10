@@ -13,13 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 # Defines a lwIP build target.
 #
 # lwIP depends on external header files to compile. This template defines
 # a combined build of the lwIP sources plus target configuration.
 template("lwip_target") {
-
   lwip_sdk_root = invoker.rt_sdk_root
 
   _lwip_root = "${lwip_sdk_root}/middleware/lwip"
@@ -57,9 +55,7 @@ template("lwip_target") {
   }
 
   config("${lwip_target_name}_base_config") {
-    include_dirs = [
-      "${lwip_sdk_root}/middleware/lwip/src/include",
-    ]
+    include_dirs = [ "${lwip_sdk_root}/middleware/lwip/src/include" ]
   }
 
   source_set(lwip_target_name) {
@@ -74,16 +70,16 @@ template("lwip_target") {
     # lwIP headers become empty if the relevant feature is disabled, so the
     # whole interface can be public regardless of build options.
     public += [
-      "${_lwip_root}/src/include/lwip/apps/mdns.h",
-      "${_lwip_root}/src/include/lwip/apps/mdns_domain.h",
-      "${_lwip_root}/src/include/lwip/apps/mdns_out.h",
-      "${_lwip_root}/src/include/lwip/apps/mdns_priv.h",
-      "${_lwip_root}/src/include/lwip/apps/mdns_opts.h",
       "${_lwip_root}/src/include/lwip/acd.h",
       "${_lwip_root}/src/include/lwip/altcp.h",
       "${_lwip_root}/src/include/lwip/altcp_tcp.h",
       "${_lwip_root}/src/include/lwip/altcp_tls.h",
       "${_lwip_root}/src/include/lwip/api.h",
+      "${_lwip_root}/src/include/lwip/apps/mdns.h",
+      "${_lwip_root}/src/include/lwip/apps/mdns_domain.h",
+      "${_lwip_root}/src/include/lwip/apps/mdns_opts.h",
+      "${_lwip_root}/src/include/lwip/apps/mdns_out.h",
+      "${_lwip_root}/src/include/lwip/apps/mdns_priv.h",
       "${_lwip_root}/src/include/lwip/arch.h",
       "${_lwip_root}/src/include/lwip/autoip.h",
       "${_lwip_root}/src/include/lwip/debug.h",
@@ -133,8 +129,8 @@ template("lwip_target") {
       "${_lwip_root}/src/include/lwip/prot/iana.h",
       "${_lwip_root}/src/include/lwip/prot/icmp.h",
       "${_lwip_root}/src/include/lwip/prot/icmp6.h",
-      "${_lwip_root}/src/include/lwip/prot/igmp.h",
       "${_lwip_root}/src/include/lwip/prot/ieee.h",
+      "${_lwip_root}/src/include/lwip/prot/igmp.h",
       "${_lwip_root}/src/include/lwip/prot/ip.h",
       "${_lwip_root}/src/include/lwip/prot/ip4.h",
       "${_lwip_root}/src/include/lwip/prot/ip6.h",
@@ -161,7 +157,7 @@ template("lwip_target") {
       "${_lwip_root}/src/apps/mdns/mdns_out.c",
       "${_lwip_root}/src/core/altcp.c",
       "${_lwip_root}/src/core/altcp_alloc.c",
-      "${_lwip_root}/src/core/altcp_tcp.c", 
+      "${_lwip_root}/src/core/altcp_tcp.c",
       "${_lwip_root}/src/core/def.c",
       "${_lwip_root}/src/core/dns.c",
       "${_lwip_root}/src/core/inet_chksum.c",
@@ -181,13 +177,13 @@ template("lwip_target") {
       "${_lwip_root}/src/core/udp.c",
       "${_lwip_root}/src/include/lwip/priv/altcp_priv.h",
       "${_lwip_root}/src/include/lwip/priv/api_msg.h",
-      "${_lwip_root}/src/include/lwip/priv/memp_priv.h",
+      "${_lwip_root}/src/include/lwip/priv/api_msg.h",
       "${_lwip_root}/src/include/lwip/priv/mem_priv.h",
+      "${_lwip_root}/src/include/lwip/priv/memp_priv.h",
       "${_lwip_root}/src/include/lwip/priv/memp_std.h",
       "${_lwip_root}/src/include/lwip/priv/nd6_priv.h",
       "${_lwip_root}/src/include/lwip/priv/raw_priv.h",
       "${_lwip_root}/src/include/lwip/priv/sockets_priv.h",
-      "${_lwip_root}/src/include/lwip/priv/api_msg.h",
     ]
 
     if (lwip_ipv4) {

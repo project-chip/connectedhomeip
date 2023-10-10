@@ -40,12 +40,10 @@ config("support_config") {
 }
 
 source_set("freertos_memory_utils") {
-  sources = [
-    "Memconfig.cpp",
-  ]
+  sources = [ "Memconfig.cpp" ]
   cflags = [ "-Wconversion" ]
 
-  deps = ["${nxp_sdk_build_root}:nxp_sdk"]
+  deps = [ "${nxp_sdk_build_root}:nxp_sdk" ]
 
   public_configs = [ ":support_config" ]
 }

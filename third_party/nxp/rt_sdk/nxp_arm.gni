@@ -15,7 +15,8 @@
 import("//build_overrides/nxp_sdk.gni")
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
-assert(nxp_platform == "rt/rt1060" || nxp_platform == "rt/rt1170" || nxp_platform == "rt/rw61x",
+assert(nxp_platform == "rt/rt1060" || nxp_platform == "rt/rt1170" ||
+           nxp_platform == "rt/rw61x",
        "${nxp_platform} must be one of: rt/rt1060, rt/rt1170, rt/rw61x.")
 
 if (nxp_platform == "rt/rt1060" || nxp_platform == "rt/rt1170") {

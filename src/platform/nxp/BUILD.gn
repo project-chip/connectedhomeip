@@ -17,7 +17,5 @@ import("//build_overrides/nxp_sdk.gni")
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
 group("nxp") {
-  public_deps = [
-        "${chip_root}/src/platform/nxp/${nxp_platform}:nxp_platform"
-  ]
+  public_deps = [ "${chip_root}/src/platform/nxp/${nxp_platform}:nxp_platform" ]
 }

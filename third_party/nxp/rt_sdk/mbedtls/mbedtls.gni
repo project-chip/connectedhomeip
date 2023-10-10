@@ -21,7 +21,7 @@ template("mbedtls_target") {
   assert(rt_sdk_root != "", "rt_sdk_root must be specified")
   mbedtls_sdk_root = rt_sdk_root
   mbedtls_target_name = target_name
-   _mbedtls_root = "${mbedtls_sdk_root}/middleware/mbedtls"
+  _mbedtls_root = "${mbedtls_sdk_root}/middleware/mbedtls"
 
   config("${mbedtls_target_name}_warnings") {
     cflags = [
@@ -31,10 +31,10 @@ template("mbedtls_target") {
   }
 
   config("${mbedtls_target_name}_config") {
-    include_dirs = [ 
+    include_dirs = [
       "${_mbedtls_root}/include",
       "${rt_sdk_root}/middleware/mbedtls/library",
-     ]
+    ]
   }
 
   static_library(mbedtls_target_name) {
@@ -114,7 +114,7 @@ template("mbedtls_target") {
       "${_mbedtls_root}/library/x509write_csr.c",
       "${_mbedtls_root}/library/xtea.c",
     ]
-    
+
     if (current_os != "freertos") {
       sources += [ "${_mbedtls_root}/library/timing.c" ]
     }
