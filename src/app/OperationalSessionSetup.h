@@ -193,8 +193,8 @@ public:
      * The device is expected to have been commissioned, A CASE session
      * setup will be triggered.
      *
-     * On establishing the session, the callback function `onConnection` will be called. If the
-     * session setup fails, `onFailure` will be called.
+     * On establishing the session, if the session setup succeeds, the callback function `onConnection` will be called.
+     * If the session setup fails, `onFailure` will be called.
      *
      * If the session already exists, `onConnection` will be called immediately,
      * before the Connect call returns.
@@ -211,18 +211,16 @@ public:
      * The device is expected to have been commissioned, A CASE session
      * setup will be triggered.
      *
-     * On establishing the session, the callback function `onConnection` will be called. If the
-     * session setup fails, `onFailure` and `onSetupFailure` will be called.
+     * On establishing the session, if the session setup succeeds, the callback function `onConnection` will be called.
+     * If the session setup fails, `onSetupFailure` will be called.
      *
      * If the session already exists, `onConnection` will be called immediately,
      * before the Connect call returns.
      *
-     * `onFailure` and `onSetupFailure` may be called before the Connect call returns, for error
-     * cases that are detected synchronously (e.g. inability to start an address
-     * lookup).
+     * `onSetupFailure` may be called before the Connect call returns, for error cases that are detected synchronously
+     * (e.g. inability to start an address lookup).
      */
-    void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure,
-                 Callback::Callback<OnSetupFailure> * onSetupFailure);
+    void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnSetupFailure> * onSetupFailure);
 
     bool IsForAddressUpdate() const { return mPerformingAddressUpdate; }
 
@@ -330,6 +328,9 @@ private:
     bool AttachToExistingSecureSession();
 
     void CleanupCASEClient();
+
+    void Connect(Callback::Callback<OnDeviceConnected> * onConnection, Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                 Callback::Callback<OnSetupFailure> * onSetupFailure);
 
     void EnqueueConnectionCallbacks(Callback::Callback<OnDeviceConnected> * onConnection,
                                     Callback::Callback<OnDeviceConnectionFailure> * onFailure,

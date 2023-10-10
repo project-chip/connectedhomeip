@@ -38,8 +38,8 @@ public:
     /**
      * Creates a Java ConnectionFailureException object in outEx.
      */
-    CHIP_ERROR CreateAndroidConnectionFailureException(JNIEnv * env, const char * message, uint32_t errorCode,
-                                                       SessionState state, jthrowable & outEx);
+    CHIP_ERROR CreateAndroidConnectionFailureException(JNIEnv * env, const char * message, uint32_t errorCode, SessionState state,
+                                                       jthrowable & outEx);
 
 private:
     AndroidConnectionFailureExceptions() {}

@@ -98,6 +98,12 @@ void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * on
 }
 
 void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * onConnection,
+                                      Callback::Callback<OnSetupFailure> * onSetupFailure)
+{
+    Connect(onConnection, nullptr, onSetupFailure);
+}
+
+void OperationalSessionSetup::Connect(Callback::Callback<OnDeviceConnected> * onConnection,
                                       Callback::Callback<OnDeviceConnectionFailure> * onFailure,
                                       Callback::Callback<OnSetupFailure> * onSetupFailure)
 {

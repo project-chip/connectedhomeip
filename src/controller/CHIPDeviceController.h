@@ -224,37 +224,42 @@ public:
      * callback is called. This can happen before GetConnectedDevice returns if
      * there is an existing CASE session.
      *
-     * If a CASE sessions fails to be established, the `onError` callback will
+     * If a CASE sessions fails to be established, the `onFailure` callback will
      * be called.  This can also happen before GetConnectedDevice returns.
      *
      * An error return from this function means that neither callback has been
      * called yet, and neither callback will be called in the future.
      */
     CHIP_ERROR GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                  chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure,
-                                  chip::Callback::Callback<OperationalSessionSetup::OnSetupFailure> * onSetupFailure)
+                                  chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-
-        // Ensure that only one of onFailure and onSetupFailure is provided.
-        VerifyOrReturnError(!(onFailure && onSetupFailure), CHIP_ERROR_INVALID_ARGUMENT);
-
-        mSystemState->CASESessionMgr()->FindOrEstablishSession(ScopedNodeId(peerNodeId, GetFabricIndex()), onConnection, onFailure,
-                                                               onSetupFailure);
+        mSystemState->CASESessionMgr()->FindOrEstablishSession(ScopedNodeId(peerNodeId, GetFabricIndex()), onConnection, onFailure);
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                  chip::Callback::Callback<OnDeviceConnectionFailure> * onFailure)
-    {
-        return GetConnectedDevice(peerNodeId, onConnection, onFailure, nullptr);
-    }
-
+    /**
+     * This function finds the device corresponding to deviceId, and establishes
+     * a CASE session with it.
+     *
+     * Once the CASE session is successfully established the `onConnectedDevice`
+     * callback is called. This can happen before GetConnectedDevice returns if
+     * there is an existing CASE session.
+     *
+     * If a CASE sessions fails to be established, the `onSetupFailure` callback will
+     * be called.  This can also happen before GetConnectedDevice returns.
+     *
+     * An error return from this function means that neither callback has been
+     * called yet, and neither callback will be called in the future.
+     */
     CHIP_ERROR
     GetConnectedDevice(NodeId peerNodeId, Callback::Callback<OnDeviceConnected> * onConnection,
-                       chip::Callback::Callback<OperationalSessionSetup::OnSetupFailure> * onExtendedDeviceConnectionFailure)
+                       chip::Callback::Callback<OperationalSessionSetup::OnSetupFailure> * onSetupFailure)
     {
-        return GetConnectedDevice(peerNodeId, onConnection, nullptr, onExtendedDeviceConnectionFailure);
+        VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+        mSystemState->CASESessionMgr()->FindOrEstablishSession(ScopedNodeId(peerNodeId, GetFabricIndex()), onConnection,
+                                                               onSetupFailure);
+        return CHIP_NO_ERROR;
     }
 
     /**
