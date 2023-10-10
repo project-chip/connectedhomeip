@@ -243,13 +243,13 @@ JNI_METHOD(jobject, readCachedVideoPlayers)(JNIEnv * env, jobject)
     return jVideoPlayerList;
 }
 
-JNI_METHOD(jboolean, _1verifyOrEstablishConnection)
+JNI_METHOD(jboolean, verifyOrEstablishConnection)
 (JNIEnv * env, jobject, jobject videoPlayer, jobject jOnConnectionSuccessHandler, jobject jOnConnectionFailureHandler,
  jobject jOnNewOrUpdatedEndpointHandler)
 {
     chip::DeviceLayer::StackLock lock;
 
-    ChipLogProgress(AppServer, "JNI_METHOD _1verifyOrEstablishConnection called");
+    ChipLogProgress(AppServer, "JNI_METHOD verifyOrEstablishConnection called");
 
     TargetVideoPlayerInfo targetVideoPlayerInfo;
     CHIP_ERROR err = convertJVideoPlayerToTargetVideoPlayerInfo(videoPlayer, targetVideoPlayerInfo);
@@ -276,7 +276,7 @@ JNI_METHOD(jboolean, _1verifyOrEstablishConnection)
         [](CHIP_ERROR err) { TvCastingAppJNIMgr().getOnConnectionFailureHandler(true).Handle(err); },
         [](TargetEndpointInfo * endpoint) { TvCastingAppJNIMgr().getOnNewOrUpdatedEndpointHandler(true).Handle(endpoint); });
     VerifyOrExit(CHIP_NO_ERROR == err,
-                 ChipLogError(AppServer, "CastingServer::_1verifyOrEstablishConnection failed: %" CHIP_ERROR_FORMAT, err.Format()));
+                 ChipLogError(AppServer, "CastingServer::verifyOrEstablishConnection failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
 exit:
     return (err == CHIP_NO_ERROR);
