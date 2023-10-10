@@ -20,6 +20,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <psa/crypto.h>
 
