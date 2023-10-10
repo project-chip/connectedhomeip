@@ -183,7 +183,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveRadioFaults(GeneralFaults<kMaxRa
 {
 #if CHIP_CONFIG_TEST
     ReturnErrorOnFailure(radioFaults.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kThreadFault)));
-    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_ENUM_BLE_FAULT));
+    ReturnErrorOnFailure(radioFaults.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kBLEFault)));
 #endif
 
     return CHIP_NO_ERROR;
