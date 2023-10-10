@@ -162,10 +162,10 @@ void ReliableMessageMgr::ExecuteActions()
         }
 
         entry->sendCount++;
-        ChipLogDetail(ExchangeManager,
-                      "Retransmitting MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange
-                      " Send Cnt %d",
-                      messageCounter, ChipLogValueExchange(&entry->ec.Get()), entry->sendCount);
+        ChipLogProgress(ExchangeManager,
+                        "Retransmitting MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange
+                        " Send Cnt %d",
+                        messageCounter, ChipLogValueExchange(&entry->ec.Get()), entry->sendCount);
 
         // Choose active/idle timeout from PeerActiveMode of session per 4.11.2.1. Retransmissions.
         System::Clock::Timestamp baseTimeout = entry->ec->GetSessionHandle()->GetMRPBaseTimeout();
