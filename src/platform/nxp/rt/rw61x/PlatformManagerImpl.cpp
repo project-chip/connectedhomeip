@@ -26,15 +26,15 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <stdlib.h>
-#include <crypto/CHIPCryptoPAL.h>
-#include <platform/FreeRTOS/SystemTimeSupport.h>
-#include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 #include "DiagnosticDataProviderImpl.h"
 #include "fsl_adapter_rng.h"
 #include "fsl_os_abstraction.h"
 #include "fwk_platform_coex.h"
+#include <crypto/CHIPCryptoPAL.h>
+#include <platform/FreeRTOS/SystemTimeSupport.h>
+#include <platform/PlatformManager.h>
+#include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
+#include <stdlib.h>
 
 #include <lwip/tcpip.h>
 
@@ -45,8 +45,8 @@
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include "ot_platform_common.h"
 #include "fwk_platform_ot.h"
+#include "ot_platform_common.h"
 #endif
 
 extern "C" void BOARD_InitHardware(void);
@@ -81,7 +81,7 @@ extern "C" void vApplicationIdleHook(void)
 }
 #endif
 
-extern "C" void __wrap_exit (int __status)
+extern "C" void __wrap_exit(int __status)
 {
     ChipLogError(DeviceLayer, "======> error exit function !!!");
     assert(0);
@@ -90,7 +90,7 @@ extern "C" void __wrap_exit (int __status)
 /* wlan_event_callback should be defined here because it is
  * referenced in wlan.c but only defined in main.c of sdk examples */
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-extern "C" int wlan_event_callback(enum wlan_event_reason reason, void *data)
+extern "C" int wlan_event_callback(enum wlan_event_reason reason, void * data)
 {
     return 0;
 }
@@ -112,7 +112,7 @@ CHIP_ERROR PlatformManagerImpl::ServiceInit(void)
     status_t status;
     hal_rng_status_t rngStatus;
     CHIP_ERROR chipRes = CHIP_NO_ERROR;
-    
+
     status = CRYPTO_InitHardware();
 
     if (status != 0)
@@ -132,7 +132,7 @@ CHIP_ERROR PlatformManagerImpl::WiFiInterfaceInit(void)
 
     ChipLogProgress(DeviceLayer, "Initialize WLAN");
 
-    wifi_status = wlan_init((uint8_t*)WIFI_FW_BIN_ADDRESS, wlan_fw_bin_len);
+    wifi_status = wlan_init((uint8_t *) WIFI_FW_BIN_ADDRESS, wlan_fw_bin_len);
     if (wifi_status != WM_SUCCESS)
     {
         ChipLogError(DeviceLayer, "WLAN initialization failed");
@@ -158,7 +158,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     // Initialize the configuration system.
     err = Internal::NXPConfig::Init();
     SuccessOrExit(err);
-    
+
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
@@ -170,11 +170,11 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     tcpip_init(NULL, NULL);
 #endif
 
-    /* 
+    /*
      * Initialize controllers here before initializing BLE/OT/WIFI,
-     * this will load the firmware in CPU1/CPU2 depending on the 
+     * this will load the firmware in CPU1/CPU2 depending on the
      * connectivity used
-    */
+     */
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     controllerMask |= conn802_15_4_c;
@@ -220,7 +220,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(DeviceLayer, "Wi-Fi module initialization failed. Make sure the Wi-Fi/BLE module is properly configured and connected with the board and start again!");
+        ChipLogProgress(DeviceLayer,
+                        "Wi-Fi module initialization failed. Make sure the Wi-Fi/BLE module is properly configured and connected "
+                        "with the board and start again!");
         chipDie();
     }
     ChipLogProgress(DeviceLayer, "Wi-Fi module initialization done.");
@@ -258,9 +260,9 @@ void PlatformManagerImpl::IdleHook(void)
     if (isResetScheduled)
     {
         /*
-        * In case a reset in IDLE has been scheduled
-        * Disable IRQs so that the idle task won't be preempted until the reset
-        */
+         * In case a reset in IDLE has been scheduled
+         * Disable IRQs so that the idle task won't be preempted until the reset
+         */
         OSA_InterruptDisable();
     }
 
@@ -276,9 +278,9 @@ void PlatformManagerImpl::IdleHook(void)
 #endif
 
     /*
-    * In case a reset in idle operation has been posted,
-    * reset the device after having run the idle function
-    */
+     * In case a reset in idle operation has been posted,
+     * reset the device after having run the idle function
+     */
     if (isResetScheduled)
     {
         PlatformMgrImpl().Reset();
@@ -305,10 +307,7 @@ bool PlatformManagerImpl::GetResetInIdleValue(void)
     return resetInIdle;
 }
 
-void PlatformManagerImpl::StopBLEConnectivity(void)
-{
-
-}
+void PlatformManagerImpl::StopBLEConnectivity(void) {}
 
 void PlatformManagerImpl::_Shutdown()
 {

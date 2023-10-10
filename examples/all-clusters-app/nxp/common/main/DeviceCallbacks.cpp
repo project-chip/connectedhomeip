@@ -67,7 +67,7 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
     case DeviceEventType::kWiFiConnectivityChange:
         OnWiFiConnectivityChange(event);
         break;
-    
+
     case DeviceEventType::kInternetConnectivityChange:
         OnInternetConnectivityChange(event);
         break;
@@ -91,11 +91,13 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
     }
 }
 
-void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
-                                                  uint8_t type, uint16_t size, uint8_t * value)
+void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t type,
+                                                  uint16_t size, uint8_t * value)
 {
-    ChipLogProgress(DeviceLayer, "endpointId " ChipLogFormatMEI " clusterId " ChipLogFormatMEI " attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
-                        ChipLogValueMEI(endpointId), ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId), type, *value, size);
+    ChipLogProgress(DeviceLayer,
+                    "endpointId " ChipLogFormatMEI " clusterId " ChipLogFormatMEI " attribute ID: " ChipLogFormatMEI
+                    " Type: %u Value: %u, length %u",
+                    ChipLogValueMEI(endpointId), ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId), type, *value, size);
 }
 
 void DeviceCallbacks::OnWiFiConnectivityChange(const ChipDeviceEvent * event)

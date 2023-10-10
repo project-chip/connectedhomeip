@@ -19,17 +19,17 @@
 
 #include "AppFactoryData.h"
 
+#include <credentials/DeviceAttestationCredsProvider.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
 
 #if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
 #include "FactoryDataProvider.h"
 /*
-* Test key used to encrypt factory data before storing it to the flash.
-*/
-static const uint8_t aes128TestKey[] __attribute__((aligned)) = {0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
-                                                                0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c};
+ * Test key used to encrypt factory data before storing it to the flash.
+ */
+static const uint8_t aes128TestKey[]
+    __attribute__((aligned)) = { 0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c };
 #else
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #endif

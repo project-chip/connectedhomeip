@@ -70,7 +70,7 @@
 /**
  * NO_SYS==1: Bare metal lwIP
  */
-#define NO_SYS       1
+#define NO_SYS 1
 /**
  * LWIP_NETCONN==0: Disable Netconn API (require to use api_lib.c)
  */
@@ -78,7 +78,7 @@
 /**
  * LWIP_SOCKET==0: Disable Socket API (require to use sockets.c)
  */
-#define LWIP_SOCKET  0
+#define LWIP_SOCKET 0
 
 #endif
 
@@ -91,7 +91,7 @@
 /**
  * The maximum number of services per netif
  * recommended to be two times greater than number of matter fabrics supported
-*/
+ */
 #ifndef MDNS_MAX_SERVICES
 #define MDNS_MAX_SERVICES 10
 #endif
@@ -120,11 +120,11 @@ void sys_lock_tcpip_core(void);
 void sys_unlock_tcpip_core(void);
 #define UNLOCK_TCPIP_CORE() sys_unlock_tcpip_core()
 
-//void sys_check_core_locking(void);
-//#define LWIP_ASSERT_CORE_LOCKED() sys_check_core_locking()
+// void sys_check_core_locking(void);
+// #define LWIP_ASSERT_CORE_LOCKED() sys_check_core_locking()
 
-//void sys_mark_tcpip_thread(void);
-//#define LWIP_MARK_TCPIP_THREAD() sys_mark_tcpip_thread()
+// void sys_mark_tcpip_thread(void);
+// #define LWIP_MARK_TCPIP_THREAD() sys_mark_tcpip_thread()
 
 #ifdef __cplusplus
 }
@@ -286,7 +286,6 @@ void sys_unlock_tcpip_core(void);
 #define TCP_LISTEN_BACKLOG 1
 #endif
 
-
 /* ---------- Network Interfaces options ---------- */
 /* Support netif api (in netifapi.c). */
 #ifndef LWIP_NETIF_API
@@ -337,7 +336,6 @@ void sys_unlock_tcpip_core(void);
 #define LWIP_PROVIDE_ERRNO 1
 #endif
 
-
 /*
    --------------------------------------
    ---------- Checksum options ----------
@@ -349,7 +347,7 @@ Some MCU allow computing and verifying the IP, UDP, TCP and ICMP checksums by ha
  - To use this feature let the following define uncommented.
  - To disable it and process by CPU comment the  the checksum.
 */
-//#define CHECKSUM_BY_HARDWARE
+// #define CHECKSUM_BY_HARDWARE
 
 #ifdef CHECKSUM_BY_HARDWARE
 /* CHECKSUM_GEN_IP==0: Generate checksums by hardware for outgoing IP packets.*/
@@ -366,13 +364,13 @@ Some MCU allow computing and verifying the IP, UDP, TCP and ICMP checksums by ha
 #define CHECKSUM_CHECK_TCP 0
 #else
 /* CHECKSUM_GEN_IP==1: Generate checksums in software for outgoing IP packets.*/
-#define CHECKSUM_GEN_IP    1
+#define CHECKSUM_GEN_IP 1
 /* CHECKSUM_GEN_UDP==1: Generate checksums in software for outgoing UDP packets.*/
-#define CHECKSUM_GEN_UDP   1
+#define CHECKSUM_GEN_UDP 1
 /* CHECKSUM_GEN_TCP==1: Generate checksums in software for outgoing TCP packets.*/
-#define CHECKSUM_GEN_TCP   1
+#define CHECKSUM_GEN_TCP 1
 /* CHECKSUM_CHECK_IP==1: Check checksums in software for incoming IP packets.*/
-#define CHECKSUM_CHECK_IP  1
+#define CHECKSUM_CHECK_IP 1
 /* CHECKSUM_CHECK_UDP==1: Check checksums in software for incoming UDP packets.*/
 #define CHECKSUM_CHECK_UDP 1
 /* CHECKSUM_CHECK_TCP==1: Check checksums in software for incoming TCP packets.*/
@@ -397,10 +395,6 @@ Some MCU allow computing and verifying the IP, UDP, TCP and ICMP checksums by ha
 #define DEFAULT_THREAD_PRIO 8
 #endif
 
-
-
-
-
 #define LWIP_TIMEVAL_PRIVATE (0)
 #define LWIP_COMPAT_MUTEX (0)
 
@@ -412,18 +406,14 @@ Some MCU allow computing and verifying the IP, UDP, TCP and ICMP checksums by ha
 #define SO_REUSE (0)
 #define LWIP_RANDOMIZE_INITIAL_LOCAL_PORTS (0)
 
-
 #define TCP_QUEUE_OOSEQ 0
 #define ARP_QUEUEING (0)
-
-
 
 // TODO: seems like this is unnecessary on Thread-only platforms
 #define LWIP_RAW 1
 #define MEMP_NUM_RAW_PCB (1)
 
 // TODO: verify count
-
 
 #define LWIP_HAVE_LOOPIF (0)
 
@@ -443,7 +433,6 @@ Some MCU allow computing and verifying the IP, UDP, TCP and ICMP checksums by ha
 #ifndef LWIP_DNS
 #define LWIP_DNS (1)
 #endif
-
 
 #if LWIP_IPV6
 // #define LWIP_IPV6_REASS (0)
@@ -466,20 +455,14 @@ Some MCU allow computing and verifying the IP, UDP, TCP and ICMP checksums by ha
 #define LWIP_PBUF_FROM_CUSTOM_POOLS (0)
 #define MEMP_USE_CUSTOM_POOLS (0)
 
-
 #define MEM_LIBC_MALLOC 1
 #define mem_clib_malloc pvPortMalloc
 #define mem_clib_free vPortFree
 
 #define mem_clib_calloc pvPortCalloc
 
-
-
 #define PBUF_CUSTOM_POOL_IDX_START (MEMP_NUM_PBUF)
 #define PBUF_CUSTOM_POOL_IDX_END (MEMP_NUM_PBUF)
-
-
-
 
 #define ETH_PAD_SIZE (0)
 #define SUB_ETHERNET_HEADER_SPACE (0)
@@ -495,11 +478,9 @@ Some MCU allow computing and verifying the IP, UDP, TCP and ICMP checksums by ha
 
 #define LWIP_MULTICAST_PING 0
 
-
-#define LWIP_DNS_FOUND_CALLBACK_TYPE    dns_found_callback
+#define LWIP_DNS_FOUND_CALLBACK_TYPE dns_found_callback
 
 // TODO: make LWIP_DEBUG conditional on build type
-
 
 #define MEMP_OVERFLOW_CHECK (0)
 #define MEMP_SANITY_CHECK (0)
@@ -536,19 +517,16 @@ Some MCU allow computing and verifying the IP, UDP, TCP and ICMP checksums by ha
 #define LWIP_DBG_TYPES_ON                                                                                                          \
     (LWIP_DBG_ON | LWIP_DBG_TRACE) /* (LWIP_DBG_ON|LWIP_DBG_TRACE|LWIP_DBG_STATE|LWIP_DBG_FRESH|LWIP_DBG_HALT) */
 
-
 /*
    ------------------------------------
    ---------- Debugging options ----------
    ------------------------------------
 */
 
-
-
 #ifdef LWIP_DEBUG
-#define U8_F  "c"
-#define S8_F  "c"
-#define X8_F  "02x"
+#define U8_F "c"
+#define S8_F "c"
+#define X8_F "02x"
 #define U16_F "u"
 #define S16_F "d"
 #define X16_F "x"
@@ -567,7 +545,7 @@ Some MCU allow computing and verifying the IP, UDP, TCP and ICMP checksums by ha
 #endif
 
 #define TCPIP_THREAD_STACKSIZE 1024
-#define TCPIP_THREAD_PRIO      8
+#define TCPIP_THREAD_PRIO 8
 
 /**
  * DEFAULT_RAW_RECVMBOX_SIZE: The mailbox size for the incoming packets on a
@@ -604,7 +582,6 @@ u32_t lwip_rand(void);
 #define LWIP_RAND() lwip_rand()
 #endif
 
-
 /**
  * DAC macro (initially defined in MIMXRT1176_cm7_features.h) must be undefined
  * in the use case of RT1170 platform.
@@ -614,6 +591,5 @@ u32_t lwip_rand(void);
 #ifdef MIMXRT1176_cm7_SERIES
 #undef DAC
 #endif
-
 
 #endif /* __LWIPOPTS_COMMON_H__ */

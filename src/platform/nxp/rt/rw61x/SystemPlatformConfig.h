@@ -29,7 +29,6 @@
 
 #include <stdint.h>
 
-
 // ==================== Platform Adaptations ====================
 
 /* Default NXP Platform adaptations are used */

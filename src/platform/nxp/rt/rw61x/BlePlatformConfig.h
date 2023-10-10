@@ -25,7 +25,6 @@
 
 #pragma once
 
-
 // ==================== Platform Adaptations ====================
 
 /* Default NXP Platform adaptations are used */
@@ -33,7 +32,6 @@
 // ========== Platform-specific Configuration Overrides =========
 
 /* Default NXP Platform configuration overrides are used */
-
 
 // Include default nxp platform configurations
 #include "platform/nxp/common/ble_zephyr/BleNXPPlatformDefaultConfig.h"

@@ -17,11 +17,11 @@
  */
 #pragma once
 
+#include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <include/platform/CommissionableDataProvider.h>
 #include <include/platform/ConfigurationManager.h>
 #include <include/platform/DeviceInstanceInfoProvider.h>
-#include <credentials/CHIPCert.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -39,8 +39,12 @@ class FactoryDataProvider : public chip::Credentials::DeviceAttestationCredentia
     using ImplClass = ::chip::DeviceLayer::FactoryDataProviderImpl;
 
 public:
-
-    enum EncryptionMode {encrypt_none = 0U, encrypt_ecb = 1U, encrypt_cbc = 2U};
+    enum EncryptionMode
+    {
+        encrypt_none = 0U,
+        encrypt_ecb  = 1U,
+        encrypt_cbc  = 2U
+    };
 
     // Default factory data IDs
     enum FactoryDataId
@@ -106,7 +110,8 @@ public:
 
 protected:
     // Methods to be implemented by impl class delegate.
-    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, uint16_t &length, uint32_t *contentAddr=NULL);
+    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
+                           uint32_t * contentAddr = NULL);
     CHIP_ERROR SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer);
 };
 

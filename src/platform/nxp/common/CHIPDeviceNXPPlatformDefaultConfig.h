@@ -58,7 +58,6 @@
 // These are configuration options that are unique to the NXP platform.
 // These can be overridden by the application as needed.
 
-
 // ========== Platform-specific Configuration Overrides =========
 #ifndef CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE
 #define CHIP_DEVICE_CONFIG_CHIP_TASK_STACK_SIZE 10240

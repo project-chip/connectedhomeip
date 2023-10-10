@@ -38,7 +38,7 @@
 
 // ==================== General Configuration Overrides ====================
 
-/* Default NXP Platform general configuration overrides are used */ 
+/* Default NXP Platform general configuration overrides are used */
 
 /* For now on RW610, due to the current file system implementation only 5 fabrics are supported */
 #define CHIP_CONFIG_MAX_FABRICS 5

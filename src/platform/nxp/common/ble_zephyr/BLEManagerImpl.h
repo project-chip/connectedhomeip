@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <toolchain.h>
-#include <sys/atomic.h>
 #include <lib/support/CHIPMemString.h>
 #include <platform/Zephyr/BLEManagerImpl.h>
+#include <sys/atomic.h>
+#include <toolchain.h>

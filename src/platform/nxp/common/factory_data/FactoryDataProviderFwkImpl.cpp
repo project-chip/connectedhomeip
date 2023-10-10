@@ -24,12 +24,13 @@ namespace DeviceLayer {
 
 FactoryDataProviderImpl FactoryDataProviderImpl::sInstance;
 
-CHIP_ERROR FactoryDataProviderImpl::SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, uint16_t &length, uint32_t *contentAddr)
+CHIP_ERROR FactoryDataProviderImpl::SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
+                                                uint32_t * contentAddr)
 {
-    CHIP_ERROR err = CHIP_ERROR_NOT_FOUND;
+    CHIP_ERROR err   = CHIP_ERROR_NOT_FOUND;
     uint32_t readLen = 0;
 
-    uint8_t *ramBufferAddr = FDP_SearchForId(searchedType, pBuf, bufLength, &readLen);
+    uint8_t * ramBufferAddr = FDP_SearchForId(searchedType, pBuf, bufLength, &readLen);
 
     if (ramBufferAddr != NULL)
     {
@@ -57,7 +58,7 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
     uint16_t certificateSize = 0;
     uint32_t certificateAddr;
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kDacCertificateId, NULL, 0, certificateSize, &certificateAddr));
-    MutableByteSpan dacCertSpan((uint8_t *)certificateAddr, certificateSize);
+    MutableByteSpan dacCertSpan((uint8_t *) certificateAddr, certificateSize);
 
     /* Extract Public Key of DAC certificate from itself */
     ReturnErrorOnFailure(Crypto::ExtractPubkeyFromX509Cert(dacCertSpan, dacPublicKey));
@@ -66,9 +67,10 @@ CHIP_ERROR FactoryDataProviderImpl::SignWithDacKey(const ByteSpan & digestToSign
     uint16_t keySize = 0;
     uint32_t keyAddr;
     ReturnErrorOnFailure(SearchForId(FactoryDataId::kDacPrivateKeyId, NULL, 0, keySize, &keyAddr));
-    MutableByteSpan dacPrivateKeySpan((uint8_t *)keyAddr, keySize);
+    MutableByteSpan dacPrivateKeySpan((uint8_t *) keyAddr, keySize);
 
-    ReturnErrorOnFailure(LoadKeypairFromRaw(ByteSpan(dacPrivateKeySpan.data(), dacPrivateKeySpan.size()), ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length()), keypair));
+    ReturnErrorOnFailure(LoadKeypairFromRaw(ByteSpan(dacPrivateKeySpan.data(), dacPrivateKeySpan.size()),
+                                            ByteSpan(dacPublicKey.Bytes(), dacPublicKey.Length()), keypair));
 
     ReturnErrorOnFailure(keypair.ECDSA_sign_msg(digestToSign.data(), digestToSign.size(), signature));
 
@@ -87,9 +89,9 @@ CHIP_ERROR FactoryDataProviderImpl::LoadKeypairFromRaw(ByteSpan privateKey, Byte
 CHIP_ERROR FactoryDataProviderImpl::Init(void)
 {
     /*
-    * Currently the fwk_factory_data_provider module supports only ecb mode.
-    * Therefore return an error if encrypt mode is not ecb
-    */
+     * Currently the fwk_factory_data_provider module supports only ecb mode.
+     * Therefore return an error if encrypt mode is not ecb
+     */
     if (pAesKey == NULL || encryptMode != encrypt_ecb)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -103,13 +105,13 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR FactoryDataProviderImpl::SetAes128Key(const uint8_t *keyAes128)
+CHIP_ERROR FactoryDataProviderImpl::SetAes128Key(const uint8_t * keyAes128)
 {
     CHIP_ERROR error = CHIP_ERROR_INVALID_ARGUMENT;
     if (keyAes128 != nullptr)
     {
         pAesKey = keyAes128;
-        error = CHIP_NO_ERROR;
+        error   = CHIP_NO_ERROR;
     }
     return error;
 }
@@ -119,13 +121,13 @@ CHIP_ERROR FactoryDataProviderImpl::SetEncryptionMode(EncryptionMode mode)
     CHIP_ERROR error = CHIP_ERROR_INVALID_ARGUMENT;
 
     /*
-    * Currently the fwk_factory_data_provider module supports only ecb mode.
-    * Therefore return an error if encrypt mode is not ecb
-    */
+     * Currently the fwk_factory_data_provider module supports only ecb mode.
+     * Therefore return an error if encrypt mode is not ecb
+     */
     if (mode == encrypt_ecb)
     {
         encryptMode = mode;
-        error = CHIP_NO_ERROR;
+        error       = CHIP_NO_ERROR;
     }
     return error;
 }

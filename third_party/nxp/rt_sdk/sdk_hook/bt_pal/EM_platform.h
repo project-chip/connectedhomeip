@@ -13,7 +13,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-
 #ifndef _H_EM_PLATFORM_HOOK
 #define _H_EM_PLATFORM_HOOK
 

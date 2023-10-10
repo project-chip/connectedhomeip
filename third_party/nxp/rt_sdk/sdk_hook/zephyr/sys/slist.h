@@ -11,7 +11,6 @@ extern "C" {
 
 #include "sys/slist.h"
 
-
 #if defined(__cplusplus)
 }
 #endif

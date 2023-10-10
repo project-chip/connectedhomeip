@@ -25,11 +25,12 @@
 
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
+#include "NXPConfig.h"
 #include <app/server/Server.h>
 #include <platform/ConfigurationManager.h>
-#include "NXPConfig.h"
-#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #include "fsl_device_registers.h"
 
@@ -109,7 +110,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 
     return CHIP_NO_ERROR;
 #else
-    (void)memset(&buf[0], 0, 6); // this is to avoid compilation error in GenericConfigurationManagerImpl.cpp
+    (void) memset(&buf[0], 0, 6); // this is to avoid compilation error in GenericConfigurationManagerImpl.cpp
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif
 }

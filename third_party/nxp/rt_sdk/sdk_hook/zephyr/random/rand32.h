@@ -20,7 +20,7 @@ extern "C" {
  * Returns 0 if success, -1 otherwise
  *
  */
-int sys_csrand_get(void *dst, size_t len);
+int sys_csrand_get(void * dst, size_t len);
 
 #ifdef __cplusplus
 }

@@ -25,8 +25,8 @@
 
 #pragma once
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#include <toolchain.h>
 #include <sys/atomic.h>
+#include <toolchain.h>
 #include <zephyr/bluetooth/bluetooth.h>
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -117,7 +117,6 @@ struct ChipDevicePlatformEvent final
         enum wlan_event_reason WlanEventReason;
         struct wlan_network * pNetworkDataEvent;
 #endif
-
     };
 };
 

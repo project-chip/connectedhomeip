@@ -20,11 +20,11 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/ConnectivityManager.h>
-#include <platform/internal/BLEManager.h>
+#include "NetworkCommissioningDriver.h"
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include "NetworkCommissioningDriver.h"
+#include <platform/ConnectivityManager.h>
+#include <platform/internal/BLEManager.h>
 
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
 
@@ -209,67 +209,70 @@ void ConnectivityManagerImpl::ProcessWlanEvent(enum wlan_event_reason wlanEvent)
 
     switch (wlanEvent)
     {
-        case WLAN_REASON_SUCCESS:
-            ChipLogProgress(DeviceLayer, "Connected to WLAN network = %d", is_sta_ipv6_connected());
-            if (sInstance._GetWiFiStationState() == kWiFiStationState_Connecting)
-            {
-                sInstance._SetWiFiStationState(kWiFiStationState_Connecting_Succeeded);
-                sInstance._SetWiFiStationState(kWiFiStationState_Connected);
-                NetworkCommissioning::NXPWiFiDriver::GetInstance().OnConnectWiFiNetwork(NetworkCommissioning::Status::kSuccess, CharSpan(), wlanEvent);
-                sInstance.OnStationConnected();
-            }
-            break;
+    case WLAN_REASON_SUCCESS:
+        ChipLogProgress(DeviceLayer, "Connected to WLAN network = %d", is_sta_ipv6_connected());
+        if (sInstance._GetWiFiStationState() == kWiFiStationState_Connecting)
+        {
+            sInstance._SetWiFiStationState(kWiFiStationState_Connecting_Succeeded);
+            sInstance._SetWiFiStationState(kWiFiStationState_Connected);
+            NetworkCommissioning::NXPWiFiDriver::GetInstance().OnConnectWiFiNetwork(NetworkCommissioning::Status::kSuccess,
+                                                                                    CharSpan(), wlanEvent);
+            sInstance.OnStationConnected();
+        }
+        break;
 
-        case WLAN_REASON_AUTH_SUCCESS:
-            ChipLogProgress(DeviceLayer, "Associated to WLAN network");
-            break;
+    case WLAN_REASON_AUTH_SUCCESS:
+        ChipLogProgress(DeviceLayer, "Associated to WLAN network");
+        break;
 
-        case WLAN_REASON_CONNECT_FAILED:
-            ChipLogError(DeviceLayer, "WLAN (re)connect failed");
-            sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
-            UpdateInternetConnectivityState();
-            break;
+    case WLAN_REASON_CONNECT_FAILED:
+        ChipLogError(DeviceLayer, "WLAN (re)connect failed");
+        sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
+        UpdateInternetConnectivityState();
+        break;
 
-        case WLAN_REASON_NETWORK_NOT_FOUND:
-            ChipLogError(DeviceLayer, "WLAN network not found");
-            NetworkCommissioning::NXPWiFiDriver::GetInstance().OnConnectWiFiNetwork(NetworkCommissioning::Status::kNetworkNotFound, CharSpan(), wlanEvent);
-            break;
+    case WLAN_REASON_NETWORK_NOT_FOUND:
+        ChipLogError(DeviceLayer, "WLAN network not found");
+        NetworkCommissioning::NXPWiFiDriver::GetInstance().OnConnectWiFiNetwork(NetworkCommissioning::Status::kNetworkNotFound,
+                                                                                CharSpan(), wlanEvent);
+        break;
 
-        case WLAN_REASON_NETWORK_AUTH_FAILED:
-            ChipLogError(DeviceLayer, "Authentication to WLAN network failed");
-            NetworkCommissioning::NXPWiFiDriver::GetInstance().OnConnectWiFiNetwork(NetworkCommissioning::Status::kAuthFailure, CharSpan(), wlanEvent);
-            ChipLogError(DeviceLayer, "Authentication to WLAN network failed end");
-            break;
+    case WLAN_REASON_NETWORK_AUTH_FAILED:
+        ChipLogError(DeviceLayer, "Authentication to WLAN network failed");
+        NetworkCommissioning::NXPWiFiDriver::GetInstance().OnConnectWiFiNetwork(NetworkCommissioning::Status::kAuthFailure,
+                                                                                CharSpan(), wlanEvent);
+        ChipLogError(DeviceLayer, "Authentication to WLAN network failed end");
+        break;
 
-        case WLAN_REASON_LINK_LOST:
-            ChipLogError(DeviceLayer, "WLAN link lost");
-            if (sInstance._GetWiFiStationState() == kWiFiStationState_Connected)
-            {
-                sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
-                sInstance.OnStationDisconnected();
-            }
-            break;
-
-        case WLAN_REASON_USER_DISCONNECT:
-            ChipLogProgress(DeviceLayer, "Disconnected from WLAN network");
+    case WLAN_REASON_LINK_LOST:
+        ChipLogError(DeviceLayer, "WLAN link lost");
+        if (sInstance._GetWiFiStationState() == kWiFiStationState_Connected)
+        {
             sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
             sInstance.OnStationDisconnected();
-            break;
+        }
+        break;
 
-        case WLAN_REASON_INITIALIZED:
-            sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
-            sInstance._SetWiFiStationMode(kWiFiStationMode_Enabled);
-            break;
+    case WLAN_REASON_USER_DISCONNECT:
+        ChipLogProgress(DeviceLayer, "Disconnected from WLAN network");
+        sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
+        sInstance.OnStationDisconnected();
+        break;
 
-        default:
-            break;
+    case WLAN_REASON_INITIALIZED:
+        sInstance._SetWiFiStationState(kWiFiStationState_NotConnected);
+        sInstance._SetWiFiStationMode(kWiFiStationMode_Enabled);
+        break;
+
+    default:
+        break;
     }
 }
 
-int ConnectivityManagerImpl::_WlanEventCallback(enum wlan_event_reason wlanEvent, void *data)
+int ConnectivityManagerImpl::_WlanEventCallback(enum wlan_event_reason wlanEvent, void * data)
 {
     ChipDeviceEvent event;
-    event.Type                          = DeviceEventType::kPlatformNxpWlanEvent;
+    event.Type                     = DeviceEventType::kPlatformNxpWlanEvent;
     event.Platform.WlanEventReason = wlanEvent;
     (void) PlatformMgr().PostEvent(&event);
     return 0;
@@ -282,7 +285,7 @@ void ConnectivityManagerImpl::OnStationConnected()
 
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
     event.WiFiConnectivityChange.Result = kConnectivity_Established;
-    (void ) PlatformMgr().PostEvent(&event);
+    (void) PlatformMgr().PostEvent(&event);
 
     /* Update the connectivity state in case the connected event has been received after getting an IP addr */
     UpdateInternetConnectivityState();
@@ -295,7 +298,7 @@ void ConnectivityManagerImpl::OnStationDisconnected()
 
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
     event.WiFiConnectivityChange.Result = kConnectivity_Lost;
-    (void ) PlatformMgr().PostEvent(&event);
+    (void) PlatformMgr().PostEvent(&event);
 
     /* Update the connectivity state in case the connected event has been received after getting an IP addr */
     UpdateInternetConnectivityState();
@@ -307,8 +310,8 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
     bool haveIPv6Conn      = false;
     const bool hadIPv4Conn = mFlags.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
     const bool hadIPv6Conn = mFlags.Has(ConnectivityFlags::kHaveIPv6InternetConnectivity);
-    const ip_addr_t *addr4;
-    const ip6_addr_t *addr6;
+    const ip_addr_t * addr4;
+    const ip6_addr_t * addr6;
     CHIP_ERROR err;
     ChipDeviceEvent event;
 
@@ -316,7 +319,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
     if (_IsWiFiStationConnected())
     {
         // Get the LwIP netif for the WiFi station interface.
-        struct netif *netif = static_cast<struct netif *>(net_get_mlan_handle());
+        struct netif * netif = static_cast<struct netif *>(net_get_mlan_handle());
 
         // If the WiFi station interface is up...
         if ((netif != nullptr) && netif_is_up(netif) && netif_is_link_up(netif))
@@ -332,7 +335,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
                 if (!ip4_addr_isany_val(*netif_ip4_addr(netif)) && !ip4_addr_isany_val(*netif_ip4_gw(netif)))
                 {
                     haveIPv4Conn = true;
-                    addr4 = &netif->ip_addr;
+                    addr4        = &netif->ip_addr;
                 }
             }
 #endif
@@ -346,7 +349,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
                 if (ip6_addr_isvalid(netif_ip6_addr_state(netif, i)))
                 {
                     haveIPv6Conn = true;
-                    addr6 = netif_ip6_addr(netif, i);
+                    addr6        = netif_ip6_addr(netif, i);
                     break;
                 }
             }
@@ -354,8 +357,8 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
     }
 
     // Update the current state.
-     mFlags.Set(ConnectivityFlags::kHaveIPv4InternetConnectivity, haveIPv4Conn).Set(ConnectivityFlags::kHaveIPv6InternetConnectivity, haveIPv6Conn);
-
+    mFlags.Set(ConnectivityFlags::kHaveIPv4InternetConnectivity, haveIPv4Conn)
+        .Set(ConnectivityFlags::kHaveIPv6InternetConnectivity, haveIPv6Conn);
 
     if (haveIPv4Conn != hadIPv4Conn)
     {
@@ -393,9 +396,10 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState()
     }
 }
 
-void ConnectivityManagerImpl::_NetifExtCallback(struct netif* netif, netif_nsc_reason_t reason, const netif_ext_callback_args_t* args)
+void ConnectivityManagerImpl::_NetifExtCallback(struct netif * netif, netif_nsc_reason_t reason,
+                                                const netif_ext_callback_args_t * args)
 {
-    struct netif *station_netif;
+    struct netif * station_netif;
     ChipDeviceEvent event;
 
     ChipLogDetail(DeviceLayer, "_NetifExtCallback: netif=%p, reason=0x%04x", netif, reason);
@@ -410,7 +414,7 @@ void ConnectivityManagerImpl::_NetifExtCallback(struct netif* netif, netif_nsc_r
 
 void ConnectivityManagerImpl::StartWiFiManagement()
 {
-    struct netif *netif = nullptr;
+    struct netif * netif = nullptr;
     EventBits_t bits;
     int32_t result;
 
@@ -436,7 +440,7 @@ void ConnectivityManagerImpl::StartWiFiManagement()
 CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    CHIP_ERROR ret = CHIP_NO_ERROR;
+    CHIP_ERROR ret                     = CHIP_NO_ERROR;
     struct wlan_network * pNetworkData = (struct wlan_network *) malloc(sizeof(struct wlan_network));
     int result;
 
@@ -485,9 +489,9 @@ void ConnectivityManagerImpl::ConnectNetworkTimerHandler(::chip::System::Layer *
     ChipDeviceEvent event;
 
     /*
-    * Make sure to have the Wi-Fi station enabled before scheduling a connect event .
-    * Otherwise start a new timer to check again the status later.
-    */
+     * Make sure to have the Wi-Fi station enabled before scheduling a connect event .
+     * Otherwise start a new timer to check again the status later.
+     */
     if (ConnectivityMgr().IsWiFiStationEnabled())
     {
         /* Post an event to start the connection asynchronously in the Matter task context */
@@ -498,7 +502,8 @@ void ConnectivityManagerImpl::ConnectNetworkTimerHandler(::chip::System::Layer *
     else
     {
         PlatformMgr().LockChipStack();
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL), ConnectNetworkTimerHandler, context);
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL),
+                                              ConnectNetworkTimerHandler, context);
         PlatformMgr().UnlockChipStack();
     }
 }

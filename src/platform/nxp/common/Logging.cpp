@@ -19,9 +19,9 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/logging/LogV.h>
 
-#include <platform/logging/LogV.h>
-#include <lib/core/CHIPConfig.h>
 #include "fsl_debug_console.h"
+#include <lib/core/CHIPConfig.h>
+#include <platform/logging/LogV.h>
 
 #include <lib/support/logging/Constants.h>
 #include <stdio.h>
@@ -41,7 +41,7 @@ namespace Platform {
  */
 void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
-    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE] = {0};
+    char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE] = { 0 };
     size_t prefixLen;
 
     /* First add the timestamp to the log message */

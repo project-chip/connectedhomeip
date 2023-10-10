@@ -36,7 +36,6 @@ struct ChipDeviceEvent;
 
 // ==================== Platform Adaptations ====================
 
-
 #ifndef CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS
 #define CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS 1
 #endif // CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS

@@ -30,7 +30,6 @@
 #define NB_PENDING_TRANSACTIONS 11
 #define TRANSACTION_SZ gOtaTransactionSz_d
 
-
 namespace chip {
 
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
@@ -79,7 +78,7 @@ private:
     const char * mImageFile = nullptr;
 
     /* Buffer used for transaction storage */
-    uint8_t mPostedOperationsStorage[NB_PENDING_TRANSACTIONS*TRANSACTION_SZ];
+    uint8_t mPostedOperationsStorage[NB_PENDING_TRANSACTIONS * TRANSACTION_SZ];
 };
 
 } // namespace chip

@@ -34,20 +34,20 @@ namespace DeviceLayer {
 class FactoryDataProviderImpl : public FactoryDataProvider
 {
 public:
-
     static FactoryDataProviderImpl sInstance;
 
     CHIP_ERROR Init(void);
-    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t *pBuf, size_t bufLength, uint16_t &length, uint32_t *contentAddr=NULL);
+    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
+                           uint32_t * contentAddr = NULL);
     CHIP_ERROR SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer);
 
-    CHIP_ERROR SetAes128Key(const uint8_t *keyAes128);
+    CHIP_ERROR SetAes128Key(const uint8_t * keyAes128);
     CHIP_ERROR SetEncryptionMode(EncryptionMode mode);
 
 private:
     CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair);
 
-    const uint8_t *pAesKey = nullptr;
+    const uint8_t * pAesKey    = nullptr;
     EncryptionMode encryptMode = encrypt_ecb;
 };
 

@@ -126,16 +126,15 @@ private:
     uint32_t mWiFiStationReconnectIntervalMS;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    enum WiFiEventGroup
-    {
+    enum WiFiEventGroup{
         kWiFiEventGroup_WiFiStationModeBit = (1 << 0),
     };
 
     BitFlags<GenericConnectivityManagerImpl_WiFi::ConnectivityFlags> mFlags;
     static netif_ext_callback_t sNetifCallback;
 
-    static int _WlanEventCallback(enum wlan_event_reason event, void *data);
-    static void _NetifExtCallback(struct netif* netif, netif_nsc_reason_t reason, const netif_ext_callback_args_t* args);
+    static int _WlanEventCallback(enum wlan_event_reason event, void * data);
+    static void _NetifExtCallback(struct netif * netif, netif_nsc_reason_t reason, const netif_ext_callback_args_t * args);
 
     void OnStationConnected(void);
     void OnStationDisconnected(void);

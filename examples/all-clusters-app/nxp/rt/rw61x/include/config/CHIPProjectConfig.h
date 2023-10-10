@@ -28,9 +28,9 @@
 
 #pragma once
 
-/* 
-* Tells to the platform Factory Data Provider whether to use the example configuration or real/provisioned data.
-*/
+/*
+ * Tells to the platform Factory Data Provider whether to use the example configuration or real/provisioned data.
+ */
 #ifndef CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
 #define CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA 0
 #endif
@@ -44,7 +44,7 @@
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
- * 
+ *
  */
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x8005
 
@@ -94,7 +94,6 @@
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION NXP_CONFIG_DEVICE_SOFTWARE_VERSION
 #endif
-
 
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME
 #define CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME "NXP Semiconductors"
@@ -162,7 +161,7 @@
  * Enables synchronizing the device's real time clock with a remote CHIP Time service
  * using the CHIP Time Sync protocol.
  */
-//#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 1
+// #define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 1
 
 /**
  * CHIP_CONFIG_MAX_BINDINGS

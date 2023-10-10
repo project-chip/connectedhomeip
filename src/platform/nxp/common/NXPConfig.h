@@ -28,16 +28,15 @@
 #include "FreeRTOS.h"
 #include <functional>
 
+#define CHIP_PLAT_NO_NVM 0
+#define CHIP_PLAT_NVM_FWK 1
+#define CHIP_PLAT_LITTLEFS 2
+#define CHIP_PLAT_KEY_STORAGE 3
 
-#define CHIP_PLAT_NO_NVM                0
-#define CHIP_PLAT_NVM_FWK               1
-#define CHIP_PLAT_LITTLEFS              2
-#define CHIP_PLAT_KEY_STORAGE           3
-
-#define DEBUG_NVM                       0
+#define DEBUG_NVM 0
 
 #ifndef CHIP_PLAT_NVM_SUPPORT
-#define CHIP_PLAT_NVM_SUPPORT           CHIP_PLAT_NO_NVM
+#define CHIP_PLAT_NVM_SUPPORT CHIP_PLAT_NO_NVM
 #endif
 
 #if (CHIP_PLAT_NVM_SUPPORT == CHIP_PLAT_NVM_FWK)
@@ -90,16 +89,16 @@ public:
 
     // Key definitions for well-known configuration values.
     // Factory config keys
-    static constexpr Key kConfigKey_SerialNum           = config_key(kFileId_ChipFactory, 0x00);
-    static constexpr Key kConfigKey_UniqueId            = config_key(kFileId_ChipFactory, 0x01);
-    static constexpr Key kConfigKey_MfrDeviceId         = config_key(kFileId_ChipFactory, 0x02);
-    static constexpr Key kConfigKey_MfrDeviceCert       = config_key(kFileId_ChipFactory, 0x03);
-    static constexpr Key kConfigKey_MfrDevicePrivateKey = config_key(kFileId_ChipFactory, 0x04);
-    static constexpr Key kConfigKey_ManufacturingDate   = config_key(kFileId_ChipFactory, 0x05);
-    static constexpr Key kConfigKey_SetupPinCode        = config_key(kFileId_ChipFactory, 0x06);
-    static constexpr Key kConfigKey_MfrDeviceICACerts   = config_key(kFileId_ChipFactory, 0x07);
-    static constexpr Key kConfigKey_HardwareVersion     = config_key(kFileId_ChipFactory, 0x08);
-    static constexpr Key kConfigKey_SetupDiscriminator  = config_key(kFileId_ChipFactory, 0x09);
+    static constexpr Key kConfigKey_SerialNum             = config_key(kFileId_ChipFactory, 0x00);
+    static constexpr Key kConfigKey_UniqueId              = config_key(kFileId_ChipFactory, 0x01);
+    static constexpr Key kConfigKey_MfrDeviceId           = config_key(kFileId_ChipFactory, 0x02);
+    static constexpr Key kConfigKey_MfrDeviceCert         = config_key(kFileId_ChipFactory, 0x03);
+    static constexpr Key kConfigKey_MfrDevicePrivateKey   = config_key(kFileId_ChipFactory, 0x04);
+    static constexpr Key kConfigKey_ManufacturingDate     = config_key(kFileId_ChipFactory, 0x05);
+    static constexpr Key kConfigKey_SetupPinCode          = config_key(kFileId_ChipFactory, 0x06);
+    static constexpr Key kConfigKey_MfrDeviceICACerts     = config_key(kFileId_ChipFactory, 0x07);
+    static constexpr Key kConfigKey_HardwareVersion       = config_key(kFileId_ChipFactory, 0x08);
+    static constexpr Key kConfigKey_SetupDiscriminator    = config_key(kFileId_ChipFactory, 0x09);
     static constexpr Key kConfigKey_Spake2pIterationCount = config_key(kFileId_ChipFactory, 0x0A);
     static constexpr Key kConfigKey_Spake2pSalt           = config_key(kFileId_ChipFactory, 0x0B);
     static constexpr Key kConfigKey_Spake2pVerifier       = config_key(kFileId_ChipFactory, 0x0C);
@@ -168,7 +167,7 @@ public:
     static CHIP_ERROR ReadConfigValue(Key key, uint64_t & val);
     static CHIP_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen);
     static CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen);
-    static CHIP_ERROR ReadConfigValueBin(const char* keyString, uint8_t * buf, size_t bufSize, size_t & outLen);
+    static CHIP_ERROR ReadConfigValueBin(const char * keyString, uint8_t * buf, size_t bufSize, size_t & outLen);
     static CHIP_ERROR ReadConfigValueCounter(uint8_t counterIdx, uint32_t & val);
     static CHIP_ERROR WriteConfigValue(Key key, bool val);
     static CHIP_ERROR WriteConfigValue(Key key, uint32_t val);
@@ -176,7 +175,7 @@ public:
     static CHIP_ERROR WriteConfigValueStr(Key key, const char * str);
     static CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen);
     static CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen);
-    static CHIP_ERROR WriteConfigValueBin(const char* keyString, const uint8_t * data, size_t dataLen);
+    static CHIP_ERROR WriteConfigValueBin(const char * keyString, const uint8_t * data, size_t dataLen);
     static CHIP_ERROR WriteConfigValueCounter(uint8_t counterIdx, uint32_t val);
     static CHIP_ERROR ClearConfigValue(Key key);
     static CHIP_ERROR ClearConfigValue(const char * keyString);

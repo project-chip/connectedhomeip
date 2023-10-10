@@ -30,11 +30,11 @@
 /**
  * DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts() is
  * currently not supported due to missing reset feature from SDK's wifi driver.
- * For this reason, the PKTCNT (beaconRxCount, packetMulticastRxCount, 
- * packetMulticastTxCount, packetUnicastRxCount, packetUnicastTxCount) 
+ * For this reason, the PKTCNT (beaconRxCount, packetMulticastRxCount,
+ * packetMulticastTxCount, packetUnicastRxCount, packetUnicastTxCount)
  * and ERRCNT (beaconLostCount, overrunCount) features of DGWIFI cluster
  * are currently not supported.
-*/
+ */
 #define DGWIFI_RESET_COUNTS_SUPPORTED 0
 
 namespace chip {
@@ -72,9 +72,9 @@ public:
     CHIP_ERROR GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount) override;
     /**
      * TODO : This should reset BeaconLostCount, BeaconRxCount, PacketMulticastRxCount,
-     * PacketMulticastTxCount, PacketUnicastRxCount, PacketUnicastTxCount 
+     * PacketMulticastTxCount, PacketUnicastRxCount, PacketUnicastTxCount
      */
-    //CHIP_ERROR ResetWiFiNetworkDiagnosticsCounts() override;
+    // CHIP_ERROR ResetWiFiNetworkDiagnosticsCounts() override;
 #endif /* DGWIFI_RESET_COUNTS_SUPPORTED */
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
 };

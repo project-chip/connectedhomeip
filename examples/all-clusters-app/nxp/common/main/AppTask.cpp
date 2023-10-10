@@ -23,28 +23,28 @@
 #include "DeviceCallbacks.h"
 #include "binding-handler.h"
 #include "lib/core/ErrorStr.h"
-#include <app/server/Server.h>
 #include <app/server/Dnssd.h>
+#include <app/server/Server.h>
 #include <lib/dnssd/Advertiser.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 #include <platform/nxp/common/NetworkCommissioningDriver.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
+#include <DeviceInfoProviderImpl.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/OnboardingCodesUtil.h>
+#include <lib/support/ThreadOperationalDataset.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/internal/DeviceNetworkInfo.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
-#include <lib/support/ThreadOperationalDataset.h>
-#include <DeviceInfoProviderImpl.h>
+#include <platform/internal/DeviceNetworkInfo.h>
 
 #include <app/util/attribute-storage.h>
 
-#include "AppMatterCli.h"
-#include "AppMatterButton.h"
 #include "AppFactoryData.h"
+#include "AppMatterButton.h"
+#include "AppMatterCli.h"
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include "OTARequestorInitiator.h"
@@ -63,7 +63,7 @@
 #endif
 
 #ifndef APP_TASK_STACK_SIZE
-#define APP_TASK_STACK_SIZE ((configSTACK_DEPTH_TYPE)6144 / sizeof(portSTACK_TYPE))
+#define APP_TASK_STACK_SIZE ((configSTACK_DEPTH_TYPE) 6144 / sizeof(portSTACK_TYPE))
 #endif
 #ifndef APP_TASK_PRIORITY
 #define APP_TASK_PRIORITY 2
@@ -79,13 +79,13 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::app::Clusters;
 
-
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 namespace {
 chip::app::Clusters::NetworkCommissioning::Instance
-    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(::chip::DeviceLayer::NetworkCommissioning::NXPWiFiDriver::GetInstance()));
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */,
+                                      &(::chip::DeviceLayer::NetworkCommissioning::NXPWiFiDriver::GetInstance()));
 } // namespace
 
 void NetWorkCommissioningInstInit()
@@ -109,8 +109,7 @@ CHIP_ERROR AppTask::StartAppTask()
         assert(err == CHIP_NO_ERROR);
     }
 
-    if (xTaskCreate(&AppTask::AppTaskMain, "AppTaskMain", APP_TASK_STACK_SIZE,
-                    &sAppTask, APP_TASK_PRIORITY, &taskHandle) != pdPASS)
+    if (xTaskCreate(&AppTask::AppTaskMain, "AppTaskMain", APP_TASK_STACK_SIZE, &sAppTask, APP_TASK_PRIORITY, &taskHandle) != pdPASS)
     {
         err = CHIP_ERROR_NO_MEMORY;
         ChipLogError(DeviceLayer, "Failed to start app task");
@@ -159,7 +158,6 @@ void AppTask::InitServer(intptr_t arg)
 #if ENABLE_OTA_PROVIDER
     InitOTAServer();
 #endif
-
 }
 
 CHIP_ERROR AppTask::Init()
@@ -179,9 +177,9 @@ CHIP_ERROR AppTask::Init()
     }
 
     /*
-    * Initialize the CHIP stack.
-    * Would also initialize all required platform modules
-    */
+     * Initialize the CHIP stack.
+     * Would also initialize all required platform modules
+     */
     err = PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
     {
@@ -198,8 +196,8 @@ CHIP_ERROR AppTask::Init()
     }
 
     /*
-    * Register all application callbacks allowing to be informed of stack events
-    */
+     * Register all application callbacks allowing to be informed of stack events
+     */
     err = CHIPDeviceManager::GetInstance().Init(&deviceCallbacks);
     if (err != CHIP_NO_ERROR)
     {
@@ -227,9 +225,9 @@ CHIP_ERROR AppTask::Init()
 #endif
 
     /*
-    * Schedule an event to the Matter stack to initialize
-    * the ZCL Data Model and start server
-    */
+     * Schedule an event to the Matter stack to initialize
+     * the ZCL Data Model and start server
+     */
     PlatformMgr().ScheduleWork(InitServer, 0);
 
     /* Init binding handlers */
@@ -244,7 +242,7 @@ CHIP_ERROR AppTask::Init()
     NetWorkCommissioningInstInit();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     /* If an update is under test make it permanent */
     OTARequestorInitiator::Instance().HandleSelfTest();
 #endif
@@ -296,7 +294,7 @@ exit:
 
 void AppTask::AppTaskMain(void * pvParameter)
 {
-    AppTask *task = (AppTask *)pvParameter;
+    AppTask * task = (AppTask *) pvParameter;
     CHIP_ERROR err;
     AppEvent event;
 
@@ -337,7 +335,6 @@ CHIP_ERROR AppTask::DisplayDeviceInformation(void)
     }
     ChipLogProgress(DeviceLayer, "Setup discriminator: %u (0x%x)", discriminator, discriminator);
 
-
     err = GetCommissionableDataProvider()->GetSetupPasscode(setupPasscode);
     if (err != CHIP_NO_ERROR)
     {
@@ -353,7 +350,6 @@ CHIP_ERROR AppTask::DisplayDeviceInformation(void)
         goto exit;
     }
     ChipLogProgress(DeviceLayer, "Vendor ID: %u (0x%x)", vendorId, vendorId);
-
 
     err = GetDeviceInstanceInfoProvider()->GetProductId(productId);
     if (err != CHIP_NO_ERROR)
@@ -415,7 +411,7 @@ void AppTask::StartCommissioning(intptr_t arg)
     }
     else if (chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
     {
-         ChipLogProgress(DeviceLayer, "Commissioning window already opened");
+        ChipLogProgress(DeviceLayer, "Commissioning window already opened");
     }
     else
     {
@@ -432,7 +428,7 @@ void AppTask::StopCommissioning(intptr_t arg)
     }
     else if (!chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen())
     {
-         ChipLogProgress(DeviceLayer, "Commissioning window not opened");
+        ChipLogProgress(DeviceLayer, "Commissioning window not opened");
     }
     else
     {
@@ -442,7 +438,7 @@ void AppTask::StopCommissioning(intptr_t arg)
 
 void AppTask::SwitchCommissioningState(intptr_t arg)
 {
-     /* Check the status of the commissioning */
+    /* Check the status of the commissioning */
     if (ConfigurationMgr().IsFullyProvisioned())
     {
         ChipLogProgress(DeviceLayer, "Device already commissioned");

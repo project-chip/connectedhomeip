@@ -24,9 +24,10 @@ namespace DeviceLayer {
 namespace NetworkCommissioning {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 namespace {
-constexpr uint8_t kMaxWiFiNetworks                  = 1;
-constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
-constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 80; // 60 seconds is DHCP_TIMEOUT from [NXP MCUXpresso SDK]/middleware/wifi_nxp/port/lwip/net.c
+constexpr uint8_t kMaxWiFiNetworks                = 1;
+constexpr uint8_t kWiFiScanNetworksTimeOutSeconds = 10;
+constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds =
+    80; // 60 seconds is DHCP_TIMEOUT from [NXP MCUXpresso SDK]/middleware/wifi_nxp/port/lwip/net.c
 } // namespace
 
 class NXPWiFiDriver final : public WiFiDriver
@@ -73,12 +74,12 @@ public:
 
     /* Returns the network SSID. User needs to allocate a buffer of size >= DeviceLayer::Internal::kMaxWiFiSSIDLength.
      * ssid - pointer to the returned SSID
-    */
+     */
     Status GetNetworkSSID(char * ssid);
 
     /* Returns the network password. User needs to allocate a buffer of size >= DeviceLayer::Internal::kMaxWiFiKeyLength.
      * credentials - pointer to the returned password
-    */
+     */
     Status GetNetworkPassword(char * credentials);
 
     // WiFiDriver

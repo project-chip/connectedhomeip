@@ -26,7 +26,6 @@
 
 #pragma once
 
-
 // ==================== Platform Adaptations ====================
 
 /* Default NXP Platform adaptations are used */
@@ -36,11 +35,9 @@
 // These are configuration options that are unique to the NXP platform.
 // These can be overridden by the application as needed.
 
-
 // ========== Platform-specific Configuration Overrides =========
 
 /* Default NXP Platform configuration overrides are used */
-
 
 // Include default nxp platform configurations
 #include "platform/nxp/common/CHIPDeviceNXPPlatformDefaultConfig.h"

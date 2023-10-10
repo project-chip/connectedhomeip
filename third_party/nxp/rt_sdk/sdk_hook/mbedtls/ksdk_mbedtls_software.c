@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
- #if !defined(MBEDTLS_CONFIG_FILE)
+#if !defined(MBEDTLS_CONFIG_FILE)
 #include "mbedtls/config.h"
 #else
 #include MBEDTLS_CONFIG_FILE
@@ -23,23 +23,23 @@
 extern void CRYPTO_ConfigureThreading(void);
 #endif
 
-#include "fsl_common.h"
 #include "fsl_adapter_rng.h"
+#include "fsl_common.h"
 #include "ksdk_mbedtls.h"
 
 /******************************************************************************/
 /*************************** FreeRTOS ********************************************/
 /******************************************************************************/
 #if defined(USE_RTOS) && defined(SDK_OS_FREE_RTOS) && defined(MBEDTLS_FREESCALE_FREERTOS_CALLOC_ALT)
-#include <stdlib.h>
 #include "FreeRTOS.h"
 #include "task.h"
+#include <stdlib.h>
 
 /*---------HEAP_4 calloc --------------------------------------------------*/
 #if defined(configFRTOS_MEMORY_SCHEME) && (configFRTOS_MEMORY_SCHEME == 4)
-void *pvPortCalloc(size_t num, size_t size)
+void * pvPortCalloc(size_t num, size_t size)
 {
-    void *ptr;
+    void * ptr;
 
     ptr = pvPortMalloc(num * size);
     if (!ptr)
@@ -54,16 +54,16 @@ void *pvPortCalloc(size_t num, size_t size)
     return ptr;
 }
 #else // HEAP_3
-void *pvPortCalloc(size_t num, size_t size)
+void * pvPortCalloc(size_t num, size_t size)
 {
-    void *pvReturn;
+    void * pvReturn;
 
     vTaskSuspendAll();
     {
         pvReturn = calloc(num, size);
         traceMALLOC(pvReturn, size);
     }
-    (void)xTaskResumeAll();
+    (void) xTaskResumeAll();
 
 #if (configUSE_MALLOC_FAILED_HOOK == 1)
     {
@@ -93,7 +93,7 @@ void *pvPortCalloc(size_t num, size_t size)
  * @brief Implementation of mbedtls_mutex_init for thread-safety.
  *
  */
-void mcux_mbedtls_mutex_init(mbedtls_threading_mutex_t *mutex)
+void mcux_mbedtls_mutex_init(mbedtls_threading_mutex_t * mutex)
 {
     mutex->mutex = xSemaphoreCreateMutex();
 
@@ -111,7 +111,7 @@ void mcux_mbedtls_mutex_init(mbedtls_threading_mutex_t *mutex)
  * @brief Implementation of mbedtls_mutex_free for thread-safety.
  *
  */
-void mcux_mbedtls_mutex_free(mbedtls_threading_mutex_t *mutex)
+void mcux_mbedtls_mutex_free(mbedtls_threading_mutex_t * mutex)
 {
     if (mutex->is_valid == 1)
     {
@@ -126,7 +126,7 @@ void mcux_mbedtls_mutex_free(mbedtls_threading_mutex_t *mutex)
  * @return 0 if successful, MBEDTLS_ERR_THREADING_MUTEX_ERROR if timeout,
  * MBEDTLS_ERR_THREADING_BAD_INPUT_DATA if the mutex is not valid.
  */
-int mcux_mbedtls_mutex_lock(mbedtls_threading_mutex_t *mutex)
+int mcux_mbedtls_mutex_lock(mbedtls_threading_mutex_t * mutex)
 {
     int ret = MBEDTLS_ERR_THREADING_BAD_INPUT_DATA;
 
@@ -151,7 +151,7 @@ int mcux_mbedtls_mutex_lock(mbedtls_threading_mutex_t *mutex)
  * @return 0 if successful, MBEDTLS_ERR_THREADING_MUTEX_ERROR if timeout,
  * MBEDTLS_ERR_THREADING_BAD_INPUT_DATA if the mutex is not valid.
  */
-int mcux_mbedtls_mutex_unlock(mbedtls_threading_mutex_t *mutex)
+int mcux_mbedtls_mutex_unlock(mbedtls_threading_mutex_t * mutex)
 {
     int ret = MBEDTLS_ERR_THREADING_BAD_INPUT_DATA;
 
@@ -173,12 +173,9 @@ int mcux_mbedtls_mutex_unlock(mbedtls_threading_mutex_t *mutex)
 static void CRYPTO_ConfigureThreadingMcux(void)
 {
     /* Configure mbedtls to use FreeRTOS mutexes. */
-    mbedtls_threading_set_alt(mcux_mbedtls_mutex_init, mcux_mbedtls_mutex_free, mcux_mbedtls_mutex_lock,
-                              mcux_mbedtls_mutex_unlock);
+    mbedtls_threading_set_alt(mcux_mbedtls_mutex_init, mcux_mbedtls_mutex_free, mcux_mbedtls_mutex_lock, mcux_mbedtls_mutex_unlock);
 }
 #endif /* defined(MBEDTLS_MCUX_FREERTOS_THREADING_ALT) */
-
-
 
 status_t CRYPTO_InitHardware(void)
 {

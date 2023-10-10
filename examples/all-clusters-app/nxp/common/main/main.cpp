@@ -21,10 +21,10 @@
 // Main Code
 // ================================================================================
 
+#include "FreeRTOS.h"
+#include <AppTask.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <AppTask.h>
-#include "FreeRTOS.h"
 
 #if configAPPLICATION_ALLOCATED_HEAP
 uint8_t __attribute__((section(".heap"))) ucHeap[configTOTAL_HEAP_SIZE];
@@ -42,7 +42,7 @@ extern "C" int main(int argc, char * argv[])
 }
 
 #if (defined(configCHECK_FOR_STACK_OVERFLOW) && (configCHECK_FOR_STACK_OVERFLOW > 0))
-void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
 {
     assert(0);
 }

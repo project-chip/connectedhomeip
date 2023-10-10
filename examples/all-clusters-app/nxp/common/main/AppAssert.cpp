@@ -21,13 +21,14 @@
 #include <platform/CHIPDeviceLayer.h>
 
 /*
-* Assert function implemented in the application layer.
-* This implementation would produce a reset.
-* But it could be extended with specific application contrains/requirements.
-*/
-void __assert_func(const char *file, int line, const char *func, const char *failedExpr)
+ * Assert function implemented in the application layer.
+ * This implementation would produce a reset.
+ * But it could be extended with specific application contrains/requirements.
+ */
+void __assert_func(const char * file, int line, const char * func, const char * failedExpr)
 {
     PRINTF("ASSERT ERROR \" %s \": file \"%s\" Line \"%d\" function name \"%s\" \n", failedExpr, file, line, func);
     chip::DeviceLayer::PlatformMgrImpl().Reset();
-    while(1);
+    while (1)
+        ;
 }

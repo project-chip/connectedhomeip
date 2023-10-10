@@ -25,7 +25,6 @@
 #include "AppEvent.h"
 #include "DeviceCallbacks.h"
 
-
 class AppTask
 {
 public:

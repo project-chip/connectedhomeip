@@ -56,7 +56,7 @@ public:
     static void SaveSettings(void);
     void StopBLEConnectivity(void);
     CHIP_ERROR ServiceInit(void);
-    
+
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
 private:

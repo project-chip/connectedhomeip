@@ -25,12 +25,12 @@
 #include <app-common/zap-generated/enums.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include "DiagnosticDataProviderImpl.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/DiagnosticDataProvider.h>
-#include "DiagnosticDataProviderImpl.h"
 
-#include <lwip/tcpip.h>
 #include <inet/InetInterface.h>
+#include <lwip/tcpip.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 extern "C" {
@@ -115,26 +115,26 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
-    ifp->name = CharSpan(threadNetworkName, strlen(threadNetworkName));
-    ifp->isOperational = true;
+    ifp->name                      = CharSpan(threadNetworkName, strlen(threadNetworkName));
+    ifp->isOperational             = true;
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
     ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD;
     ConfigurationMgr().GetPrimary802154MACAddress(ifp->MacAddress);
     ifp->hardwareAddress = ByteSpan(ifp->MacAddress, kMaxHardwareAddrSize);
 #elif CHIP_DEVICE_CONFIG_ENABLE_WPA
-    struct netif *netif = nullptr;
-    netif = static_cast<struct netif *>(net_get_mlan_handle());
+    struct netif * netif = nullptr;
+    netif                = static_cast<struct netif *>(net_get_mlan_handle());
     strncpy(ifp->Name, "wlan0", Inet::InterfaceId::kMaxIfNameLength);
-    ifp->name = CharSpan(ifp->Name, strlen(ifp->Name));
+    ifp->name          = CharSpan(ifp->Name, strlen(ifp->Name));
     ifp->isOperational = true;
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
-    ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
+    ifp->type            = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
     ifp->hardwareAddress = ByteSpan(netif->hwaddr, netif->hwaddr_len);
 #endif
 
-   // IPv6-only support
+    // IPv6-only support
     Inet::InterfaceAddressIterator interfAddrIterator;
     uint8_t ipv6AddressesCount = 0;
     while (interfAddrIterator.HasCurrent() && ipv6AddressesCount < kMaxIPv6AddrCount)
@@ -232,7 +232,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetwork
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
 {
-    channelNumber  = wlan_get_current_channel();
+    channelNumber = wlan_get_current_channel();
     return CHIP_NO_ERROR;
 }
 
@@ -286,7 +286,6 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & 
     {
         packetMulticastRxCount = stats.mcast_rx_frame;
         return CHIP_NO_ERROR;
-        
     }
 #endif /* CONFIG_WIFI_GET_LOG */
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;

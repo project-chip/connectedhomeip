@@ -15,11 +15,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <platform/CHIPDeviceLayer.h>
 
+#include "NetworkCommissioningDriver.h"
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
-#include <platform/CHIPDeviceLayer.h>
-#include "NetworkCommissioningDriver.h"
 #include <wlan.h>
 
 using namespace ::chip;
@@ -37,7 +37,7 @@ constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";
 class NXPScanResponseIterator : public Iterator<WiFiScanResponse>
 {
 public:
-    NXPScanResponseIterator(const size_t size, WiFiScanResponse *responses) : mSize(size), mResponses(responses) {}
+    NXPScanResponseIterator(const size_t size, WiFiScanResponse * responses) : mSize(size), mResponses(responses) {}
     size_t Count() override { return mSize; }
     bool Next(WiFiScanResponse & item) override
     {
@@ -55,7 +55,7 @@ public:
 
 private:
     const size_t mSize;
-    WiFiScanResponse *mResponses;
+    WiFiScanResponse * mResponses;
     size_t mIternum = 0;
 };
 
@@ -76,21 +76,22 @@ CHIP_ERROR NXPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
                                                    sizeof(mSavedNetwork.credentials), &credentialsLen);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(DeviceLayer, "WiFi network credentials not retrieved from persisted storage: %" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogProgress(DeviceLayer, "WiFi network credentials not retrieved from persisted storage: %" CHIP_ERROR_FORMAT,
+                        err.Format());
         return CHIP_NO_ERROR;
     }
 
     mSavedNetwork.credentialsLen = credentialsLen;
     mSavedNetwork.ssidLen        = ssidLen;
 
-    mStagingNetwork   = mSavedNetwork;
-    mpScanCallback    = nullptr;
-    mpConnectCallback = nullptr;
+    mStagingNetwork        = mSavedNetwork;
+    mpScanCallback         = nullptr;
+    mpConnectCallback      = nullptr;
     mpStatusChangeCallback = networkStatusChangeCallback;
 
     // Connect to saved network
     ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
-    
+
     return err;
 }
 
@@ -212,7 +213,7 @@ void NXPWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callbac
 
     mpConnectCallback = callback;
     err               = ConnectWiFiNetwork(reinterpret_cast<const char *>(mStagingNetwork.ssid), mStagingNetwork.ssidLen,
-                             reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);
+                                           reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -227,8 +228,8 @@ exit:
     }
 
     /* Always inform the cluster of the network status so that in case of success,
-    * we have time send the response to the controller before switching to a new network.
-    */
+     * we have time send the response to the controller before switching to a new network.
+     */
     if (callback != nullptr)
     {
         callback->OnResult(networkingStatus, CharSpan(), 0);
@@ -241,15 +242,15 @@ CHIP_ERROR NXPWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 
     ChipLogProgress(DeviceLayer, "Scan for WiFi network(s) requested");
 
-    (void)memset(&wlan_scan_param, 0, sizeof(wlan_scan_params_v2_t));
+    (void) memset(&wlan_scan_param, 0, sizeof(wlan_scan_params_v2_t));
     wlan_scan_param.cb = &NXPWiFiDriver::OnScanWiFiNetworkDone;
 
     if ((ssid.size() > 0) && (ssid.size() < MLAN_MAX_SSID_LENGTH))
     {
 #ifdef CONFIG_COMBO_SCAN
-        (void)memcpy(wlan_scan_param.ssid[0], ssid.data(), ssid.size());
+        (void) memcpy(wlan_scan_param.ssid[0], ssid.data(), ssid.size());
 #else
-        (void)memcpy(wlan_scan_param.ssid, ssid.data(), ssid.size());
+        (void) memcpy(wlan_scan_param.ssid, ssid.data(), ssid.size());
 #endif
     }
 
@@ -263,7 +264,7 @@ CHIP_ERROR NXPWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
     return CHIP_NO_ERROR;
 }
 
-//TODO should be modified to do it in the context of the Matter stack
+// TODO should be modified to do it in the context of the Matter stack
 int NXPWiFiDriver::OnScanWiFiNetworkDone(unsigned int count)
 {
     ChipLogProgress(DeviceLayer, "Scan for WiFi network(s) done, found: %u", count);
@@ -290,7 +291,7 @@ int NXPWiFiDriver::OnScanWiFiNetworkDone(unsigned int count)
         return WM_SUCCESS;
     }
 
-    struct WiFiScanResponse *response_list = response_list_ptr.get();
+    struct WiFiScanResponse * response_list = response_list_ptr.get();
 
     int valid = 0;
 
@@ -311,7 +312,7 @@ int NXPWiFiDriver::OnScanWiFiNetworkDone(unsigned int count)
 
         if (res.wep != 0U)
         {
-            response.security =  WiFiSecurity::kWep;
+            response.security = WiFiSecurity::kWep;
         }
         else if (res.wpa != 0U)
         {
@@ -341,8 +342,9 @@ int NXPWiFiDriver::OnScanWiFiNetworkDone(unsigned int count)
 
         memcpy(response.bssid, res.bssid, DeviceLayer::Internal::kWiFiBSSIDLength);
 
-        response.channel = (uint16_t)res.channel;
-        response.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4; // TODO 5 GHz also possible, but results don't show this information
+        response.channel  = (uint16_t) res.channel;
+        response.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4; // TODO 5 GHz also possible, but results don't
+                                                                                     // show this information
         response.rssi = -static_cast<int8_t>(res.rssi);
 
         response_list[valid] = response;
@@ -351,7 +353,7 @@ int NXPWiFiDriver::OnScanWiFiNetworkDone(unsigned int count)
     }
 
     if (CHIP_NO_ERROR == DeviceLayer::SystemLayer().ScheduleLambda([valid, response_list]() {
-            std::unique_ptr<struct WiFiScanResponse []> auto_free(response_list);
+            std::unique_ptr<struct WiFiScanResponse[]> auto_free(response_list);
             NXPScanResponseIterator iter(valid, response_list);
             if (GetInstance().mpScanCallback)
             {

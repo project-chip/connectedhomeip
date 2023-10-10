@@ -23,8 +23,8 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include "lib/support/CHIPMem.h"
 #include "NXPConfig.h"
+#include "lib/support/CHIPMem.h"
 #include <platform/KeyValueStoreManager.h>
 #include <string>
 
@@ -44,8 +44,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
 
     ChipLogProgress(DeviceLayer, "KVS, get key id:: %s", key);
 
-    err = chip::DeviceLayer::Internal::NXPConfig::ReadConfigValueBin(
-        key, (uint8_t *) value, value_size, read_bytes);
+    err = chip::DeviceLayer::Internal::NXPConfig::ReadConfigValueBin(key, (uint8_t *) value, value_size, read_bytes);
 
     *read_bytes_size = read_bytes;
 
@@ -62,8 +61,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, 
 
     ChipLogProgress(DeviceLayer, "KVS, put key id:: %s ", key);
 
-    err = chip::DeviceLayer::Internal::NXPConfig::WriteConfigValueBin(
-        key, (uint8_t *) value, value_size);
+    err = chip::DeviceLayer::Internal::NXPConfig::WriteConfigValueBin(key, (uint8_t *) value, value_size);
 
 exit:
     ConvertError(err);
