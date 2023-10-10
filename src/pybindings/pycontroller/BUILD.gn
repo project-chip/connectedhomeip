@@ -68,10 +68,10 @@ shared_library("CHIPController") {
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
     "${chip_root}/src/setup_payload",
-    "${chip_root}/src/transport",
     "${chip_root}/src/tracing/json",
     "${chip_root}/src/tracing/perfetto",
     "${chip_root}/src/tracing/perfetto:file_output",
+    "${chip_root}/src/transport",
     "${chip_root}/third_party/jsoncpp",
   ]
   deps = [
