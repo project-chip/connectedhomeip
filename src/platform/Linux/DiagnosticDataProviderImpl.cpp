@@ -413,10 +413,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveRadioFaults(GeneralFaults<kMaxRa
 {
 #if CHIP_CONFIG_TEST
     // On Linux Simulation, set following radio faults statically.
-    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_ENUM_WI_FI_FAULT));
-    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_ENUM_CELLULAR_FAULT));
-    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_ENUM_THREAD_FAULT));
-    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_ENUM_NFC_FAULT));
+    ReturnErrorOnFailure(radioFaults.add(RadioFaultEnum::kWiFiFault));
+    ReturnErrorOnFailure(radioFaults.add(RadioFaultEnum::kCellularFault));
+    ReturnErrorOnFailure(radioFaults.add(RadioFaultEnum::kThreadFault));
+    ReturnErrorOnFailure(radioFaults.add(RadioFaultEnum::kNFCFault));
 #endif
 
     return CHIP_NO_ERROR;

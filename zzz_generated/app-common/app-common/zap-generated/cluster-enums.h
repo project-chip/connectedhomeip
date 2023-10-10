@@ -1047,9 +1047,6 @@ enum class NetworkFaultEnum : uint8_t
     kUnknownEnumValue = 4,
 };
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for RadioFaultEnum
 enum class RadioFaultEnum : uint8_t
 {
@@ -1066,10 +1063,6 @@ enum class RadioFaultEnum : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 7,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using RadioFaultEnum                                                           = EmberAfRadioFaultEnum;
-static RadioFaultEnum __attribute__((unused)) kRadioFaultEnumkUnknownEnumValue = static_cast<RadioFaultEnum>(7);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 } // namespace GeneralDiagnostics
 
 namespace SoftwareDiagnostics {

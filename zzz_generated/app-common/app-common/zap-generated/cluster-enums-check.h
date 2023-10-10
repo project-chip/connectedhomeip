@@ -884,9 +884,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::Rad
     using EnumType = GeneralDiagnostics::RadioFaultEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kUnspecified:
     case EnumType::kWiFiFault:
     case EnumType::kCellularFault:
@@ -894,15 +891,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::Rad
     case EnumType::kNFCFault:
     case EnumType::kBLEFault:
     case EnumType::kEthernetFault:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_RADIO_FAULT_ENUM_UNSPECIFIED:
-    case EMBER_ZCL_RADIO_FAULT_ENUM_WI_FI_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_ENUM_CELLULAR_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_ENUM_THREAD_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_ENUM_NFC_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_ENUM_BLE_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_ENUM_ETHERNET_FAULT:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(7);

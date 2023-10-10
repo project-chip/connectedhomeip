@@ -9,7 +9,6 @@ WeakEnums:
     - InterfaceTypeEnum
     - MoveMode
     - PHYRateEnum
-    - RadioFaultEnum
     - StepMode
 
 CommandHandlerInterfaceOnlyClusters:

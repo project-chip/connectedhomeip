@@ -53,13 +53,13 @@ CHIP_ERROR GenericFaultTestEventTriggerDelegate::HandleEventTrigger(uint64_t eve
         GeneralFaults<kMaxRadioFaults> radioFaultsPrevious;
         GeneralFaults<kMaxRadioFaults> radioFaultsCurrent;
 
-        ReturnErrorOnFailure(radioFaultsPrevious.add(EMBER_ZCL_RADIO_FAULT_ENUM_WI_FI_FAULT));
-        ReturnErrorOnFailure(radioFaultsPrevious.add(EMBER_ZCL_RADIO_FAULT_ENUM_THREAD_FAULT));
+        ReturnErrorOnFailure(radioFaultsPrevious.add(RadioFaultEnum::kWiFiFault));
+        ReturnErrorOnFailure(radioFaultsPrevious.add(RadioFaultEnum::kThreadFault));
 
-        ReturnErrorOnFailure(radioFaultsCurrent.add(EMBER_ZCL_RADIO_FAULT_ENUM_WI_FI_FAULT));
-        ReturnErrorOnFailure(radioFaultsCurrent.add(EMBER_ZCL_RADIO_FAULT_ENUM_CELLULAR_FAULT));
-        ReturnErrorOnFailure(radioFaultsCurrent.add(EMBER_ZCL_RADIO_FAULT_ENUM_THREAD_FAULT));
-        ReturnErrorOnFailure(radioFaultsCurrent.add(EMBER_ZCL_RADIO_FAULT_ENUM_NFC_FAULT));
+        ReturnErrorOnFailure(radioFaultsCurrent.add(RadioFaultEnum::kWiFiFault));
+        ReturnErrorOnFailure(radioFaultsCurrent.add(RadioFaultEnum::kCellularFault));
+        ReturnErrorOnFailure(radioFaultsCurrent.add(RadioFaultEnum::kThreadFault));
+        ReturnErrorOnFailure(radioFaultsCurrent.add(RadioFaultEnum::kNFCFault));
 
         app::Clusters::GeneralDiagnosticsServer::Instance().OnRadioFaultsDetect(radioFaultsPrevious, radioFaultsCurrent);
 

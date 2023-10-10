@@ -95,18 +95,6 @@ enum EmberAfPHYRateEnum : uint8_t
     EMBER_ZCL_PHY_RATE_ENUM_RATE400_G = 9,
 };
 
-// Enum for RadioFaultEnum
-enum EmberAfRadioFaultEnum : uint8_t
-{
-    EMBER_ZCL_RADIO_FAULT_ENUM_UNSPECIFIED    = 0,
-    EMBER_ZCL_RADIO_FAULT_ENUM_WI_FI_FAULT    = 1,
-    EMBER_ZCL_RADIO_FAULT_ENUM_CELLULAR_FAULT = 2,
-    EMBER_ZCL_RADIO_FAULT_ENUM_THREAD_FAULT   = 3,
-    EMBER_ZCL_RADIO_FAULT_ENUM_NFC_FAULT      = 4,
-    EMBER_ZCL_RADIO_FAULT_ENUM_BLE_FAULT      = 5,
-    EMBER_ZCL_RADIO_FAULT_ENUM_ETHERNET_FAULT = 6,
-};
-
 // Enum for StepMode
 enum EmberAfStepMode : uint8_t
 {
