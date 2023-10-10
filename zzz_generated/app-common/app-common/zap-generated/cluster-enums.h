@@ -3027,7 +3027,21 @@ enum class Feature : uint32_t
 };
 } // namespace ColorControl
 
-namespace BallastConfiguration {} // namespace BallastConfiguration
+namespace BallastConfiguration {
+
+// Bitmap for BallastStatusBitmap
+enum class BallastStatusBitmap : uint8_t
+{
+    kBallastNonOperational = 0x1,
+    kLampFailure           = 0x2,
+};
+
+// Bitmap for LampAlarmModeBitmap
+enum class LampAlarmModeBitmap : uint8_t
+{
+    kLampBurnHours = 0x1,
+};
+} // namespace BallastConfiguration
 
 namespace IlluminanceMeasurement {
 

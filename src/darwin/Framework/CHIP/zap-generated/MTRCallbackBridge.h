@@ -1403,6 +1403,10 @@ typedef void (*ColorControlEventListListAttributeCallback)(void * context,
                                                            const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*ColorControlAttributeListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*BallastConfigurationBallastStatusAttributeCallback)(
+    void *, chip::BitMask<chip::app::Clusters::BallastConfiguration::BallastStatusBitmap>);
+typedef void (*BallastConfigurationLampAlarmModeAttributeCallback)(
+    void *, chip::BitMask<chip::app::Clusters::BallastConfiguration::LampAlarmModeBitmap>);
 typedef void (*BallastConfigurationGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*BallastConfigurationAcceptedCommandListListAttributeCallback)(
@@ -13508,6 +13512,72 @@ public:
     void OnSubscriptionEstablished();
     using MTRColorControlAttributeListListAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRColorControlAttributeListListAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBallastConfigurationBallastStatusAttributeCallbackBridge
+    : public MTRCallbackBridge<BallastConfigurationBallastStatusAttributeCallback>
+{
+public:
+    MTRBallastConfigurationBallastStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BallastConfigurationBallastStatusAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBallastConfigurationBallastStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                MTRActionBlock action) :
+        MTRCallbackBridge<BallastConfigurationBallastStatusAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::BallastConfiguration::BallastStatusBitmap> value);
+};
+
+class MTRBallastConfigurationBallastStatusAttributeCallbackSubscriptionBridge
+    : public MTRBallastConfigurationBallastStatusAttributeCallbackBridge
+{
+public:
+    MTRBallastConfigurationBallastStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action,
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBallastConfigurationBallastStatusAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBallastConfigurationBallastStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBallastConfigurationBallastStatusAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBallastConfigurationLampAlarmModeAttributeCallbackBridge
+    : public MTRCallbackBridge<BallastConfigurationLampAlarmModeAttributeCallback>
+{
+public:
+    MTRBallastConfigurationLampAlarmModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BallastConfigurationLampAlarmModeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBallastConfigurationLampAlarmModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                MTRActionBlock action) :
+        MTRCallbackBridge<BallastConfigurationLampAlarmModeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::BallastConfiguration::LampAlarmModeBitmap> value);
+};
+
+class MTRBallastConfigurationLampAlarmModeAttributeCallbackSubscriptionBridge
+    : public MTRBallastConfigurationLampAlarmModeAttributeCallbackBridge
+{
+public:
+    MTRBallastConfigurationLampAlarmModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action,
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBallastConfigurationLampAlarmModeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBallastConfigurationLampAlarmModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBallastConfigurationLampAlarmModeAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

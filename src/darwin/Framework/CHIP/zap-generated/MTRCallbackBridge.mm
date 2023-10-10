@@ -13167,6 +13167,50 @@ void MTRColorControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
+void MTRBallastConfigurationBallastStatusAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::BallastConfiguration::BallastStatusBitmap> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRBallastConfigurationBallastStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRBallastConfigurationLampAlarmModeAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::BallastConfiguration::LampAlarmModeBitmap> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRBallastConfigurationLampAlarmModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
 void MTRBallastConfigurationGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {
     NSArray * _Nonnull objCValue;

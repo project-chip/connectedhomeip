@@ -26939,6 +26939,14 @@ class BallastConfiguration(Cluster):
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
 
+    class Bitmaps:
+        class BallastStatusBitmap(IntFlag):
+            kBallastNonOperational = 0x1
+            kLampFailure = 0x2
+
+        class LampAlarmModeBitmap(IntFlag):
+            kLampBurnHours = 0x1
+
     class Attributes:
         @dataclass
         class PhysicalMinLevel(ClusterAttributeDescriptor):

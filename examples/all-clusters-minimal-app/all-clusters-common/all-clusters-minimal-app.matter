@@ -2990,6 +2990,15 @@ server cluster ColorControl = 768 {
 
 /** Attributes and commands for configuring a lighting ballast. */
 server cluster BallastConfiguration = 769 {
+  bitmap BallastStatusBitmap : BITMAP8 {
+    kBallastNonOperational = 0x1;
+    kLampFailure = 0x2;
+  }
+
+  bitmap LampAlarmModeBitmap : BITMAP8 {
+    kLampBurnHours = 0x1;
+  }
+
   readonly attribute int8u physicalMinLevel = 0;
   readonly attribute int8u physicalMaxLevel = 1;
   attribute int8u minLevel = 16;
