@@ -219,7 +219,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ifp->isOperational             = true;
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
-    ifp->type = GeneralDiagnostics::InterfaceTypeEnum::kThread;
+    ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kThread;
     uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
     ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
     ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);
@@ -231,9 +231,9 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ifp->name          = CharSpan::fromCharString(ifp->Name);
     ifp->isOperational = true;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    ifp->type          = GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
+    ifp->type          = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
 #else
-    ifp->type = GeneralDiagnostics::InterfaceTypeEnum::kEthernet;
+    ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kEthernet;
 #endif
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
