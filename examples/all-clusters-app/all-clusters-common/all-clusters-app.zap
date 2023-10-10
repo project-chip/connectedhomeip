@@ -6859,10 +6859,6 @@
               "code": 6,
               "mfgCode": null,
               "source": "server",
-<<<<<<< HEAD
-              "isIncoming": 0,
-              "isEnabled": 1
-=======
               "incoming": 1,
               "outgoing": 1
             },
@@ -6889,7 +6885,6 @@
               "source": "server",
               "incoming": 0,
               "outgoing": 1
->>>>>>> 0ab96465fa (Activating scenes yaml tests on CI now that the level control cluster handler is implemented)
             }
           ],
           "attributes": [
@@ -7095,11 +7090,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-<<<<<<< HEAD
               "defaultValue": "3",
-=======
-              "defaultValue": "1",
->>>>>>> 0ab96465fa (Activating scenes yaml tests on CI now that the level control cluster handler is implemented)
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -22393,11 +22384,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-<<<<<<< HEAD
               "defaultValue": "3",
-=======
-              "defaultValue": "1",
->>>>>>> 0ab96465fa (Activating scenes yaml tests on CI now that the level control cluster handler is implemented)
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
