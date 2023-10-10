@@ -25,6 +25,10 @@
 #include <boost/algorithm/string.hpp>
 #include "matter_pc_main.hpp"
 
+#include "process.h"
+#include "clock.h"
+#include "etimer.h"
+
 // Matter includes
 #include "app/server/Server.h"
 #include "crypto/CHIPCryptoPAL.h"
@@ -37,12 +41,30 @@
 #include <sstream>
 #include <stdbool.h>
 #include <string>
+#include <vector>
 
 #define LOG_TAG "mpc_nw_monitor"
 
 using namespace chip;
 using namespace attribute_store;
 using namespace std;
+
+// Declare the Contiki Process for the MPC network monitoring
+PROCESS(mpc_nw_mon_process, "mpc_nw_mon_process");
+
+struct interviewable_node {
+public:
+    attribute       node; 
+    clock_time_t    interviewAfter; //seconds since epoch
+};
+
+typedef enum {
+    MPC_INTERVIEW_TIMER_SET_EVENT,
+} attribute_resolver_worker_event_t;
+
+struct etimer interview_trigger_timer;
+vector<struct interviewable_node> pending_interviews;
+const int INTERVIEW_DELAY_MSEC = 10000; //10s = 10,000 ms
 
 static void generateUNID(string & unid)
 {
@@ -75,6 +97,23 @@ class OperationalDiscover : public chip::Dnssd::OperationalBrowseDeleagete
             return false;
         }
     }
+
+    void mpc_queue_node_for_interview(attribute node)
+    {
+        clock_time_t interviewDelay = clock_time() + INTERVIEW_DELAY_MSEC;
+        
+        struct interviewable_node nodeEntry;
+        nodeEntry.node = node;
+        nodeEntry.interviewAfter = interviewDelay;
+        pending_interviews.push_back(nodeEntry);
+
+        // if there list has only the entry we just added or if timer is no longer running, post event to start timer
+        if (pending_interviews.size() == 1 || etimer_expired(&interview_trigger_timer))
+        {
+            process_post(&mpc_nw_mon_process, MPC_INTERVIEW_TIMER_SET_EVENT, (void *)INTERVIEW_DELAY_MSEC);
+        }
+    }
+    
     void OnOperationalNodeDiscovered(const chip::Dnssd::OperationalNodeData & operationalData) override
     {
         sl_log_debug(LOG_TAG, "Found matter node with node ID " ChipLogFormatX64 ":" ChipLogFormatX64, 
@@ -140,18 +179,17 @@ class OperationalDiscover : public chip::Dnssd::OperationalBrowseDeleagete
                         ->GetNodeId() == operationalData.peerId.GetNodeId())
                 {
                     sl_log_info(LOG_TAG, "MPC moved to Online Functional");
+                    auto ep = node.emplace_node<EndpointId>(ATTRIBUTE_ENDPOINT_ID, 0);
+                    ep.emplace_node<NodeStateSecurity>(DOTDOT_ATTRIBUTE_ID_STATE_SECURITY, ZCL_NODE_STATE_SECURITY_MATTER);
+                    ep.emplace_node<uint32_t>(DOTDOT_ATTRIBUTE_ID_STATE_MAXIMUM_COMMAND_DELAY, 1);
                     state = ZCL_NODE_STATE_NETWORK_STATUS_ONLINE_FUNCTIONAL;
                 }
                 else
                 {
-                    // Register resolver completion call back for all other node for post interview processing
-                    mpc_attribute_resolver_helper_set_resolution_listener(node);
+                    mpc_queue_node_for_interview(node);
                 }
                 sl_log_debug(LOG_TAG, "networkList formed [%s] -> <%s>", node.reported<string>().c_str(), networkListEntry.c_str());
                 attribute_store_set_reported_string(node.emplace_node(DOTDOT_ATTRIBUTE_ID_STATE_NETWORK_LIST), networkListEntry.c_str());
-                auto ep = node.emplace_node<EndpointId>(ATTRIBUTE_ENDPOINT_ID, 0);
-                ep.emplace_node<NodeStateSecurity>(DOTDOT_ATTRIBUTE_ID_STATE_SECURITY, ZCL_NODE_STATE_SECURITY_MATTER);
-                ep.emplace_node<uint32_t>(DOTDOT_ATTRIBUTE_ID_STATE_MAXIMUM_COMMAND_DELAY, 1);
                 node.emplace_node<NodeStateNetworkStatus>(DOTDOT_ATTRIBUTE_ID_STATE_NETWORK_STATUS, state);
 
             } catch (...)
@@ -346,6 +384,8 @@ sl_status_t mpc_nw_monitor_init()
     // register listeners needed to setup reportables
     mpc_node_monitor_init();
 
+    process_start(&mpc_nw_mon_process, 0);
+
     // Create attribute tree entries for MPC itself
     if (attribute::root().child_count() == 0)
     {
@@ -384,4 +424,66 @@ sl_status_t mpc_nw_monitor_init()
     }
 
     return SL_STATUS_OK;
+}
+
+static void mpc_nw_monitor_ev_init()
+{
+    pending_interviews.clear();
+}
+
+static void mpc_start_next_pending_interview()
+{
+    if (pending_interviews.empty())
+    {
+        sl_log_debug(LOG_TAG, "interview timer expired when there is no pending node to be interviewed");
+        return;
+    }
+
+    // fetch first node from pending list and start interview by adding ep0 and then remove it from list
+    auto nodeEntry = pending_interviews.cbegin();
+    attribute node = nodeEntry->node;
+    sl_log_info(LOG_TAG, "Starting Interview for node %x", node);
+    // Register resolver completion call back for all other node for post interview processing
+    mpc_attribute_resolver_helper_set_resolution_listener(node);
+    auto ep = node.emplace_node<EndpointId>(ATTRIBUTE_ENDPOINT_ID, 0);
+    ep.emplace_node<NodeStateSecurity>(DOTDOT_ATTRIBUTE_ID_STATE_SECURITY, ZCL_NODE_STATE_SECURITY_MATTER);
+    ep.emplace_node<uint32_t>(DOTDOT_ATTRIBUTE_ID_STATE_MAXIMUM_COMMAND_DELAY, 1);
+    pending_interviews.erase(nodeEntry);
+
+    if (!pending_interviews.empty())
+    {
+        auto nextNodeEntry = pending_interviews.cbegin();
+        clock_time_t nextTrigger = 0;
+        if (clock_time() < nextNodeEntry->interviewAfter)
+        {
+            nextTrigger = clock_time() - nextNodeEntry->interviewAfter;
+        }
+        process_post(&mpc_nw_mon_process, MPC_INTERVIEW_TIMER_SET_EVENT, (void *)nextTrigger);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Contiki Process thread
+///////////////////////////////////////////////////////////////////////////////
+PROCESS_THREAD(mpc_nw_mon_process, ev, data)
+{
+    PROCESS_BEGIN();
+    while (1) {
+        if (ev == PROCESS_EVENT_INIT) {
+            mpc_nw_monitor_ev_init();
+        } else if (ev == PROCESS_EVENT_EXIT) {
+            sl_log_debug(LOG_TAG, "Teardown of mpc network monitor");
+        } else if ((ev == PROCESS_EVENT_TIMER)
+               && (data == &interview_trigger_timer)) {
+            mpc_start_next_pending_interview();
+        } else if (ev == MPC_INTERVIEW_TIMER_SET_EVENT) {
+            sl_log_debug(LOG_TAG,
+                   "Restarting timer for Next interview trigger [%lu ms from now]",
+                   (clock_time_t)data);
+            etimer_set(&interview_trigger_timer, (clock_time_t)data);
+        }
+
+        PROCESS_WAIT_EVENT();
+    }
+    PROCESS_END()
 }

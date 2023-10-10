@@ -40,7 +40,7 @@ config("unify-config") {
     "zap-generated",
   ]
   ldflags = [ "-lboost_system" ]
-  cflags = [ "-Wno-unused-const-variable" ]
+  cflags = [ "-Wno-unused-const-variable", "-Wno-implicit-fallthrough" ]
   defines = []
   if (is_debug_build) {
     defines += [ "DEBUG_BUILD" ]
