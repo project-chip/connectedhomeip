@@ -41,23 +41,26 @@ tests:
           constraints:
               type: int16u
 
-    - label: "Step 3: Read FeatureMap (global attribute 65532)"
+    - label: "Step 3a: Read FeatureMap (global attribute 65532)"
       PICS: (!S.S.F00)
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 0
           constraints:
               type: bitmap32
+              hasMasksSet: [0x1]
+              # This needs to be changed in the Name Support PR: https://github.com/project-chip/connectedhomeip/pull/29639
+              # Issue in Test plan repo: https://github.com/CHIP-Specifications/chip-test-plans/issues/3515
+              #hasMasksClear: [0x1]
 
-    - label: "Step 3: Read FeatureMap (global attribute 65532)"
+    - label: "Step 3a: Read FeatureMap (global attribute 65532)"
       PICS: S.S.F00
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 1
           constraints:
               type: bitmap32
+              hasMasksSet: [0x1]
 
     - label:
           "Step 4: Read Mandatory attributes in AttributeList (global attribute
