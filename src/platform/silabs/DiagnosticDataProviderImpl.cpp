@@ -270,22 +270,22 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             switch (interfaceType)
             {
             case Inet::InterfaceType::Unknown:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_UNSPECIFIED;
+                ifp->type = GeneralDiagnostics::InterfaceTypeEnum::kUnspecified;
                 break;
             case Inet::InterfaceType::WiFi:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
+                ifp->type = GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
                 break;
             case Inet::InterfaceType::Ethernet:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET;
+                ifp->type = GeneralDiagnostics::InterfaceTypeEnum::kEthernet;
                 break;
             case Inet::InterfaceType::Thread:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD;
+                ifp->type = GeneralDiagnostics::InterfaceTypeEnum::kThread;
                 break;
             case Inet::InterfaceType::Cellular:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_CELLULAR;
+                ifp->type = GeneralDiagnostics::InterfaceTypeEnum::kCellular;
                 break;
             default:
-                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
+                ifp->type = GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
                 break;
             }
         }
