@@ -55,14 +55,14 @@ ReliableMessageMgr * ReliableMessageContext::GetReliableMessageMgr()
     return static_cast<ExchangeContext *>(this)->GetExchangeMgr()->GetReliableMessageMgr();
 }
 
-void ReliableMessageContext::SetMessageNotAcked(bool messageNotAcked)
+void ReliableMessageContext::SetWaitingForAck(bool waitingForAck)
 {
-    mFlags.Set(Flags::kFlagMessageNotAcked, messageNotAcked);
+    mFlags.Set(Flags::kFlagWaitingForAck, waitingForAck);
 
 #if CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
     DeviceLayer::ChipDeviceEvent event;
     event.Type                = DeviceLayer::DeviceEventType::kICDMsgAckSyncEvent;
-    event.AckSync.awaitingAck = messageNotAcked;
+    event.AckSync.awaitingAck = waitingForAck;
     CHIP_ERROR status         = DeviceLayer::PlatformMgr().PostEvent(&event);
     if (status != CHIP_NO_ERROR)
     {
@@ -103,7 +103,11 @@ CHIP_ERROR ReliableMessageContext::FlushAcks()
 void ReliableMessageContext::HandleRcvdAck(uint32_t ackMessageCounter)
 {
     // Msg is an Ack; Check Retrans Table and remove message context
-    if (!GetReliableMessageMgr()->CheckAndRemRetransTable(this, ackMessageCounter))
+    if (GetReliableMessageMgr()->CheckAndRemRetransTable(this, ackMessageCounter))
+    {
+        SetWaitingForResponseOrAck(false);
+    }
+    else
     {
         // This can happen quite easily due to a packet with a piggyback ack
         // being lost and retransmitted.

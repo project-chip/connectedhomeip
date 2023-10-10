@@ -117,7 +117,7 @@ source_set("operational-state-test-srcs") {
   ]
 }
 
-chip_test_suite("tests") {
+chip_test_suite_using_nltest("tests") {
   output_name = "libAppTests"
 
   test_sources = [

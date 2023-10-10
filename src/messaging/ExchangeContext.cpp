@@ -79,6 +79,7 @@ bool ExchangeContext::IsResponseExpected() const
 void ExchangeContext::SetResponseExpected(bool inResponseExpected)
 {
     mFlags.Set(Flags::kFlagResponseExpected, inResponseExpected);
+    SetWaitingForResponseOrAck(inResponseExpected);
 }
 
 void ExchangeContext::UseSuggestedResponseTimeout(Timeout applicationProcessingTimeout)
@@ -489,6 +490,9 @@ void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
     }
 #endif // CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
 
+    // Grab the value of WaitingForResponseOrAck() before we mess with our state.
+    bool gotMRPAck = !WaitingForResponseOrAck();
+
     SetResponseExpected(false);
 
     // Hold a ref to ourselves so we can make calls into our delegate that might
@@ -502,9 +506,8 @@ void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
     {
         // If we timed out _after_ getting an ack for the message, that means
         // the session is probably fine (since our message and the ack got
-        // through), so don't mark the session defunct unless we have an
-        // un-acked message here.
-        if (IsMessageNotAcked())
+        // through), so don't mark the session defunct if we got an MRP ack.
+        if (!gotMRPAck)
         {
             if (mSession->IsSecureSession() && mSession->AsSecureSession()->IsCASESession())
             {
@@ -596,7 +599,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         return CHIP_NO_ERROR;
     }
 
-    if (IsMessageNotAcked())
+    if (IsWaitingForAck())
     {
         // The only way we can get here is a spec violation on the other side:
         // we sent a message that needs an ack, and the other side responded

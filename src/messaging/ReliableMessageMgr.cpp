@@ -49,12 +49,12 @@ namespace Messaging {
 ReliableMessageMgr::RetransTableEntry::RetransTableEntry(ReliableMessageContext * rc) :
     ec(*rc->GetExchangeContext()), nextRetransTime(0), sendCount(0)
 {
-    ec->SetMessageNotAcked(true);
+    ec->SetWaitingForAck(true);
 }
 
 ReliableMessageMgr::RetransTableEntry::~RetransTableEntry()
 {
-    ec->SetMessageNotAcked(false);
+    ec->SetWaitingForAck(false);
 }
 
 ReliableMessageMgr::ReliableMessageMgr(ObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool) :
@@ -158,12 +158,6 @@ void ReliableMessageMgr::ExecuteActions()
             // Do not StartTimer, we will schedule the timer at the end of the timer handler.
             mRetransTable.ReleaseObject(entry);
 
-            // Dropping our entry marked the exchange as not having an un-acked
-            // message... but of course it _does_ have an un-acked message and
-            // we have just given up on waiting for the ack.
-
-            ec->GetReliableMessageContext()->SetMessageNotAcked(true);
-
             return Loop::Continue;
         }
 
@@ -204,7 +198,7 @@ void ReliableMessageMgr::Timeout(System::Layer * aSystemLayer, void * aAppState)
 
 CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, RetransTableEntry ** rEntry)
 {
-    VerifyOrDie(!rc->IsMessageNotAcked());
+    VerifyOrDie(!rc->IsWaitingForAck());
 
     *rEntry = mRetransTable.CreateObject(rc);
     if (*rEntry == nullptr)
