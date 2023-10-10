@@ -50,7 +50,7 @@
 #define OPENTHREAD_CONFIG_DHCP6_SERVER_ENABLE 0
 #define OPENTHREAD_CONFIG_MULTIPLE_INSTANCE_ENABLE 0
 
-// Enable usage of external heap allocator for ot 
+// Enable usage of external heap allocator for ot
 #define OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE 1
 
 // Disable TCP
@@ -67,8 +67,8 @@
 #define OPENTHREAD_CONFIG_PLATFORM_RADIO_COEX_ENABLE 0
 #endif /* SPINEL_INTERFACE_RPMSG */
 
-/* 
-* "ot-nxp/src/rw/rw612/platform/radio.c" has a dependency on 
+/*
+* "ot-nxp/src/rw/rw612/platform/radio.c" has a dependency on
 * "examples/platforms/utils/link_metrics.cpp" which is not built in the Matter build system
 * for this reason, currently we are disabling this feature
 */

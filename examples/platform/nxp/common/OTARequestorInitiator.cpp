@@ -43,12 +43,12 @@ void OTARequestorInitiator::InitOTA(intptr_t context)
 
 void OTARequestorInitiator::HandleSelfTest()
 {
-    /* If application is in test mode after an OTA update 
+    /* If application is in test mode after an OTA update
        mark image as "ok" to switch the update state to permanent
        (if we have arrived this far, the bootloader had validated the image) */
 
     mflash_drv_init();
-    
+
     OtaImgState_t update_state;
 
     /* Retrieve current update state */
@@ -66,6 +66,6 @@ void OTARequestorInitiator::HandleSelfTest()
     }
 
     OTA_Initialize();
-    
-    /* If the image is not marked ok, the bootloader will automatically revert back to primary application at next reboot */  
+
+    /* If the image is not marked ok, the bootloader will automatically revert back to primary application at next reboot */
 }

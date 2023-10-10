@@ -165,8 +165,8 @@ ssize_t streamer_nxp_read(streamer_t * streamer, char * buffer, size_t length)
 
     if (length != 0)
     {
-        /** 
-         * If the reading process is over, 
+        /**
+         * If the reading process is over,
          * let CLI Task enter blocked state until notification
         **/
         if (readDone)
@@ -178,7 +178,7 @@ ssize_t streamer_nxp_read(streamer_t * streamer, char * buffer, size_t length)
         status = SerialManager_TryRead((serial_read_handle_t)streamerSerialReadHandle, (uint8_t *)buffer, length, &bytesRead);
         assert(status != kStatus_SerialManager_Error);
 
-        /** 
+        /**
          * If we are at the end of the line or the buffer is empty,
          * consider the reading process done
         **/
@@ -193,10 +193,10 @@ ssize_t streamer_nxp_read(streamer_t * streamer, char * buffer, size_t length)
 
 ssize_t streamer_nxp_write(streamer_t * streamer, const char * buffer, size_t length)
 {
-    uint32_t intMask; 
+    uint32_t intMask;
     serial_manager_status_t status = kStatus_SerialManager_Error;
     size_t len = 0;
-    
+
     intMask = DisableGlobalIRQ();
     txCount++;
     status = SerialManager_WriteNonBlocking((serial_write_handle_t)streamerSerialWriteHandle, (uint8_t *)buffer, (uint32_t) length);
