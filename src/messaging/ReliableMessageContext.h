@@ -174,7 +174,7 @@ protected:
 
         // When set, sender knows that the peer (receiver) should currently be active
         // When bit is not set, we don't know if the peer (receiver) is active or not
-        kPeerShouldBeActive = (1u << 10)
+        kPeerShouldBeActive = (1u << 10),
 
         /// When set:
         ///

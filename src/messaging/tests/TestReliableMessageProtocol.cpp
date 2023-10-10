@@ -1833,7 +1833,7 @@ void TestReliableMessageProtocol::CheckGetBackoff(nlTestSuite * inSuite, void * 
     }
 }
 
-void CheckApplicationResponseDelayed(nlTestSuite * inSuite, void * inContext)
+void TestReliableMessageProtocol::CheckApplicationResponseDelayed(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
@@ -1996,7 +1996,7 @@ void CheckApplicationResponseDelayed(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
-void CheckApplicationResponseNeverComes(nlTestSuite * inSuite, void * inContext)
+void TestReliableMessageProtocol::CheckApplicationResponseNeverComes(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
