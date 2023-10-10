@@ -270,22 +270,22 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             switch (interfaceType)
             {
             case Inet::InterfaceType::Unknown:
-                ifp->type = GeneralDiagnostics::InterfaceTypeEnum::kUnspecified;
+                ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kUnspecified;
                 break;
             case Inet::InterfaceType::WiFi:
-                ifp->type = GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
+                ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
                 break;
             case Inet::InterfaceType::Ethernet:
-                ifp->type = GeneralDiagnostics::InterfaceTypeEnum::kEthernet;
+                ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kEthernet;
                 break;
             case Inet::InterfaceType::Thread:
-                ifp->type = GeneralDiagnostics::InterfaceTypeEnum::kThread;
+                ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kThread;
                 break;
             case Inet::InterfaceType::Cellular:
-                ifp->type = GeneralDiagnostics::InterfaceTypeEnum::kCellular;
+                ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kCellular;
                 break;
             default:
-                ifp->type = GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
+                ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
                 break;
             }
         }

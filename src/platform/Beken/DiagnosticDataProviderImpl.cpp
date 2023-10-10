@@ -134,7 +134,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 
     Platform::CopyString(ifp->Name, netif->hostname);
     ifp->name = CharSpan::fromCharString(ifp->Name);
-    ifp->type = GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
+    ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
     ifp->offPremiseServicesReachableIPv4.SetNonNull(false);
     ifp->offPremiseServicesReachableIPv6.SetNonNull(false);
     memcpy(ifp->MacAddress, netif->hwaddr, sizeof(netif->hwaddr));

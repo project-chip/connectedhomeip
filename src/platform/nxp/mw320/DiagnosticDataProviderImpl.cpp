@@ -163,7 +163,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
     ifp->name                                          = CharSpan::fromCharString(ifp->Name);
     ifp->isOperational                                 = true;
-    ifp->type                                          = GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
+    ifp->type                                          = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
     if (ConnectivityUtils::GetInterfaceIPv4Addrs("", size, ifp) == CHIP_NO_ERROR)

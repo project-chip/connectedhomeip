@@ -248,7 +248,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ifp->isOperational             = true;
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
-    ifp->type = GeneralDiagnostics::InterfaceTypeEnum::kThread;
+    ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kThread;
 
     otExtAddress extAddr;
     ThreadStackMgrImpl().GetExtAddress(extAddr);
