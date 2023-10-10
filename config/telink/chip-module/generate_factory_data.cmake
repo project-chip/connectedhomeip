@@ -116,6 +116,18 @@ if(CONFIG_CHIP_DEVICE_ENABLE_KEY)
 string(APPEND script_args "--enable-key \"${CONFIG_CHIP_DEVICE_ENABLE_KEY}\"\n")
 endif()
 
+if(${FLASH_SIZE} MATCHES 1m)
+  set(SEEK "0xF5000")
+elseif(${FLASH_SIZE} MATCHES 2m)
+  set(SEEK "0x107000")
+elseif(${FLASH_SIZE} MATCHES 4m)
+  set(SEEK "0x207000")
+else()
+  set(SEEK "0x107000")
+endif()
+
+string(APPEND script_args "--offset ${SEEK}\n")
+
 string(APPEND script_args "--output \"${output_path}\"/factory\n")
 
 set(factory_data_bin ${output_path}/factory/factory_data.bin)
