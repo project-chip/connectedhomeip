@@ -9605,7 +9605,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(Attribute
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::MinLevel::Id: {
@@ -9741,7 +9741,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(Attribute
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::LampBurnHoursTripPoint::Id: {

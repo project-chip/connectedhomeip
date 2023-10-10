@@ -7633,6 +7633,10 @@
           BarrierControl:
               - BarrierControlCapabilities
               - BarrierControlSafetyStatus
+          BallastConfiguration:
+              # The BallastConfiguration cluster is provisional for now, but not marked that way.
+              - BallastStatusBitmap
+              - LampAlarmModeBitmap
       attributes:
           GeneralDiagnostics:
               # Not in the spec yet.
