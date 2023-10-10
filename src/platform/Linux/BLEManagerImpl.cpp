@@ -344,20 +344,23 @@ exit:
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {
-    BluezConnection * connection = static_cast<BluezConnection *>(conId);
-    return (connection != nullptr) ? connection->mMtu : 0;
+    VerifyOrReturnValue(conId != BLE_CONNECTION_UNINITIALIZED, 0,
+                        ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
+    return conId->mMtu;
 }
 
 bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     bool result = false;
 
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
     VerifyOrExit(Ble::UUIDsMatch(svcId, &CHIP_BLE_SVC_ID),
                  ChipLogError(DeviceLayer, "SubscribeCharacteristic() called with invalid service ID"));
     VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_TX),
                  ChipLogError(DeviceLayer, "SubscribeCharacteristic() called with invalid characteristic ID"));
 
-    VerifyOrExit(BluezSubscribeCharacteristic(conId) == CHIP_NO_ERROR,
+    VerifyOrExit(conId->BluezSubscribeCharacteristic() == CHIP_NO_ERROR,
                  ChipLogError(DeviceLayer, "BluezSubscribeCharacteristic() failed"));
     result = true;
 
@@ -369,12 +372,14 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
 {
     bool result = false;
 
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
     VerifyOrExit(Ble::UUIDsMatch(svcId, &CHIP_BLE_SVC_ID),
                  ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() called with invalid service ID"));
     VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_TX),
                  ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() called with invalid characteristic ID"));
 
-    VerifyOrExit(BluezUnsubscribeCharacteristic(conId) == CHIP_NO_ERROR,
+    VerifyOrExit(conId->BluezUnsubscribeCharacteristic() == CHIP_NO_ERROR,
                  ChipLogError(DeviceLayer, "BluezUnsubscribeCharacteristic() failed"));
     result = true;
 
@@ -386,9 +391,11 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
     bool result = false;
 
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
     ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (con %p)", conId);
 
-    VerifyOrExit(CloseBluezConnection(conId) == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "CloseBluezConnection() failed"));
+    VerifyOrExit(conId->CloseBluezConnection() == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "CloseBluezConnection() failed"));
     result = true;
 
 exit:
@@ -400,7 +407,9 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 {
     bool result = false;
 
-    VerifyOrExit(SendBluezIndication(conId, std::move(pBuf)) == CHIP_NO_ERROR,
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
+    VerifyOrExit(conId->SendBluezIndication(std::move(pBuf)) == CHIP_NO_ERROR,
                  ChipLogError(DeviceLayer, "SendBluezIndication() failed"));
     result = true;
 
@@ -413,12 +422,14 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::Ch
 {
     bool result = false;
 
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
     VerifyOrExit(Ble::UUIDsMatch(svcId, &CHIP_BLE_SVC_ID),
                  ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid service ID"));
     VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_RX),
                  ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid characteristic ID"));
 
-    VerifyOrExit(BluezSendWriteRequest(conId, std::move(pBuf)) == CHIP_NO_ERROR,
+    VerifyOrExit(conId->BluezSendWriteRequest(std::move(pBuf)) == CHIP_NO_ERROR,
                  ChipLogError(DeviceLayer, "BluezSendWriteRequest() failed"));
     result = true;
 

@@ -34,45 +34,70 @@ namespace Internal {
 
 struct BluezEndpoint;
 
-struct BluezConnection
+class BluezConnection
 {
-
+public:
     struct IOChannel
     {
         GIOChannel * mpChannel;
         GSource * mWatchSource;
     };
 
+    BluezConnection(BluezEndpoint * apEndpoint, BluezDevice1 * apDevice);
+    ~BluezConnection();
+
+    CHIP_ERROR SendBluezIndication(chip::System::PacketBufferHandle apBuf);
+    CHIP_ERROR CloseBluezConnection();
+
+    /// Write to the CHIP RX characteristic on the remote peripheral device
+    CHIP_ERROR BluezSendWriteRequest(chip::System::PacketBufferHandle apBuf);
+    /// Subscribe to the CHIP TX characteristic on the remote peripheral device
+    CHIP_ERROR BluezSubscribeCharacteristic();
+    /// Unsubscribe from the CHIP TX characteristic on the remote peripheral device
+    CHIP_ERROR BluezUnsubscribeCharacteristic();
+
+private:
     struct ConnectionDataBundle
     {
+        ConnectionDataBundle(BluezConnection *, const chip::System::PacketBufferHandle &);
+        ~ConnectionDataBundle() = default;
+
         BluezConnection * mpConn;
-        GVariant * mpVal;
+        GAutoPtr<GVariant> mData;
     };
 
-    char * mpPeerAddress;
-    BluezDevice1 * mpDevice;
-    BluezGattService1 * mpService;
-    BluezGattCharacteristic1 * mpC1;
-    BluezGattCharacteristic1 * mpC2;
-    // additional data characteristics
-    BluezGattCharacteristic1 * mpC3;
+    CHIP_ERROR Init();
 
-    bool mIsNotify;
-    uint16_t mMtu;
-    struct IOChannel mC1Channel;
-    struct IOChannel mC2Channel;
+    static CHIP_ERROR BluezC2Indicate(ConnectionDataBundle * data);
+    static CHIP_ERROR BluezDisconnect(BluezConnection * apConn);
+
+    static void SendWriteRequestDone(GObject * aObject, GAsyncResult * aResult, gpointer apConn);
+    static CHIP_ERROR SendWriteRequestImpl(ConnectionDataBundle * data);
+
+    static void OnCharacteristicChanged(GDBusProxy * aInterface, GVariant * aChangedProperties,
+                                        const gchar * const * aInvalidatedProps, gpointer apConn);
+    static void SubscribeCharacteristicDone(GObject * aObject, GAsyncResult * aResult, gpointer apConn);
+    static CHIP_ERROR SubscribeCharacteristicImpl(BluezConnection * apConn);
+
+    static void UnsubscribeCharacteristicDone(GObject * aObject, GAsyncResult * aResult, gpointer apConn);
+    static CHIP_ERROR UnsubscribeCharacteristicImpl(BluezConnection * apConn);
+
     BluezEndpoint * mpEndpoint;
+    BluezDevice1 * mpDevice;
+
+public:
+    char * mpPeerAddress;
+    BluezGattService1 * mpService   = nullptr;
+    BluezGattCharacteristic1 * mpC1 = nullptr;
+    BluezGattCharacteristic1 * mpC2 = nullptr;
+    // additional data characteristics
+    BluezGattCharacteristic1 * mpC3 = nullptr;
+
+    bool mIsNotify              = false;
+    uint16_t mMtu               = 0;
+    struct IOChannel mC1Channel = { 0 };
+    struct IOChannel mC2Channel = { 0 };
 };
-
-CHIP_ERROR SendBluezIndication(BluezConnection * apConn, chip::System::PacketBufferHandle apBuf);
-CHIP_ERROR CloseBluezConnection(BluezConnection * apConn);
-
-/// Write to the CHIP RX characteristic on the remote peripheral device
-CHIP_ERROR BluezSendWriteRequest(BluezConnection * apConn, chip::System::PacketBufferHandle apBuf);
-/// Subscribe to the CHIP TX characteristic on the remote peripheral device
-CHIP_ERROR BluezSubscribeCharacteristic(BluezConnection * apConn);
-/// Unsubscribe from the CHIP TX characteristic on the remote peripheral device
-CHIP_ERROR BluezUnsubscribeCharacteristic(BluezConnection * apConn);
 
 } // namespace Internal
 } // namespace DeviceLayer
