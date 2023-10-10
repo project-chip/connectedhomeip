@@ -63,16 +63,6 @@ enum EmberAfEnhancedColorMode : uint8_t
     EMBER_ZCL_ENHANCED_COLOR_MODE_ENHANCED_CURRENT_HUE_AND_CURRENT_SATURATION = 3,
 };
 
-// Enum for InterfaceTypeEnum
-enum EmberAfInterfaceTypeEnum : uint8_t
-{
-    EMBER_ZCL_INTERFACE_TYPE_ENUM_UNSPECIFIED = 0,
-    EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI       = 1,
-    EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET    = 2,
-    EMBER_ZCL_INTERFACE_TYPE_ENUM_CELLULAR    = 3,
-    EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD      = 4,
-};
-
 // Enum for MoveMode
 enum EmberAfMoveMode : uint8_t
 {

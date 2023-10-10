@@ -6,7 +6,6 @@ WeakEnums:
     - ColorControlOptions
     - ColorMode
     - EnhancedColorMode
-    - InterfaceTypeEnum
     - MoveMode
     - PHYRateEnum
     - StepMode

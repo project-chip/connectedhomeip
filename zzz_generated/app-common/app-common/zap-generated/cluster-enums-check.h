@@ -845,21 +845,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::Int
     using EnumType = GeneralDiagnostics::InterfaceTypeEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kUnspecified:
     case EnumType::kWiFi:
     case EnumType::kEthernet:
     case EnumType::kCellular:
     case EnumType::kThread:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_INTERFACE_TYPE_ENUM_UNSPECIFIED:
-    case EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI:
-    case EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET:
-    case EMBER_ZCL_INTERFACE_TYPE_ENUM_CELLULAR:
-    case EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(5);
