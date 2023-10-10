@@ -17,7 +17,6 @@ import argparse
 import os
 from datetime import datetime, timezone
 
-
 SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))
 FALLBACK_LKGT_FILENAME = os.path.abspath(os.path.join(SCRIPT_DIR, 'fallback_lkgt'))
 
