@@ -397,10 +397,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveRadioFaults(GeneralFaults<kMaxRa
 {
 #if CHIP_CONFIG_TEST
     // On Linux Simulation, set following radio faults statically.
-    ReturnErrorOnFailure(radioFaults.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kWiFiFault)));
-    ReturnErrorOnFailure(radioFaults.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kCellularFault)));
-    ReturnErrorOnFailure(radioFaults.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kThreadFault)));
-    ReturnErrorOnFailure(radioFaults.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kNFCFault)));
+    ReturnErrorOnFailure(radioFaults.add(to_underlying(RadioFaultEnum::kWiFiFault)));
+    ReturnErrorOnFailure(radioFaults.add(to_underlying(RadioFaultEnum::kCellularFault)));
+    ReturnErrorOnFailure(radioFaults.add(to_underlying(RadioFaultEnum::kThreadFault)));
+    ReturnErrorOnFailure(radioFaults.add(to_underlying(RadioFaultEnum::kNFCFault)));
 #endif
 
     return CHIP_NO_ERROR;

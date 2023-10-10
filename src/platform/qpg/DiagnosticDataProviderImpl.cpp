@@ -160,8 +160,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveRadioFaults(GeneralFaults<kMaxRa
 {
     ChipLogProgress(DeviceLayer, "GetActiveRadioFaults");
 #if CHIP_CONFIG_TEST
-    ReturnErrorOnFailure(radioFaults.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kThreadFault)));
-    ReturnErrorOnFailure(radioFaults.add(to_underlying(GeneralDiagnostics::RadioFaultEnum::kBLEFault)));
+    ReturnErrorOnFailure(radioFaults.add(to_underlying(RadioFaultEnum::kThreadFault)));
+    ReturnErrorOnFailure(radioFaults.add(to_underlying(RadioFaultEnum::kBLEFault)));
 #endif
 
     return CHIP_NO_ERROR;
