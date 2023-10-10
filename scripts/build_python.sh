@@ -44,6 +44,7 @@ declare case_retry_delta
 declare install_virtual_env
 declare clean_virtual_env=yes
 declare install_pytest_requirements=yes
+declare enable_tracing_support=true
 
 help() {
 
@@ -69,6 +70,7 @@ Input Options:
                                                             Defaults to yes.
   --extra_packages PACKAGES                                 Install extra Python packages from PyPI
   -z --pregen_dir DIRECTORY                                 Directory where generated zap files have been pre-generated.
+  --enable_tracing_support <true/false>                 Specify whether to enable tracing support.
 "
 }
 
@@ -132,6 +134,14 @@ while (($#)); do
             pregen_dir=$2
             shift
             ;;
+        --enable_tracing_support)
+            enable_tracing_support=$2
+            if [[ "$enable_tracing_support" != "true" && "$enable_tracing_support" != "false" ]]; then
+                echo "enable_tracing_support should have a true/false value, not '$enable_tracing_support'"
+                exit
+            fi
+            shift
+            ;;
         -*)
             help
             echo "Unknown Option \"$1\""
@@ -142,7 +152,7 @@ while (($#)); do
 done
 
 # Print input values
-echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\", enable_pybindings = $enable_pybindings, chip_case_retry_delta=\"$chip_case_retry_delta\", pregen_dir=\"$pregen_dir\""
+echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\", enable_pybindings = $enable_pybindings, chip_case_retry_delta=\"$chip_case_retry_delta\", pregen_dir=\"$pregen_dir\", enable_tracing_support = $enable_tracing_support"
 
 # Ensure we have a compilation environment
 source "$CHIP_ROOT/scripts/activate.sh"
@@ -153,7 +163,7 @@ source "$CHIP_ROOT/scripts/activate.sh"
 [[ -n "$pregen_dir" ]] && pregen_dir_arg="chip_code_pre_generated_directory=\"$pregen_dir\"" || pregen_dir_arg=""
 
 # Make all possible human redable tracing available.
-tracing_options="matter_log_json_payload_hex=true matter_log_json_payload_decode_full=true matter_enable_tracing_support=true"
+tracing_options="matter_log_json_payload_hex=true matter_log_json_payload_decode_full=true matter_enable_tracing_support=$enable_tracing_support"
 
 gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$tracing_options chip_detail_logging=$chip_detail_logging enable_pylib=$enable_pybindings enable_rtti=$enable_pybindings chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg"
 
