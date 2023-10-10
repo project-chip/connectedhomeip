@@ -2538,7 +2538,7 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
                 if (status == EMBER_ZCL_STATUS_SUCCESS)
                 {
                     // Set ColorMode attributes to reflect ColorTemperature.
-                    uint8_t updateColorMode = EMBER_ZCL_COLOR_MODE_COLOR_TEMPERATURE;
+                    uint8_t updateColorMode = to_underlying(ColorControl::ColorMode::kColorTemperature);
                     Attributes::ColorMode::Set(endpoint, updateColorMode);
 
                     updateColorMode = to_underlying(EnhancedColorModeEnum::kColorTemperature);

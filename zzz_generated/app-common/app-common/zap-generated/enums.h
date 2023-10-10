@@ -40,14 +40,6 @@ enum EmberAfBarrierControlMovingState : uint8_t
     EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_OPENING = 2,
 };
 
-// Enum for ColorMode
-enum EmberAfColorMode : uint8_t
-{
-    EMBER_ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION = 0,
-    EMBER_ZCL_COLOR_MODE_CURRENT_X_AND_CURRENT_Y            = 1,
-    EMBER_ZCL_COLOR_MODE_COLOR_TEMPERATURE                  = 2,
-};
-
 // Enum for InterfaceTypeEnum
 enum EmberAfInterfaceTypeEnum : uint8_t
 {
