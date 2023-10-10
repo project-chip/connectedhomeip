@@ -227,7 +227,6 @@ void SPIDRV_SetBaudrate(uint32_t baudrate)
 
 sl_status_t sl_wfx_host_spi_cs_assert(void)
 {
-    // SILABS_LOG("sl_wfx_host_spi_cs_assert started.");
     xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
 
     if (!spi_enabled) // Reduce sl_spidrv_init_instances
@@ -238,13 +237,11 @@ sl_status_t sl_wfx_host_spi_cs_assert(void)
 #endif // EFR32MG24
         spi_enabled = true;
     }
-    // SILABS_LOG("sl_wfx_host_spi_cs_assert completed.");
     return SL_STATUS_OK;
 }
 
 sl_status_t sl_wfx_host_spi_cs_deassert(void)
 {
-    // SILABS_LOG("sl_wfx_host_spi_cs_deassert started.");
     if (spi_enabled)
     {
         if (ECODE_EMDRV_SPIDRV_OK != SPIDRV_DeInit(SL_SPIDRV_HANDLE))
@@ -260,7 +257,6 @@ sl_status_t sl_wfx_host_spi_cs_deassert(void)
         spi_enabled = false;
     }
     xSemaphoreGive(spi_sem_sync_hdl);
-    // SILABS_LOG("sl_wfx_host_spi_cs_deassert completed.");
     return SL_STATUS_OK;
 }
 #endif // SL_SPICTRL_MUX
