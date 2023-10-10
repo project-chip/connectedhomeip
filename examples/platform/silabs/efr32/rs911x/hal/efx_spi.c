@@ -27,7 +27,6 @@
 #include "semphr.h"
 #include "task.h"
 
-#include "btl_interface.h"
 #include "dmadrv.h"
 #include "em_chip.h"
 #include "em_cmu.h"
@@ -71,6 +70,9 @@
 #include "rsi_driver.h"
 #endif // CHIP_9117
 
+#if SL_BTLCTRL_MUX
+#include "btl_interface.h"
+#endif // SL_BTLCTRL_MUX
 #if SL_LCDCTRL_MUX
 #include "sl_memlcd.h"
 #endif // SL_LCDCTRL_MUX
