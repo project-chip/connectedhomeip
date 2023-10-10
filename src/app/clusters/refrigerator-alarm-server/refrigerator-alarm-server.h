@@ -29,28 +29,28 @@ class RefrigeratorAlarmServer
 public:
     static RefrigeratorAlarmServer & Instance();
 
-    EmberAfStatus GetMaskValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * mask);
-    EmberAfStatus GetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * state);
+    EmberAfStatus GetMaskValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> * mask);
+    EmberAfStatus GetStateValue(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> * state);
     EmberAfStatus GetSupportedValue(chip::EndpointId endpoint,
-                                    chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> * suppported);
+                                    chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> * suppported);
 
     // A change in mask value will result in a corresponding change in state.
     EmberAfStatus SetMaskValue(chip::EndpointId endpoint,
-                               const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> mask);
+                               const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> mask);
 
     // When State changes we are generating Notify event.
     EmberAfStatus SetStateValue(chip::EndpointId endpoint,
-                                chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> newState);
+                                chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> newState);
 
     // A change in supported value will result in a corresponding change in mask and state.
     EmberAfStatus SetSupportedValue(chip::EndpointId endpoint,
-                                    const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> supported);
+                                    const chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> supported);
 
 private:
     static RefrigeratorAlarmServer instance;
 
-    void SendNotifyEvent(chip::EndpointId endpointId, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> becameActive,
-                         chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> becameInactive,
-                         chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> newState,
-                         chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmMap> mask);
+    void SendNotifyEvent(chip::EndpointId endpointId, chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> becameActive,
+                         chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> becameInactive,
+                         chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> newState,
+                         chip::BitMask<chip::app::Clusters::RefrigeratorAlarm::AlarmBitmap> mask);
 };

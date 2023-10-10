@@ -37,7 +37,7 @@ public:
      *   @return The cluster will do this update if ModifyEnabledAlarmsCallback() returns true.
      *   The cluster will not do this update if ModifyEnabledAlarmsCallback() returns false.
      */
-    bool ModifyEnabledAlarmsCallback(const BitMask<AlarmMap> mask) override;
+    bool ModifyEnabledAlarmsCallback(const BitMask<AlarmBitmap> mask) override;
 
     /**
      *   @brief
@@ -46,18 +46,18 @@ public:
      *   @return The cluster will reset active alarms if ResetAlarmsCallback() returns true.
      *   The cluster will not reset active alarms if ResetAlarmsCallback() returns false.
      */
-    bool ResetAlarmsCallback(const BitMask<AlarmMap> alarms) override;
+    bool ResetAlarmsCallback(const BitMask<AlarmBitmap> alarms) override;
 
     ~DishwasherAlarmDelegate() = default;
 };
 
-bool DishwasherAlarmDelegate::ModifyEnabledAlarmsCallback(const BitMask<AlarmMap> mask)
+bool DishwasherAlarmDelegate::ModifyEnabledAlarmsCallback(const BitMask<AlarmBitmap> mask)
 {
     // placeholder implementation
     return true;
 }
 
-bool DishwasherAlarmDelegate::ResetAlarmsCallback(const BitMask<AlarmMap> alarms)
+bool DishwasherAlarmDelegate::ResetAlarmsCallback(const BitMask<AlarmBitmap> alarms)
 {
     // placeholder implementation
     return true;
@@ -89,12 +89,12 @@ void MatterDishwasherAlarmServerInit()
     // 3   TempTooLow        1
     // 4   TempTooHigh       0
     // 5   WaterLevelError   1
-    BitMask<AlarmMap> supported;
-    supported.SetField(AlarmMap::kInflowError, 1);
-    supported.SetField(AlarmMap::kDrainError, 1);
-    supported.SetField(AlarmMap::kDoorError, 1);
-    supported.SetField(AlarmMap::kTempTooLow, 1);
-    supported.SetField(AlarmMap::kWaterLevelError, 1);
+    BitMask<AlarmBitmap> supported;
+    supported.SetField(AlarmBitmap::kInflowError, 1);
+    supported.SetField(AlarmBitmap::kDrainError, 1);
+    supported.SetField(AlarmBitmap::kDoorError, 1);
+    supported.SetField(AlarmBitmap::kTempTooLow, 1);
+    supported.SetField(AlarmBitmap::kWaterLevelError, 1);
     DishwasherAlarmServer::Instance().SetSupportedValue(kDemoEndpointId, supported);
 
     // Set Mask attribute = 0x2F = 47
@@ -105,12 +105,12 @@ void MatterDishwasherAlarmServerInit()
     // 3   TempTooLow        1
     // 4   TempTooHigh       0
     // 5   WaterLevelError   1
-    BitMask<AlarmMap> mask;
-    mask.SetField(AlarmMap::kInflowError, 1);
-    mask.SetField(AlarmMap::kDrainError, 1);
-    mask.SetField(AlarmMap::kDoorError, 1);
-    mask.SetField(AlarmMap::kTempTooLow, 1);
-    mask.SetField(AlarmMap::kWaterLevelError, 1);
+    BitMask<AlarmBitmap> mask;
+    mask.SetField(AlarmBitmap::kInflowError, 1);
+    mask.SetField(AlarmBitmap::kDrainError, 1);
+    mask.SetField(AlarmBitmap::kDoorError, 1);
+    mask.SetField(AlarmBitmap::kTempTooLow, 1);
+    mask.SetField(AlarmBitmap::kWaterLevelError, 1);
     DishwasherAlarmServer::Instance().SetMaskValue(kDemoEndpointId, mask);
 
     // Set Latch attribute = 0x03
@@ -121,9 +121,9 @@ void MatterDishwasherAlarmServerInit()
     // 3   TempTooLow        0
     // 4   TempTooHigh       0
     // 5   WaterLevelError   0
-    BitMask<AlarmMap> latch;
-    latch.SetField(AlarmMap::kInflowError, 1);
-    latch.SetField(AlarmMap::kDrainError, 1);
+    BitMask<AlarmBitmap> latch;
+    latch.SetField(AlarmBitmap::kInflowError, 1);
+    latch.SetField(AlarmBitmap::kDrainError, 1);
     DishwasherAlarmServer::Instance().SetLatchValue(kDemoEndpointId, latch);
 
     // Set State attribute = 0x07
@@ -134,9 +134,9 @@ void MatterDishwasherAlarmServerInit()
     // 3   TempTooLow        0
     // 4   TempTooHigh       0
     // 5   WaterLevelError   0
-    BitMask<AlarmMap> state;
-    state.SetField(AlarmMap::kInflowError, 1);
-    state.SetField(AlarmMap::kDrainError, 1);
-    state.SetField(AlarmMap::kDoorError, 1);
+    BitMask<AlarmBitmap> state;
+    state.SetField(AlarmBitmap::kInflowError, 1);
+    state.SetField(AlarmBitmap::kDrainError, 1);
+    state.SetField(AlarmBitmap::kDoorError, 1);
     DishwasherAlarmServer::Instance().SetStateValue(kDemoEndpointId, state);
 }

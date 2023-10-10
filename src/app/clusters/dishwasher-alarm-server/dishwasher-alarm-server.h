@@ -35,16 +35,16 @@ class DishwasherAlarmServer
 public:
     static DishwasherAlarmServer & Instance();
 
-    EmberAfStatus GetMaskValue(EndpointId endpoint, BitMask<AlarmMap> * mask);
-    EmberAfStatus GetStateValue(EndpointId endpoint, BitMask<AlarmMap> * state);
-    EmberAfStatus GetLatchValue(EndpointId endpoint, BitMask<AlarmMap> * latch);
-    EmberAfStatus GetSupportedValue(EndpointId endpoint, BitMask<AlarmMap> * suppported);
+    EmberAfStatus GetMaskValue(EndpointId endpoint, BitMask<AlarmBitmap> * mask);
+    EmberAfStatus GetStateValue(EndpointId endpoint, BitMask<AlarmBitmap> * state);
+    EmberAfStatus GetLatchValue(EndpointId endpoint, BitMask<AlarmBitmap> * latch);
+    EmberAfStatus GetSupportedValue(EndpointId endpoint, BitMask<AlarmBitmap> * suppported);
 
     // Whenever there is change on Mask we should change State accordingly.
-    EmberAfStatus SetMaskValue(EndpointId endpoint, const BitMask<AlarmMap> mask);
-    EmberAfStatus SetLatchValue(EndpointId endpoint, const BitMask<AlarmMap> latch);
+    EmberAfStatus SetMaskValue(EndpointId endpoint, const BitMask<AlarmBitmap> mask);
+    EmberAfStatus SetLatchValue(EndpointId endpoint, const BitMask<AlarmBitmap> latch);
     // A change in supported value will result in a corresponding change in mask and state.
-    EmberAfStatus SetSupportedValue(EndpointId endpoint, const BitMask<AlarmMap> supported);
+    EmberAfStatus SetSupportedValue(EndpointId endpoint, const BitMask<AlarmBitmap> supported);
 
     /**
      * @brief Set the value of the State attribute
@@ -60,7 +60,7 @@ public:
      * honoring the Mask and Supported attributes.
      * The default value for the ignoreLatchState parameter is false.
      */
-    EmberAfStatus SetStateValue(EndpointId endpoint, const BitMask<AlarmMap> newState, bool ignoreLatchState = false);
+    EmberAfStatus SetStateValue(EndpointId endpoint, const BitMask<AlarmBitmap> newState, bool ignoreLatchState = false);
 
     /**
      * @brief Reset the value of latched alarms in the State attribute.
@@ -69,7 +69,7 @@ public:
      * @param[in] alarms Each bit set to a 1 in this parameter corresponds to a bit in the
      * State attribute will SHALL be reset to false.
      */
-    EmberAfStatus ResetLatchedAlarms(EndpointId endpoint, const BitMask<AlarmMap> alarms);
+    EmberAfStatus ResetLatchedAlarms(EndpointId endpoint, const BitMask<AlarmBitmap> alarms);
 
     // check whether the Alarm featureMap has enabled Reset feature.
     bool HasResetFeature(EndpointId endpoint);
@@ -77,8 +77,8 @@ public:
 private:
     static DishwasherAlarmServer instance;
 
-    void SendNotifyEvent(EndpointId endpointId, BitMask<AlarmMap> becameActive, BitMask<AlarmMap> becameInactive,
-                         BitMask<AlarmMap> newState, BitMask<AlarmMap> mask);
+    void SendNotifyEvent(EndpointId endpointId, BitMask<AlarmBitmap> becameActive, BitMask<AlarmBitmap> becameInactive,
+                         BitMask<AlarmBitmap> newState, BitMask<AlarmBitmap> mask);
 };
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
