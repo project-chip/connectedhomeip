@@ -29,7 +29,7 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/ErrorStr.h>
-#include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/logging/TextOnlyLogging.h>
 
 /**
  * Base-level abnormal termination.
