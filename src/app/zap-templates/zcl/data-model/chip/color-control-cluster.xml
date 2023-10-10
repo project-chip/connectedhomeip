@@ -24,6 +24,20 @@ limitations under the License.
     <field name="ColorTemperature" mask="0x10" />
   </bitmap>
 
+  <bitmap name="ColorControlOptionsBitmap" type="BITMAP8">
+    <cluster code="0x0300" />
+    <field name="ExecuteIfOff" mask="0x1"/>
+  </bitmap>
+
+  <enum name="EnhancedColorModeEnum" type="ENUM8">
+    <cluster code="0x0300" />
+    <item name="CurrentHueAndCurrentSaturation" value="0x00"/>
+    <item name="CurrentXAndCurrentY" value="0x01"/>
+    <item name="ColorTemperature" value="0x02"/>
+    <item name="EnhancedCurrentHueAndCurrentSaturation" value="0x03"/>
+  </enum>
+
+
   <enum name="HueDirection" type="ENUM8">
     <cluster code="0x0300"/>
     <item name="ShortestDistance" value="0x0"/>

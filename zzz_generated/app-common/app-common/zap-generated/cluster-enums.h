@@ -2920,6 +2920,20 @@ using ColorMode                                                      = EmberAfCo
 static ColorMode __attribute__((unused)) kColorModekUnknownEnumValue = static_cast<ColorMode>(3);
 #endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
+// Enum for EnhancedColorModeEnum
+enum class EnhancedColorModeEnum : uint8_t
+{
+    kCurrentHueAndCurrentSaturation         = 0x00,
+    kCurrentXAndCurrentY                    = 0x01,
+    kColorTemperature                       = 0x02,
+    kEnhancedCurrentHueAndCurrentSaturation = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
 // Enum for HueDirection
 enum class HueDirection : uint8_t
 {
@@ -2992,6 +3006,12 @@ enum class ColorCapabilities : uint16_t
     kColorLoopSupported        = 0x4,
     kXYAttributesSupported     = 0x8,
     kColorTemperatureSupported = 0x10,
+};
+
+// Bitmap for ColorControlOptionsBitmap
+enum class ColorControlOptionsBitmap : uint8_t
+{
+    kExecuteIfOff = 0x1,
 };
 
 // Bitmap for ColorLoopUpdateFlags

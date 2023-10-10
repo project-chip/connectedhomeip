@@ -1247,6 +1247,13 @@ server cluster ColorControl = 768 {
     kColorTemperature = 2;
   }
 
+  enum EnhancedColorModeEnum : ENUM8 {
+    kCurrentHueAndCurrentSaturation = 0;
+    kCurrentXAndCurrentY = 1;
+    kColorTemperature = 2;
+    kEnhancedCurrentHueAndCurrentSaturation = 3;
+  }
+
   enum HueDirection : ENUM8 {
     kShortestDistance = 0;
     kLongestDistance = 1;
@@ -1282,6 +1289,10 @@ server cluster ColorControl = 768 {
     kColorLoopSupported = 0x4;
     kXYAttributesSupported = 0x8;
     kColorTemperatureSupported = 0x10;
+  }
+
+  bitmap ColorControlOptionsBitmap : BITMAP8 {
+    kExecuteIfOff = 0x1;
   }
 
   bitmap ColorLoopUpdateFlags : BITMAP8 {

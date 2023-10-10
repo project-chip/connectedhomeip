@@ -477,6 +477,10 @@ typedef void (*NullableColorControlClusterColorLoopDirectionAttributeCallback)(
 typedef void (*ColorControlClusterColorModeAttributeCallback)(void *, chip::app::Clusters::ColorControl::ColorMode);
 typedef void (*NullableColorControlClusterColorModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::ColorMode> &);
+typedef void (*ColorControlClusterEnhancedColorModeEnumAttributeCallback)(void *,
+                                                                          chip::app::Clusters::ColorControl::EnhancedColorModeEnum);
+typedef void (*NullableColorControlClusterEnhancedColorModeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::EnhancedColorModeEnum> &);
 typedef void (*ColorControlClusterHueDirectionAttributeCallback)(void *, chip::app::Clusters::ColorControl::HueDirection);
 typedef void (*NullableColorControlClusterHueDirectionAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::HueDirection> &);
@@ -27465,6 +27469,73 @@ public:
     void OnSubscriptionEstablished();
     using MTRNullableColorControlClusterColorModeAttributeCallbackBridge::KeepAliveOnCallback;
     using MTRNullableColorControlClusterColorModeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRColorControlClusterEnhancedColorModeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<ColorControlClusterEnhancedColorModeEnumAttributeCallback>
+{
+public:
+    MTRColorControlClusterEnhancedColorModeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<ColorControlClusterEnhancedColorModeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRColorControlClusterEnhancedColorModeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<ColorControlClusterEnhancedColorModeEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::ColorControl::EnhancedColorModeEnum value);
+};
+
+class MTRColorControlClusterEnhancedColorModeEnumAttributeCallbackSubscriptionBridge
+    : public MTRColorControlClusterEnhancedColorModeEnumAttributeCallbackBridge
+{
+public:
+    MTRColorControlClusterEnhancedColorModeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRColorControlClusterEnhancedColorModeEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRColorControlClusterEnhancedColorModeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRColorControlClusterEnhancedColorModeEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableColorControlClusterEnhancedColorModeEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableColorControlClusterEnhancedColorModeEnumAttributeCallback>
+{
+public:
+    MTRNullableColorControlClusterEnhancedColorModeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableColorControlClusterEnhancedColorModeEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableColorControlClusterEnhancedColorModeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<NullableColorControlClusterEnhancedColorModeEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::EnhancedColorModeEnum> & value);
+};
+
+class MTRNullableColorControlClusterEnhancedColorModeEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableColorControlClusterEnhancedColorModeEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableColorControlClusterEnhancedColorModeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableColorControlClusterEnhancedColorModeEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableColorControlClusterEnhancedColorModeEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableColorControlClusterEnhancedColorModeEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

@@ -2184,6 +2184,20 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::ColorMode
         return static_cast<EnumType>(3);
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::EnhancedColorModeEnum val)
+{
+    using EnumType = ColorControl::EnhancedColorModeEnum;
+    switch (val)
+    {
+    case EnumType::kCurrentHueAndCurrentSaturation:
+    case EnumType::kCurrentXAndCurrentY:
+    case EnumType::kColorTemperature:
+    case EnumType::kEnhancedCurrentHueAndCurrentSaturation:
+        return val;
+    default:
+        return static_cast<EnumType>(4);
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(ColorControl::HueDirection val)
 {
     using EnumType = ColorControl::HueDirection;

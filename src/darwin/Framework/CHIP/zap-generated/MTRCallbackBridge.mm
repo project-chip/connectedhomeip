@@ -25253,6 +25253,54 @@ void MTRNullableColorControlClusterColorModeAttributeCallbackSubscriptionBridge:
     }
 }
 
+void MTRColorControlClusterEnhancedColorModeEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ColorControl::EnhancedColorModeEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRColorControlClusterEnhancedColorModeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRNullableColorControlClusterEnhancedColorModeEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::EnhancedColorModeEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRNullableColorControlClusterEnhancedColorModeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
 void MTRColorControlClusterHueDirectionAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::ColorControl::HueDirection value)
 {
     NSNumber * _Nonnull objCValue;

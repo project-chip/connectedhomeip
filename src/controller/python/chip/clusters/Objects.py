@@ -25425,6 +25425,17 @@ class ColorControl(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 3,
 
+        class EnhancedColorModeEnum(MatterIntEnum):
+            kCurrentHueAndCurrentSaturation = 0x00
+            kCurrentXAndCurrentY = 0x01
+            kColorTemperature = 0x02
+            kEnhancedCurrentHueAndCurrentSaturation = 0x03
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 4,
+
         class HueDirection(MatterIntEnum):
             kShortestDistance = 0x00
             kLongestDistance = 0x01
@@ -25481,6 +25492,9 @@ class ColorControl(Cluster):
             kColorLoopSupported = 0x4
             kXYAttributesSupported = 0x8
             kColorTemperatureSupported = 0x10
+
+        class ColorControlOptionsBitmap(IntFlag):
+            kExecuteIfOff = 0x1
 
         class ColorLoopUpdateFlags(IntFlag):
             kUpdateAction = 0x1

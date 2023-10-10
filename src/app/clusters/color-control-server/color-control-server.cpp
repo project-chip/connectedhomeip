@@ -210,7 +210,7 @@ public:
             switch (decodePair.attributeID)
             {
             case Attributes::CurrentX::Id:
-                if (SupportsColorMode(endpoint, EMBER_ZCL_ENHANCED_COLOR_MODE_CURRENT_X_AND_CURRENT_Y))
+                if (SupportsColorMode(endpoint, EnhancedColorModeEnum::kCurrentXAndCurrentY))
                 {
                     if (decodePair.attributeValue)
                         colorXTransitionState->finalValue =
@@ -218,20 +218,20 @@ public:
                 }
                 break;
             case Attributes::CurrentY::Id:
-                if (SupportsColorMode(endpoint, EMBER_ZCL_ENHANCED_COLOR_MODE_CURRENT_X_AND_CURRENT_Y))
+                if (SupportsColorMode(endpoint, EnhancedColorModeEnum::kCurrentXAndCurrentY))
                 {
                     colorYTransitionState->finalValue =
                         std::min(static_cast<uint16_t>(decodePair.attributeValue), colorYTransitionState->highLimit);
                 }
                 break;
             case Attributes::EnhancedCurrentHue::Id:
-                if (SupportsColorMode(endpoint, EMBER_ZCL_ENHANCED_COLOR_MODE_ENHANCED_CURRENT_HUE_AND_CURRENT_SATURATION))
+                if (SupportsColorMode(endpoint, EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation))
                 {
                     colorHueTransitionState->finalEnhancedHue = static_cast<uint16_t>(decodePair.attributeValue);
                 }
                 break;
             case Attributes::CurrentSaturation::Id:
-                if (SupportsColorMode(endpoint, EMBER_ZCL_ENHANCED_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION))
+                if (SupportsColorMode(endpoint, EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation))
                 {
                     colorSaturationTransitionState->finalValue =
                         std::min(static_cast<uint16_t>(decodePair.attributeValue), colorSaturationTransitionState->highLimit);
@@ -247,7 +247,7 @@ public:
                 loopTimeValue = static_cast<uint16_t>(decodePair.attributeValue);
                 break;
             case Attributes::ColorTemperatureMireds::Id:
-                if (SupportsColorMode(endpoint, EMBER_ZCL_ENHANCED_COLOR_MODE_COLOR_TEMPERATURE))
+                if (SupportsColorMode(endpoint, EnhancedColorModeEnum::kColorTemperature))
                 {
                     colorTempTransitionState->finalValue =
                         std::min(static_cast<uint16_t>(decodePair.attributeValue), colorTempTransitionState->highLimit);
@@ -267,7 +267,7 @@ public:
         ReturnErrorOnFailure(pair_iterator.GetStatus());
 
         // Switch to the mode saved in the scene
-        if (SupportsColorMode(endpoint, targetColorMode))
+        if (SupportsColorMode(endpoint, static_cast<EnhancedColorModeEnum>(targetColorMode)))
         {
             ColorControlServer::Instance().handleModeSwitch(endpoint, targetColorMode);
         }
@@ -324,22 +324,18 @@ public:
     }
 
 private:
-    bool SupportsColorMode(EndpointId endpoint, uint8_t mode)
+    bool SupportsColorMode(EndpointId endpoint, EnhancedColorModeEnum mode)
     {
         switch (mode)
         {
-        case EMBER_ZCL_ENHANCED_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION:
+        case EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation:
             return ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kHueAndSaturation);
-            break;
-        case EMBER_ZCL_ENHANCED_COLOR_MODE_CURRENT_X_AND_CURRENT_Y:
+        case EnhancedColorModeEnum::kCurrentXAndCurrentY:
             return ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kXy);
-            break;
-        case EMBER_ZCL_ENHANCED_COLOR_MODE_COLOR_TEMPERATURE:
+        case EnhancedColorModeEnum::kColorTemperature:
             return ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kColorTemperature);
-            break;
-        case EMBER_ZCL_ENHANCED_COLOR_MODE_ENHANCED_CURRENT_HUE_AND_CURRENT_SATURATION:
+        case EnhancedColorModeEnum::kEnhancedCurrentHueAndCurrentSaturation:
             return ColorControlServer::Instance().HasFeature(endpoint, ColorControlServer::Feature::kEnhancedHue);
-            break;
         default:
             return false;
         }
@@ -508,18 +504,18 @@ bool ColorControlServer::shouldExecuteIfOff(EndpointId endpoint, uint8_t optionM
         // 0xFF are the default values passed to the command handler when
         // the payload is not present - in that case there is use of option
         // attribute to decide execution of the command
-        return READBITS(options, EMBER_ZCL_COLOR_CONTROL_OPTIONS_EXECUTE_IF_OFF);
+        return READBITS(options, to_underlying(ColorControlOptionsBitmap::kExecuteIfOff));
     }
     // ---------- The above is to distinguish if the payload is present or not
 
-    if (READBITS(optionMask, EMBER_ZCL_COLOR_CONTROL_OPTIONS_EXECUTE_IF_OFF))
+    if (READBITS(optionMask, to_underlying(ColorControlOptionsBitmap::kExecuteIfOff)))
     {
         // Mask is present and set in the command payload, this indicates
         // use the override as temporary option
-        return READBITS(optionOverride, EMBER_ZCL_COLOR_CONTROL_OPTIONS_EXECUTE_IF_OFF);
+        return READBITS(optionOverride, to_underlying(ColorControlOptionsBitmap::kExecuteIfOff));
     }
     // if we are here - use the option attribute bits
-    return (READBITS(options, EMBER_ZCL_COLOR_CONTROL_OPTIONS_EXECUTE_IF_OFF));
+    return (READBITS(options, to_underlying(ColorControlOptionsBitmap::kExecuteIfOff)));
 }
 
 /**
@@ -2545,7 +2541,7 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
                     uint8_t updateColorMode = EMBER_ZCL_COLOR_MODE_COLOR_TEMPERATURE;
                     Attributes::ColorMode::Set(endpoint, updateColorMode);
 
-                    updateColorMode = EMBER_ZCL_ENHANCED_COLOR_MODE_COLOR_TEMPERATURE;
+                    updateColorMode = to_underlying(EnhancedColorModeEnum::kColorTemperature);
                     Attributes::EnhancedColorMode::Set(endpoint, updateColorMode);
                 }
             }
