@@ -135,7 +135,7 @@ public:
     static void TestKeepActivemodeRequests(nlTestSuite * aSuite, void * aContext)
     {
         TestContext * ctx = static_cast<TestContext *>(aContext);
-        typedef ICDSubscriber::KeepActiveFlags ActiveFlag;
+        typedef ICDListener::KeepActiveFlags ActiveFlag;
         ICDNotifier notifier = ICDNotifier::GetInstance();
 
         // Setting a requirement will transition the ICD to active mode.

@@ -19,23 +19,23 @@
 #include <app/AppConfig.h>
 #include <lib/core/CHIPError.h>
 
-class ICDSubscriber;
+class ICDListener;
 
 namespace chip {
 namespace app {
 
 /**
- * The ICDManager implements the ICDSubscriber functions and is always subscribed to the ICDNotifier
+ * The ICDManager implements the ICDListener functions and is always subscribed to the ICDNotifier
  * This allows other Matter modules to inform the ICDManager that it needs to go and may have to stay in Active Mode,
  * outside of its standard ActiveModeInterval and IdleModeInterval, without being tightly coupled the  application data model
  *
- * This implementation also allows other modules to implement an ICDSubscriber and subscribe to ICDNotifier
+ * This implementation also allows other modules to implement an ICDListener and subscribe to ICDNotifier
  * to couple behaviours with the ICD cycles. In such cases, ICD_MAX_NOTIFICATION_SUBSCRIBERS need to be adjusted
  */
 
 static_assert(ICD_MAX_NOTIFICATION_SUBSCRIBERS > 0, "At least 1 Subscriber is required for the ICD Manager");
 
-class ICDSubscriber
+class ICDListener
 {
 public:
     enum class KeepActiveFlags : uint8_t
@@ -45,7 +45,7 @@ public:
         kExchangeContextOpen     = 0x03,
     };
 
-    virtual ~ICDSubscriber() {}
+    virtual ~ICDListener() {}
 
     /**
      * @brief This function is called for all subscribers of the ICDNotifier when it calls BroadcastNetworkActivityNotification
@@ -74,8 +74,8 @@ class ICDNotifier
 {
 public:
     ~ICDNotifier();
-    CHIP_ERROR Subscribe(ICDSubscriber * subscriber);
-    void Unsubscribe(ICDSubscriber * subscriber);
+    CHIP_ERROR Subscribe(ICDListener * subscriber);
+    void Unsubscribe(ICDListener * subscriber);
 
     /**
      * The following Broacast* methods triggers all the registered ICDSubscribers related callback
@@ -83,14 +83,14 @@ public:
      * Those functions require to be called from the Chip Task Context, or by holding the chip stack lock.
      */
     void BroadcastNetworkActivityNotification();
-    void BroadcastActiveRequestNotification(ICDSubscriber::KeepActiveFlags request);
-    void BroadcastActiveRequestWithdrawal(ICDSubscriber::KeepActiveFlags request);
+    void BroadcastActiveRequestNotification(ICDListener::KeepActiveFlags request);
+    void BroadcastActiveRequestWithdrawal(ICDListener::KeepActiveFlags request);
 
     static ICDNotifier & GetInstance() { return sICDNotifier; }
 
 private:
     static ICDNotifier sICDNotifier;
-    ICDSubscriber * mSubscribers[ICD_MAX_NOTIFICATION_SUBSCRIBERS] = {};
+    ICDListener * mSubscribers[ICD_MAX_NOTIFICATION_SUBSCRIBERS] = {};
 };
 
 } // namespace app

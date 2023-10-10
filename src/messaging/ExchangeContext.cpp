@@ -326,7 +326,7 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, cons
     SetAutoRequestAck(!session->IsGroupSession());
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    app::ICDNotifier::GetInstance().BroadcastActiveRequestNotification(app::ICDSubscriber::KeepActiveFlags::kExchangeContextOpen);
+    app::ICDNotifier::GetInstance().BroadcastActiveRequestNotification(app::ICDListener::KeepActiveFlags::kExchangeContextOpen);
 #endif
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
@@ -345,7 +345,7 @@ ExchangeContext::~ExchangeContext()
     VerifyOrDie(mFlags.Has(Flags::kFlagClosed));
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    app::ICDNotifier::GetInstance().BroadcastActiveRequestWithdrawal(app::ICDSubscriber::KeepActiveFlags::kExchangeContextOpen);
+    app::ICDNotifier::GetInstance().BroadcastActiveRequestWithdrawal(app::ICDListener::KeepActiveFlags::kExchangeContextOpen);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
     // Ideally, in this scenario, the retransmit table should

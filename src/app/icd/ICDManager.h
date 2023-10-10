@@ -34,7 +34,7 @@ class TestICDManager;
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
  */
-class ICDManager : public ICDSubscriber
+class ICDManager : public ICDListener
 {
 public:
     enum class OperationalState : uint8_t
@@ -63,7 +63,7 @@ public:
     static System::Clock::Milliseconds32 GetSlowPollingInterval() { return kSlowPollingInterval; }
     static System::Clock::Milliseconds32 GetFastPollingInterval() { return kFastPollingInterval; }
 
-    // Implementation of ICDSubscriber functions.
+    // Implementation of ICDListener functions.
     // Callers must origin from the chip task context or be holding the ChipStack lock.
     void OnNetworkActivity() override;
     void OnKeepActiveRequest(KeepActiveFlags request) override;

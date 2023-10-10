@@ -29,7 +29,7 @@ ICDNotifier::~ICDNotifier()
     memset(mSubscribers, 0, sizeof(mSubscribers));
 }
 
-CHIP_ERROR ICDNotifier::Subscribe(ICDSubscriber * subscriber)
+CHIP_ERROR ICDNotifier::Subscribe(ICDListener * subscriber)
 {
     CHIP_ERROR err = CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     for (auto & sub : mSubscribers)
@@ -44,7 +44,7 @@ CHIP_ERROR ICDNotifier::Subscribe(ICDSubscriber * subscriber)
     return err;
 }
 
-void ICDNotifier::Unsubscribe(ICDSubscriber * subscriber)
+void ICDNotifier::Unsubscribe(ICDListener * subscriber)
 {
     for (auto & sub : mSubscribers)
     {
@@ -67,7 +67,7 @@ void ICDNotifier::BroadcastNetworkActivityNotification()
     }
 }
 
-void ICDNotifier::BroadcastActiveRequestNotification(ICDSubscriber::KeepActiveFlags request)
+void ICDNotifier::BroadcastActiveRequestNotification(ICDListener::KeepActiveFlags request)
 {
     for (auto subscriber : mSubscribers)
     {
@@ -78,7 +78,7 @@ void ICDNotifier::BroadcastActiveRequestNotification(ICDSubscriber::KeepActiveFl
     }
 }
 
-void ICDNotifier::BroadcastActiveRequestWithdrawal(ICDSubscriber::KeepActiveFlags request)
+void ICDNotifier::BroadcastActiveRequestWithdrawal(ICDListener::KeepActiveFlags request)
 {
     for (auto subscriber : mSubscribers)
     {

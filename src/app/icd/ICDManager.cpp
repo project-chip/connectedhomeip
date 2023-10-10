@@ -248,7 +248,7 @@ void ICDManager::OnTransitionToIdle(System::Layer * aLayer, void * appState)
     pIcdManager->mStateObserver->OnTransitionToIdle();
 }
 
-/* ICDSubscriber functions. */
+/* ICDListener functions. */
 void ICDManager::OnKeepActiveRequest(KeepActiveFlags request)
 {
     assertChipStackLockedByCurrentThread();
