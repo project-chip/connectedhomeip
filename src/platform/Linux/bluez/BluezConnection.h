@@ -49,7 +49,13 @@ public:
     CHIP_ERROR SendBluezIndication(chip::System::PacketBufferHandle apBuf);
     CHIP_ERROR CloseBluezConnection();
 
+    const char * GetPeerAddress() const;
+
     uint16_t GetMTU() const { return mMtu; }
+    void SetMTU(uint16_t aMtu) { mMtu = aMtu; }
+
+    bool IsNotifyAcquired() const { return mNotifyAcquired; }
+    void SetNotifyAcquired(bool aNotifyAcquired) { mNotifyAcquired = aNotifyAcquired; }
 
     /// Write to the CHIP RX characteristic on the remote peripheral device
     CHIP_ERROR BluezSendWriteRequest(chip::System::PacketBufferHandle apBuf);
@@ -87,16 +93,16 @@ private:
     BluezEndpoint * mpEndpoint;
     BluezDevice1 * mpDevice;
 
+    bool mNotifyAcquired = false;
+    uint16_t mMtu        = 0;
+
 public:
-    char * mpPeerAddress;
     BluezGattService1 * mpService   = nullptr;
     BluezGattCharacteristic1 * mpC1 = nullptr;
     BluezGattCharacteristic1 * mpC2 = nullptr;
     // additional data characteristics
     BluezGattCharacteristic1 * mpC3 = nullptr;
 
-    bool mIsNotify              = false;
-    uint16_t mMtu               = 0;
     struct IOChannel mC1Channel = { 0 };
     struct IOChannel mC2Channel = { 0 };
 };

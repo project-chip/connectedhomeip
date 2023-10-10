@@ -62,7 +62,6 @@ gboolean BluezIsCharOnService(BluezGattCharacteristic1 * aChar, BluezGattService
 BluezConnection::BluezConnection(BluezEndpoint * apEndpoint, BluezDevice1 * apDevice) :
     mpEndpoint(apEndpoint), mpDevice(BLUEZ_DEVICE1(g_object_ref(apDevice)))
 {
-    mpPeerAddress = g_strdup(bluez_device1_get_address(apDevice));
     Init();
 }
 
@@ -76,8 +75,6 @@ BluezConnection::~BluezConnection()
         g_object_unref(mpC1);
     if (mpC2)
         g_object_unref(mpC2);
-    if (mpPeerAddress)
-        g_free(mpPeerAddress);
     if (mC1Channel.mWatchSource)
     {
         g_source_destroy(mC1Channel.mWatchSource);
@@ -234,6 +231,11 @@ exit:
 CHIP_ERROR BluezConnection::CloseBluezConnection()
 {
     return PlatformMgrImpl().GLibMatterContextInvokeSync(BluezDisconnect, this);
+}
+
+const char * BluezConnection::GetPeerAddress() const
+{
+    return bluez_device1_get_address(mpDevice);
 }
 
 // BluezSendWriteRequest callbacks

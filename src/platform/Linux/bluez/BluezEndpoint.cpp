@@ -325,10 +325,10 @@ static gboolean BluezCharacteristicWriteFD(GIOChannel * aChannel, GIOCondition a
     VerifyOrExit(!(aCond & (G_IO_ERR | G_IO_NVAL)), ChipLogError(DeviceLayer, "INFO: socket error in %s", __func__));
     VerifyOrExit(aCond == G_IO_IN, ChipLogError(DeviceLayer, "FAIL: error in %s", __func__));
 
-    ChipLogDetail(DeviceLayer, "c1 %s mtu, %d", __func__, conn->mMtu);
+    ChipLogDetail(DeviceLayer, "c1 %s mtu, %d", __func__, conn->GetMTU());
 
-    buf = g_new(uint8_t, conn->mMtu);
-    len = read(g_io_channel_unix_get_fd(aChannel), buf, conn->mMtu);
+    buf = g_new(uint8_t, conn->GetMTU());
+    len = read(g_io_channel_unix_get_fd(aChannel), buf, conn->GetMTU());
     VerifyOrExit(len > 0, ChipLogError(DeviceLayer, "FAIL: short read in %s (%zd)", __func__, len));
 
     // Casting len to size_t is safe, since we ensured that it's not negative.
@@ -368,6 +368,7 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
 #endif // CHIP_ERROR_LOGGING
     BluezConnection * conn = nullptr;
     GAutoPtr<GVariant> option_mtu;
+    uint16_t mtu;
 
     BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apEndpoint);
 
@@ -391,9 +392,9 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
     }
 
     VerifyOrReturnValue(
-        g_variant_lookup(aOptions, "mtu", "q", &conn->mMtu), FALSE,
-        ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);
+        g_variant_lookup(aOptions, "mtu", "q", &mtu), FALSE, ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "MTU negotiation failed"));
+    conn->SetMTU(mtu);
 
     channel = g_io_channel_unix_new(fds[0]);
     g_io_channel_set_encoding(channel, nullptr, nullptr);
@@ -408,7 +409,7 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
 
     bluez_gatt_characteristic1_set_write_acquired(aChar, TRUE);
 
-    Bluez_gatt_characteristic1_complete_acquire_write_with_fd(aInvocation, fds[1], conn->mMtu);
+    Bluez_gatt_characteristic1_complete_acquire_write_with_fd(aInvocation, fds[1], conn->GetMTU());
     close(fds[1]);
 
     return TRUE;
@@ -434,6 +435,7 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
 #endif // CHIP_ERROR_LOGGING
     BluezConnection * conn = nullptr;
     GAutoPtr<GVariant> option_mtu;
+    uint16_t mtu;
 
     BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apEndpoint);
     VerifyOrReturnValue(endpoint != nullptr, FALSE, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
@@ -449,10 +451,10 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
         conn != nullptr, FALSE,
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No Chipoble connection"));
 
-    VerifyOrReturnValue(g_variant_lookup(aOptions, "mtu", "q", &conn->mMtu), FALSE, {
-        ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "MTU negotiation failed");
-    });
+    VerifyOrReturnValue(
+        g_variant_lookup(aOptions, "mtu", "q", &mtu), FALSE, ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "MTU negotiation failed"););
+    conn->SetMTU(mtu);
 
     if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, fds) < 0)
     {
@@ -478,10 +480,10 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
     bluez_gatt_characteristic1_set_notify_acquired(aChar, TRUE);
 
     // same reply as for AcquireWrite
-    Bluez_gatt_characteristic1_complete_acquire_write_with_fd(aInvocation, fds[1], conn->mMtu);
+    Bluez_gatt_characteristic1_complete_acquire_write_with_fd(aInvocation, fds[1], conn->GetMTU());
     close(fds[1]);
 
-    conn->mIsNotify = true;
+    conn->SetNotifyAcquired(true);
     BLEManagerImpl::HandleTXCharCCCDWrite(conn);
 
     return TRUE;
@@ -517,7 +519,7 @@ static gboolean BluezCharacteristicStartNotify(BluezGattCharacteristic1 * aChar,
     {
         bluez_gatt_characteristic1_complete_start_notify(aChar, aInvocation);
         bluez_gatt_characteristic1_set_notifying(aChar, TRUE);
-        conn->mIsNotify = true;
+        conn->SetNotifyAcquired(true);
         BLEManagerImpl::HandleTXCharCCCDWrite(conn);
     }
     isSuccess = true;
@@ -555,7 +557,7 @@ static gboolean BluezCharacteristicStopNotify(BluezGattCharacteristic1 * aChar, 
         bluez_gatt_characteristic1_complete_start_notify(aChar, aInvocation);
         bluez_gatt_characteristic1_set_notifying(aChar, FALSE);
     }
-    conn->mIsNotify = false;
+    conn->SetNotifyAcquired(false);
 
     isSuccess = true;
 
@@ -688,7 +690,7 @@ static void UpdateConnectionTable(BluezDevice1 * apDevice, BluezEndpoint & aEndp
         aEndpoint.mpPeerDevicePath = g_strdup(objectPath);
         g_hash_table_insert(aEndpoint.mpConnMap, aEndpoint.mpPeerDevicePath, connection);
 
-        ChipLogDetail(DeviceLayer, "New BLE connection: conn %p, device %s, path %s", connection, connection->mpPeerAddress,
+        ChipLogDetail(DeviceLayer, "New BLE connection: conn %p, device %s, path %s", connection, connection->GetPeerAddress(),
                       aEndpoint.mpPeerDevicePath);
 
         BLEManagerImpl::HandleNewConnection(connection);
@@ -735,7 +737,7 @@ static void BluezHandleNewDevice(BluezDevice1 * device, BluezEndpoint * apEndpoi
     apEndpoint->mpPeerDevicePath = g_strdup(g_dbus_proxy_get_object_path(G_DBUS_PROXY(device)));
     g_hash_table_insert(apEndpoint->mpConnMap, apEndpoint->mpPeerDevicePath, conn);
 
-    ChipLogDetail(DeviceLayer, "BLE device connected: conn %p, device %s, path %s", conn, conn->mpPeerAddress,
+    ChipLogDetail(DeviceLayer, "BLE device connected: conn %p, device %s, path %s", conn, conn->GetPeerAddress(),
                   apEndpoint->mpPeerDevicePath);
 
 exit:

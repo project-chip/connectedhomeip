@@ -566,12 +566,12 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId)
     // whether the client is enabling or disabling indications.
     {
         ChipDeviceEvent event;
-        event.Type = connection->mIsNotify ? DeviceEventType::kCHIPoBLESubscribe : DeviceEventType::kCHIPoBLEUnsubscribe;
+        event.Type = connection->IsNotifyAcquired() ? DeviceEventType::kCHIPoBLESubscribe : DeviceEventType::kCHIPoBLEUnsubscribe;
         event.CHIPoBLESubscribe.ConId = connection;
         PlatformMgr().PostEventOrDie(&event);
     }
 
-    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received", connection->mIsNotify ? "subscribe" : "unsubscribe");
+    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received", connection->IsNotifyAcquired() ? "subscribe" : "unsubscribe");
 
 exit:
     if (err != CHIP_NO_ERROR)
