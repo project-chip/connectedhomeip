@@ -31,10 +31,11 @@ namespace unify::matter_bridge {
 
 class IdentifyClusterCommandHandler : public command_translator_interface {
 public:
-    IdentifyClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
-        group_translator& group_translator_m)
+    IdentifyClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
+        group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::Identify::Id, "Identify", unify_mqtt,
-              group_translator_m)
+            group_translator_m, dev_translator)
+        , m_dev_translator(dev_translator)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -54,12 +55,18 @@ public:
 
         return CHIP_NO_ERROR;
     }
+
+private:
+    device_translator& m_dev_translator;
+    std::vector<const char*> unify_cluster_names() const override { return std::vector<const char*>(); }
 };
 class GroupsClusterCommandHandler : public command_translator_interface {
 public:
-    GroupsClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
-        group_translator& group_translator_m)
-        : command_translator_interface(node_state_monitor, chip::app::Clusters::Groups::Id, "Groups", unify_mqtt, group_translator_m)
+    GroupsClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
+        group_translator& group_translator_m, device_translator& dev_translator)
+        : command_translator_interface(node_state_monitor, chip::app::Clusters::Groups::Id, "Groups", unify_mqtt, group_translator_m,
+            dev_translator)
+        , m_dev_translator(dev_translator)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -83,12 +90,18 @@ public:
 
         return CHIP_NO_ERROR;
     }
+
+private:
+    device_translator& m_dev_translator;
+    std::vector<const char*> unify_cluster_names() const override { return std::vector<const char*>(); }
 };
 class OnOffClusterCommandHandler : public command_translator_interface {
 public:
-    OnOffClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
-        group_translator& group_translator_m)
-        : command_translator_interface(node_state_monitor, chip::app::Clusters::OnOff::Id, "OnOff", unify_mqtt, group_translator_m)
+    OnOffClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
+        group_translator& group_translator_m, device_translator& dev_translator)
+        : command_translator_interface(node_state_monitor, chip::app::Clusters::OnOff::Id, "OnOff", unify_mqtt, group_translator_m,
+            dev_translator)
+        , m_dev_translator(dev_translator)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -112,13 +125,18 @@ public:
 
         return CHIP_NO_ERROR;
     }
+
+private:
+    device_translator& m_dev_translator;
+    std::vector<const char*> unify_cluster_names() const override { return std::vector<const char*>(); }
 };
 class LevelControlClusterCommandHandler : public command_translator_interface {
 public:
-    LevelControlClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
-        group_translator& group_translator_m)
+    LevelControlClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
+        group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::LevelControl::Id, "Level", unify_mqtt,
-              group_translator_m)
+            group_translator_m, dev_translator)
+        , m_dev_translator(dev_translator)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -145,13 +163,18 @@ public:
 
         return CHIP_NO_ERROR;
     }
+
+private:
+    device_translator& m_dev_translator;
+    std::vector<const char*> unify_cluster_names() const override { return std::vector<const char*>(); }
 };
 class DoorLockClusterCommandHandler : public command_translator_interface {
 public:
-    DoorLockClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
-        group_translator& group_translator_m)
+    DoorLockClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
+        group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::DoorLock::Id, "DoorLock", unify_mqtt,
-              group_translator_m)
+            group_translator_m, dev_translator)
+        , m_dev_translator(dev_translator)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -272,13 +295,20 @@ public:
 
         return CHIP_NO_ERROR;
     }
+
+private:
+    device_translator& m_dev_translator;
+    std::vector<const char*> unify_cluster_names() const override { return std::vector<const char*>({ "DoorLock" }); }
+    void command_response(const bridged_endpoint* ep, const std::string& cluster, const std::string& cmd_response,
+        const nlohmann::json& unify_value, CommandHandler::Handle& cmd_handle) override;
 };
 class BarrierControlClusterCommandHandler : public command_translator_interface {
 public:
-    BarrierControlClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
-        group_translator& group_translator_m)
+    BarrierControlClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
+        group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::BarrierControl::Id, "BarrierControl", unify_mqtt,
-              group_translator_m)
+            group_translator_m, dev_translator)
+        , m_dev_translator(dev_translator)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -298,13 +328,18 @@ public:
 
         return CHIP_NO_ERROR;
     }
+
+private:
+    device_translator& m_dev_translator;
+    std::vector<const char*> unify_cluster_names() const override { return std::vector<const char*>(); }
 };
 class ThermostatClusterCommandHandler : public command_translator_interface {
 public:
-    ThermostatClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
-        group_translator& group_translator_m)
+    ThermostatClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
+        group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::Thermostat::Id, "Thermostat", unify_mqtt,
-              group_translator_m)
+            group_translator_m, dev_translator)
+        , m_dev_translator(dev_translator)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -404,13 +439,18 @@ public:
 
         return CHIP_NO_ERROR;
     }
+
+private:
+    device_translator& m_dev_translator;
+    std::vector<const char*> unify_cluster_names() const override { return std::vector<const char*>(); }
 };
 class FanControlClusterCommandHandler : public command_translator_interface {
 public:
-    FanControlClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
-        group_translator& group_translator_m)
+    FanControlClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
+        group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::FanControl::Id, "FanControl", unify_mqtt,
-              group_translator_m)
+            group_translator_m, dev_translator)
+        , m_dev_translator(dev_translator)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -439,13 +479,19 @@ public:
 
         return CHIP_NO_ERROR;
     }
+
+private:
+    device_translator& m_dev_translator;
+    std::vector<const char*> unify_cluster_names() const override { return std::vector<const char*>(); }
 };
 class ThermostatUserInterfaceConfigurationClusterCommandHandler : public command_translator_interface {
 public:
-    ThermostatUserInterfaceConfigurationClusterCommandHandler(const matter_node_state_monitor& node_state_monitor,
-        UnifyMqtt& unify_mqtt, group_translator& group_translator_m)
+    ThermostatUserInterfaceConfigurationClusterCommandHandler(matter_node_state_monitor& node_state_monitor,
+        UnifyMqtt& unify_mqtt, group_translator& group_translator_m,
+        device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::ThermostatUserInterfaceConfiguration::Id,
-              "ThermostatUserInterfaceConfiguration", unify_mqtt, group_translator_m)
+            "ThermostatUserInterfaceConfiguration", unify_mqtt, group_translator_m, dev_translator)
+        , m_dev_translator(dev_translator)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -462,13 +508,18 @@ public:
 
         return CHIP_NO_ERROR;
     }
+
+private:
+    device_translator& m_dev_translator;
+    std::vector<const char*> unify_cluster_names() const override { return std::vector<const char*>(); }
 };
 class ColorControlClusterCommandHandler : public command_translator_interface {
 public:
-    ColorControlClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
-        group_translator& group_translator_m)
+    ColorControlClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
+        group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::ColorControl::Id, "ColorControl", unify_mqtt,
-              group_translator_m)
+            group_translator_m, dev_translator)
+        , m_dev_translator(dev_translator)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -505,13 +556,18 @@ public:
 
         return CHIP_NO_ERROR;
     }
+
+private:
+    device_translator& m_dev_translator;
+    std::vector<const char*> unify_cluster_names() const override { return std::vector<const char*>(); }
 };
 class IlluminanceMeasurementClusterCommandHandler : public command_translator_interface {
 public:
-    IlluminanceMeasurementClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
-        group_translator& group_translator_m)
+    IlluminanceMeasurementClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
+        group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::IlluminanceMeasurement::Id, "IlluminanceMeasurement",
-              unify_mqtt, group_translator_m)
+            unify_mqtt, group_translator_m, dev_translator)
+        , m_dev_translator(dev_translator)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -528,13 +584,18 @@ public:
 
         return CHIP_NO_ERROR;
     }
+
+private:
+    device_translator& m_dev_translator;
+    std::vector<const char*> unify_cluster_names() const override { return std::vector<const char*>(); }
 };
 class TemperatureMeasurementClusterCommandHandler : public command_translator_interface {
 public:
-    TemperatureMeasurementClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
-        group_translator& group_translator_m)
+    TemperatureMeasurementClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
+        group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::TemperatureMeasurement::Id, "TemperatureMeasurement",
-              unify_mqtt, group_translator_m)
+            unify_mqtt, group_translator_m, dev_translator)
+        , m_dev_translator(dev_translator)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -551,13 +612,18 @@ public:
 
         return CHIP_NO_ERROR;
     }
+
+private:
+    device_translator& m_dev_translator;
+    std::vector<const char*> unify_cluster_names() const override { return std::vector<const char*>(); }
 };
 class PressureMeasurementClusterCommandHandler : public command_translator_interface {
 public:
-    PressureMeasurementClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
-        group_translator& group_translator_m)
+    PressureMeasurementClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
+        group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::PressureMeasurement::Id, "PressureMeasurement",
-              unify_mqtt, group_translator_m)
+            unify_mqtt, group_translator_m, dev_translator)
+        , m_dev_translator(dev_translator)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -574,13 +640,18 @@ public:
 
         return CHIP_NO_ERROR;
     }
+
+private:
+    device_translator& m_dev_translator;
+    std::vector<const char*> unify_cluster_names() const override { return std::vector<const char*>(); }
 };
 class FlowMeasurementClusterCommandHandler : public command_translator_interface {
 public:
-    FlowMeasurementClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
-        group_translator& group_translator_m)
+    FlowMeasurementClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
+        group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::FlowMeasurement::Id, "FlowMeasurement", unify_mqtt,
-              group_translator_m)
+            group_translator_m, dev_translator)
+        , m_dev_translator(dev_translator)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -597,13 +668,18 @@ public:
 
         return CHIP_NO_ERROR;
     }
+
+private:
+    device_translator& m_dev_translator;
+    std::vector<const char*> unify_cluster_names() const override { return std::vector<const char*>(); }
 };
 class RelativeHumidityMeasurementClusterCommandHandler : public command_translator_interface {
 public:
-    RelativeHumidityMeasurementClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
-        group_translator& group_translator_m)
+    RelativeHumidityMeasurementClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
+        group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::RelativeHumidityMeasurement::Id, "RelativityHumidity",
-              unify_mqtt, group_translator_m)
+            unify_mqtt, group_translator_m, dev_translator)
+        , m_dev_translator(dev_translator)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -620,13 +696,18 @@ public:
 
         return CHIP_NO_ERROR;
     }
+
+private:
+    device_translator& m_dev_translator;
+    std::vector<const char*> unify_cluster_names() const override { return std::vector<const char*>(); }
 };
 class OccupancySensingClusterCommandHandler : public command_translator_interface {
 public:
-    OccupancySensingClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
-        group_translator& group_translator_m)
+    OccupancySensingClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
+        group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::OccupancySensing::Id, "OccupancySensing", unify_mqtt,
-              group_translator_m)
+            group_translator_m, dev_translator)
+        , m_dev_translator(dev_translator)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -643,13 +724,18 @@ public:
 
         return CHIP_NO_ERROR;
     }
+
+private:
+    device_translator& m_dev_translator;
+    std::vector<const char*> unify_cluster_names() const override { return std::vector<const char*>(); }
 };
 class ElectricalMeasurementClusterCommandHandler : public command_translator_interface {
 public:
-    ElectricalMeasurementClusterCommandHandler(const matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
-        group_translator& group_translator_m)
+    ElectricalMeasurementClusterCommandHandler(matter_node_state_monitor& node_state_monitor, UnifyMqtt& unify_mqtt,
+        group_translator& group_translator_m, device_translator& dev_translator)
         : command_translator_interface(node_state_monitor, chip::app::Clusters::ElectricalMeasurement::Id, "ElectricalMeasurement",
-              unify_mqtt, group_translator_m)
+            unify_mqtt, group_translator_m, dev_translator)
+        , m_dev_translator(dev_translator)
     {
     }
     void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext& HandlerContext) override;
@@ -669,6 +755,10 @@ public:
 
         return CHIP_NO_ERROR;
     }
+
+private:
+    device_translator& m_dev_translator;
+    std::vector<const char*> unify_cluster_names() const override { return std::vector<const char*>(); }
 };
 
 } // namespace unify::matter_bridge

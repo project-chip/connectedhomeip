@@ -15,14 +15,14 @@ function unifyClusterName(clusterID) {
   }
 }
 
-function unifySupportedClusterCommand(clusterID,commandID) {
+function unifySupportedClusterCommand(clusterID, commandID) {
   if(unify.model.hasOwnProperty(clusterID)) {
     return unify.model[clusterID].commands.hasOwnProperty(commandID);
   }
   return false;
 }
 
-function unifyClusterCommandName(clusterID,commandID) {
+function unifyClusterCommandName(clusterID, commandID) {
   if( unifySupportedClusterCommand(clusterID,commandID) ) {
     return unify.model[clusterID].commands[commandID].name
   } else {
@@ -30,11 +30,26 @@ function unifyClusterCommandName(clusterID,commandID) {
   }
 }
 
-function unifyClusterCommandArgument(clusterID,commandID,index) {
+function unifyClusterCommandArgument(clusterID, commandID, index) {
   if( unifySupportedClusterCommand(clusterID,commandID) ) {
     return unify.model[clusterID].commands[commandID].arguments[index]
   } else {
     return "argument_"+commandID+"-" + index
+  }
+}
+
+function unifySupportedClusterCommandResponse(clusterID, commandID) {
+    if( unify.model.hasOwnProperty(clusterID) ) {
+      return unify.model[clusterID].commandresponses.hasOwnProperty(commandID);
+    }
+    return false;
+}
+
+function unifyClusterCommandResponseName(clusterID,commandID) {
+  if( unifySupportedClusterCommandResponse(clusterID,commandID) ) {
+    return unify.model[clusterID].commandresponses[commandID].name;
+  } else {
+    return ""
   }
 }
 
@@ -203,6 +218,8 @@ exports.unifySupportedCluster = unifySupportedCluster
 exports.unifyClusterName = unifyClusterName
 exports.unifySupportedClusterCommand = unifySupportedClusterCommand
 exports.unifyClusterCommandName = unifyClusterCommandName
+exports.unifySupportedClusterCommandResponse = unifySupportedClusterCommandResponse
+exports.unifyClusterCommandResponseName = unifyClusterCommandResponseName
 exports.unifySupportedClusterAttribute = unifySupportedClusterAttribute
 exports.unifyClusterAttributeName = unifyClusterAttributeName
 exports.unifyEnumValName = unifyEnumValName

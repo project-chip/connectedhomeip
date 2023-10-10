@@ -59,5 +59,14 @@ function supportedClusterEvents(code)
   }
 }
 
+function supportedClusterCommandResponse(code)
+{
+  switch (code) {
+    case 257: return true // Cluster DoorLock
+    default: return false
+  }
+}
+
 exports.supportedMappedClusterCode = supportedMappedClusterCode
 exports.supportedClusterEvents = supportedClusterEvents
+exports.supportedClusterCommandResponse = supportedClusterCommandResponse

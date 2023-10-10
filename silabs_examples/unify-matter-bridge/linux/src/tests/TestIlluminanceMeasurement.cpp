@@ -14,7 +14,7 @@ using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::IlluminanceMeasurement;
 
-using TestContext = Test::ClusterContext<IlluminanceMeasurementAttributeAccess, IlluminanceMeasurementClusterCommandHandler>;
+using TestContext = unify::matter_bridge::Test::ClusterContext<IlluminanceMeasurementAttributeAccess, IlluminanceMeasurementClusterCommandHandler>;
 
 static int Initialize(void * context)
 {

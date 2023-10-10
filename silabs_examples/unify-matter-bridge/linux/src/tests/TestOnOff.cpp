@@ -11,7 +11,7 @@
 
 using namespace unify::matter_bridge;
 using namespace chip::app;
-using TestContext = Test::ClusterContext<OnOffAttributeAccess, OnOffClusterCommandHandler>;
+using TestContext = unify::matter_bridge::Test::ClusterContext<OnOffAttributeAccess, OnOffClusterCommandHandler>;
 
 static int Initialize(void * context)
 {

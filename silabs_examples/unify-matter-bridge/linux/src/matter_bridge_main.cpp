@@ -146,10 +146,10 @@ int main(int argc, char * argv[])
 
 #define INIT_ZAP_TRANSLATOR(a)                                                                                                     \
     a##AttributeAccess a##_attribute_instance(node_state_monitor, unify_mqtt_handler, matter_device_translator);                   \
-    a##ClusterCommandHandler a##_command_instance(node_state_monitor, unify_mqtt_handler, m_group_translator);
+    a##ClusterCommandHandler a##_command_instance(node_state_monitor, unify_mqtt_handler, m_group_translator, matter_device_translator);
 
     // Initializing Group cluster command handler
-    GroupClusterCommandHandler group_handler(node_state_monitor, unify_mqtt_handler, m_group_translator);
+    GroupClusterCommandHandler group_handler(node_state_monitor, unify_mqtt_handler, m_group_translator, matter_device_translator);
 
     // Initializing Bridged Device Basic Info attributes update handler
     BridgedDeviceBasicInfoAttributeAccess bridge_device_basic_handler(node_state_monitor, unify_mqtt_handler,

@@ -100,7 +100,7 @@ public:
             ctx->mAttributeHandler.emplace(ctx->mNodeStateMonitor, ctx->mMqttHandler, ctx->mDeviceTranslator);
 
         if (!ctx->mCommandHandler)
-            ctx->mCommandHandler.emplace(ctx->mNodeStateMonitor, ctx->mMqttHandler, ctx->mGroupTranslator);
+            ctx->mCommandHandler.emplace(ctx->mNodeStateMonitor, ctx->mMqttHandler, ctx->mGroupTranslator, ctx->mDeviceTranslator);
 
         return SUCCESS;
     }

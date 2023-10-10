@@ -36,10 +36,10 @@ class {{asUpperCamelCase label}}ClusterCommandHandler : public command_translato
 {
   public:
   {{asUpperCamelCase label}}ClusterCommandHandler(
-    const matter_node_state_monitor &node_state_monitor, 
-    UnifyMqtt &unify_mqtt, group_translator &group_translator_m) :
+    matter_node_state_monitor &node_state_monitor, 
+    UnifyMqtt &unify_mqtt, group_translator &group_translator_m, device_translator &dev_translator) :
     command_translator_interface(node_state_monitor,
-                                 chip::app::Clusters::{{asUpperCamelCase label}}::Id,"{{unifyClusterName code}}", unify_mqtt, group_translator_m)
+                                 chip::app::Clusters::{{asUpperCamelCase label}}::Id,"{{unifyClusterName code}}", unify_mqtt, group_translator_m, dev_translator),m_dev_translator(dev_translator)
   {}
   void InvokeCommand(chip::app::CommandHandlerInterface::HandlerContext
                     &HandlerContext) override;
@@ -79,6 +79,19 @@ class {{asUpperCamelCase label}}ClusterCommandHandler : public command_translato
     return CHIP_NO_ERROR;
   }
 
+private:
+  device_translator &m_dev_translator;
+  std::vector<const char *> unify_cluster_names() const override
+  {
+    return std::vector<const char *>({{#if (supportedClusterCommandResponse code)}} { "{{unifyClusterName code}}" } {{/if}});
+  }
+{{#if (supportedClusterCommandResponse code)}}
+  void command_response(const bridged_endpoint *ep,
+                          const std::string& cluster,
+                          const std::string& cmd_response,
+                          const nlohmann::json &unify_value,
+                          CommandHandler::Handle & cmd_handle) override;
+{{/if}}
 };
 {{/if}}
 {{/zcl_clusters}}

@@ -20,6 +20,7 @@
 #include "sl_log.h"
 #include "chip_types_to_json.hpp"
 #include "cluster_emulator.hpp"
+#include "matter_device_translator.hpp"
 
 using namespace chip;
 using namespace chip::app;
@@ -43,6 +44,9 @@ void {{asUpperCamelCase label}}ClusterCommandHandler::InvokeCommand(
   }
 
   std::string cmd;
+  {{#if (supportedClusterCommandResponse code)}}
+  std::string cmd_response;
+  {{/if}}
   nlohmann::json payload     = {};
 
   if( m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath) ) {
@@ -85,16 +89,30 @@ void {{asUpperCamelCase label}}ClusterCommandHandler::InvokeCommand(
         {{/zcl_command_arguments}}
       }
     {{else}}
-    if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR){
+    if (DataModel::Decode(ctxt.GetReader(), data) == CHIP_NO_ERROR) {
       Invoke_{{label}}(ctxt,data);
     }
     {{/if}}
+      {{#if (supportedClusterCommandResponse parent.code)}}
+        {{#if (unifySupportedClusterCommandResponse parent.code code)}} 
+        cmd_response = "{{unifyClusterCommandResponseName parent.code code}}"; // "{{asUpperCamelCase label}}";
+        {{/if}}
+      {{/if}}
     }
     break;
     {{/zcl_commands_source_client}}
   }
 
-  if(!cmd.empty()) {
+{{#if (supportedClusterCommandResponse code)}}
+
+  if(!cmd_response.empty() && !cmd.empty()) {
+    send_unify_mqtt_cmd(ctxt, cmd, payload, cmd_response);
+    sl_log_debug(LOG_TAG, " %s command send to unify dotdot data model, waiting for response", cmd);
+  } else if (!cmd.empty()) {
+{{else}}
+
+  if (!cmd.empty()) {
+{{/if}}
     ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::Success);
     send_unify_mqtt_cmd(ctxt, cmd, payload );
     sl_log_debug(LOG_TAG, "Mapped [%] command to unify dotdot data model", cmd.c_str());
@@ -103,5 +121,66 @@ void {{asUpperCamelCase label}}ClusterCommandHandler::InvokeCommand(
   }
   ctxt.SetCommandHandled();
 }
+
+{{#if (supportedClusterCommandResponse code)}}
+
+void {{asUpperCamelCase label}}ClusterCommandHandler::command_response(const bridged_endpoint *ep,
+                                            const std::string &cluster,
+                                            const std::string &cmd_response,
+                                            const nlohmann::json &unify_value,
+                                            CommandHandler::Handle &cmd_handle)
+{
+  using namespace chip::app::Clusters::{{asUpperCamelCase label}};
+
+  auto cluster_id = m_dev_translator.get_cluster_id(cluster);
+
+  if (!cluster_id.has_value() || (cluster_id.value() != Clusters::{{asUpperCamelCase label}}::Id)) {
+    return;
+  }
+
+  auto command_id = m_dev_translator.get_command_id(cluster, cmd_response);
+
+  if (!command_id.has_value()) {
+    return;
+  }
+
+  std::string status = "0";
+  chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
+  const ConcreteCommandPath cpath = ConcreteCommandPath(node_matter_endpoint,
+                                                         Clusters::{{asUpperCamelCase label}}::Id,
+                                                         command_id.value());
+  switch (command_id.value()) {
+    {{#zcl_commands_source_client}}
+    {{#if (unifySupportedClusterCommand parent.code code)}}
+    case Commands::{{asUpperCamelCase label}}::Id: {
+      status = unify_value["Status"];
+      break;
+    }  
+    {{/if}}
+    {{/zcl_commands_source_client}}
+    }
+
+  // we retrieve the same handler used by invoke command to send command to UMB
+  auto cmd_rsp_handler = cmd_handle.Get();
+
+  // When the platform shutted down,
+  // interaction model engine will invalidate all commandHandle to avoid dangling references.
+  // We may receive the callback after it and should make it noop.
+  if (cmd_rsp_handler == nullptr) {
+    sl_log_warning("command_translator","failed to get handler\n");
+    return;
+  }
+
+  if (std::stoi(status) == 1) {
+    cmd_rsp_handler->AddStatus(cpath, Protocols::InteractionModel::Status::Success);
+  } else {
+    cmd_rsp_handler->AddStatus(cpath, Protocols::InteractionModel::Status::Failure);
+  }
+
+  cmd_handle.Release();
+  sl_log_debug("command_translator","%s Command response handling Completed \n",
+                cmd_response);
+}
+ {{/if}}
 {{/if}}
 {{/zcl_clusters}}

@@ -13,6 +13,18 @@ exports.model = {
       },
       {{/zcl_commands_source_server}}
     },
+    {{#if (supportedClusterCommandResponse code)}}
+    commandresponses: {
+      {{#zcl_commands_source_client}}
+      {{code}} : {
+        name : "{{asUpperCamelCase label}}",
+        arguments : [
+          {{#zcl_command_arguments}}"{{asUpperCamelCase label}}",{{/zcl_command_arguments}}
+        ],
+      },
+      {{/zcl_commands_source_client}}
+    },
+    {{/if}}
     attributes: {
       {{#zcl_attributes_server}}
       {{code}} : "{{asUpperCamelCase label}}",

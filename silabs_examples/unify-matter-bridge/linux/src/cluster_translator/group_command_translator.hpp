@@ -27,10 +27,11 @@ namespace unify::matter_bridge {
 class GroupClusterCommandHandler : public command_translator_interface
 {
 public:
-    GroupClusterCommandHandler(const matter_node_state_monitor & node_state_monitor, UnifyMqtt & unify_mqtt,
-                               group_translator & group_translator) :
-        command_translator_interface(node_state_monitor, chip::app::Clusters::Groups::Id, "Groups", unify_mqtt, group_translator),
-        m_group_translator(group_translator)
+    GroupClusterCommandHandler(matter_node_state_monitor & node_state_monitor, UnifyMqtt & unify_mqtt,
+                               group_translator & group_translator, device_translator& dev_translator) :
+        command_translator_interface(node_state_monitor, chip::app::Clusters::Groups::Id, "Groups", unify_mqtt, group_translator,
+        dev_translator),
+        m_group_translator(group_translator), m_dev_translator(dev_translator)
     {
         group_translator.register_unify_group_mqtt_message();
     }
@@ -40,6 +41,8 @@ public:
 private:
     void RemoveAllGroups(chip::FabricIndex fabric_index);
     group_translator & m_group_translator;
+    device_translator & m_dev_translator;
+    std::vector<const char*> unify_cluster_names() const override { return std::vector<const char*>(); }
 };
 
 } // namespace unify::matter_bridge

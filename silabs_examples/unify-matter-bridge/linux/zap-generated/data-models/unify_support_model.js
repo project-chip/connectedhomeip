@@ -581,6 +581,217 @@ exports.model = {
         ],
       },
     },
+    commandresponses : {
+      0 : {
+        name : "LockDoorResponse",
+        arguments : [
+          "Status",
+        ],
+      },
+      1 : {
+        name : "UnlockDoorResponse",
+        arguments : [
+          "Status",
+        ],
+      },
+      2 : {
+        name : "ToggleResponse",
+        arguments : [
+          "Status",
+        ],
+      },
+      3 : {
+        name : "UnlockWithTimeoutResponse",
+        arguments : [
+          "Status",
+        ],
+      },
+      4 : {
+        name : "GetLogRecordResponse",
+        arguments : [
+          "LogEntryID",
+          "Timestamp",
+          "EventType",
+          "SourceOperationEvent",
+          "EventIDOrAlarmCode",
+          "UserID",
+          "Pin",
+        ],
+      },
+      5 : {
+        name : "SetPINCodeResponse",
+        arguments : [
+          "Status",
+        ],
+      },
+      6 : {
+        name : "GetPINCodeResponse",
+        arguments : [
+          "UserID",
+          "UserStatus",
+          "UserType",
+          "Code",
+        ],
+      },
+      7 : {
+        name : "ClearPINCodeResponse",
+        arguments : [
+          "Status",
+        ],
+      },
+      8 : {
+        name : "ClearAllPINCodesResponse",
+        arguments : [
+          "Status",
+        ],
+      },
+      9 : {
+        name : "SetUserStatusResponse",
+        arguments : [
+          "Status",
+        ],
+      },
+      10 : {
+        name : "GetUserStatusResponse",
+        arguments : [
+          "UserID",
+          "UserStatus",
+        ],
+      },
+      11 : {
+        name : "SetWeekdayScheduleResponse",
+        arguments : [
+          "Status",
+        ],
+      },
+      12 : {
+        name : "GetWeekdayScheduleResponse",
+        arguments : [
+          "ScheduleID",
+          "UserID",
+          "Status",
+          "DaysMask",
+          "StartHour",
+          "StartMinute",
+          "EndHour",
+          "EndMinute",
+        ],
+      },
+      13 : {
+        name : "ClearWeekdayScheduleResponse",
+        arguments : [
+          "Status",
+        ],
+      },
+      14 : {
+        name : "SetYearDayScheduleResponse",
+        arguments : [
+          "Status",
+        ],
+      },
+      15 : {
+        name : "GetYearDayScheduleResponse",
+        arguments : [
+          "ScheduleID",
+          "UserID",
+          "Status",
+          "LocalStartTime",
+          "LocalEndTime",
+        ],
+      },
+      16 : {
+        name : "ClearYearDayScheduleResponse",
+        arguments : [
+          "Status",
+        ],
+      },
+      17 : {
+        name : "SetHolidayScheduleResponse",
+        arguments : [
+          "Status",
+        ],
+      },
+      18 : {
+        name : "GetHolidayScheduleResponse",
+        arguments : [
+          "HolidayScheduleID",
+          "Status",
+          "LocalStartTime",
+          "LocalEndTime",
+          "OperatingModeDuringHoliday",
+        ],
+      },
+      19 : {
+        name : "ClearHolidayScheduleResponse",
+        arguments : [
+          "Status",
+        ],
+      },
+      20 : {
+        name : "SetUserTypeResponse",
+        arguments : [
+          "Status",
+        ],
+      },
+      21 : {
+        name : "GetUserTypeResponse",
+        arguments : [
+          "UserID",
+          "UserType",
+        ],
+      },
+      22 : {
+        name : "SetRFIDCodeResponse",
+        arguments : [
+          "Status",
+        ],
+      },
+      23 : {
+        name : "GetRFIDCodeResponse",
+        arguments : [
+          "UserID",
+          "UserStatus",
+          "UserType",
+          "RFIDCode",
+        ],
+      },
+      24 : {
+        name : "ClearRFIDCodeResponse",
+        arguments : [
+          "Status",
+        ],
+      },
+      25 : {
+        name : "ClearAllRFIDCodesResponse",
+        arguments : [
+          "Status",
+        ],
+      },
+      32 : {
+        name : "OperatingEventNotification",
+        arguments : [
+          "OperationEventSource",
+          "OperationEventCode",
+          "UserID",
+          "Pin",
+          "LocalTime",
+          "Data",
+        ],
+      },
+      33 : {
+        name : "ProgrammingEventNotification",
+        arguments : [
+          "ProgramEventSource",
+          "ProgramEventCode",
+          "UserID",
+          "Pin",
+          "UserType",
+          "UserStatus",
+          "LocalTime",
+          "Data",
+        ],
+      },
+    },
     attributes : {
       0 : "LockState",
       1 : "LockType",

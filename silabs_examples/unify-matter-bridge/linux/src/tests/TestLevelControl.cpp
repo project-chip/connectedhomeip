@@ -10,7 +10,7 @@
 
 using namespace unify::matter_bridge;
 using namespace chip::app;
-using TestContext = Test::ClusterContext<LevelControlAttributeAccess, LevelControlClusterCommandHandler>;
+using TestContext = unify::matter_bridge::Test::ClusterContext<LevelControlAttributeAccess, LevelControlClusterCommandHandler>;
 
 static int Initialize(void * context)
 {

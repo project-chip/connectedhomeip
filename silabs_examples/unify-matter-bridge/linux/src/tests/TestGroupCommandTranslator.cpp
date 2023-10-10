@@ -30,7 +30,7 @@ constexpr uint16_t kMaxGroupKeysPerFabric = 8;
 chip::TestPersistentStorageDelegate gTestStorage;
 chip::Credentials::GroupDataProviderImpl gGroupsProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
 
-using TestContext = Test::ClusterContext<GroupClusterAttributeTranslatorHelper, GroupClusterCommandHandler>;
+using TestContext = unify::matter_bridge::Test::ClusterContext<GroupClusterAttributeTranslatorHelper, GroupClusterCommandHandler>;
 
 static int Initialize(void * context)
 {

@@ -16,6 +16,7 @@
 #include "command_translator.hpp"
 #include "chip_types_to_json.hpp"
 #include "cluster_emulator.hpp"
+#include "matter_device_translator.hpp"
 #include "sl_log.h"
 #include <iostream>
 #include <sstream>
@@ -94,6 +95,7 @@ void IdentifyClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
     }
     ctxt.SetCommandHandled();
 }
+
 // Groups : 4
 void GroupsClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext& ctxt)
 {
@@ -304,6 +306,7 @@ void OnOffClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerC
     }
     ctxt.SetCommandHandled();
 }
+
 // Level Control : 8
 void LevelControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext& ctxt)
 {
@@ -552,6 +555,7 @@ void LevelControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface::H
     }
     ctxt.SetCommandHandled();
 }
+
 // Door Lock : 257
 void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext& ctxt)
 {
@@ -564,6 +568,7 @@ void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
     }
 
     std::string cmd;
+    std::string cmd_response;
     nlohmann::json payload = {};
 
     if (m_node_state_monitor.emulator().is_command_emulated(ctxt.mRequestPath)) {
@@ -592,6 +597,7 @@ void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
                 }
             }
         }
+        cmd_response = "LockDoorResponse"; // "LockDoor";
     } break;
     case Commands::UnlockDoor::Id: {
         Commands::UnlockDoor::DecodableType data;
@@ -605,6 +611,7 @@ void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
                 }
             }
         }
+        cmd_response = "UnlockDoorResponse"; // "UnlockDoor";
     } break;
     case Commands::UnlockWithTimeout::Id: {
         Commands::UnlockWithTimeout::DecodableType data;
@@ -623,6 +630,7 @@ void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
                 }
             }
         }
+        cmd_response = "UnlockWithTimeoutResponse"; // "UnlockWithTimeout";
     } break;
     case Commands::SetWeekDaySchedule::Id: {
         Commands::SetWeekDaySchedule::DecodableType data;
@@ -664,6 +672,7 @@ void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
         }
+        cmd_response = "SetWeekdayScheduleResponse"; // "SetWeekDaySchedule";
     } break;
     case Commands::GetWeekDaySchedule::Id: {
         Commands::GetWeekDaySchedule::DecodableType data;
@@ -680,6 +689,7 @@ void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
         }
+        cmd_response = "GetWeekdayScheduleResponse"; // "GetWeekDaySchedule";
     } break;
     case Commands::ClearWeekDaySchedule::Id: {
         Commands::ClearWeekDaySchedule::DecodableType data;
@@ -696,6 +706,7 @@ void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
         }
+        cmd_response = "ClearWeekdayScheduleResponse"; // "ClearWeekDaySchedule";
     } break;
     case Commands::SetYearDaySchedule::Id: {
         Commands::SetYearDaySchedule::DecodableType data;
@@ -722,6 +733,7 @@ void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
         }
+        cmd_response = "SetYearDayScheduleResponse"; // "SetYearDaySchedule";
     } break;
     case Commands::GetYearDaySchedule::Id: {
         Commands::GetYearDaySchedule::DecodableType data;
@@ -738,6 +750,7 @@ void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
         }
+        cmd_response = "GetYearDayScheduleResponse"; // "GetYearDaySchedule";
     } break;
     case Commands::ClearYearDaySchedule::Id: {
         Commands::ClearYearDaySchedule::DecodableType data;
@@ -754,6 +767,7 @@ void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
         }
+        cmd_response = "ClearYearDayScheduleResponse"; // "ClearYearDaySchedule";
     } break;
     case Commands::SetHolidaySchedule::Id: {
         Commands::SetHolidaySchedule::DecodableType data;
@@ -780,6 +794,7 @@ void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
         }
+        cmd_response = "SetHolidayScheduleResponse"; // "SetHolidaySchedule";
     } break;
     case Commands::GetHolidaySchedule::Id: {
         Commands::GetHolidaySchedule::DecodableType data;
@@ -791,6 +806,7 @@ void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
         }
+        cmd_response = "GetHolidayScheduleResponse"; // "GetHolidaySchedule";
     } break;
     case Commands::ClearHolidaySchedule::Id: {
         Commands::ClearHolidaySchedule::DecodableType data;
@@ -802,6 +818,7 @@ void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
                 sl_log_warning(LOG_TAG, "Failed to add the command argument value to json format: %s", ex.what());
             }
         }
+        cmd_response = "ClearHolidayScheduleResponse"; // "ClearHolidaySchedule";
     } break;
     case Commands::SetUser::Id: {
         Commands::SetUser::DecodableType data;
@@ -859,7 +876,10 @@ void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
     } break;
     }
 
-    if (!cmd.empty()) {
+    if (!cmd_response.empty() && !cmd.empty()) {
+        send_unify_mqtt_cmd(ctxt, cmd, payload, cmd_response);
+        sl_log_debug(LOG_TAG, " %s command send to unify dotdot data model, waiting for response", cmd);
+    } else if (!cmd.empty()) {
         ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::Success);
         send_unify_mqtt_cmd(ctxt, cmd, payload);
         sl_log_debug(LOG_TAG, "Mapped [%] command to unify dotdot data model", cmd.c_str());
@@ -867,6 +887,99 @@ void DoorLockClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Handl
         ctxt.mCommandHandler.AddStatus(ctxt.mRequestPath, Protocols::InteractionModel::Status::UnsupportedCommand);
     }
     ctxt.SetCommandHandled();
+}
+
+void DoorLockClusterCommandHandler::command_response(const bridged_endpoint* ep, const std::string& cluster,
+    const std::string& cmd_response, const nlohmann::json& unify_value,
+    CommandHandler::Handle& cmd_handle)
+{
+    using namespace chip::app::Clusters::DoorLock;
+
+    auto cluster_id = m_dev_translator.get_cluster_id(cluster);
+
+    if (!cluster_id.has_value() || (cluster_id.value() != Clusters::DoorLock::Id)) {
+        return;
+    }
+
+    auto command_id = m_dev_translator.get_command_id(cluster, cmd_response);
+
+    if (!command_id.has_value()) {
+        return;
+    }
+
+    std::string status = "0";
+    chip::EndpointId node_matter_endpoint = ep->matter_endpoint;
+    const ConcreteCommandPath cpath = ConcreteCommandPath(node_matter_endpoint, Clusters::DoorLock::Id, command_id.value());
+    switch (command_id.value()) {
+    case Commands::LockDoor::Id: {
+        status = unify_value["Status"];
+        break;
+    }
+    case Commands::UnlockDoor::Id: {
+        status = unify_value["Status"];
+        break;
+    }
+    case Commands::UnlockWithTimeout::Id: {
+        status = unify_value["Status"];
+        break;
+    }
+    case Commands::SetWeekDaySchedule::Id: {
+        status = unify_value["Status"];
+        break;
+    }
+    case Commands::GetWeekDaySchedule::Id: {
+        status = unify_value["Status"];
+        break;
+    }
+    case Commands::ClearWeekDaySchedule::Id: {
+        status = unify_value["Status"];
+        break;
+    }
+    case Commands::SetYearDaySchedule::Id: {
+        status = unify_value["Status"];
+        break;
+    }
+    case Commands::GetYearDaySchedule::Id: {
+        status = unify_value["Status"];
+        break;
+    }
+    case Commands::ClearYearDaySchedule::Id: {
+        status = unify_value["Status"];
+        break;
+    }
+    case Commands::SetHolidaySchedule::Id: {
+        status = unify_value["Status"];
+        break;
+    }
+    case Commands::GetHolidaySchedule::Id: {
+        status = unify_value["Status"];
+        break;
+    }
+    case Commands::ClearHolidaySchedule::Id: {
+        status = unify_value["Status"];
+        break;
+    }
+    }
+
+    // we retrieve the same handler used by invoke command to send command to UMB
+    auto cmd_rsp_handler = cmd_handle.Get();
+
+    // When the platform shutted down,
+    // interaction model engine will invalidate all commandHandle to avoid dangling references.
+    // We may receive the callback after it and should make it noop.
+    if (cmd_rsp_handler == nullptr) {
+        sl_log_warning("command_translator", "failed to get handler\n");
+        return;
+    }
+
+    if (std::stoi(status) == 1) {
+        cmd_rsp_handler->AddStatus(cpath, Protocols::InteractionModel::Status::Success);
+    } else {
+        cmd_rsp_handler->AddStatus(cpath, Protocols::InteractionModel::Status::Failure);
+    }
+
+    cmd_handle.Release();
+    sl_log_debug("command_translator", "%s Command response handling Completed \n", cmd_response);
 }
 // Barrier Control : 259
 void BarrierControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext& ctxt)
@@ -924,6 +1037,7 @@ void BarrierControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface:
     }
     ctxt.SetCommandHandled();
 }
+
 // Thermostat : 513
 void ThermostatClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext& ctxt)
 {
@@ -1069,6 +1183,7 @@ void ThermostatClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Han
     }
     ctxt.SetCommandHandled();
 }
+
 // Fan Control : 514
 void FanControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext& ctxt)
 {
@@ -1114,6 +1229,7 @@ void FanControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface::Han
     }
     ctxt.SetCommandHandled();
 }
+
 // Thermostat User Interface Configuration : 516
 void ThermostatUserInterfaceConfigurationClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext& ctxt)
 {
@@ -1153,6 +1269,7 @@ void ThermostatUserInterfaceConfigurationClusterCommandHandler::InvokeCommand(Co
     }
     ctxt.SetCommandHandled();
 }
+
 // Color Control : 768
 void ColorControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext& ctxt)
 {
@@ -1761,6 +1878,7 @@ void ColorControlClusterCommandHandler::InvokeCommand(CommandHandlerInterface::H
     }
     ctxt.SetCommandHandled();
 }
+
 // Illuminance Measurement : 1024
 void IlluminanceMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext& ctxt)
 {
@@ -1800,6 +1918,7 @@ void IlluminanceMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerIn
     }
     ctxt.SetCommandHandled();
 }
+
 // Temperature Measurement : 1026
 void TemperatureMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext& ctxt)
 {
@@ -1839,6 +1958,7 @@ void TemperatureMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerIn
     }
     ctxt.SetCommandHandled();
 }
+
 // Pressure Measurement : 1027
 void PressureMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext& ctxt)
 {
@@ -1878,6 +1998,7 @@ void PressureMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInter
     }
     ctxt.SetCommandHandled();
 }
+
 // Flow Measurement : 1028
 void FlowMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext& ctxt)
 {
@@ -1917,6 +2038,7 @@ void FlowMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInterface
     }
     ctxt.SetCommandHandled();
 }
+
 // Relative Humidity Measurement : 1029
 void RelativeHumidityMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext& ctxt)
 {
@@ -1956,6 +2078,7 @@ void RelativeHumidityMeasurementClusterCommandHandler::InvokeCommand(CommandHand
     }
     ctxt.SetCommandHandled();
 }
+
 // Occupancy Sensing : 1030
 void OccupancySensingClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext& ctxt)
 {
@@ -1995,6 +2118,7 @@ void OccupancySensingClusterCommandHandler::InvokeCommand(CommandHandlerInterfac
     }
     ctxt.SetCommandHandled();
 }
+
 // Electrical Measurement : 2820
 void ElectricalMeasurementClusterCommandHandler::InvokeCommand(CommandHandlerInterface::HandlerContext& ctxt)
 {

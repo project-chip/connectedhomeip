@@ -11,7 +11,7 @@
 
 using namespace unify::matter_bridge;
 using namespace chip::app;
-using TestContext = Test::ClusterContext<ColorControlAttributeAccess, ColorControlClusterCommandHandler>;
+using TestContext = unify::matter_bridge::Test::ClusterContext<ColorControlAttributeAccess, ColorControlClusterCommandHandler>;
 
 static int Initialize(void * context)
 {
