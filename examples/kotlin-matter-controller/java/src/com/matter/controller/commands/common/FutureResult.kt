@@ -53,7 +53,7 @@ class FutureResult {
         }
 
         try {
-          lock.wait()
+          lock.wait(remainingTime)
         } catch (e: InterruptedException) {
           logger.log(Level.INFO, "Wait Result failed with exception: " + e.message)
         }
