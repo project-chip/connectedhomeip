@@ -28,8 +28,8 @@
 #include <system/SystemClock.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDManager.h>          // nogncheck
 #include <app/icd/ICDManagementServer.h> // nogncheck
+#include <app/icd/ICDManager.h>          // nogncheck
 #endif
 
 namespace chip {

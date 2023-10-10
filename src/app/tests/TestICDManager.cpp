@@ -16,10 +16,10 @@
  *    limitations under the License.
  */
 #include <app/EventManagement.h>
+#include <app/icd/ICDManagementServer.h>
 #include <app/icd/ICDManager.h>
 #include <app/icd/ICDNotifier.h>
 #include <app/icd/ICDStateObserver.h>
-#include <app/icd/ICDManagementServer.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/TimeUtils.h>
