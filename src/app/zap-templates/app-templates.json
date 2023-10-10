@@ -1,53 +1,49 @@
 {
-    "name": "CHIP Application templates",
-    "version": "chip-v1",
-    "helpers": [
-        "partials/helper.js",
-        "common/ListHelper.js",
-        "common/StringHelper.js",
-        "common/ChipTypesHelper.js",
-        "templates/app/helper.js",
-        "templates/chip/helper.js"
-    ],
-    "resources": {
-        "config-data": "../common/templates/config-data.yaml"
+  "name": "CHIP Application templates",
+  "version": "chip-v1",
+  "helpers": [
+    "partials/helper.js",
+    "common/ListHelper.js",
+    "common/StringHelper.js",
+    "common/ChipTypesHelper.js",
+    "templates/app/helper.js",
+    "templates/chip/helper.js"
+  ],
+  "resources": {
+    "config-data": "../common/templates/config-data.yaml"
+  },
+  "override": "common/override.js",
+  "partials": [
+    {
+      "name": "header",
+      "path": "partials/header.zapt"
+    }
+  ],
+  "templates": [
+    {
+      "path": "templates/app/endpoint_config.zapt",
+      "name": "ZCL endpoint configuration",
+      "output": "endpoint_config.h"
     },
-    "override": "common/override.js",
-    "partials": [
-        {
-            "name": "header",
-            "path": "partials/header.zapt"
-        },
-        {
-            "name": "im_command_handler_cluster_commands",
-            "path": "partials/im_command_handler_cluster_commands.zapt"
-        }
-    ],
-    "templates": [
-        {
-            "path": "templates/app/endpoint_config.zapt",
-            "name": "ZCL endpoint configuration",
-            "output": "endpoint_config.h"
-        },
-        {
-            "path": "templates/app/gen_config.zapt",
-            "name": "ZCL gen_config header",
-            "output": "gen_config.h"
-        },
-        {
-            "path": "templates/app/im-cluster-command-handler.zapt",
-            "name": "CHIP Client Callbacks for Interaction Model",
-            "output": "IMClusterCommandHandler.cpp"
-        },
-        {
-            "path": "templates/app/CHIPClusters.zapt",
-            "name": "C++ ZCL API Header",
-            "output": "CHIPClusters.h"
-        },
-        {
-            "path": "templates/app/access.zapt",
-            "name": "Matter access definitions",
-            "output": "access.h"
-        }
-    ]
+    {
+      "path": "templates/app/gen_config.zapt",
+      "name": "ZCL gen_config header",
+      "output": "gen_config.h"
+    },
+    {
+      "path": "templates/app/im-cluster-command-handler.zapt",
+      "name": "CHIP Client Callbacks for Interaction Model",
+      "output": "IMClusterCommandHandler.cpp"
+    },
+    {
+      "path": "templates/app/CHIPClusters.zapt",
+      "name": "C++ ZCL API Header",
+      "output": "CHIPClusters.h"
+    },
+    {
+      "path": "templates/app/access.zapt",
+      "name": "Matter access definitions",
+      "output": "access.h"
+    }
+  ]
 }
