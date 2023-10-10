@@ -4533,9 +4533,18 @@ server cluster ColorControl = 768 {
 
 /** Attributes and commands for configuring a lighting ballast. */
 server cluster BallastConfiguration = 769 {
+  bitmap BallastStatusBitmap : BITMAP8 {
+    kBallastNonOperational = 0x1;
+    kLampFailure = 0x2;
+  }
+
+  bitmap LampAlarmModeBitmap : BITMAP8 {
+    kLampBurnHours = 0x1;
+  }
+
   readonly attribute int8u physicalMinLevel = 0;
   readonly attribute int8u physicalMaxLevel = 1;
-  readonly attribute bitmap8 ballastStatus = 2;
+  readonly attribute BallastStatusBitmap ballastStatus = 2;
   attribute int8u minLevel = 16;
   attribute int8u maxLevel = 17;
   attribute nullable int8u intrinsicBallastFactor = 20;
@@ -4545,7 +4554,7 @@ server cluster BallastConfiguration = 769 {
   attribute char_string<16> lampManufacturer = 49;
   attribute nullable int24u lampRatedHours = 50;
   attribute nullable int24u lampBurnHours = 51;
-  attribute bitmap8 lampAlarmMode = 52;
+  attribute LampAlarmModeBitmap lampAlarmMode = 52;
   attribute nullable int24u lampBurnHoursTripPoint = 53;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
