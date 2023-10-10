@@ -32,8 +32,8 @@
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ColorControl;
-using chip::Protocols::InteractionModel::Status;
 using chip::app::Clusters::ColorControl::EnhancedColorModeEnum;
+using chip::Protocols::InteractionModel::Status;
 
 #ifdef EMBER_AF_PLUGIN_SCENES
 class DefaultColorControlSceneHandler : public scenes::DefaultSceneHandlerImpl
@@ -152,7 +152,8 @@ public:
         uint8_t modeValue;
         if (EMBER_ZCL_STATUS_SUCCESS != Attributes::EnhancedColorMode::Get(endpoint, &modeValue))
         {
-            modeValue = to_underlying(ColorControl::EnhancedColorModeEnum::kCurrentXAndCurrentY); // Default mode value according to spec
+            modeValue =
+                to_underlying(ColorControl::EnhancedColorModeEnum::kCurrentXAndCurrentY); // Default mode value according to spec
         }
         AddAttributeValuePair(pairs, Attributes::EnhancedColorMode::Id, modeValue, attributeCount);
 
@@ -200,9 +201,9 @@ public:
 
         // Initialize action attributes to default values in case they are not in the scene
         EnhancedColorModeEnum targetEnhancedColorMode = EnhancedColorModeEnum::kCurrentHueAndCurrentSaturation;
-        uint8_t loopActiveValue    = 0x00;
-        uint8_t loopDirectionValue = 0x00;
-        uint16_t loopTimeValue     = 0x0019; // Default loop time value according to spec
+        uint8_t loopActiveValue                       = 0x00;
+        uint8_t loopDirectionValue                    = 0x00;
+        uint16_t loopTimeValue                        = 0x0019; // Default loop time value according to spec
 
         while (pair_iterator.Next())
         {
