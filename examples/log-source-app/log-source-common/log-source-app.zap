@@ -475,14 +475,6 @@
           "code": 50,
           "mfgCode": null,
           "define": "DIAGNOSTIC_LOGS_CLUSTER",
-          "side": "client",
-          "enabled": 1
-        },
-        {
-          "name": "Diagnostic Logs",
-          "code": 50,
-          "mfgCode": null,
-          "define": "DIAGNOSTIC_LOGS_CLUSTER",
           "side": "server",
           "enabled": 1,
           "commands": [
