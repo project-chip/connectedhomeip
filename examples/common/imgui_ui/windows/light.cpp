@@ -103,7 +103,9 @@ void Light::UpdateState()
     LevelControl::Attributes::RemainingTime::Get(mEndpointId, &mLevelRemainingTime10sOfSec);
 
     // Color control
-    ColorControl::Attributes::ColorMode::Get(mEndpointId, &mColorMode);
+    uint8_t colorMode;
+    ColorControl::Attributes::ColorMode::Get(mEndpointId, &colorMode);
+    mColorMode = static_cast<ColorControl::ColorMode>(colorMode);
 
     ColorControl::Attributes::CurrentHue::Get(mEndpointId, &mColorHue);
     ColorControl::Attributes::CurrentSaturation::Get(mEndpointId, &mColorSaturation);
@@ -155,14 +157,14 @@ void Light::Render()
     ImGui::Text("Color Control:");
     ImGui::Indent();
     const char * mode = // based on ColorMode attribute: spec 3.2.7.9
-        (mColorMode == to_underlying(ColorMode::kCurrentHueAndCurrentSaturation)) ? "Hue/Saturation"
-        : (mColorMode == to_underlying(ColorMode::kCurrentXAndCurrentY))          ? "X/Y"
-        : (mColorMode == to_underlying(ColorMode::kColorTemperature))             ? "Temperature/Mireds"
-                                                                                  : "UNKNOWN";
+        (mColorMode == ColorControl::ColorMode::kCurrentHueAndCurrentSaturation) ? "Hue/Saturation"
+        : (mColorMode == ColorControl::ColorMode::kCurrentXAndCurrentY)          ? "X/Y"
+        : (mColorMode == ColorControl::ColorMode::kColorTemperature)             ? "Temperature/Mireds"
+                                                                                 : "UNKNOWN";
 
     ImGui::Text("Mode: %s", mode);
 
-    if (mColorMode == EMBER_ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION)
+    if (mColorMode == ColorControl::ColorMode::kCurrentHueAndCurrentSaturation)
     {
         const float hueDegrees        = (mColorHue * 360.0f) / 254.0f;
         const float saturationPercent = 100.0f * (mColorSaturation / 254.0f);
@@ -173,12 +175,12 @@ void Light::Render()
         ImGui::ColorButton("LightColor", HueSaturationToColor(hueDegrees, saturationPercent), 0 /* ImGuiColorEditFlags_* */,
                            ImVec2(80, 80));
     }
-    else if (mColorMode == EMBER_ZCL_COLOR_MODE_CURRENT_X_AND_CURRENT_Y)
+    else if (mColorMode == ColorControl::ColorMode::kCurrentXAndCurrentY)
     {
         ImGui::Text("Current X: %d", mColorX);
         ImGui::Text("Current Y: %d", mColorY);
     }
-    else if (mColorMode == EMBER_ZCL_COLOR_MODE_COLOR_TEMPERATURE)
+    else if (mColorMode == ColorControl::ColorMode::kColorTemperature)
     {
         ImGui::Text("Color Temperature Mireds: %d", mColorTemperatureMireds);
     }
