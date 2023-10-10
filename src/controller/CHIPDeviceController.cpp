@@ -1878,14 +1878,7 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
         ParseCommissioningInfo();
         break;
     case CommissioningStage::kReadCommissioningInfo2:
-        if (param.GetCheckForMatchingFabric())
-        {
-            ParseFabrics();
-        }
-        if (param.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
-        {
-            ParseICDInfo();
-        }
+        ParseCommissioningInfo2();
         break;
     default:
         // We're not trying to read anything here, just exit
@@ -2110,11 +2103,28 @@ void DeviceCommissioner::ParseTimeSyncInfo(ReadCommissioningInfo & info)
     }
 }
 
-void DeviceCommissioner::ParseFabrics()
+void DeviceCommissioner::ParseCommissioningInfo2()
+{
+    ReadCommissioningInfo2 info;
+    CHIP_ERROR return_err = CHIP_NO_ERROR;
+
+    return_err = ParseFabrics(info);
+
+    if (return_err == CHIP_NO_ERROR)
+    {
+        return_err = ParseICDInfo(info);
+    }
+
+    CommissioningDelegate::CommissioningReport report;
+    report.Set<ReadCommissioningInfo2>(info);
+    CommissioningStageComplete(return_err, report);
+}
+
+CHIP_ERROR DeviceCommissioner::ParseFabrics(ReadCommissioningInfo2 & info)
 {
     CHIP_ERROR err;
     CHIP_ERROR return_err = CHIP_NO_ERROR;
-    MatchingFabricInfo info;
+
     // We might not have requested a Fabrics attribute at all, so not having a
     // value for it is not an error.
     err = mAttributeCache->ForEachAttribute(OperationalCredentials::Id, [this, &info](const app::ConcreteAttributePath & path) {
@@ -2177,15 +2187,12 @@ void DeviceCommissioner::ParseFabrics()
         mPairingDelegate->OnFabricCheck(info.nodeId);
     }
 
-    CommissioningDelegate::CommissioningReport report;
-    report.Set<MatchingFabricInfo>(info);
-    CommissioningStageComplete(return_err, report);
+    return return_err;
 }
 
-void DeviceCommissioner::ParseICDInfo()
+CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo2 & info)
 {
     CHIP_ERROR err;
-    IcdInfo info;
     IcdManagement::Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
 
     err = mAttributeCache->Get<IcdManagement::Attributes::FeatureMap::TypeInfo>(kRootEndpointId, featureMap);
@@ -2193,6 +2200,10 @@ void DeviceCommissioner::ParseICDInfo()
     {
         info.isIcd                  = true;
         info.checkInProtocolSupport = !!(featureMap & to_underlying(IcdManagement::Feature::kCheckInProtocolSupport));
+    }
+    else if (err == CHIP_ERROR_KEY_NOT_FOUND)
+    {
+        info.isIcd = false;
     }
     else if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
     {
@@ -2212,12 +2223,7 @@ void DeviceCommissioner::ParseICDInfo()
         }
     }
 
-    CommissioningDelegate::CommissioningReport report;
-    if (err == CHIP_NO_ERROR)
-    {
-        report.Set<IcdInfo>(info);
-    }
-    CommissioningStageComplete(err, report);
+    return err;
 }
 
 void DeviceCommissioner::OnArmFailSafe(void * context,
@@ -2482,7 +2488,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         if (numberOfAttributes == 0)
         {
             // We don't actually want to do this step, so just bypass it
-            ChipLogProgress(Controller, "kCheckForMatchingFabric step called without parameter set, skipping");
+            ChipLogProgress(Controller, "kReadCommissioningInfo2 step called without parameter set, skipping");
             CommissioningStageComplete(CHIP_NO_ERROR);
         }
 
@@ -2840,14 +2846,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                                                                /* attemptCount = */ 3, &mOnDeviceConnectionRetryCallback
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
         );
-    }
-    break;
-    case CommissioningStage::kICDIdentification: {
-        app::AttributePathParams readPaths[1];
-        // TODO(#29382): We probably want to read "ActiveMode" attribute (to be implemented) for ICD.
-        readPaths[0] = app::AttributePathParams(endpoint, app::Clusters::IcdManagement::Id,
-                                                app::Clusters::IcdManagement::Attributes::FeatureMap::Id);
-        SendCommissioningReadRequest(proxy, timeout, readPaths, 1);
     }
     break;
     case CommissioningStage::kSendComplete: {

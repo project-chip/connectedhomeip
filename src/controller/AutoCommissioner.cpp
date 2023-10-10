@@ -631,11 +631,25 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             // Don't send DST unless the device says it needs it
             mNeedsDST = false;
             break;
-        case CommissioningStage::kCheckForMatchingFabric: {
-            chip::NodeId nodeId = report.Get<MatchingFabricInfo>().nodeId;
-            if (nodeId != kUndefinedNodeId)
+        case CommissioningStage::kReadCommissioningInfo2: {
+            ReadCommissioningInfo2 commissioningInfo = report.Get<ReadCommissioningInfo2>();
+
+            if (mParams.GetCheckForMatchingFabric())
             {
-                mParams.SetRemoteNodeId(nodeId);
+                chip::NodeId nodeId = commissioningInfo.nodeId;
+                if (nodeId != kUndefinedNodeId)
+                {
+                    mParams.SetRemoteNodeId(nodeId);
+                }
+            }
+
+            if (mParams.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
+            {
+                if (commissioningInfo.isIcd)
+                {
+                    mNeedIcdRegistraion = true;
+                    ChipLogDetail(Controller, "AutoCommissioner: Device is ICD");
+                }
             }
             break;
         }
@@ -701,15 +715,6 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         case CommissioningStage::kFindOperational:
             mOperationalDeviceProxy = report.Get<OperationalNodeFoundData>().operationalProxy;
             break;
-        case CommissioningStage::kICDIdentification: {
-            IcdInfo icdInfo = report.Get<IcdInfo>();
-            if (icdInfo.isIcd)
-            {
-                mNeedIcdRegistraion = true;
-                ChipLogDetail(Controller, "AutoCommissioner: Device is ICD");
-            }
-            break;
-        }
         case CommissioningStage::kCleanup:
             ReleasePAI();
             ReleaseDAC();

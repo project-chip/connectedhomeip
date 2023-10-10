@@ -648,15 +648,11 @@ struct ReadCommissioningInfo
     uint8_t maxDSTSize             = 1;
 };
 
-struct IcdInfo
+struct ReadCommissioningInfo2
 {
+    NodeId nodeId               = kUndefinedNodeId;
     bool isIcd                  = false;
     bool checkInProtocolSupport = false;
-};
-
-struct MatchingFabricInfo
-{
-    NodeId nodeId = kUndefinedNodeId;
 };
 
 struct TimeZoneResponseInfo
@@ -690,7 +686,7 @@ public:
     virtual ~CommissioningDelegate(){};
     /* CommissioningReport is returned after each commissioning step is completed. The reports for each step are:
      * kReadCommissioningInfo - ReadCommissioningInfo
-     * kCheckForMatchingFabric = MatchingFabricInfo
+     * kReadCommissioningInfo2: ReadCommissioningInfo2
      * kArmFailsafe: CommissioningErrorInfo if there is an error
      * kConfigRegulatory: CommissioningErrorInfo if there is an error
      * kConfigureUTCTime: None
@@ -715,8 +711,8 @@ public:
      * kCleanup: none
      */
     struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData,
-                                         ReadCommissioningInfo, AttestationErrorInfo, CommissioningErrorInfo,
-                                         NetworkCommissioningStatusInfo, MatchingFabricInfo, TimeZoneResponseInfo, IcdInfo>
+                                         ReadCommissioningInfo, ReadCommissioningInfo2, AttestationErrorInfo,
+                                         CommissioningErrorInfo, NetworkCommissioningStatusInfo, TimeZoneResponseInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

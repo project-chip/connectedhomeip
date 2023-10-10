@@ -935,10 +935,12 @@ private:
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     // Parsers for the two different read clients
     void ParseCommissioningInfo();
-    void ParseFabrics();
+    void ParseCommissioningInfo2();
+    // Called by ParseCommissioningInfo2
+    CHIP_ERROR ParseFabrics(ReadCommissioningInfo2 & info);
+    CHIP_ERROR ParseICDInfo(ReadCommissioningInfo2 & info);
     // Called by ParseCommissioningInfo
     void ParseTimeSyncInfo(ReadCommissioningInfo & info);
-    void ParseICDInfo();
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
     static CHIP_ERROR
