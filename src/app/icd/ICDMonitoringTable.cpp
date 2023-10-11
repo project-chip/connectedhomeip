@@ -119,7 +119,7 @@ CHIP_ERROR ICDMonitoringEntry::DeleteKey()
     return CHIP_NO_ERROR;
 }
 
-bool ICDMonitoringEntry::EnsureKeyEquivalent(ByteSpan keyData)
+bool ICDMonitoringEntry::IsKeyEquivalent(ByteSpan keyData)
 {
     VerifyOrReturnValue(keyData.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, false);
     VerifyOrReturnValue(symmetricKeystore != nullptr, false);
@@ -215,6 +215,8 @@ CHIP_ERROR ICDMonitoringTable::Remove(uint16_t index)
     // Remove last entry
     entry.fabricIndex = this->mFabric;
     entry.index       = index;
+
+    // entry.Delete() doesn't delete the key from the AES128KeyHandle
     return entry.Delete(this->mStorage);
 }
 

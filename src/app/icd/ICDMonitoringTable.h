@@ -64,20 +64,20 @@ struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
 
     /**
      * @brief Implement the key verification needed by the ICDManagement Server.
-     *        Since we cannot retrieve the key from the AES128KeyHandle IF using
-     *        PSA CRYPTO, we must implement a way to deduct if the verification key
+     *        Since for some key implementations we cannot retrieve the key from the AES128KeyHandle
+     *        we must implement a way to deduce whether the verification key
      *        received is the same or at least works as the same way as the one stored.
      *
      *        This method will produce a random number and then encrypt it with the keyData.
      *        It will then decrypt it with the key stored in the entry. If the resulting decrypted
-     *        challenges matches the randomly generated number, then we can safely assume that both key are interchangeable.
+     *        challenge matches the randomly generated number, then we can safely assume that both key are interchangeable.
      *        This method cannot guarantee a perfect match since the probability of two keys generating the same output in AES128 is
-     * not 0 but 1/2^128 which is small enough for our usage.
+     *        not 0 but 1/2^128 which is small enough for our purposes.
      *
      * @param keyData
      * @return bool True if the key is equivalent to the one stored, otherwise false
      */
-    bool EnsureKeyEquivalent(ByteSpan keyData);
+    bool IsKeyEquivalent(ByteSpan keyData);
 
     chip::FabricIndex fabricIndex                 = kUndefinedFabricIndex;
     chip::NodeId checkInNodeID                    = kUndefinedNodeId;

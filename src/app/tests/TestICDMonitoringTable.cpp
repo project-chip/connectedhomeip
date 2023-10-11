@@ -75,9 +75,9 @@ void TestEntryKeyFunctions(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer1b)));
 
     // Test Comparing Key
-    NL_TEST_ASSERT(aSuite, !entry.EnsureKeyEquivalent(ByteSpan(kKeyBuffer1a)));
+    NL_TEST_ASSERT(aSuite, !entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1a)));
 
-    NL_TEST_ASSERT(aSuite, entry.EnsureKeyEquivalent(ByteSpan(kKeyBuffer1b)));
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1b)));
 
     // Test Deleting Key
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.DeleteKey());

@@ -218,9 +218,9 @@ void ApplicationInit()
     Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 
     // Issue 29397
-    // Somehow All-cluster-app test the ICDManagementServer cluster without having the
+    // Somehow All-cluster-app test the ICDManagementServer cluster without having
     // CHIP_CONFIG_ENABLE_ICD_SERVER set to 1.
-    ICDManagementServer::GetInstance().SetSessionKeyStore(Server::GetInstance().GetSessionKeystore());
+    ICDManagementServer::GetInstance().SetSymmetricKeystore(Server::GetInstance().GetSessionKeystore());
 
     SetTagList(/* endpoint= */ 0, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));

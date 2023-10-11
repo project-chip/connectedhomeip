@@ -1,5 +1,4 @@
 #include "ICDManagementServer.h"
-#include <app/icd/ICDMonitoringTable.h>
 
 using namespace chip;
 using namespace chip::Protocols;
@@ -12,10 +11,10 @@ Status ICDManagementServer::RegisterClient(PersistentStorageDelegate & storage, 
                                            uint64_t monitored_subject, chip::ByteSpan key,
                                            Optional<chip::ByteSpan> verification_key, bool is_admin)
 {
-    ICDMonitoringTable table(storage, fabric_index, GetClientsSupportedPerFabric(), mSessionKeyStore);
+    ICDMonitoringTable table(storage, fabric_index, GetClientsSupportedPerFabric(), mSymmetricKeystore);
 
     // Get current entry, if exists
-    ICDMonitoringEntry entry(mSessionKeyStore);
+    ICDMonitoringEntry entry(mSymmetricKeystore);
     CHIP_ERROR err = table.Find(node_id, entry);
     if (CHIP_NO_ERROR == err)
     {
@@ -23,7 +22,7 @@ Status ICDManagementServer::RegisterClient(PersistentStorageDelegate & storage, 
         if (!is_admin)
         {
             VerifyOrReturnError(verification_key.HasValue(), InteractionModel::Status::Failure);
-            VerifyOrReturnError(entry.EnsureKeyEquivalent(verification_key.Value()), InteractionModel::Status::Failure);
+            VerifyOrReturnError(entry.IsKeyEquivalent(verification_key.Value()), InteractionModel::Status::Failure);
         }
     }
     else if (CHIP_ERROR_NOT_FOUND == err)
@@ -60,10 +59,10 @@ Status ICDManagementServer::RegisterClient(PersistentStorageDelegate & storage, 
 Status ICDManagementServer::UnregisterClient(PersistentStorageDelegate & storage, FabricIndex fabric_index, chip::NodeId node_id,
                                              Optional<chip::ByteSpan> verificationKey, bool is_admin)
 {
-    ICDMonitoringTable table(storage, fabric_index, GetClientsSupportedPerFabric(), mSessionKeyStore);
+    ICDMonitoringTable table(storage, fabric_index, GetClientsSupportedPerFabric(), mSymmetricKeystore);
 
     // Get current entry, if exists
-    ICDMonitoringEntry entry(mSessionKeyStore);
+    ICDMonitoringEntry entry(mSymmetricKeystore);
     CHIP_ERROR err = table.Find(node_id, entry);
     VerifyOrReturnError(CHIP_ERROR_NOT_FOUND != err, InteractionModel::Status::NotFound);
     VerifyOrReturnError(CHIP_NO_ERROR == err, InteractionModel::Status::Failure);
@@ -72,7 +71,7 @@ Status ICDManagementServer::UnregisterClient(PersistentStorageDelegate & storage
     if (!is_admin)
     {
         VerifyOrReturnError(verificationKey.HasValue(), InteractionModel::Status::Failure);
-        VerifyOrReturnError(entry.EnsureKeyEquivalent(verificationKey.Value()), InteractionModel::Status::Failure);
+        VerifyOrReturnError(entry.IsKeyEquivalent(verificationKey.Value()), InteractionModel::Status::Failure);
     }
 
     err = table.Remove(entry.index);

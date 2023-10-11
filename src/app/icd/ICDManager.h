@@ -16,10 +16,10 @@
  */
 #pragma once
 
+#include <app/icd/ICDMonitoringTable.h>
 #include <app/icd/ICDNotifier.h>
 #include <app/icd/ICDStateObserver.h>
 #include <credentials/FabricTable.h>
-#include <crypto/SessionKeystore.h>
 #include <lib/support/BitFlags.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -52,7 +52,7 @@ public:
 
     ICDManager() {}
     void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, ICDStateObserver * stateObserver,
-              Crypto::SessionKeystore * sessionKeyStore);
+              Crypto::SymmetricKeystore * symmetricKeyStore);
     void Shutdown();
     void UpdateICDMode();
     void UpdateOperationState(OperationalState state);
@@ -101,13 +101,13 @@ private:
 
     BitFlags<KeepActiveFlags> mKeepActiveFlags{ 0 };
 
-    OperationalState mOperationalState         = OperationalState::IdleMode;
-    ICDMode mICDMode                           = ICDMode::SIT;
-    PersistentStorageDelegate * mStorage       = nullptr;
-    FabricTable * mFabricTable                 = nullptr;
-    ICDStateObserver * mStateObserver          = nullptr;
-    bool mTransitionToIdleCalled               = false;
-    Crypto::SessionKeystore * mSessionKeyStore = nullptr;
+    OperationalState mOperationalState             = OperationalState::IdleMode;
+    ICDMode mICDMode                               = ICDMode::SIT;
+    PersistentStorageDelegate * mStorage           = nullptr;
+    FabricTable * mFabricTable                     = nullptr;
+    ICDStateObserver * mStateObserver              = nullptr;
+    bool mTransitionToIdleCalled                   = false;
+    Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
 };
 
 } // namespace app
