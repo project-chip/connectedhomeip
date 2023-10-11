@@ -29,7 +29,7 @@
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR CreateChipAttributePath(const app::ConcreteDataAttributePath & aPath, jobject & outObj);
+CHIP_ERROR CreateChipAttributePath(JNIEnv * env, const app::ConcreteDataAttributePath & aPath, jobject & outObj);
 
 // Callback for success and failure cases of GetConnectedDevice().
 struct GetConnectedDeviceCallback
@@ -76,7 +76,7 @@ struct ReportCallback : public app::ClusterStateCache::Callback
     void ReportError(jobject attributePath, jobject eventPath, Protocols::InteractionModel::Status status);
     void ReportError(jobject attributePath, jobject eventPath, const char * message, ChipError::StorageType errorCode);
 
-    CHIP_ERROR CreateChipEventPath(const app::ConcreteEventPath & aPath, jobject & outObj);
+    CHIP_ERROR CreateChipEventPath(JNIEnv * env, const app::ConcreteEventPath & aPath, jobject & outObj);
 
     void UpdateClusterDataVersion();
 
