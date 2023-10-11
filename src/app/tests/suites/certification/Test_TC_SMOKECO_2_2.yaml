@@ -17,7 +17,6 @@ name:
     Server
 
 PICS:
-    - SMOKECO.S
     - SMOKECO.S.F00
 
 config:

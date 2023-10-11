@@ -16,7 +16,6 @@ name:
     4.2.3. [TC-SMOKECO-2.3] Primary Functionality - CO Alarm with DUT as Server
 
 PICS:
-    - SMOKECO.S
     - SMOKECO.S.F01
 
 config:
