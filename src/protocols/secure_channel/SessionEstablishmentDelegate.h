@@ -25,7 +25,6 @@
 
 #pragma once
 
-#include <protocols/secure_channel/PairingSession.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/Session.h>
 #include <transport/raw/MessageHeader.h>
@@ -33,7 +32,7 @@
 
 namespace chip {
 
-enum class SessionState : uint8_t
+enum class SessionEstablishmentStage : uint8_t
 {
     kUndefined              = 0,
     kSentPBKDFParamRequest  = 1,
@@ -61,7 +60,7 @@ public:
      *   failure. This will be called at most once per session establishment and
      *   will not be called if OnSessionEstablished is called.
      */
-    virtual void OnSessionEstablishmentError(CHIP_ERROR error, SessionState state) { OnSessionEstablishmentError(error); }
+    virtual void OnSessionEstablishmentError(CHIP_ERROR error, SessionEstablishmentStage stage) { OnSessionEstablishmentError(error); }
 
     /**
      *   Called on start of session establishment process

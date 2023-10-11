@@ -159,10 +159,10 @@ public:
     {
         const ScopedNodeId peerId;
         CHIP_ERROR error;
-        SessionState sessionState;
+        SessionEstablishmentStage sessionStage;
 
-        ConnnectionFailureInfo(const ScopedNodeId & peer, CHIP_ERROR err, SessionState state) :
-            peerId(peer), error(err), sessionState(state)
+        ConnnectionFailureInfo(const ScopedNodeId & peer, CHIP_ERROR err, SessionEstablishmentStage stage) :
+            peerId(peer), error(err), sessionStage(stage)
         {}
     };
 
@@ -226,7 +226,7 @@ public:
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablished(const SessionHandle & session) override;
-    void OnSessionEstablishmentError(CHIP_ERROR error, SessionState state) override;
+    void OnSessionEstablishmentError(CHIP_ERROR error, SessionEstablishmentStage stage) override;
 
     ScopedNodeId GetPeerId() const { return mPeerId; }
 
@@ -357,12 +357,12 @@ private:
      *
      * Setting releaseBehavior to DoNotRelease is meant for use from the destructor
      */
-    void DequeueConnectionCallbacks(CHIP_ERROR error, SessionState state,
+    void DequeueConnectionCallbacks(CHIP_ERROR error, SessionEstablishmentStage stage,
                                     ReleaseBehavior releaseBehavior = ReleaseBehavior::Release);
 
     void DequeueConnectionCallbacks(CHIP_ERROR error, ReleaseBehavior releaseBehavior = ReleaseBehavior::Release)
     {
-        this->DequeueConnectionCallbacks(error, SessionState::kUndefined, releaseBehavior);
+        this->DequeueConnectionCallbacks(error, SessionEstablishmentStage::kUndefined, releaseBehavior);
     }
 
     /**
@@ -371,7 +371,7 @@ private:
      * being released.
      */
     static void NotifyConnectionCallbacks(Callback::Cancelable & failureReady, Callback::Cancelable & setupFailureReady,
-                                          Callback::Cancelable & successReady, CHIP_ERROR error, SessionState state,
+                                          Callback::Cancelable & successReady, CHIP_ERROR error, SessionEstablishmentStage stage,
                                           const ScopedNodeId & peerId, bool performingAddressUpdate,
                                           Messaging::ExchangeManager * exchangeMgr,
                                           const Optional<SessionHandle> & optionalSessionHandle);

@@ -555,7 +555,7 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
 
 void CASESession::AbortPendingEstablish(CHIP_ERROR err)
 {
-    SessionState state = MapCASEStateToSessionState(mState);
+    SessionEstablishmentStage state = MapCASEStateToSessionEstablishmentStage(mState);
     Clear();
     // Do this last in case the delegate frees us.
     NotifySessionEstablishmentError(err, state);
@@ -2268,26 +2268,26 @@ bool CASESession::InvokeBackgroundWorkWatchdog()
     return watchdogFired;
 }
 
-// Helper function to map CASESession::State to SessionState
-SessionState CASESession::MapCASEStateToSessionState(State caseState)
+// Helper function to map CASESession::State to SessionEstablishmentStage
+SessionEstablishmentStage CASESession::MapCASEStateToSessionEstablishmentStage(State caseState)
 {
     switch (caseState)
     {
     case State::kInitialized:
-        return SessionState::kUndefined;
+        return SessionEstablishmentStage::kUndefined;
     case State::kSentSigma1:
     case State::kSentSigma1Resume:
-        return SessionState::kSentSigma1;
+        return SessionEstablishmentStage::kSentSigma1;
     case State::kSentSigma2:
     case State::kSentSigma2Resume:
     case State::kSendSigma3Pending:
     case State::kHandleSigma3Pending:
-        return SessionState::kSentSigma2;
+        return SessionEstablishmentStage::kSentSigma2;
     case State::kSentSigma3:
-        return SessionState::kSentSigma3;
+        return SessionEstablishmentStage::kSentSigma3;
     // Add more mappings here for other states
     default:
-        return SessionState::kUndefined; // Default mapping
+        return SessionEstablishmentStage::kUndefined; // Default mapping
     }
 }
 

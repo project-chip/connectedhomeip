@@ -321,7 +321,7 @@ private:
     Optional<State> mStopHandshakeAtState = Optional<State>::Missing();
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
-    SessionState MapCASEStateToSessionState(State caseState);
+    SessionEstablishmentStage MapCASEStateToSessionEstablishmentStage(State caseState);
 };
 
 } // namespace chip
