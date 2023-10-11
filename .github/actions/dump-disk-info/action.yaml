@@ -5,6 +5,5 @@ inputs:
     description: "Platform name"
     required: true
 runs:
-  using: "composite"
   main: ./scripts/dump_disk_info.sh
   post: ./scripts/dump_disk_info.sh
