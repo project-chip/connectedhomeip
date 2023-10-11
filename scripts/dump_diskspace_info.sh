@@ -15,6 +15,27 @@
 # limitations under the License.
 #
 
-set -e
+# This script is meant to run in github CI to dump information related to
+# disk space usage. Currently there is a heisenbug related to running out
+# of disk space. Dumping information below might help us get a better
+# understanding of how disk space is used in github CI.
 
+echo "Disk Space Usage:"
 df -h
+
+listOfDirectories=("third_party/" ".environment/" "out/")
+
+pipCacheDir=$(python -m pip cache dir)
+exitcode=$?
+
+if [ $exitcode -eq 0 ]; then
+  listOfDirectories+=($pipCacheDir)
+fi
+
+
+echo "Storage Space Used By Key Directories:"
+for directory in ${listOfDirectories[@]}; do
+  if [ -d "$directory" ]; then
+    du -d1 -h $directory
+  fi
+done
