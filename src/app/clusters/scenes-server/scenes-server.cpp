@@ -136,7 +136,6 @@ CHIP_ERROR ScenesServer::Init()
             ChipLogDetail(Zcl, "ERR: getting the scenes FeatureMap on Endpoint %hu Status: %x", endpoint, status);
         }
 
-        // Forcing matter mandatory features on
         // Explicit AttributeValuePairs is mandatory for matter so we force it here
         featureMap |= to_underlying(Feature::kExplicit);
         status = Attributes::FeatureMap::Set(endpoint, featureMap);
@@ -212,7 +211,7 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
 
     uint8_t EFSCount = 0;
 
-    uint32_t featureMap = 0x00;
+    uint32_t featureMap = 0;
     ReturnOnFailure(AddResponseOnError(ctx, response, Attributes::FeatureMap::Get(ctx.mRequestPath.mEndpointId, &featureMap)));
 
     SceneData storageData(CharSpan(), transitionTimeMs);
@@ -394,7 +393,7 @@ CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & end
     }
     else
     {
-        uint32_t featureMap = 0x00;
+        uint32_t featureMap = 0;
         ReturnErrorOnFailure(
             StatusIB(ToInteractionModelStatus(Attributes::FeatureMap::Get(endpointID, &featureMap))).ToChipError());
         // Check if we still support scenes name in case an OTA changed that, if we don't, set name to empty
