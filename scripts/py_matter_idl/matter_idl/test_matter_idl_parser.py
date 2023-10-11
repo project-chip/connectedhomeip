@@ -27,9 +27,10 @@ except ModuleNotFoundError:
 import unittest
 
 from matter_idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeInstantiation, AttributeQuality,
-                                         AttributeStorage, Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry,
-                                         DataType, DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality, Field,
-                                         FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct, StructTag)
+                                         AttributeStorage, Bitmap, Cluster, ClusterSide, Command, CommandInstantiation,
+                                         CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority,
+                                         EventQuality, Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct,
+                                         StructTag)
 
 
 def parseText(txt, skip_meta=True):
@@ -768,6 +769,38 @@ server cluster A = 1 { /* Test comment */ }
                                            "FooBar", "SomeNewEvent"}),
                 ServerClusterInstantiation(name="AnotherExample", events_emitted={
                     "StartUp", "ShutDown"}),
+            ])
+        ])
+
+        self.assertEqual(actual, expected)
+
+    def test_handle_commands(self):
+        actual = parseText("""
+            endpoint 1 {
+                server cluster Example {}
+            }
+            endpoint 2 {
+              server cluster Example {
+                handle command TestCommand;
+                handle command AnotherOne;
+              }
+              server cluster AnotherExample {
+                handle command Xyz;
+              }
+            }
+        """)
+
+        expected = Idl(endpoints=[
+            Endpoint(number=1, server_clusters=[
+                     ServerClusterInstantiation(name="Example")]),
+            Endpoint(number=2, server_clusters=[
+                ServerClusterInstantiation(name="Example", commands=[
+                    CommandInstantiation(name="TestCommand"),
+                    CommandInstantiation(name="AnotherOne"),
+                ]),
+                ServerClusterInstantiation(name="AnotherExample", commands=[
+                    CommandInstantiation(name="Xyz"),
+                ]),
             ])
         ])
 
