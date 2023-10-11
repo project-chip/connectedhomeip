@@ -6,7 +6,5 @@ inputs:
     required: true
 runs:
   using: "composite"
-  steps:
-    - name: Dump info
-      run: df -h
-  post: df -h
+  main: ./scripts/dump_disk_info.sh
+  post: ./scripts/dump_disk_info.sh
