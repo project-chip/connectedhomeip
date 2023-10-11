@@ -1169,8 +1169,6 @@ server cluster RvcOperationalState = 97 {
   }
 
   command Pause(): OperationalCommandResponse = 0;
-  command Stop(): OperationalCommandResponse = 1;
-  command Start(): OperationalCommandResponse = 2;
   command Resume(): OperationalCommandResponse = 3;
 }
 
