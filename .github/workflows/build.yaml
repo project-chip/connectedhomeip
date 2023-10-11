@@ -428,5 +428,12 @@ jobs:
               with:
                 platform: linux
 
+            - name: Get diskspace info
+              run: df
+
             - name: Run Build Coverage
               run: ./scripts/build_coverage.sh
+
+            - name: Get diskspace info after build coverage complete
+              if: success() || failure()
+              run: df
