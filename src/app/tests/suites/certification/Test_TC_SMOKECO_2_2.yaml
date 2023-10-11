@@ -18,6 +18,7 @@ name:
 
 PICS:
     - SMOKECO.S
+    - SMOKECO.S.F00
 
 config:
     nodeId: 0x12344321
