@@ -17,6 +17,8 @@ runs:
   steps:
     - name: Dump info
       uses: ./.github/actions/dump-disk-info
+      with:
+        platform: ${{ inputs.platform }}
     - name: Checkout submodules
       uses: ./.github/actions/checkout-submodules
       with:
