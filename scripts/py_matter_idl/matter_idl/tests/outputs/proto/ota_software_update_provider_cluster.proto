@@ -16,17 +16,17 @@ message OtaSoftwareUpdateProviderCluster {
   }
 
   // Enums
-  enum OTAApplyUpdateAction {
-    OTAAUA_PROCEED = 0;
-    OTAAUA_AWAIT_NEXT_ACTION = 1;
-    OTAAUA_DISCONTINUE = 2;
+  enum ApplyUpdateActionEnum {
+    AUAE_PROCEED = 0;
+    AUAE_AWAIT_NEXT_ACTION = 1;
+    AUAE_DISCONTINUE = 2;
   }
 
-  enum OTADownloadProtocol {
-    OTADP_BDXSYNCHRONOUS = 0;
-    OTADP_BDXASYNCHRONOUS = 1;
-    OTADP_HTTPS = 2;
-    OTADP_VENDOR_SPECIFIC = 3;
+  enum DownloadProtocolEnum {
+    DPE_BDXSYNCHRONOUS = 0;
+    DPE_BDXASYNCHRONOUS = 1;
+    DPE_HTTPS = 2;
+    DPE_VENDOR_SPECIFIC = 3;
   }
 
   enum OTAQueryStatus {
@@ -60,8 +60,8 @@ message OtaSoftwareUpdateProviderCluster {
     INT16U product_id = 3145729;
     /** INT32U Type: 6 IsList: 0 FieldId: 2 */
     INT32U software_version = 3145730;
-    /** OTADownloadProtocol Type: 6 IsList: 1 FieldId: 3 */
-    repeated OTADownloadProtocol protocols_supported = 3145731;
+    /** DownloadProtocolEnum Type: 6 IsList: 1 FieldId: 3 */
+    repeated DownloadProtocolEnum protocols_supported = 3145731;
     /** INT16U Type: 6 IsList: 0 FieldId: 4 */
     optional INT16U hardware_version = 3145732;
     /** CHAR_STRING Type: 4 IsList: 0 FieldId: 5 */
@@ -89,8 +89,8 @@ message OtaSoftwareUpdateProviderCluster {
   message ApplyUpdateRequestCommandResponse {
     // option (message_type) = MATTER_COMMAND_RESPONSE;
     
-    /** OTAApplyUpdateAction Type: 6 IsList: 0 FieldId: 0 */
-    OTAApplyUpdateAction action = 3145728;
+    /** ApplyUpdateActionEnum Type: 6 IsList: 0 FieldId: 0 */
+    ApplyUpdateActionEnum action = 3145728;
     /** INT32U Type: 6 IsList: 0 FieldId: 1 */
     INT32U delayed_action_time = 3145729;
   }

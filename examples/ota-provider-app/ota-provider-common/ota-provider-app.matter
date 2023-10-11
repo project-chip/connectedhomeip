@@ -268,20 +268,20 @@ server cluster BasicInformation = 40 {
 
 /** Provides an interface for providing OTA software updates */
 server cluster OtaSoftwareUpdateProvider = 41 {
-  enum OTAApplyUpdateAction : ENUM8 {
+  enum ApplyUpdateActionEnum : ENUM8 {
     kProceed = 0;
     kAwaitNextAction = 1;
     kDiscontinue = 2;
   }
 
-  enum OTADownloadProtocol : ENUM8 {
+  enum DownloadProtocolEnum : ENUM8 {
     kBDXSynchronous = 0;
     kBDXAsynchronous = 1;
     kHTTPS = 2;
     kVendorSpecific = 3;
   }
 
-  enum OTAQueryStatus : ENUM8 {
+  enum StatusEnum : ENUM8 {
     kUpdateAvailable = 0;
     kBusy = 1;
     kNotAvailable = 2;
@@ -299,7 +299,7 @@ server cluster OtaSoftwareUpdateProvider = 41 {
     vendor_id vendorID = 0;
     int16u productID = 1;
     int32u softwareVersion = 2;
-    OTADownloadProtocol protocolsSupported[] = 3;
+    DownloadProtocolEnum protocolsSupported[] = 3;
     optional int16u hardwareVersion = 4;
     optional char_string<2> location = 5;
     optional boolean requestorCanConsent = 6;
@@ -317,7 +317,7 @@ server cluster OtaSoftwareUpdateProvider = 41 {
   }
 
   response struct QueryImageResponse = 1 {
-    OTAQueryStatus status = 0;
+    StatusEnum status = 0;
     optional int32u delayedActionTime = 1;
     optional char_string<256> imageURI = 2;
     optional int32u softwareVersion = 3;
@@ -328,7 +328,7 @@ server cluster OtaSoftwareUpdateProvider = 41 {
   }
 
   response struct ApplyUpdateResponse = 3 {
-    OTAApplyUpdateAction action = 0;
+    ApplyUpdateActionEnum action = 0;
     int32u delayedActionTime = 1;
   }
 

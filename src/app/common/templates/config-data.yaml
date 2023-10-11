@@ -6,10 +6,8 @@ WeakEnums:
     - ColorControlOptions
     - ColorMode
     - EnhancedColorMode
-    - InterfaceTypeEnum
     - MoveMode
     - PHYRateEnum
-    - RadioFaultEnum
     - StepMode
 
 CommandHandlerInterfaceOnlyClusters:
