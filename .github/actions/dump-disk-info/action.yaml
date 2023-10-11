@@ -5,5 +5,12 @@ inputs:
     description: "Platform name"
     required: true
 runs:
-  main: ./scripts/dump_disk_info.sh
-  post: ./scripts/dump_disk_info.sh
+  using: "composite"
+  steps:
+    - name: Collect disk info
+      uses: pyTooling/Actions/with-post-step@v0.4.5
+      with:
+        main: |-
+          exec ./scripts/dump_disk_info.sh
+        post: |-
+          exec ./scripts/dump_disk_info.sh
