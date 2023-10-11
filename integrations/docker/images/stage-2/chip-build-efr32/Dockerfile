@@ -19,8 +19,8 @@ RUN git clone --depth=1 --branch=v4.3.2 https://github.com/SiliconLabs/gecko_sdk
     rm -rf .git \
     && : # last line
 
-# Clone WiSeConnect Wi-Fi and Bluetooth Software 2.7.1-Matter (2be7a5b)
-RUN git clone --depth=1 --branch=2.7.1-Matter https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk.git /tmp/wiseconnect-wifi-bt-sdk && \
+# Clone WiSeConnect Wi-Fi and Bluetooth Software 2.8.1 (90f424f)
+RUN git clone --depth=1 --branch=2.8.1 https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk.git /tmp/wiseconnect-wifi-bt-sdk && \
     cd /tmp/wiseconnect-wifi-bt-sdk && \
     rm -rf .git \
     && : # last line
