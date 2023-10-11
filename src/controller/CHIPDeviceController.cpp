@@ -2485,14 +2485,19 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                 app::AttributePathParams(endpoint, IcdManagement::Id, IcdManagement::Attributes::FeatureMap::Id);
         }
 
+        // Current implementation makes sense when we only have a few attributes to read with conditions. Should revisit this if we
+        // are adding more attributes here.
+
         if (numberOfAttributes == 0)
         {
             // We don't actually want to do this step, so just bypass it
             ChipLogProgress(Controller, "kReadCommissioningInfo2 step called without parameter set, skipping");
             CommissioningStageComplete(CHIP_NO_ERROR);
         }
-
-        SendCommissioningReadRequest(proxy, timeout, readPaths, numberOfAttributes);
+        else
+        {
+            SendCommissioningReadRequest(proxy, timeout, readPaths, numberOfAttributes);
+        }
     }
     break;
     case CommissioningStage::kConfigureUTCTime: {
