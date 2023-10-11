@@ -17,6 +17,9 @@ name: Test
 config:
     nodeId: 0x12344321
     endpoint: 0
+    nodeId2:
+        type: node_id
+        defaultValue: 0x43211234
 
 tests:
     - label: "Wait for the alpha device to be retrieved "
@@ -91,7 +94,7 @@ tests:
               - name: "Elements"
                 value: NOCSRElements
               - name: "nodeId"
-                value: 0x43211234
+                value: nodeId2
       response:
           values:
               - name: "NOC"
@@ -130,10 +133,26 @@ tests:
                 value: 0
 
     - label: "Send Commissioning Complete command from beta"
-      nodeId: 0x43211234
+      nodeId: nodeId2
       identity: "beta"
       cluster: "General Commissioning"
       command: "CommissioningComplete"
+
+    - label: "Read alpha fabric index"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: AlphaFabricIndex
+
+    - label: "Read beta fabric index"
+      identity: "beta"
+      nodeId: nodeId2
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "CurrentFabricIndex"
+      response:
+          saveAs: BetaFabricIndex
 
     - label: "Read the fabrics list again from alpha"
       command: "readAttribute"
@@ -144,13 +163,81 @@ tests:
           constraints:
               type: list
 
+    - label: "Read the fabrics list again from alpha without fabric-filtering"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "Fabrics"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  { Label: "", NodeID: nodeId, FabricIndex: AlphaFabricIndex },
+                  { Label: "", NodeID: nodeId2, FabricIndex: BetaFabricIndex },
+              ]
+          constraints:
+              type: list
+
+    - label:
+          "Read the fabrics list again from alpha without fabric-filtering,
+          checking contains constraint"
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "Fabrics"
+      fabricFiltered: false
+      response:
+          constraints:
+              type: list
+              # Flip the order to test the constraint better.
+              contains:
+                  [
+                      {
+                          Label: "",
+                          NodeID: nodeId2,
+                          FabricIndex: BetaFabricIndex,
+                      },
+                      {
+                          Label: "",
+                          NodeID: nodeId,
+                          FabricIndex: AlphaFabricIndex,
+                      },
+                  ]
+              excludes:
+                  [
+                      {
+                          Label: "",
+                          NodeID: nodeId,
+                          FabricIndex: BetaFabricIndex,
+                      },
+                      {
+                          Label: "",
+                          NodeID: nodeId2,
+                          FabricIndex: AlphaFabricIndex,
+                      },
+                  ]
+
     - label: "Read the fabrics list from beta this time"
       identity: "beta"
-      nodeId: 0x43211234
+      nodeId: nodeId2
       command: "readAttribute"
       cluster: "Operational Credentials"
       attribute: "Fabrics"
       response:
-          value: [{ Label: "", NodeID: 0x43211234 }]
+          value: [{ Label: "", NodeID: nodeId2 }]
+          constraints:
+              type: list
+
+    - label: "Read the fabrics list from beta without fabric-filtering"
+      identity: "beta"
+      nodeId: nodeId2
+      command: "readAttribute"
+      cluster: "Operational Credentials"
+      attribute: "Fabrics"
+      fabricFiltered: false
+      response:
+          value:
+              [
+                  { Label: "", NodeID: nodeId, FabricIndex: AlphaFabricIndex },
+                  { Label: "", NodeID: nodeId2, FabricIndex: BetaFabricIndex },
+              ]
           constraints:
               type: list

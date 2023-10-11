@@ -89,7 +89,7 @@ class YamlLoader:
         schema = {
             'label': str,
             'identity': str,
-            'nodeId': int,
+            'nodeId': (int, str),  # Can be a variable.
             'runIf': str,  # Should be a variable.
             'groupId': (int, str),  # Can be a variable.
             'endpoint': (int, str),  # Can be a variable
