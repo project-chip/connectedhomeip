@@ -127,6 +127,7 @@ else()
 endif()
 
 string(APPEND script_args "--offset ${FD_OFFSET}\n")
+string(APPEND script_args "--size 0x1000\n")
 
 string(APPEND script_args "--output \"${output_path}\"/factory\n")
 
