@@ -5,9 +5,8 @@ inputs:
     description: "Platform name"
     required: true
 runs:
+  using: "composite"
   steps:
     - name: Dump info
       run: df -h
-post:
-  - name: Post jobs dump info
-    run: df -h
+  post: df -h
