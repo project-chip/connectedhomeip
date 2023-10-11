@@ -1,4 +1,4 @@
-#include "IcdMonitoringTable.h"
+#include "ICDMonitoringTable.h"
 #include <lib/support/CodeUtils.h>
 
 namespace chip {
@@ -10,14 +10,14 @@ enum class Fields : uint8_t
     kKey              = 3,
 };
 
-CHIP_ERROR IcdMonitoringEntry::UpdateKey(StorageKeyName & skey)
+CHIP_ERROR ICDMonitoringEntry::UpdateKey(StorageKeyName & skey)
 {
     VerifyOrReturnError(kUndefinedFabricIndex != this->fabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
-    skey = DefaultStorageKeyAllocator::IcdManagementTableEntry(this->fabricIndex, index);
+    skey = DefaultStorageKeyAllocator::ICDManagementTableEntry(this->fabricIndex, index);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR IcdMonitoringEntry::Serialize(TLV::TLVWriter & writer) const
+CHIP_ERROR ICDMonitoringEntry::Serialize(TLV::TLVWriter & writer) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer));
@@ -28,7 +28,7 @@ CHIP_ERROR IcdMonitoringEntry::Serialize(TLV::TLVWriter & writer) const
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR IcdMonitoringEntry::Deserialize(TLV::TLVReader & reader)
+CHIP_ERROR ICDMonitoringEntry::Deserialize(TLV::TLVReader & reader)
 {
 
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -63,14 +63,14 @@ CHIP_ERROR IcdMonitoringEntry::Deserialize(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-void IcdMonitoringEntry::Clear()
+void ICDMonitoringEntry::Clear()
 {
     this->checkInNodeID    = kUndefinedNodeId;
     this->monitoredSubject = kUndefinedNodeId;
     this->key              = ByteSpan();
 }
 
-CHIP_ERROR IcdMonitoringTable::Get(uint16_t index, IcdMonitoringEntry & entry) const
+CHIP_ERROR ICDMonitoringTable::Get(uint16_t index, ICDMonitoringEntry & entry) const
 {
     entry.fabricIndex = this->mFabric;
     entry.index       = index;
@@ -79,7 +79,7 @@ CHIP_ERROR IcdMonitoringTable::Get(uint16_t index, IcdMonitoringEntry & entry) c
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR IcdMonitoringTable::Find(NodeId id, IcdMonitoringEntry & entry)
+CHIP_ERROR ICDMonitoringTable::Find(NodeId id, ICDMonitoringEntry & entry)
 {
     uint16_t index = 0;
     while (index < this->Limit())
@@ -94,14 +94,14 @@ CHIP_ERROR IcdMonitoringTable::Find(NodeId id, IcdMonitoringEntry & entry)
     return CHIP_ERROR_NOT_FOUND;
 }
 
-CHIP_ERROR IcdMonitoringTable::Set(uint16_t index, const IcdMonitoringEntry & entry)
+CHIP_ERROR ICDMonitoringTable::Set(uint16_t index, const ICDMonitoringEntry & entry)
 {
     VerifyOrReturnError(index < this->Limit(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(kUndefinedNodeId != entry.checkInNodeID, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(kUndefinedNodeId != entry.monitoredSubject, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(entry.key.size() == IcdMonitoringEntry::kKeyMaxSize, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(entry.key.size() == ICDMonitoringEntry::kKeyMaxSize, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(nullptr != entry.key.data(), CHIP_ERROR_INVALID_ARGUMENT);
-    IcdMonitoringEntry e(this->mFabric, index);
+    ICDMonitoringEntry e(this->mFabric, index);
     e.checkInNodeID    = entry.checkInNodeID;
     e.monitoredSubject = entry.monitoredSubject;
     e.key              = entry.key;
@@ -109,15 +109,15 @@ CHIP_ERROR IcdMonitoringTable::Set(uint16_t index, const IcdMonitoringEntry & en
     return e.Save(this->mStorage);
 }
 
-CHIP_ERROR IcdMonitoringTable::Remove(uint16_t index)
+CHIP_ERROR ICDMonitoringTable::Remove(uint16_t index)
 {
-    IcdMonitoringEntry entry(this->mFabric, index);
+    ICDMonitoringEntry entry(this->mFabric, index);
 
     // Shift remaining entries down one position
     while (CHIP_NO_ERROR == this->Get(static_cast<uint16_t>(index + 1), entry))
     {
         // WARNING: The key data is held in the entry's serializing buffer
-        IcdMonitoringEntry copy = entry;
+        ICDMonitoringEntry copy = entry;
         this->Set(index++, copy);
     }
 
@@ -127,9 +127,9 @@ CHIP_ERROR IcdMonitoringTable::Remove(uint16_t index)
     return entry.Delete(this->mStorage);
 }
 
-CHIP_ERROR IcdMonitoringTable::RemoveAll()
+CHIP_ERROR ICDMonitoringTable::RemoveAll()
 {
-    IcdMonitoringEntry entry(this->mFabric);
+    ICDMonitoringEntry entry(this->mFabric);
     uint16_t index = 0;
     while (index < this->Limit())
     {
@@ -145,13 +145,13 @@ CHIP_ERROR IcdMonitoringTable::RemoveAll()
     return CHIP_NO_ERROR;
 }
 
-bool IcdMonitoringTable::IsEmpty()
+bool ICDMonitoringTable::IsEmpty()
 {
-    IcdMonitoringEntry entry(this->mFabric);
+    ICDMonitoringEntry entry(this->mFabric);
     return (this->Get(0, entry) == CHIP_ERROR_NOT_FOUND);
 }
 
-uint16_t IcdMonitoringTable::Limit() const
+uint16_t ICDMonitoringTable::Limit() const
 {
     return mLimit;
 }

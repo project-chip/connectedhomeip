@@ -16,7 +16,7 @@ import("//build_overrides/chip.gni")
 import("icd.gni")
 
 # ICD Server sources and configurations
-source_set("observer-srcs") {
+source_set("observer") {
   sources = [ "ICDStateObserver.h" ]
 }
 
@@ -32,28 +32,28 @@ source_set("notifier") {
 
 # ICD Manager source-set is broken out of the main source-set to enable unit tests
 # All sources and configurations used by the ICDManager need to go in this source-set
-source_set("manager-srcs") {
+source_set("manager") {
   sources = [
     "ICDManager.cpp",
     "ICDManager.h",
   ]
 
   public_deps = [
-    ":cluster-srcs",
+    ":cluster",
     ":notifier",
-    ":observer-srcs",
+    ":observer",
     "${chip_root}/src/credentials:credentials",
   ]
 }
 
 # ICD management cluster source-set is broken out of the main source-set to enable unit tests
 # All sources and configurations used by the ICD management cluster need to go in this source-set
-source_set("cluster-srcs") {
+source_set("cluster") {
   sources = [
-    "IcdManagementServer.cpp",
-    "IcdManagementServer.h",
-    "IcdMonitoringTable.cpp",
-    "IcdMonitoringTable.h",
+    "ICDManagementServer.cpp",
+    "ICDManagementServer.h",
+    "ICDMonitoringTable.cpp",
+    "ICDMonitoringTable.h",
   ]
 
   public_deps = [
