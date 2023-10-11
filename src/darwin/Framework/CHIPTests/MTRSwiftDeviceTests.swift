@@ -389,6 +389,9 @@ class MTRSwiftDeviceTests : XCTestCase {
         XCTAssertEqual(eventReportsReceived, 0);
     }
 
+    // Note: test027_AttestationChallenge is not implementable in Swift so far,
+    // because the attestationChallenge property is internal-only
+
     func test999_TearDown()
     {
         ResetCommissionee(sConnectedDevice, DispatchQueue.main, self, DeviceConstants.timeoutInSeconds)

@@ -17,31 +17,11 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-<!--  These are generic enums that should be defined in the ModeBase namespace.
-Due to the ModeBase cluster not having a clustre ID, these enems will need to be defined manually.
-These enems can be used once the zap generation tool supports aliased and derived clusters.
+<!--
+The generic enum values for the StatusCode and ModeTag enums are defined within the ModeBase namespace
+in the mode-base-server source code. See mode-base-cluster-objects.h.
+This is because zap does not currently support generating code for clusters that do not have a cluster ID.
 -->
-<!--  <enum name="StatusCode" type="ENUM8">-->
-<!--    <cluster code="0x..."/>-->
-<!--    <item value="0x0" name="Success"/>-->
-<!--    <item value="0x1" name="UnsupportedMode"/>-->
-<!--    <item value="0x2" name="GenericFailure"/>-->
-<!--    <item value="0x3" name="InvalidInMode"/>-->
-<!--  </enum>-->
-
-<!--  <enum name="ModeTag" type="ENUM16">-->
-<!--    <cluster code="0x..."/>-->
-<!--    <item value="0x0" name="Auto"/>-->
-<!--    <item value="0x1" name="Quick"/>-->
-<!--    <item value="0x2" name="Quiet"/>-->
-<!--    <item value="0x3" name="LowNoise"/>-->
-<!--    <item value="0x4" name="LowEnergy"/>-->
-<!--    <item value="0x5" name="Vacation"/>-->
-<!--    <item value="0x6" name="Min"/>-->
-<!--    <item value="0x7" name="Max"/>-->
-<!--    <item value="0x8" name="Night"/>-->
-<!--    <item value="0x9" name="Day"/>-->
-<!--  </enum>-->
 
   <struct name="ModeTagStruct">
     <cluster code="0x0051"/>
