@@ -215,7 +215,7 @@ public:
     bool IsSendExpected() const { return mFlags.Has(Flags::kFlagWillSendMessage); }
 
     /**
-     * Tracks if we have received at least one application level message
+     * Tracks whether we have received at least one application level message
      * during the life-time of this exchange
      *
      * @return Returns 'true' if we have received at least one message, else 'false'

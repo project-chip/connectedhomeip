@@ -1574,7 +1574,7 @@ void TestReliableMessageProtocol::CheckIsPeerActiveNotInitiator(nlTestSuite * in
 {
     /**
      * This tests the following scenario:
-     * 1) A reliable message expecting a response is sent from the initiator to responder which is losts
+     * 1) A reliable message expecting a response is sent from the initiator to responder which is lost
      * 2) Initiator resends the message at the IdleRetrans interval
      * 3) Responder receives the message and sends a standalone ack
      * 4) Responder sends a response and fails
