@@ -1449,7 +1449,15 @@ using CHIP_ERROR = ::chip::ChipError;
 
 // AVAILABLE: 0xb1
 // AVAILABLE: 0xb2
-// AVAILABLE: 0xb3
+
+/**
+ *  @def CHIP_ERROR_DNS_SD_UNAUTHORIZED
+ *
+ *  @brief
+ *    The application is not authorized to do DNS_SD lookups.
+ *
+ */
+#define CHIP_ERROR_DNS_SD_UNAUTHORIZED                        CHIP_CORE_ERROR(0xb3)
 
 /**
  *  @def CHIP_ERROR_MDNS_COLLISION

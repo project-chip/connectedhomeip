@@ -1,6 +1,8 @@
 {{> header}}
 
+#include <app/data-model/WrappedStructEncoder.h>
 #include <app-common/zap-generated/cluster-objects.h>
+
 #include <variant>
 
 namespace chip {
@@ -80,12 +82,11 @@ namespace Commands {
 {{#zcl_commands}}
 namespace {{asUpperCamelCase name}} {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outer));
+    DataModel::WrappedStructEncoder encoder{aWriter, aTag};
     {{#zcl_command_arguments}}
-    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}}));
+    encoder.Encode(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
     {{/zcl_command_arguments}}
-    return aWriter.EndContainer(outer);
+    return encoder.Finalize();
 }
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {

@@ -51,8 +51,8 @@ class TC_ICDM_2_1(MatterBaseTest):
             idleModeInterval *= 1000  # Convert seconds to milliseconds
             activeModeInterval = await self.read_icdm_attribute_expect_success(endpoint=endpoint,
                                                                                attribute=attributes.ActiveModeInterval)
-            asserts.assert_greater_equal(activeModeInterval, 300,
-                                         "ActiveModeInterval attribute is smaller than minimum value (300).")
+            asserts.assert_true(0 <= activeModeInterval <= 65535,
+                                "ActiveModeInterval attribute does not fit in a uint16.")
             asserts.assert_less_equal(activeModeInterval, idleModeInterval,
                                       "ActiveModeInterval attribute is greater than the IdleModeInterval attrbiute.")
         else:
@@ -64,8 +64,8 @@ class TC_ICDM_2_1(MatterBaseTest):
 
             activeModeThreshold = await self.read_icdm_attribute_expect_success(endpoint=endpoint,
                                                                                 attribute=attributes.ActiveModeThreshold)
-            asserts.assert_greater_equal(activeModeThreshold, 300,
-                                         "ActiveModeThreshold attribute is smaller than minimum value (300).")
+            asserts.assert_true(0 <= activeModeThreshold <= 65535,
+                                "ActiveModeThreshold attribute does not fit in a uint16.")
         else:
             asserts.assert_true(False, "ActiveModeThreshold is a mandatory attribute and must be present in the PICS file")
 

@@ -191,6 +191,27 @@ server cluster Scenes = 5 {
     group_id groupID = 0;
   }
 
+  request struct EnhancedAddSceneRequest {
+    group_id groupID = 0;
+    INT8U sceneID = 1;
+    INT16U transitionTime = 2;
+    CHAR_STRING sceneName = 3;
+    ExtensionFieldSet extensionFieldSets[] = 4;
+  }
+
+  request struct EnhancedViewSceneRequest {
+    group_id groupID = 0;
+    INT8U sceneID = 1;
+  }
+
+  request struct CopySceneRequest {
+    ScenesCopyMode mode = 0;
+    group_id groupIdentifierFrom = 1;
+    INT8U sceneIdentifierFrom = 2;
+    group_id groupIdentifierTo = 3;
+    INT8U sceneIdentifierTo = 4;
+  }
+
   response struct AddSceneResponse = 0 {
     status status = 0;
     group_id groupID = 1;
@@ -230,6 +251,27 @@ server cluster Scenes = 5 {
     optional INT8U sceneList[] = 3;
   }
 
+  response struct EnhancedAddSceneResponse = 64 {
+    status status = 0;
+    group_id groupID = 1;
+    INT8U sceneID = 2;
+  }
+
+  response struct EnhancedViewSceneResponse = 65 {
+    status status = 0;
+    group_Id groupID = 1;
+    INT8U sceneID = 2;
+    optional INT16U transitionTime = 3;
+    optional CHAR_STRING sceneName = 4;
+    optional ExtensionFieldSet extensionFieldSets[] = 5;
+  }
+
+  response struct CopySceneResponse = 66 {
+    status status = 0;
+    group_Id groupIdentifierFrom = 1;
+    INT8U sceneIdentifierFrom = 2;
+  }
+
   fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
   fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
   fabric command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
@@ -237,6 +279,9 @@ server cluster Scenes = 5 {
   fabric command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
   fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
   fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
+  fabric command EnhancedAddScene(EnhancedAddSceneRequest): EnhancedAddSceneResponse = 64;
+  fabric command EnhancedViewScene(EnhancedViewSceneRequest): EnhancedViewSceneResponse = 65;
+  fabric command CopyScene(CopySceneRequest): CopySceneResponse = 66;
 }
 
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
@@ -4533,9 +4578,18 @@ server cluster ColorControl = 768 {
 
 /** Attributes and commands for configuring a lighting ballast. */
 server cluster BallastConfiguration = 769 {
+  bitmap BallastStatusBitmap : BITMAP8 {
+    kBallastNonOperational = 0x1;
+    kLampFailure = 0x2;
+  }
+
+  bitmap LampAlarmModeBitmap : BITMAP8 {
+    kLampBurnHours = 0x1;
+  }
+
   readonly attribute int8u physicalMinLevel = 0;
   readonly attribute int8u physicalMaxLevel = 1;
-  readonly attribute bitmap8 ballastStatus = 2;
+  readonly attribute BallastStatusBitmap ballastStatus = 2;
   attribute int8u minLevel = 16;
   attribute int8u maxLevel = 17;
   attribute nullable int8u intrinsicBallastFactor = 20;
@@ -4545,7 +4599,7 @@ server cluster BallastConfiguration = 769 {
   attribute char_string<16> lampManufacturer = 49;
   attribute nullable int24u lampRatedHours = 50;
   attribute nullable int24u lampBurnHours = 51;
-  attribute bitmap8 lampAlarmMode = 52;
+  attribute LampAlarmModeBitmap lampAlarmMode = 52;
   attribute nullable int24u lampBurnHoursTripPoint = 53;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -6311,7 +6365,7 @@ endpoint 0 {
     callback attribute currentHeapFree default = 0x0000000000000000;
     callback attribute currentHeapUsed default = 0x0000000000000000;
     callback attribute currentHeapHighWatermark default = 0x0000000000000000;
-    ram      attribute featureMap default = 1;
+    callback attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6479,8 +6533,8 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision default = 1;
   }
 
   server cluster FixedLabel {
@@ -6712,7 +6766,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6724,7 +6778,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6749,7 +6803,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6761,7 +6815,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6795,7 +6849,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6804,7 +6858,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6892,7 +6946,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 7;
+    callback attribute featureMap default = 7;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6906,7 +6960,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 7;
+    callback attribute featureMap default = 7;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -7211,7 +7265,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7230,7 +7284,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7249,7 +7303,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7268,7 +7322,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7287,7 +7341,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7306,7 +7360,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7325,7 +7379,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7344,7 +7398,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7363,7 +7417,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7382,7 +7436,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7606,6 +7660,7 @@ endpoint 2 {
     ram      attribute currentGroup default = 0x0000;
     ram      attribute sceneValid default = 0x00;
     ram      attribute nameSupport default = 0x80;
+    ram      attribute lastConfiguredBy;
     ram      attribute sceneTableSize default = 16;
     callback attribute remainingCapacity default = 8;
     callback attribute generatedCommandList;

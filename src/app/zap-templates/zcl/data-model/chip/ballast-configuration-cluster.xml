@@ -17,6 +17,17 @@ limitations under the License.
 <configurator>
   <domain name="Lighting"/>
 
+  <bitmap name="BallastStatusBitmap" type="bitmap8">
+    <cluster code="0x0301"/>
+    <field name="BallastNonOperational" mask="0x01"/>
+    <field name="LampFailure" mask="0x02"/>
+  </bitmap>
+
+  <bitmap name="LampAlarmModeBitmap" type="bitmap8">
+    <cluster code="0x0301"/>
+    <field name="LampBurnHours" mask="0x01"/>
+  </bitmap>
+
   <cluster>
     <name>Ballast Configuration</name>
     <domain>Lighting</domain>
@@ -32,7 +43,7 @@ limitations under the License.
     <!-- Ballast Configuration Attribute Set -->
     <attribute side="server" code="0x0000" define="PHYSICAL_MIN_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="false" default="0x01" optional="false">PhysicalMinLevel</attribute>
     <attribute side="server" code="0x0001" define="PHYSICAL_MAX_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="false" default="0xFE" optional="false">PhysicalMaxLevel</attribute>
-    <attribute side="server" code="0x0002" define="BALLAST_STATUS" type="BITMAP8" min="0x00" max="0x03" writable="false" default="0x00" optional="true">BallastStatus</attribute>
+    <attribute side="server" code="0x0002" define="BALLAST_STATUS" type="BallastStatusBitmap" min="0x00" max="0x03" writable="false" default="0x00" optional="true">BallastStatus</attribute>
     <!-- Ballast Settings Attribute Set -->
     <attribute side="server" code="0x0010" define="MIN_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="true" default="0x01" optional="false">MinLevel</attribute>
     <attribute side="server" code="0x0011" define="MAX_LEVEL" type="INT8U" min="0x01" max="0xFE" writable="true" default="0xFE" optional="false">MaxLevel</attribute>
@@ -46,7 +57,7 @@ limitations under the License.
     <attribute side="server" code="0x0031" define="LAMP_MANUFACTURER" type="CHAR_STRING" length="16" writable="true" optional="true">LampManufacturer</attribute>
     <attribute side="server" code="0x0032" define="LAMP_RATED_HOURS" type="INT24U" writable="true" default="0xFFFFFF" isNullable="true" optional="true">LampRatedHours</attribute>
     <attribute side="server" code="0x0033" define="LAMP_BURN_HOURS" type="INT24U" writable="true" default="0x000000" isNullable="true" optional="true">LampBurnHours</attribute>
-    <attribute side="server" code="0x0034" define="LAMP_ALARM_MODE" type="BITMAP8" min="0x00" max="0x01" writable="true" default="0x00" optional="true">LampAlarmMode</attribute>
+    <attribute side="server" code="0x0034" define="LAMP_ALARM_MODE" type="LampAlarmModeBitmap" min="0x00" max="0x01" writable="true" default="0x00" optional="true">LampAlarmMode</attribute>
     <attribute side="server" code="0x0035" define="LAMP_BURN_HOURS_TRIP_POINT" type="INT24U" writable="true" default="0xFFFFFF" isNullable="true" optional="true">LampBurnHoursTripPoint</attribute>
   </cluster>
 </configurator>

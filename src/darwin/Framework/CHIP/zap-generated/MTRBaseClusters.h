@@ -15340,6 +15340,15 @@ typedef NS_OPTIONS(uint32_t, MTRColorControlFeature) {
     MTRColorControlFeatureColorTemperature MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x10,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_OPTIONS(uint8_t, MTRBallastConfigurationBallastStatusBitmap) {
+    MTRBallastConfigurationBallastStatusBitmapBallastNonOperational MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRBallastConfigurationBallastStatusBitmapLampFailure MTR_PROVISIONALLY_AVAILABLE = 0x2,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint8_t, MTRBallastConfigurationLampAlarmModeBitmap) {
+    MTRBallastConfigurationLampAlarmModeBitmapLampBurnHours MTR_PROVISIONALLY_AVAILABLE = 0x1,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTRIlluminanceMeasurementLightSensorType) {
     MTRIlluminanceMeasurementLightSensorTypePhotodiode MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
     MTRIlluminanceMeasurementLightSensorTypeCMOS MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,

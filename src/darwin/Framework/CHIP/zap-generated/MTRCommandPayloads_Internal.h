@@ -15,15 +15,12 @@
  *    limitations under the License.
  */
 
+#import <Matter/MTRCommandPayloadsObjc.h>
 #import <Matter/MTRDefines.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 
 NS_ASSUME_NONNULL_BEGIN
-
-@interface MTROperationalCredentialsClusterAttestationResponseParams ()
-@property (nonatomic, strong) NSData * attestationChallenge;
-@end
 
 @interface MTRIdentifyClusterIdentifyParams (InternalMethods)
 
