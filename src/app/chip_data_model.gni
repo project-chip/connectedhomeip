@@ -199,10 +199,6 @@ template("chip_data_model") {
       deps = []
     }
 
-    if (!defined(public_deps)) {
-      public_deps = []
-    }
-
     if (!defined(cflags)) {
       cflags = []
     }
@@ -292,7 +288,7 @@ template("chip_data_model") {
         ]
       } else if (cluster == "icd-management-server") {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
-        public_deps += [ "${chip_root}/src/app/icd:cluster" ]
+        deps += [ "${chip_root}/src/app/icd:cluster" ]
       } else if (cluster == "resource-monitoring-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
