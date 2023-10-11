@@ -16,7 +16,7 @@ name:
     4.2.3. [TC-SMOKECO-2.3] Primary Functionality - CO Alarm with DUT as Server
 
 PICS:
-    - SMOKECO.S
+    - SMOKECO.S.F01
 
 config:
     nodeId: 0x12344321
@@ -144,7 +144,7 @@ tests:
                 value: "y"
 
     - label: "Step 10: TH reads TestInProgress attribute from DUT"
-      PICS: SMOKECO.S.A0005
+      PICS: SMOKECO.S.A0005 && SMOKECO.M.ManuallyControlledTest
       command: "readAttribute"
       attribute: "TestInProgress"
       response:

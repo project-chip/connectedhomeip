@@ -1825,7 +1825,7 @@ endpoint 0 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 1;
   }
 
   server cluster BasicInformation {
@@ -1977,7 +1977,7 @@ endpoint 0 {
     callback attribute currentHeapFree default = 0x0000000000000000;
     callback attribute currentHeapUsed default = 0x0000000000000000;
     callback attribute currentHeapHighWatermark default = 0x0000000000000000;
-    ram      attribute featureMap default = 1;
+    callback attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -2120,8 +2120,8 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision default = 1;
   }
 
   server cluster FixedLabel {
