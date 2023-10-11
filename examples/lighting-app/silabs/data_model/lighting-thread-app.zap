@@ -5363,8 +5363,7 @@
               "maxInterval": 65534,
               "reportableChange": 0
             }
-          ],
-          "events": []
+          ]
         },
         {
           "name": "Color Control",
@@ -5916,6 +5915,5 @@
       "endpointId": 1,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }
