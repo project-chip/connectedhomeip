@@ -312,30 +312,6 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 #endif
 
-#if CONFIG_CHIP_OTA_REQUESTOR
-    InitBasicOTARequestor();
-#endif
-
-#ifdef CONFIG_BOOTLOADER_MCUBOOT
-#if CONFIG_CHIP_OTA_REQUESTOR
-    if (GetRequestorInstance()->GetCurrentUpdateState() == Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kIdle &&
-        mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
-#else
-    if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
-#endif
-    {
-        int img_confirmation = boot_write_img_confirmed();
-        if (img_confirmation)
-        {
-            LOG_ERR("Image not confirmed %d. Will be reverted!", img_confirmation);
-        }
-        else
-        {
-            LOG_INF("Image confirmed");
-        }
-    }
-#endif /* CONFIG_BOOTLOADER_MCUBOOT */
-
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
@@ -702,13 +678,29 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
         UpdateStatusLED();
 #endif
         break;
-    case DeviceEventType::kThreadConnectivityChange:
+    case DeviceEventType::kDnssdInitialized:
 #if CONFIG_CHIP_OTA_REQUESTOR
-        if (event->ThreadConnectivityChange.Result == kConnectivity_Established)
-        {
-            InitBasicOTARequestor();
-        }
+        InitBasicOTARequestor();
 #endif
+#ifdef CONFIG_BOOTLOADER_MCUBOOT
+#if CONFIG_CHIP_OTA_REQUESTOR
+    if (GetRequestorInstance()->GetCurrentUpdateState() == Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kIdle &&
+        mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
+#else
+    if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
+#endif
+    {
+        int img_confirmation = boot_write_img_confirmed();
+        if (img_confirmation)
+        {
+            LOG_ERR("Image not confirmed %d. Will be reverted!", img_confirmation);
+        }
+        else
+        {
+            LOG_INF("Image confirmed");
+        }
+    }
+#endif /* CONFIG_BOOTLOADER_MCUBOOT */
         break;
     default:
         break;
