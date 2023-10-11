@@ -8,20 +8,10 @@
 #include <app/util/im-client-callbacks.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
-typedef void (*CommandSuccessCallback)(void *, const chip::app::DataModel::NullObjectType &);
-using CommandSuccessCallbackType = CommandSuccessCallback;
 typedef void (*DefaultSuccessCallbackType)(void *);
 
 typedef void (*VendorIdAttributeCallback)(void *, chip::VendorId);
 typedef void (*NullableVendorIdAttributeCallback)(void *, const chip::app::DataModel::Nullable<chip::VendorId> &);
-
-{{#zcl_clusters}}
-{{#zcl_command_responses}}
-{{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
-typedef void (*{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name preserveAcronyms=true}}CallbackType)(void *, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::DecodableType &);
-{{/if}}
-{{/zcl_command_responses}}
-{{/zcl_clusters}}
 
 {{#zcl_clusters}}
 {{#zcl_enums}}
@@ -50,7 +40,6 @@ typedef void (*{{asUpperCamelCase parent.name preserveAcronyms=true}}{{asUpperCa
 {{/zcl_clusters}}
 
 {{#>MTRCallbackBridge header="1" partial-type="Status"                         }}DefaultSuccessCallback{{/MTRCallbackBridge}}
-{{#>MTRCallbackBridge header="1" partial-type="CommandStatus"                  }}CommandSuccessCallback{{/MTRCallbackBridge}}
 {{#>MTRCallbackBridge header="1" type="Octet_String" isNullable=false ns="chip"}}OctetStringAttributeCallback{{/MTRCallbackBridge}}
 {{#>MTRCallbackBridge header="1" type="Octet_String" isNullable=true  ns="chip"}}NullableOctetStringAttributeCallback{{/MTRCallbackBridge}}
 {{#>MTRCallbackBridge header="1" type="Char_String"  isNullable=false ns="chip"}}CharStringAttributeCallback{{/MTRCallbackBridge}}
@@ -95,14 +84,6 @@ typedef void (*{{asUpperCamelCase parent.name preserveAcronyms=true}}{{asUpperCa
 {{/if}}
 {{/if}}
 {{/zcl_attributes_server}}
-{{/zcl_clusters}}
-
-{{#zcl_clusters}}
-{{#zcl_command_responses}}
-{{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
-{{#>MTRCallbackBridge header="1" partial-type="Command" provisional=(isProvisional (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}{{asUpperCamelCase ../../name preserveAcronyms=true}}Cluster{{asUpperCamelCase ../name preserveAcronyms=true}}Callback{{/MTRCallbackBridge}}
-{{/if}}
-{{/zcl_command_responses}}
 {{/zcl_clusters}}
 
 {{#zcl_clusters}}

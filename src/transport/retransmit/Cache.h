@@ -58,7 +58,7 @@ class Cache
 {
 public:
     Cache() {}
-    Cache(const Cache &) = delete;
+    Cache(const Cache &)             = delete;
     Cache & operator=(const Cache &) = delete;
 
     ~Cache()

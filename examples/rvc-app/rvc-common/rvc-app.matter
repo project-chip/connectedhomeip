@@ -1,38 +1,6 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
-struct ModeTagStruct {
-    optional vendor_id mfgCode = 0;
-    enum16 value = 1;
-}
-
-struct ModeOptionStruct {
-    char_string<64> label = 0;
-    int8u mode = 1;
-    ModeTagStruct modeTags[] = 2;
-}
-
-struct ApplicationStruct {
-    int16u catalogVendorID = 0;
-    char_string applicationID = 1;
-}
-
-struct ErrorStateStruct {
-    enum8 errorStateID = 0;
-    optional char_string<64> errorStateLabel = 1;
-    optional char_string<64> errorStateDetails = 2;
-}
-
-struct LabelStruct {
-    char_string<16> label = 0;
-    char_string<16> value = 1;
-}
-
-struct OperationalStateStruct {
-    enum8 operationalStateID = 0;
-    optional char_string<64> operationalStateLabel = 1;
-}
-
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 server cluster Identify = 3 {
   enum EffectIdentifierEnum : ENUM8 {
@@ -1032,7 +1000,7 @@ endpoint 0 {
     callback attribute accessControlEntriesPerFabric;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 1;
   }
 
   server cluster BasicInformation {
@@ -1129,8 +1097,8 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision default = 1;
   }
 }
 endpoint 1 {
@@ -1158,7 +1126,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList default = 0;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 1;
   }
 
   server cluster RvcRunMode {
@@ -1168,7 +1136,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -1180,7 +1148,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 

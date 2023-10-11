@@ -73,6 +73,40 @@ source_set("attributes") {
   ]
 }
 
+source_set("verifymacros_no_logging") {
+  sources = [ "VerificationMacrosNoLogging.h" ]
+
+  public_deps = [ "${nlassert_root}:nlassert" ]
+}
+
+source_set("safeint") {
+  sources = [ "SafeInt.h" ]
+}
+
+source_set("memory") {
+  sources = [
+    "CHIPMem.cpp",
+    "CHIPMem.h",
+    "CHIPPlatformMemory.cpp",
+    "CHIPPlatformMemory.h",
+  ]
+
+  if (chip_config_memory_management == "simple") {
+    sources += [ "CHIPMem-Simple.cpp" ]
+  }
+  if (chip_config_memory_management == "malloc") {
+    sources += [ "CHIPMem-Malloc.cpp" ]
+  }
+
+  public_deps = [ "${chip_root}/src/lib/core:error" ]
+
+  deps = [
+    ":safeint",
+    ":verifymacros_no_logging",
+    "${chip_root}/src/lib/core:chip_config_header",
+  ]
+}
+
 source_set("chip_version_header") {
   sources = get_target_outputs(":gen_chip_version")
 
@@ -97,17 +131,11 @@ static_library("support") {
     "BytesToHex.h",
     "CHIPArgParser.cpp",
     "CHIPCounter.h",
-    "CHIPMem.cpp",
-    "CHIPMem.h",
     "CHIPMemString.h",
-    "CHIPPlatformMemory.cpp",
-    "CHIPPlatformMemory.h",
     "CodeUtils.h",
     "DLLUtil.h",
     "DefaultStorageKeyAllocator.h",
     "Defer.h",
-    "ErrorStr.cpp",
-    "ErrorStr.h",
     "FibonacciUtils.cpp",
     "FibonacciUtils.h",
     "FixedBufferAllocator.cpp",
@@ -126,7 +154,6 @@ static_library("support") {
     "PrivateHeap.cpp",
     "PrivateHeap.h",
     "ReferenceCountedHandle.h",
-    "SafeInt.h",
     "SerializableIntegerSet.cpp",
     "SerializableIntegerSet.h",
     "SetupDiscriminator.h",
@@ -142,8 +169,11 @@ static_library("support") {
     "Variant.h",
     "ZclString.cpp",
     "ZclString.h",
-    "logging/CHIPLogging.cpp",
+    "logging/BinaryLogging.cpp",
+    "logging/BinaryLogging.h",
     "logging/CHIPLogging.h",
+    "logging/TextOnlyLogging.cpp",
+    "logging/TextOnlyLogging.h",
     "verhoeff/Verhoeff.cpp",
     "verhoeff/Verhoeff.h",
     "verhoeff/Verhoeff10.cpp",
@@ -171,7 +201,11 @@ static_library("support") {
     ":attributes",
     ":chip_version_header",
     ":logging_constants",
+    ":memory",
+    ":safeint",
+    ":verifymacros_no_logging",
     "${chip_root}/src/lib/core:chip_config_header",
+    "${chip_root}/src/lib/core:error",
     "${chip_root}/src/platform:platform_buildconfig",
     "${chip_root}/src/platform/logging:headers",
     "${nlassert_root}:nlassert",
@@ -201,12 +235,6 @@ static_library("support") {
     ":storage_audit_config",
   ]
 
-  if (chip_config_memory_management == "simple") {
-    sources += [ "CHIPMem-Simple.cpp" ]
-  }
-  if (chip_config_memory_management == "malloc") {
-    sources += [ "CHIPMem-Malloc.cpp" ]
-  }
   if (chip_with_nlfaultinjection) {
     sources += [
       "CHIPFaultInjection.cpp",

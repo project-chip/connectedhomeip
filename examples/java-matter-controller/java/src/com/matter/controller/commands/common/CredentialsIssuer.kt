@@ -18,8 +18,7 @@
 package com.matter.controller.commands.common
 
 /**
- * @brief Credentials Issuer for the Command
- * @details Contains all credential information of the issuer of the command, such as operational
- *   credentials for a given fabric, the DAC verifier of the commisioner, etc ..
+ * Credentials Issuer which contains all credential information of the issuer of the command, such
+ * as operational credentials for a given fabric, the DAC verifier of the commisioner, etc ..
  */
 class CredentialsIssuer

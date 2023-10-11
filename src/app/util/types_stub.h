@@ -211,16 +211,16 @@ typedef struct
 /**
  * @brief Returns the low byte of the 16-bit value \c n as an \c uint8_t.
  */
-#define EMBER_LOW_BYTE(n) ((uint8_t)((n) &0xFF))
+#define EMBER_LOW_BYTE(n) ((uint8_t) ((n) &0xFF))
 
 /**
  * @brief Returns the high byte of the 16-bit value \c n as an \c uint8_t.
  */
-#define EMBER_HIGH_BYTE(n) ((uint8_t)(EMBER_LOW_BYTE((n) >> 8)))
+#define EMBER_HIGH_BYTE(n) ((uint8_t) (EMBER_LOW_BYTE((n) >> 8)))
 /**
  * @brief Returns the low byte of the 32-bit value \c n as an \c uint8_t.
  */
-#define EMBER_BYTE_0(n) ((uint8_t)((n) &0xFF))
+#define EMBER_BYTE_0(n) ((uint8_t) ((n) &0xFF))
 
 /**
  * @brief Returns the second byte of the 32-bit value \c n as an \c uint8_t.

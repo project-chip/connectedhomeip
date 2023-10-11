@@ -181,8 +181,8 @@ void ThermostatUI::DrawCurrentTemp(GLIB_Context_t * glibContext, int8_t temp, bo
     }
 
     // Print Current temp
-    tempArray[0] = (uint8_t)((temp / 10));
-    tempArray[1] = (uint8_t)((temp % 10));
+    tempArray[0] = (uint8_t) ((temp / 10));
+    tempArray[1] = (uint8_t) ((temp % 10));
 
     for (uint8_t ch = 0; ch < 2; ch++)
     {

@@ -27,7 +27,7 @@ limitations under the License.
         <cluster code="0x0046"/>
         <item fieldId="1" name="CheckInNodeID" type="node_id" isFabricSensitive="true"/>
         <item fieldId="2" name="MonitoredSubject" type="INT64U" isFabricSensitive="true"/>
-        <item fieldId="3" name="Key" type="OCTET_STRING" length="16" isFabricSensitive="true"/>
+        <!-- RESERVED = 0x03 -->
     </struct>
 
     <cluster>
@@ -43,8 +43,8 @@ limitations under the License.
         <globalAttribute side="either" code="0xFFFD" value="1"/>
 
         <attribute side="server" code="0x00" define="IDLE_MODE_INTERVAL" type="INT32U" min="1" max="64800" default="1" writable="false" optional="false" isNullable="false">IdleModeInterval</attribute>
-        <attribute side="server" code="0x01" define="ACTIVE_MODE_INTERVAL" type="INT32U" min="300" default="300" writable="false" optional="false" isNullable="false">ActiveModeInterval</attribute>
-        <attribute side="server" code="0x02" define="ACTIVE_MODE_THRESHOLD" type="INT16U" min="300" default="300" writable="false" optional="false" isNullable="false">ActiveModeThreshold</attribute>
+        <attribute side="server" code="0x01" define="ACTIVE_MODE_INTERVAL" type="INT32U" default="300" writable="false" optional="false" isNullable="false">ActiveModeInterval</attribute>
+        <attribute side="server" code="0x02" define="ACTIVE_MODE_THRESHOLD" type="INT16U" default="300" writable="false" optional="false" isNullable="false">ActiveModeThreshold</attribute>
         <attribute side="server" code="0x03" define="REGISTERED_CLIENTS" type="ARRAY" entryType="MonitoringRegistrationStruct" writable="false" optional="true" isNullable="false">
             <description>RegisteredClients</description>
             <access op="read" privilege="administer"/>

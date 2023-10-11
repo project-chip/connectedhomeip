@@ -23,142 +23,10 @@
 #include <app/data-model/DecodableList.h>
 #include <app/util/im-client-callbacks.h>
 
-typedef void (*CommandSuccessCallback)(void *, const chip::app::DataModel::NullObjectType &);
-using CommandSuccessCallbackType = CommandSuccessCallback;
 typedef void (*DefaultSuccessCallbackType)(void *);
 
 typedef void (*VendorIdAttributeCallback)(void *, chip::VendorId);
 typedef void (*NullableVendorIdAttributeCallback)(void *, const chip::app::DataModel::Nullable<chip::VendorId> &);
-
-typedef void (*GroupsClusterAddGroupResponseCallbackType)(
-    void *, const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType &);
-typedef void (*GroupsClusterViewGroupResponseCallbackType)(
-    void *, const chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType &);
-typedef void (*GroupsClusterGetGroupMembershipResponseCallbackType)(
-    void *, const chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType &);
-typedef void (*GroupsClusterRemoveGroupResponseCallbackType)(
-    void *, const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType &);
-typedef void (*ScenesClusterAddSceneResponseCallbackType)(
-    void *, const chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType &);
-typedef void (*ScenesClusterViewSceneResponseCallbackType)(
-    void *, const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType &);
-typedef void (*ScenesClusterRemoveSceneResponseCallbackType)(
-    void *, const chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType &);
-typedef void (*ScenesClusterRemoveAllScenesResponseCallbackType)(
-    void *, const chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType &);
-typedef void (*ScenesClusterStoreSceneResponseCallbackType)(
-    void *, const chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType &);
-typedef void (*ScenesClusterGetSceneMembershipResponseCallbackType)(
-    void *, const chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType &);
-typedef void (*ScenesClusterEnhancedAddSceneResponseCallbackType)(
-    void *, const chip::app::Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType &);
-typedef void (*ScenesClusterEnhancedViewSceneResponseCallbackType)(
-    void *, const chip::app::Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType &);
-typedef void (*ScenesClusterCopySceneResponseCallbackType)(
-    void *, const chip::app::Clusters::Scenes::Commands::CopySceneResponse::DecodableType &);
-typedef void (*OTASoftwareUpdateProviderClusterQueryImageResponseCallbackType)(
-    void *, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType &);
-typedef void (*OTASoftwareUpdateProviderClusterApplyUpdateResponseCallbackType)(
-    void *, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType &);
-typedef void (*GeneralCommissioningClusterArmFailSafeResponseCallbackType)(
-    void *, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType &);
-typedef void (*GeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType)(
-    void *, const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType &);
-typedef void (*GeneralCommissioningClusterCommissioningCompleteResponseCallbackType)(
-    void *, const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType &);
-typedef void (*NetworkCommissioningClusterScanNetworksResponseCallbackType)(
-    void *, const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType &);
-typedef void (*NetworkCommissioningClusterNetworkConfigResponseCallbackType)(
-    void *, const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType &);
-typedef void (*NetworkCommissioningClusterConnectNetworkResponseCallbackType)(
-    void *, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType &);
-typedef void (*DiagnosticLogsClusterRetrieveLogsResponseCallbackType)(
-    void *, const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType &);
-typedef void (*TimeSynchronizationClusterSetTimeZoneResponseCallbackType)(
-    void *, const chip::app::Clusters::TimeSynchronization::Commands::SetTimeZoneResponse::DecodableType &);
-typedef void (*OperationalCredentialsClusterAttestationResponseCallbackType)(
-    void *, const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType &);
-typedef void (*OperationalCredentialsClusterCertificateChainResponseCallbackType)(
-    void *, const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType &);
-typedef void (*OperationalCredentialsClusterCSRResponseCallbackType)(
-    void *, const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType &);
-typedef void (*OperationalCredentialsClusterNOCResponseCallbackType)(
-    void *, const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType &);
-typedef void (*GroupKeyManagementClusterKeySetReadResponseCallbackType)(
-    void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType &);
-typedef void (*GroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType)(
-    void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType &);
-typedef void (*ICDManagementClusterRegisterClientResponseCallbackType)(
-    void *, const chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType &);
-typedef void (*LaundryWasherModeClusterChangeToModeResponseCallbackType)(
-    void *, const chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::DecodableType &);
-typedef void (*RefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseCallbackType)(
-    void *,
-    const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeResponse::DecodableType &);
-typedef void (*RVCRunModeClusterChangeToModeResponseCallbackType)(
-    void *, const chip::app::Clusters::RvcRunMode::Commands::ChangeToModeResponse::DecodableType &);
-typedef void (*RVCCleanModeClusterChangeToModeResponseCallbackType)(
-    void *, const chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeResponse::DecodableType &);
-typedef void (*DishwasherModeClusterChangeToModeResponseCallbackType)(
-    void *, const chip::app::Clusters::DishwasherMode::Commands::ChangeToModeResponse::DecodableType &);
-typedef void (*OperationalStateClusterOperationalCommandResponseCallbackType)(
-    void *, const chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType &);
-typedef void (*RVCOperationalStateClusterOperationalCommandResponseCallbackType)(
-    void *, const chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType &);
-typedef void (*DoorLockClusterGetWeekDayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType &);
-typedef void (*DoorLockClusterGetYearDayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType &);
-typedef void (*DoorLockClusterGetHolidayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType &);
-typedef void (*DoorLockClusterGetUserResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType &);
-typedef void (*DoorLockClusterSetCredentialResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType &);
-typedef void (*DoorLockClusterGetCredentialStatusResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType &);
-typedef void (*ThermostatClusterGetWeeklyScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType &);
-typedef void (*ChannelClusterChangeChannelResponseCallbackType)(
-    void *, const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType &);
-typedef void (*TargetNavigatorClusterNavigateTargetResponseCallbackType)(
-    void *, const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType &);
-typedef void (*MediaPlaybackClusterPlaybackResponseCallbackType)(
-    void *, const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType &);
-typedef void (*KeypadInputClusterSendKeyResponseCallbackType)(
-    void *, const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType &);
-typedef void (*ContentLauncherClusterLauncherResponseCallbackType)(
-    void *, const chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType &);
-typedef void (*ApplicationLauncherClusterLauncherResponseCallbackType)(
-    void *, const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType &);
-typedef void (*AccountLoginClusterGetSetupPINResponseCallbackType)(
-    void *, const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType &);
-typedef void (*UnitTestingClusterTestSpecificResponseCallbackType)(
-    void *, const chip::app::Clusters::UnitTesting::Commands::TestSpecificResponse::DecodableType &);
-typedef void (*UnitTestingClusterTestAddArgumentsResponseCallbackType)(
-    void *, const chip::app::Clusters::UnitTesting::Commands::TestAddArgumentsResponse::DecodableType &);
-typedef void (*UnitTestingClusterTestSimpleArgumentResponseCallbackType)(
-    void *, const chip::app::Clusters::UnitTesting::Commands::TestSimpleArgumentResponse::DecodableType &);
-typedef void (*UnitTestingClusterTestStructArrayArgumentResponseCallbackType)(
-    void *, const chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType &);
-typedef void (*UnitTestingClusterTestListInt8UReverseResponseCallbackType)(
-    void *, const chip::app::Clusters::UnitTesting::Commands::TestListInt8UReverseResponse::DecodableType &);
-typedef void (*UnitTestingClusterTestEnumsResponseCallbackType)(
-    void *, const chip::app::Clusters::UnitTesting::Commands::TestEnumsResponse::DecodableType &);
-typedef void (*UnitTestingClusterTestNullableOptionalResponseCallbackType)(
-    void *, const chip::app::Clusters::UnitTesting::Commands::TestNullableOptionalResponse::DecodableType &);
-typedef void (*UnitTestingClusterTestComplexNullableOptionalResponseCallbackType)(
-    void *, const chip::app::Clusters::UnitTesting::Commands::TestComplexNullableOptionalResponse::DecodableType &);
-typedef void (*UnitTestingClusterBooleanResponseCallbackType)(
-    void *, const chip::app::Clusters::UnitTesting::Commands::BooleanResponse::DecodableType &);
-typedef void (*UnitTestingClusterSimpleStructResponseCallbackType)(
-    void *, const chip::app::Clusters::UnitTesting::Commands::SimpleStructResponse::DecodableType &);
-typedef void (*UnitTestingClusterTestEmitTestEventResponseCallbackType)(
-    void *, const chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventResponse::DecodableType &);
-typedef void (*UnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackType)(
-    void *, const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType &);
-typedef void (*SampleMEIClusterAddArgumentsResponseCallbackType)(
-    void *, const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType &);
 
 typedef void (*IdentifyClusterEffectIdentifierEnumAttributeCallback)(void *, chip::app::Clusters::Identify::EffectIdentifierEnum);
 typedef void (*NullableIdentifyClusterEffectIdentifierEnumAttributeCallback)(
@@ -219,30 +87,30 @@ typedef void (*BasicInformationClusterProductFinishEnumAttributeCallback)(void *
                                                                           chip::app::Clusters::BasicInformation::ProductFinishEnum);
 typedef void (*NullableBasicInformationClusterProductFinishEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::BasicInformation::ProductFinishEnum> &);
-typedef void (*OTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback)(
-    void *, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction);
-typedef void (*NullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction> &);
-typedef void (*OTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback)(
-    void *, chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol);
-typedef void (*NullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol> &);
-typedef void (*OTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback)(
-    void *, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus);
-typedef void (*NullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus> &);
-typedef void (*OTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback)(
-    void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason);
-typedef void (*NullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason> &);
-typedef void (*OTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback)(
-    void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum);
-typedef void (*NullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum> &);
-typedef void (*OTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback)(
-    void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum);
-typedef void (*NullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum> &);
+typedef void (*OTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallback)(
+    void *, chip::app::Clusters::OtaSoftwareUpdateProvider::ApplyUpdateActionEnum);
+typedef void (*NullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::ApplyUpdateActionEnum> &);
+typedef void (*OTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallback)(
+    void *, chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum);
+typedef void (*NullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum> &);
+typedef void (*OTASoftwareUpdateProviderClusterStatusEnumAttributeCallback)(
+    void *, chip::app::Clusters::OtaSoftwareUpdateProvider::StatusEnum);
+typedef void (*NullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::StatusEnum> &);
+typedef void (*OTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallback)(
+    void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::AnnouncementReasonEnum);
+typedef void (*NullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::AnnouncementReasonEnum> &);
+typedef void (*OTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallback)(
+    void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::ChangeReasonEnum);
+typedef void (*NullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::ChangeReasonEnum> &);
+typedef void (*OTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallback)(
+    void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum);
+typedef void (*NullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum> &);
 typedef void (*TimeFormatLocalizationClusterCalendarTypeEnumAttributeCallback)(
     void *, chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum);
 typedef void (*NullableTimeFormatLocalizationClusterCalendarTypeEnumAttributeCallback)(
@@ -1531,6 +1399,10 @@ typedef void (*ColorControlEventListListAttributeCallback)(void * context,
                                                            const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*ColorControlAttributeListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+typedef void (*BallastConfigurationBallastStatusAttributeCallback)(
+    void *, chip::BitMask<chip::app::Clusters::BallastConfiguration::BallastStatusBitmap>);
+typedef void (*BallastConfigurationLampAlarmModeAttributeCallback)(
+    void *, chip::BitMask<chip::app::Clusters::BallastConfiguration::LampAlarmModeBitmap>);
 typedef void (*BallastConfigurationGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*BallastConfigurationAcceptedCommandListListAttributeCallback)(
@@ -1866,18 +1738,6 @@ public:
         MTRCallbackBridge<DefaultSuccessCallback>(queue, handler, action, OnSuccessFn){};
 
     static void OnSuccessFn(void * context);
-};
-
-class MTRCommandSuccessCallbackBridge : public MTRCallbackBridge<CommandSuccessCallback>
-{
-public:
-    MTRCommandSuccessCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<CommandSuccessCallback>(queue, handler, OnSuccessFn){};
-
-    MTRCommandSuccessCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<CommandSuccessCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::NullObjectType &);
 };
 
 class MTROctetStringAttributeCallbackBridge : public MTRCallbackBridge<OctetStringAttributeCallback>
@@ -13653,6 +13513,72 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+class MTRBallastConfigurationBallastStatusAttributeCallbackBridge
+    : public MTRCallbackBridge<BallastConfigurationBallastStatusAttributeCallback>
+{
+public:
+    MTRBallastConfigurationBallastStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BallastConfigurationBallastStatusAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBallastConfigurationBallastStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                MTRActionBlock action) :
+        MTRCallbackBridge<BallastConfigurationBallastStatusAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::BallastConfiguration::BallastStatusBitmap> value);
+};
+
+class MTRBallastConfigurationBallastStatusAttributeCallbackSubscriptionBridge
+    : public MTRBallastConfigurationBallastStatusAttributeCallbackBridge
+{
+public:
+    MTRBallastConfigurationBallastStatusAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action,
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBallastConfigurationBallastStatusAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBallastConfigurationBallastStatusAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBallastConfigurationBallastStatusAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRBallastConfigurationLampAlarmModeAttributeCallbackBridge
+    : public MTRCallbackBridge<BallastConfigurationLampAlarmModeAttributeCallback>
+{
+public:
+    MTRBallastConfigurationLampAlarmModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<BallastConfigurationLampAlarmModeAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRBallastConfigurationLampAlarmModeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                MTRActionBlock action) :
+        MTRCallbackBridge<BallastConfigurationLampAlarmModeAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::BallastConfiguration::LampAlarmModeBitmap> value);
+};
+
+class MTRBallastConfigurationLampAlarmModeAttributeCallbackSubscriptionBridge
+    : public MTRBallastConfigurationLampAlarmModeAttributeCallbackBridge
+{
+public:
+    MTRBallastConfigurationLampAlarmModeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            MTRActionBlock action,
+                                                                            MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRBallastConfigurationLampAlarmModeAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRBallastConfigurationLampAlarmModeAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRBallastConfigurationLampAlarmModeAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
 class MTRBallastConfigurationGeneratedCommandListListAttributeCallbackBridge
     : public MTRCallbackBridge<BallastConfigurationGeneratedCommandListListAttributeCallback>
 {
@@ -18931,948 +18857,6 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRGroupsClusterAddGroupResponseCallbackBridge : public MTRCallbackBridge<GroupsClusterAddGroupResponseCallbackType>
-{
-public:
-    MTRGroupsClusterAddGroupResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<GroupsClusterAddGroupResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRGroupsClusterAddGroupResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<GroupsClusterAddGroupResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType & data);
-};
-
-class MTRGroupsClusterViewGroupResponseCallbackBridge : public MTRCallbackBridge<GroupsClusterViewGroupResponseCallbackType>
-{
-public:
-    MTRGroupsClusterViewGroupResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<GroupsClusterViewGroupResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRGroupsClusterViewGroupResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<GroupsClusterViewGroupResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType & data);
-};
-
-class MTRGroupsClusterGetGroupMembershipResponseCallbackBridge
-    : public MTRCallbackBridge<GroupsClusterGetGroupMembershipResponseCallbackType>
-{
-public:
-    MTRGroupsClusterGetGroupMembershipResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<GroupsClusterGetGroupMembershipResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRGroupsClusterGetGroupMembershipResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             MTRActionBlock action) :
-        MTRCallbackBridge<GroupsClusterGetGroupMembershipResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType & data);
-};
-
-class MTRGroupsClusterRemoveGroupResponseCallbackBridge : public MTRCallbackBridge<GroupsClusterRemoveGroupResponseCallbackType>
-{
-public:
-    MTRGroupsClusterRemoveGroupResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<GroupsClusterRemoveGroupResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRGroupsClusterRemoveGroupResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<GroupsClusterRemoveGroupResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType & data);
-};
-
-class MTRScenesClusterAddSceneResponseCallbackBridge : public MTRCallbackBridge<ScenesClusterAddSceneResponseCallbackType>
-{
-public:
-    MTRScenesClusterAddSceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<ScenesClusterAddSceneResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRScenesClusterAddSceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<ScenesClusterAddSceneResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType & data);
-};
-
-class MTRScenesClusterViewSceneResponseCallbackBridge : public MTRCallbackBridge<ScenesClusterViewSceneResponseCallbackType>
-{
-public:
-    MTRScenesClusterViewSceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<ScenesClusterViewSceneResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRScenesClusterViewSceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<ScenesClusterViewSceneResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType & data);
-};
-
-class MTRScenesClusterRemoveSceneResponseCallbackBridge : public MTRCallbackBridge<ScenesClusterRemoveSceneResponseCallbackType>
-{
-public:
-    MTRScenesClusterRemoveSceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<ScenesClusterRemoveSceneResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRScenesClusterRemoveSceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<ScenesClusterRemoveSceneResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType & data);
-};
-
-class MTRScenesClusterRemoveAllScenesResponseCallbackBridge
-    : public MTRCallbackBridge<ScenesClusterRemoveAllScenesResponseCallbackType>
-{
-public:
-    MTRScenesClusterRemoveAllScenesResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<ScenesClusterRemoveAllScenesResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRScenesClusterRemoveAllScenesResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<ScenesClusterRemoveAllScenesResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType & data);
-};
-
-class MTRScenesClusterStoreSceneResponseCallbackBridge : public MTRCallbackBridge<ScenesClusterStoreSceneResponseCallbackType>
-{
-public:
-    MTRScenesClusterStoreSceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<ScenesClusterStoreSceneResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRScenesClusterStoreSceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<ScenesClusterStoreSceneResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType & data);
-};
-
-class MTRScenesClusterGetSceneMembershipResponseCallbackBridge
-    : public MTRCallbackBridge<ScenesClusterGetSceneMembershipResponseCallbackType>
-{
-public:
-    MTRScenesClusterGetSceneMembershipResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<ScenesClusterGetSceneMembershipResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRScenesClusterGetSceneMembershipResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             MTRActionBlock action) :
-        MTRCallbackBridge<ScenesClusterGetSceneMembershipResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType & data);
-};
-
-class MTRScenesClusterEnhancedAddSceneResponseCallbackBridge
-    : public MTRCallbackBridge<ScenesClusterEnhancedAddSceneResponseCallbackType>
-{
-public:
-    MTRScenesClusterEnhancedAddSceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<ScenesClusterEnhancedAddSceneResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRScenesClusterEnhancedAddSceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<ScenesClusterEnhancedAddSceneResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType & data);
-};
-
-class MTRScenesClusterEnhancedViewSceneResponseCallbackBridge
-    : public MTRCallbackBridge<ScenesClusterEnhancedViewSceneResponseCallbackType>
-{
-public:
-    MTRScenesClusterEnhancedViewSceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<ScenesClusterEnhancedViewSceneResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRScenesClusterEnhancedViewSceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                            MTRActionBlock action) :
-        MTRCallbackBridge<ScenesClusterEnhancedViewSceneResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType & data);
-};
-
-class MTRScenesClusterCopySceneResponseCallbackBridge : public MTRCallbackBridge<ScenesClusterCopySceneResponseCallbackType>
-{
-public:
-    MTRScenesClusterCopySceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<ScenesClusterCopySceneResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRScenesClusterCopySceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<ScenesClusterCopySceneResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::CopySceneResponse::DecodableType & data);
-};
-
-class MTROTASoftwareUpdateProviderClusterQueryImageResponseCallbackBridge
-    : public MTRCallbackBridge<OTASoftwareUpdateProviderClusterQueryImageResponseCallbackType>
-{
-public:
-    MTROTASoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<OTASoftwareUpdateProviderClusterQueryImageResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTROTASoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        MTRActionBlock action) :
-        MTRCallbackBridge<OTASoftwareUpdateProviderClusterQueryImageResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & data);
-};
-
-class MTROTASoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge
-    : public MTRCallbackBridge<OTASoftwareUpdateProviderClusterApplyUpdateResponseCallbackType>
-{
-public:
-    MTROTASoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<OTASoftwareUpdateProviderClusterApplyUpdateResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTROTASoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                         MTRActionBlock action) :
-        MTRCallbackBridge<OTASoftwareUpdateProviderClusterApplyUpdateResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType & data);
-};
-
-class MTRGeneralCommissioningClusterArmFailSafeResponseCallbackBridge
-    : public MTRCallbackBridge<GeneralCommissioningClusterArmFailSafeResponseCallbackType>
-{
-public:
-    MTRGeneralCommissioningClusterArmFailSafeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<GeneralCommissioningClusterArmFailSafeResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRGeneralCommissioningClusterArmFailSafeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    MTRActionBlock action) :
-        MTRCallbackBridge<GeneralCommissioningClusterArmFailSafeResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
-};
-
-class MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge
-    : public MTRCallbackBridge<GeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType>
-{
-public:
-    MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<GeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                            MTRActionBlock action) :
-        MTRCallbackBridge<GeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType>(queue, handler, action,
-                                                                                              OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data);
-};
-
-class MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge
-    : public MTRCallbackBridge<GeneralCommissioningClusterCommissioningCompleteResponseCallbackType>
-{
-public:
-    MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<GeneralCommissioningClusterCommissioningCompleteResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              MTRActionBlock action) :
-        MTRCallbackBridge<GeneralCommissioningClusterCommissioningCompleteResponseCallbackType>(queue, handler, action,
-                                                                                                OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);
-};
-
-class MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge
-    : public MTRCallbackBridge<NetworkCommissioningClusterScanNetworksResponseCallbackType>
-{
-public:
-    MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NetworkCommissioningClusterScanNetworksResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     MTRActionBlock action) :
-        MTRCallbackBridge<NetworkCommissioningClusterScanNetworksResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & data);
-};
-
-class MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge
-    : public MTRCallbackBridge<NetworkCommissioningClusterNetworkConfigResponseCallbackType>
-{
-public:
-    MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NetworkCommissioningClusterNetworkConfigResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      MTRActionBlock action) :
-        MTRCallbackBridge<NetworkCommissioningClusterNetworkConfigResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data);
-};
-
-class MTRNetworkCommissioningClusterConnectNetworkResponseCallbackBridge
-    : public MTRCallbackBridge<NetworkCommissioningClusterConnectNetworkResponseCallbackType>
-{
-public:
-    MTRNetworkCommissioningClusterConnectNetworkResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<NetworkCommissioningClusterConnectNetworkResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRNetworkCommissioningClusterConnectNetworkResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       MTRActionBlock action) :
-        MTRCallbackBridge<NetworkCommissioningClusterConnectNetworkResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data);
-};
-
-class MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge
-    : public MTRCallbackBridge<DiagnosticLogsClusterRetrieveLogsResponseCallbackType>
-{
-public:
-    MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DiagnosticLogsClusterRetrieveLogsResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               MTRActionBlock action) :
-        MTRCallbackBridge<DiagnosticLogsClusterRetrieveLogsResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & data);
-};
-
-class MTR_PROVISIONALLY_AVAILABLE MTRTimeSynchronizationClusterSetTimeZoneResponseCallbackBridge
-    : public MTRCallbackBridge<TimeSynchronizationClusterSetTimeZoneResponseCallbackType>
-{
-public:
-    MTRTimeSynchronizationClusterSetTimeZoneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TimeSynchronizationClusterSetTimeZoneResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRTimeSynchronizationClusterSetTimeZoneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                   MTRActionBlock action) :
-        MTRCallbackBridge<TimeSynchronizationClusterSetTimeZoneResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::TimeSynchronization::Commands::SetTimeZoneResponse::DecodableType & data);
-};
-
-class MTROperationalCredentialsClusterAttestationResponseCallbackBridge
-    : public MTRCallbackBridge<OperationalCredentialsClusterAttestationResponseCallbackType>
-{
-public:
-    MTROperationalCredentialsClusterAttestationResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<OperationalCredentialsClusterAttestationResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTROperationalCredentialsClusterAttestationResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      MTRActionBlock action) :
-        MTRCallbackBridge<OperationalCredentialsClusterAttestationResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType & data);
-};
-
-class MTROperationalCredentialsClusterCertificateChainResponseCallbackBridge
-    : public MTRCallbackBridge<OperationalCredentialsClusterCertificateChainResponseCallbackType>
-{
-public:
-    MTROperationalCredentialsClusterCertificateChainResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<OperationalCredentialsClusterCertificateChainResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTROperationalCredentialsClusterCertificateChainResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           MTRActionBlock action) :
-        MTRCallbackBridge<OperationalCredentialsClusterCertificateChainResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & data);
-};
-
-class MTROperationalCredentialsClusterCSRResponseCallbackBridge
-    : public MTRCallbackBridge<OperationalCredentialsClusterCSRResponseCallbackType>
-{
-public:
-    MTROperationalCredentialsClusterCSRResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<OperationalCredentialsClusterCSRResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTROperationalCredentialsClusterCSRResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              MTRActionBlock action) :
-        MTRCallbackBridge<OperationalCredentialsClusterCSRResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType & data);
-};
-
-class MTROperationalCredentialsClusterNOCResponseCallbackBridge
-    : public MTRCallbackBridge<OperationalCredentialsClusterNOCResponseCallbackType>
-{
-public:
-    MTROperationalCredentialsClusterNOCResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<OperationalCredentialsClusterNOCResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTROperationalCredentialsClusterNOCResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                              MTRActionBlock action) :
-        MTRCallbackBridge<OperationalCredentialsClusterNOCResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & data);
-};
-
-class MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge
-    : public MTRCallbackBridge<GroupKeyManagementClusterKeySetReadResponseCallbackType>
-{
-public:
-    MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<GroupKeyManagementClusterKeySetReadResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 MTRActionBlock action) :
-        MTRCallbackBridge<GroupKeyManagementClusterKeySetReadResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType & data);
-};
-
-class MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge
-    : public MTRCallbackBridge<GroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>
-{
-public:
-    MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<GroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           MTRActionBlock action) :
-        MTRCallbackBridge<GroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & data);
-};
-
-class MTR_PROVISIONALLY_AVAILABLE MTRICDManagementClusterRegisterClientResponseCallbackBridge
-    : public MTRCallbackBridge<ICDManagementClusterRegisterClientResponseCallbackType>
-{
-public:
-    MTRICDManagementClusterRegisterClientResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<ICDManagementClusterRegisterClientResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRICDManagementClusterRegisterClientResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                MTRActionBlock action) :
-        MTRCallbackBridge<ICDManagementClusterRegisterClientResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data);
-};
-
-class MTR_PROVISIONALLY_AVAILABLE MTRLaundryWasherModeClusterChangeToModeResponseCallbackBridge
-    : public MTRCallbackBridge<LaundryWasherModeClusterChangeToModeResponseCallbackType>
-{
-public:
-    MTRLaundryWasherModeClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<LaundryWasherModeClusterChangeToModeResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRLaundryWasherModeClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  MTRActionBlock action) :
-        MTRCallbackBridge<LaundryWasherModeClusterChangeToModeResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::DecodableType & data);
-};
-
-class MTR_PROVISIONALLY_AVAILABLE MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseCallbackBridge
-    : public MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseCallbackType>
-{
-public:
-    MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue,
-                                                                                                ResponseHandler handler) :
-        MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseCallbackType>(queue, handler,
-                                                                                                                  OnSuccessFn){};
-
-    MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue,
-                                                                                                ResponseHandler handler,
-                                                                                                MTRActionBlock action) :
-        MTRCallbackBridge<RefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseCallbackType>(
-            queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeResponse::DecodableType &
-            data);
-};
-
-class MTR_PROVISIONALLY_AVAILABLE MTRRVCRunModeClusterChangeToModeResponseCallbackBridge
-    : public MTRCallbackBridge<RVCRunModeClusterChangeToModeResponseCallbackType>
-{
-public:
-    MTRRVCRunModeClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<RVCRunModeClusterChangeToModeResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRRVCRunModeClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<RVCRunModeClusterChangeToModeResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::RvcRunMode::Commands::ChangeToModeResponse::DecodableType & data);
-};
-
-class MTR_PROVISIONALLY_AVAILABLE MTRRVCCleanModeClusterChangeToModeResponseCallbackBridge
-    : public MTRCallbackBridge<RVCCleanModeClusterChangeToModeResponseCallbackType>
-{
-public:
-    MTRRVCCleanModeClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<RVCCleanModeClusterChangeToModeResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRRVCCleanModeClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                             MTRActionBlock action) :
-        MTRCallbackBridge<RVCCleanModeClusterChangeToModeResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeResponse::DecodableType & data);
-};
-
-class MTR_PROVISIONALLY_AVAILABLE MTRDishwasherModeClusterChangeToModeResponseCallbackBridge
-    : public MTRCallbackBridge<DishwasherModeClusterChangeToModeResponseCallbackType>
-{
-public:
-    MTRDishwasherModeClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DishwasherModeClusterChangeToModeResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRDishwasherModeClusterChangeToModeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               MTRActionBlock action) :
-        MTRCallbackBridge<DishwasherModeClusterChangeToModeResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DishwasherMode::Commands::ChangeToModeResponse::DecodableType & data);
-};
-
-class MTR_PROVISIONALLY_AVAILABLE MTROperationalStateClusterOperationalCommandResponseCallbackBridge
-    : public MTRCallbackBridge<OperationalStateClusterOperationalCommandResponseCallbackType>
-{
-public:
-    MTROperationalStateClusterOperationalCommandResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<OperationalStateClusterOperationalCommandResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTROperationalStateClusterOperationalCommandResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       MTRActionBlock action) :
-        MTRCallbackBridge<OperationalStateClusterOperationalCommandResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType & data);
-};
-
-class MTR_PROVISIONALLY_AVAILABLE MTRRVCOperationalStateClusterOperationalCommandResponseCallbackBridge
-    : public MTRCallbackBridge<RVCOperationalStateClusterOperationalCommandResponseCallbackType>
-{
-public:
-    MTRRVCOperationalStateClusterOperationalCommandResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<RVCOperationalStateClusterOperationalCommandResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRRVCOperationalStateClusterOperationalCommandResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          MTRActionBlock action) :
-        MTRCallbackBridge<RVCOperationalStateClusterOperationalCommandResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType & data);
-};
-
-class MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterGetWeekDayScheduleResponseCallbackType>
-{
-public:
-    MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DoorLockClusterGetWeekDayScheduleResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               MTRActionBlock action) :
-        MTRCallbackBridge<DoorLockClusterGetWeekDayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data);
-};
-
-class MTRDoorLockClusterGetYearDayScheduleResponseCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterGetYearDayScheduleResponseCallbackType>
-{
-public:
-    MTRDoorLockClusterGetYearDayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DoorLockClusterGetYearDayScheduleResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRDoorLockClusterGetYearDayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               MTRActionBlock action) :
-        MTRCallbackBridge<DoorLockClusterGetYearDayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data);
-};
-
-class MTRDoorLockClusterGetHolidayScheduleResponseCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterGetHolidayScheduleResponseCallbackType>
-{
-public:
-    MTRDoorLockClusterGetHolidayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DoorLockClusterGetHolidayScheduleResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRDoorLockClusterGetHolidayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               MTRActionBlock action) :
-        MTRCallbackBridge<DoorLockClusterGetHolidayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data);
-};
-
-class MTRDoorLockClusterGetUserResponseCallbackBridge : public MTRCallbackBridge<DoorLockClusterGetUserResponseCallbackType>
-{
-public:
-    MTRDoorLockClusterGetUserResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DoorLockClusterGetUserResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRDoorLockClusterGetUserResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<DoorLockClusterGetUserResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType & data);
-};
-
-class MTRDoorLockClusterSetCredentialResponseCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterSetCredentialResponseCallbackType>
-{
-public:
-    MTRDoorLockClusterSetCredentialResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DoorLockClusterSetCredentialResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRDoorLockClusterSetCredentialResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<DoorLockClusterSetCredentialResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType & data);
-};
-
-class MTRDoorLockClusterGetCredentialStatusResponseCallbackBridge
-    : public MTRCallbackBridge<DoorLockClusterGetCredentialStatusResponseCallbackType>
-{
-public:
-    MTRDoorLockClusterGetCredentialStatusResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<DoorLockClusterGetCredentialStatusResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRDoorLockClusterGetCredentialStatusResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                MTRActionBlock action) :
-        MTRCallbackBridge<DoorLockClusterGetCredentialStatusResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType & data);
-};
-
-class MTRThermostatClusterGetWeeklyScheduleResponseCallbackBridge
-    : public MTRCallbackBridge<ThermostatClusterGetWeeklyScheduleResponseCallbackType>
-{
-public:
-    MTRThermostatClusterGetWeeklyScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<ThermostatClusterGetWeeklyScheduleResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRThermostatClusterGetWeeklyScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                MTRActionBlock action) :
-        MTRCallbackBridge<ThermostatClusterGetWeeklyScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & data);
-};
-
-class MTRChannelClusterChangeChannelResponseCallbackBridge
-    : public MTRCallbackBridge<ChannelClusterChangeChannelResponseCallbackType>
-{
-public:
-    MTRChannelClusterChangeChannelResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<ChannelClusterChangeChannelResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRChannelClusterChangeChannelResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<ChannelClusterChangeChannelResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType & data);
-};
-
-class MTRTargetNavigatorClusterNavigateTargetResponseCallbackBridge
-    : public MTRCallbackBridge<TargetNavigatorClusterNavigateTargetResponseCallbackType>
-{
-public:
-    MTRTargetNavigatorClusterNavigateTargetResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<TargetNavigatorClusterNavigateTargetResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRTargetNavigatorClusterNavigateTargetResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  MTRActionBlock action) :
-        MTRCallbackBridge<TargetNavigatorClusterNavigateTargetResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType & data);
-};
-
-class MTRMediaPlaybackClusterPlaybackResponseCallbackBridge
-    : public MTRCallbackBridge<MediaPlaybackClusterPlaybackResponseCallbackType>
-{
-public:
-    MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<MediaPlaybackClusterPlaybackResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRMediaPlaybackClusterPlaybackResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<MediaPlaybackClusterPlaybackResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType & data);
-};
-
-class MTRKeypadInputClusterSendKeyResponseCallbackBridge : public MTRCallbackBridge<KeypadInputClusterSendKeyResponseCallbackType>
-{
-public:
-    MTRKeypadInputClusterSendKeyResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<KeypadInputClusterSendKeyResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRKeypadInputClusterSendKeyResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<KeypadInputClusterSendKeyResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType & data);
-};
-
-class MTRContentLauncherClusterLauncherResponseCallbackBridge
-    : public MTRCallbackBridge<ContentLauncherClusterLauncherResponseCallbackType>
-{
-public:
-    MTRContentLauncherClusterLauncherResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<ContentLauncherClusterLauncherResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRContentLauncherClusterLauncherResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                            MTRActionBlock action) :
-        MTRCallbackBridge<ContentLauncherClusterLauncherResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType & data);
-};
-
-class MTRApplicationLauncherClusterLauncherResponseCallbackBridge
-    : public MTRCallbackBridge<ApplicationLauncherClusterLauncherResponseCallbackType>
-{
-public:
-    MTRApplicationLauncherClusterLauncherResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<ApplicationLauncherClusterLauncherResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRApplicationLauncherClusterLauncherResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                MTRActionBlock action) :
-        MTRCallbackBridge<ApplicationLauncherClusterLauncherResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType & data);
-};
-
-class MTRAccountLoginClusterGetSetupPINResponseCallbackBridge
-    : public MTRCallbackBridge<AccountLoginClusterGetSetupPINResponseCallbackType>
-{
-public:
-    MTRAccountLoginClusterGetSetupPINResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<AccountLoginClusterGetSetupPINResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRAccountLoginClusterGetSetupPINResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                            MTRActionBlock action) :
-        MTRCallbackBridge<AccountLoginClusterGetSetupPINResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & data);
-};
-
-class MTRUnitTestingClusterTestSpecificResponseCallbackBridge
-    : public MTRCallbackBridge<UnitTestingClusterTestSpecificResponseCallbackType>
-{
-public:
-    MTRUnitTestingClusterTestSpecificResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<UnitTestingClusterTestSpecificResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRUnitTestingClusterTestSpecificResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                            MTRActionBlock action) :
-        MTRCallbackBridge<UnitTestingClusterTestSpecificResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::UnitTesting::Commands::TestSpecificResponse::DecodableType & data);
-};
-
-class MTRUnitTestingClusterTestAddArgumentsResponseCallbackBridge
-    : public MTRCallbackBridge<UnitTestingClusterTestAddArgumentsResponseCallbackType>
-{
-public:
-    MTRUnitTestingClusterTestAddArgumentsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<UnitTestingClusterTestAddArgumentsResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRUnitTestingClusterTestAddArgumentsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                MTRActionBlock action) :
-        MTRCallbackBridge<UnitTestingClusterTestAddArgumentsResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::UnitTesting::Commands::TestAddArgumentsResponse::DecodableType & data);
-};
-
-class MTRUnitTestingClusterTestSimpleArgumentResponseCallbackBridge
-    : public MTRCallbackBridge<UnitTestingClusterTestSimpleArgumentResponseCallbackType>
-{
-public:
-    MTRUnitTestingClusterTestSimpleArgumentResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<UnitTestingClusterTestSimpleArgumentResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRUnitTestingClusterTestSimpleArgumentResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  MTRActionBlock action) :
-        MTRCallbackBridge<UnitTestingClusterTestSimpleArgumentResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::UnitTesting::Commands::TestSimpleArgumentResponse::DecodableType & data);
-};
-
-class MTRUnitTestingClusterTestStructArrayArgumentResponseCallbackBridge
-    : public MTRCallbackBridge<UnitTestingClusterTestStructArrayArgumentResponseCallbackType>
-{
-public:
-    MTRUnitTestingClusterTestStructArrayArgumentResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<UnitTestingClusterTestStructArrayArgumentResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRUnitTestingClusterTestStructArrayArgumentResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       MTRActionBlock action) :
-        MTRCallbackBridge<UnitTestingClusterTestStructArrayArgumentResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType & data);
-};
-
-class MTRUnitTestingClusterTestListInt8UReverseResponseCallbackBridge
-    : public MTRCallbackBridge<UnitTestingClusterTestListInt8UReverseResponseCallbackType>
-{
-public:
-    MTRUnitTestingClusterTestListInt8UReverseResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<UnitTestingClusterTestListInt8UReverseResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRUnitTestingClusterTestListInt8UReverseResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    MTRActionBlock action) :
-        MTRCallbackBridge<UnitTestingClusterTestListInt8UReverseResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::UnitTesting::Commands::TestListInt8UReverseResponse::DecodableType & data);
-};
-
-class MTRUnitTestingClusterTestEnumsResponseCallbackBridge
-    : public MTRCallbackBridge<UnitTestingClusterTestEnumsResponseCallbackType>
-{
-public:
-    MTRUnitTestingClusterTestEnumsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<UnitTestingClusterTestEnumsResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRUnitTestingClusterTestEnumsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<UnitTestingClusterTestEnumsResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::UnitTesting::Commands::TestEnumsResponse::DecodableType & data);
-};
-
-class MTRUnitTestingClusterTestNullableOptionalResponseCallbackBridge
-    : public MTRCallbackBridge<UnitTestingClusterTestNullableOptionalResponseCallbackType>
-{
-public:
-    MTRUnitTestingClusterTestNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<UnitTestingClusterTestNullableOptionalResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRUnitTestingClusterTestNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    MTRActionBlock action) :
-        MTRCallbackBridge<UnitTestingClusterTestNullableOptionalResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::UnitTesting::Commands::TestNullableOptionalResponse::DecodableType & data);
-};
-
-class MTRUnitTestingClusterTestComplexNullableOptionalResponseCallbackBridge
-    : public MTRCallbackBridge<UnitTestingClusterTestComplexNullableOptionalResponseCallbackType>
-{
-public:
-    MTRUnitTestingClusterTestComplexNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<UnitTestingClusterTestComplexNullableOptionalResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRUnitTestingClusterTestComplexNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           MTRActionBlock action) :
-        MTRCallbackBridge<UnitTestingClusterTestComplexNullableOptionalResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::UnitTesting::Commands::TestComplexNullableOptionalResponse::DecodableType & data);
-};
-
-class MTRUnitTestingClusterBooleanResponseCallbackBridge : public MTRCallbackBridge<UnitTestingClusterBooleanResponseCallbackType>
-{
-public:
-    MTRUnitTestingClusterBooleanResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<UnitTestingClusterBooleanResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRUnitTestingClusterBooleanResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<UnitTestingClusterBooleanResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::UnitTesting::Commands::BooleanResponse::DecodableType & data);
-};
-
-class MTRUnitTestingClusterSimpleStructResponseCallbackBridge
-    : public MTRCallbackBridge<UnitTestingClusterSimpleStructResponseCallbackType>
-{
-public:
-    MTRUnitTestingClusterSimpleStructResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<UnitTestingClusterSimpleStructResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRUnitTestingClusterSimpleStructResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                            MTRActionBlock action) :
-        MTRCallbackBridge<UnitTestingClusterSimpleStructResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::UnitTesting::Commands::SimpleStructResponse::DecodableType & data);
-};
-
-class MTRUnitTestingClusterTestEmitTestEventResponseCallbackBridge
-    : public MTRCallbackBridge<UnitTestingClusterTestEmitTestEventResponseCallbackType>
-{
-public:
-    MTRUnitTestingClusterTestEmitTestEventResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<UnitTestingClusterTestEmitTestEventResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRUnitTestingClusterTestEmitTestEventResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                 MTRActionBlock action) :
-        MTRCallbackBridge<UnitTestingClusterTestEmitTestEventResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventResponse::DecodableType & data);
-};
-
-class MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackBridge
-    : public MTRCallbackBridge<UnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackType>
-{
-public:
-    MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<UnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             MTRActionBlock action) :
-        MTRCallbackBridge<UnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackType>(queue, handler, action,
-                                                                                               OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & data);
-};
-
-class MTR_PROVISIONALLY_AVAILABLE MTRSampleMEIClusterAddArgumentsResponseCallbackBridge
-    : public MTRCallbackBridge<SampleMEIClusterAddArgumentsResponseCallbackType>
-{
-public:
-    MTRSampleMEIClusterAddArgumentsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<SampleMEIClusterAddArgumentsResponseCallbackType>(queue, handler, OnSuccessFn){};
-
-    MTRSampleMEIClusterAddArgumentsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action) :
-        MTRCallbackBridge<SampleMEIClusterAddArgumentsResponseCallbackType>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType & data);
-};
-
 class MTRIdentifyClusterEffectIdentifierEnumAttributeCallbackBridge
     : public MTRCallbackBridge<IdentifyClusterEffectIdentifierEnumAttributeCallback>
 {
@@ -21087,441 +20071,437 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge
-    : public MTRCallbackBridge<OTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback>
+class MTROTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<OTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallback>
 {
 public:
-    MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                   ResponseHandler handler) :
-        MTRCallbackBridge<OTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTROTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<OTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                   MTRActionBlock action) :
-        MTRCallbackBridge<OTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback>(queue, handler, action,
-                                                                                                 OnSuccessFn){};
+    MTROTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<OTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallback>(queue, handler, action,
+                                                                                                  OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::ApplyUpdateActionEnum value);
 };
 
-class MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge
-    : public MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge
+class MTROTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackSubscriptionBridge
+    : public MTROTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge
 {
 public:
-    MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge(
+    MTROTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge(queue, handler, action),
+        MTROTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnDone;
+    using MTROTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback>
+class MTRNullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallback>
 {
 public:
-    MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                           ResponseHandler handler) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback>(queue, handler,
-                                                                                                         OnSuccessFn){};
+    MTRNullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                            ResponseHandler handler) :
+        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallback>(queue, handler,
+                                                                                                          OnSuccessFn){};
 
-    MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                           ResponseHandler handler,
-                                                                                           MTRActionBlock action) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback>(queue, handler, action,
-                                                                                                         OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction> & value);
-};
-
-class MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge
-    : public MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge
-{
-public:
-    MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge
-    : public MTRCallbackBridge<OTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback>
-{
-public:
-    MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<OTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                  MTRActionBlock action) :
-        MTRCallbackBridge<OTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback>(queue, handler, action,
-                                                                                                OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol value);
-};
-
-class MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge
-    : public MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge
-{
-public:
-    MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback>
-{
-public:
-    MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                          ResponseHandler handler) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback>(queue, handler,
-                                                                                                        OnSuccessFn){};
-
-    MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                          ResponseHandler handler,
-                                                                                          MTRActionBlock action) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback>(queue, handler, action,
-                                                                                                        OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol> & value);
-};
-
-class MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge
-    : public MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge
-{
-public:
-    MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<OTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback>
-{
-public:
-    MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<OTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             MTRActionBlock action) :
-        MTRCallbackBridge<OTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus value);
-};
-
-class MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge
-    : public MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge
-{
-public:
-    MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback>
-{
-public:
-    MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                     ResponseHandler handler) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                     ResponseHandler handler,
-                                                                                     MTRActionBlock action) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback>(queue, handler, action,
-                                                                                                   OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus> & value);
-};
-
-class MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge
-    : public MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge
-{
-public:
-    MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge
-    : public MTRCallbackBridge<OTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback>
-{
-public:
-    MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                     ResponseHandler handler) :
-        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                     ResponseHandler handler,
-                                                                                     MTRActionBlock action) :
-        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback>(queue, handler, action,
-                                                                                                   OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason value);
-};
-
-class MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge
-    : public MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge
-{
-public:
-    MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback>
-{
-public:
-    MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                             ResponseHandler handler) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback>(queue, handler,
-                                                                                                           OnSuccessFn){};
-
-    MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                             ResponseHandler handler,
-                                                                                             MTRActionBlock action) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback>(queue, handler, action,
-                                                                                                           OnSuccessFn){};
+    MTRNullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                            ResponseHandler handler,
+                                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallback>(queue, handler, action,
+                                                                                                          OnSuccessFn){};
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason> & value);
+        const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::ApplyUpdateActionEnum> & value);
 };
 
-class MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge
-    : public MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge
+class MTRNullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge(
+    MTRNullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge(queue, handler, action),
+        MTRNullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnDone;
+    using MTRNullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<OTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback>
+class MTROTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<OTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallback>
 {
 public:
-    MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge(dispatch_queue_t queue,
+    MTROTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge(dispatch_queue_t queue,
                                                                                    ResponseHandler handler) :
-        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+        MTRCallbackBridge<OTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTROTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                                    MTRActionBlock action) :
-        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback>(queue, handler, action,
+        MTRCallbackBridge<OTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallback>(queue, handler, action,
                                                                                                  OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum value);
 };
 
-class MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge
-    : public MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge
+class MTROTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackSubscriptionBridge
+    : public MTROTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge
 {
 public:
-    MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge(
+    MTROTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge(queue, handler, action),
+        MTROTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnDone;
+    using MTROTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback>
+class MTRNullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallback>
 {
 public:
-    MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge(dispatch_queue_t queue,
+    MTRNullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge(dispatch_queue_t queue,
                                                                                            ResponseHandler handler) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback>(queue, handler,
+        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallback>(queue, handler,
                                                                                                          OnSuccessFn){};
 
-    MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge(dispatch_queue_t queue,
+    MTRNullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge(dispatch_queue_t queue,
                                                                                            ResponseHandler handler,
                                                                                            MTRActionBlock action) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback>(queue, handler, action,
+        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallback>(queue, handler, action,
                                                                                                          OnSuccessFn){};
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum> & value);
+                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum> & value);
 };
 
-class MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge
-    : public MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge
+class MTRNullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge(
+    MTRNullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge(queue, handler, action),
+        MTRNullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnDone;
+    using MTRNullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<OTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback>
+class MTROTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<OTASoftwareUpdateProviderClusterStatusEnumAttributeCallback>
 {
 public:
-    MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTROTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OTASoftwareUpdateProviderClusterStatusEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                  MTRActionBlock action) :
-        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback>(queue, handler, action,
-                                                                                                OnSuccessFn){};
+    MTROTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<OTASoftwareUpdateProviderClusterStatusEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::StatusEnum value);
 };
 
-class MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge
-    : public MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge
+class MTROTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackSubscriptionBridge
+    : public MTROTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge
 {
 public:
-    MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge(
+    MTROTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge(queue, handler, action),
+        MTROTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnDone;
+    using MTROTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback>
+class MTRNullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallback>
 {
 public:
-    MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                          ResponseHandler handler) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback>(queue, handler,
-                                                                                                        OnSuccessFn){};
+    MTRNullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                          ResponseHandler handler,
-                                                                                          MTRActionBlock action) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback>(queue, handler, action,
-                                                                                                        OnSuccessFn){};
+    MTRNullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallback>(queue, handler, action,
+                                                                                               OnSuccessFn){};
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum> & value);
+                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::StatusEnum> & value);
 };
 
-class MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge
-    : public MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge
+class MTRNullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge(
+    MTRNullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge(queue, handler, action),
+        MTRNullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnDone;
+    using MTRNullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<OTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallback>
+{
+public:
+    MTROTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler) :
+        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler,
+                                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallback>(queue, handler, action,
+                                                                                                    OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::AnnouncementReasonEnum value);
+};
+
+class MTROTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackSubscriptionBridge
+    : public MTROTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge
+{
+public:
+    MTROTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallback>
+{
+public:
+    MTRNullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                              ResponseHandler handler) :
+        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallback>(queue, handler,
+                                                                                                            OnSuccessFn){};
+
+    MTRNullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                              ResponseHandler handler,
+                                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallback>(queue, handler, action,
+                                                                                                            OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::AnnouncementReasonEnum> & value);
+};
+
+class MTRNullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<OTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallback>
+{
+public:
+    MTROTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallback>(queue, handler, action,
+                                                                                              OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::ChangeReasonEnum value);
+};
+
+class MTROTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge
+    : public MTROTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge
+{
+public:
+    MTROTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallback>
+{
+public:
+    MTRNullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                        ResponseHandler handler) :
+        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallback>(queue, handler,
+                                                                                                      OnSuccessFn){};
+
+    MTRNullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                        ResponseHandler handler,
+                                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallback>(queue, handler, action,
+                                                                                                      OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::ChangeReasonEnum> & value);
+};
+
+class MTRNullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<OTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallback>
+{
+public:
+    MTROTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum value);
+};
+
+class MTROTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge
+    : public MTROTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge
+{
+public:
+    MTROTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallback>
+{
+public:
+    MTRNullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                       ResponseHandler handler) :
+        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                       ResponseHandler handler,
+                                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallback>(queue, handler, action,
+                                                                                                     OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum> & value);
+};
+
+class MTRNullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;

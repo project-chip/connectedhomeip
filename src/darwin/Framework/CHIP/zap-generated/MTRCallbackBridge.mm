@@ -29,11 +29,6 @@ void MTRDefaultSuccessCallbackBridge::OnSuccessFn(void * context)
     DispatchSuccess(context, nil);
 };
 
-void MTRCommandSuccessCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::NullObjectType &)
-{
-    DispatchSuccess(context, nil);
-};
-
 void MTROctetStringAttributeCallbackBridge::OnSuccessFn(void * context, chip::ByteSpan value)
 {
     NSData * _Nonnull objCValue;
@@ -8129,7 +8124,6 @@ void MTRICDManagementRegisteredClientsListAttributeCallbackBridge::OnSuccessFn(v
             newElement_0 = [MTRICDManagementClusterMonitoringRegistrationStruct new];
             newElement_0.checkInNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.checkInNodeID];
             newElement_0.monitoredSubject = [NSNumber numberWithUnsignedLongLong:entry_0.monitoredSubject];
-            newElement_0.key = AsData(entry_0.key);
             newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
             [array_0 addObject:newElement_0];
         }
@@ -13159,6 +13153,50 @@ void MTRColorControlAttributeListListAttributeCallbackBridge::OnSuccessFn(void *
 };
 
 void MTRColorControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRBallastConfigurationBallastStatusAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::BallastConfiguration::BallastStatusBitmap> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRBallastConfigurationBallastStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+{
+    if (!mQueue) {
+        return;
+    }
+
+    if (mEstablishedHandler != nil) {
+        dispatch_async(mQueue, mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        mEstablishedHandler = nil;
+    }
+}
+
+void MTRBallastConfigurationLampAlarmModeAttributeCallbackBridge::OnSuccessFn(void * context, chip::BitMask<chip::app::Clusters::BallastConfiguration::LampAlarmModeBitmap> value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:value.Raw()];
+    DispatchSuccess(context, objCValue);
+};
+
+void MTRBallastConfigurationLampAlarmModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -19211,774 +19249,6 @@ void MTRSampleMEIAttributeListListAttributeCallbackSubscriptionBridge::OnSubscri
     }
 }
 
-void MTRGroupsClusterAddGroupResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType & data)
-{
-    auto * response = [MTRGroupsClusterAddGroupResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRGroupsClusterViewGroupResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType & data)
-{
-    auto * response = [MTRGroupsClusterViewGroupResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRGroupsClusterGetGroupMembershipResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType & data)
-{
-    auto * response = [MTRGroupsClusterGetGroupMembershipResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRGroupsClusterRemoveGroupResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType & data)
-{
-    auto * response = [MTRGroupsClusterRemoveGroupResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRScenesClusterAddSceneResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType & data)
-{
-    auto * response = [MTRScenesClusterAddSceneResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRScenesClusterViewSceneResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType & data)
-{
-    auto * response = [MTRScenesClusterViewSceneResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRScenesClusterRemoveSceneResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType & data)
-{
-    auto * response = [MTRScenesClusterRemoveSceneResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRScenesClusterRemoveAllScenesResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType & data)
-{
-    auto * response = [MTRScenesClusterRemoveAllScenesResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRScenesClusterStoreSceneResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType & data)
-{
-    auto * response = [MTRScenesClusterStoreSceneResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRScenesClusterGetSceneMembershipResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType & data)
-{
-    auto * response = [MTRScenesClusterGetSceneMembershipResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRScenesClusterEnhancedAddSceneResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType & data)
-{
-    auto * response = [MTRScenesClusterEnhancedAddSceneResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRScenesClusterEnhancedViewSceneResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType & data)
-{
-    auto * response = [MTRScenesClusterEnhancedViewSceneResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRScenesClusterCopySceneResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::CopySceneResponse::DecodableType & data)
-{
-    auto * response = [MTRScenesClusterCopySceneResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTROTASoftwareUpdateProviderClusterQueryImageResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & data)
-{
-    auto * response = [MTROTASoftwareUpdateProviderClusterQueryImageResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTROTASoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType & data)
-{
-    auto * response = [MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRGeneralCommissioningClusterArmFailSafeResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data)
-{
-    auto * response = [MTRGeneralCommissioningClusterArmFailSafeResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data)
-{
-    auto * response = [MTRGeneralCommissioningClusterSetRegulatoryConfigResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data)
-{
-    auto * response = [MTRGeneralCommissioningClusterCommissioningCompleteResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & data)
-{
-    auto * response = [MTRNetworkCommissioningClusterScanNetworksResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRNetworkCommissioningClusterNetworkConfigResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data)
-{
-    auto * response = [MTRNetworkCommissioningClusterNetworkConfigResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRNetworkCommissioningClusterConnectNetworkResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data)
-{
-    auto * response = [MTRNetworkCommissioningClusterConnectNetworkResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & data)
-{
-    auto * response = [MTRDiagnosticLogsClusterRetrieveLogsResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRTimeSynchronizationClusterSetTimeZoneResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::TimeSynchronization::Commands::SetTimeZoneResponse::DecodableType & data)
-{
-    auto * response = [MTRTimeSynchronizationClusterSetTimeZoneResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTROperationalCredentialsClusterAttestationResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType & data)
-{
-    auto * response = [MTROperationalCredentialsClusterAttestationResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTROperationalCredentialsClusterCertificateChainResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & data)
-{
-    auto * response = [MTROperationalCredentialsClusterCertificateChainResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTROperationalCredentialsClusterCSRResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::OperationalCredentials::Commands::CSRResponse::DecodableType & data)
-{
-    auto * response = [MTROperationalCredentialsClusterCSRResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTROperationalCredentialsClusterNOCResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & data)
-{
-    auto * response = [MTROperationalCredentialsClusterNOCResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRGroupKeyManagementClusterKeySetReadResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType & data)
-{
-    auto * response = [MTRGroupKeyManagementClusterKeySetReadResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & data)
-{
-    auto * response = [MTRGroupKeyManagementClusterKeySetReadAllIndicesResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRICDManagementClusterRegisterClientResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::IcdManagement::Commands::RegisterClientResponse::DecodableType & data)
-{
-    auto * response = [MTRICDManagementClusterRegisterClientResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRLaundryWasherModeClusterChangeToModeResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::LaundryWasherMode::Commands::ChangeToModeResponse::DecodableType & data)
-{
-    auto * response = [MTRLaundryWasherModeClusterChangeToModeResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Commands::ChangeToModeResponse::DecodableType & data)
-{
-    auto * response = [MTRRefrigeratorAndTemperatureControlledCabinetModeClusterChangeToModeResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRRVCRunModeClusterChangeToModeResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::RvcRunMode::Commands::ChangeToModeResponse::DecodableType & data)
-{
-    auto * response = [MTRRVCRunModeClusterChangeToModeResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRRVCCleanModeClusterChangeToModeResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::RvcCleanMode::Commands::ChangeToModeResponse::DecodableType & data)
-{
-    auto * response = [MTRRVCCleanModeClusterChangeToModeResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRDishwasherModeClusterChangeToModeResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::DishwasherMode::Commands::ChangeToModeResponse::DecodableType & data)
-{
-    auto * response = [MTRDishwasherModeClusterChangeToModeResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTROperationalStateClusterOperationalCommandResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::OperationalState::Commands::OperationalCommandResponse::DecodableType & data)
-{
-    auto * response = [MTROperationalStateClusterOperationalCommandResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRRVCOperationalStateClusterOperationalCommandResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::RvcOperationalState::Commands::OperationalCommandResponse::DecodableType & data)
-{
-    auto * response = [MTRRVCOperationalStateClusterOperationalCommandResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRDoorLockClusterGetWeekDayScheduleResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data)
-{
-    auto * response = [MTRDoorLockClusterGetWeekDayScheduleResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRDoorLockClusterGetYearDayScheduleResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data)
-{
-    auto * response = [MTRDoorLockClusterGetYearDayScheduleResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRDoorLockClusterGetHolidayScheduleResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data)
-{
-    auto * response = [MTRDoorLockClusterGetHolidayScheduleResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRDoorLockClusterGetUserResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType & data)
-{
-    auto * response = [MTRDoorLockClusterGetUserResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRDoorLockClusterSetCredentialResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType & data)
-{
-    auto * response = [MTRDoorLockClusterSetCredentialResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRDoorLockClusterGetCredentialStatusResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType & data)
-{
-    auto * response = [MTRDoorLockClusterGetCredentialStatusResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRThermostatClusterGetWeeklyScheduleResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & data)
-{
-    auto * response = [MTRThermostatClusterGetWeeklyScheduleResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRChannelClusterChangeChannelResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType & data)
-{
-    auto * response = [MTRChannelClusterChangeChannelResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRTargetNavigatorClusterNavigateTargetResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType & data)
-{
-    auto * response = [MTRTargetNavigatorClusterNavigateTargetResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRMediaPlaybackClusterPlaybackResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType & data)
-{
-    auto * response = [MTRMediaPlaybackClusterPlaybackResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRKeypadInputClusterSendKeyResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType & data)
-{
-    auto * response = [MTRKeypadInputClusterSendKeyResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRContentLauncherClusterLauncherResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::DecodableType & data)
-{
-    auto * response = [MTRContentLauncherClusterLauncherResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRApplicationLauncherClusterLauncherResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType & data)
-{
-    auto * response = [MTRApplicationLauncherClusterLauncherResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRAccountLoginClusterGetSetupPINResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & data)
-{
-    auto * response = [MTRAccountLoginClusterGetSetupPINResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterTestSpecificResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::UnitTesting::Commands::TestSpecificResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterTestSpecificResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterTestAddArgumentsResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::UnitTesting::Commands::TestAddArgumentsResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterTestAddArgumentsResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterTestSimpleArgumentResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::UnitTesting::Commands::TestSimpleArgumentResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterTestSimpleArgumentResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterTestStructArrayArgumentResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::UnitTesting::Commands::TestStructArrayArgumentResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterTestStructArrayArgumentResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterTestListInt8UReverseResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::UnitTesting::Commands::TestListInt8UReverseResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterTestListInt8UReverseResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterTestEnumsResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::UnitTesting::Commands::TestEnumsResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterTestEnumsResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterTestNullableOptionalResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::UnitTesting::Commands::TestNullableOptionalResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterTestNullableOptionalResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterTestComplexNullableOptionalResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::UnitTesting::Commands::TestComplexNullableOptionalResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterTestComplexNullableOptionalResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterBooleanResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::UnitTesting::Commands::BooleanResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterBooleanResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterSimpleStructResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::UnitTesting::Commands::SimpleStructResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterSimpleStructResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterTestEmitTestEventResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::UnitTesting::Commands::TestEmitTestEventResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterTestEmitTestEventResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::UnitTesting::Commands::TestEmitTestFabricScopedEventResponse::DecodableType & data)
-{
-    auto * response = [MTRUnitTestingClusterTestEmitTestFabricScopedEventResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
-void MTRSampleMEIClusterAddArgumentsResponseCallbackBridge::OnSuccessFn(void * context, const chip::app::Clusters::SampleMei::Commands::AddArgumentsResponse::DecodableType & data)
-{
-    auto * response = [MTRSampleMEIClusterAddArgumentsResponseParams new];
-    CHIP_ERROR err = [response _setFieldsFromDecodableStruct:data];
-    if (err != CHIP_NO_ERROR) {
-        OnFailureFn(context, err);
-        return;
-    }
-    SetAttestationChallengeIfNeeded(context, response);
-    DispatchSuccess(context, response);
-};
-
 void MTRIdentifyClusterEffectIdentifierEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Identify::EffectIdentifierEnum value)
 {
     NSNumber * _Nonnull objCValue;
@@ -20843,14 +20113,14 @@ void MTRNullableBasicInformationClusterProductFinishEnumAttributeCallbackSubscri
     }
 }
 
-void MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction value)
+void MTROTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::ApplyUpdateActionEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTROTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -20865,7 +20135,7 @@ void MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSub
     }
 }
 
-void MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction> & value)
+void MTRNullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::ApplyUpdateActionEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20876,7 +20146,7 @@ void MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCal
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -20891,14 +20161,14 @@ void MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCal
     }
 }
 
-void MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol value)
+void MTROTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTROTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -20913,7 +20183,7 @@ void MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubs
     }
 }
 
-void MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol> & value)
+void MTRNullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20924,7 +20194,7 @@ void MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCall
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -20939,14 +20209,14 @@ void MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCall
     }
 }
 
-void MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus value)
+void MTROTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::StatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTROTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -20961,7 +20231,7 @@ void MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscript
     }
 }
 
-void MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus> & value)
+void MTRNullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::StatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -20972,7 +20242,7 @@ void MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackB
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -20987,14 +20257,14 @@ void MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackS
     }
 }
 
-void MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason value)
+void MTROTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::AnnouncementReasonEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTROTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -21009,7 +20279,7 @@ void MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackS
     }
 }
 
-void MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason> & value)
+void MTRNullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::AnnouncementReasonEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21020,7 +20290,7 @@ void MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeC
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -21035,14 +20305,14 @@ void MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeC
     }
 }
 
-void MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum value)
+void MTROTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::ChangeReasonEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTROTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -21057,7 +20327,7 @@ void MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSub
     }
 }
 
-void MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum> & value)
+void MTRNullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::ChangeReasonEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21068,7 +20338,7 @@ void MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCal
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -21083,14 +20353,14 @@ void MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCal
     }
 }
 
-void MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value)
+void MTROTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTROTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;
@@ -21105,7 +20375,7 @@ void MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubs
     }
 }
 
-void MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum> & value)
+void MTRNullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -21116,7 +20386,7 @@ void MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCall
     DispatchSuccess(context, objCValue);
 };
 
-void MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
+void MTRNullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished()
 {
     if (!mQueue) {
         return;

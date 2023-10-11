@@ -28,8 +28,9 @@
 
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPError.h>
-#include <lib/support/ErrorStr.h>
-#include <lib/support/logging/CHIPLogging.h>
+#include <lib/core/ErrorStr.h>
+#include <lib/support/VerificationMacrosNoLogging.h>
+#include <lib/support/logging/TextOnlyLogging.h>
 
 /**
  * Base-level abnormal termination.
@@ -547,7 +548,7 @@ inline void chipDie(void)
 #define VerifyOrDie(aCondition)                                                                                                    \
     nlABORT_ACTION(aCondition, ChipLogDetail(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition))
 #else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
-#define VerifyOrDie(aCondition) nlABORT(aCondition)
+#define VerifyOrDie(aCondition) VerifyOrDieWithoutLogging(aCondition)
 #endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 
 /**

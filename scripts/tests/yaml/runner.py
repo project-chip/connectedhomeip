@@ -344,7 +344,10 @@ def chip_repl(parser_group: ParserGroup, adapter: str, stop_on_error: bool, stop
     runner_hooks = TestRunnerLogger(show_adapter_logs, show_adapter_logs_on_error, use_test_harness_log_format)
     runner_config = TestRunnerConfig(adapter, parser_group.pseudo_clusters, runner_options, runner_hooks)
 
-    runner = __import__(runner, fromlist=[None]).Runner(repl_storage_path, commission_on_network_dut)
+    node_id_to_commission = None
+    if commission_on_network_dut:
+        node_id_to_commission = parser_group.builder_config.parser_config.config_override['nodeId']
+    runner = __import__(runner, fromlist=[None]).Runner(repl_storage_path, node_id_to_commission=node_id_to_commission)
     loop = asyncio.get_event_loop()
     return loop.run_until_complete(runner.run(parser_group.builder_config, runner_config))
 

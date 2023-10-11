@@ -119,10 +119,12 @@ private:
 
     // OnEventData and OnAttributeData must be implemented by subclasses.
     void OnEventData(const chip::app::EventHeader & aEventHeader, chip::TLV::TLVReader * apData,
-        const chip::app::StatusIB * apStatus) override = 0;
+        const chip::app::StatusIB * apStatus) override
+        = 0;
 
     void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::TLV::TLVReader * apData,
-        const chip::app::StatusIB & aStatus) override = 0;
+        const chip::app::StatusIB & aStatus) override
+        = 0;
 
     void OnError(CHIP_ERROR aError) override;
 

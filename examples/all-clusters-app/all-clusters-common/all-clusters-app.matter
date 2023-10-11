@@ -1,38 +1,6 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
-struct ModeTagStruct {
-    optional vendor_id mfgCode = 0;
-    enum16 value = 1;
-}
-
-struct ModeOptionStruct {
-    char_string<64> label = 0;
-    int8u mode = 1;
-    ModeTagStruct modeTags[] = 2;
-}
-
-struct ApplicationStruct {
-    int16u catalogVendorID = 0;
-    char_string applicationID = 1;
-}
-
-struct ErrorStateStruct {
-    enum8 errorStateID = 0;
-    optional char_string<64> errorStateLabel = 1;
-    optional char_string<64> errorStateDetails = 2;
-}
-
-struct LabelStruct {
-    char_string<16> label = 0;
-    char_string<16> value = 1;
-}
-
-struct OperationalStateStruct {
-    enum8 operationalStateID = 0;
-    optional char_string<64> operationalStateLabel = 1;
-}
-
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 server cluster Identify = 3 {
   enum EffectIdentifierEnum : ENUM8 {
@@ -223,6 +191,27 @@ server cluster Scenes = 5 {
     group_id groupID = 0;
   }
 
+  request struct EnhancedAddSceneRequest {
+    group_id groupID = 0;
+    INT8U sceneID = 1;
+    INT16U transitionTime = 2;
+    CHAR_STRING sceneName = 3;
+    ExtensionFieldSet extensionFieldSets[] = 4;
+  }
+
+  request struct EnhancedViewSceneRequest {
+    group_id groupID = 0;
+    INT8U sceneID = 1;
+  }
+
+  request struct CopySceneRequest {
+    ScenesCopyMode mode = 0;
+    group_id groupIdentifierFrom = 1;
+    INT8U sceneIdentifierFrom = 2;
+    group_id groupIdentifierTo = 3;
+    INT8U sceneIdentifierTo = 4;
+  }
+
   response struct AddSceneResponse = 0 {
     status status = 0;
     group_id groupID = 1;
@@ -262,6 +251,27 @@ server cluster Scenes = 5 {
     optional INT8U sceneList[] = 3;
   }
 
+  response struct EnhancedAddSceneResponse = 64 {
+    status status = 0;
+    group_id groupID = 1;
+    INT8U sceneID = 2;
+  }
+
+  response struct EnhancedViewSceneResponse = 65 {
+    status status = 0;
+    group_Id groupID = 1;
+    INT8U sceneID = 2;
+    optional INT16U transitionTime = 3;
+    optional CHAR_STRING sceneName = 4;
+    optional ExtensionFieldSet extensionFieldSets[] = 5;
+  }
+
+  response struct CopySceneResponse = 66 {
+    status status = 0;
+    group_Id groupIdentifierFrom = 1;
+    INT8U sceneIdentifierFrom = 2;
+  }
+
   fabric command access(invoke: manage) AddScene(AddSceneRequest): AddSceneResponse = 0;
   fabric command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
   fabric command access(invoke: manage) RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
@@ -269,6 +279,9 @@ server cluster Scenes = 5 {
   fabric command access(invoke: manage) StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
   fabric command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
   fabric command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
+  fabric command EnhancedAddScene(EnhancedAddSceneRequest): EnhancedAddSceneResponse = 64;
+  fabric command EnhancedViewScene(EnhancedViewSceneRequest): EnhancedViewSceneResponse = 65;
+  fabric command CopyScene(CopySceneRequest): CopySceneResponse = 66;
 }
 
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
@@ -836,20 +849,20 @@ server cluster BasicInformation = 40 {
 
 /** Provides an interface for providing OTA software updates */
 client cluster OtaSoftwareUpdateProvider = 41 {
-  enum OTAApplyUpdateAction : ENUM8 {
+  enum ApplyUpdateActionEnum : ENUM8 {
     kProceed = 0;
     kAwaitNextAction = 1;
     kDiscontinue = 2;
   }
 
-  enum OTADownloadProtocol : ENUM8 {
+  enum DownloadProtocolEnum : ENUM8 {
     kBDXSynchronous = 0;
     kBDXAsynchronous = 1;
     kHTTPS = 2;
     kVendorSpecific = 3;
   }
 
-  enum OTAQueryStatus : ENUM8 {
+  enum StatusEnum : ENUM8 {
     kUpdateAvailable = 0;
     kBusy = 1;
     kNotAvailable = 2;
@@ -867,7 +880,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     vendor_id vendorID = 0;
     INT16U productID = 1;
     INT32U softwareVersion = 2;
-    OTADownloadProtocol protocolsSupported[] = 3;
+    DownloadProtocolEnum protocolsSupported[] = 3;
     optional INT16U hardwareVersion = 4;
     optional CHAR_STRING<2> location = 5;
     optional BOOLEAN requestorCanConsent = 6;
@@ -875,7 +888,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
   }
 
   response struct QueryImageResponse = 1 {
-    OTAQueryStatus status = 0;
+    StatusEnum status = 0;
     optional INT32U delayedActionTime = 1;
     optional CHAR_STRING<256> imageURI = 2;
     optional INT32U softwareVersion = 3;
@@ -891,7 +904,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
   }
 
   response struct ApplyUpdateResponse = 3 {
-    OTAApplyUpdateAction action = 0;
+    ApplyUpdateActionEnum action = 0;
     INT32U delayedActionTime = 1;
   }
 
@@ -910,13 +923,13 @@ client cluster OtaSoftwareUpdateProvider = 41 {
 
 /** Provides an interface for downloading and applying OTA software updates */
 server cluster OtaSoftwareUpdateRequestor = 42 {
-  enum OTAAnnouncementReason : ENUM8 {
+  enum AnnouncementReasonEnum : ENUM8 {
     kSimpleAnnouncement = 0;
     kUpdateAvailable = 1;
     kUrgentUpdateAvailable = 2;
   }
 
-  enum OTAChangeReasonEnum : ENUM8 {
+  enum ChangeReasonEnum : ENUM8 {
     kUnknown = 0;
     kSuccess = 1;
     kFailure = 2;
@@ -924,7 +937,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
     kDelayByProvider = 4;
   }
 
-  enum OTAUpdateStateEnum : ENUM8 {
+  enum UpdateStateEnum : ENUM8 {
     kUnknown = 0;
     kIdle = 1;
     kQuerying = 2;
@@ -943,9 +956,9 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   }
 
   info event StateTransition = 0 {
-    OTAUpdateStateEnum previousState = 0;
-    OTAUpdateStateEnum newState = 1;
-    OTAChangeReasonEnum reason = 2;
+    UpdateStateEnum previousState = 0;
+    UpdateStateEnum newState = 1;
+    ChangeReasonEnum reason = 2;
     nullable INT32U targetSoftwareVersion = 3;
   }
 
@@ -963,7 +976,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
 
   attribute ProviderLocation defaultOTAProviders[] = 0;
   readonly attribute boolean updatePossible = 1;
-  readonly attribute OTAUpdateStateEnum updateState = 2;
+  readonly attribute UpdateStateEnum updateState = 2;
   readonly attribute nullable int8u updateStateProgress = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -975,7 +988,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   request struct AnnounceOTAProviderRequest {
     node_id providerNodeID = 0;
     vendor_id vendorID = 1;
-    OTAAnnouncementReason announcementReason = 2;
+    AnnouncementReasonEnum announcementReason = 2;
     optional OCTET_STRING<512> metadataForNode = 3;
     endpoint_no endpoint = 4;
   }
@@ -2440,7 +2453,6 @@ server cluster IcdManagement = 70 {
   fabric_scoped struct MonitoringRegistrationStruct {
     fabric_sensitive node_id checkInNodeID = 1;
     fabric_sensitive int64u monitoredSubject = 2;
-    fabric_sensitive octet_string<16> key = 3;
     fabric_idx fabricIndex = 254;
   }
 
@@ -4566,9 +4578,18 @@ server cluster ColorControl = 768 {
 
 /** Attributes and commands for configuring a lighting ballast. */
 server cluster BallastConfiguration = 769 {
+  bitmap BallastStatusBitmap : BITMAP8 {
+    kBallastNonOperational = 0x1;
+    kLampFailure = 0x2;
+  }
+
+  bitmap LampAlarmModeBitmap : BITMAP8 {
+    kLampBurnHours = 0x1;
+  }
+
   readonly attribute int8u physicalMinLevel = 0;
   readonly attribute int8u physicalMaxLevel = 1;
-  readonly attribute bitmap8 ballastStatus = 2;
+  readonly attribute BallastStatusBitmap ballastStatus = 2;
   attribute int8u minLevel = 16;
   attribute int8u maxLevel = 17;
   attribute nullable int8u intrinsicBallastFactor = 20;
@@ -4578,7 +4599,7 @@ server cluster BallastConfiguration = 769 {
   attribute char_string<16> lampManufacturer = 49;
   attribute nullable int24u lampRatedHours = 50;
   attribute nullable int24u lampBurnHours = 51;
-  attribute bitmap8 lampAlarmMode = 52;
+  attribute LampAlarmModeBitmap lampAlarmMode = 52;
   attribute nullable int24u lampBurnHoursTripPoint = 53;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -6344,7 +6365,7 @@ endpoint 0 {
     callback attribute currentHeapFree default = 0x0000000000000000;
     callback attribute currentHeapUsed default = 0x0000000000000000;
     callback attribute currentHeapHighWatermark default = 0x0000000000000000;
-    ram      attribute featureMap default = 1;
+    callback attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6512,8 +6533,8 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision default = 1;
   }
 
   server cluster FixedLabel {
@@ -6590,15 +6611,15 @@ endpoint 1 {
     ram      attribute currentScene default = 0x00;
     ram      attribute currentGroup default = 0x0000;
     ram      attribute sceneValid default = 0x00;
-    ram      attribute nameSupport;
+    ram      attribute nameSupport default = 0x80;
     ram      attribute lastConfiguredBy;
-    ram      attribute sceneTableSize;
-    callback attribute remainingCapacity;
+    ram      attribute sceneTableSize default = 16;
+    callback attribute remainingCapacity default = 8;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 5;
   }
 
@@ -6745,7 +6766,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6757,7 +6778,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6782,7 +6803,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6794,7 +6815,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6828,7 +6849,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6837,7 +6858,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6925,7 +6946,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 7;
+    callback attribute featureMap default = 7;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -6939,7 +6960,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 7;
+    callback attribute featureMap default = 7;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -7244,7 +7265,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7263,7 +7284,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7282,7 +7303,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7301,7 +7322,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7320,7 +7341,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7339,7 +7360,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7358,7 +7379,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7377,7 +7398,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7396,7 +7417,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7415,7 +7436,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     ram      attribute clusterRevision default = 3;
   }
 
@@ -7638,14 +7659,15 @@ endpoint 2 {
     ram      attribute currentScene default = 0x00;
     ram      attribute currentGroup default = 0x0000;
     ram      attribute sceneValid default = 0x00;
-    ram      attribute nameSupport;
-    ram      attribute sceneTableSize;
-    callback attribute remainingCapacity;
+    ram      attribute nameSupport default = 0x80;
+    ram      attribute lastConfiguredBy;
+    ram      attribute sceneTableSize default = 16;
+    callback attribute remainingCapacity default = 8;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 5;
   }
 
@@ -7659,7 +7681,7 @@ endpoint 2 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x0000;
+    ram      attribute featureMap default = 0x0001;
     ram      attribute clusterRevision default = 5;
   }
 
