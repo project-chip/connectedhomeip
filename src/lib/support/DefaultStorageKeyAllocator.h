@@ -185,7 +185,7 @@ public:
 
     // ICD Management
 
-    static StorageKeyName IcdManagementTableEntry(chip::FabricIndex fabric, uint16_t index)
+    static StorageKeyName ICDManagementTableEntry(chip::FabricIndex fabric, uint16_t index)
     {
         return StorageKeyName::Formatted("f/%x/icd/%x", fabric, index);
     }

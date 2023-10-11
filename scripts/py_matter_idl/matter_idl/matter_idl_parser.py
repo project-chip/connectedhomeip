@@ -18,11 +18,11 @@ except ModuleNotFoundError:
 
     from matter_idl.matter_idl_types import AccessPrivilege
 
-from matter_idl.matter_idl_types import (Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality, AttributeStorage,
-                                         Bitmap, Cluster, ClusterSide, Command, CommandInstantiation, CommandQuality, ConstantEntry,
-                                         DataType, DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality, Field,
-                                         FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct, StructQuality,
-                                         StructTag)
+from matter_idl.matter_idl_types import (ApiMaturity, Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality,
+                                         AttributeStorage, Bitmap, Cluster, ClusterSide, Command, CommandInstantiation,
+                                         CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority,
+                                         EventQuality, Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct,
+                                         StructQuality, StructTag)
 
 
 def UnionOfAllFlags(flags_list):
@@ -158,6 +158,18 @@ class MatterIdlTransformer(Transformer):
     def bool_default_false(self, _):
         return False
 
+    def provisional_api_maturity(self, _):
+        return ApiMaturity.PROVISIONAL
+
+    def internal_api_maturity(self, _):
+        return ApiMaturity.INTERNAL
+
+    def deprecated_api_maturity(self, _):
+        return ApiMaturity.DEPRECATED
+
+    def stable_api_maturity(self, _):
+        return ApiMaturity.STABLE
+
     def id(self, tokens):
         """An id is a string containing an identifier
         """
@@ -182,8 +194,10 @@ class MatterIdlTransformer(Transformer):
             raise Exception("Unexpected size for data type")
 
     @v_args(inline=True)
-    def constant_entry(self, id, number):
-        return ConstantEntry(name=id, code=number)
+    def constant_entry(self, api_maturity, id, number):
+        if api_maturity is None:
+            api_maturity = ApiMaturity.STABLE
+        return ConstantEntry(name=id, code=number, api_maturity=api_maturity)
 
     @v_args(inline=True)
     def enum(self, id, type, *entries):
@@ -255,7 +269,9 @@ class MatterIdlTransformer(Transformer):
         # Last argument is the named_member, the rest
         # are qualities
         field = args[-1]
-        field.qualities = UnionOfAllFlags(args[:-1]) or FieldQuality.NONE
+        field.qualities = UnionOfAllFlags(args[1:-1]) or FieldQuality.NONE
+        if args[0] is not None:
+            field.api_maturity = args[0]
         return field
 
     @v_args(meta=True)
@@ -454,15 +470,25 @@ class MatterIdlTransformer(Transformer):
         return AddServerClusterToEndpointTransform(
             ServerClusterInstantiation(parse_meta=meta, name=id, attributes=attributes, events_emitted=events, commands=commands))
 
+    @v_args(inline=True)
+    def cluster_content(self, api_maturity, element):
+        if api_maturity is not None:
+            element.api_maturity = api_maturity
+        return element
+
     @v_args(inline=True, meta=True)
-    def cluster(self, meta, side, name, code, *content):
+    def cluster(self, meta, api_maturity, side, name, code, *content):
         meta = None if self.skip_meta else ParseMetaData(meta)
 
         # shift actual starting position where the doc comment would start
         if meta and self._cluster_start_pos:
             meta.start_pos = self._cluster_start_pos
 
-        result = Cluster(parse_meta=meta, side=side, name=name, code=code)
+        if api_maturity is None:
+            api_maturity = ApiMaturity.STABLE
+
+        result = Cluster(parse_meta=meta, side=side, name=name,
+                         code=code, api_maturity=api_maturity)
 
         for item in content:
             if type(item) == Enum:

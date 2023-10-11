@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <app/icd/IcdMonitoringTable.h>
+#include <app/icd/ICDMonitoringTable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
@@ -61,9 +61,9 @@ constexpr uint8_t kKeyBuffer3a[] = {
 void TestSaveAndLoadRegistrationValue(nlTestSuite * aSuite, void * aContext)
 {
     TestPersistentStorageDelegate storage;
-    IcdMonitoringTable saving(storage, kTestFabricIndex1, kMaxTestClients1);
-    IcdMonitoringTable loading(storage, kTestFabricIndex1, kMaxTestClients1);
-    IcdMonitoringEntry entry;
+    ICDMonitoringTable saving(storage, kTestFabricIndex1, kMaxTestClients1);
+    ICDMonitoringTable loading(storage, kTestFabricIndex1, kMaxTestClients1);
+    ICDMonitoringEntry entry;
     CHIP_ERROR err;
 
     // Insert first entry
@@ -139,8 +139,8 @@ void TestSaveAndLoadRegistrationValue(nlTestSuite * aSuite, void * aContext)
 void TestSaveAllInvalidRegistrationValues(nlTestSuite * aSuite, void * aContext)
 {
     TestPersistentStorageDelegate storage;
-    IcdMonitoringTable table(storage, kTestFabricIndex1, kMaxTestClients1);
-    IcdMonitoringEntry entry;
+    ICDMonitoringTable table(storage, kTestFabricIndex1, kMaxTestClients1);
+    ICDMonitoringEntry entry;
     CHIP_ERROR err;
 
     // Invalid checkInNodeID
@@ -182,9 +182,9 @@ void TestSaveAllInvalidRegistrationValues(nlTestSuite * aSuite, void * aContext)
 void TestSaveLoadRegistrationValueForMultipleFabrics(nlTestSuite * aSuite, void * aContext)
 {
     TestPersistentStorageDelegate storage;
-    IcdMonitoringTable table1(storage, kTestFabricIndex1, kMaxTestClients1);
-    IcdMonitoringTable table2(storage, kTestFabricIndex2, kMaxTestClients2);
-    IcdMonitoringEntry entry;
+    ICDMonitoringTable table1(storage, kTestFabricIndex1, kMaxTestClients1);
+    ICDMonitoringTable table2(storage, kTestFabricIndex2, kMaxTestClients2);
+    ICDMonitoringEntry entry;
     CHIP_ERROR err;
 
     // Insert in first fabric
@@ -246,9 +246,9 @@ void TestSaveLoadRegistrationValueForMultipleFabrics(nlTestSuite * aSuite, void 
 void TestDeleteValidEntryFromStorage(nlTestSuite * aSuite, void * context)
 {
     TestPersistentStorageDelegate storage;
-    IcdMonitoringTable table1(storage, kTestFabricIndex1, kMaxTestClients1);
-    IcdMonitoringTable table2(storage, kTestFabricIndex2, kMaxTestClients2);
-    IcdMonitoringEntry entry;
+    ICDMonitoringTable table1(storage, kTestFabricIndex1, kMaxTestClients1);
+    ICDMonitoringTable table2(storage, kTestFabricIndex2, kMaxTestClients2);
+    ICDMonitoringEntry entry;
     CHIP_ERROR err;
 
     // Insert first entry

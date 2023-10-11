@@ -27,7 +27,7 @@ namespace chip {
 
 using chip::Protocols::InteractionModel::Status;
 
-class IcdManagementServer
+class ICDManagementServer
 {
 public:
     uint32_t GetIdleModeIntervalSec() { return mIdleInterval_s; }
@@ -36,9 +36,9 @@ public:
 
     uint16_t GetActiveModeThresholdMs() { return mActiveThreshold_ms; }
 
-    uint32_t GetICDCounter() { return mIcdCounter; }
+    uint32_t GetICDCounter() { return mICDCounter; }
 
-    void SetICDCounter(uint32_t count) { mIcdCounter = count; }
+    void SetICDCounter(uint32_t count) { mICDCounter = count; }
 
     uint16_t GetClientsSupportedPerFabric() { return mFabricClientsSupported; }
 
@@ -50,12 +50,12 @@ public:
 
     Status StayActiveRequest(FabricIndex fabric_index);
 
-    static IcdManagementServer & GetInstance() { return mInstance; }
+    static ICDManagementServer & GetInstance() { return mInstance; }
 
 private:
-    IcdManagementServer() = default;
+    ICDManagementServer() = default;
 
-    static IcdManagementServer mInstance;
+    static ICDManagementServer mInstance;
 
     static_assert((CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC) <= 64800,
                   "Spec requires the IdleModeInterval to be equal or inferior to 64800s.");
@@ -73,7 +73,7 @@ private:
                   "Spec requires the ActiveModeThreshold to be equal or greater to 300ms.");
     uint16_t mActiveThreshold_ms = CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS;
 
-    uint32_t mIcdCounter = 0;
+    uint32_t mICDCounter = 0;
 
     static_assert((CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC) >= 1,
                   "Spec requires the minimum of supported clients per fabric be equal or greater to 1.");

@@ -79,6 +79,6 @@ static_library("messaging") {
   ]
 
   if (chip_enable_icd_server) {
-    public_deps += [ "${chip_root}/src/app/icd:manager-srcs" ]
+    public_deps += [ "${chip_root}/src/app/icd:manager" ]
   }
 }

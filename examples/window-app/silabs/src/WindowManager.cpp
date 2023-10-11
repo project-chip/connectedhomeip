@@ -183,6 +183,7 @@ void WindowManager::DispatchEventAttributeChange(chip::EndpointId endpoint, chip
     /* ============= Positions for Position Aware ============= */
     case Attributes::CurrentPositionLiftPercent100ths::Id:
     case Attributes::CurrentPositionTiltPercent100ths::Id:
+        UpdateLEDs();
         UpdateLCD();
         break;
     default:

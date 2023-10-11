@@ -25,13 +25,13 @@
 
 namespace chip {
 
-inline constexpr size_t kIcdMonitoringBufferSize = 40;
+inline constexpr size_t kICDMonitoringBufferSize = 40;
 
-struct IcdMonitoringEntry : public PersistentData<kIcdMonitoringBufferSize>
+struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
 {
     static constexpr size_t kKeyMaxSize = 16;
 
-    IcdMonitoringEntry(FabricIndex fabric = kUndefinedFabricIndex, NodeId nodeId = kUndefinedNodeId)
+    ICDMonitoringEntry(FabricIndex fabric = kUndefinedFabricIndex, NodeId nodeId = kUndefinedNodeId)
     {
         this->fabricIndex      = fabric;
         this->checkInNodeID    = nodeId;
@@ -51,8 +51,8 @@ struct IcdMonitoringEntry : public PersistentData<kIcdMonitoringBufferSize>
 };
 
 /**
- * @brief IcdMonitoringTable exists to manage the persistence of entries in the IcdManagement Cluster.
- *        To access persisted data with the IcdMonitoringTable class, instantiate an instance of this class
+ * @brief ICDMonitoringTable exists to manage the persistence of entries in the IcdManagement Cluster.
+ *        To access persisted data with the ICDMonitoringTable class, instantiate an instance of this class
  *        and call the LoadFromStorage function.
  *
  *        This class can only manage one fabric at a time. The flow is load a fabric, execute necessary operations,
@@ -62,9 +62,9 @@ struct IcdMonitoringEntry : public PersistentData<kIcdMonitoringBufferSize>
  *        https://github.com/project-chip/connectedhomeip/issues/24288
  */
 
-struct IcdMonitoringTable
+struct ICDMonitoringTable
 {
-    IcdMonitoringTable(PersistentStorageDelegate & storage, FabricIndex fabric, uint16_t limit) :
+    ICDMonitoringTable(PersistentStorageDelegate & storage, FabricIndex fabric, uint16_t limit) :
         mStorage(&storage), mFabric(fabric), mLimit(limit)
     {}
 
@@ -75,7 +75,7 @@ struct IcdMonitoringTable
      * @return CHIP_NO_ERROR on success,
      *         CHIP_ERROR_NOT_FOUND if index is greater than the index of the last entry on the table.
      */
-    CHIP_ERROR Get(uint16_t index, IcdMonitoringEntry & entry) const;
+    CHIP_ERROR Get(uint16_t index, ICDMonitoringEntry & entry) const;
 
     /**
      * @brief Stores the MonitoringRegistrationStruct entry at the given position,
@@ -84,7 +84,7 @@ struct IcdMonitoringTable
      * @param entry On success, contains the MonitoringRegistrationStruct matching the given index.
      * @return CHIP_NO_ERROR on success
      */
-    CHIP_ERROR Set(uint16_t index, const IcdMonitoringEntry & entry);
+    CHIP_ERROR Set(uint16_t index, const ICDMonitoringEntry & entry);
 
     /**
      * @brief Search the registered clients for an entry on the fabric whose checkInNodeID matches the given id.
@@ -94,7 +94,7 @@ struct IcdMonitoringTable
      *  If CHIP_ERROR_NOT_FOUND is returned, entry.index contains the total number of entries in the table.
      * @return CHIP_NO_ERROR if found, CHIP_ERROR_NOT_FOUND if no checkInNodeID matches the provided id.
      */
-    CHIP_ERROR Find(NodeId id, IcdMonitoringEntry & entry);
+    CHIP_ERROR Find(NodeId id, ICDMonitoringEntry & entry);
 
     /**
      * @brief Removes the MonitoringRegistrationStruct entry at the given position,
