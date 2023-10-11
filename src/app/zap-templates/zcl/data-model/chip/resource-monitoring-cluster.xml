@@ -105,12 +105,12 @@ limitations under the License.
   <struct name="ReplacementProductStruct">
     <cluster code="0x0071" />
     <item name="ProductIdentifierType" type="ProductIdentifierTypeEnum" optional="false"/>
-    <item name="ProductIdentifierValue" type="CHAR_STRING" length="20" optional="false"/>
+    <item name="ProductIdentifierValue" type="char_string" length="20" optional="false"/>
   </struct>
 
   <struct name="ReplacementProductStruct">
     <cluster code="0x0072" />
     <item name="ProductIdentifierType" type="ProductIdentifierTypeEnum" optional="false"/>
-    <item name="ProductIdentifierValue" type="CHAR_STRING" length="20" optional="false"/>
+    <item name="ProductIdentifierValue" type="char_string" length="20" optional="false"/>
   </struct>
 </configurator>

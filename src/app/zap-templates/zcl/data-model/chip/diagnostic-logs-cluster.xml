@@ -47,7 +47,7 @@ limitations under the License.
             <description>Retrieving diagnostic logs from a Node</description>
             <arg name="Intent" type="IntentEnum"/>
             <arg name="RequestedProtocol" type="TransferProtocolEnum"/>
-            <arg name="TransferFileDesignator" type="CHAR_STRING" length="32" optional="true"/>
+            <arg name="TransferFileDesignator" type="char_string" length="32" optional="true"/>
         </command>
         <command source="server" code="0x01" name="RetrieveLogsResponse" optional="false" cli="chip logs response">
             <description>Response to the RetrieveLogsRequest</description>

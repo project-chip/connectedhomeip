@@ -110,7 +110,7 @@ limitations under the License.
 
     <event side="server" code="0x00" name="StartUp" priority="critical" optional="false">
       <description>The StartUp event SHALL be emitted by a Node as soon as reasonable after completing a boot or reboot process.</description>
-      <field id="0" name="SoftwareVersion" type="INT32U"/>
+      <field id="0" name="SoftwareVersion" type="int32u"/>
     </event>
     <event side="server" code="0x01" name="ShutDown" priority="critical" optional="true">
       <description>The ShutDown event SHOULD be emitted by a Node prior to any orderly shutdown sequence on a best-effort basis.</description>

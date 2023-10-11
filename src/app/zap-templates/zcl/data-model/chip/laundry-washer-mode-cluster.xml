@@ -35,9 +35,9 @@ limitations under the License.
     <description>Attributes and commands for selecting a mode from a list of supported options.</description>
     <!-- Base data types -->
     <attribute side="server" code="0x0000" define="SUPPORTED_MODES"  type="ARRAY" entryType="ModeOptionStruct" writable="false" optional="false" isNullable="false" length="255">SupportedModes</attribute>
-    <attribute side="server" code="0x0001" define="CURRENT_MODE"     type="INT8U"                              writable="false" optional="false" isNullable="false" reportable="true">CurrentMode</attribute>
-    <attribute side="server" code="0x0002" define="START_UP_MODE"    type="INT8U"                              writable="true"  optional="true"  isNullable="true">StartUpMode</attribute>
-    <attribute side="server" code="0x0003" define="ON_MODE"          type="INT8U"                              writable="true"  optional="true"  isNullable="true">OnMode</attribute>
+    <attribute side="server" code="0x0001" define="CURRENT_MODE"     type="int8u"                              writable="false" optional="false" isNullable="false" reportable="true">CurrentMode</attribute>
+    <attribute side="server" code="0x0002" define="START_UP_MODE"    type="int8u"                              writable="true"  optional="true"  isNullable="true">StartUpMode</attribute>
+    <attribute side="server" code="0x0003" define="ON_MODE"          type="int8u"                              writable="true"  optional="true"  isNullable="true">OnMode</attribute>
 
     <!-- Commands -->
     <command source="client" code="0x00" name="ChangeToMode" response="ChangeToModeResponse" optional="false">
@@ -45,7 +45,7 @@ limitations under the License.
         This command is used to change device modes.
         On receipt of this command the device SHALL respond with a ChangeToModeResponse command.
       </description>
-      <arg name="NewMode" type="INT8U" optional="false"/>
+      <arg name="NewMode" type="int8u" optional="false"/>
     </command>
 
     <command source="server" code="0x01" name="ChangeToModeResponse" disableDefaultResponse="true" optional="false">
@@ -53,7 +53,7 @@ limitations under the License.
         This command is sent by the device on receipt of the ChangeToModeWithStatus command.
       </description>
       <arg name="Status"     type="enum8"                   optional="false"/>
-      <arg name="StatusText" type="CHAR_STRING" lenght="64" optional="true"/>
+      <arg name="StatusText" type="char_string" lenght="64" optional="true"/>
     </command>
   </cluster>
 </configurator>
