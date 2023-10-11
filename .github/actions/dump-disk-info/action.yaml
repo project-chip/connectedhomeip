@@ -1,0 +1,13 @@
+name: Dump disk space info
+description: Help debug running out of disk space on github CI
+inputs:
+  platform:
+    description: "Platform name"
+    required: true
+runs:
+  steps:
+    - name: Dump info
+      run: df -h
+post:
+  - name: Post jobs dump info
+    run: df -h

@@ -421,23 +421,12 @@ jobs:
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
-            - name: Get diskspace info before checkout
-              run: df
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Get diskspace info before submodule checkout & Bootstrap
-              run: df
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
 
-            - name: Get diskspace info
-              run: df
-
             - name: Run Build Coverage
               run: ./scripts/build_coverage.sh
-
-            - name: Get diskspace info after build coverage complete
-              if: success() || failure()
-              run: df
