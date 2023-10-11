@@ -24,6 +24,7 @@
 #import <Matter/MTRClusterStateCacheContainer.h>
 #import <Matter/Matter.h>
 
+#import "MTRCommandPayloadExtensions_Internal.h"
 #import "MTRErrorTestUtils.h"
 #import "MTRTestKeys.h"
 #import "MTRTestResetCommissioneeHelper.h"
@@ -1370,8 +1371,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  clientQueue:queue
                                reportHandler:^(id _Nullable values, NSError * _Nullable error) {
                                }
-                     subscriptionEstablished:^() {
-                     }];
+                     subscriptionEstablished:^() {}];
     [self waitForExpectations:@[ errorExpectation ] timeout:60];
 }
 
@@ -1424,8 +1424,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  clientQueue:queue
                                reportHandler:^(id _Nullable values, NSError * _Nullable error) {
                                }
-                     subscriptionEstablished:^() {
-                     }];
+                     subscriptionEstablished:^() {}];
     [self waitForExpectations:@[ errorExpectation ] timeout:60];
 }
 
@@ -1598,8 +1597,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                      clientQueue:queue
                                    reportHandler:^(id _Nullable values, NSError * _Nullable error) {
                                    }
-                         subscriptionEstablished:^() {
-                         }];
+                         subscriptionEstablished:^() {}];
 
     [self waitForExpectations:@[ subscriptionDroppedExpectation ] timeout:60];
 
@@ -1674,8 +1672,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  clientQueue:queue
                                reportHandler:^(id _Nullable values, NSError * _Nullable error) {
                                }
-                     subscriptionEstablished:^() {
-                     }];
+                     subscriptionEstablished:^() {}];
     [self waitForExpectations:@[ errorExpectation ] timeout:60];
 }
 
@@ -1687,6 +1684,30 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     __auto_type * opcredsCluster = [[MTRClusterOperationalCredentials alloc] initWithDevice:device endpointID:@(0) queue:queue];
     __auto_type * onOffCluster = [[MTRClusterOnOff alloc] initWithDevice:device endpointID:@(1) queue:queue];
     __auto_type * badOnOffCluster = [[MTRClusterOnOff alloc] initWithDevice:device endpointID:@(0) queue:queue];
+
+    // Ensure our existing fabric label is not "Test".  This uses a "base"
+    // cluster to ensure read-through to the other side.
+    __auto_type * baseOpCredsCluster = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:GetConnectedDevice() endpointID:@(0) queue:queue];
+    XCTestExpectation * readFabricLabelExpectation = [self expectationWithDescription:@"Read fabric label first time"];
+    [baseOpCredsCluster readAttributeFabricsWithParams:nil completion:^(NSArray * _Nullable value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(value);
+        XCTAssertEqual(value.count, 1);
+        MTROperationalCredentialsClusterFabricDescriptorStruct * entry = value[0];
+        XCTAssertNotEqualObjects(entry.label, @"Test");
+        [readFabricLabelExpectation fulfill];
+    }];
+
+    XCTestExpectation * readFabricIndexExpectation = [self expectationWithDescription:@"Read current fabric index"];
+    __block NSNumber * currentFabricIndex;
+    [baseOpCredsCluster readAttributeCurrentFabricIndexWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(value);
+        currentFabricIndex = value;
+        [readFabricIndexExpectation fulfill];
+    }];
+
+    [self waitForExpectations:@[ readFabricLabelExpectation, readFabricIndexExpectation ] timeout:kTimeoutInSeconds];
 
     XCTestExpectation * onExpectation = [self expectationWithDescription:@"On command executed"];
     [onOffCluster onWithParams:nil
@@ -1718,6 +1739,7 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                          XCTAssertNotNil(data);
                                          XCTAssertEqualObjects(data.statusCode, @(0));
                                          XCTAssertNotNil(data.fabricIndex);
+                                         XCTAssertEqualObjects(data.fabricIndex, currentFabricIndex);
                                          [updateLabelExpectation fulfill];
                                      }];
 
@@ -1757,6 +1779,19 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     ]
                       timeout:60
                  enforceOrder:YES];
+
+    // Now make sure our fabric label got updated.
+    readFabricLabelExpectation = [self expectationWithDescription:@"Read fabric label second time"];
+    [baseOpCredsCluster readAttributeFabricsWithParams:nil completion:^(NSArray * _Nullable value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(value);
+        XCTAssertEqual(value.count, 1);
+        MTROperationalCredentialsClusterFabricDescriptorStruct * entry = value[0];
+        XCTAssertEqualObjects(entry.label, @"Test");
+        [readFabricLabelExpectation fulfill];
+    }];
+
+    [self waitForExpectations:@[ readFabricLabelExpectation ] timeout:kTimeoutInSeconds];
 }
 
 - (void)test020_ReadMultipleAttributes
@@ -2410,6 +2445,83 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     }];
 
     [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test027_AttestationChallenge
+{
+    // Check that we have an attestation challenge result in
+    // MTROperationalCredentialsClusterAttestationResponseParams.
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    // We don't care about our nonce being random here, so just all-0 is fine.
+    __auto_type * nonce = [[NSMutableData alloc] initWithLength:32];
+    __auto_type * params = [[MTROperationalCredentialsClusterAttestationRequestParams alloc] init];
+    params.attestationNonce = nonce;
+
+    __auto_type * baseDevice = GetConnectedDevice();
+    __auto_type * baseCluster = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:baseDevice endpointID:@(0) queue:queue];
+    XCTestExpectation * attestationRequestedViaBaseCluster = [self expectationWithDescription:@"Invoked AttestationRequest via base cluster"];
+    [baseCluster attestationRequestWithParams:params completion:^(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(data);
+        XCTAssertNotNil(data.attestationChallenge);
+        [attestationRequestedViaBaseCluster fulfill];
+    }];
+
+    [self waitForExpectations:@[ attestationRequestedViaBaseCluster ] timeout:kTimeoutInSeconds];
+
+    __auto_type * requestFields = @{
+        MTRTypeKey : MTRStructureValueType,
+        MTRValueKey : @[
+            @{
+                MTRContextTagKey : @(0), // AttestationNonce
+                MTRDataKey : @ {
+                    MTRTypeKey : MTROctetStringValueType,
+                    MTRValueKey : nonce,
+                },
+            },
+        ],
+    };
+
+    XCTestExpectation * attestationRequestedViaBaseDevice = [self expectationWithDescription:@"Invoked AttestationRequest via base device"];
+    [baseDevice invokeCommandWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeOperationalCredentialsID) commandID:@(MTRCommandIDTypeClusterOperationalCredentialsCommandAttestationRequestID) commandFields:requestFields timedInvokeTimeout:nil queue:queue completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(values);
+        XCTAssertEqual(values.count, 1);
+        __auto_type * response = [[MTROperationalCredentialsClusterAttestationResponseParams alloc] initWithResponseValue:values[0] error:&error];
+        XCTAssertNil(error);
+        XCTAssertNotNil(response);
+        XCTAssertNotNil(response.attestationChallenge);
+        [attestationRequestedViaBaseDevice fulfill];
+    }];
+
+    [self waitForExpectations:@[ attestationRequestedViaBaseDevice ] timeout:kTimeoutInSeconds];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId deviceController:sController];
+    __auto_type * cluster = [[MTRClusterOperationalCredentials alloc] initWithDevice:device endpointID:@(0) queue:queue];
+    XCTestExpectation * attestationRequestedViaCluster = [self expectationWithDescription:@"Invoked AttestationRequest via cluster"];
+    [cluster attestationRequestWithParams:params expectedValues:nil expectedValueInterval:nil completion:^(MTROperationalCredentialsClusterAttestationResponseParams * _Nullable data, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(data);
+        XCTAssertNotNil(data.attestationChallenge);
+        [attestationRequestedViaCluster fulfill];
+    }];
+
+    [self waitForExpectations:@[ attestationRequestedViaCluster ] timeout:kTimeoutInSeconds];
+
+    XCTestExpectation * attestationRequestedViaDevice = [self expectationWithDescription:@"Invoked AttestationRequest via device"];
+    [device invokeCommandWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeOperationalCredentialsID) commandID:@(MTRCommandIDTypeClusterOperationalCredentialsCommandAttestationRequestID) commandFields:requestFields expectedValues:nil expectedValueInterval:nil timedInvokeTimeout:nil queue:queue completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(values);
+        XCTAssertEqual(values.count, 1);
+        __auto_type * response = [[MTROperationalCredentialsClusterAttestationResponseParams alloc] initWithResponseValue:values[0] error:&error];
+        XCTAssertNil(error);
+        XCTAssertNotNil(response);
+        XCTAssertNotNil(response.attestationChallenge);
+        [attestationRequestedViaDevice fulfill];
+    }];
+
+    [self waitForExpectations:@[ attestationRequestedViaDevice ] timeout:kTimeoutInSeconds];
 }
 
 - (void)test900_SubscribeAllAttributes

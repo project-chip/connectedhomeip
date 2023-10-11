@@ -1,5 +1,7 @@
 /*
+ *
  *    Copyright (c) 2023 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,9 +16,15 @@
  *    limitations under the License.
  */
 
-#include "macros_impl.h"
+#include "esp32_tracing.h"
 #include <esp_heap_caps.h>
 #include <esp_insights.h>
+#include <esp_log.h>
+#include <memory>
+#include <tracing/backend.h>
+
+namespace chip {
+namespace Tracing {
 namespace Insights {
 
 #define LOG_HEAP_INFO(label, group, entry_exit)                                                                                    \
@@ -28,17 +36,31 @@ namespace Insights {
                        heap_caps_get_free_size(MALLOC_CAP_8BIT));                                                                  \
     } while (0)
 
-ESP32Backend::ESP32Backend(const char * str, ...)
+void ESP32Backend::LogMessageReceived(MessageReceivedInfo & info) {}
+
+void ESP32Backend::LogMessageSend(MessageSendInfo & info) {}
+
+void ESP32Backend::LogNodeLookup(NodeLookupInfo & info) {}
+
+void ESP32Backend::LogNodeDiscovered(NodeDiscoveredInfo & info) {}
+
+void ESP32Backend::LogNodeDiscoveryFailed(NodeDiscoveryFailedInfo & info) {}
+
+void ESP32Backend::TraceBegin(const char * label, const char * group)
 {
-    va_list args;
-    va_start(args, str);
-    mlabel = str;
-    mgroup = va_arg(args, const char *);
-    LOG_HEAP_INFO(mlabel, mgroup, "Entry");
+    LOG_HEAP_INFO(label, group, "Entry");
 }
 
-ESP32Backend::~ESP32Backend()
+void ESP32Backend::TraceEnd(const char * label, const char * group)
 {
-    LOG_HEAP_INFO(mlabel, mgroup, "Exit");
+    LOG_HEAP_INFO(label, group, "Exit");
+}
+
+void ESP32Backend::TraceInstant(const char * label, const char * group)
+{
+    ESP_DIAG_EVENT("MTR_TRC", "Instant : %s -%s", label, group);
 }
 } // namespace Insights
+} // namespace Tracing
+} // namespace chip
+// namespace chip

@@ -1790,14 +1790,6 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("Key", indent + 1, value.key);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Key'");
-            return err;
-        }
-    }
-    {
         CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
         if (err != CHIP_NO_ERROR)
         {
@@ -10354,7 +10346,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("PhysicalMaxLevel", 1, value);
         }
         case BallastConfiguration::Attributes::BallastStatus::Id: {
-            uint8_t value;
+            chip::BitMask<chip::app::Clusters::BallastConfiguration::BallastStatusBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BallastStatus", 1, value);
         }
@@ -10404,7 +10396,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("LampBurnHours", 1, value);
         }
         case BallastConfiguration::Attributes::LampAlarmMode::Id: {
-            uint8_t value;
+            chip::BitMask<chip::app::Clusters::BallastConfiguration::LampAlarmModeBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LampAlarmMode", 1, value);
         }

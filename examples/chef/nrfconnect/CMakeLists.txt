@@ -94,6 +94,8 @@ target_sources(app PRIVATE
     ${CHEF}/common/chef-channel-manager.cpp
     ${CHEF}/common/chef-air-quality.cpp
     ${CHEF}/common/chef-concentration-measurement.cpp
+    ${CHEF}/common/chef-rvc-mode-delegate.cpp
+    ${CHEF}/common/chef-rvc-operational-state-delegate.cpp
 )
 
 message(STATUS ${CHEF}/devices/${SAMPLE_NAME}.zap)

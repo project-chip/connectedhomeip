@@ -23,6 +23,7 @@
  *    a class to store and format IPV4 and IPV6 Internet Protocol addresses.
  *
  */
+#include <lib/core/CHIPConfig.h>
 
 #include <inet/IPAddress.h>
 
@@ -1205,7 +1206,7 @@ void CheckFromSocket(nlTestSuite * inSuite, void * inContext)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     (void) inSuite;
     // This test is only supported for non LWIP stack.
-#else // INET_LWIP
+#else // CHIP_SYSTEM_CONFIG_USE_LWIP
     const struct TestContext * lContext       = static_cast<const struct TestContext *>(inContext);
     IPAddressExpandedContextIterator lCurrent = lContext->mIPAddressExpandedContextRange.mBegin;
     IPAddressExpandedContextIterator lEnd     = lContext->mIPAddressExpandedContextRange.mEnd;
@@ -1260,7 +1261,7 @@ void CheckFromSocket(nlTestSuite * inSuite, void * inContext)
 
         ++lCurrent;
     }
-#endif // INET_LWIP
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
 /**

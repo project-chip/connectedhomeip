@@ -5112,7 +5112,6 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(AttributeId aAtt
                 newElement_0 = [MTRICDManagementClusterMonitoringRegistrationStruct new];
                 newElement_0.checkInNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.checkInNodeID];
                 newElement_0.monitoredSubject = [NSNumber numberWithUnsignedLongLong:entry_0.monitoredSubject];
-                newElement_0.key = AsData(entry_0.key);
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
@@ -9606,7 +9605,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(Attribute
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::MinLevel::Id: {
@@ -9742,7 +9741,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(Attribute
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::LampBurnHoursTripPoint::Id: {

@@ -2713,7 +2713,6 @@ client cluster IcdManagement = 70 {
   fabric_scoped struct MonitoringRegistrationStruct {
     fabric_sensitive node_id checkInNodeID = 1;
     fabric_sensitive int64u monitoredSubject = 2;
-    fabric_sensitive octet_string<16> key = 3;
     fabric_idx fabricIndex = 254;
   }
 
@@ -5043,9 +5042,18 @@ client cluster ColorControl = 768 {
 
 /** Attributes and commands for configuring a lighting ballast. */
 client cluster BallastConfiguration = 769 {
+  bitmap BallastStatusBitmap : BITMAP8 {
+    kBallastNonOperational = 0x1;
+    kLampFailure = 0x2;
+  }
+
+  bitmap LampAlarmModeBitmap : BITMAP8 {
+    kLampBurnHours = 0x1;
+  }
+
   readonly attribute int8u physicalMinLevel = 0;
   readonly attribute int8u physicalMaxLevel = 1;
-  readonly attribute optional bitmap8 ballastStatus = 2;
+  readonly attribute optional BallastStatusBitmap ballastStatus = 2;
   attribute int8u minLevel = 16;
   attribute int8u maxLevel = 17;
   attribute optional nullable int8u intrinsicBallastFactor = 20;
@@ -5055,7 +5063,7 @@ client cluster BallastConfiguration = 769 {
   attribute optional char_string<16> lampManufacturer = 49;
   attribute optional nullable int24u lampRatedHours = 50;
   attribute optional nullable int24u lampBurnHours = 51;
-  attribute optional bitmap8 lampAlarmMode = 52;
+  attribute optional LampAlarmModeBitmap lampAlarmMode = 52;
   attribute optional nullable int24u lampBurnHoursTripPoint = 53;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;

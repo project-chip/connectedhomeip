@@ -44,6 +44,26 @@ typedef void (^MTRDevicePerformAsyncBlock)(MTRBaseDevice * baseDevice);
 // false-positives, for example due to compressed fabric id collisions.
 - (void)nodeMayBeAdvertisingOperational;
 
+/**
+ * Like the public invokeCommandWithEndpointID but:
+ *
+ * 1) Allows passing through a serverSideProcessingTimeout.
+ * 2) Expects one of the command payload structs as commandPayload
+ * 3) On success, returns an instance of responseClass via the completion (or
+ *    nil if there is no responseClass, which indicates a status-only command).
+ */
+- (void)_invokeKnownCommandWithEndpointID:(NSNumber *)endpointID
+                                clusterID:(NSNumber *)clusterID
+                                commandID:(NSNumber *)commandID
+                           commandPayload:(id)commandPayload
+                           expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+                    expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                       timedInvokeTimeout:(NSNumber * _Nullable)timeout
+              serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                            responseClass:(Class _Nullable)responseClass
+                                    queue:(dispatch_queue_t)queue
+                               completion:(void (^)(id _Nullable response, NSError * _Nullable error))completion;
+
 @property (nonatomic, readonly) MTRDeviceController * deviceController;
 @property (nonatomic, readonly, copy) NSNumber * nodeID;
 // Queue used for various internal bookkeeping work.

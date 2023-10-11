@@ -33,6 +33,13 @@ class PairOnNetworkLongImReadCommand(
       eventPath: ChipEventPath?,
       e: Exception
     ) {
+      if (attributePath != null && attributePath.clusterId.getId() == UNIT_TEST_CLUSTER) {
+        logger.log(
+          Level.INFO,
+          "TODO: skip the error check for unit test cluster that covers most error result"
+        )
+        return
+      }
       logger.log(Level.INFO, "Read receive onError")
       setFailure("read failure")
     }
@@ -55,11 +62,12 @@ class PairOnNetworkLongImReadCommand(
     fun checkStartUpEventJson(event: EventState): Boolean =
       event.getJson().toString() == """{"0:STRUCT":{"0:UINT":1}}"""
 
-    fun checkAllAttributesJsonForBasicCluster(cluster: String): Boolean {
+    fun checkAllAttributesJsonForFixedLabel(cluster: String): Boolean {
       val expected =
-        """{"16:BOOL":false,""" +
-          """"65531:ARRAY-UINT":[""" +
-          """0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,18,19,20,65528,65529,65531,65532,65533]}"""
+        """{"65528:ARRAY-?":[],"0:ARRAY-STRUCT":[{"0:STRING":"room","1:STRING":"bedroom 2"},""" +
+          """{"0:STRING":"orientation","1:STRING":"North"},{"0:STRING":"floor","1:STRING":"2"},""" +
+          """{"0:STRING":"direction","1:STRING":"up"}],"65531:ARRAY-UINT":[0,65528,65529,65531,65532,65533],""" +
+          """"65533:UINT":1,"65529:ARRAY-?":[],"65532:UINT":0}"""
       return cluster.equals(expected)
     }
 
@@ -67,9 +75,16 @@ class PairOnNetworkLongImReadCommand(
       val endpointZero =
         requireNotNull(nodeState.getEndpointState(0)) { "Endpoint zero not found." }
 
+      val endpointOne = requireNotNull(nodeState.getEndpointState(0)) { "Endpoint one not found." }
+
       val basicCluster =
         requireNotNull(endpointZero.getClusterState(CLUSTER_ID_BASIC)) {
           "Basic cluster not found."
+        }
+
+      val fixedLabelCluster =
+        requireNotNull(endpointOne.getClusterState(FIXED_LABEL_CLUSTER)) {
+          "fixed label cluster not found."
         }
 
       val localConfigDisabledAttribute =
@@ -81,7 +96,9 @@ class PairOnNetworkLongImReadCommand(
         requireNotNull(basicCluster.getEventState(EVENT_ID_START_UP)) { "No start up event found." }
 
       val clusterAttributes =
-        requireNotNull(basicCluster.getAttributesJson()) { "No basicCluster attribute found." }
+        requireNotNull(fixedLabelCluster.getAttributesJson()) {
+          "No fixed label cluster attribute found."
+        }
 
       require(checkLocalConfigDisableAttributeTlv(localConfigDisabledAttribute)) {
         "Invalid local config disabled attribute TLV ${localConfigDisabledAttribute.getTlv().contentToString()}"
@@ -101,8 +118,8 @@ class PairOnNetworkLongImReadCommand(
         "Invalid start up event Json ${startUpEvents[0].getJson().toString()}"
       }
 
-      require(checkAllAttributesJsonForBasicCluster(clusterAttributes)) {
-        "Invalid basic cluster attributes Json ${clusterAttributes}"
+      require(checkAllAttributesJsonForFixedLabel(clusterAttributes)) {
+        "Invalid fixed label cluster attributes Json ${clusterAttributes}"
       }
     }
 
@@ -132,9 +149,9 @@ class PairOnNetworkLongImReadCommand(
     val attributePathList =
       listOf(
         ChipAttributePath.newInstance(
-          ChipPathId.forId(/* endpointId= */ 0),
-          ChipPathId.forId(CLUSTER_ID_BASIC),
-          ChipPathId.forId(ATTR_ID_LOCAL_CONFIG_DISABLED),
+          ChipPathId.forWildcard(),
+          ChipPathId.forWildcard(),
+          ChipPathId.forWildcard()
         ),
         ChipAttributePath.newInstance(
           ChipPathId.forId(/* endpointId= */ 0),
@@ -176,6 +193,8 @@ class PairOnNetworkLongImReadCommand(
 
     private const val MATTER_PORT = 5540
     private const val CLUSTER_ID_BASIC = 0x0028L
+    private const val FIXED_LABEL_CLUSTER = 0x0040L
+    private const val UNIT_TEST_CLUSTER = 0xfff1fc05
     private const val ATTR_ID_LOCAL_CONFIG_DISABLED = 16L
     private const val EVENT_ID_START_UP = 0L
     private const val GLOBAL_ATTRIBUTE_LIST = 65531L

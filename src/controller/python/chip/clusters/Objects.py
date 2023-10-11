@@ -14674,13 +14674,11 @@ class IcdManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="checkInNodeID", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="monitoredSubject", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="key", Tag=3, Type=bytes),
                         ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=254, Type=uint),
                     ])
 
             checkInNodeID: 'uint' = 0
             monitoredSubject: 'uint' = 0
-            key: 'bytes' = b""
             fabricIndex: 'uint' = 0
 
     class Commands:
@@ -26926,6 +26924,14 @@ class BallastConfiguration(Cluster):
     attributeList: 'typing.List[uint]' = None
     featureMap: 'uint' = None
     clusterRevision: 'uint' = None
+
+    class Bitmaps:
+        class BallastStatusBitmap(IntFlag):
+            kBallastNonOperational = 0x1
+            kLampFailure = 0x2
+
+        class LampAlarmModeBitmap(IntFlag):
+            kLampBurnHours = 0x1
 
     class Attributes:
         @dataclass
