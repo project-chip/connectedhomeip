@@ -39,6 +39,7 @@ class TC_DISHM_3_2(MatterBaseTest):
 
     async def write_start_up_mode(self, newMode):
         ret = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, Clusters.DishwasherMode.Attributes.StartUpMode(newMode))])
+        logging.info("Write StartUpMode Return: %s" % ret[0])
         asserts.assert_equal(ret[0].Status, Status.Success, "Writing to StartUpMode failed")
 
     async def check_preconditions(self, endpoint):
@@ -119,10 +120,7 @@ class TC_DISHM_3_2(MatterBaseTest):
                 break
 
             self.print_step(4, "Write to the StartUpMode Attribute")
-
-            ret = await self.write_start_up_mode(newMode=new_start_up_mode_th)
-            # There is no recorded response returned when writing to StartUpMode.
-            logging.info("Write StartUpMode Return: %s" % ret)
+            await self.write_start_up_mode(newMode=new_start_up_mode_th)
 
         else:
             new_start_up_mode_th = startup_mode_dut

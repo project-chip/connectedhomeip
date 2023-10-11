@@ -83,6 +83,7 @@ class TC_DISHM_2_1(MatterBaseTest):
             SUCCESS = 0x00
             UNSUPPORTED_MODE = 0x01
             GENERIC_FAILURE = 0x02
+            INVALID_MODE = 0x03
 
         self.print_step(4, "Send ChangeToMode command with NewMode set to %d" % (old_current_mode_dut))
 
@@ -102,12 +103,14 @@ class TC_DISHM_2_1(MatterBaseTest):
 
             ret = await self.send_change_to_mode_cmd(newMode=self.modeFail)
             st = ret.status
+            logging.info("ChangeToMode Status: %s" % (ret.status))
             is_mfg_code = st in range(0x80, 0xC0)
-            is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or is_mfg_code
+            is_err_code = (st == CommonCodes.GENERIC_FAILURE.value) or (st == CommonCodes.INVALID_MODE.value) or is_mfg_code
             asserts.assert_true(
                 is_err_code, "Changing to mode %d must fail due to the current state of the device" % (self.modeFail))
             # Status text is an optional string which may not always be included
             if ret.statusText:
+                logging.info("Status Text: %s" % (ret.statusText))
                 st_text_len = len(ret.statusText)
                 asserts.assert_true(st_text_len in range(1, 65), "StatusText length (%d) must be between 1 and 64" % (st_text_len))
 
