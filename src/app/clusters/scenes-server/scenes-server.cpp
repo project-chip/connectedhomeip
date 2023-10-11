@@ -718,11 +718,15 @@ void ScenesServer::HandleRecallScene(HandlerContext & ctx, const Commands::Recal
     if (CHIP_NO_ERROR == err)
     {
         status = Attributes::SceneValid::Set(ctx.mRequestPath.mEndpointId, true);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
-        {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, ToInteractionModelStatus(status));
-            return;
-        }
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, ToInteractionModelStatus(status));
+        return;
+    }
+
+    if (CHIP_ERROR_NOT_FOUND == err)
+    {
+        // TODO : implement proper mapping between CHIP_ERROR and IM Status
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::NotFound);
+        return;
     }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, StatusIB(err).mStatus);

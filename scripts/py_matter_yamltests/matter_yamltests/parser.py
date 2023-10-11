@@ -593,6 +593,8 @@ class TestStep:
                 self._test.event)
             self._test.endpoint = self._config_variable_substitution(
                 self._test.endpoint)
+            self._test.group_id = self._config_variable_substitution(
+                self._test.group_id)
             test.update_arguments(self.arguments)
             test.update_responses(self.responses)
 
