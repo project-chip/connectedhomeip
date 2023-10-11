@@ -29,13 +29,13 @@ pipCacheDir=$(python -m pip cache dir)
 exitcode=$?
 
 if [ $exitcode -eq 0 ]; then
-  listOfDirectories+=($pipCacheDir)
+    listOfDirectories+=("$pipCacheDir")
 fi
 
 
 echo "Storage Space Used By Key Directories:"
 for directory in ${listOfDirectories[@]}; do
-  if [ -d "$directory" ]; then
-    du -d1 -h $directory
-  fi
+    if [ -d "$directory" ]; then
+      du -d1 -h "$directory"
+    fi
 done
