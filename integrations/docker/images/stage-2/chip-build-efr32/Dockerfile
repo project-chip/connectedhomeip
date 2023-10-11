@@ -13,8 +13,8 @@ RUN set -x \
     && : # last line
 
 
-# Clone Gecko SDK 4.3.1 (2ba59bf)
-RUN git clone --depth=1 --branch=v4.3.1 https://github.com/SiliconLabs/gecko_sdk.git /tmp/gecko_sdk && \
+# Clone Gecko SDK 4.3.2 (1228a95)
+RUN git clone --depth=1 --branch=v4.3.2 https://github.com/SiliconLabs/gecko_sdk.git /tmp/gecko_sdk && \
     cd /tmp/gecko_sdk && \
     rm -rf .git \
     && : # last line
@@ -25,8 +25,8 @@ RUN git clone --depth=1 --branch=2.7.1-Matter https://github.com/SiliconLabs/wis
     rm -rf .git \
     && : # last line
 
-# Clone Wiseconnect SDK 3.1.0-MatterCert1 (f84bf66)
-RUN git clone --depth=1 --branch=v3.1.0-MatterCert1 https://github.com/SiliconLabs/wiseconnect.git /tmp/wifi_sdk && \
+# Clone Wiseconnect SDK 3.1.0 (58a2404)
+RUN git clone --depth=1 --branch=v3.1.0 https://github.com/SiliconLabs/wiseconnect.git /tmp/wifi_sdk && \
     cd /tmp/wifi_sdk && \
     rm -rf .git \
     && : # last line
