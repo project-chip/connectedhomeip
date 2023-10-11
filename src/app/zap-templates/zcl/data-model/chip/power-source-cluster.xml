@@ -80,7 +80,7 @@ limitations under the License.
 
   </cluster>
 
-  <bitmap name="Feature" type="BITMAP32">
+  <bitmap name="Feature" type="bitmap32">
     <cluster code="0x002F"/>
     <field name="Wired" mask="0x1"/>
     <field name="Battery" mask="0x2"/>
@@ -88,21 +88,21 @@ limitations under the License.
     <field name="Replaceable" mask="0x8"/>
   </bitmap>
 
-  <enum name="WiredFaultEnum" type="ENUM8">
+  <enum name="WiredFaultEnum" type="enum8">
     <cluster code="0x002F"/>
     <item name="Unspecified" value="0x00"/>
     <item name="OverVoltage" value="0x01"/>
     <item name="UnderVoltage" value="0x02"/>
   </enum>
 
-  <enum name="BatFaultEnum" type="ENUM8">
+  <enum name="BatFaultEnum" type="enum8">
     <cluster code="0x002F"/>
     <item name="Unspecified" value="0x00"/>
     <item name="OverTemp" value="0x01"/>
     <item name="UnderTemp" value="0x02"/>
   </enum>
 
-  <enum name="BatChargeFaultEnum" type="ENUM8">
+  <enum name="BatChargeFaultEnum" type="enum8">
     <cluster code="0x002F"/>
     <item name="Unspecified" value="0x00"/>
     <item name="AmbientTooHot" value="0x01"/>
@@ -117,7 +117,7 @@ limitations under the License.
     <item name="SafetyTimeout" value="0x0A"/>
   </enum>
 
-  <enum name="PowerSourceStatusEnum" type="ENUM8">
+  <enum name="PowerSourceStatusEnum" type="enum8">
     <cluster code="0x002F"/>
     <item name="Unspecified" value="0x00"/>
     <item name="Active" value="0x01"/>
@@ -125,20 +125,20 @@ limitations under the License.
     <item name="Unavailable" value="0x03"/>
   </enum>
 
-  <enum name="WiredCurrentTypeEnum" type="ENUM8">
+  <enum name="WiredCurrentTypeEnum" type="enum8">
     <cluster code="0x002F"/>
     <item name="AC" value="0x00"/>
     <item name="DC" value="0x01"/>
   </enum>
 
-  <enum name="BatChargeLevelEnum" type="ENUM8">
+  <enum name="BatChargeLevelEnum" type="enum8">
     <cluster code="0x002F"/>
     <item name="OK" value="0x00"/>
     <item name="Warning" value="0x01"/>
     <item name="Critical" value="0x02"/>
   </enum>
 
-  <enum name="BatReplaceabilityEnum" type="ENUM8">
+  <enum name="BatReplaceabilityEnum" type="enum8">
     <cluster code="0x002F"/>
     <item name="Unspecified" value="0x00"/>
     <item name="NotReplaceable" value="0x01"/>
@@ -146,7 +146,7 @@ limitations under the License.
     <item name="FactoryReplaceable" value="0x03"/>
   </enum>
 
-  <enum name="BatChargeStateEnum" type="ENUM8">
+  <enum name="BatChargeStateEnum" type="enum8">
     <cluster code="0x002F"/>
     <item name="Unknown" value="0x00"/>
     <item name="IsCharging" value="0x01"/>
@@ -154,7 +154,7 @@ limitations under the License.
     <item name="IsNotCharging" value="0x03"/>
   </enum>
 
-  <enum name="BatCommonDesignationEnum" type="ENUM16">
+  <enum name="BatCommonDesignationEnum" type="enum16">
     <cluster code="0x002F"/>
     <item name="Unspecified" value="0"/>
     <item name="AAA" value="1"/>
@@ -239,7 +239,7 @@ limitations under the License.
     <item name="32600" value="80"/>
   </enum>
 
-  <enum name="BatApprovedChemistryEnum" type="ENUM16">
+  <enum name="BatApprovedChemistryEnum" type="enum16">
     <cluster code="0x002F"/>
     <item name="Unspecified" value="0"/>
     <item name="Alkaline" value="1"/>

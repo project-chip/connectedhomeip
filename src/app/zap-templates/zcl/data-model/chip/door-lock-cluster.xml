@@ -447,7 +447,7 @@ limitations under the License.
 
 
     <!-- Cluster data types -->
-    <enum name="AlarmCodeEnum" type="ENUM8">
+    <enum name="AlarmCodeEnum" type="enum8">
         <cluster code="0x0101" />
         <item value="0" name="LockJammed" />
         <item value="1" name="LockFactoryReset" />
@@ -459,14 +459,14 @@ limitations under the License.
         <item value="8" name="ForcedUser" />
     </enum>
 
-    <enum name="CredentialRuleEnum" type="ENUM8">
+    <enum name="CredentialRuleEnum" type="enum8">
         <cluster code="0x0101" />
         <item value="0" name="Single" />
         <item value="1" name="Dual" />
         <item value="2" name="Tri" />
     </enum>
 
-    <bitmap name="DlCredentialRuleMask" type="BITMAP8">
+    <bitmap name="DlCredentialRuleMask" type="bitmap8">
         <cluster code="0x0101" />
         <field mask="0x01" name="Single" />
         <field mask="0x02" name="Dual" />
@@ -479,7 +479,7 @@ limitations under the License.
         <item name="CredentialIndex" type="INT16U" />
     </struct>
 
-    <enum name="CredentialTypeEnum" type="ENUM8">
+    <enum name="CredentialTypeEnum" type="enum8">
         <cluster code="0x0101" />
         <item value="0" name="ProgrammingPIN" />
         <item value="1" name="PIN" />
@@ -489,14 +489,14 @@ limitations under the License.
         <item value="5" name="Face" />
     </enum>
 
-    <enum name="DataOperationTypeEnum" type="ENUM8">
+    <enum name="DataOperationTypeEnum" type="enum8">
         <cluster code="0x0101" />
         <item value="0" name="Add" />
         <item value="1" name="Clear" />
         <item value="2" name="Modify" />
     </enum>
 
-    <bitmap name="DaysMaskMap" type="BITMAP8">
+    <bitmap name="DaysMaskMap" type="bitmap8">
         <cluster code="0x0101" />
         <field mask="0x01" name="Sunday" />
         <field mask="0x02" name="Monday" />
@@ -507,7 +507,7 @@ limitations under the License.
         <field mask="0x40" name="Saturday" />
     </bitmap>
 
-    <enum name="DoorStateEnum" type="ENUM8">
+    <enum name="DoorStateEnum" type="enum8">
         <cluster code="0x0101" />
         <item value="0" name="DoorOpen" />
         <item value="1" name="DoorClosed" />
@@ -517,7 +517,7 @@ limitations under the License.
         <item value="5" name="DoorAjar" />
     </enum>
 
-    <enum name="LockDataTypeEnum" type="ENUM8">
+    <enum name="LockDataTypeEnum" type="enum8">
         <cluster code="0x0101" />
         <item value="0" name="Unspecified" />
         <item value="1" name="ProgrammingCode" />
@@ -532,7 +532,7 @@ limitations under the License.
         <item value="10" name="Face" />
     </enum>
 
-    <enum name="LockOperationTypeEnum" type="ENUM8">
+    <enum name="LockOperationTypeEnum" type="enum8">
         <cluster code="0x0101" />
         <item value="0" name="Lock" />
         <item value="1" name="Unlock" />
@@ -541,7 +541,7 @@ limitations under the License.
         <item value="4" name="Unlatch" />
     </enum>
 
-    <enum name="OperationErrorEnum" type="ENUM8">
+    <enum name="OperationErrorEnum" type="enum8">
         <cluster code="0x0101" />
         <item value="0" name="Unspecified" />
         <item value="1" name="InvalidCredential" />
@@ -550,7 +550,7 @@ limitations under the License.
         <item value="4" name="InsufficientBattery" />
     </enum>
 
-    <enum name="OperatingModeEnum" type="ENUM8">
+    <enum name="OperatingModeEnum" type="enum8">
         <cluster code="0x0101" />
         <item value="0" name="Normal" />
         <item value="1" name="Vacation" />
@@ -559,7 +559,7 @@ limitations under the License.
         <item value="4" name="Passage" />
     </enum>
 
-    <enum name="OperationSourceEnum" type="ENUM8">
+    <enum name="OperationSourceEnum" type="enum8">
         <cluster code="0x0101" />
         <item value="0" name="Unspecified" />
         <item value="1" name="Manual" />
@@ -573,14 +573,14 @@ limitations under the License.
         <item value="9" name="Biometric" />
     </enum>
 
-    <enum name="UserStatusEnum" type="ENUM8">
+    <enum name="UserStatusEnum" type="enum8">
         <cluster code="0x0101" />
         <item value="0" name="Available" />
         <item value="1" name="OccupiedEnabled" />
         <item value="3" name="OccupiedDisabled" />
     </enum>
 
-    <enum name="UserTypeEnum" type="ENUM8">
+    <enum name="UserTypeEnum" type="enum8">
         <cluster code="0x0101" />
         <item value="0" name="UnrestrictedUser" />
         <item value="1" name="YearDayScheduleUser" />
@@ -597,7 +597,7 @@ limitations under the License.
 
     <!-- Auxiliary data types -->
     <!-- LockState Attribute Values -->
-    <enum name="DlLockState" type="ENUM8">
+    <enum name="DlLockState" type="enum8">
         <cluster code="0x0101" />
         <item value="0" name="Not Fully Locked" />
         <item value="1" name="Locked" />
@@ -606,7 +606,7 @@ limitations under the License.
     </enum>
 
     <!-- LockType Attribute Values -->
-    <enum name="DlLockType" type="ENUM8">
+    <enum name="DlLockType" type="enum8">
         <cluster code="0x0101" />
         <item value="0" name="Dead bolt" />
         <item value="1" name="Magnetic" />
@@ -623,7 +623,7 @@ limitations under the License.
     </enum>
 
     <!-- CredentialRulesSupport attribute bit meaning set -->
-    <bitmap name="DlCredentialRulesSupport" type="BITMAP8">
+    <bitmap name="DlCredentialRulesSupport" type="bitmap8">
         <cluster code="0x0101" />
         <field mask="0x01" name="Single" />
         <field mask="0x02" name="Dual" />
@@ -631,7 +631,7 @@ limitations under the License.
     </bitmap>
 
     <!-- SupportedOperatingModes attribute bit meaning set -->
-    <bitmap name="DlSupportedOperatingModes" type="BITMAP16">
+    <bitmap name="DlSupportedOperatingModes" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x01" name="Normal" />
         <field mask="0x02" name="Vacation" /> <!-- Could be optional -->
@@ -641,7 +641,7 @@ limitations under the License.
     </bitmap>
 
     <!-- DefaultConfigurationRegister attribute bit meaning set -->
-    <bitmap name="DlDefaultConfigurationRegister" type="BITMAP16">
+    <bitmap name="DlDefaultConfigurationRegister" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x01" name="EnableLocalProgrammingEnabled" />
         <field mask="0x02" name="KeypadInterfaceDefaultAccessEnabled" />
@@ -652,7 +652,7 @@ limitations under the License.
     </bitmap>
 
     <!-- LocalProgrammingFeatures attribute bit meaning set -->
-    <bitmap name="DlLocalProgrammingFeatures" type="BITMAP8">
+    <bitmap name="DlLocalProgrammingFeatures" type="bitmap8">
         <cluster code="0x0101" />
         <field mask="0x01" name="AddUsersCredentialsSchedulesLocally" />
         <field mask="0x02" name="ModifyUsersCredentialsSchedulesLocally" />
@@ -661,7 +661,7 @@ limitations under the License.
     </bitmap>
 
     <!-- KeypadOperationEventMask attribute bit meaning set -->
-    <bitmap name="DlKeypadOperationEventMask" type="BITMAP16">
+    <bitmap name="DlKeypadOperationEventMask" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x01" name="Unknown" />
         <field mask="0x02" name="Lock" />
@@ -674,7 +674,7 @@ limitations under the License.
     </bitmap>
 
     <!-- RemoteOperationEventMask attribute bit meaning set -->
-    <bitmap name="DlRemoteOperationEventMask" type="BITMAP16">
+    <bitmap name="DlRemoteOperationEventMask" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x01" name="Unknown" />
         <field mask="0x02" name="Lock" />
@@ -686,7 +686,7 @@ limitations under the License.
     </bitmap>
 
     <!-- ManualOperationEventMask attribute bit meaning set -->
-    <bitmap name="DlManualOperationEventMask" type="BITMAP16">
+    <bitmap name="DlManualOperationEventMask" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x001" name="Unknown" />
         <field mask="0x002" name="ThumbturnLock" />
@@ -702,7 +702,7 @@ limitations under the License.
     </bitmap>
 
     <!-- RFIDOperationEventMask attribute bit meaning set -->
-    <bitmap name="DlRFIDOperationEventMask" type="BITMAP16">
+    <bitmap name="DlRFIDOperationEventMask" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x01" name="Unknown" />
         <field mask="0x02" name="Lock" />
@@ -714,7 +714,7 @@ limitations under the License.
     </bitmap>
 
     <!-- KeypadProgrammingEventMask attribute bit meaning set -->
-    <bitmap name="DlKeypadProgrammingEventMask" type="BITMAP16">
+    <bitmap name="DlKeypadProgrammingEventMask" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x01" name="Unknown" />
         <field mask="0x02" name="ProgrammingPINChanged" />
@@ -724,7 +724,7 @@ limitations under the License.
     </bitmap>
 
     <!-- RemoteProgrammingEventMask attribute bit meaning set -->
-    <bitmap name="DlRemoteProgrammingEventMask" type="BITMAP16">
+    <bitmap name="DlRemoteProgrammingEventMask" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x01" name="Unknown" />
         <field mask="0x02" name="ProgrammingPINChanged" />
@@ -736,14 +736,14 @@ limitations under the License.
     </bitmap>
 
     <!-- RFIDProgrammingEventMask attribute bit meaning set -->
-    <bitmap name="DlRFIDProgrammingEventMask" type="BITMAP16">
+    <bitmap name="DlRFIDProgrammingEventMask" type="bitmap16">
         <cluster code="0x0101" />
         <field mask="0x01" name="Unknown" />
         <field mask="0x20" name="RFIDCodeAdded" />
         <field mask="0x40" name="RFIDCodeCleared" />
     </bitmap>
 
-    <enum name="DlStatus" type="ENUM8">
+    <enum name="DlStatus" type="enum8">
         <cluster code="0x0101" />
         <item value="0x00" name="Success" />
         <item value="0x01" name="Failure" />
@@ -754,7 +754,7 @@ limitations under the License.
         <item value="0x8B" name="NotFound" />
     </enum>
 
-    <bitmap name="Feature" type="BITMAP32">
+    <bitmap name="Feature" type="bitmap32">
         <cluster code="0x0101" />
         <field name="PIN Credential" mask="0x01" />
         <field name="RFID Credential" mask="0x02" />
@@ -771,7 +771,7 @@ limitations under the License.
         <field name="Unbolt" mask="0x1000" />
     </bitmap>
 
-    <enum name="DoorLockSetPinOrIdStatus" type="ENUM8">
+    <enum name="DoorLockSetPinOrIdStatus" type="enum8">
         <cluster code="0x0101"/>
         <item name="Success" value="0x00"/>
         <item name="GeneralFailure" value="0x01"/>
@@ -779,7 +779,7 @@ limitations under the License.
         <item name="DuplicateCodeError" value="0x03"/>
     </enum>
 
-    <enum name="DoorLockOperationEventCode" type="ENUM8">
+    <enum name="DoorLockOperationEventCode" type="enum8">
         <cluster code="0x0101"/>
         <item name="UnknownOrMfgSpecific" value="0x00"/>
         <item name="Lock" value="0x01"/>
@@ -798,7 +798,7 @@ limitations under the License.
         <item name="ManualUnlock" value="0x0E"/>
     </enum>
 
-    <enum name="DoorLockProgrammingEventCode" type="ENUM8">
+    <enum name="DoorLockProgrammingEventCode" type="enum8">
         <cluster code="0x0101"/>
         <item name="UnknownOrMfgSpecific" value="0x00"/>
         <item name="MasterCodeChanged" value="0x01"/>
@@ -809,7 +809,7 @@ limitations under the License.
         <item name="IdDeleted" value="0x06"/>
     </enum>
 
-    <enum name="DoorLockUserStatus" type="ENUM8">
+    <enum name="DoorLockUserStatus" type="enum8">
         <cluster code="0x0101"/>
         <item name="Available" value="0x00"/>
         <item name="OccupiedEnabled" value="0x01"/>
@@ -817,7 +817,7 @@ limitations under the License.
         <item name="NotSupported" value="0xFF"/>
     </enum>
 
-    <enum name="DoorLockUserType" type="ENUM8">
+    <enum name="DoorLockUserType" type="enum8">
         <cluster code="0x0101"/>
         <item name="Unrestricted" value="0x00"/>
         <item name="YearDayScheduleUser" value="0x01"/>
@@ -827,7 +827,7 @@ limitations under the License.
         <item name="NotSupported" value="0xFF"/>
     </enum>
 
-    <bitmap name="DoorLockDayOfWeek" type="BITMAP8">
+    <bitmap name="DoorLockDayOfWeek" type="bitmap8">
         <cluster code="0x0101"/>
         <field name="Sunday" mask="0x01"/>
         <field name="Monday" mask="0x02"/>

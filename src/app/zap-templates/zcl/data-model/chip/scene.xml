@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <bitmap name="ScenesCopyMode" type="BITMAP8">
+  <bitmap name="ScenesCopyMode" type="bitmap8">
     <cluster code="0x0005"/>
     <field name="CopyAllScenes" mask="0x01"/>
   </bitmap>
@@ -47,7 +47,7 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="CURRENT_SCENE" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="false">CurrentScene</attribute>
     <attribute side="server" code="0x0002" define="CURRENT_GROUP" type="group_id" min="0x0000" max="0xFFF7" writable="false" default="0x0000" optional="false">CurrentGroup</attribute>
     <attribute side="server" code="0x0003" define="SCENE_VALID" type="BOOLEAN" min="0x00" max="0x01" writable="false" default="0x00" optional="false">SceneValid</attribute>
-    <attribute side="server" code="0x0004" define="SCENE_NAME_SUPPORT" type="BITMAP8" min="0x00" max="0x80" writable="false" default="0x00" optional="false">NameSupport</attribute>
+    <attribute side="server" code="0x0004" define="SCENE_NAME_SUPPORT" type="bitmap8" min="0x00" max="0x80" writable="false" default="0x00" optional="false">NameSupport</attribute>
     <attribute side="server" code="0x0005" define="LAST_CONFIGURED_BY" type="node_id" writable="false" isNullable="true" optional="true">LastConfiguredBy</attribute>
     <attribute side="server" code="0x0006" define="SCENE_TABLE_SIZE" type="INT16U" writable="false" optional="false">SceneTableSize</attribute>
     <attribute side="server" code="0x0007" define="REMAINING_CAPACITY" type="INT8U" writable="false" optional="false">RemainingCapacity</attribute>
@@ -229,7 +229,7 @@ limitations under the License.
     </command>
   </cluster>
 
-  <bitmap name="Feature" type="BITMAP32">
+  <bitmap name="Feature" type="bitmap32">
     <cluster code="0x0005" />
     <field name="SceneNames" mask="0x01" />
     <field name="Explicit" mask="0x02" />

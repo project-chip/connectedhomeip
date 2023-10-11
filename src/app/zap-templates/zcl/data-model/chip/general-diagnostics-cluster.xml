@@ -16,7 +16,7 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
-  <enum name="HardwareFaultEnum" type="ENUM8">
+  <enum name="HardwareFaultEnum" type="enum8">
     <cluster code="0x0033"/>
     <item name="Unspecified" value="0x00"/>
     <item name="Radio" value="0x01"/>
@@ -30,7 +30,7 @@ limitations under the License.
     <item name="NonVolatileMemoryError" value="0x09"/>
     <item name="TamperDetected" value="0x0A"/>
   </enum>
-  <enum name="RadioFaultEnum" type="ENUM8">
+  <enum name="RadioFaultEnum" type="enum8">
     <cluster code="0x0033"/>
     <item name="Unspecified" value="0x00"/>
     <item name="WiFiFault" value="0x01"/>
@@ -40,14 +40,14 @@ limitations under the License.
     <item name="BLEFault" value="0x05"/>
     <item name="EthernetFault" value="0x06"/>    
   </enum>
-  <enum name="NetworkFaultEnum" type="ENUM8">
+  <enum name="NetworkFaultEnum" type="enum8">
     <cluster code="0x0033"/>
     <item name="Unspecified" value="0x00"/>
     <item name="HardwareFailure" value="0x01"/>
     <item name="NetworkJammed" value="0x02"/>
     <item name="ConnectionFailed" value="0x03"/>
   </enum>
-  <enum name="BootReasonEnum" type="ENUM8">
+  <enum name="BootReasonEnum" type="enum8">
     <cluster code="0x0033"/>
     <item name="Unspecified" value="0x00"/>
     <item name="PowerOnReboot" value="0x01"/>
@@ -57,7 +57,7 @@ limitations under the License.
     <item name="SoftwareUpdateCompleted" value="0x05"/>
     <item name="SoftwareReset" value="0x06"/>
   </enum>  
-  <enum name="InterfaceTypeEnum" type="ENUM8">
+  <enum name="InterfaceTypeEnum" type="enum8">
     <cluster code="0x0033"/>
     <item name="Unspecified" value="0x00"/>
     <item name="WiFi" value="0x01"/>

@@ -33,7 +33,7 @@ limitations under the License.
     <item fieldId="7" name="fabricSensitiveInt8uList" type="INT8U" array="true" isFabricSensitive="true"/>
   </struct>
 
-  <enum name="SimpleEnum" type="ENUM8">
+  <enum name="SimpleEnum" type="enum8">
     <cluster code="0xFFF1FC05"/>
     <item name="Unspecified" value="0x00"/>
     <item name="ValueA" value="0x01"/>
@@ -41,7 +41,7 @@ limitations under the License.
     <item name="ValueC" value="0x03"/>
   </enum>
 
-  <bitmap name="SimpleBitmap" type="BITMAP8">
+  <bitmap name="SimpleBitmap" type="bitmap8">
     <cluster code="0xFFF1FC05"/>
     <field name="ValueA" mask="0x1"/>
     <field name="ValueB" mask="0x2"/>
@@ -104,7 +104,7 @@ limitations under the License.
           array="true" optional="true"/>
   </struct>
 
-    <bitmap name="Bitmap8MaskMap" type="BITMAP8">
+    <bitmap name="Bitmap8MaskMap" type="bitmap8">
         <cluster code="0xFFF1FC05" />
         <field mask="0x01" name="MaskVal1" />
         <field mask="0x02" name="MaskVal2" />
@@ -112,7 +112,7 @@ limitations under the License.
         <field mask="0x40" name="MaskVal4" />
     </bitmap>
 
-    <bitmap name="Bitmap16MaskMap" type="BITMAP16">
+    <bitmap name="Bitmap16MaskMap" type="bitmap16">
         <cluster code="0xFFF1FC05" />
         <field mask="0x01" name="MaskVal1" />
         <field mask="0x02" name="MaskVal2" />
@@ -120,7 +120,7 @@ limitations under the License.
         <field mask="0x4000" name="MaskVal4" />
     </bitmap>
 
-    <bitmap name="Bitmap32MaskMap" type="BITMAP32">
+    <bitmap name="Bitmap32MaskMap" type="bitmap32">
         <cluster code="0xFFF1FC05" />
         <field mask="0x01" name="MaskVal1" />
         <field mask="0x02" name="MaskVal2" />
@@ -128,7 +128,7 @@ limitations under the License.
         <field mask="0x40000000" name="MaskVal4" />
     </bitmap>
     
-    <bitmap name="Bitmap64MaskMap" type="BITMAP64">
+    <bitmap name="Bitmap64MaskMap" type="bitmap64">
         <cluster code="0xFFF1FC05" />
         <field mask="0x01" name="MaskVal1" />
         <field mask="0x02" name="MaskVal2" />
@@ -164,8 +164,8 @@ limitations under the License.
     <attribute side="server" code="0x0012" define="INT48S" type="INT48S" writable="true" default="0" optional="false">int48s</attribute>
     <attribute side="server" code="0x0013" define="INT56S" type="INT56S" writable="true" default="0" optional="false">int56s</attribute>
     <attribute side="server" code="0x0014" define="INT64S" type="INT64S" writable="true" default="0" optional="false">int64s</attribute>
-    <attribute side="server" code="0x0015" define="ENUM8" type="ENUM8" writable="true" default="0" optional="false">enum8</attribute>
-    <attribute side="server" code="0x0016" define="ENUM16" type="ENUM16" writable="true" default="0" optional="false">enum16</attribute>
+    <attribute side="server" code="0x0015" define="ENUM8" type="enum8" writable="true" default="0" optional="false">enum8</attribute>
+    <attribute side="server" code="0x0016" define="ENUM16" type="enum16" writable="true" default="0" optional="false">enum16</attribute>
     <attribute side="server" code="0x0017" define="FLOAT_SINGLE" type="SINGLE" writable="true" default="0" optional="false">float_single</attribute>
     <attribute side="server" code="0x0018" define="FLOAT_DOUBLE" type="DOUBLE" writable="true" default="0" optional="false">float_double</attribute>
     <attribute side="server" code="0x0019" define="OCTET_STRING" type="OCTET_STRING" length="10" writable="true" optional="false">octet_string</attribute>
@@ -219,8 +219,8 @@ limitations under the License.
     <attribute side="server" code="0x4012" define="NULLABLE_INT48S" type="INT48S" writable="true" default="0" isNullable="true" optional="false">nullable_int48s</attribute>
     <attribute side="server" code="0x4013" define="NULLABLE_INT56S" type="INT56S" writable="true" default="0" isNullable="true" optional="false">nullable_int56s</attribute>
     <attribute side="server" code="0x4014" define="NULLABLE_INT64S" type="INT64S" writable="true" default="0" isNullable="true" optional="false">nullable_int64s</attribute>
-    <attribute side="server" code="0x4015" define="NULLABLE_ENUM8" type="ENUM8" writable="true" default="0" isNullable="true" optional="false">nullable_enum8</attribute>
-    <attribute side="server" code="0x4016" define="NULLABLE_ENUM16" type="ENUM16" writable="true" default="0" isNullable="true" optional="false">nullable_enum16</attribute>
+    <attribute side="server" code="0x4015" define="NULLABLE_ENUM8" type="enum8" writable="true" default="0" isNullable="true" optional="false">nullable_enum8</attribute>
+    <attribute side="server" code="0x4016" define="NULLABLE_ENUM16" type="enum16" writable="true" default="0" isNullable="true" optional="false">nullable_enum16</attribute>
     <attribute side="server" code="0x4017" define="NULLABLE_FLOAT_SINGLE" type="SINGLE" writable="true" default="0" isNullable="true" optional="false">nullable_float_single</attribute>
     <attribute side="server" code="0x4018" define="NULLABLE_FLOAT_DOUBLE" type="DOUBLE" writable="true" default="0" isNullable="true" optional="false">nullable_float_double</attribute>
     <attribute side="server" code="0x4019" define="NULLABLE_OCTET_STRING" type="OCTET_STRING" length="10" writable="true" isNullable="true" optional="false">nullable_octet_string</attribute>

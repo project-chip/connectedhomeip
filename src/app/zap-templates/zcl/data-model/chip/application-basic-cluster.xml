@@ -42,7 +42,7 @@ limitations under the License.
     <item name="ApplicationID" type="CHAR_STRING"/>
   </struct> -->
 
-  <enum name="ApplicationStatusEnum" type="ENUM8">
+  <enum name="ApplicationStatusEnum" type="enum8">
     <cluster code="0x050d"/>
     <item name="Stopped" value="0x00"/>
     <item name="ActiveVisibleFocus" value="0x01"/>

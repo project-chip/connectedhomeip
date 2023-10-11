@@ -40,7 +40,7 @@ limitations under the License.
     </command>
   </cluster>
 
-  <enum name="TargetNavigatorStatusEnum" type="ENUM8">
+  <enum name="TargetNavigatorStatusEnum" type="enum8">
     <cluster code="0x0505"/>
     <item name="Success"        value="0x00"/>
     <item name="TargetNotFound" value="0x01"/>

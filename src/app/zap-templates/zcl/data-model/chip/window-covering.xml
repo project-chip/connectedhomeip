@@ -124,7 +124,7 @@ limitations under the License.
   </cluster>
 
   <!-- Window Covering Descriptive Enum Set -->
-  <enum name="Type" type="ENUM8">
+  <enum name="Type" type="enum8">
     <cluster code="0x0102"/>
     <item value="00" name="RollerShade"/>
     <item value="01" name="RollerShade2Motor"/>
@@ -139,7 +139,7 @@ limitations under the License.
     <item value="255" name="Unknown"/>
   </enum>
 
-  <enum name="EndProductType" type="ENUM8">
+  <enum name="EndProductType" type="enum8">
     <cluster code="0x0102"/>
     <item value="00" name="RollerShade"/>
     <item value="01" name="RomanShade"/>
@@ -169,7 +169,7 @@ limitations under the License.
   </enum>
 
   <!-- Window Covering BitFlag Meaning Set -->
-  <bitmap name="Mode" type="BITMAP8">
+  <bitmap name="Mode" type="bitmap8">
     <cluster code="0x0102"/>
     <field mask="0x01" name="MotorDirectionReversed"/>
     <field mask="0x02" name="CalibrationMode"/>
@@ -177,14 +177,14 @@ limitations under the License.
     <field mask="0x08" name="LedFeedback"/>
   </bitmap>
 
-  <bitmap name="OperationalStatus" type="BITMAP8">
+  <bitmap name="OperationalStatus" type="bitmap8">
     <cluster code="0x0102"/>
     <field mask="0x03" name="Global"/>
     <field mask="0x0C" name="Lift"/>
     <field mask="0x30" name="Tilt"/>
   </bitmap>
 
-  <bitmap name="ConfigStatus" type="BITMAP8">
+  <bitmap name="ConfigStatus" type="bitmap8">
     <cluster code="0x0102"/>
     <field mask="0x01" name="Operational"/>
     <field mask="0x02" name="OnlineReserved"/>
@@ -195,7 +195,7 @@ limitations under the License.
     <field mask="0x40" name="TiltEncoderControlled"/>
   </bitmap>
 
-  <bitmap name="SafetyStatus" type="BITMAP16">
+  <bitmap name="SafetyStatus" type="bitmap16">
     <cluster code="0x0102"/>
     <field mask="0x0001" name="RemoteLockout"/>
     <field mask="0x0002" name="TamperDetection"/>
@@ -211,7 +211,7 @@ limitations under the License.
     <field mask="0x0800" name="Protection"/>
   </bitmap>
 
-  <bitmap name="Feature" type="BITMAP32">
+  <bitmap name="Feature" type="bitmap32">
     <cluster code="0x0102"/>
     <field mask="0x01" name="Lift" />
     <field mask="0x02" name="Tilt" />

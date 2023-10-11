@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <bitmap name="CommandBits" type="BITMAP16">
+  <bitmap name="CommandBits" type="bitmap16">
     <cluster code="0x0025"/>
     <field mask="0x0001" name="InstantAction"/>
     <field mask="0x0002" name="InstantActionWithTransition"/>
@@ -33,13 +33,13 @@ limitations under the License.
     <field mask="0x0800" name="DisableActionWithDuration"/>
   </bitmap>
 
-  <enum name="ActionErrorEnum" type="ENUM8">
+  <enum name="ActionErrorEnum" type="enum8">
     <cluster code="0x0025"/>
     <item value="0" name="Unknown"/>
     <item value="1" name="Interrupted"/>
   </enum>
 
-  <enum name="ActionStateEnum" type="ENUM8">
+  <enum name="ActionStateEnum" type="enum8">
     <cluster code="0x0025"/>
     <item value="0" name="Inactive"/>
     <item value="1" name="Active"/>
@@ -47,7 +47,7 @@ limitations under the License.
     <item value="3" name="Disabled"/>
   </enum>
 
-  <enum name="ActionTypeEnum" type="ENUM8">
+  <enum name="ActionTypeEnum" type="enum8">
     <cluster code="0x0025"/>
     <item value="0" name="Other"/>
     <item value="1" name="Scene"/>
@@ -58,7 +58,7 @@ limitations under the License.
     <item value="6" name="Alarm"/>
   </enum>
 
-  <enum name="EndpointListTypeEnum" type="ENUM8">
+  <enum name="EndpointListTypeEnum" type="enum8">
     <cluster code="0x0025"/>
     <item value="0" name="Other"/>
     <item value="1" name="Room"/>

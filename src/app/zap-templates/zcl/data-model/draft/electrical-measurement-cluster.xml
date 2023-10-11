@@ -29,7 +29,7 @@ limitations under the License.
 
     <globalAttribute side="either" code="0xFFFD" value="3"/>
 
-    <attribute side="server" code="0x0000" define="MEASUREMENT_TYPE" type="BITMAP32" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x000000" optional="true">measurement type</attribute>
+    <attribute side="server" code="0x0000" define="MEASUREMENT_TYPE" type="bitmap32" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x000000" optional="true">measurement type</attribute>
     <attribute side="server" code="0x0100" define="DC_VOLTAGE" type="INT16S" min="-32768" max="32767" writable="false" default="0x8000" optional="true">dc voltage</attribute>
     <attribute side="server" code="0x0101" define="DC_VOLTAGE_MIN" type="INT16S" min="-32768" max="32767" writable="false" default="0x8000" optional="true">dc voltage min</attribute>
     <attribute side="server" code="0x0102" define="DC_VOLTAGE_MAX" type="INT16S" min="-32768" max="32767" writable="false" default="0x8000" optional="true">dc voltage max</attribute>
@@ -99,10 +99,10 @@ limitations under the License.
     <attribute side="server" code="0x0603" define="AC_CURRENT_DIVISOR" type="INT16U" min="1" max="0xFFFF" writable="false" default="0x01" optional="true">ac current divisor</attribute>
     <attribute side="server" code="0x0604" define="AC_POWER_MULTIPLIER" type="INT16U" min="1" max="0xFFFF" writable="false" default="0x01" optional="true">ac power multiplier</attribute>
     <attribute side="server" code="0x0605" define="AC_POWER_DIVISOR" type="INT16U" min="1" max="0xFFFF" writable="false" default="0x01" optional="true">ac power divisor</attribute>
-    <attribute side="server" code="0x0700" define="DC_OVERLOAD_ALARMS_MASK" type="BITMAP8" min="0x00" max="0xFF" writable="true" default="0x00" optional="true">overload alarms mask</attribute>
+    <attribute side="server" code="0x0700" define="DC_OVERLOAD_ALARMS_MASK" type="bitmap8" min="0x00" max="0xFF" writable="true" default="0x00" optional="true">overload alarms mask</attribute>
     <attribute side="server" code="0x0701" define="DC_VOLTAGE_OVERLOAD" type="INT16S" min="-32768" max="32767" writable="false" default="0xffff" optional="true">voltage overload</attribute>
     <attribute side="server" code="0x0702" define="DC_CURRENT_OVERLOAD" type="INT16S" min="-32768" max="32767" writable="false" default="0xffff" optional="true">current overload</attribute>
-    <attribute side="server" code="0x0800" define="AC_OVERLOAD_ALARMS_MASK" type="BITMAP16" min="0x0000" max="0xFFFF" writable="true" default="0x0000" optional="true">ac overload alarms mask</attribute>
+    <attribute side="server" code="0x0800" define="AC_OVERLOAD_ALARMS_MASK" type="bitmap16" min="0x0000" max="0xFFFF" writable="true" default="0x0000" optional="true">ac overload alarms mask</attribute>
     <attribute side="server" code="0x0801" define="AC_VOLTAGE_OVERLOAD" type="INT16S" min="-32768" max="32767" writable="false" default="0xffff" optional="true">ac voltage overload</attribute>
     <attribute side="server" code="0x0802" define="AC_CURRENT_OVERLOAD" type="INT16S" min="-32768" max="32767" writable="false" default="0xffff" optional="true">ac current overload</attribute>
     <attribute side="server" code="0x0803" define="AC_POWER_OVERLOAD" type="INT16S" min="-32768" max="32767" writable="false" default="0xffff" optional="true">ac active power overload</attribute>
@@ -163,7 +163,7 @@ limitations under the License.
         A function which returns the power profiling information requested in the GetProfileInfo command. The power profiling information consists of a list of attributes which are profiled along with the period used to profile them.
       </description>
       <arg name="profileCount" type="INT8U"/>
-      <arg name="profileIntervalPeriod" type="ENUM8"/>
+      <arg name="profileIntervalPeriod" type="enum8"/>
       <arg name="maxNumberOfIntervals" type="INT8U"/>
       <arg name="listOfAttributes" type="INT16U" array="true"/>
     </command>
@@ -173,8 +173,8 @@ limitations under the License.
         A function which returns the electricity measurement profile. The electricity measurement profile includes information regarding the amount of time used to capture data related to the flow of electricity as well as the intervals thes
       </description>
       <arg name="startTime" type="INT32U"/>
-      <arg name="status" type="ENUM8"/>
-      <arg name="profileIntervalPeriod" type="ENUM8"/>
+      <arg name="status" type="enum8"/>
+      <arg name="profileIntervalPeriod" type="enum8"/>
       <arg name="numberOfIntervalsDelivered" type="INT8U"/>
       <arg name="attributeId" type="INT16U"/>
       <arg name="intervals" type="INT8U" array="true"/>
@@ -192,7 +192,7 @@ limitations under the License.
       </description>
       <arg name="attributeId" type="INT16U"/>
       <arg name="startTime" type="INT32U"/>
-      <arg name="numberOfIntervals" type="ENUM8"/>
+      <arg name="numberOfIntervals" type="enum8"/>
     </command>
   </cluster>
 </configurator>

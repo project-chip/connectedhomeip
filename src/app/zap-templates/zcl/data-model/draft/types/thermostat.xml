@@ -15,23 +15,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <bitmap name="ThermostatOccupancy" type="BITMAP8">
+  <bitmap name="ThermostatOccupancy" type="bitmap8">
     <field name="occupied" mask="0x1"/>
   </bitmap>
 
-  <bitmap name="ThermostatSensing" type="BITMAP8">
+  <bitmap name="ThermostatSensing" type="bitmap8">
     <field name="localTempSensedRemotely" mask="0x1"/>
     <field name="outdoorTempSensedRemotely" mask="0x2"/>
     <field name="occupancySensedRemotely" mask="0x4"/>
   </bitmap>
 
-  <bitmap name="ThermostatAlarmMask" type="BITMAP8">
+  <bitmap name="ThermostatAlarmMask" type="bitmap8">
     <field name="initializationFailure" mask="0x1"/>
     <field name="hardwareFailure" mask="0x2"/>
     <field name="selfcalibrationFailure" mask="0x4"/>
   </bitmap>
 
-  <bitmap name="ThermostatRunningState" type="BITMAP16">
+  <bitmap name="ThermostatRunningState" type="bitmap16">
     <field name="HeatStateOn" mask="0x0001"/>
     <field name="CoolStateOn" mask="0x0002"/>
     <field name="FanStateOn" mask="0x0004"/>

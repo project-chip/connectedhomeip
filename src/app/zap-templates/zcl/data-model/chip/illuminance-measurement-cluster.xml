@@ -33,7 +33,7 @@ limitations under the License.
       <attribute side="server" code="0x0004" define="ILLUM_LIGHT_SENSOR_TYPE"  type="LightSensorTypeEnum"  min="0x00"   max="0xFF"   writable="false"                   isNullable="true" default="0xFF"   optional="true" >LightSensorType</attribute>
   </cluster>
 
-  <enum name="LightSensorTypeEnum" type="ENUM8">
+  <enum name="LightSensorTypeEnum" type="enum8">
     <cluster code="0x0400"/>
     <item name="Photodiode" value="0x00"/>
     <item name="CMOS" value="0x01"/>

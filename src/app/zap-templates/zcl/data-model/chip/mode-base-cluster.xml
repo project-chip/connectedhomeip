@@ -31,7 +31,7 @@ This is because zap does not currently support generating code for clusters that
     <cluster code="0x0059"/>
     <!-- MfgCode has been deprecated -->
     <item name="MfgCode" type="vendor_id" optional="true"/>
-    <item name="Value"   type="ENUM16"    optional="false"/>
+    <item name="Value"   type="enum16"    optional="false"/>
   </struct>
 
   <struct name="ModeOptionStruct">
@@ -73,12 +73,12 @@ This is because zap does not currently support generating code for clusters that
 <!--      <description>-->
 <!--        This command is sent by the device on receipt of the ChangeToModeWithStatus command.-->
 <!--      </description>-->
-<!--      <arg name="Status"     type="ENUM8"                   optional="false"/>-->
+<!--      <arg name="Status"     type="enum8"                   optional="false"/>-->
 <!--      <arg name="StatusText" type="CHAR_STRING" lenght="64" optional="true"/>-->
 <!--    </command>-->
 <!--  </cluster>-->
 
-  <bitmap name="Feature" type="BITMAP32">
+  <bitmap name="Feature" type="bitmap32">
 <!--    <cluster code="0x..."/>-->
     <cluster code="0x0051"/>
     <cluster code="0x0052"/>

@@ -17,12 +17,12 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <enum name="StatusCode" type="ENUM8">
+  <enum name="StatusCode" type="enum8">
     <cluster code="0x0055"/>
     <item value="0x40" name="CleaningInProgress"/>
   </enum>
 
-  <enum name="ModeTag" type="ENUM16">
+  <enum name="ModeTag" type="enum16">
     <cluster code="0x0055"/>
     <item value="0x4000" name="DeepClean"/>
     <item value="0x4001" name="Vacuum"/>
@@ -56,7 +56,7 @@ limitations under the License.
       <description>
         This command is sent by the device on receipt of the ChangeToModeWithStatus command.
       </description>
-      <arg name="Status"     type="ENUM8"                   optional="false"/>
+      <arg name="Status"     type="enum8"                   optional="false"/>
       <arg name="StatusText" type="CHAR_STRING" lenght="64" optional="true"/>
     </command>
   </cluster>

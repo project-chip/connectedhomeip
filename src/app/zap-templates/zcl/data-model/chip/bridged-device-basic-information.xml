@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
     <domain name="CHIP"/>
 
-    <enum name="ProductFinishEnum" type="ENUM8">
+    <enum name="ProductFinishEnum" type="enum8">
         <cluster code="0x0039"/>
         <item name="Other" value="0"/>
         <item name="Matte" value="1"/>
@@ -27,7 +27,7 @@ limitations under the License.
         <item name="Fabric" value="5"/>
     </enum>
 
-    <enum name="ColorEnum" type="ENUM8">
+    <enum name="ColorEnum" type="enum8">
         <cluster code="0x0039"/>
         <item name="Black" value="0"/>
         <item name="Navy" value="1"/>

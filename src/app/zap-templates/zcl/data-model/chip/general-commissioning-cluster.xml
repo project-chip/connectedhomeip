@@ -16,7 +16,7 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
-  <enum name="CommissioningErrorEnum" type="ENUM8">
+  <enum name="CommissioningErrorEnum" type="enum8">
     <cluster code="0x0030"/>
     <item name="OK" value="0x0"/>
     <item name="ValueOutsideRange" value="0x1"/>
@@ -24,7 +24,7 @@ limitations under the License.
     <item name="NoFailSafe" value="0x3"/>
     <item name="BusyWithOtherAdmin" value="0x4"/>
   </enum>
-  <enum name="RegulatoryLocationTypeEnum" type="ENUM8">
+  <enum name="RegulatoryLocationTypeEnum" type="enum8">
     <cluster code="0x0030"/>
     <item name="Indoor" value="0x0"/>
     <item name="Outdoor" value="0x1"/>

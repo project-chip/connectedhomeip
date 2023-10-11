@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <enum name="AccessControlEntryPrivilegeEnum" type="ENUM8">
+  <enum name="AccessControlEntryPrivilegeEnum" type="enum8">
     <cluster code="0x001F"/>
     <item name="View" value="0x01"/>
     <item name="Proxy View" value="0x02"/>
@@ -26,14 +26,14 @@ limitations under the License.
     <item name="Administer" value="0x05"/>
   </enum>
 
-  <enum name="AccessControlEntryAuthModeEnum" type="ENUM8">
+  <enum name="AccessControlEntryAuthModeEnum" type="enum8">
     <cluster code="0x001F"/>
     <item name="PASE" value="0x01"/>
     <item name="CASE" value="0x02"/>
     <item name="Group" value="0x03"/>
   </enum>
 
-  <enum name="ChangeTypeEnum" type="ENUM8">
+  <enum name="ChangeTypeEnum" type="enum8">
     <cluster code="0x001F"/>
     <item name="Changed" value="0x00"/>
     <item name="Added" value="0x01"/>

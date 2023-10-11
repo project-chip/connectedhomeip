@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <bitmap name="Feature" type="BITMAP32">
+  <bitmap name="Feature" type="bitmap32">
     <cluster code="0x0300" />
     <field name="HueAndSaturation" mask="0x01" />
     <field name="EnhancedHue" mask="0x02" />
@@ -24,7 +24,7 @@ limitations under the License.
     <field name="ColorTemperature" mask="0x10" />
   </bitmap>
 
-  <enum name="HueDirection" type="ENUM8">
+  <enum name="HueDirection" type="enum8">
     <cluster code="0x0300"/>
     <item name="ShortestDistance" value="0x0"/>
     <item name="LongestDistance" value="0x1"/>
@@ -32,40 +32,40 @@ limitations under the License.
     <item name="Down" value="0x3"/>
   </enum>
 
-  <enum name="HueMoveMode" type="ENUM8">
+  <enum name="HueMoveMode" type="enum8">
     <cluster code="0x0300"/>
     <item name="Stop" value="0x0"/>
     <item name="Up" value="0x1"/>
     <item name="Down" value="0x3"/>
   </enum>
 
-  <enum name="HueStepMode" type="ENUM8">
+  <enum name="HueStepMode" type="enum8">
     <cluster code="0x0300"/>
     <item name="Up" value="0x1"/>
     <item name="Down" value="0x3"/>
   </enum>
 
-  <enum name="SaturationMoveMode" type="ENUM8">
+  <enum name="SaturationMoveMode" type="enum8">
     <cluster code="0x0300"/>
     <item name="Stop" value="0x0"/>
     <item name="Up" value="0x1"/>
     <item name="Down" value="0x3"/>
   </enum>
 
-  <enum name="SaturationStepMode" type="ENUM8">
+  <enum name="SaturationStepMode" type="enum8">
     <cluster code="0x0300"/>
     <item name="Up" value="0x1"/>
     <item name="Down" value="0x3"/>
   </enum>
 
-  <enum name="ColorMode" type="ENUM8">
+  <enum name="ColorMode" type="enum8">
     <cluster code="0x0300"/>
     <item name="CurrentHueAndCurrentSaturation" value="0x00"/>
     <item name="CurrentXAndCurrentY" value="0x01"/>
     <item name="ColorTemperature" value="0x02"/>
   </enum>
 
-  <bitmap name="ColorCapabilities" type="BITMAP16">
+  <bitmap name="ColorCapabilities" type="bitmap16">
     <cluster code="0x0300"/>
     <field name="HueSaturationSupported" mask="0x0001"/>
     <field name="EnhancedHueSupported" mask="0x0002"/>
@@ -74,7 +74,7 @@ limitations under the License.
     <field name="ColorTemperatureSupported" mask="0x0010"/>
   </bitmap>
 
-  <bitmap name="ColorLoopUpdateFlags" type="BITMAP8">
+  <bitmap name="ColorLoopUpdateFlags" type="bitmap8">
     <cluster code="0x0300"/>
     <field name="UpdateAction" mask="0x01"/>
     <field name="UpdateDirection" mask="0x02"/>
@@ -82,14 +82,14 @@ limitations under the License.
     <field name="UpdateStartHue" mask="0x08"/>
   </bitmap>
 
-  <enum name="ColorLoopAction" type="ENUM8">
+  <enum name="ColorLoopAction" type="enum8">
     <cluster code="0x0300"/>
     <item name="Deactivate" value="0x00"/>
     <item name="ActivateFromColorLoopStartEnhancedHue" value="0x01"/>
     <item name="ActivateFromEnhancedCurrentHue" value="0x02"/>
   </enum>
 
-  <enum name="ColorLoopDirection" type="ENUM8">
+  <enum name="ColorLoopDirection" type="enum8">
     <cluster code="0x0300"/>
     <item name="DecrementHue" value="0x00"/>
     <item name="IncrementHue" value="0x01"/>
@@ -117,15 +117,15 @@ limitations under the License.
     <!-- CURRENT_X -->
     <attribute side="server" code="0x0004" define="COLOR_CONTROL_CURRENT_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="false" reportable="true" default="0x607D" optional="true">CurrentY</attribute>
     <!-- CURRENT_Y -->
-    <attribute side="server" code="0x0005" define="COLOR_CONTROL_DRIFT_COMPENSATION" type="ENUM8" min="0x00" max="0x04" writable="false" optional="true">DriftCompensation</attribute>
+    <attribute side="server" code="0x0005" define="COLOR_CONTROL_DRIFT_COMPENSATION" type="enum8" min="0x00" max="0x04" writable="false" optional="true">DriftCompensation</attribute>
     <!-- DRIFT_COMPENSATION -->
     <attribute side="server" code="0x0006" define="COLOR_CONTROL_COMPENSATION_TEXT" type="CHAR_STRING" length="254" writable="false" optional="true">CompensationText</attribute>
     <!-- COMPENSATION_TEXT -->
     <attribute side="server" code="0x0007" define="COLOR_CONTROL_COLOR_TEMPERATURE" type="INT16U" min="0x0000" max="0xFEFF" writable="false" reportable="true" default="0x00FA" optional="true">ColorTemperatureMireds</attribute>
     <!-- COLOR_TEMPERATURE -->
-    <attribute side="server" code="0x0008" define="COLOR_CONTROL_COLOR_MODE" type="ENUM8" min="0x00" max="0x02" writable="false" default="0x01">ColorMode</attribute>
+    <attribute side="server" code="0x0008" define="COLOR_CONTROL_COLOR_MODE" type="enum8" min="0x00" max="0x02" writable="false" default="0x01">ColorMode</attribute>
     <!-- COLOR_MODE -->
-    <attribute side="server" code="0x000F" define="COLOR_CONTROL_OPTIONS" type="BITMAP8" writable="true" default="0x00">Options</attribute>
+    <attribute side="server" code="0x000F" define="COLOR_CONTROL_OPTIONS" type="bitmap8" writable="true" default="0x00">Options</attribute>
     <!-- COLOR_CONTROL_OPTIONS -->
     <attribute side="server" code="0x0010" define="COLOR_CONTROL_NUMBER_OF_PRIMARIES" type="INT8U" min="0x00" max="0x06" isNullable="true" writable="false">NumberOfPrimaries</attribute>
     <!-- NUMBER_OF_PRIMARIES -->
@@ -245,8 +245,8 @@ limitations under the License.
       <arg name="Hue" type="INT8U"/>
       <arg name="Direction" type="HueDirection"/>
       <arg name="TransitionTime" type="INT16U"/>
-      <arg name="OptionsMask" type="BITMAP8"/>
-      <arg name="OptionsOverride" type="BITMAP8"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
     </command>
 
     <command source="client" code="0x01" name="MoveHue" optional="true" cli="zcl color-control movehue">
@@ -255,8 +255,8 @@ limitations under the License.
       </description>
       <arg name="MoveMode" type="HueMoveMode"/>
       <arg name="Rate" type="INT8U"/>
-      <arg name="OptionsMask" type="BITMAP8"/>
-      <arg name="OptionsOverride" type="BITMAP8"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
     </command>
 
     <command source="client" code="0x02" name="StepHue" optional="true" cli="zcl color-control stephue">
@@ -266,8 +266,8 @@ limitations under the License.
       <arg name="StepMode" type="HueStepMode"/>
       <arg name="StepSize" type="INT8U"/>
       <arg name="TransitionTime" type="INT8U"/>
-      <arg name="OptionsMask" type="BITMAP8"/>
-      <arg name="OptionsOverride" type="BITMAP8"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
     </command>
 
     <command source="client" code="0x03" name="MoveToSaturation" optional="true" cli="zcl color-control movetosat">
@@ -276,8 +276,8 @@ limitations under the License.
       </description>
       <arg name="Saturation" type="INT8U"/>
       <arg name="TransitionTime" type="INT16U"/>
-      <arg name="OptionsMask" type="BITMAP8"/>
-      <arg name="OptionsOverride" type="BITMAP8"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
     </command>
 
     <command source="client" code="0x04" name="MoveSaturation" optional="true" cli="zcl color-control movesat">
@@ -286,8 +286,8 @@ limitations under the License.
       </description>
       <arg name="MoveMode" type="SaturationMoveMode"/>
       <arg name="Rate" type="INT8U"/>
-      <arg name="OptionsMask" type="BITMAP8"/>
-      <arg name="OptionsOverride" type="BITMAP8"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
     </command>
 
     <command source="client" code="0x05" name="StepSaturation" optional="true" cli="zcl color-control stepsat">
@@ -297,8 +297,8 @@ limitations under the License.
       <arg name="StepMode" type="SaturationStepMode"/>
       <arg name="StepSize" type="INT8U"/>
       <arg name="TransitionTime" type="INT8U"/>
-      <arg name="OptionsMask" type="BITMAP8"/>
-      <arg name="OptionsOverride" type="BITMAP8"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
     </command>
 
     <command source="client" code="0x06" name="MoveToHueAndSaturation" optional="true" cli="zcl color-control movetohueandsat">
@@ -308,8 +308,8 @@ limitations under the License.
       <arg name="Hue" type="INT8U"/>
       <arg name="Saturation" type="INT8U"/>
       <arg name="TransitionTime" type="INT16U"/>
-      <arg name="OptionsMask" type="BITMAP8"/>
-      <arg name="OptionsOverride" type="BITMAP8"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
     </command>
 
     <command source="client" code="0x07" name="MoveToColor" optional="true" cli="zcl color-control movetocolor">
@@ -319,8 +319,8 @@ limitations under the License.
       <arg name="ColorX" type="INT16U"/>
       <arg name="ColorY" type="INT16U"/>
       <arg name="TransitionTime" type="INT16U"/>
-      <arg name="OptionsMask" type="BITMAP8"/>
-      <arg name="OptionsOverride" type="BITMAP8"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
     </command>
 
     <command source="client" code="0x08" name="MoveColor" optional="true" cli="zcl color-control movecolor">
@@ -329,8 +329,8 @@ limitations under the License.
       </description>
       <arg name="RateX" type="INT16S"/>
       <arg name="RateY" type="INT16S"/>
-      <arg name="OptionsMask" type="BITMAP8"/>
-      <arg name="OptionsOverride" type="BITMAP8"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
     </command>
 
     <command source="client" code="0x09" name="StepColor" optional="true" cli="zcl color-control stepcolor">
@@ -340,8 +340,8 @@ limitations under the License.
       <arg name="StepX" type="INT16S"/>
       <arg name="StepY" type="INT16S"/>
       <arg name="TransitionTime" type="INT16U"/>
-      <arg name="OptionsMask" type="BITMAP8"/>
-      <arg name="OptionsOverride" type="BITMAP8"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
     </command>
 
     <command source="client" code="0x0A" name="MoveToColorTemperature" optional="true" cli="zcl color-control movetocolortemp">
@@ -350,20 +350,20 @@ limitations under the License.
       </description>
       <arg name="ColorTemperatureMireds" type="INT16U"/>
       <arg name="TransitionTime" type="INT16U"/>
-      <arg name="OptionsMask" type="BITMAP8"/>
-      <arg name="OptionsOverride" type="BITMAP8"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
     </command>
   </cluster>
 
   <clusterExtension code="0x0300">
     <attribute side="server" code="0x4000" define="COLOR_CONTROL_ENHANCED_CURRENT_HUE" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">EnhancedCurrentHue</attribute>
-    <attribute side="server" code="0x4001" define="COLOR_CONTROL_ENHANCED_COLOR_MODE" type="ENUM8" min="0x00" max="0xFF" writable="false" default="0x01">EnhancedColorMode</attribute>
+    <attribute side="server" code="0x4001" define="COLOR_CONTROL_ENHANCED_COLOR_MODE" type="enum8" min="0x00" max="0xFF" writable="false" default="0x01">EnhancedColorMode</attribute>
     <attribute side="server" code="0x4002" define="COLOR_CONTROL_COLOR_LOOP_ACTIVE" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">ColorLoopActive</attribute>
     <attribute side="server" code="0x4003" define="COLOR_CONTROL_COLOR_LOOP_DIRECTION" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">ColorLoopDirection</attribute>
     <attribute side="server" code="0x4004" define="COLOR_CONTROL_COLOR_LOOP_TIME" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0019" optional="true">ColorLoopTime</attribute>
     <attribute side="server" code="0x4005" define="COLOR_CONTROL_COLOR_LOOP_START_ENHANCED_HUE" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x2300" optional="true">ColorLoopStartEnhancedHue</attribute>
     <attribute side="server" code="0x4006" define="COLOR_CONTROL_COLOR_LOOP_STORED_ENHANCED_HUE" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">ColorLoopStoredEnhancedHue</attribute>
-    <attribute side="server" code="0x400A" define="COLOR_CONTROL_COLOR_CAPABILITIES" type="BITMAP16" min="0x0000" max="0x001F" writable="false" default="0x0000">ColorCapabilities</attribute>
+    <attribute side="server" code="0x400A" define="COLOR_CONTROL_COLOR_CAPABILITIES" type="bitmap16" min="0x0000" max="0x001F" writable="false" default="0x0000">ColorCapabilities</attribute>
     <attribute side="server" code="0x400B" define="COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN" type="INT16U" min="0x0000" max="0xFEFF" writable="false" default="0x0000" optional="true">ColorTempPhysicalMinMireds</attribute>
     <attribute side="server" code="0x400C" define="COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX" type="INT16U" min="0x0000" max="0xFEFF" writable="false" default="0xFEFF" optional="true">ColorTempPhysicalMaxMireds</attribute>
 
@@ -374,8 +374,8 @@ limitations under the License.
       <arg name="EnhancedHue" type="INT16U"/>
       <arg name="Direction" type="HueDirection"/>
       <arg name="TransitionTime" type="INT16U"/>
-      <arg name="OptionsMask" type="BITMAP8"/>
-      <arg name="OptionsOverride" type="BITMAP8"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
     </command>
 
     <command source="client" code="0x41" name="EnhancedMoveHue" optional="true" noDefaultImplementation="true" cli="zcl color-control emovehue">
@@ -384,8 +384,8 @@ limitations under the License.
       </description>
       <arg name="MoveMode" type="HueMoveMode"/>
       <arg name="Rate" type="INT16U"/>
-      <arg name="OptionsMask" type="BITMAP8"/>
-      <arg name="OptionsOverride" type="BITMAP8"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
     </command>
 
     <command source="client" code="0x42" name="EnhancedStepHue" optional="true" noDefaultImplementation="true" cli="zcl color-control estephue">
@@ -395,8 +395,8 @@ limitations under the License.
       <arg name="StepMode" type="HueStepMode"/>
       <arg name="StepSize" type="INT16U"/>
       <arg name="TransitionTime" type="INT16U"/>
-      <arg name="OptionsMask" type="BITMAP8"/>
-      <arg name="OptionsOverride" type="BITMAP8"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
     </command>
 
     <command source="client" code="0x43" name="EnhancedMoveToHueAndSaturation" optional="true" noDefaultImplementation="true" cli="zcl color-control emovetohueandsat">
@@ -406,8 +406,8 @@ limitations under the License.
       <arg name="EnhancedHue" type="INT16U"/>
       <arg name="Saturation" type="INT8U"/>
       <arg name="TransitionTime" type="INT16U"/>
-      <arg name="OptionsMask" type="BITMAP8"/>
-      <arg name="OptionsOverride" type="BITMAP8"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
     </command>
 
     <command source="client" code="0x44" name="ColorLoopSet" optional="true" noDefaultImplementation="true" cli="zcl color-control loop">
@@ -419,16 +419,16 @@ limitations under the License.
       <arg name="Direction" type="ColorLoopDirection"/>
       <arg name="Time" type="INT16U"/>
       <arg name="StartHue" type="INT16U"/>
-      <arg name="OptionsMask" type="BITMAP8"/>
-      <arg name="OptionsOverride" type="BITMAP8"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
     </command>
 
     <command source="client" code="0x47" name="StopMoveStep" optional="true" noDefaultImplementation="true" cli="zcl color-control stopmovestep">
       <description>
         Command description for StopMoveStep
       </description>
-      <arg name="OptionsMask" type="BITMAP8"/>
-      <arg name="OptionsOverride" type="BITMAP8"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
     </command>
 
     <command source="client" code="0x4B" name="MoveColorTemperature" optional="true" noDefaultImplementation="true" cli="zcl color-control movecolortemp">
@@ -439,8 +439,8 @@ limitations under the License.
       <arg name="Rate" type="INT16U"/>
       <arg name="ColorTemperatureMinimumMireds" type="INT16U"/>
       <arg name="ColorTemperatureMaximumMireds" type="INT16U"/>
-      <arg name="OptionsMask" type="BITMAP8"/>
-      <arg name="OptionsOverride" type="BITMAP8"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
     </command>
 
     <command source="client" code="0x4C" name="StepColorTemperature" optional="true" noDefaultImplementation="true" cli="zcl color-control stepcolortemp">
@@ -452,8 +452,8 @@ limitations under the License.
       <arg name="TransitionTime" type="INT16U"/>
       <arg name="ColorTemperatureMinimumMireds" type="INT16U"/>
       <arg name="ColorTemperatureMaximumMireds" type="INT16U"/>
-      <arg name="OptionsMask" type="BITMAP8"/>
-      <arg name="OptionsOverride" type="BITMAP8"/>
+      <arg name="OptionsMask" type="bitmap8"/>
+      <arg name="OptionsOverride" type="bitmap8"/>
     </command>
   </clusterExtension>
 </configurator>

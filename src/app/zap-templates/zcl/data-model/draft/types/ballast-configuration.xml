@@ -14,12 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <bitmap name="BallastStatus" type="BITMAP8">
+  <bitmap name="BallastStatus" type="bitmap8">
     <field name="NonOperational" mask="0x1"/>
     <field name="LampNotInSocket" mask="0x2"/>
   </bitmap>
 
-  <bitmap name="LampAlarmMode" type="BITMAP8">
+  <bitmap name="LampAlarmMode" type="bitmap8">
     <field name="lampBurnHours" mask="0x1"/>
   </bitmap>
 </configurator>

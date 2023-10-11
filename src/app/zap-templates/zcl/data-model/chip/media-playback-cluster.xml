@@ -96,7 +96,7 @@ limitations under the License.
     <item name="Position"  type="INT64U" isNullable="true"/>
   </struct>
 
-  <enum name="PlaybackStateEnum" type="ENUM8">
+  <enum name="PlaybackStateEnum" type="enum8">
     <cluster code="0x0506"/>
     <item name="Playing"    value="0x00"/>
     <item name="Paused"     value="0x01"/>
@@ -104,7 +104,7 @@ limitations under the License.
     <item name="Buffering"  value="0x03"/>
   </enum>
 
-  <enum name="MediaPlaybackStatusEnum" type="ENUM8">
+  <enum name="MediaPlaybackStatusEnum" type="enum8">
     <cluster code="0x0506"/>
     <item name="Success"                value="0x00"/>
     <item name="InvalidStateForCommand" value="0x01"/>
@@ -114,7 +114,7 @@ limitations under the License.
     <item name="SeekOutOfRange"         value="0x05"/>
   </enum>
 
-  <bitmap name="Feature" type="BITMAP32">
+  <bitmap name="Feature" type="bitmap32">
     <cluster code="0x0506"/>
     <field name="AdvancedSeek" mask="0x1"/>
     <field name="VariableSpeed" mask="0x2"/>
