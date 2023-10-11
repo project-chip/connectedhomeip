@@ -31,7 +31,8 @@ runs:
       with:
         platform: ${{ inputs.platform }}
     - name: Dump disk info after checkout submodule & Bootstrap
-      run: ./scripts/dump_diskspace_info.sh
+      shell: bash
+      run: bash scripts/dump_diskspace_info.sh
     - name: Upload Bootstrap Logs
       uses: ./.github/actions/upload-bootstrap-logs
       with:
