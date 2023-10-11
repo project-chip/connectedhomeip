@@ -44,13 +44,13 @@ static const int EXTRA_SPACE_FOR_ATTRIBUTE_TAG = 19;
 CHIP_ERROR CreateChipAttributePath(JNIEnv * env, const app::ConcreteDataAttributePath & aPath, jobject & outObj)
 {
     jclass attributePathCls = nullptr;
-    ReturnErrorOnFailure(JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/model/ChipAttributePath",
-                                                                            attributePathCls));
+    ReturnErrorOnFailure(
+        JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/model/ChipAttributePath", attributePathCls));
     jmethodID attributePathCtor =
         env->GetStaticMethodID(attributePathCls, "newInstance", "(IJJ)Lchip/devicecontroller/model/ChipAttributePath;");
     VerifyOrReturnError(attributePathCtor != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
     outObj = env->CallStaticObjectMethod(attributePathCls, attributePathCtor, static_cast<jint>(aPath.mEndpointId),
-                                        static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId));
+                                         static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId));
     VerifyOrReturnError(outObj != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
     return CHIP_NO_ERROR;
 }
@@ -66,7 +66,7 @@ CHIP_ERROR ReportCallback::CreateChipEventPath(JNIEnv * env, const app::Concrete
     VerifyOrReturnError(eventPathCtor != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
     outObj = env->CallStaticObjectMethod(eventPathCls, eventPathCtor, static_cast<jint>(aPath.mEndpointId),
-                                        static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mEventId));
+                                         static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mEventId));
     VerifyOrReturnError(outObj != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
     return CHIP_NO_ERROR;
 }
@@ -309,9 +309,8 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
     JniLocalReferenceManager manager(env);
 
     jobject attributePathObj = nullptr;
-    err = CreateChipAttributePath(env, aPath, attributePathObj);
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   ChipLogError(Controller, "Unable to create Java ChipAttributePath: %s", ErrorStr(err)));
+    err                      = CreateChipAttributePath(env, aPath, attributePathObj);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to create Java ChipAttributePath: %s", ErrorStr(err)));
 
     if (aPath.IsListItemOperation())
     {
@@ -435,9 +434,8 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
     jobject eventPathObj = nullptr;
-    err = CreateChipEventPath(env, aEventHeader.mPath, eventPathObj);
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   ChipLogError(Controller, "Unable to create Java ChipEventPath: %s", ErrorStr(err)));
+    err                  = CreateChipEventPath(env, aEventHeader.mPath, eventPathObj);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to create Java ChipEventPath: %s", ErrorStr(err)));
 
     if (apData == nullptr)
     {
@@ -719,9 +717,8 @@ void WriteAttributesCallback::OnResponse(const app::WriteClient * apWriteClient,
     JniLocalReferenceManager manager(env);
 
     jobject attributePathObj = nullptr;
-    err = CreateChipAttributePath(env, aPath, attributePathObj);
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   ChipLogError(Controller, "Unable to create Java ChipAttributePath: %s", ErrorStr(err)));
+    err                      = CreateChipAttributePath(env, aPath, attributePathObj);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to create Java ChipAttributePath: %s", ErrorStr(err)));
 
     if (aStatus.mStatus != Protocols::InteractionModel::Status::Success)
     {
