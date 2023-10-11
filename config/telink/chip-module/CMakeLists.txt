@@ -189,19 +189,19 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
 endif()
 
 if(${FLASH_SIZE} MATCHES 1m)
-  set(SEEK "980")
+  set(FD_SEEK "980")
 elseif(${FLASH_SIZE} MATCHES 2m)
-  set(SEEK "1052")
+  set(FD_SEEK "1052")
 elseif(${FLASH_SIZE} MATCHES 4m)
-  set(SEEK "2076")
+  set(FD_SEEK "2076")
 else()
-  set(SEEK "1052")
+  set(FD_SEEK "1052")
 endif()
 
 if (CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE)
   add_custom_target(merge_factory_data ALL
     COMMAND
-    dd if=${PROJECT_BINARY_DIR}/factory/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=SEEK
+    dd if=${PROJECT_BINARY_DIR}/factory/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=${FD_SEEK}
   )
   if (CONFIG_CHIP_OTA_IMAGE_BUILD)
     add_dependencies(merge_factory_data merge_mcuboot)
