@@ -5990,7 +5990,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("UpdatePossible", 1, value);
         }
         case OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id: {
-            chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value;
+            chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("UpdateState", 1, value);
         }

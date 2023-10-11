@@ -2534,9 +2534,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
 
 namespace UpdateState {
 
-EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum * value)
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum * value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum>;
     Traits::StorageType temp;
     uint8_t * readable   = Traits::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::OtaSoftwareUpdateRequestor::Id, Id, readable, sizeof(temp));
@@ -2548,9 +2548,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::OtaSoftwareUpd
     *value = Traits::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value)
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum value)
 {
-    using Traits = NumericAttributeTraits<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum>;
+    using Traits = NumericAttributeTraits<chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum>;
     if (!Traits::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
