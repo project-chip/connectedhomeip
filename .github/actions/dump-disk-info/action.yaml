@@ -11,6 +11,6 @@ runs:
       uses: pyTooling/Actions/with-post-step@v0.4.5
       with:
         main: |-
-          exec ./scripts/dump_disk_info.sh
+          exec ./scripts/dump_diskspace_info.sh
         post: |-
-          exec ./scripts/dump_disk_info.sh
+          exec ./scripts/dump_diskspace_info.sh
