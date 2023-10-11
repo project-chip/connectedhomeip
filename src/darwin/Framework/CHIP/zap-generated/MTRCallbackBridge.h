@@ -87,30 +87,30 @@ typedef void (*BasicInformationClusterProductFinishEnumAttributeCallback)(void *
                                                                           chip::app::Clusters::BasicInformation::ProductFinishEnum);
 typedef void (*NullableBasicInformationClusterProductFinishEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::BasicInformation::ProductFinishEnum> &);
-typedef void (*OTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback)(
-    void *, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction);
-typedef void (*NullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction> &);
-typedef void (*OTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback)(
-    void *, chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol);
-typedef void (*NullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol> &);
-typedef void (*OTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback)(
-    void *, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus);
-typedef void (*NullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus> &);
-typedef void (*OTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback)(
-    void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason);
-typedef void (*NullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason> &);
-typedef void (*OTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback)(
-    void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum);
-typedef void (*NullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum> &);
-typedef void (*OTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback)(
-    void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum);
-typedef void (*NullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum> &);
+typedef void (*OTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallback)(
+    void *, chip::app::Clusters::OtaSoftwareUpdateProvider::ApplyUpdateActionEnum);
+typedef void (*NullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::ApplyUpdateActionEnum> &);
+typedef void (*OTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallback)(
+    void *, chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum);
+typedef void (*NullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum> &);
+typedef void (*OTASoftwareUpdateProviderClusterStatusEnumAttributeCallback)(
+    void *, chip::app::Clusters::OtaSoftwareUpdateProvider::StatusEnum);
+typedef void (*NullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::StatusEnum> &);
+typedef void (*OTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallback)(
+    void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::AnnouncementReasonEnum);
+typedef void (*NullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::AnnouncementReasonEnum> &);
+typedef void (*OTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallback)(
+    void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::ChangeReasonEnum);
+typedef void (*NullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::ChangeReasonEnum> &);
+typedef void (*OTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallback)(
+    void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum);
+typedef void (*NullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum> &);
 typedef void (*TimeFormatLocalizationClusterCalendarTypeEnumAttributeCallback)(
     void *, chip::app::Clusters::TimeFormatLocalization::CalendarTypeEnum);
 typedef void (*NullableTimeFormatLocalizationClusterCalendarTypeEnumAttributeCallback)(
@@ -20071,441 +20071,437 @@ private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge
-    : public MTRCallbackBridge<OTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback>
+class MTROTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<OTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallback>
 {
 public:
-    MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                   ResponseHandler handler) :
-        MTRCallbackBridge<OTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTROTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                    ResponseHandler handler) :
+        MTRCallbackBridge<OTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                   MTRActionBlock action) :
-        MTRCallbackBridge<OTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback>(queue, handler, action,
-                                                                                                 OnSuccessFn){};
+    MTROTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                    MTRActionBlock action) :
+        MTRCallbackBridge<OTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallback>(queue, handler, action,
+                                                                                                  OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::ApplyUpdateActionEnum value);
 };
 
-class MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge
-    : public MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge
+class MTROTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackSubscriptionBridge
+    : public MTROTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge
 {
 public:
-    MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge(
+    MTROTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge(queue, handler, action),
+        MTROTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTROTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnDone;
+    using MTROTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback>
+class MTRNullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallback>
 {
 public:
-    MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                           ResponseHandler handler) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback>(queue, handler,
-                                                                                                         OnSuccessFn){};
+    MTRNullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                            ResponseHandler handler) :
+        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallback>(queue, handler,
+                                                                                                          OnSuccessFn){};
 
-    MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                           ResponseHandler handler,
-                                                                                           MTRActionBlock action) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallback>(queue, handler, action,
-                                                                                                         OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction> & value);
-};
-
-class MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge
-    : public MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge
-{
-public:
-    MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableOTASoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge
-    : public MTRCallbackBridge<OTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback>
-{
-public:
-    MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<OTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                  MTRActionBlock action) :
-        MTRCallbackBridge<OTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback>(queue, handler, action,
-                                                                                                OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol value);
-};
-
-class MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge
-    : public MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge
-{
-public:
-    MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTROTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback>
-{
-public:
-    MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                          ResponseHandler handler) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback>(queue, handler,
-                                                                                                        OnSuccessFn){};
-
-    MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                          ResponseHandler handler,
-                                                                                          MTRActionBlock action) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallback>(queue, handler, action,
-                                                                                                        OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol> & value);
-};
-
-class MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge
-    : public MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge
-{
-public:
-    MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableOTASoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<OTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback>
-{
-public:
-    MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<OTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             MTRActionBlock action) :
-        MTRCallbackBridge<OTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback>(queue, handler, action, OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus value);
-};
-
-class MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge
-    : public MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge
-{
-public:
-    MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTROTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback>
-{
-public:
-    MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                     ResponseHandler handler) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                     ResponseHandler handler,
-                                                                                     MTRActionBlock action) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback>(queue, handler, action,
-                                                                                                   OnSuccessFn){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus> & value);
-};
-
-class MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge
-    : public MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge
-{
-public:
-    MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableOTASoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge
-    : public MTRCallbackBridge<OTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback>
-{
-public:
-    MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                     ResponseHandler handler) :
-        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback>(queue, handler, OnSuccessFn){};
-
-    MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                     ResponseHandler handler,
-                                                                                     MTRActionBlock action) :
-        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback>(queue, handler, action,
-                                                                                                   OnSuccessFn){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason value);
-};
-
-class MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge
-    : public MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge
-{
-public:
-    MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
-        MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge(queue, handler, action),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    void OnSubscriptionEstablished();
-    using MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTROTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnDone;
-
-private:
-    MTRSubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback>
-{
-public:
-    MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                             ResponseHandler handler) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback>(queue, handler,
-                                                                                                           OnSuccessFn){};
-
-    MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                             ResponseHandler handler,
-                                                                                             MTRActionBlock action) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallback>(queue, handler, action,
-                                                                                                           OnSuccessFn){};
+    MTRNullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                            ResponseHandler handler,
+                                                                                            MTRActionBlock action) :
+        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallback>(queue, handler, action,
+                                                                                                          OnSuccessFn){};
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason> & value);
+        const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::ApplyUpdateActionEnum> & value);
 };
 
-class MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge
-    : public MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge
+class MTRNullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge(
+    MTRNullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge(queue, handler, action),
+        MTRNullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableOTASoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnDone;
+    using MTRNullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOTASoftwareUpdateProviderClusterApplyUpdateActionEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<OTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback>
+class MTROTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<OTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallback>
 {
 public:
-    MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge(dispatch_queue_t queue,
+    MTROTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge(dispatch_queue_t queue,
                                                                                    ResponseHandler handler) :
-        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+        MTRCallbackBridge<OTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    MTROTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                                    MTRActionBlock action) :
-        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback>(queue, handler, action,
+        MTRCallbackBridge<OTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallback>(queue, handler, action,
                                                                                                  OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum value);
 };
 
-class MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge
-    : public MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge
+class MTROTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackSubscriptionBridge
+    : public MTROTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge
 {
 public:
-    MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge(
+    MTROTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge(queue, handler, action),
+        MTROTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTROTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnDone;
+    using MTROTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback>
+class MTRNullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallback>
 {
 public:
-    MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge(dispatch_queue_t queue,
+    MTRNullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge(dispatch_queue_t queue,
                                                                                            ResponseHandler handler) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback>(queue, handler,
+        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallback>(queue, handler,
                                                                                                          OnSuccessFn){};
 
-    MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge(dispatch_queue_t queue,
+    MTRNullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge(dispatch_queue_t queue,
                                                                                            ResponseHandler handler,
                                                                                            MTRActionBlock action) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallback>(queue, handler, action,
+        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallback>(queue, handler, action,
                                                                                                          OnSuccessFn){};
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum> & value);
+                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::DownloadProtocolEnum> & value);
 };
 
-class MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge
-    : public MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge
+class MTRNullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge(
+    MTRNullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge(queue, handler, action),
+        MTRNullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableOTASoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnDone;
+    using MTRNullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOTASoftwareUpdateProviderClusterDownloadProtocolEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<OTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback>
+class MTROTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<OTASoftwareUpdateProviderClusterStatusEnumAttributeCallback>
 {
 public:
-    MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
-        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+    MTROTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OTASoftwareUpdateProviderClusterStatusEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                  MTRActionBlock action) :
-        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback>(queue, handler, action,
-                                                                                                OnSuccessFn){};
+    MTROTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         MTRActionBlock action) :
+        MTRCallbackBridge<OTASoftwareUpdateProviderClusterStatusEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::StatusEnum value);
 };
 
-class MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge
-    : public MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge
+class MTROTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackSubscriptionBridge
+    : public MTROTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge
 {
 public:
-    MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge(
+    MTROTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge(queue, handler, action),
+        MTROTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTROTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnDone;
+    using MTROTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge
-    : public MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback>
+class MTRNullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallback>
 {
 public:
-    MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                          ResponseHandler handler) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback>(queue, handler,
-                                                                                                        OnSuccessFn){};
+    MTRNullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallback>(queue, handler, OnSuccessFn){};
 
-    MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                          ResponseHandler handler,
-                                                                                          MTRActionBlock action) :
-        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback>(queue, handler, action,
-                                                                                                        OnSuccessFn){};
+    MTRNullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 MTRActionBlock action) :
+        MTRCallbackBridge<NullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallback>(queue, handler, action,
+                                                                                               OnSuccessFn){};
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum> & value);
+                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::StatusEnum> & value);
 };
 
-class MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge
-    : public MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge
+class MTRNullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge
 {
 public:
-    MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge(
+    MTRNullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
         MTRSubscriptionEstablishedHandler establishedHandler) :
-        MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge(queue, handler, action),
+        MTRNullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge(queue, handler, action),
         mEstablishedHandler(establishedHandler)
     {}
 
     void OnSubscriptionEstablished();
-    using MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
-    using MTRNullableOTASoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnDone;
+    using MTRNullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOTASoftwareUpdateProviderClusterStatusEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<OTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallback>
+{
+public:
+    MTROTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler) :
+        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                      ResponseHandler handler,
+                                                                                      MTRActionBlock action) :
+        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallback>(queue, handler, action,
+                                                                                                    OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::AnnouncementReasonEnum value);
+};
+
+class MTROTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackSubscriptionBridge
+    : public MTROTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge
+{
+public:
+    MTROTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallback>
+{
+public:
+    MTRNullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                              ResponseHandler handler) :
+        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallback>(queue, handler,
+                                                                                                            OnSuccessFn){};
+
+    MTRNullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                              ResponseHandler handler,
+                                                                                              MTRActionBlock action) :
+        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallback>(queue, handler, action,
+                                                                                                            OnSuccessFn){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::AnnouncementReasonEnum> & value);
+};
+
+class MTRNullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOTASoftwareUpdateRequestorClusterAnnouncementReasonEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<OTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallback>
+{
+public:
+    MTROTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                MTRActionBlock action) :
+        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallback>(queue, handler, action,
+                                                                                              OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::ChangeReasonEnum value);
+};
+
+class MTROTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge
+    : public MTROTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge
+{
+public:
+    MTROTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallback>
+{
+public:
+    MTRNullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                        ResponseHandler handler) :
+        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallback>(queue, handler,
+                                                                                                      OnSuccessFn){};
+
+    MTRNullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                        ResponseHandler handler,
+                                                                                        MTRActionBlock action) :
+        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallback>(queue, handler, action,
+                                                                                                      OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::ChangeReasonEnum> & value);
+};
+
+class MTRNullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOTASoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTROTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<OTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallback>
+{
+public:
+    MTROTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler) :
+        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTROTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               MTRActionBlock action) :
+        MTRCallbackBridge<OTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallback>(queue, handler, action, OnSuccessFn){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum value);
+};
+
+class MTROTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge
+    : public MTROTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge
+{
+public:
+    MTROTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTROTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTROTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTROTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge::OnDone;
+
+private:
+    MTRSubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class MTRNullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge
+    : public MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallback>
+{
+public:
+    MTRNullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                       ResponseHandler handler) :
+        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallback>(queue, handler, OnSuccessFn){};
+
+    MTRNullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                       ResponseHandler handler,
+                                                                                       MTRActionBlock action) :
+        MTRCallbackBridge<NullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallback>(queue, handler, action,
+                                                                                                     OnSuccessFn){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum> & value);
+};
+
+class MTRNullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge
+    : public MTRNullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge
+{
+public:
+    MTRNullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, MTRActionBlock action,
+        MTRSubscriptionEstablishedHandler establishedHandler) :
+        MTRNullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge(queue, handler, action),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    void OnSubscriptionEstablished();
+    using MTRNullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge::KeepAliveOnCallback;
+    using MTRNullableOTASoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge::OnDone;
 
 private:
     MTRSubscriptionEstablishedHandler mEstablishedHandler;
