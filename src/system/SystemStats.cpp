@@ -38,7 +38,7 @@ namespace System {
 namespace Stats {
 
 static const Label sStatsStrings[chip::System::Stats::kNumEntries] = {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && defined(LWIP_PBUF_FROM_CUSTOM_POOLS) && LWIP_PBUF_FROM_CUSTOM_POOLS
 #define LWIP_PBUF_MEMPOOL(name, num, payload, desc) "SystemLayer_Num" desc,
 #include "lwippools.h"
 #undef LWIP_PBUF_MEMPOOL
@@ -106,7 +106,7 @@ bool Difference(Snapshot & result, Snapshot & after, Snapshot & before)
 
 void UpdateLwipPbufCounts(void)
 {
-#if LWIP_PBUF_FROM_CUSTOM_POOLS
+#if defined(LWIP_PBUF_FROM_CUSTOM_POOLS) && LWIP_PBUF_FROM_CUSTOM_POOLS
     size_t lwip_pool_idx = PBUF_CUSTOM_POOL_IDX_END;
     size_t system_idx    = 0;
 

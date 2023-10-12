@@ -231,7 +231,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
             {
                 ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
             }
-#if !CONFIG_DISABLE_IPV4
+#if !(defined(CONFIG_DISABLE_IPV4) && CONFIG_DISABLE_IPV4)
             if (esp_netif_get_ip_info(ifa, &ipv4_info) == ESP_OK)
             {
                 memcpy(ifp->Ipv4AddressesBuffer[0], &(ipv4_info.ip.addr), kMaxIPv4AddrSize);

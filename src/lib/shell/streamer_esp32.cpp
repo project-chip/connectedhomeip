@@ -28,7 +28,7 @@
 #if CONFIG_ESP_CONSOLE_UART_DEFAULT || CONFIG_ESP_CONSOLE_UART_CUSTOM
 #include "driver/uart.h"
 #endif
-#if CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG
+#if defined(CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG) && CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG
 #include "driver/usb_serial_jtag.h"
 #include "esp_vfs_usb_serial_jtag.h"
 #endif
@@ -79,7 +79,7 @@ int streamer_esp32_init(streamer_t * streamer)
     esp_vfs_dev_uart_use_driver(0);
 #endif // CONFIG_ESP_CONSOLE_UART_DEFAULT || CONFIG_ESP_CONSOLE_UART_CUSTOM
 
-#if CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG
+#if defined(CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG) && CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG
     esp_vfs_dev_usb_serial_jtag_set_rx_line_endings(ESP_LINE_ENDINGS_CR);
     esp_vfs_dev_usb_serial_jtag_set_tx_line_endings(ESP_LINE_ENDINGS_CRLF);
 
@@ -124,7 +124,7 @@ ssize_t streamer_esp32_write(streamer_t * streamer, const char * buf, size_t len
 #if CONFIG_ESP_CONSOLE_UART_DEFAULT || CONFIG_ESP_CONSOLE_UART_CUSTOM
     return uart_write_bytes(CONFIG_ESP_CONSOLE_UART_NUM, buf, len);
 #endif
-#if CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG
+#if defined(CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG) && CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG
     return usb_serial_jtag_write_bytes(buf, len, 0);
 #endif
 }
