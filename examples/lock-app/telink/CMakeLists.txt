@@ -80,7 +80,3 @@ chip_configure_data_model(app
     INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lock-common/lock-app.zap
 )
-
-if(CONFIG_CHIP_OTA_REQUESTOR)
-    target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
-endif()

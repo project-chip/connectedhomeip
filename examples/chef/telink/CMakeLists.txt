@@ -99,11 +99,6 @@ chip_configure_data_model(app
     INCLUDE_SERVER
     ZAP_FILE ${CHEF}/devices/${SAMPLE_NAME}.zap
 )
-           
-
-if(CONFIG_CHIP_OTA_REQUESTOR)
-    target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
-endif()
 
 if (CONFIG_CHIP_PW_RPC)
 
