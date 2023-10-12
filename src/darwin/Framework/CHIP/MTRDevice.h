@@ -34,11 +34,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  *
  * The logs types are : End User Support, Network Diagnostics and Crash logs.
  */
-typedef NS_ENUM(NSUInteger, MTRDiagnosticLogType) {
-    MTRDiagnosticLogTypeUnknown = 0,
-    MTRDiagnosticLogTypeEndUserSupport = 1, // End user support logs are requested
-    MTRDiagnosticLogTypeNetworkDiagnostics = 2, // Network Diagnostics logs are requested
-    MTRDiagnosticLogTypeCrash = 3 // Crash logs are requested
+typedef NS_ENUM(NSInteger, MTRDiagnosticLogType) {
+    MTRDiagnosticLogTypeEndUserSupport = 0, // End user support logs are requested
+    MTRDiagnosticLogTypeNetworkDiagnostics = 1, // Network Diagnostics logs are requested
+    MTRDiagnosticLogTypeCrash = 2 // Crash logs are requested
 } MTR_PROVISIONALLY_AVAILABLE;
 
 @protocol MTRDeviceDelegate;
@@ -47,33 +46,28 @@ MTR_PROVISIONALLY_AVAILABLE
 @interface MTRDiagnosticLogResult : NSObject
 
 /**
- * A boolean indicating whether the request for diagnostic logs has timed out.
- */
-@property (readonly, nonatomic) BOOL requestTimedOut;
-
-/**
- * Array containing the file path(s) for the desired log type(s).
- * The log type values should correspond to the enum MTRDiagnosticLogType values.
- * If there are no logs an empty array will be returned.
- */
-
-/**
  * The URL representing the location of the end user support log file that was downloaded.
- * If its null, that would imply no log of type end user support was retreived.
+ * If no end user support log was requested or retreived, this will be set to nil.
  */
-@property (readonly, nonatomic, nullable) NSURL *endUserSupportLog;
+@property (readonly, nonatomic, nullable) NSURL * endUserSupportLog;
 
 /**
  * The URL representing the location of the network diagnostics log file that was downloaded.
- * If its null, that would imply no log of type network diagnostics was retreived.
+ * If no network diagnostics log was requested or retreived, this will be set to nil.
  */
-@property (readonly, nonatomic, nullable) NSURL *networkDiagnosticsLog;
+@property (readonly, nonatomic, nullable) NSURL * networkDiagnosticsLog;
 
 /**
  * The URL representing the location of the crash log file that was downloaded.
- * If its null, that would imply no log of type crash were retreived.
+ * If no crash log was requested or retrieved, this will be set to nil.
  */
-@property (readonly, nonatomic, nullable) NSURL *crashLog;
+@property (readonly, nonatomic, nullable) NSURL * crashLog;
+
+/**
+ * If an error occured while retreiving the logs, this will be set to the error.
+ * if no error occurs, this will be set to nil.
+ */
+@property (readonly, nonatomic, nullable) NSError * error;
 
 @end
 
@@ -250,19 +244,22 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Requests diagnostic logs of the desired types from the device.
  *
+ * Note: The consumer of this API should move the files that the NSURLs in the MTRDiagnosticLogResult point to
+ * or open it for reading before the completion handler returns. Otherwise, the files will be deleted, and the data will be lost.
+ *
  * @param types      The types of logs being requested. This should correspond to values in the enum MTRDiagnosticLogType.
- * @param timeout    The timeout in minutes for getting the logs.  If the timeout expires, completion
+ * @param timeout    The timeout for getting the logs.  If the timeout expires, completion
  *                   will be called with whatever logs have been retrieved by that point
  *                   (which might be none, and might include partial logs).
- *                   If the timeout is nil, it will never expire and completion will not be called until
- *                   the logs are fully retrieved.
+ *                   If the timeout is set to 0, the request will not expire and completion will not be called until
+ *                   the logs are fully retrieved or an error occurs.
  * @param queue      The queue on which completion will be called.
  * @param completion The completion that will be called to pass in the file paths for the requested logs.
  */
 - (void)downloadDiagnosticLogsOfTypes:(NSArray<NSNumber *> *)types
-                         timeout:(NSNumber * _Nullable)timeout
-                           queue:(dispatch_queue_t)queue
-                      completion:(void (^)(NSError * _Nullable error, MTRDiagnosticLogResult * _Nullable logResult))completion MTR_PROVISIONALLY_AVAILABLE;
+                              timeout:(NSTimeInterval)timeout
+                                queue:(dispatch_queue_t)queue
+                           completion:(void (^)(MTRDiagnosticLogResult * _Nullable logResult))completion MTR_PROVISIONALLY_AVAILABLE;
 
 @end
 
