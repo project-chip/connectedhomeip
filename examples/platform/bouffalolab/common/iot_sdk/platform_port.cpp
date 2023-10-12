@@ -23,39 +23,45 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <platform/CHIPDeviceBuildConfig.h>
+
 #include <FreeRTOS.h>
 
 #include <blog.h>
 
-#if BL702_ENABLE
+#if CHIP_DEVICE_LAYER_TARGET_BL702
 #include <bl702_glb.h>
 #include <bl702_hbn.h>
-#elif BL702L_ENABLE
+#elif CHIP_DEVICE_LAYER_TARGET_BL702L
 #include <bl702l_glb.h>
 #include <bl702l_hbn.h>
-#elif BL602_ENABLE
-#include <wifi_mgmr_ext.h>
 #endif
-#include <bl_irq.h>
-#if BL702L_ENABLE
+
 #include <bl_rtc.h>
-#endif
 #include <bl_sec.h>
-#include <bl_sys.h>
+
 #ifdef CFG_USE_PSRAM
 #include <bl_psram.h>
 #endif
 #include <bl_timer.h>
-#include <hal_board.h>
-#include <hal_boot2.h>
 
 #include <hosal_uart.h>
 
-#if BL702L_ENABLE
+#if CHIP_DEVICE_LAYER_TARGET_BL702L
 #include <rom_freertos_ext.h>
 #include <rom_hal_ext.h>
 #include <rom_lmac154_ext.h>
 #endif
+
+extern "C" {
+#include <bl_irq.h>
+#include <bl_sys.h>
+#include <hal_board.h>
+#include <hal_boot2.h>
+#if CHIP_DEVICE_LAYER_TARGET_BL602
+#include <wifi_mgmr_ext.h>
+#endif
+}
 
 #include <uart.h>
 
@@ -65,21 +71,21 @@
 HOSAL_UART_DEV_DECL(uart_stdio, CHIP_UART_PORT, CHIP_UART_PIN_TX, CHIP_UART_PIN_RX, CHIP_UART_BAUDRATE);
 
 #ifdef SYS_AOS_LOOP_ENABLE
-void aos_loop_start(void);
+extern "C" void aos_loop_start(void);
 #endif
 
 // ================================================================================
 // FreeRTOS Callbacks
 // ================================================================================
-unsigned int sleep(unsigned int seconds)
+extern "C" unsigned int sleep(unsigned int seconds)
 {
     const TickType_t xDelay = 1000 * seconds / portTICK_PERIOD_MS;
     vTaskDelay(xDelay);
     return 0;
 }
 
-#if !BL702L_ENABLE
-void vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
+#if !CHIP_DEVICE_LAYER_TARGET_BL702L
+extern "C" void vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
 {
     printf("Stack Overflow checked. Stack name %s", pcTaskName);
     while (true)
@@ -88,7 +94,7 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
     }
 }
 
-void vApplicationMallocFailedHook(void)
+extern "C" void vApplicationMallocFailedHook(void)
 {
     printf("Memory Allocate Failed. Current left size is %d bytes", xPortGetFreeHeapSize());
     while (true)
@@ -97,13 +103,13 @@ void vApplicationMallocFailedHook(void)
     }
 }
 
-void vApplicationIdleHook(void)
+extern "C" void vApplicationIdleHook(void)
 {
     //    bl_wdt_feed();
     __asm volatile("   wfi     ");
 }
 
-void vApplicationGetIdleTaskMemory(StaticTask_t ** ppxIdleTaskTCBBuffer, StackType_t ** ppxIdleTaskStackBuffer,
+extern "C" void vApplicationGetIdleTaskMemory(StaticTask_t ** ppxIdleTaskTCBBuffer, StackType_t ** ppxIdleTaskStackBuffer,
                                    uint32_t * pulIdleTaskStackSize)
 {
     /* If the buffers to be provided to the Idle task are declared inside this
@@ -126,7 +132,7 @@ void vApplicationGetIdleTaskMemory(StaticTask_t ** ppxIdleTaskTCBBuffer, StackTy
 /* configSUPPORT_STATIC_ALLOCATION and configUSE_TIMERS are both set to 1, so the
 application must provide an implementation of vApplicationGetTimerTaskMemory()
 to provide the memory that is used by the Timer service task. */
-void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBuffer, StackType_t ** ppxTimerTaskStackBuffer,
+extern "C" void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBuffer, StackType_t ** ppxTimerTaskStackBuffer,
                                     uint32_t * pulTimerTaskStackSize)
 {
     /* If the buffers to be provided to the Timer task are declared inside this
@@ -147,7 +153,7 @@ void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBuffer, Stack
 }
 
 #if (configUSE_TICK_HOOK != 0)
-void vApplicationTickHook(void)
+extern "C" void vApplicationTickHook(void)
 {
 #if defined(CFG_USB_CDC_ENABLE)
     extern void usb_cdc_monitor(void);
@@ -156,9 +162,9 @@ void vApplicationTickHook(void)
 }
 #endif
 
-void vApplicationSleep(TickType_t xExpectedIdleTime) {}
+extern "C" void vApplicationSleep(TickType_t xExpectedIdleTime) {}
 
-void vAssertCalled(void)
+extern "C" void vAssertCalled(void)
 {
     void * ra = (void *) __builtin_return_address(0);
 
@@ -184,8 +190,8 @@ void vAssertCalled(void)
 }
 #endif
 
-#if BL702L_ENABLE
-void __attribute__((weak)) user_vAssertCalled(void)
+#if CHIP_DEVICE_LAYER_TARGET_BL702L
+extern "C" void __attribute__((weak)) user_vAssertCalled(void)
 {
     void * ra = (void *) __builtin_return_address(0);
 
@@ -204,7 +210,7 @@ void __attribute__((weak)) user_vAssertCalled(void)
         ;
 }
 
-void __attribute__((weak)) user_vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
+extern "C" void __attribute__((weak)) user_vApplicationStackOverflowHook(TaskHandle_t xTask, char * pcTaskName)
 {
     puts("Stack Overflow checked\r\n");
     if (pcTaskName)
@@ -217,7 +223,7 @@ void __attribute__((weak)) user_vApplicationStackOverflowHook(TaskHandle_t xTask
     }
 }
 
-void __attribute__((weak)) user_vApplicationMallocFailedHook(void)
+extern "C" void __attribute__((weak)) user_vApplicationMallocFailedHook(void)
 {
     printf("Memory Allocate Failed. Current left size is %d bytes\r\n", xPortGetFreeHeapSize());
 #if defined(CFG_USE_PSRAM)
@@ -229,35 +235,35 @@ void __attribute__((weak)) user_vApplicationMallocFailedHook(void)
     }
 }
 
-void bflb_assert(void) __attribute__((weak, alias("user_vAssertCalled")));
+extern "C" void bflb_assert(void) __attribute__((weak, alias("user_vAssertCalled")));
 #else
-void user_vAssertCalled(void) __attribute__((weak, alias("vAssertCalled")));
-void bflb_assert(void) __attribute__((weak, alias("vAssertCalled")));
+extern "C" void user_vAssertCalled(void) __attribute__((weak, alias("vAssertCalled")));
+extern "C" void bflb_assert(void) __attribute__((weak, alias("vAssertCalled")));
 #endif
 
 // ================================================================================
 // Main Code
 // ================================================================================
-extern uint8_t _heap_start;
-extern size_t _heap_size; // @suppress("Type cannot be resolved")
+extern "C"  uint8_t _heap_start;
+extern "C"  size_t _heap_size; // @suppress("Type cannot be resolved")
 
-#if BL602_ENABLE
-extern uint8_t _heap_wifi_start;
-extern uint8_t _heap_wifi_size; // @suppress("Type cannot be resolved")
+#if CHIP_DEVICE_LAYER_TARGET_BL602
+extern "C"  uint8_t _heap_wifi_start;
+extern "C"  uint8_t _heap_wifi_size; // @suppress("Type cannot be resolved")
 static const HeapRegion_t xHeapRegions[] = {
     { &_heap_start, (unsigned int) &_heap_size }, // set on runtime
     { &_heap_wifi_start, (unsigned int) &_heap_wifi_size },
     { NULL, 0 } /* Terminates the array. */
 };
-#elif BL702_ENABLE
-extern uint8_t _heap2_start;
-extern uint8_t _heap2_size; // @suppress("Type cannot be resolved")
+#elif CHIP_DEVICE_LAYER_TARGET_BL702
+extern "C"  uint8_t _heap2_start;
+extern "C"  uint8_t _heap2_size; // @suppress("Type cannot be resolved")
 static const HeapRegion_t xHeapRegions[] = {
     { &_heap_start, (size_t) &_heap_size },   // set on runtime
     { &_heap2_start, (size_t) &_heap2_size }, // set on runtime
     { NULL, 0 }                               /* Terminates the array. */
 };
-#elif BL702L_ENABLE
+#elif CHIP_DEVICE_LAYER_TARGET_BL702L
 static const HeapRegion_t xHeapRegions[] = {
     { &_heap_start, (size_t) &_heap_size }, // set on runtime
     { NULL, 0 }                             /* Terminates the array. */
@@ -265,18 +271,18 @@ static const HeapRegion_t xHeapRegions[] = {
 #endif
 
 #ifdef CFG_USE_PSRAM
-extern uint32_t __psram_bss_init_start;
-extern uint32_t __psram_bss_init_end;
+extern "C" uint32_t __psram_bss_init_start;
+extern "C" uint32_t __psram_bss_init_end;
 
 static uint32_t __attribute__((section(".rsvd_data"))) psram_reset_count;
 
-extern uint8_t _heap3_start;
-extern size_t _heap3_size; // @suppress("Type cannot be resolved")
+extern "C" uint8_t _heap3_start;
+extern "C" size_t _heap3_size; // @suppress("Type cannot be resolved")
 static const HeapRegion_t xPsramHeapRegions[] = {
     { &_heap3_start, (size_t) &_heap3_size }, { NULL, 0 } /* Terminates the array. */
 };
 
-size_t get_heap3_size(void)
+extern "C" size_t get_heap3_size(void)
 {
     return (size_t) &_heap3_size;
 }
@@ -325,13 +331,13 @@ void do_psram_test()
 }
 #endif
 
-void setup_heap()
+extern "C" void setup_heap()
 {
     bl_sys_init();
 
-#if BL702_ENABLE
+#if CHIP_DEVICE_LAYER_TARGET_BL702
     bl_sys_em_config();
-#elif BL702L_ENABLE
+#elif CHIP_DEVICE_LAYER_TARGET_BL702L
     bl_sys_em_config();
 
     // Initialize rom data
@@ -341,7 +347,7 @@ void setup_heap()
     memcpy((void *) &_rom_data_run, (void *) &_rom_data_load, (size_t) &_rom_data_size);
 #endif
 
-#if BL702_ENABLE
+#if CHIP_DEVICE_LAYER_TARGET_BL702
     extern uint8_t __ocram_bss_start[], __ocram_bss_end[];
     if (NULL != __ocram_bss_start && NULL != __ocram_bss_end && __ocram_bss_end > __ocram_bss_start)
     {
@@ -358,16 +364,16 @@ void setup_heap()
 #endif
 }
 
-size_t get_heap_size(void)
+extern "C" size_t get_heap_size(void)
 {
     return (size_t) &_heap_size;
 }
 
-void app_init(void)
+extern "C" void app_init(void)
 {
     bl_sys_early_init();
 
-#if BL702L_ENABLE
+#if CHIP_DEVICE_LAYER_TARGET_BL702L
     rom_freertos_init(256, 400);
     rom_hal_init();
     rom_lmac154_hook_init();
@@ -377,11 +383,11 @@ void app_init(void)
 
     blog_init();
     bl_irq_init();
-#if BL702L_ENABLE
+#if CHIP_DEVICE_LAYER_TARGET_BL702L
     bl_rtc_init();
 #endif
     bl_sec_init();
-#if BL702_ENABLE
+#if CHIP_DEVICE_LAYER_TARGET_BL702
     bl_timer_init();
 #endif
 
@@ -390,15 +396,15 @@ void app_init(void)
     /* board config is set after system is init*/
     hal_board_cfg(0);
 
-#if BL702L_ENABLE || CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+#if CHIP_DEVICE_LAYER_TARGET_BL702L || CHIP_DEVICE_CONFIG_ENABLE_WIFI || CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
     hosal_dma_init();
 #endif
-#if BL602_ENABLE
+#if CHIP_DEVICE_LAYER_TARGET_BL602
     wifi_td_diagnosis_init();
 #endif
 }
 
-void platform_port_init(void)
+extern "C" void platform_port_init(void)
 {
     app_init();
 

@@ -627,6 +627,8 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_mbedtls") {
+
+    defines = [ "MBEDTLS_ECP_ALT_KEEP_ORIGINAL=0" ]
     include_dirs =
         [ "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library" ]
 
