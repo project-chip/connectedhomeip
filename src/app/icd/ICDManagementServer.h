@@ -18,10 +18,13 @@
 #pragma once
 
 #include <app/util/basic-types.h>
+#include <crypto/SessionKeystore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/Optional.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
+
+#include <app/icd/ICDMonitoringTable.h>
 
 namespace chip {
 
@@ -33,6 +36,8 @@ public:
     uint32_t GetIdleModeIntervalSec() { return mIdleInterval_s; }
 
     uint32_t GetActiveModeIntervalMs() { return mActiveInterval_ms; }
+
+    void SetSymmetricKeystore(Crypto::SymmetricKeystore * keyStore) { mSymmetricKeystore = keyStore; }
 
     uint16_t GetActiveModeThresholdMs() { return mActiveThreshold_ms; }
 
@@ -56,6 +61,7 @@ private:
     ICDManagementServer() = default;
 
     static ICDManagementServer mInstance;
+    Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
 
     static_assert((CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC) <= 64800,
                   "Spec requires the IdleModeInterval to be equal or inferior to 64800s.");

@@ -107,13 +107,14 @@ CHIP_ERROR IcdManagementAttributeAccess::ReadRegisteredClients(EndpointId endpoi
     uint16_t supported_clients = ICDManagementServer::GetInstance().GetClientsSupportedPerFabric();
 
     return encoder.EncodeList([supported_clients](const auto & subEncoder) -> CHIP_ERROR {
-        ICDMonitoringEntry e;
+        Crypto::SessionKeystore * keyStore = Server::GetInstance().GetSessionKeystore();
+        ICDMonitoringEntry e(keyStore);
 
-        const auto & fabricTable = Server::GetInstance().GetFabricTable();
+        const auto & fabricTable            = Server::GetInstance().GetFabricTable();
+        PersistentStorageDelegate & storage = Server::GetInstance().GetPersistentStorage();
         for (const auto & fabricInfo : fabricTable)
         {
-            PersistentStorageDelegate & storage = chip::Server::GetInstance().GetPersistentStorage();
-            ICDMonitoringTable table(storage, fabricInfo.GetFabricIndex(), supported_clients);
+            ICDMonitoringTable table(storage, fabricInfo.GetFabricIndex(), supported_clients, keyStore);
             for (uint16_t i = 0; i < table.Limit(); ++i)
             {
                 CHIP_ERROR err = table.Get(i, e);
@@ -165,7 +166,8 @@ class IcdManagementFabricDelegate : public chip::FabricTable::Delegate
     void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override
     {
         uint16_t supported_clients = ICDManagementServer::GetInstance().GetClientsSupportedPerFabric();
-        ICDMonitoringTable table(chip::Server::GetInstance().GetPersistentStorage(), fabricIndex, supported_clients);
+        ICDMonitoringTable table(Server::GetInstance().GetPersistentStorage(), fabricIndex, supported_clients,
+                                 Server::GetInstance().GetSessionKeystore());
         table.RemoveAll();
     }
 };
