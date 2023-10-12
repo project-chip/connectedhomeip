@@ -14,9 +14,9 @@ RUN set -x \
 
 
 # Clone Gecko SDK 4.3.2 (1228a95)
-RUN git clone --single-branch --depth=1 --branch=v4.3.2 https://github.com/SiliconLabs/gecko_sdk.git /tmp/gecko_sdk && \
-    cd /tmp/gecko_sdk && \
-    rm -rf .git \
+RUN wget https://github.com/SiliconLabs/gecko_sdk/releases/download/v4.3.2/gecko-sdk.zip -O /tmp/gecko_sdk.zip \
+    && unzip /tmp/gecko_sdk.zip -d /tmp/gecko_sdk \
+    && rm -rf /tmp/gecko_sdk.zip \
     && : # last line
 
 # Clone WiSeConnect Wi-Fi and Bluetooth Software 2.8.2 (4fa5c5f)
