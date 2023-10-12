@@ -12,7 +12,7 @@ WeakEnums:
     - RadioFaultEnum
     - StepMode
 
-EnumsNotUsedInDataModelStruct:
+EnumsNotUsedAsTypeInXML:
     # List of enums that are not used in a DataModel Struct. By adding an enum
     # to this list you prevent incorrectly assuming from code that you are
     # able to use kUnknownEnumValue safely. This happens for derivate clusters

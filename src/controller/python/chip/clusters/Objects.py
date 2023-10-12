@@ -15261,10 +15261,11 @@ class LaundryWasherMode(Cluster):
             kDelicate = 0x4001
             kHeavy = 0x4002
             kWhites = 0x4003
-            # kUnknownEnumValue intentionally not defined. This enum is not used
-            # in a DataModel struct, likely because it is a part of a derivative
+            # kUnknownEnumValue intentionally not defined. This enum never goes
+            # through DataModel::Decode, likely because it is a part of a derived
             # cluster. As a result having kUnknownEnumValue in this enum is error
-            # prone, and was removed.
+            # prone, and was removed. See
+            # src/app/common/templates/config-data.yaml.
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -15531,10 +15532,11 @@ class RefrigeratorAndTemperatureControlledCabinetMode(Cluster):
         class ModeTag(MatterIntEnum):
             kRapidCool = 0x4000
             kRapidFreeze = 0x4001
-            # kUnknownEnumValue intentionally not defined. This enum is not used
-            # in a DataModel struct, likely because it is a part of a derivative
+            # kUnknownEnumValue intentionally not defined. This enum never goes
+            # through DataModel::Decode, likely because it is a part of a derived
             # cluster. As a result having kUnknownEnumValue in this enum is error
-            # prone, and was removed.
+            # prone, and was removed. See
+            # src/app/common/templates/config-data.yaml.
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -16011,10 +16013,11 @@ class RvcRunMode(Cluster):
         class ModeTag(MatterIntEnum):
             kIdle = 0x4000
             kCleaning = 0x4001
-            # kUnknownEnumValue intentionally not defined. This enum is not used
-            # in a DataModel struct, likely because it is a part of a derivative
+            # kUnknownEnumValue intentionally not defined. This enum never goes
+            # through DataModel::Decode, likely because it is a part of a derived
             # cluster. As a result having kUnknownEnumValue in this enum is error
-            # prone, and was removed.
+            # prone, and was removed. See
+            # src/app/common/templates/config-data.yaml.
 
         class StatusCode(MatterIntEnum):
             kStuck = 0x41
@@ -16025,10 +16028,11 @@ class RvcRunMode(Cluster):
             kWaterTankLidOpen = 0x46
             kMopCleaningPadMissing = 0x47
             kBatteryLow = 0x48
-            # kUnknownEnumValue intentionally not defined. This enum is not used
-            # in a DataModel struct, likely because it is a part of a derivative
+            # kUnknownEnumValue intentionally not defined. This enum never goes
+            # through DataModel::Decode, likely because it is a part of a derived
             # cluster. As a result having kUnknownEnumValue in this enum is error
-            # prone, and was removed.
+            # prone, and was removed. See
+            # src/app/common/templates/config-data.yaml.
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -16296,17 +16300,19 @@ class RvcCleanMode(Cluster):
             kDeepClean = 0x4000
             kVacuum = 0x4001
             kMop = 0x4002
-            # kUnknownEnumValue intentionally not defined. This enum is not used
-            # in a DataModel struct, likely because it is a part of a derivative
+            # kUnknownEnumValue intentionally not defined. This enum never goes
+            # through DataModel::Decode, likely because it is a part of a derived
             # cluster. As a result having kUnknownEnumValue in this enum is error
-            # prone, and was removed.
+            # prone, and was removed. See
+            # src/app/common/templates/config-data.yaml.
 
         class StatusCode(MatterIntEnum):
             kCleaningInProgress = 0x40
-            # kUnknownEnumValue intentionally not defined. This enum is not used
-            # in a DataModel struct, likely because it is a part of a derivative
+            # kUnknownEnumValue intentionally not defined. This enum never goes
+            # through DataModel::Decode, likely because it is a part of a derived
             # cluster. As a result having kUnknownEnumValue in this enum is error
-            # prone, and was removed.
+            # prone, and was removed. See
+            # src/app/common/templates/config-data.yaml.
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -17033,10 +17039,11 @@ class DishwasherMode(Cluster):
             kNormal = 0x4000
             kHeavy = 0x4001
             kLight = 0x4002
-            # kUnknownEnumValue intentionally not defined. This enum is not used
-            # in a DataModel struct, likely because it is a part of a derivative
+            # kUnknownEnumValue intentionally not defined. This enum never goes
+            # through DataModel::Decode, likely because it is a part of a derived
             # cluster. As a result having kUnknownEnumValue in this enum is error
-            # prone, and was removed.
+            # prone, and was removed. See
+            # src/app/common/templates/config-data.yaml.
 
     class Bitmaps:
         class Feature(IntFlag):
