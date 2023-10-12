@@ -187,7 +187,7 @@ public:
     {
         mBLEManagerImpl->StartAdvertisingProcess();
 #ifdef CONFIG_BOOTLOADER_MCUBOOT
-    OtaConfirmNewImage();
+        OtaConfirmNewImage();
 #endif /* CONFIG_BOOTLOADER_MCUBOOT */
     };
 
