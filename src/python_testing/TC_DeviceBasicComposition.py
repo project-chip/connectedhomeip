@@ -184,10 +184,13 @@ def separate_endpoint_types(endpoint_dict: dict[int, Any]) -> tuple[list[int], l
         if endpoint_id == 0:
             continue
         aggregator_id = 0x000e
+        content_app_id = 0x0024
         device_types = [d.deviceType for d in endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
         if aggregator_id in device_types:
             flat.append(endpoint_id)
         else:
+            if content_app_id in device_types:
+                continue
             tree.append(endpoint_id)
     return (flat, tree)
 
@@ -263,6 +266,23 @@ def create_device_type_lists(roots: list[int], endpoint_dict: dict[int, Any]) ->
                 tree_device_types[d.deviceType].add(ep)
         device_types[root] = tree_device_types
 
+    return device_types
+
+
+def get_direct_children_of_root(endpoint_dict: dict[int, Any]) -> set[int]:
+    root_children = set(endpoint_dict[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList])
+    direct_children = root_children
+    for ep in root_children:
+        ep_children = set(endpoint_dict[ep][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList])
+        direct_children = direct_children - ep_children
+    return direct_children
+
+
+def create_device_type_list_for_root(direct_children, endpoint_dict: dict[int, Any]) -> dict[int, set[int]]:
+    device_types = defaultdict(set)
+    for ep in direct_children:
+        for d in endpoint_dict[ep][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]:
+            device_types[d.deviceType].add(ep)
     return device_types
 
 
@@ -817,18 +837,19 @@ class TC_DeviceBasicComposition(MatterBaseTest):
             self.fail_current_test("power source EndpointList attribute is incorrect")
 
     def test_DESC_2_2(self):
-        self.print_step(1, "Wildcard read of device - already done")
+        self.print_step(0, "Wildcard read of device - already done")
 
-        self.print_step(2, "Identify all endpoints that are roots of a tree-composition")
+        self.print_step(
+            1, "Identify all endpoints that are roots of a tree-composition. Omit any endpoints that include the Content App device type.")
         _, tree = separate_endpoint_types(self.endpoints)
         roots = find_tree_roots(tree, self.endpoints)
 
         self.print_step(
-            3, "For each tree root, go through each of the children and add their endpoint IDs to a list of device types based on the DeviceTypes list")
+            1.1, "For each tree root, go through each of the children and add their endpoint IDs to a list of device types based on the DeviceTypes list")
         device_types = create_device_type_lists(roots, self.endpoints)
 
         self.print_step(
-            4, "For device types with more than one endpoint listed, ensure each of the listed endpoints has a tag attribute and the tag attributes are not the same")
+            1.2, "For device types with more than one endpoint listed, ensure each of the listed endpoints has a tag attribute and the tag attributes are not the same")
         problems = find_tag_list_problems(roots, device_types, self.endpoints)
 
         for ep, problem in problems.items():
@@ -837,7 +858,16 @@ class TC_DeviceBasicComposition(MatterBaseTest):
             msg = f'problem on ep {ep}: missing feature = {problem.missing_feature}, missing attribute = {problem.missing_attribute}, duplicates = {problem.duplicates}, same_tags = {problem.same_tag}'
             self.record_error(self.get_test_name(), location=location, problem=msg, spec_location="Descriptor TagList")
 
-        if problems:
+        self.print_step(2, "Identify all the direct children of the root node endpoint")
+        root_direct_children = get_direct_children_of_root(self.endpoints)
+        self.print_step(
+            2.1, "Go through each of the direct children of the root node and add their endpoint IDs to a list of device types based on the DeviceTypes list")
+        device_types = create_device_type_list_for_root(root_direct_children, self.endpoints)
+        self.print_step(
+            2.2, "For device types with more than one endpoint listed, ensure each of the listed endpoints has a tag attribute and the tag attributes are not the same")
+        root_problems = find_tag_list_problems([0], {0: device_types}, self.endpoints)
+
+        if problems or root_problems:
             self.fail_current_test("Problems with tags lists")
 
 
