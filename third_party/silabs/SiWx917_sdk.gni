@@ -52,7 +52,6 @@ template("siwx917_sdk") {
     _include_dirs = [
       "${chip_root}",
       "${chip_root}/examples/platform/silabs/SiWx917/SiWx917",
-      "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/support/hal",
       "${efr32_sdk_root}/platform/emdrv/nvm3/inc",
       "${efr32_sdk_root}/platform/emdrv/common/inc",
       "${efr32_sdk_root}/platform/service/device_init/inc",
@@ -130,6 +129,9 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/platform/service/sleeptimer/config",
       "${efr32_sdk_root}/platform/service/sleeptimer/src",
       "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/support/inc",
+
+      "${efr32_sdk_root}/platform/service/iostream/inc",
+      "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/button/inc",
     ]
 
     if (silabs_board == "BRD4338A") {
@@ -191,6 +193,7 @@ template("siwx917_sdk") {
       "SL_NVM3_PRESENT",
       "ROM_WIRELESS",
       "BRD4325A",  #TODO: should be removed after SoC macro clean-up
+      "CONNECTIVITY_PLATFORM",
     ]
 
     if (silabs_board == "BRD4325B") {
@@ -410,7 +413,6 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/kernel/timers.c",
       "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/autogen/sl_event_handler.c",
       "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/support/hal/rsi_hal_mcu_m4.c",
-      "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/support/hal/rsi_hal_mcu_platform_init.c",
       "${wifi_sdk_root}/components/siwx917_soc/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.c",
 
       # mbedtls
@@ -436,6 +438,8 @@ template("siwx917_sdk") {
       "${chip_root}/third_party/mbedtls/repo/library/sha256.c",
       "${chip_root}/third_party/mbedtls/repo/library/sha512.c",
       "${chip_root}/third_party/mbedtls/repo/library/x509_create.c",
+      "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream.c",
+      "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream_rtt.c",
       "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc.c",
       "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc_dh.c",
       "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc_dsa.c",
@@ -448,6 +452,8 @@ template("siwx917_sdk") {
       "${sdk_support_root}/matter/mbedtls/tinycrypt/src/platform_util.c",
       "${sdk_support_root}/matter/mbedtls/tinycrypt/src/x509_crt.c",
       "${sdk_support_root}/matter/mbedtls/tinycrypt/src/x509write_csr.c",
+      "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/autogen/sl_si91x_button_instances.c",
+      "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/button/src/sl_si91x_button.c",
     ]
 
     # nvm3 ans startup
