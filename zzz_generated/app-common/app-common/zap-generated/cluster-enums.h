@@ -416,8 +416,8 @@ enum class ProductFinishEnum : uint8_t
 
 namespace OtaSoftwareUpdateProvider {
 
-// Enum for OTAApplyUpdateAction
-enum class OTAApplyUpdateAction : uint8_t
+// Enum for ApplyUpdateActionEnum
+enum class ApplyUpdateActionEnum : uint8_t
 {
     kProceed         = 0x00,
     kAwaitNextAction = 0x01,
@@ -429,8 +429,8 @@ enum class OTAApplyUpdateAction : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for OTADownloadProtocol
-enum class OTADownloadProtocol : uint8_t
+// Enum for DownloadProtocolEnum
+enum class DownloadProtocolEnum : uint8_t
 {
     kBDXSynchronous  = 0x00,
     kBDXAsynchronous = 0x01,
@@ -443,8 +443,8 @@ enum class OTADownloadProtocol : uint8_t
     kUnknownEnumValue = 4,
 };
 
-// Enum for OTAQueryStatus
-enum class OTAQueryStatus : uint8_t
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
 {
     kUpdateAvailable              = 0x00,
     kBusy                         = 0x01,
@@ -460,8 +460,8 @@ enum class OTAQueryStatus : uint8_t
 
 namespace OtaSoftwareUpdateRequestor {
 
-// Enum for OTAAnnouncementReason
-enum class OTAAnnouncementReason : uint8_t
+// Enum for AnnouncementReasonEnum
+enum class AnnouncementReasonEnum : uint8_t
 {
     kSimpleAnnouncement    = 0x00,
     kUpdateAvailable       = 0x01,
@@ -473,8 +473,8 @@ enum class OTAAnnouncementReason : uint8_t
     kUnknownEnumValue = 3,
 };
 
-// Enum for OTAChangeReasonEnum
-enum class OTAChangeReasonEnum : uint8_t
+// Enum for ChangeReasonEnum
+enum class ChangeReasonEnum : uint8_t
 {
     kUnknown         = 0x00,
     kSuccess         = 0x01,
@@ -488,8 +488,8 @@ enum class OTAChangeReasonEnum : uint8_t
     kUnknownEnumValue = 5,
 };
 
-// Enum for OTAUpdateStateEnum
-enum class OTAUpdateStateEnum : uint8_t
+// Enum for UpdateStateEnum
+enum class UpdateStateEnum : uint8_t
 {
     kUnknown              = 0x00,
     kIdle                 = 0x01,
@@ -1011,9 +1011,6 @@ enum class HardwareFaultEnum : uint8_t
     kUnknownEnumValue = 11,
 };
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for InterfaceTypeEnum
 enum class InterfaceTypeEnum : uint8_t
 {
@@ -1028,10 +1025,6 @@ enum class InterfaceTypeEnum : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 5,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using InterfaceTypeEnum                                                              = EmberAfInterfaceTypeEnum;
-static InterfaceTypeEnum __attribute__((unused)) kInterfaceTypeEnumkUnknownEnumValue = static_cast<InterfaceTypeEnum>(5);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 
 // Enum for NetworkFaultEnum
 enum class NetworkFaultEnum : uint8_t
@@ -1047,9 +1040,6 @@ enum class NetworkFaultEnum : uint8_t
     kUnknownEnumValue = 4,
 };
 
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for RadioFaultEnum
 enum class RadioFaultEnum : uint8_t
 {
@@ -1066,10 +1056,6 @@ enum class RadioFaultEnum : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 7,
 };
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using RadioFaultEnum                                                           = EmberAfRadioFaultEnum;
-static RadioFaultEnum __attribute__((unused)) kRadioFaultEnumkUnknownEnumValue = static_cast<RadioFaultEnum>(7);
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 } // namespace GeneralDiagnostics
 
 namespace SoftwareDiagnostics {
@@ -3014,7 +3000,21 @@ enum class Feature : uint32_t
 };
 } // namespace ColorControl
 
-namespace BallastConfiguration {} // namespace BallastConfiguration
+namespace BallastConfiguration {
+
+// Bitmap for BallastStatusBitmap
+enum class BallastStatusBitmap : uint8_t
+{
+    kBallastNonOperational = 0x1,
+    kLampFailure           = 0x2,
+};
+
+// Bitmap for LampAlarmModeBitmap
+enum class LampAlarmModeBitmap : uint8_t
+{
+    kLampBurnHours = 0x1,
+};
+} // namespace BallastConfiguration
 
 namespace IlluminanceMeasurement {
 
@@ -4140,3 +4140,6 @@ namespace SampleMei {} // namespace SampleMei
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+
+// Included at the end, so all our definitions above are available.
+#include <app/CompatEnumNames.h>

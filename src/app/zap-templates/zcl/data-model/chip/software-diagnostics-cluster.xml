@@ -18,7 +18,7 @@ limitations under the License.
   <domain name="CHIP"/>
   <struct name="ThreadMetricsStruct">
     <cluster code="0x0034"/>
-    <item name="Id" type="INT64U"/>
+    <item name="ID" type="INT64U"/>
     <item name="Name" type="CHAR_STRING" length="8" optional="true"/>
     <item name="StackFreeCurrent" type="INT32U" optional="true"/>
     <item name="StackFreeMinimum" type="INT32U" optional="true"/>

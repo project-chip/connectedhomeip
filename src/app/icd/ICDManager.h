@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <app/icd/ICDMonitoringTable.h>
+#include <app/icd/ICDNotifier.h>
 #include <app/icd/ICDStateObserver.h>
 #include <credentials/FabricTable.h>
 #include <lib/support/BitFlags.h>
@@ -33,7 +35,7 @@ class TestICDManager;
 /**
  * @brief ICD Manager is responsible of processing the events and triggering the correct action for an ICD
  */
-class ICDManager
+class ICDManager : public ICDListener
 {
 public:
     enum class OperationalState : uint8_t
@@ -48,18 +50,11 @@ public:
         LIT, // Long Interval Time ICD
     };
 
-    enum class KeepActiveFlags : uint8_t
-    {
-        kCommissioningWindowOpen = 0x01,
-        kFailSafeArmed           = 0x02,
-        kExpectingMsgResponse    = 0x03,
-        kAwaitingMsgAck          = 0x04,
-    };
-
     ICDManager() {}
-    void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, ICDStateObserver * stateObserver);
+    void Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, ICDStateObserver * stateObserver,
+              Crypto::SymmetricKeystore * symmetricKeyStore);
     void Shutdown();
-    void UpdateIcdMode();
+    void UpdateICDMode();
     void UpdateOperationState(OperationalState state);
     void SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state);
     bool IsKeepActive() { return mKeepActiveFlags.HasAny(); }
@@ -69,6 +64,12 @@ public:
     static System::Clock::Milliseconds32 GetSITPollingThreshold() { return kSITPollingThreshold; }
     static System::Clock::Milliseconds32 GetSlowPollingInterval() { return kSlowPollingInterval; }
     static System::Clock::Milliseconds32 GetFastPollingInterval() { return kFastPollingInterval; }
+
+    // Implementation of ICDListener functions.
+    // Callers must origin from the chip task context or be holding the ChipStack lock.
+    void OnNetworkActivity() override;
+    void OnKeepActiveRequest(KeepActiveFlags request) override;
+    void OnActiveRequestWithdrawal(KeepActiveFlags request) override;
 
 protected:
     friend class TestICDManager;
@@ -82,6 +83,8 @@ protected:
      * etc.)
      */
     static void OnTransitionToIdle(System::Layer * aLayer, void * appState);
+
+    static uint8_t OpenExchangeContextCount;
 
 private:
     // SIT ICDs should have a SlowPollingThreshold shorter than or equal to 15s (spec 9.16.1.5)
@@ -97,12 +100,14 @@ private:
     bool SupportsCheckInProtocol();
 
     BitFlags<KeepActiveFlags> mKeepActiveFlags{ 0 };
-    OperationalState mOperationalState   = OperationalState::IdleMode;
-    ICDMode mICDMode                     = ICDMode::SIT;
-    PersistentStorageDelegate * mStorage = nullptr;
-    FabricTable * mFabricTable           = nullptr;
-    ICDStateObserver * mStateObserver    = nullptr;
-    bool mTransitionToIdleCalled         = false;
+
+    OperationalState mOperationalState             = OperationalState::IdleMode;
+    ICDMode mICDMode                               = ICDMode::SIT;
+    PersistentStorageDelegate * mStorage           = nullptr;
+    FabricTable * mFabricTable                     = nullptr;
+    ICDStateObserver * mStateObserver              = nullptr;
+    bool mTransitionToIdleCalled                   = false;
+    Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
 };
 
 } // namespace app
