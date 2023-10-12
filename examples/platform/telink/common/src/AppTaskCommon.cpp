@@ -386,12 +386,16 @@ void AppTaskCommon::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
     case kButtonId_FactoryReset:
         FactoryResetButtonEventHandler();
         break;
+#if APP_USE_THREAD_START_BUTTON
     case kButtonId_StartThread:
         StartThreadButtonEventHandler();
         break;
+#endif
+#if APP_USE_BLE_START_BUTTON
     case kButtonId_StartBleAdv:
         StartBleAdvButtonEventHandler();
         break;
+#endif
     }
 }
 #endif
