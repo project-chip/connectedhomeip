@@ -131,7 +131,7 @@ template("siwx917_sdk") {
       "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/support/inc",
 
       "${efr32_sdk_root}/platform/service/iostream/inc",      
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/button/inc"
+      "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/button/inc",
     ]
 
     if (silabs_board == "BRD4338A") {
@@ -454,7 +454,7 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream.c",
       "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream_rtt.c",
       "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/autogen/sl_si91x_button_instances.c",
-      "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/button/src/sl_si91x_button.c"
+      "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/button/src/sl_si91x_button.c",
     ]
 
     # nvm3 ans startup
