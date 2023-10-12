@@ -98,10 +98,6 @@ chip_configure_data_model(app
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lighting-common/lighting-app.zap
 )
 
-if(CONFIG_CHIP_OTA_REQUESTOR)
-    target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
-endif()
-
 # Fix for unused swap parameter in: zephyr/include/zephyr/arch/riscv/irq.h:70
 add_compile_options(-Wno-error=unused-parameter)
 

@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,7 @@
 
 #pragma once
 
+#ifdef CONFIG_CHIP_OTA_REQUESTOR
 #include <platform/telink/OTAImageProcessorImpl.h>
 
 namespace chip {
@@ -32,3 +33,10 @@ class OTAImageProcessorImpl;
  * an update so the confirmation must be done on the OTA provider side.
  */
 void InitBasicOTARequestor();
+
+#endif // CONFIG_CHIP_OTA_REQUESTOR
+
+/**
+ * Confirm or revert new image in MCUBoot.
+ */
+void OtaConfirmNewImage();

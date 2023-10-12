@@ -75,6 +75,9 @@ config SYSTEM_WORKQUEUE_STACK_SIZE
 config HEAP_MEM_POOL_SIZE
     default 128 if PM
 
+config COMMON_LIBC_MALLOC_ARENA_SIZE 
+    default 12288
+
 config NET_IPV6_MLD
     default n
 
