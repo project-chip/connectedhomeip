@@ -153,59 +153,68 @@ nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::OnOff::Fe
     using namespace chip::app::Clusters::OnOff;
     nlohmann::json obj;
     obj["Lighting"] = static_cast<bool>(value.GetField(Feature::kLighting));
-    obj["DeadFront"] = static_cast<bool>(value.GetField(Feature::kDeadFront));
+    obj["DeadFrontBehavior"] = static_cast<bool>(value.GetField(Feature::kDeadFrontBehavior));
     return obj;
 }
 template <>
-nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::OnOff::OnOffControl>& value)
+nlohmann::json inline to_json(const chip::BitMask<chip::app::Clusters::OnOff::OnOffControlBitmap>& value)
 {
     using namespace chip::app::Clusters::OnOff;
     nlohmann::json obj;
-    obj["AcceptOnlyWhenOn"] = static_cast<bool>(value.GetField(OnOffControl::kAcceptOnlyWhenOn));
+    obj["AcceptOnlyWhenOn"] = static_cast<bool>(value.GetField(OnOffControlBitmap::kAcceptOnlyWhenOn));
     return obj;
 }
 
 template <>
-nlohmann::json inline to_json(const chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant& value)
-{
-    using namespace chip::app::Clusters::OnOff;
-    return static_cast<uint8_t>(value);
-}
-template <>
-nlohmann::json inline to_json(const chip::app::Clusters::OnOff::OnOffDyingLightEffectVariant& value)
+nlohmann::json inline to_json(const chip::app::Clusters::OnOff::DelayedAllOffEffectVariantEnum& value)
 {
     using namespace chip::app::Clusters::OnOff;
     switch (value) {
-    case OnOffDyingLightEffectVariant::k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second:
-        return "20PercenterDimUpIn_0p5SecondsThenFadeToOffIn_1Second";
+    case DelayedAllOffEffectVariantEnum::kDelayedOffFastFade:
+        return "DelayedOffFastFade";
+    case DelayedAllOffEffectVariantEnum::kNoFade:
+        return "NoFade";
+    case DelayedAllOffEffectVariantEnum::kDelayedOffSlowFade:
+        return "DelayedOffSlowFade";
     default:
         return "{}";
     }
 }
 template <>
-nlohmann::json inline to_json(const chip::app::Clusters::OnOff::OnOffEffectIdentifier& value)
+nlohmann::json inline to_json(const chip::app::Clusters::OnOff::DyingLightEffectVariantEnum& value)
 {
     using namespace chip::app::Clusters::OnOff;
     switch (value) {
-    case OnOffEffectIdentifier::kDelayedAllOff:
+    case DyingLightEffectVariantEnum::kDyingLightFadeOff:
+        return "DyingLightFadeOff";
+    default:
+        return "{}";
+    }
+}
+template <>
+nlohmann::json inline to_json(const chip::app::Clusters::OnOff::EffectIdentifierEnum& value)
+{
+    using namespace chip::app::Clusters::OnOff;
+    switch (value) {
+    case EffectIdentifierEnum::kDelayedAllOff:
         return "DelayedAllOff";
-    case OnOffEffectIdentifier::kDyingLight:
+    case EffectIdentifierEnum::kDyingLight:
         return "DyingLight";
     default:
         return "{}";
     }
 }
 template <>
-nlohmann::json inline to_json(const chip::app::Clusters::OnOff::OnOffStartUpOnOff& value)
+nlohmann::json inline to_json(const chip::app::Clusters::OnOff::StartUpOnOffEnum& value)
 {
     using namespace chip::app::Clusters::OnOff;
     switch (value) {
-    case OnOffStartUpOnOff::kOff:
-        return "SetOnOffTo0";
-    case OnOffStartUpOnOff::kOn:
-        return "SetOnOffTo1";
-    case OnOffStartUpOnOff::kTogglePreviousOnOff:
-        return "TogglePreviousOnOff";
+    case StartUpOnOffEnum::kOff:
+        return "Off";
+    case StartUpOnOffEnum::kOn:
+        return "On";
+    case StartUpOnOffEnum::kToggle:
+        return "Toggle";
     default:
         return "{}";
     }

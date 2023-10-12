@@ -1,38 +1,6 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
-struct ModeTagStruct {
-    optional vendor_id mfgCode = 0;
-    enum16 value = 1;
-}
-
-struct ModeOptionStruct {
-    char_string<64> label = 0;
-    int8u mode = 1;
-    ModeTagStruct modeTags[] = 2;
-}
-
-struct ApplicationStruct {
-    int16u catalogVendorID = 0;
-    char_string applicationID = 1;
-}
-
-struct ErrorStateStruct {
-    enum8 errorStateID = 0;
-    optional char_string<64> errorStateLabel = 1;
-    optional char_string<64> errorStateDetails = 2;
-}
-
-struct LabelStruct {
-    char_string<16> label = 0;
-    char_string<16> value = 1;
-}
-
-struct OperationalStateStruct {
-    enum8 operationalStateID = 0;
-    optional char_string<64> operationalStateLabel = 1;
-}
-
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 server cluster Identify = 3 {
   enum EffectIdentifierEnum : ENUM8 {
@@ -343,20 +311,20 @@ server cluster BasicInformation = 40 {
 
 /** Provides an interface for providing OTA software updates */
 client cluster OtaSoftwareUpdateProvider = 41 {
-  enum OTAApplyUpdateAction : ENUM8 {
+  enum ApplyUpdateActionEnum : ENUM8 {
     kProceed = 0;
     kAwaitNextAction = 1;
     kDiscontinue = 2;
   }
 
-  enum OTADownloadProtocol : ENUM8 {
+  enum DownloadProtocolEnum : ENUM8 {
     kBDXSynchronous = 0;
     kBDXAsynchronous = 1;
     kHTTPS = 2;
     kVendorSpecific = 3;
   }
 
-  enum OTAQueryStatus : ENUM8 {
+  enum StatusEnum : ENUM8 {
     kUpdateAvailable = 0;
     kBusy = 1;
     kNotAvailable = 2;
@@ -374,7 +342,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     vendor_id vendorID = 0;
     INT16U productID = 1;
     INT32U softwareVersion = 2;
-    OTADownloadProtocol protocolsSupported[] = 3;
+    DownloadProtocolEnum protocolsSupported[] = 3;
     optional INT16U hardwareVersion = 4;
     optional CHAR_STRING<2> location = 5;
     optional BOOLEAN requestorCanConsent = 6;
@@ -382,7 +350,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
   }
 
   response struct QueryImageResponse = 1 {
-    OTAQueryStatus status = 0;
+    StatusEnum status = 0;
     optional INT32U delayedActionTime = 1;
     optional CHAR_STRING<256> imageURI = 2;
     optional INT32U softwareVersion = 3;
@@ -398,7 +366,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
   }
 
   response struct ApplyUpdateResponse = 3 {
-    OTAApplyUpdateAction action = 0;
+    ApplyUpdateActionEnum action = 0;
     INT32U delayedActionTime = 1;
   }
 
@@ -417,13 +385,13 @@ client cluster OtaSoftwareUpdateProvider = 41 {
 
 /** Provides an interface for downloading and applying OTA software updates */
 server cluster OtaSoftwareUpdateRequestor = 42 {
-  enum OTAAnnouncementReason : ENUM8 {
+  enum AnnouncementReasonEnum : ENUM8 {
     kSimpleAnnouncement = 0;
     kUpdateAvailable = 1;
     kUrgentUpdateAvailable = 2;
   }
 
-  enum OTAChangeReasonEnum : ENUM8 {
+  enum ChangeReasonEnum : ENUM8 {
     kUnknown = 0;
     kSuccess = 1;
     kFailure = 2;
@@ -431,7 +399,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
     kDelayByProvider = 4;
   }
 
-  enum OTAUpdateStateEnum : ENUM8 {
+  enum UpdateStateEnum : ENUM8 {
     kUnknown = 0;
     kIdle = 1;
     kQuerying = 2;
@@ -450,9 +418,9 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   }
 
   info event StateTransition = 0 {
-    OTAUpdateStateEnum previousState = 0;
-    OTAUpdateStateEnum newState = 1;
-    OTAChangeReasonEnum reason = 2;
+    UpdateStateEnum previousState = 0;
+    UpdateStateEnum newState = 1;
+    ChangeReasonEnum reason = 2;
     nullable INT32U targetSoftwareVersion = 3;
   }
 
@@ -470,7 +438,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
 
   attribute ProviderLocation defaultOTAProviders[] = 0;
   readonly attribute boolean updatePossible = 1;
-  readonly attribute OTAUpdateStateEnum updateState = 2;
+  readonly attribute UpdateStateEnum updateState = 2;
   readonly attribute nullable int8u updateStateProgress = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1351,6 +1319,17 @@ endpoint 0 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
+
+    handle command AddGroup;
+    handle command AddGroupResponse;
+    handle command ViewGroup;
+    handle command ViewGroupResponse;
+    handle command GetGroupMembership;
+    handle command GetGroupMembershipResponse;
+    handle command RemoveGroup;
+    handle command RemoveGroupResponse;
+    handle command RemoveAllGroups;
+    handle command AddGroupIfIdentifying;
   }
 
   server cluster Descriptor {
@@ -1373,7 +1352,7 @@ endpoint 0 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision default = 1;
   }
 
   server cluster BasicInformation {
@@ -1437,6 +1416,13 @@ endpoint 0 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
+
+    handle command ArmFailSafe;
+    handle command ArmFailSafeResponse;
+    handle command SetRegulatoryConfig;
+    handle command SetRegulatoryConfigResponse;
+    handle command CommissioningComplete;
+    handle command CommissioningCompleteResponse;
   }
 
   server cluster NetworkCommissioning {
@@ -1454,11 +1440,21 @@ endpoint 0 {
     callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
+
+    handle command ScanNetworks;
+    handle command ScanNetworksResponse;
+    handle command RemoveNetwork;
+    handle command NetworkConfigResponse;
+    handle command ConnectNetwork;
+    handle command ConnectNetworkResponse;
+    handle command ReorderNetwork;
   }
 
   server cluster DiagnosticLogs {
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
+
+    handle command RetrieveLogsRequest;
   }
 
   server cluster GeneralDiagnostics {
@@ -1473,6 +1469,8 @@ endpoint 0 {
     callback attribute testEventTriggersEnabled default = false;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
+
+    handle command TestEventTrigger;
   }
 
   server cluster SoftwareDiagnostics {
@@ -1480,7 +1478,7 @@ endpoint 0 {
     callback attribute currentHeapFree default = 0x0000000000000000;
     callback attribute currentHeapUsed default = 0x0000000000000000;
     callback attribute currentHeapHighWatermark default = 0x0000000000000000;
-    ram      attribute featureMap default = 1;
+    callback attribute featureMap default = 1;
     ram      attribute clusterRevision default = 1;
   }
 
@@ -1550,6 +1548,8 @@ endpoint 0 {
     callback attribute activeNetworkFaultsList;
     ram      attribute featureMap default = 0x000F;
     ram      attribute clusterRevision default = 1;
+
+    handle command ResetCounts;
   }
 
   server cluster AdministratorCommissioning {
@@ -1562,6 +1562,10 @@ endpoint 0 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
+
+    handle command OpenCommissioningWindow;
+    handle command OpenBasicCommissioningWindow;
+    handle command RevokeCommissioning;
   }
 
   server cluster OperationalCredentials {
@@ -1577,6 +1581,19 @@ endpoint 0 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
+
+    handle command AttestationRequest;
+    handle command AttestationResponse;
+    handle command CertificateChainRequest;
+    handle command CertificateChainResponse;
+    handle command CSRRequest;
+    handle command CSRResponse;
+    handle command AddNOC;
+    handle command UpdateNOC;
+    handle command NOCResponse;
+    handle command UpdateFabricLabel;
+    handle command RemoveFabric;
+    handle command AddTrustedRootCertificate;
   }
 
   server cluster GroupKeyManagement {
@@ -1588,8 +1605,15 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision default = 1;
+
+    handle command KeySetWrite;
+    handle command KeySetRead;
+    handle command KeySetReadResponse;
+    handle command KeySetRemove;
+    handle command KeySetReadAllIndices;
+    handle command KeySetReadAllIndicesResponse;
   }
 
   server cluster FixedLabel {
@@ -1617,12 +1641,26 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
+
+    handle command Identify;
+    handle command TriggerEffect;
   }
 
   server cluster Groups {
     ram      attribute nameSupport;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 4;
+
+    handle command AddGroup;
+    handle command AddGroupResponse;
+    handle command ViewGroup;
+    handle command ViewGroupResponse;
+    handle command GetGroupMembership;
+    handle command GetGroupMembershipResponse;
+    handle command RemoveGroup;
+    handle command RemoveGroupResponse;
+    handle command RemoveAllGroups;
+    handle command AddGroupIfIdentifying;
   }
 
   server cluster Descriptor {

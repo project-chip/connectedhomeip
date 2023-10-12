@@ -608,7 +608,7 @@ OnOffAttributeAccess::Read(const ConcreteReadAttributePath& aPath, AttributeValu
             }
             break;
         }
-        case MN::StartUpOnOff::Id: { // type is OnOffStartUpOnOff
+        case MN::StartUpOnOff::Id: { // type is StartUpOnOffEnum
             MN::StartUpOnOff::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
@@ -770,7 +770,7 @@ void OnOffAttributeAccess::reported_updated(const bridged_endpoint* ep, const st
         }
         break;
     }
-        // type is OnOffStartUpOnOff
+        // type is StartUpOnOffEnum
     case MN::StartUpOnOff::Id: {
         using T = MN::StartUpOnOff::TypeInfo::Type;
         std::optional<T> value = from_json<T>(unify_value);

@@ -134,25 +134,24 @@ inline std::optional<chip::BitMask<OnOff::Feature>> from_json(const nlohmann::js
 {
     chip::BitMask<OnOff::Feature> r;
     r.SetField(OnOff::Feature::kLighting, obj.value("Lighting", false));
-    r.SetField(OnOff::Feature::kDeadFront, obj.value("DeadFront", false));
+    r.SetField(OnOff::Feature::kDeadFrontBehavior, obj.value("DeadFrontBehavior", false));
     return r;
 }
 template <>
-inline std::optional<chip::BitMask<OnOff::OnOffControl>> from_json(const nlohmann::json& obj)
+inline std::optional<chip::BitMask<OnOff::OnOffControlBitmap>> from_json(const nlohmann::json& obj)
 {
-    chip::BitMask<OnOff::OnOffControl> r;
-    r.SetField(OnOff::OnOffControl::kAcceptOnlyWhenOn, obj.value("AcceptOnlyWhenOn", false));
+    chip::BitMask<OnOff::OnOffControlBitmap> r;
+    r.SetField(OnOff::OnOffControlBitmap::kAcceptOnlyWhenOn, obj.value("AcceptOnlyWhenOn", false));
     return r;
 }
 
 template <>
-inline std::optional<OnOff::OnOffDelayedAllOffEffectVariant> from_json(const nlohmann::json& value)
+inline std::optional<OnOff::DelayedAllOffEffectVariantEnum> from_json(const nlohmann::json& value)
 {
-    const std::map<std::string, OnOff::OnOffDelayedAllOffEffectVariant> table = {
-        { "FadeToOffIn_0p8Seconds", OnOff::OnOffDelayedAllOffEffectVariant::kFadeToOffIn0p8Seconds },
-        { "NoFade", OnOff::OnOffDelayedAllOffEffectVariant::kNoFade },
-        { "50PercentDimDownIn_0p8SecondsThenFadeToOffIn_12Seconds",
-            OnOff::OnOffDelayedAllOffEffectVariant::k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds },
+    const std::map<std::string, OnOff::DelayedAllOffEffectVariantEnum> table = {
+        { "DelayedOffFastFade", OnOff::DelayedAllOffEffectVariantEnum::kDelayedOffFastFade },
+        { "NoFade", OnOff::DelayedAllOffEffectVariantEnum::kNoFade },
+        { "DelayedOffSlowFade", OnOff::DelayedAllOffEffectVariantEnum::kDelayedOffSlowFade },
     };
 
     auto i = table.find(value);
@@ -163,11 +162,10 @@ inline std::optional<OnOff::OnOffDelayedAllOffEffectVariant> from_json(const nlo
     }
 }
 template <>
-inline std::optional<OnOff::OnOffDyingLightEffectVariant> from_json(const nlohmann::json& value)
+inline std::optional<OnOff::DyingLightEffectVariantEnum> from_json(const nlohmann::json& value)
 {
-    const std::map<std::string, OnOff::OnOffDyingLightEffectVariant> table = {
-        { "20PercenterDimUpIn_0p5SecondsThenFadeToOffIn_1Second",
-            OnOff::OnOffDyingLightEffectVariant::k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second },
+    const std::map<std::string, OnOff::DyingLightEffectVariantEnum> table = {
+        { "DyingLightFadeOff", OnOff::DyingLightEffectVariantEnum::kDyingLightFadeOff },
     };
 
     auto i = table.find(value);
@@ -178,11 +176,11 @@ inline std::optional<OnOff::OnOffDyingLightEffectVariant> from_json(const nlohma
     }
 }
 template <>
-inline std::optional<OnOff::OnOffEffectIdentifier> from_json(const nlohmann::json& value)
+inline std::optional<OnOff::EffectIdentifierEnum> from_json(const nlohmann::json& value)
 {
-    const std::map<std::string, OnOff::OnOffEffectIdentifier> table = {
-        { "DelayedAllOff", OnOff::OnOffEffectIdentifier::kDelayedAllOff },
-        { "DyingLight", OnOff::OnOffEffectIdentifier::kDyingLight },
+    const std::map<std::string, OnOff::EffectIdentifierEnum> table = {
+        { "DelayedAllOff", OnOff::EffectIdentifierEnum::kDelayedAllOff },
+        { "DyingLight", OnOff::EffectIdentifierEnum::kDyingLight },
     };
 
     auto i = table.find(value);
@@ -193,12 +191,12 @@ inline std::optional<OnOff::OnOffEffectIdentifier> from_json(const nlohmann::jso
     }
 }
 template <>
-inline std::optional<OnOff::OnOffStartUpOnOff> from_json(const nlohmann::json& value)
+inline std::optional<OnOff::StartUpOnOffEnum> from_json(const nlohmann::json& value)
 {
-    const std::map<std::string, OnOff::OnOffStartUpOnOff> table = {
-        { "SetOnOffTo0", OnOff::OnOffStartUpOnOff::kOff },
-        { "SetOnOffTo1", OnOff::OnOffStartUpOnOff::kOn },
-        { "TogglePreviousOnOff", OnOff::OnOffStartUpOnOff::kTogglePreviousOnOff },
+    const std::map<std::string, OnOff::StartUpOnOffEnum> table = {
+        { "Off", OnOff::StartUpOnOffEnum::kOff },
+        { "On", OnOff::StartUpOnOffEnum::kOn },
+        { "Toggle", OnOff::StartUpOnOffEnum::kToggle },
     };
 
     auto i = table.find(value);
