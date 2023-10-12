@@ -130,7 +130,7 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/platform/service/sleeptimer/src",
       "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/support/inc",
 
-      "${efr32_sdk_root}/platform/service/iostream/inc",      
+      "${efr32_sdk_root}/platform/service/iostream/inc",
       "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/button/inc",
     ]
 
@@ -411,8 +411,8 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/kernel/stream_buffer.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/tasks.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/timers.c",
-      "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/support/hal/rsi_hal_mcu_m4.c",
       "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/autogen/sl_event_handler.c",
+      "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/support/hal/rsi_hal_mcu_m4.c",
       "${wifi_sdk_root}/components/siwx917_soc/drivers/service/nvm3/src/sl_si91x_nvm3_hal_flash.c",
 
       # mbedtls
@@ -438,6 +438,8 @@ template("siwx917_sdk") {
       "${chip_root}/third_party/mbedtls/repo/library/sha256.c",
       "${chip_root}/third_party/mbedtls/repo/library/sha512.c",
       "${chip_root}/third_party/mbedtls/repo/library/x509_create.c",
+      "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream.c",
+      "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream_rtt.c",
       "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc.c",
       "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc_dh.c",
       "${sdk_support_root}/matter/mbedtls/tinycrypt/src/ecc_dsa.c",
@@ -450,9 +452,6 @@ template("siwx917_sdk") {
       "${sdk_support_root}/matter/mbedtls/tinycrypt/src/platform_util.c",
       "${sdk_support_root}/matter/mbedtls/tinycrypt/src/x509_crt.c",
       "${sdk_support_root}/matter/mbedtls/tinycrypt/src/x509write_csr.c",
-
-      "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream.c",
-      "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream_rtt.c",
       "${sdk_support_root}/matter/si91x/siwx917/${sdk_support_board}/autogen/sl_si91x_button_instances.c",
       "${wifi_sdk_root}/components/siwx917_soc/drivers/hardware_drivers/button/src/sl_si91x_button.c",
     ]
