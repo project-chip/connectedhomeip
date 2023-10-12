@@ -74,7 +74,30 @@ public:
     CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice);
     void CancelConnect();
 
+private:
+    struct ConnectParams
+    {
+        ConnectParams(const BluezEndpoint & aEndpoint, BluezDevice1 * apDevice) : mEndpoint(aEndpoint), mpDevice(apDevice) {}
+        ~ConnectParams() = default;
+
+        const BluezEndpoint & mEndpoint;
+        BluezDevice1 * mpDevice;
+        uint16_t mNumRetries = 0;
+    };
+
+    BluezGattService1 * BluezServiceCreate();
+    void BluezOnBusAcquired(GDBusConnection * aConn, const char * aName);
+    void BluezPeripheralObjectsSetup();
+    void BluezObjectsSetup();
+
+    static CHIP_ERROR StartupEndpointBindings(BluezEndpoint * endpoint);
+
+    static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer apParams);
+    static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams);
+
 public:
+    BluezConnection * GetBluezConnectionViaDevice();
+
     // Bus owning name
     char * mpOwningName = nullptr;
 
