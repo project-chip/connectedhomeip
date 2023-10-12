@@ -26,8 +26,9 @@
     ```bash
     $ west build -b <build_target>
     ```
-    Also use key `-DFLASH_SIZE`, if your board has memory size different from 2 MB,
-    for example, `-DFLASH_SIZE=1m` or `-DFLASH_SIZE=1m`:
+
+    Also use key `-DFLASH_SIZE`, if your board has memory size different from 2
+    MB, for example, `-DFLASH_SIZE=1m` or `-DFLASH_SIZE=1m`:
 
     ```bash
     $ west build -b tlsr9518adk80d -- -DFLASH_SIZE=4m
