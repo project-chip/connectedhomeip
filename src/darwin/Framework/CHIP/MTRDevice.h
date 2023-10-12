@@ -35,10 +35,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  * The logs types are : End User Support, Network Diagnostics and Crash logs.
  */
 typedef NS_ENUM(NSUInteger, MTRDiagnosticLogType) {
-    MTRDiagnosticLogTypeEndUserSupport = 0, // End user support logs are requested
-    MTRDiagnosticLogTypeNetworkDiagnostics = 1, // Network Diagnostics logs are requested
-    MTRDiagnosticLogTypeCrash = 2, // Crash logs are requested
-    MTRDiagnosticLogTypeUnknown = 3
+    MTRDiagnosticLogTypeUnknown = 0,
+    MTRDiagnosticLogTypeEndUserSupport = 1, // End user support logs are requested
+    MTRDiagnosticLogTypeNetworkDiagnostics = 2, // Network Diagnostics logs are requested
+    MTRDiagnosticLogTypeCrash = 3 // Crash logs are requested
 } MTR_PROVISIONALLY_AVAILABLE;
 
 @protocol MTRDeviceDelegate;
@@ -56,7 +56,24 @@ MTR_PROVISIONALLY_AVAILABLE
  * The log type values should correspond to the enum MTRDiagnosticLogType values.
  * If there are no logs an empty array will be returned.
  */
-@property (readonly, nonatomic) NSDictionary<NSNumber *, NSString *> * filePathDictionary;
+
+/**
+ * The URL representing the location of the end user support log file that was downloaded.
+ * If its null, that would imply no log of type end user support was retreived.
+ */
+@property (readonly, nonatomic, nullable) NSURL *endUserSupportLog;
+
+/**
+ * The URL representing the location of the network diagnostics log file that was downloaded.
+ * If its null, that would imply no log of type network diagnostics was retreived.
+ */
+@property (readonly, nonatomic, nullable) NSURL *networkDiagnosticsLog;
+
+/**
+ * The URL representing the location of the crash log file that was downloaded.
+ * If its null, that would imply no log of type crash were retreived.
+ */
+@property (readonly, nonatomic, nullable) NSURL *crashLog;
 
 @end
 
