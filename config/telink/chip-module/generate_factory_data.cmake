@@ -116,18 +116,16 @@ if(CONFIG_CHIP_DEVICE_ENABLE_KEY)
 string(APPEND script_args "--enable-key \"${CONFIG_CHIP_DEVICE_ENABLE_KEY}\"\n")
 endif()
 
-if(${FLASH_SIZE} MATCHES 1m)
-  set(FD_OFFSET "0xF5000")
-elseif(${FLASH_SIZE} MATCHES 2m)
-  set(FD_OFFSET "0x107000")
-elseif(${FLASH_SIZE} MATCHES 4m)
-  set(FD_OFFSET "0x207000")
-else()
-  set(FD_OFFSET "0x107000")
-endif()
+# get code-partition factory_partition address
+dt_nodelabel(dts_partition_path NODELABEL "factory_partition")
+dt_reg_addr(factory_off PATH ${dts_partition_path})
 
-string(APPEND script_args "--offset ${FD_OFFSET}\n")
-string(APPEND script_args "--size 0x1000\n")
+# get code-partition factory_partition size
+dt_nodelabel(dts_partition_path NODELABEL "factory_partition")
+dt_reg_size(factory_size PATH ${dts_partition_path})
+
+string(APPEND script_args "--offset ${factory_off}\n")
+string(APPEND script_args "--size ${factory_size}\n")
 
 string(APPEND script_args "--output \"${output_path}\"/factory\n")
 
