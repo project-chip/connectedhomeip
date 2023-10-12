@@ -1,11 +1,17 @@
+import sys
 import os
 import json
 import pathlib
 import argparse
 import xml.etree.ElementTree as ET
-from matter_testing_support import MatterBaseTest, default_matter_test_main, async_test_body
 import chip.clusters as Clusters
 from rich.console import Console
+
+
+# Add the path to python_testing folder, in order to be able to import from matter_testing_support
+sys.path.append(os.path.abspath(sys.path[0] + "/../../python_testing"))
+from matter_testing_support import MatterBaseTest, default_matter_test_main, async_test_body  # noqa: E402
+
 
 console = None
 
@@ -23,7 +29,7 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
         clusterName = "OTA Software Update"
 
     elif onOffCluster == clusterName:
-        clusterName = clusterName.replace("/","-")
+        clusterName = clusterName.replace("/", "-")
 
     # Determine if file has already been handled and use this file
     for outputFolderFileName in os.listdir(outputPathStr):
