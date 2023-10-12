@@ -1,0 +1,1 @@
+../../../../../scripts/setup/requirements.silabs_docker.txt
