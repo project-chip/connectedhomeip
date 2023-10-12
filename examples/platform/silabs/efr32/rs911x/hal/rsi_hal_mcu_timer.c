@@ -140,18 +140,18 @@ found:
 }
 /*==============================================*/
 /**
-* @fn          uint32_t rsi_ms_to_tick(uint32_t timeout_ms)
-* @brief       Converting ms to os ticks
-* @param[in]   timeout_ms - timeout in ms
-* @return      uint32_t
-*/
+ * @fn          uint32_t rsi_ms_to_tick(uint32_t timeout_ms)
+ * @brief       Converting ms to os ticks
+ * @param[in]   timeout_ms - timeout in ms
+ * @return      uint32_t
+ */
 uint32_t rsi_ms_to_tick(uint32_t timeout_ms)
 {
-  uint32_t ticks_cnt = 0, ticks_val = 0, ticks = 0;
-  ticks_cnt = SysTick->LOAD + 1UL;
-  ticks_val = SystemCoreClock / ticks_cnt;
-  ticks     = ticks_val / 1000;
-  return (timeout_ms * ticks);
+    uint32_t ticks_cnt = 0, ticks_val = 0, ticks = 0;
+    ticks_cnt = SysTick->LOAD + 1UL;
+    ticks_val = SystemCoreClock / ticks_cnt;
+    ticks     = ticks_val / 1000;
+    return (timeout_ms * ticks);
 }
 #else /* _use_the_rsi_defined_functions */
 
