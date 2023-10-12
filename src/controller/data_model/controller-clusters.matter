@@ -126,6 +126,10 @@ client cluster Groups = 4 {
 
 /** Attributes and commands for scene configuration and manipulation. */
 provisional client cluster Scenes = 5 {
+  bitmap CopyModeBitmap : bitmap8 {
+    kCopyAllScenes = 0x1;
+  }
+
   bitmap Feature : bitmap32 {
     kSceneNames = 0x1;
     kExplicit = 0x2;
@@ -133,8 +137,8 @@ provisional client cluster Scenes = 5 {
     kFabricScenes = 0x8;
   }
 
-  bitmap ScenesCopyMode : bitmap8 {
-    kCopyAllScenes = 0x1;
+  bitmap NameSupportBitmap : bitmap8 {
+    kSceneNames = 0x80;
   }
 
   struct AttributeValuePair {
@@ -267,7 +271,7 @@ provisional client cluster Scenes = 5 {
   }
 
   request struct CopySceneRequest {
-    ScenesCopyMode mode = 0;
+    CopyModeBitmap mode = 0;
     group_id groupIdentifierFrom = 1;
     int8u sceneIdentifierFrom = 2;
     group_id groupIdentifierTo = 3;

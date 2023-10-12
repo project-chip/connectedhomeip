@@ -166,6 +166,10 @@ server cluster Groups = 4 {
 
 /** Attributes and commands for scene configuration and manipulation. */
 provisional server cluster Scenes = 5 {
+  bitmap CopyModeBitmap : bitmap8 {
+    kCopyAllScenes = 0x1;
+  }
+
   bitmap Feature : bitmap32 {
     kSceneNames = 0x1;
     kExplicit = 0x2;
@@ -173,8 +177,8 @@ provisional server cluster Scenes = 5 {
     kFabricScenes = 0x8;
   }
 
-  bitmap ScenesCopyMode : bitmap8 {
-    kCopyAllScenes = 0x1;
+  bitmap NameSupportBitmap : bitmap8 {
+    kSceneNames = 0x80;
   }
 
   struct AttributeValuePair {

@@ -90,6 +90,12 @@ enum class NameSupportBitmap : uint8_t
 
 namespace Scenes {
 
+// Bitmap for CopyModeBitmap
+enum class CopyModeBitmap : uint8_t
+{
+    kCopyAllScenes = 0x1,
+};
+
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
@@ -99,10 +105,10 @@ enum class Feature : uint32_t
     kFabricScenes = 0x8,
 };
 
-// Bitmap for ScenesCopyMode
-enum class ScenesCopyMode : uint8_t
+// Bitmap for NameSupportBitmap
+enum class NameSupportBitmap : uint8_t
 {
-    kCopyAllScenes = 0x1,
+    kSceneNames = 0x80,
 };
 } // namespace Scenes
 

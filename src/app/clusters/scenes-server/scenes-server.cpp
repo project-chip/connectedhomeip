@@ -119,13 +119,11 @@ CHIP_ERROR ScenesServer::Init()
         EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
         if (EMBER_ZCL_STATUS_SUCCESS == status)
         {
-            // Setting NameSupport attribute value to 0x80 if the feature bit is set
-            //  The bit of 7 (0x80) the NameSupport attribute indicates whether or not scene names are supported
-            //
-            //  According to spec, bit 7 (Scene Names) MUST match feature bit 0 (Scene Names)
-            uint8_t nameSupport =
-                (featureMap & to_underlying(Feature::kSceneNames)) ? static_cast<uint8_t>(0x80) : static_cast<uint8_t>(0x00);
-            status = Attributes::NameSupport::Set(endpoint, nameSupport);
+            // According to spec, bit 7 MUST match feature bit 0 (SceneNames)
+            BitMask<NameSupportBitmap> nameSupport = (featureMap & to_underlying(Feature::kSceneNames))
+                ? BitMask<NameSupportBitmap>(NameSupportBitmap::kSceneNames)
+                : BitMask<NameSupportBitmap>();
+            status                                 = Attributes::NameSupport::Set(endpoint, nameSupport.Raw());
             if (EMBER_ZCL_STATUS_SUCCESS != status)
             {
                 ChipLogDetail(Zcl, "ERR: setting NameSupport on Endpoint %hu Status: %x", endpoint, status);
@@ -851,7 +849,7 @@ void ScenesServer::HandleCopyScene(HandlerContext & ctx, const Commands::CopySce
                                        sceneTable->GetRemainingCapacity(ctx.mCommandHandler.GetAccessingFabricIndex(), capacity)));
 
     // Checks if we copy a single scene or all of them
-    if (req.mode.GetField(app::Clusters::Scenes::ScenesCopyMode::kCopyAllScenes))
+    if (req.mode.GetField(app::Clusters::Scenes::CopyModeBitmap::kCopyAllScenes))
     {
         // Scene Table interface data
         SceneId scenesInGroup[scenes::kMaxScenesPerFabric];
