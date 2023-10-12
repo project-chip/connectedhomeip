@@ -24,12 +24,21 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
     # Map clusters to common XML template if needed
     otaProviderCluster = "OTA Software Update Provider Cluster"
     onOffCluster = "On/Off Cluster"
+    groupKeyManagementCluster = "Group Key Management Cluster"
+    nodeOperationalCredentialsCluster = "Node Operational Credentials Cluster"
+    basicInformationCluster = "Basic Information Cluster"
 
     if otaProviderCluster in clusterName:
         clusterName = "OTA Software Update"
 
     elif onOffCluster == clusterName:
         clusterName = clusterName.replace("/", "-")
+
+    elif groupKeyManagementCluster == clusterName:
+        clusterName = "Group Communication"
+
+    elif nodeOperationalCredentialsCluster == clusterName or basicInformationCluster == clusterName:
+        clusterName = clusterName.replace("Cluster", "").strip()
 
     # Determine if file has already been handled and use this file
     for outputFolderFileName in os.listdir(outputPathStr):
@@ -41,35 +50,35 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
     # If no file is found in output folder, determine if there is a match for the cluster name in input folder
     if fileName == "":
         for file in xmlFileList:
-            if clusterName.lower() in file.lower():
+            if file.lower().startswith(clusterName.lower()):
                 fileName = file
                 break
         else:
-            print(f"[red]Could not find matching file for \"{clusterName}\"")
+            console.print(f"[red]Could not find matching file for \"{clusterName}\" ❌")
             return
 
     try:
         # Open the XML PICS template file
-        print(f"Open \"{xmlPath}{fileName}\"")
+        console.print(f"Open \"{xmlPath}{fileName}\"")
         parser = ET.XMLParser(target=ET.TreeBuilder(insert_comments=True))
         tree = ET.parse(f"{xmlPath}{fileName}", parser)
         root = tree.getroot()
     except ET.ParseError:
-        print(f"[red]Could not find \"{fileName}\"")
+        console.print(f"[red]Could not find \"{fileName}\" ❌")
         return
 
     # Usage PICS
-    # print(clusterPicsCode)
+    # console.print(clusterPicsCode)
     usageNode = root.find('usage')
     for picsItem in usageNode:
         itemNumberElement = picsItem.find('itemNumber')
 
-        print(f"Searching for {itemNumberElement.text}")
+        console.print(f"Searching for {itemNumberElement.text}")
 
         if itemNumberElement.text == f"{clusterPicsCode}":
-            print("Found usage PICS value in XML template")
+            console.print("Found usage PICS value in XML template ✅")
             supportElement = picsItem.find('support')
-            # print(f"Support: {supportElement.text}")
+            # console.print(f"Support: {supportElement.text}")
             supportElement.text = "true"
 
             # Since usage PICS (server or client) is not a list, we can break out when a match is found,
@@ -77,57 +86,57 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
             break
 
     # Feature PICS
-    # print(featurePicsList)
+    # console.print(featurePicsList)
     featureNode = root.find("./clusterSide[@type='Server']/features")
     for picsItem in featureNode:
         itemNumberElement = picsItem.find('itemNumber')
 
-        print(f"Searching for {itemNumberElement.text}")
+        console.print(f"Searching for {itemNumberElement.text}")
 
         if f"{itemNumberElement.text}" in featurePicsList:
-            print("Found feature PICS value in XML template")
+            console.print("Found feature PICS value in XML template ✅")
             supportElement = picsItem.find('support')
             supportElement.text = "true"
 
     # Attributes PICS
     # TODO: Only check if list is not empty
-    # print(attributePicsList)
+    # console.print(attributePicsList)
     serverAttributesNode = root.find("./clusterSide[@type='Server']/attributes")
     for picsItem in serverAttributesNode:
         itemNumberElement = picsItem.find('itemNumber')
 
-        print(f"Searching for {itemNumberElement.text}")
+        console.print(f"Searching for {itemNumberElement.text}")
 
         if f"{itemNumberElement.text}" in attributePicsList:
-            print("Found attribute PICS value in XML template")
+            console.print("Found attribute PICS value in XML template ✅")
             supportElement = picsItem.find('support')
             supportElement.text = "true"
 
     # AcceptedCommandList PICS
     # TODO: Only check if list is not empty
-    # print(acceptedCommandPicsList)
+    # console.print(acceptedCommandPicsList)
     serverCommandsReceivedNode = root.find("./clusterSide[@type='Server']/commandsReceived")
     for picsItem in serverCommandsReceivedNode:
         itemNumberElement = picsItem.find('itemNumber')
 
-        print(f"Searching for {itemNumberElement.text}")
+        console.print(f"Searching for {itemNumberElement.text}")
 
         if f"{itemNumberElement.text}" in acceptedCommandPicsList:
-            print("Found acceptedCommand PICS value in XML template")
+            console.print("Found acceptedCommand PICS value in XML template ✅")
             supportElement = picsItem.find('support')
             supportElement.text = "true"
 
     # GeneratedCommandList PICS
-    # print(generatedCommandPicsList)
+    # console.print(generatedCommandPicsList)
     # TODO: Only check if list is not empty
     serverCommandsGeneratedNode = root.find("./clusterSide[@type='Server']/commandsGenerated")
     for picsItem in serverCommandsGeneratedNode:
         itemNumberElement = picsItem.find('itemNumber')
 
-        print(f"Searching for {itemNumberElement.text}")
+        console.print(f"Searching for {itemNumberElement.text}")
 
         if f"{itemNumberElement.text}" in generatedCommandPicsList:
-            print("Found generatedCommand PICS value in XML template")
+            console.print("Found generatedCommand PICS value in XML template ✅")
             supportElement = picsItem.find('support')
             supportElement.text = "true"
 
@@ -145,28 +154,28 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
 
         try:
             condition = statusElement.attrib['cond']
-            print(f"Checking {itemNumberElement.text} with conformance {statusElement.text} and condition {condition}")
+            console.print(f"Checking {itemNumberElement.text} with conformance {statusElement.text} and condition {condition}")
         except ET.ParseError:
             condition = ""
-            print(f"Checking {itemNumberElement.text} with conformance {statusElement.text}")
+            console.print(f"Checking {itemNumberElement.text} with conformance {statusElement.text}")
 
         if statusElement.text == "M":
 
             # Is event mandated by the server
             if condition == clusterPicsCode:
-                print("Found event mandated by server")
+                console.print("Found event mandated by server ✅")
                 supportElement = picsItem.find('support')
                 supportElement.text = "true"
                 continue
 
             if condition in featurePicsList:
-                print("Found event mandated by feature")
+                console.print("Found event mandated by feature ✅")
                 supportElement = picsItem.find('support')
                 supportElement.text = "true"
                 continue
 
             if condition == "":
-                print("Event is mandated without a condition")
+                console.print("Event is mandated without a condition ✅")
                 continue
 
     # Grabbing the header from the XML templates
@@ -189,7 +198,7 @@ def GenerateDevicePicsXmlFiles(clusterName, clusterPicsCode, featurePicsList, at
 async def DeviceMapping(devCtrl, nodeID, outputPathStr):
 
     # --- Device mapping --- #
-    print("[blue]Perform device mapping")
+    console.print("[blue]Perform device mapping")
     # Determine how many endpoints to map
     # Test step 1 - Read parts list
 
@@ -198,11 +207,11 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
 
     # Add endpoint 0 to the parts list, since this is not returned by the device
     partsList.insert(0, 0)
-    print(partsList)
+    # console.print(partsList)
 
     for endpoint in partsList:
         # Test step 2 - Map each available endpoint
-        print(f"Mapping endpoint: {endpoint}")
+        console.print(f"Mapping endpoint: {endpoint}")
 
         # Create endpoint specific output folder and register this as output folder
         endpointOutputPathStr = f"{outputPathStr}endpoint{endpoint}/"
@@ -213,7 +222,7 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
         # Read device list (Not required)
         deviceListResponse = await devCtrl.ReadAttribute(nodeID, [(endpoint, Clusters.Descriptor.Attributes.DeviceTypeList)])
         # TODO: Print the list and not just the first element
-        print(f"Device Type: {deviceListResponse[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList][0].deviceType}")
+        console.print(f"Device Type: {deviceListResponse[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList][0].deviceType}")
 
         # Read server list
         serverListResponse = await devCtrl.ReadAttribute(nodeID, [(endpoint, Clusters.Descriptor.Attributes.ServerList)])
@@ -230,74 +239,74 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
 
             # Does the clusterInfoDict contain the found cluster ID?
             if clusterID not in clusterInfoDict:
-                print(f"[red]Cluster ID ({clusterID}) not in list!")
+                console.print(f"[red]Cluster ID ({clusterID}) not in list! ❌")
                 continue
 
             clusterName = clusterInfoDict[clusterID]['Name']
             clusterPICS = f"{clusterInfoDict[clusterID]['PICS_Code']}{serverTag}"
 
-            print(f"{clusterName} - {clusterPICS}")
+            console.print(f"{clusterName} - {clusterPICS}")
 
             # Print PICS for specific server from dict
-            # print(clusterInfoDict[f"0x{server:04x}"])
+            # console.print(clusterInfoDict[f"0x{server:04x}"])
 
             # Read feature map
             featureMapResponse = await devCtrl.ReadAttribute(nodeID, [(endpoint, clusterClass.Attributes.FeatureMap)])
-            # print(f"FeatureMap: {featureMapResponse[endpoint][clusterClass][clusterClass.Attributes.FeatureMap]}")
+            # console.print(f"FeatureMap: {featureMapResponse[endpoint][clusterClass][clusterClass.Attributes.FeatureMap]}")
 
             featureMapValue = featureMapResponse[endpoint][clusterClass][clusterClass.Attributes.FeatureMap]
             featureMapBitString = "{:08b}".format(featureMapValue).lstrip("0")
             for bitLocation in range(len(featureMapBitString)):
                 if featureMapValue >> bitLocation & 1 == 1:
-                    # print(f"{clusterPICS}{featureTag}{bitLocation:02x}")
+                    # console.print(f"{clusterPICS}{featureTag}{bitLocation:02x}")
                     featurePicsList.append(f"{clusterPICS}{featureTag}{bitLocation:02x}")
 
-            print("Collected feature PICS:")
-            print(featurePicsList)
+            console.print("Collected feature PICS:")
+            console.print(featurePicsList)
 
             # Read attribute list
             attributeListResponse = await devCtrl.ReadAttribute(nodeID, [(endpoint, clusterClass.Attributes.AttributeList)])
             attributeList = attributeListResponse[endpoint][clusterClass][clusterClass.Attributes.AttributeList]
-            # print(f"AttributeList: {attributeList}")
+            # console.print(f"AttributeList: {attributeList}")
 
             # Convert attribute to PICS code
             for attribute in attributeList:
                 if (attribute != 0xfff8 and attribute != 0xfff9 and attribute != 0xfffa and attribute != 0xfffb and attribute != 0xfffc and attribute != 0xfffd):
-                    # print(f"{clusterPICS}{attributeTag}{attribute:04x}")
+                    # console.print(f"{clusterPICS}{attributeTag}{attribute:04x}")
                     attributePicsList.append(f"{clusterPICS}{attributeTag}{attribute:04x}")
                 '''
                 else:
-                    print(f"[yellow]Ignore global attribute 0x{attribute:04x}")
+                    console.print(f"[yellow]Ignore global attribute 0x{attribute:04x}")
                 '''
 
-            print("Collected attribute PICS:")
-            print(attributePicsList)
+            console.print("Collected attribute PICS:")
+            console.print(attributePicsList)
 
             # Read AcceptedCommandList
             acceptedCommandListResponse = await devCtrl.ReadAttribute(nodeID, [(endpoint, clusterClass.Attributes.AcceptedCommandList)])
             acceptedCommandList = acceptedCommandListResponse[endpoint][clusterClass][clusterClass.Attributes.AcceptedCommandList]
-            # print(f"AcceptedCommandList: {acceptedCommandList}")
+            # console.print(f"AcceptedCommandList: {acceptedCommandList}")
 
             # Convert accepted command to PICS code
             for acceptedCommand in acceptedCommandList:
-                # print(f"{clusterPICS}{commandTag}{acceptedCommand:02x}{acceptedCommandTag}")
+                # console.print(f"{clusterPICS}{commandTag}{acceptedCommand:02x}{acceptedCommandTag}")
                 acceptedCommandListPicsList.append(f"{clusterPICS}{commandTag}{acceptedCommand:02x}{acceptedCommandTag}")
 
-            print("Collected accepted command PICS:")
-            print(acceptedCommandListPicsList)
+            console.print("Collected accepted command PICS:")
+            console.print(acceptedCommandListPicsList)
 
             # Read GeneratedCommandList
             generatedCommandListResponse = await devCtrl.ReadAttribute(nodeID, [(endpoint, clusterClass.Attributes.GeneratedCommandList)])
             generatedCommandList = generatedCommandListResponse[endpoint][clusterClass][clusterClass.Attributes.GeneratedCommandList]
-            # print(f"GeneratedCommandList: {generatedCommandList}")
+            # console.print(f"GeneratedCommandList: {generatedCommandList}")
 
             # Convert accepted command to PICS code
             for generatedCommand in generatedCommandList:
-                # print(f"{clusterPICS}{commandTag}{generatedCommand:02x}{generatedCommandTag}")
+                # console.print(f"{clusterPICS}{commandTag}{generatedCommand:02x}{generatedCommandTag}")
                 generatedCommandListPicsList.append(f"{clusterPICS}{commandTag}{generatedCommand:02x}{generatedCommandTag}")
 
-            print("Collected generated command PICS:")
-            print(generatedCommandListPicsList)
+            console.print("Collected generated command PICS:")
+            console.print(generatedCommandListPicsList)
 
             # Write the collected PICS to a PICS XML file
             GenerateDevicePicsXmlFiles(clusterName, clusterPICS, featurePicsList, attributePicsList, acceptedCommandListPicsList, generatedCommandListPicsList, endpointOutputPathStr)
@@ -311,7 +320,7 @@ async def DeviceMapping(devCtrl, nodeID, outputPathStr):
             clusterName = clusterInfoDict[clusterID]['Name']
             clusterPICS = f"{clusterInfoDict[clusterID]['PICS_Code']}{clientTag}"
 
-            print(f"{clusterName} - {clusterPICS}")
+            console.print(f"{clusterName} - {clusterPICS}")
 
             GenerateDevicePicsXmlFiles(clusterName, clusterPICS, [], [], [], [], endpointOutputPathStr)
 
