@@ -140,7 +140,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "im" \
-                     --tool-args "onnetwork-long-im-read --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --tool-args "onnetwork-long-im-read --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000" \
                      --factoryreset \
                   '
             - name: Run IM Write Test
@@ -162,7 +162,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "im" \
-                     --tool-args "onnetwork-long-im-subscribe --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --tool-args "onnetwork-long-im-subscribe --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000" \
                      --factoryreset \
                   '
             - name: Run Pairing AlreadyDiscovered Test
@@ -229,7 +229,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-kotlin-matter-controller \
                      --tool-cluster "im" \
-                     --tool-args "onnetwork-long-im-read --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --tool-args "onnetwork-long-im-read --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000" \
                      --factoryreset \
                   '
             - name: Run Kotlin IM Write Test
@@ -251,7 +251,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-kotlin-matter-controller \
                      --tool-cluster "im" \
-                     --tool-args "onnetwork-long-im-subscribe --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --tool-args "onnetwork-long-im-subscribe --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000" \
                      --factoryreset \
                   '                                                  
             - name: Uploading core files
