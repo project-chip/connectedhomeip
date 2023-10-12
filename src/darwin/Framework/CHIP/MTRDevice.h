@@ -47,7 +47,7 @@ MTR_PROVISIONALLY_AVAILABLE
 
 /**
  * The URL representing the location of the end user support log file that was downloaded.
- * If no end user support log was requested or retreived, this will be set to nil.
+ * If no end user support log was requested or retrieved, this will be set to nil.
  */
 @property (readonly, nonatomic, nullable) NSURL * endUserSupportLog;
 
@@ -245,7 +245,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * Requests diagnostic logs of the desired types from the device.
  *
  * Note: The consumer of this API should move the files that the NSURLs in the MTRDiagnosticLogResult point to
- * or open it for reading before the completion handler returns. Otherwise, the files will be deleted, and the data will be lost.
+ * or open them for reading before the completion handler returns. Otherwise, the files will be deleted, and the data will be lost.
  *
  * @param types      The types of logs being requested. This should correspond to values in the enum MTRDiagnosticLogType.
  * @param timeout    The timeout for getting the logs.  If the timeout expires, completion
@@ -254,7 +254,7 @@ MTR_PROVISIONALLY_AVAILABLE
  *                   If the timeout is set to 0, the request will not expire and completion will not be called until
  *                   the logs are fully retrieved or an error occurs.
  * @param queue      The queue on which completion will be called.
- * @param completion The completion that will be called to pass in the file paths for the requested logs.
+ * @param completion The completion that will be called to pass in the URLs for the requested logs.
  */
 - (void)downloadDiagnosticLogsOfTypes:(NSArray<NSNumber *> *)types
                               timeout:(NSTimeInterval)timeout
