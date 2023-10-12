@@ -1559,7 +1559,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
 - (MTRBaseDevice *)newBaseDevice
 {
-    return [[MTRBaseDevice alloc] initWithNodeID:self.nodeID controller:self.deviceController];
+    return [MTRBaseDevice deviceWithNodeID:self.nodeID controller:self.deviceController];
 }
 
 @end
