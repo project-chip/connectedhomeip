@@ -42,8 +42,8 @@ namespace {
 OnOffEffect gEffect = {
     chip::EndpointId{ 1 },
     PlugMgr().OnTriggerOffWithEffect,
-    OnOffEffectIdentifier::kDelayedAllOff,
-    to_underlying(OnOffDelayedAllOffEffectVariant::kFadeToOffIn0p8Seconds),
+    EffectIdentifierEnum::kDelayedAllOff,
+    to_underlying(DelayedAllOffEffectVariantEnum::kDelayedOffFastFade),
 };
 
 } // namespace
@@ -245,32 +245,32 @@ void OnOffPlugManager::OnTriggerOffWithEffect(OnOffEffect * effect)
 
     // Temporary print outs and delay to test OffEffect behaviour
     // Until dimming is supported for dev boards.
-    if (effectId == OnOffEffectIdentifier::kDelayedAllOff)
+    if (effectId == EffectIdentifierEnum::kDelayedAllOff)
     {
-        auto typedEffectVariant = static_cast<OnOffDelayedAllOffEffectVariant>(effectVariant);
-        if (typedEffectVariant == OnOffDelayedAllOffEffectVariant::kFadeToOffIn0p8Seconds)
+        auto typedEffectVariant = static_cast<DelayedAllOffEffectVariantEnum>(effectVariant);
+        if (typedEffectVariant == DelayedAllOffEffectVariantEnum::kDelayedOffFastFade)
         {
             offEffectDuration = 800;
-            ChipLogProgress(Zcl, "OnOffDelayedAllOffEffectVariant::kFadeToOffIn0p8Seconds");
+            ChipLogProgress(Zcl, "DelayedAllOffEffectVariantEnum::kDelayedOffFastFade");
         }
-        else if (typedEffectVariant == OnOffDelayedAllOffEffectVariant::kNoFade)
+        else if (typedEffectVariant == DelayedAllOffEffectVariantEnum::kNoFade)
         {
             offEffectDuration = 800;
-            ChipLogProgress(Zcl, "OnOffDelayedAllOffEffectVariant::kNoFade");
+            ChipLogProgress(Zcl, "DelayedAllOffEffectVariantEnum::kNoFade");
         }
-        else if (typedEffectVariant == OnOffDelayedAllOffEffectVariant::k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds)
+        else if (typedEffectVariant == DelayedAllOffEffectVariantEnum::kDelayedOffSlowFade)
         {
             offEffectDuration = 12800;
-            ChipLogProgress(Zcl, "OnOffDelayedAllOffEffectVariant::k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds");
+            ChipLogProgress(Zcl, "DelayedAllOffEffectVariantEnum::kDelayedOffSlowFade");
         }
     }
-    else if (effectId == OnOffEffectIdentifier::kDyingLight)
+    else if (effectId == EffectIdentifierEnum::kDyingLight)
     {
-        auto typedEffectVariant = static_cast<OnOffDyingLightEffectVariant>(effectVariant);
-        if (typedEffectVariant == OnOffDyingLightEffectVariant::k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second)
+        auto typedEffectVariant = static_cast<DyingLightEffectVariantEnum>(effectVariant);
+        if (typedEffectVariant == DyingLightEffectVariantEnum::kDyingLightFadeOff)
         {
             offEffectDuration = 1500;
-            ChipLogProgress(Zcl, "OnOffDyingLightEffectVariant::k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second");
+            ChipLogProgress(Zcl, "DyingLightEffectVariantEnum::kDyingLightFadeOff");
         }
     }
 
