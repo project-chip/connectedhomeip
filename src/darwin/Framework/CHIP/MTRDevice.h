@@ -30,14 +30,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 };
 
 /**
- * This enum is used to specify the type of logs requested from this device.
+ * This enum is used to specify the type of log requested from this device.
  *
- * The logs types are : End User Support, Network Diagnostics and Crash logs.
+ * The log types are : End User Support, Network Diagnostics and Crash logs.
  */
 typedef NS_ENUM(NSInteger, MTRDiagnosticLogType) {
-    MTRDiagnosticLogTypeEndUserSupport = 0, // End user support logs are requested
-    MTRDiagnosticLogTypeNetworkDiagnostics = 1, // Network Diagnostics logs are requested
-    MTRDiagnosticLogTypeCrash = 2 // Crash logs are requested
+    MTRDiagnosticLogTypeEndUserSupport = 0, // End user support log is requested
+    MTRDiagnosticLogTypeNetworkDiagnostics = 1, // Network Diagnostics log is requested
+    MTRDiagnosticLogTypeCrash = 2 // Crash log is requested
 } MTR_PROVISIONALLY_AVAILABLE;
 
 @protocol MTRDeviceDelegate;
@@ -62,12 +62,6 @@ MTR_PROVISIONALLY_AVAILABLE
  * If no crash log was requested or retrieved, this will be set to nil.
  */
 @property (readonly, nonatomic, nullable) NSURL * crashLog;
-
-/**
- * If an error occured while retreiving the logs, this will be set to the error.
- * if no error occurs, this will be set to nil.
- */
-@property (readonly, nonatomic, nullable) NSError * error;
 
 @end
 
@@ -242,24 +236,23 @@ MTR_PROVISIONALLY_AVAILABLE
     MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 /**
- * Requests diagnostic logs of the desired types from the device.
+ * Download log of the desired type from the device.
  *
- * Note: The consumer of this API should move the files that the NSURLs in the MTRDiagnosticLogResult point to
- * or open them for reading before the completion handler returns. Otherwise, the files will be deleted, and the data will be lost.
+ * Note: The consumer of this API should move the file that the NSURL in the MTRDiagnosticLogResult points to
+ * or open it for reading before the completion handler returns. Otherwise, the file will be deleted, and the data will be lost.
  *
- * @param types      The types of logs being requested. This should correspond to values in the enum MTRDiagnosticLogType.
- * @param timeout    The timeout for getting the logs.  If the timeout expires, completion
- *                   will be called with whatever logs have been retrieved by that point
- *                   (which might be none, and might include partial logs).
+ * @param type       The type of log being requested. This should correspond to a value in the enum MTRDiagnosticLogType.
+ * @param timeout    The timeout for getting the log. If the timeout expires, completion will be called with whatever
+ *                   has been retrieved by that point (which might be none or a partial log).
  *                   If the timeout is set to 0, the request will not expire and completion will not be called until
- *                   the logs are fully retrieved or an error occurs.
+ *                   the log is fully retrieved or an error occurs.
  * @param queue      The queue on which completion will be called.
- * @param completion The completion that will be called to pass in the URLs for the requested logs.
+ * @param completion The completion that will be called to pass in the URL for the requested log.
  */
-- (void)downloadDiagnosticLogsOfTypes:(NSArray<NSNumber *> *)types
-                              timeout:(NSTimeInterval)timeout
-                                queue:(dispatch_queue_t)queue
-                           completion:(void (^)(MTRDiagnosticLogResult * logResult))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)downloadLogOfType:(MTRDiagnosticLogType)type
+                  timeout:(NSTimeInterval)timeout
+                    queue:(dispatch_queue_t)queue
+               completion:(void (^)(MTRDiagnosticLogResult * _Nullable logResult, NSError * error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 @end
 
