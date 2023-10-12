@@ -8,7 +8,7 @@
  * CHIP_DEVICE_IS_ESP32 flag for esp32 uses a time.h timespec
  */
 
-#if CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
+/*#if CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
 #define CHIP_DEVICE_IS_ESP32 1
 //#undef CHIP_DEVICE_IS_NRF
 #endif
@@ -17,12 +17,23 @@
 #define CHIP_DEVICE_IS_NRF 1
 //#undef CHIP_DEVICE_IS_ESP32
 #endif
+*/
 
-#if defined(CHIP_DEVICE_IS_NRF)
+#if defined(CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS)
+#if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS
+#define CHIP_DEVICE_USES_SYS_TIME 1
+#else
+#define CHIP_DEVICE_USES_TIME_H 1
+#endif
+#else
+#define CHIP_DEVICE_USES_SYS_TIME 1
+#endif
+
+#if CHIP_DEVICE_USES_SYS_TIME
 #include <system/SystemClock.h>
 #endif
 
-#if defined(CHIP_DEVICE_IS_ESP32)
+#if CHIP_DEVICE_USES_TIME_H
 #include <time.h>
 #endif
 
@@ -35,7 +46,7 @@ namespace timing {
 // todo add description
 class DurationTimer
 {
-#ifdef CHIP_DEVICE_IS_NRF
+#if CHIP_DEVICE_USES_SYS_TIME
 private:
     string toTimeStr(timeval * time);
 
@@ -45,7 +56,7 @@ protected:
     string label;
 #endif
 
-#ifdef CHIP_DEVICE_IS_ESP32
+#if CHIP_DEVICE_USES_TIME_H
 private:
     string toTimeStr(timespec * time);
 
