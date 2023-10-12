@@ -1,10 +1,10 @@
-# The below dependencies are being installed by apt inside docker
-# adding the list here for book keeping if things start breaking in future
-# Jinja2==3.1.2
-# lark==1.1.7
-# linkify-it-py==2.0.2
-# myst-parser==2.0.0
-# Sphinx==7.2.6
-# sphinx-rtd-theme==1.3.0
-# sphinx-tabs==3.4.1
-# stringcase==1.2.0
+# codegen.py build requirements
+Jinja2==3.1.2
+lark==1.1.7
+stringcase==1.2.0
+# Sphinx dependencies (for slc-cli)
+linkify-it-py==2.0.2
+myst-parser==2.0.0
+Sphinx==7.2.6
+sphinx-rtd-theme==1.3.0
+sphinx-tabs==3.4.1

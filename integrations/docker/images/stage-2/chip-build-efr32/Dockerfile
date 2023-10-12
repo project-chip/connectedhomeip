@@ -14,7 +14,7 @@ RUN set -x \
 
 
 # Clone Gecko SDK 4.3.2 (1228a95)
-RUN git clone --depth=1 --branch=v4.3.2 https://github.com/SiliconLabs/gecko_sdk.git /tmp/gecko_sdk && \
+RUN git clone --single-branch --depth=1 --branch=v4.3.2 https://github.com/SiliconLabs/gecko_sdk.git /tmp/gecko_sdk && \
     cd /tmp/gecko_sdk && \
     rm -rf .git \
     && : # last line
@@ -41,6 +41,8 @@ RUN wget https://www.silabs.com/documents/login/software/slc_cli_linux.zip && \
 # Final SDK container for compiling using Silabs SDK
 FROM ghcr.io/project-chip/chip-build:${VERSION}
 
+ADD requirements.txt /tmp/requirements.txt
+
 # GNU ARM Embedded toolchain, cross compiler for various platform builds
 RUN set -x \
     && apt-get update \
@@ -48,22 +50,12 @@ RUN set -x \
     gcc-arm-none-eabi \
     binutils-arm-none-eabi \
     openjdk-17-jdk-headless \
-    python3-sphinx \
     ccache \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     # Install Python Packages
-    && pip3 install \
-    # codegen.py build requirements
-    # TODO: why are these added here instead of build-env?
-    lark \
-    jinja2 \
-    stringcase \
-    # Sphinx dependencies (for slc-cli)
-    myst_parser \
-    sphinx_rtd_theme \
-    sphinx_tabs \
-    linkify-it-py \
+    && pip3 install -r /tmp/requirements.txt \
+    && rm /tmp/requirements.txt \
     && : # last line
 
 ENV GSDK_ROOT=/opt/silabs/gecko_sdk/
