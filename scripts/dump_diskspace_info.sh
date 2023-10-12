@@ -36,6 +36,6 @@ echo
 echo "Storage Space Used By Key Directories:"
 for directory in "${listOfDirectories[@]}"; do
     if [ -d "$directory" ]; then
-      du -d1 -h "$directory"
+        du -d1 -h "$directory"
     fi
 done
