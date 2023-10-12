@@ -144,7 +144,7 @@ if (silabs_board == "BRD4304A") {
 } else if (silabs_board == "BRD4186A" || silabs_board == "BRD4187A") {
   variant = string_replace(silabs_board, "A", "C")
   print(
-      "${silabs_board} is deprecated, It is recommended to use the 'C' variant of this board (${variant})")
+      "${silabs_board} is deprecated. It is recommended to use the 'C' variant of this board (${variant})")
   silabs_family = "efr32mg24"
   silabs_mcu = "EFR32MG24A010F1536GM48"
 } else if (silabs_board == "BRD4186C") {
@@ -206,7 +206,7 @@ if (silabs_board == "BRD4304A") {
 } else {
   assert(
       false,
-      "The board ${silabs_board} is unsupported, A list of supported board can be found here https://t.ly/_b3SK")
+      "The board ${silabs_board} is unsupported. A list of supported board can be found here https://t.ly/_b3SK")
 }
 
 # qr code cannot be true if lcd is disabled
