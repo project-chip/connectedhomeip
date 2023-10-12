@@ -27,8 +27,8 @@
 // TODO add includes ?
 extern "C" {
 #include "em_core.h"
-#include "sl_event_handler.h"
 #include "rsi_board.h"
+#include "sl_event_handler.h"
 #include "sl_system_init.h"
 void soc_pll_config(void);
 }
