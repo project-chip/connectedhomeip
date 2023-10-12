@@ -2,7 +2,6 @@ name: Dump disk space info
 description: Help debug running out of disk space on github CI
 runs:
   using: "composite"
-  if: ${{ runner.os == 'Linux' }}
   steps:
     - name: Collect disk info
       # Unfortunately current syntax for github wrapper actions only work for
@@ -13,6 +12,7 @@ runs:
       # is run and after the job is run regardless if the job succeeds or
       # fails.
       uses: pyTooling/Actions/with-post-step@v0.4.5
+      if: ${{ runner.os == 'Linux' }}
       with:
         main: |-
           exec ./scripts/dump_diskspace_info.sh
