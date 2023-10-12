@@ -725,7 +725,6 @@ void WindowManager::UpdateLCD()
 #if CHIP_ENABLE_OPENTHREAD
     if (mState.isThreadProvisioned)
 #else
-    // if (mState.isWiFiProvisioned)
     if (ConnectivityMgr().IsWiFiStationProvisioned())
 #endif // CHIP_ENABLE_OPENTHREAD
     {
@@ -751,7 +750,7 @@ void WindowManager::UpdateLCD()
         chip::MutableCharSpan qrCode(mQRCodeBuffer);
         if (GetQRCode(qrCode, chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE)) == CHIP_NO_ERROR)
         {
-            slLCD.SetQRCode((uint8_t *) qrCode.data(), qrCode.size());
+            slLCD.SetQRCode(Uint8::from_char(qrCode.data()), qrCode.size());
             slLCD.ShowQRCode(true);
         }
     }
