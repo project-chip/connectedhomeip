@@ -842,7 +842,7 @@ tests:
           Data message to DUT + TH sends Status Response Message with an error
           Status."
       verification: |
-          Mark this as not testable /NA. Out of Scope 
+          Mark this as not testable /NA. Out of Scope
           SDK Issue : https://github.com/project-chip/connectedhomeip/issues/23990
       disabled: true
 
@@ -850,7 +850,7 @@ tests:
           "Step 13: TH sends Subscribe Request Message to DUT with EventRequests
           set to path which indicates a cluster event that is not supported."
       verification: |
-          Mark this as not testable /NA. Out of Scope 
+          Mark this as not testable /NA. Out of Scope
           SDK Issue : https://github.com/project-chip/connectedhomeip/issues/23990
       disabled: true
 
