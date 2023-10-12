@@ -252,7 +252,7 @@ MTR_PROVISIONALLY_AVAILABLE
 - (void)downloadLogOfType:(MTRDiagnosticLogType)type
                   timeout:(NSTimeInterval)timeout
                     queue:(dispatch_queue_t)queue
-               completion:(void (^)(MTRDiagnosticLogResult * _Nullable logResult, NSError * error))completion MTR_PROVISIONALLY_AVAILABLE;
+               completion:(void (^)(MTRDiagnosticLogResult * _Nullable logResult, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 @end
 
