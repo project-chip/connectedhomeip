@@ -1,1 +1,1 @@
-17 : [Silabs] Update Docker image (WiseConnect and GECKO SDK(s) update)
+18 : [Silabs] Adds bugfix for symlink for docker use and optimize SDK download
