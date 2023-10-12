@@ -27,6 +27,8 @@ config("config") {
   ]
 
   cflags = [ "-Wconversion" ]
+
+  defines = [ "CONFIG_USE_SEPARATE_EVENTLOOP=0" ]
 }
 
 chip_data_model("tv-casting-common") {
@@ -89,6 +91,9 @@ chip_data_model("tv-casting-common") {
   sources += [
     "core/CastingApp.cpp",
     "core/CastingApp.h",
+    "core/CastingPlayer.h",
+    "core/CastingPlayerDiscovery.cpp",
+    "core/CastingPlayerDiscovery.h",
     "core/Types.h",
     "support/AppParameters.h",
     "support/DataProvider.h",

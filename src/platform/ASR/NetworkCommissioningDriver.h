@@ -33,10 +33,10 @@ namespace DeviceLayer {
 namespace NetworkCommissioning {
 
 namespace {
-constexpr uint8_t kMaxWiFiNetworks                  = 1;
-constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
-constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
-constexpr uint8_t kWiFiMaxNetworks                  = 15;
+inline constexpr uint8_t kMaxWiFiNetworks                  = 1;
+inline constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
+inline constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
+inline constexpr uint8_t kWiFiMaxNetworks                  = 15;
 } // namespace
 
 class ASRScanResponseIterator : public Iterator<WiFiScanResponse>
@@ -56,7 +56,7 @@ public:
         // copy the available information into WiFiScanResponse struct, which will be copied to the result to be sent
         item.security.SetRaw(mpScanResults->ap_list[mIternum].security);
         item.ssidLen  = static_cast<uint8_t>(strnlen(reinterpret_cast<const char *>(mpScanResults->ap_list[mIternum].ssid),
-                                                    chip::DeviceLayer::Internal::kMaxWiFiSSIDLength));
+                                                     chip::DeviceLayer::Internal::kMaxWiFiSSIDLength));
         item.channel  = mpScanResults->ap_list[mIternum].channel;
         item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
         item.rssi     = mpScanResults->ap_list[mIternum].ap_power;

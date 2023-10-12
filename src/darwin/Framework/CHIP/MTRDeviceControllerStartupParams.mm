@@ -503,7 +503,9 @@ static NSData * _Nullable MatterCertToX509Data(const ByteSpan & cert)
     if (usingExistingNOC == YES
         && ((oldIntermediateCert == nil) != (self.intermediateCertificate == nil)
             || ((oldIntermediateCert != nil) &&
-                [MTRCertificates isCertificate:oldIntermediateCert equalTo:self.intermediateCertificate] == NO))) {
+                [MTRCertificates isCertificate:oldIntermediateCert
+                                       equalTo:self.intermediateCertificate]
+                    == NO))) {
         self.operationalCertificate = nil;
     }
 

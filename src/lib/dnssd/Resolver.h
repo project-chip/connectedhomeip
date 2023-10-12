@@ -139,9 +139,9 @@ struct OperationalNodeData
     void Reset() { peerId = PeerId(); }
 };
 
-constexpr size_t kMaxDeviceNameLen         = 32;
-constexpr size_t kMaxRotatingIdLen         = 50;
-constexpr size_t kMaxPairingInstructionLen = 128;
+inline constexpr size_t kMaxDeviceNameLen         = 32;
+inline constexpr size_t kMaxRotatingIdLen         = 50;
+inline constexpr size_t kMaxPairingInstructionLen = 128;
 
 /// Data that is specific to commisionable/commissioning node discovery
 struct CommissionNodeData

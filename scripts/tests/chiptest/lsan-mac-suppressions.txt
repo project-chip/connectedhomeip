@@ -3,6 +3,11 @@
 leak:realizeClassWithoutSwift
 leak:objc_initializeClassPair_internal
 
+# Something under map_images (as called from
+# dyld4::RuntimeState::setObjCNotifiers) seems to be randomly leaking a few
+# bytes.  Not a Matter issue, so just suppress it here.
+leak:map_images
+
 # TODO: Under [NSManagedObjectContext executeFetchRequest] there are managed object bits that seem to be leaky.
 leak:class_addMethod
 leak:class_addIvar

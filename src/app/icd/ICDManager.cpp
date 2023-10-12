@@ -18,9 +18,9 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/icd/ICDManagementServer.h>
 #include <app/icd/ICDManager.h>
-#include <app/icd/IcdManagementServer.h>
-#include <app/icd/IcdMonitoringTable.h>
+#include <app/icd/ICDMonitoringTable.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
@@ -33,11 +33,6 @@
 #define ICD_ENFORCE_SIT_SLOW_POLL_LIMIT 0
 #endif
 
-#ifndef ICD_REPORT_ON_ENTER_ACTIVE_MODE
-// Enabling this makes the device emit subscription reports when transitioning from idle to active mode.
-#define ICD_REPORT_ON_ENTER_ACTIVE_MODE 0
-#endif
-
 namespace chip {
 namespace app {
 
@@ -45,25 +40,37 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IcdManagement;
 
-void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, ICDStateObserver * stateObserver)
+uint8_t ICDManager::OpenExchangeContextCount = 0;
+static_assert(UINT8_MAX >= CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS,
+              "ICDManager::OpenExchangeContextCount cannot hold count for the max exchange count");
+
+void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricTable, ICDStateObserver * stateObserver,
+                      Crypto::SymmetricKeystore * symmetricKeystore)
 {
     VerifyOrDie(storage != nullptr);
     VerifyOrDie(fabricTable != nullptr);
     VerifyOrDie(stateObserver != nullptr);
+    VerifyOrDie(symmetricKeystore != nullptr);
 
     mStorage       = storage;
     mFabricTable   = fabricTable;
     mStateObserver = stateObserver;
+    VerifyOrDie(ICDNotifier::GetInstance().Subscribe(this) == CHIP_NO_ERROR);
+    mSymmetricKeystore = symmetricKeystore;
 
-    uint32_t activeModeInterval = IcdManagementServer::GetInstance().GetActiveModeInterval();
+    uint32_t activeModeInterval = ICDManagementServer::GetInstance().GetActiveModeIntervalMs();
+
+    ICDManagementServer::GetInstance().SetSymmetricKeystore(mSymmetricKeystore);
+
     VerifyOrDie(kFastPollingInterval.count() < activeModeInterval);
 
-    UpdateIcdMode();
+    UpdateICDMode();
     UpdateOperationState(OperationalState::ActiveMode);
 }
 
 void ICDManager::Shutdown()
 {
+    ICDNotifier::GetInstance().Unsubscribe(this);
     // cancel any running timer of the icd
     DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
     DeviceLayer::SystemLayer().CancelTimer(OnActiveModeDone, this);
@@ -85,7 +92,7 @@ bool ICDManager::SupportsCheckInProtocol()
     return success ? ((featureMap & to_underlying(Feature::kCheckInProtocolSupport)) != 0) : false;
 }
 
-void ICDManager::UpdateIcdMode()
+void ICDManager::UpdateICDMode()
 {
     assertChipStackLockedByCurrentThread();
 
@@ -101,7 +108,7 @@ void ICDManager::UpdateIcdMode()
         for (const auto & fabricInfo : *mFabricTable)
         {
             // We only need 1 valid entry to ensure LIT compliance
-            IcdMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex(), 1 /*Table entry limit*/);
+            ICDMonitoringTable table(*mStorage, fabricInfo.GetFabricIndex(), 1 /*Table entry limit*/, mSymmetricKeystore);
             if (!table.IsEmpty())
             {
                 tempMode = ICDMode::LIT;
@@ -127,9 +134,14 @@ void ICDManager::UpdateOperationState(OperationalState state)
 
     if (state == OperationalState::IdleMode)
     {
-        mOperationalState         = OperationalState::IdleMode;
-        uint32_t idleModeInterval = IcdManagementServer::GetInstance().GetIdleModeInterval();
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(idleModeInterval), OnIdleModeDone, this);
+        mOperationalState = OperationalState::IdleMode;
+
+        // When the active mode interval is 0, we stay in idleMode until a notification brings the icd into active mode
+        if (ICDManagementServer::GetInstance().GetActiveModeIntervalMs() > 0)
+        {
+            uint32_t idleModeInterval = ICDManagementServer::GetInstance().GetIdleModeIntervalSec();
+            DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(idleModeInterval), OnIdleModeDone, this);
+        }
 
         System::Clock::Milliseconds32 slowPollInterval = GetSlowPollingInterval();
 
@@ -156,8 +168,17 @@ void ICDManager::UpdateOperationState(OperationalState state)
             DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
 
             mOperationalState           = OperationalState::ActiveMode;
-            uint32_t activeModeInterval = IcdManagementServer::GetInstance().GetActiveModeInterval();
+            uint32_t activeModeInterval = ICDManagementServer::GetInstance().GetActiveModeIntervalMs();
+
+            if (activeModeInterval == 0 && !mKeepActiveFlags.HasAny())
+            {
+                // A Network Activity triggered the active mode and activeModeInterval is 0.
+                // Stay active for at least Active Mode Threshold.
+                activeModeInterval = ICDManagementServer::GetInstance().GetActiveModeThresholdMs();
+            }
+
             DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeInterval), OnActiveModeDone, this);
+
             uint32_t activeModeJitterInterval =
                 (activeModeInterval >= ICD_ACTIVE_TIME_JITTER_MS) ? activeModeInterval - ICD_ACTIVE_TIME_JITTER_MS : 0;
             DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeJitterInterval), OnTransitionToIdle, this);
@@ -172,7 +193,7 @@ void ICDManager::UpdateOperationState(OperationalState state)
         }
         else
         {
-            uint16_t activeModeThreshold = IcdManagementServer::GetInstance().GetActiveModeThreshold();
+            uint16_t activeModeThreshold = ICDManagementServer::GetInstance().GetActiveModeThresholdMs();
             DeviceLayer::SystemLayer().ExtendTimerTo(System::Clock::Timeout(activeModeThreshold), OnActiveModeDone, this);
             uint16_t activeModeJitterThreshold =
                 (activeModeThreshold >= ICD_ACTIVE_TIME_JITTER_MS) ? activeModeThreshold - ICD_ACTIVE_TIME_JITTER_MS : 0;
@@ -204,34 +225,88 @@ void ICDManager::SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state)
 
 void ICDManager::OnIdleModeDone(System::Layer * aLayer, void * appState)
 {
-    ICDManager * pIcdManager = reinterpret_cast<ICDManager *>(appState);
-    pIcdManager->UpdateOperationState(OperationalState::ActiveMode);
+    ICDManager * pICDManager = reinterpret_cast<ICDManager *>(appState);
+    pICDManager->UpdateOperationState(OperationalState::ActiveMode);
 
     // We only reset this flag when idle mode is complete to avoid re-triggering the check when an event brings us back to active,
     // which could cause a loop.
-    pIcdManager->mTransitionToIdleCalled = false;
+    pICDManager->mTransitionToIdleCalled = false;
 }
 
 void ICDManager::OnActiveModeDone(System::Layer * aLayer, void * appState)
 {
-    ICDManager * pIcdManager = reinterpret_cast<ICDManager *>(appState);
+    ICDManager * pICDManager = reinterpret_cast<ICDManager *>(appState);
 
     // Don't go to idle mode when we have a keep active requirement
-    if (!pIcdManager->mKeepActiveFlags.HasAny())
+    if (!pICDManager->mKeepActiveFlags.HasAny())
     {
-        pIcdManager->UpdateOperationState(OperationalState::IdleMode);
+        pICDManager->UpdateOperationState(OperationalState::IdleMode);
     }
 }
 
 void ICDManager::OnTransitionToIdle(System::Layer * aLayer, void * appState)
 {
-    ICDManager * pIcdManager = reinterpret_cast<ICDManager *>(appState);
+    ICDManager * pICDManager = reinterpret_cast<ICDManager *>(appState);
 
     // OnTransitionToIdle will trigger a report message if reporting is needed, which should extend the active mode until the
     // ack for the report is received.
-    pIcdManager->mTransitionToIdleCalled = true;
-    pIcdManager->mStateObserver->OnTransitionToIdle();
+    pICDManager->mTransitionToIdleCalled = true;
+    pICDManager->mStateObserver->OnTransitionToIdle();
 }
 
+/* ICDListener functions. */
+void ICDManager::OnKeepActiveRequest(KeepActiveFlags request)
+{
+    assertChipStackLockedByCurrentThread();
+
+    if (request == KeepActiveFlags::kExchangeContextOpen)
+    {
+        // There can be multiple open exchange contexts at the same time.
+        // Keep track of the requests count.
+        this->OpenExchangeContextCount++;
+        this->SetKeepActiveModeRequirements(request, true /* state */);
+    }
+    else /* !kExchangeContextOpen */
+    {
+        // Only 1 request per type (kCommissioningWindowOpen, kFailSafeArmed)
+        // set requirement directly
+        this->SetKeepActiveModeRequirements(request, true /* state */);
+    }
+}
+
+void ICDManager::OnActiveRequestWithdrawal(KeepActiveFlags request)
+{
+    assertChipStackLockedByCurrentThread();
+
+    if (request == KeepActiveFlags::kExchangeContextOpen)
+    {
+        // There can be multiple open exchange contexts at the same time.
+        // Keep track of the requests count.
+        if (this->OpenExchangeContextCount > 0)
+        {
+            this->OpenExchangeContextCount--;
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "The ICD Manager did not account for ExchangeContext closure");
+        }
+
+        if (this->OpenExchangeContextCount == 0)
+        {
+            this->SetKeepActiveModeRequirements(request, false /* state */);
+        }
+    }
+    else /* !kExchangeContextOpen */
+    {
+        // Only 1 request per type (kCommissioningWindowOpen, kFailSafeArmed)
+        // remove requirement directly
+        this->SetKeepActiveModeRequirements(request, false /* state */);
+    }
+}
+
+void ICDManager::OnNetworkActivity()
+{
+    this->UpdateOperationState(OperationalState::ActiveMode);
+}
 } // namespace app
 } // namespace chip

@@ -1,12 +1,6 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
-{{#zcl_structs}}
-{{#if has_more_than_one_cluster}}
-{{>idl_structure_definition extraIndent=0}}
-
-{{/if}}
-{{/zcl_structs}}
 {{#all_user_clusters~}}
 {{#if (is_client side)~}}
 {{>idl_cluster_definition generateClientCluster=1}}
@@ -57,6 +51,12 @@ endpoint {{endpointId}} {
         ;
       {{/if}}
     {{/user_cluster_attributes}}
+    {{#user_cluster_commands}}
+    {{~#first}}
+
+    {{/first}}
+    handle command {{asUpperCamelCase name}};
+    {{/user_cluster_commands}}
   }
       {{/if}}
     {{/if}}

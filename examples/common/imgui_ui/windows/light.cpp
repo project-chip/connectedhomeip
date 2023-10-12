@@ -155,11 +155,10 @@ void Light::Render()
     ImGui::Text("Color Control:");
     ImGui::Indent();
     const char * mode = // based on ColorMode attribute: spec 3.2.7.9
-        (mColorMode == EMBER_ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION)
-        ? "Hue/Saturation"
-        : (mColorMode == EMBER_ZCL_COLOR_MODE_CURRENT_X_AND_CURRENT_Y)
-            ? "X/Y"
-            : (mColorMode == EMBER_ZCL_COLOR_MODE_COLOR_TEMPERATURE) ? "Temperature/Mireds" : "UNKNOWN";
+        (mColorMode == EMBER_ZCL_COLOR_MODE_CURRENT_HUE_AND_CURRENT_SATURATION) ? "Hue/Saturation"
+        : (mColorMode == EMBER_ZCL_COLOR_MODE_CURRENT_X_AND_CURRENT_Y)          ? "X/Y"
+        : (mColorMode == EMBER_ZCL_COLOR_MODE_COLOR_TEMPERATURE)                ? "Temperature/Mireds"
+                                                                                : "UNKNOWN";
 
     ImGui::Text("Mode: %s", mode);
 

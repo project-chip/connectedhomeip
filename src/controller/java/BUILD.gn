@@ -17,6 +17,8 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/java/config.gni")
 import("${chip_root}/build/chip/java/rules.gni")
 import("${chip_root}/build/chip/tests.gni")
+import("${chip_root}/src/app/common_flags.gni")
+import("${chip_root}/src/platform/device.gni")
 
 if (!matter_enable_java_compilation) {
   import("${build_root}/config/android_abi.gni")
@@ -69,22 +71,31 @@ shared_library("jni") {
     "${chip_root}/src/platform",
   ]
 
-  if (matter_enable_java_generated_api) {
+  if (matter_enable_tlv_decoder_api) {
     defines += [ "USE_JAVA_TLV_ENCODE_DECODE" ]
 
     sources += [
-      "CHIPDefaultCallbacks.cpp",
-      "CHIPDefaultCallbacks.h",
       "CHIPTLVValueDecoder-JNI.cpp",
       "zap-generated/CHIPAttributeTLVValueDecoder.cpp",
-      "zap-generated/CHIPClustersWrite-JNI.cpp",
       "zap-generated/CHIPEventTLVValueDecoder.cpp",
+    ]
+  }
+
+  if (matter_enable_java_generated_api) {
+    sources += [
+      "CHIPDefaultCallbacks.cpp",
+      "CHIPDefaultCallbacks.h",
+      "zap-generated/CHIPClustersWrite-JNI.cpp",
       "zap-generated/CHIPInvokeCallbacks.cpp",
       "zap-generated/CHIPInvokeCallbacks.h",
       "zap-generated/CHIPReadCallbacks.cpp",
     ]
 
     deps += [ "${chip_root}/src/controller/data_model:java-jni-sources" ]
+  }
+
+  if (chip_build_controller_dynamic_server) {
+    defines += [ "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER" ]
   }
 
   if (matter_enable_java_compilation) {
@@ -308,7 +319,7 @@ kotlin_library("onboardingpayload_qr_code_test") {
 
 kotlin_library("chipcluster") {
   import(
-      "${chip_root}/src/controller/java/src/chip/devicecontroller/cluster/files.gni")
+      "${chip_root}/src/controller/java/generated/java/chip/devicecontroller/cluster/files.gni")
 
   output_name = "CHIPClusters.jar"
 
@@ -338,6 +349,39 @@ kotlin_library("chipcluster_test") {
   ]
 
   kotlinc_flags = [ "-Xlint:deprecation" ]
+}
+
+kotlin_library("kotlin_matter_controller") {
+  output_name = "KotlinMatterController.jar"
+
+  deps = [
+    ":java",
+    "${chip_root}/third_party/java_deps:annotation",
+  ]
+
+  sources = [
+    "src/matter/controller/CompletionListenerAdapter.kt",
+    "src/matter/controller/ControllerParams.kt",
+    "src/matter/controller/InteractionClient.kt",
+    "src/matter/controller/MatterController.kt",
+    "src/matter/controller/MatterControllerException.kt",
+    "src/matter/controller/MatterControllerImpl.kt",
+    "src/matter/controller/Messages.kt",
+    "src/matter/controller/OperationalKeyConfig.kt",
+    "src/matter/controller/model/Paths.kt",
+    "src/matter/controller/model/States.kt",
+  ]
+
+  if (matter_enable_java_compilation) {
+    deps += [
+      "${chip_root}/third_party/java_deps:json",
+      "${chip_root}/third_party/java_deps:kotlin-stdlib",
+      "${chip_root}/third_party/java_deps:kotlinx-coroutines-core-jvm",
+      "${chip_root}/third_party/java_deps/stub_src",
+    ]
+  } else {
+    deps += [ ":android" ]
+  }
 }
 
 group("unit_tests") {
@@ -391,6 +435,7 @@ android_library("java") {
     "src/chip/devicecontroller/DeviceAttestationDelegate.java",
     "src/chip/devicecontroller/DiscoveredDevice.java",
     "src/chip/devicecontroller/GetConnectedDeviceCallbackJni.java",
+    "src/chip/devicecontroller/GroupKeySecurityPolicy.java",
     "src/chip/devicecontroller/InvokeCallback.java",
     "src/chip/devicecontroller/InvokeCallbackJni.java",
     "src/chip/devicecontroller/KeypairDelegate.java",
@@ -420,6 +465,10 @@ android_library("java") {
     "src/chip/devicecontroller/model/NodeState.java",
   ]
 
+  if (matter_enable_tlv_decoder_api) {
+    sources += [ "src/chip/devicecontroller/ChipTLVValueDecoder.java" ]
+  }
+
   if (matter_enable_java_generated_api) {
     sources += [
       "generated/java/chip/devicecontroller/ClusterReadMapping.java",
@@ -430,7 +479,6 @@ android_library("java") {
       "src/chip/clusterinfo/CommandResponseInfo.java",
       "src/chip/clusterinfo/DelegatedClusterCallback.java",
       "src/chip/clusterinfo/InteractionInfo.java",
-      "src/chip/devicecontroller/ChipTLVValueDecoder.java",
       "zap-generated/chip/devicecontroller/ChipClusters.java",
       "zap-generated/chip/devicecontroller/ChipEventStructs.java",
       "zap-generated/chip/devicecontroller/ChipStructs.java",

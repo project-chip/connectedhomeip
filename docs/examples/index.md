@@ -87,6 +87,15 @@ darwin-framework-tool/README
 java-matter-controller/README
 ```
 
+## Kotlin matter controller example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+kotlin-matter-controller/README
+```
+
 ## Virtual Device App example
 
 ```{toctree}
@@ -273,6 +282,7 @@ tv-app/**/README
 :maxdepth: 1
 
 tv-casting-app/**/README
+tv-casting-app/APIs.md
 ```
 
 ## Window example

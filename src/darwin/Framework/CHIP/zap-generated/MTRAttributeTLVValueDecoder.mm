@@ -409,8 +409,7 @@ static id _Nullable DecodeAttributeValueForOnOffCluster(AttributeId aAttributeId
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForOnOffSwitchConfigurationCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForOnOffSwitchConfigurationCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::OnOffSwitchConfiguration;
     switch (aAttributeId) {
@@ -444,8 +443,7 @@ static id _Nullable DecodeAttributeValueForOnOffSwitchConfigurationCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForLevelControlCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForLevelControlCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::LevelControl;
     switch (aAttributeId) {
@@ -635,8 +633,7 @@ static id _Nullable DecodeAttributeValueForLevelControlCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForBinaryInputBasicCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForBinaryInputBasicCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::BinaryInputBasic;
     switch (aAttributeId) {
@@ -762,8 +759,7 @@ static id _Nullable DecodeAttributeValueForBinaryInputBasicCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForPulseWidthModulationCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForPulseWidthModulationCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::PulseWidthModulation;
     switch (aAttributeId) {
@@ -775,8 +771,7 @@ static id _Nullable DecodeAttributeValueForPulseWidthModulationCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForDescriptorCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForDescriptorCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::Descriptor;
     switch (aAttributeId) {
@@ -1002,8 +997,7 @@ static id _Nullable DecodeAttributeValueForBindingCluster(AttributeId aAttribute
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForAccessControlCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForAccessControlCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::AccessControl;
     switch (aAttributeId) {
@@ -1275,8 +1269,7 @@ static id _Nullable DecodeAttributeValueForActionsCluster(AttributeId aAttribute
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForBasicInformationCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::BasicInformation;
     switch (aAttributeId) {
@@ -1587,8 +1580,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForOTASoftwareUpdateProviderCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForOTASoftwareUpdateProviderCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::OtaSoftwareUpdateProvider;
     switch (aAttributeId) {
@@ -1600,8 +1592,7 @@ static id _Nullable DecodeAttributeValueForOTASoftwareUpdateProviderCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForOTASoftwareUpdateRequestorCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForOTASoftwareUpdateRequestorCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::OtaSoftwareUpdateRequestor;
     switch (aAttributeId) {
@@ -1679,8 +1670,7 @@ static id _Nullable DecodeAttributeValueForOTASoftwareUpdateRequestorCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForLocalizationConfigurationCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForLocalizationConfigurationCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::LocalizationConfiguration;
     switch (aAttributeId) {
@@ -1739,8 +1729,7 @@ static id _Nullable DecodeAttributeValueForLocalizationConfigurationCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForTimeFormatLocalizationCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForTimeFormatLocalizationCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::TimeFormatLocalization;
     switch (aAttributeId) {
@@ -1800,8 +1789,7 @@ static id _Nullable DecodeAttributeValueForTimeFormatLocalizationCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForUnitLocalizationCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForUnitLocalizationCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::UnitLocalization;
     switch (aAttributeId) {
@@ -1824,8 +1812,7 @@ static id _Nullable DecodeAttributeValueForUnitLocalizationCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForPowerSourceConfigurationCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForPowerSourceConfigurationCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::PowerSourceConfiguration;
     switch (aAttributeId) {
@@ -1863,8 +1850,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceConfigurationCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForPowerSourceCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::PowerSource;
     switch (aAttributeId) {
@@ -2342,8 +2328,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::GeneralCommissioning;
     switch (aAttributeId) {
@@ -2412,8 +2397,7 @@ static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::NetworkCommissioning;
     switch (aAttributeId) {
@@ -2542,8 +2526,7 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForDiagnosticLogsCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForDiagnosticLogsCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::DiagnosticLogs;
     switch (aAttributeId) {
@@ -2555,8 +2538,7 @@ static id _Nullable DecodeAttributeValueForDiagnosticLogsCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForGeneralDiagnosticsCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForGeneralDiagnosticsCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::GeneralDiagnostics;
     switch (aAttributeId) {
@@ -2585,14 +2567,12 @@ static id _Nullable DecodeAttributeValueForGeneralDiagnosticsCluster(
                 if (entry_0.offPremiseServicesReachableIPv4.IsNull()) {
                     newElement_0.offPremiseServicesReachableIPv4 = nil;
                 } else {
-                    newElement_0.offPremiseServicesReachableIPv4 =
-                        [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv4.Value()];
+                    newElement_0.offPremiseServicesReachableIPv4 = [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv4.Value()];
                 }
                 if (entry_0.offPremiseServicesReachableIPv6.IsNull()) {
                     newElement_0.offPremiseServicesReachableIPv6 = nil;
                 } else {
-                    newElement_0.offPremiseServicesReachableIPv6 =
-                        [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv6.Value()];
+                    newElement_0.offPremiseServicesReachableIPv6 = [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv6.Value()];
                 }
                 newElement_0.hardwareAddress = AsData(entry_0.hardwareAddress);
                 { // Scope for our temporary variables
@@ -2772,6 +2752,19 @@ static id _Nullable DecodeAttributeValueForGeneralDiagnosticsCluster(
         value = [NSNumber numberWithBool:cppValue];
         return value;
     }
+#if MTR_ENABLE_PROVISIONAL
+    case Attributes::AverageWearCount::Id: {
+        using TypeInfo = Attributes::AverageWearCount::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue];
+        return value;
+    }
+#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }
@@ -2780,8 +2773,7 @@ static id _Nullable DecodeAttributeValueForGeneralDiagnosticsCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForSoftwareDiagnosticsCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForSoftwareDiagnosticsCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::SoftwareDiagnostics;
     switch (aAttributeId) {
@@ -2878,8 +2870,7 @@ static id _Nullable DecodeAttributeValueForSoftwareDiagnosticsCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ThreadNetworkDiagnostics;
     switch (aAttributeId) {
@@ -3748,8 +3739,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForWiFiNetworkDiagnosticsCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForWiFiNetworkDiagnosticsCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::WiFiNetworkDiagnostics;
     switch (aAttributeId) {
@@ -3956,8 +3946,7 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkDiagnosticsCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForEthernetNetworkDiagnosticsCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForEthernetNetworkDiagnosticsCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::EthernetNetworkDiagnostics;
     switch (aAttributeId) {
@@ -4080,8 +4069,7 @@ static id _Nullable DecodeAttributeValueForEthernetNetworkDiagnosticsCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForTimeSynchronizationCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForTimeSynchronizationCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::TimeSynchronization;
     switch (aAttributeId) {
@@ -4335,8 +4323,7 @@ static id _Nullable DecodeAttributeValueForTimeSynchronizationCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::BridgedDeviceBasicInformation;
     switch (aAttributeId) {
@@ -4630,8 +4617,7 @@ static id _Nullable DecodeAttributeValueForSwitchCluster(AttributeId aAttributeI
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForAdministratorCommissioningCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForAdministratorCommissioningCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::AdministratorCommissioning;
     switch (aAttributeId) {
@@ -4684,8 +4670,7 @@ static id _Nullable DecodeAttributeValueForAdministratorCommissioningCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForOperationalCredentialsCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForOperationalCredentialsCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::OperationalCredentials;
     switch (aAttributeId) {
@@ -4826,8 +4811,7 @@ static id _Nullable DecodeAttributeValueForOperationalCredentialsCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForGroupKeyManagementCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForGroupKeyManagementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::GroupKeyManagement;
     switch (aAttributeId) {
@@ -4944,8 +4928,7 @@ static id _Nullable DecodeAttributeValueForGroupKeyManagementCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForFixedLabelCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForFixedLabelCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::FixedLabel;
     switch (aAttributeId) {
@@ -5045,8 +5028,7 @@ static id _Nullable DecodeAttributeValueForUserLabelCluster(AttributeId aAttribu
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForBooleanStateCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForBooleanStateCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::BooleanState;
     switch (aAttributeId) {
@@ -5069,8 +5051,7 @@ static id _Nullable DecodeAttributeValueForBooleanStateCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForICDManagementCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForICDManagementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::IcdManagement;
     switch (aAttributeId) {
@@ -5131,7 +5112,6 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(
                 newElement_0 = [MTRICDManagementClusterMonitoringRegistrationStruct new];
                 newElement_0.checkInNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.checkInNodeID];
                 newElement_0.monitoredSubject = [NSNumber numberWithUnsignedLongLong:entry_0.monitoredSubject];
-                newElement_0.key = AsData(entry_0.key);
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 [array_0 addObject:newElement_0];
             }
@@ -5179,8 +5159,7 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForModeSelectCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForModeSelectCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ModeSelect;
     switch (aAttributeId) {
@@ -5315,8 +5294,7 @@ static id _Nullable DecodeAttributeValueForModeSelectCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForLaundryWasherModeCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForLaundryWasherModeCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::LaundryWasherMode;
     switch (aAttributeId) {
@@ -5432,8 +5410,7 @@ static id _Nullable DecodeAttributeValueForLaundryWasherModeCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForRefrigeratorAndTemperatureControlledCabinetModeCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForRefrigeratorAndTemperatureControlledCabinetModeCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::RefrigeratorAndTemperatureControlledCabinetMode;
     switch (aAttributeId) {
@@ -5549,8 +5526,7 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAndTemperatureControlledC
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForLaundryWasherControlsCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForLaundryWasherControlsCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::LaundryWasherControls;
     switch (aAttributeId) {
@@ -5653,8 +5629,7 @@ static id _Nullable DecodeAttributeValueForLaundryWasherControlsCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForRVCRunModeCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForRVCRunModeCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::RvcRunMode;
     switch (aAttributeId) {
@@ -5770,8 +5745,7 @@ static id _Nullable DecodeAttributeValueForRVCRunModeCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForRVCCleanModeCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForRVCCleanModeCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::RvcCleanMode;
     switch (aAttributeId) {
@@ -5887,8 +5861,7 @@ static id _Nullable DecodeAttributeValueForRVCCleanModeCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForTemperatureControlCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForTemperatureControlCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::TemperatureControl;
     switch (aAttributeId) {
@@ -5998,8 +5971,7 @@ static id _Nullable DecodeAttributeValueForTemperatureControlCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForRefrigeratorAlarmCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForRefrigeratorAlarmCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::RefrigeratorAlarm;
     switch (aAttributeId) {
@@ -6050,8 +6022,7 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAlarmCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForDishwasherModeCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForDishwasherModeCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::DishwasherMode;
     switch (aAttributeId) {
@@ -6167,8 +6138,7 @@ static id _Nullable DecodeAttributeValueForDishwasherModeCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForAirQualityCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForAirQualityCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::AirQuality;
     switch (aAttributeId) {
@@ -6193,8 +6163,7 @@ static id _Nullable DecodeAttributeValueForAirQualityCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForSmokeCOAlarmCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForSmokeCOAlarmCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::SmokeCoAlarm;
     switch (aAttributeId) {
@@ -6375,8 +6344,7 @@ static id _Nullable DecodeAttributeValueForSmokeCOAlarmCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForDishwasherAlarmCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForDishwasherAlarmCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::DishwasherAlarm;
     switch (aAttributeId) {
@@ -6440,8 +6408,7 @@ static id _Nullable DecodeAttributeValueForDishwasherAlarmCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForOperationalStateCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForOperationalStateCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::OperationalState;
     switch (aAttributeId) {
@@ -6610,8 +6577,7 @@ static id _Nullable DecodeAttributeValueForOperationalStateCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForRVCOperationalStateCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForRVCOperationalStateCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::RvcOperationalState;
     switch (aAttributeId) {
@@ -6780,8 +6746,7 @@ static id _Nullable DecodeAttributeValueForRVCOperationalStateCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForHEPAFilterMonitoringCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForHEPAFilterMonitoringCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::HepaFilterMonitoring;
     switch (aAttributeId) {
@@ -6870,8 +6835,7 @@ static id _Nullable DecodeAttributeValueForHEPAFilterMonitoringCluster(
                 auto & entry_0 = iter_0.GetValue();
                 MTRHEPAFilterMonitoringClusterReplacementProductStruct * newElement_0;
                 newElement_0 = [MTRHEPAFilterMonitoringClusterReplacementProductStruct new];
-                newElement_0.productIdentifierType =
-                    [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.productIdentifierType)];
+                newElement_0.productIdentifierType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.productIdentifierType)];
                 newElement_0.productIdentifierValue = AsString(entry_0.productIdentifierValue);
                 if (newElement_0.productIdentifierValue == nil) {
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
@@ -6898,8 +6862,7 @@ static id _Nullable DecodeAttributeValueForHEPAFilterMonitoringCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForActivatedCarbonFilterMonitoringCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForActivatedCarbonFilterMonitoringCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ActivatedCarbonFilterMonitoring;
     switch (aAttributeId) {
@@ -6988,8 +6951,7 @@ static id _Nullable DecodeAttributeValueForActivatedCarbonFilterMonitoringCluste
                 auto & entry_0 = iter_0.GetValue();
                 MTRActivatedCarbonFilterMonitoringClusterReplacementProductStruct * newElement_0;
                 newElement_0 = [MTRActivatedCarbonFilterMonitoringClusterReplacementProductStruct new];
-                newElement_0.productIdentifierType =
-                    [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.productIdentifierType)];
+                newElement_0.productIdentifierType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.productIdentifierType)];
                 newElement_0.productIdentifierValue = AsString(entry_0.productIdentifierValue);
                 if (newElement_0.productIdentifierValue == nil) {
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
@@ -7437,8 +7399,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForWindowCoveringCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::WindowCovering;
     switch (aAttributeId) {
@@ -7724,8 +7685,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForBarrierControlCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForBarrierControlCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::BarrierControl;
     switch (aAttributeId) {
@@ -7847,8 +7807,7 @@ static id _Nullable DecodeAttributeValueForBarrierControlCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::PumpConfigurationAndControl;
     switch (aAttributeId) {
@@ -8185,8 +8144,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForThermostatCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::Thermostat;
     switch (aAttributeId) {
@@ -8781,8 +8739,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForFanControlCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForFanControlCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::FanControl;
     switch (aAttributeId) {
@@ -8936,8 +8893,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForThermostatUserInterfaceConfigurationCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForThermostatUserInterfaceConfigurationCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ThermostatUserInterfaceConfiguration;
     switch (aAttributeId) {
@@ -8982,8 +8938,7 @@ static id _Nullable DecodeAttributeValueForThermostatUserInterfaceConfigurationC
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForColorControlCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ColorControl;
     switch (aAttributeId) {
@@ -9616,8 +9571,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::BallastConfiguration;
     switch (aAttributeId) {
@@ -9651,7 +9605,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::MinLevel::Id: {
@@ -9787,7 +9741,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     case Attributes::LampBurnHoursTripPoint::Id: {
@@ -9813,8 +9767,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForIlluminanceMeasurementCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForIlluminanceMeasurementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::IlluminanceMeasurement;
     switch (aAttributeId) {
@@ -9897,8 +9850,7 @@ static id _Nullable DecodeAttributeValueForIlluminanceMeasurementCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForTemperatureMeasurementCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForTemperatureMeasurementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::TemperatureMeasurement;
     switch (aAttributeId) {
@@ -9966,8 +9918,7 @@ static id _Nullable DecodeAttributeValueForTemperatureMeasurementCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForPressureMeasurementCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForPressureMeasurementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::PressureMeasurement;
     switch (aAttributeId) {
@@ -10102,8 +10053,7 @@ static id _Nullable DecodeAttributeValueForPressureMeasurementCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForFlowMeasurementCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForFlowMeasurementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::FlowMeasurement;
     switch (aAttributeId) {
@@ -10171,8 +10121,7 @@ static id _Nullable DecodeAttributeValueForFlowMeasurementCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForRelativeHumidityMeasurementCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForRelativeHumidityMeasurementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::RelativeHumidityMeasurement;
     switch (aAttributeId) {
@@ -10240,8 +10189,7 @@ static id _Nullable DecodeAttributeValueForRelativeHumidityMeasurementCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForOccupancySensingCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::OccupancySensing;
     switch (aAttributeId) {
@@ -10385,8 +10333,7 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForCarbonMonoxideConcentrationMeasurementCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForCarbonMonoxideConcentrationMeasurementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::CarbonMonoxideConcentrationMeasurement;
     switch (aAttributeId) {
@@ -10561,8 +10508,7 @@ static id _Nullable DecodeAttributeValueForCarbonMonoxideConcentrationMeasuremen
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForCarbonDioxideConcentrationMeasurementCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForCarbonDioxideConcentrationMeasurementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::CarbonDioxideConcentrationMeasurement;
     switch (aAttributeId) {
@@ -10737,8 +10683,7 @@ static id _Nullable DecodeAttributeValueForCarbonDioxideConcentrationMeasurement
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForNitrogenDioxideConcentrationMeasurementCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForNitrogenDioxideConcentrationMeasurementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::NitrogenDioxideConcentrationMeasurement;
     switch (aAttributeId) {
@@ -10913,8 +10858,7 @@ static id _Nullable DecodeAttributeValueForNitrogenDioxideConcentrationMeasureme
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForOzoneConcentrationMeasurementCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForOzoneConcentrationMeasurementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::OzoneConcentrationMeasurement;
     switch (aAttributeId) {
@@ -11089,8 +11033,7 @@ static id _Nullable DecodeAttributeValueForOzoneConcentrationMeasurementCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForPM25ConcentrationMeasurementCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForPM25ConcentrationMeasurementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::Pm25ConcentrationMeasurement;
     switch (aAttributeId) {
@@ -11265,8 +11208,7 @@ static id _Nullable DecodeAttributeValueForPM25ConcentrationMeasurementCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForFormaldehydeConcentrationMeasurementCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForFormaldehydeConcentrationMeasurementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::FormaldehydeConcentrationMeasurement;
     switch (aAttributeId) {
@@ -11441,8 +11383,7 @@ static id _Nullable DecodeAttributeValueForFormaldehydeConcentrationMeasurementC
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForPM1ConcentrationMeasurementCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForPM1ConcentrationMeasurementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::Pm1ConcentrationMeasurement;
     switch (aAttributeId) {
@@ -11617,8 +11558,7 @@ static id _Nullable DecodeAttributeValueForPM1ConcentrationMeasurementCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForPM10ConcentrationMeasurementCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForPM10ConcentrationMeasurementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::Pm10ConcentrationMeasurement;
     switch (aAttributeId) {
@@ -11793,8 +11733,7 @@ static id _Nullable DecodeAttributeValueForPM10ConcentrationMeasurementCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForTotalVolatileOrganicCompoundsConcentrationMeasurementCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForTotalVolatileOrganicCompoundsConcentrationMeasurementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement;
     switch (aAttributeId) {
@@ -11969,8 +11908,7 @@ static id _Nullable DecodeAttributeValueForTotalVolatileOrganicCompoundsConcentr
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForRadonConcentrationMeasurementCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForRadonConcentrationMeasurementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::RadonConcentrationMeasurement;
     switch (aAttributeId) {
@@ -12332,8 +12270,7 @@ static id _Nullable DecodeAttributeValueForChannelCluster(AttributeId aAttribute
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForTargetNavigatorCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForTargetNavigatorCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::TargetNavigator;
     switch (aAttributeId) {
@@ -12389,8 +12326,7 @@ static id _Nullable DecodeAttributeValueForTargetNavigatorCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForMediaPlaybackCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForMediaPlaybackCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::MediaPlayback;
     switch (aAttributeId) {
@@ -12505,8 +12441,7 @@ static id _Nullable DecodeAttributeValueForMediaPlaybackCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForMediaInputCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForMediaInputCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::MediaInput;
     switch (aAttributeId) {
@@ -12581,8 +12516,7 @@ static id _Nullable DecodeAttributeValueForLowPowerCluster(AttributeId aAttribut
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForKeypadInputCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForKeypadInputCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::KeypadInput;
     switch (aAttributeId) {
@@ -12594,8 +12528,7 @@ static id _Nullable DecodeAttributeValueForKeypadInputCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForContentLauncherCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForContentLauncherCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ContentLauncher;
     switch (aAttributeId) {
@@ -12649,8 +12582,7 @@ static id _Nullable DecodeAttributeValueForContentLauncherCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForAudioOutputCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForAudioOutputCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::AudioOutput;
     switch (aAttributeId) {
@@ -12707,8 +12639,7 @@ static id _Nullable DecodeAttributeValueForAudioOutputCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForApplicationLauncherCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForApplicationLauncherCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ApplicationLauncher;
     switch (aAttributeId) {
@@ -12774,8 +12705,7 @@ static id _Nullable DecodeAttributeValueForApplicationLauncherCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForApplicationBasicCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForApplicationBasicCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ApplicationBasic;
     switch (aAttributeId) {
@@ -12912,8 +12842,7 @@ static id _Nullable DecodeAttributeValueForApplicationBasicCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForAccountLoginCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForAccountLoginCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::AccountLogin;
     switch (aAttributeId) {
@@ -12925,8 +12854,7 @@ static id _Nullable DecodeAttributeValueForAccountLoginCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForElectricalMeasurementCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForElectricalMeasurementCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ElectricalMeasurement;
     switch (aAttributeId) {
@@ -14346,8 +14274,7 @@ static id _Nullable DecodeAttributeValueForElectricalMeasurementCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeAttributeValueForUnitTestingCluster(
-    AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttributeId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::UnitTesting;
     switch (aAttributeId) {
@@ -14822,8 +14749,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(
                     if (entry_0.nullableOptionalInt.Value().IsNull()) {
                         newElement_0.nullableOptionalInt = nil;
                     } else {
-                        newElement_0.nullableOptionalInt =
-                            [NSNumber numberWithUnsignedShort:entry_0.nullableOptionalInt.Value().Value()];
+                        newElement_0.nullableOptionalInt = [NSNumber numberWithUnsignedShort:entry_0.nullableOptionalInt.Value().Value()];
                     }
                 } else {
                     newElement_0.nullableOptionalInt = nil;
@@ -14868,8 +14794,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(
                     newElement_0.nullableStruct = [MTRUnitTestingClusterSimpleStruct new];
                     newElement_0.nullableStruct.a = [NSNumber numberWithUnsignedChar:entry_0.nullableStruct.Value().a];
                     newElement_0.nullableStruct.b = [NSNumber numberWithBool:entry_0.nullableStruct.Value().b];
-                    newElement_0.nullableStruct.c =
-                        [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.nullableStruct.Value().c)];
+                    newElement_0.nullableStruct.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.nullableStruct.Value().c)];
                     newElement_0.nullableStruct.d = AsData(entry_0.nullableStruct.Value().d);
                     newElement_0.nullableStruct.e = AsString(entry_0.nullableStruct.Value().e);
                     if (newElement_0.nullableStruct.e == nil) {
@@ -14885,8 +14810,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(
                     newElement_0.optionalStruct = [MTRUnitTestingClusterSimpleStruct new];
                     newElement_0.optionalStruct.a = [NSNumber numberWithUnsignedChar:entry_0.optionalStruct.Value().a];
                     newElement_0.optionalStruct.b = [NSNumber numberWithBool:entry_0.optionalStruct.Value().b];
-                    newElement_0.optionalStruct.c =
-                        [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.optionalStruct.Value().c)];
+                    newElement_0.optionalStruct.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.optionalStruct.Value().c)];
                     newElement_0.optionalStruct.d = AsData(entry_0.optionalStruct.Value().d);
                     newElement_0.optionalStruct.e = AsString(entry_0.optionalStruct.Value().e);
                     if (newElement_0.optionalStruct.e == nil) {
@@ -14905,12 +14829,9 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(
                         newElement_0.nullableOptionalStruct = nil;
                     } else {
                         newElement_0.nullableOptionalStruct = [MTRUnitTestingClusterSimpleStruct new];
-                        newElement_0.nullableOptionalStruct.a =
-                            [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().a];
-                        newElement_0.nullableOptionalStruct.b =
-                            [NSNumber numberWithBool:entry_0.nullableOptionalStruct.Value().Value().b];
-                        newElement_0.nullableOptionalStruct.c =
-                            [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.nullableOptionalStruct.Value().Value().c)];
+                        newElement_0.nullableOptionalStruct.a = [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().a];
+                        newElement_0.nullableOptionalStruct.b = [NSNumber numberWithBool:entry_0.nullableOptionalStruct.Value().Value().b];
+                        newElement_0.nullableOptionalStruct.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.nullableOptionalStruct.Value().Value().c)];
                         newElement_0.nullableOptionalStruct.d = AsData(entry_0.nullableOptionalStruct.Value().Value().d);
                         newElement_0.nullableOptionalStruct.e = AsString(entry_0.nullableOptionalStruct.Value().Value().e);
                         if (newElement_0.nullableOptionalStruct.e == nil) {
@@ -14918,12 +14839,9 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(
                             *aError = err;
                             return nil;
                         }
-                        newElement_0.nullableOptionalStruct.f =
-                            [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().f.Raw()];
-                        newElement_0.nullableOptionalStruct.g =
-                            [NSNumber numberWithFloat:entry_0.nullableOptionalStruct.Value().Value().g];
-                        newElement_0.nullableOptionalStruct.h =
-                            [NSNumber numberWithDouble:entry_0.nullableOptionalStruct.Value().Value().h];
+                        newElement_0.nullableOptionalStruct.f = [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().f.Raw()];
+                        newElement_0.nullableOptionalStruct.g = [NSNumber numberWithFloat:entry_0.nullableOptionalStruct.Value().Value().g];
+                        newElement_0.nullableOptionalStruct.h = [NSNumber numberWithDouble:entry_0.nullableOptionalStruct.Value().Value().h];
                     }
                 } else {
                     newElement_0.nullableOptionalStruct = nil;
@@ -15125,23 +15043,20 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(
                 newElement_0 = [MTRUnitTestingClusterTestFabricScoped new];
                 newElement_0.fabricSensitiveInt8u = [NSNumber numberWithUnsignedChar:entry_0.fabricSensitiveInt8u];
                 if (entry_0.optionalFabricSensitiveInt8u.HasValue()) {
-                    newElement_0.optionalFabricSensitiveInt8u =
-                        [NSNumber numberWithUnsignedChar:entry_0.optionalFabricSensitiveInt8u.Value()];
+                    newElement_0.optionalFabricSensitiveInt8u = [NSNumber numberWithUnsignedChar:entry_0.optionalFabricSensitiveInt8u.Value()];
                 } else {
                     newElement_0.optionalFabricSensitiveInt8u = nil;
                 }
                 if (entry_0.nullableFabricSensitiveInt8u.IsNull()) {
                     newElement_0.nullableFabricSensitiveInt8u = nil;
                 } else {
-                    newElement_0.nullableFabricSensitiveInt8u =
-                        [NSNumber numberWithUnsignedChar:entry_0.nullableFabricSensitiveInt8u.Value()];
+                    newElement_0.nullableFabricSensitiveInt8u = [NSNumber numberWithUnsignedChar:entry_0.nullableFabricSensitiveInt8u.Value()];
                 }
                 if (entry_0.nullableOptionalFabricSensitiveInt8u.HasValue()) {
                     if (entry_0.nullableOptionalFabricSensitiveInt8u.Value().IsNull()) {
                         newElement_0.nullableOptionalFabricSensitiveInt8u = nil;
                     } else {
-                        newElement_0.nullableOptionalFabricSensitiveInt8u =
-                            [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalFabricSensitiveInt8u.Value().Value()];
+                        newElement_0.nullableOptionalFabricSensitiveInt8u = [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalFabricSensitiveInt8u.Value().Value()];
                     }
                 } else {
                     newElement_0.nullableOptionalFabricSensitiveInt8u = nil;
@@ -15155,8 +15070,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(
                 newElement_0.fabricSensitiveStruct = [MTRUnitTestingClusterSimpleStruct new];
                 newElement_0.fabricSensitiveStruct.a = [NSNumber numberWithUnsignedChar:entry_0.fabricSensitiveStruct.a];
                 newElement_0.fabricSensitiveStruct.b = [NSNumber numberWithBool:entry_0.fabricSensitiveStruct.b];
-                newElement_0.fabricSensitiveStruct.c =
-                    [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.fabricSensitiveStruct.c)];
+                newElement_0.fabricSensitiveStruct.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.fabricSensitiveStruct.c)];
                 newElement_0.fabricSensitiveStruct.d = AsData(entry_0.fabricSensitiveStruct.d);
                 newElement_0.fabricSensitiveStruct.e = AsString(entry_0.fabricSensitiveStruct.e);
                 if (newElement_0.fabricSensitiveStruct.e == nil) {
@@ -16036,8 +15950,7 @@ id _Nullable MTRDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::T
         return DecodeAttributeValueForPM10ConcentrationMeasurementCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id: {
-        return DecodeAttributeValueForTotalVolatileOrganicCompoundsConcentrationMeasurementCluster(
-            aPath.mAttributeId, aReader, aError);
+        return DecodeAttributeValueForTotalVolatileOrganicCompoundsConcentrationMeasurementCluster(aPath.mAttributeId, aReader, aError);
     }
     case Clusters::RadonConcentrationMeasurement::Id: {
         return DecodeAttributeValueForRadonConcentrationMeasurementCluster(aPath.mAttributeId, aReader, aError);

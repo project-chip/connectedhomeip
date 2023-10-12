@@ -6,35 +6,32 @@ You can use this example as a reference for creating your own application.
 
 ## Build and flash
 
-1. Pull docker image from repository:
+1. Run the Docker container:
 
     ```bash
-    $ docker pull ghcr.io/project-chip/chip-build-telink:10
+    $ docker run -it --rm -v $PWD:/host -w /host ghcr.io/project-chip/chip-build-telink:$(wget -q -O - https://raw.githubusercontent.com/project-chip/connectedhomeip/master/.github/workflows/examples-telink.yaml 2> /dev/null | grep chip-build-telink | awk -F: '{print $NF}')
     ```
 
-2. Run docker container:
+    Compatible docker image version can be found in next file:
 
     ```bash
-    $ docker run -it --rm -v ${CHIP_BASE}:/root/chip -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" ghcr.io/project-chip/chip-build-telink:10
+    $ .github/workflows/examples-telink.yaml
     ```
 
-    here `${CHIP_BASE}` is directory which contains CHIP repo files **!!!Pay
-    attention that OUTPUT_DIR should contains ABSOLUTE path to output dir**
-
-3. Activate the build environment:
+2. Activate the build environment:
 
     ```bash
     $ source ./scripts/activate.sh
     ```
 
-4. In the example dir run (replace _<build_target>_ with your board name, for
+3. In the example dir run (replace _<build_target>_ with your board name, for
    example, `tlsr9518adk80d` or `tlsr9528a`):
 
     ```bash
     $ west build -b <build_target>
     ```
 
-5. Flash binary:
+4. Flash binary:
 
     ```
     $ west flash --erase

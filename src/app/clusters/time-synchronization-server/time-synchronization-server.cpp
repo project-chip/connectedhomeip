@@ -300,41 +300,30 @@ void TimeSynchronizationServer::AttemptToGetFallbackNTPTimeFromDelegate()
 void TimeSynchronizationServer::OnDeviceConnectedFn(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle)
 {
     // Connected to our trusted time source, let's read the time.
-    app::AttributePathParams readPaths[2];
-    readPaths[0] = app::AttributePathParams(kRootEndpointId, app::Clusters::TimeSynchronization::Id,
-                                            app::Clusters::TimeSynchronization::Attributes::UTCTime::Id);
-    readPaths[1] = app::AttributePathParams(kRootEndpointId, app::Clusters::TimeSynchronization::Id,
-                                            app::Clusters::TimeSynchronization::Attributes::Granularity::Id);
+    AttributePathParams readPaths[2];
+    readPaths[0] = AttributePathParams(kRootEndpointId, Id, Attributes::UTCTime::Id);
+    readPaths[1] = AttributePathParams(kRootEndpointId, Id, Attributes::Granularity::Id);
 
-    app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
-    app::ReadPrepareParams readParams(sessionHandle);
+    InteractionModelEngine * engine = InteractionModelEngine::GetInstance();
+    ReadPrepareParams readParams(sessionHandle);
     readParams.mpAttributePathParamsList    = readPaths;
     readParams.mAttributePathParamsListSize = 2;
 
-    auto attributeCache = Platform::MakeUnique<app::ClusterStateCache>(*this);
-    if (attributeCache == nullptr)
+    auto readInfo = Platform::MakeUnique<TimeReadInfo>(engine, &exchangeMgr, *this, ReadClient::InteractionType::Read);
+    if (readInfo == nullptr)
     {
         // This is unlikely to work if we don't have memory, but let's try
         OnDeviceConnectionFailureFn();
         return;
     }
-    auto readClient = chip::Platform::MakeUnique<app::ReadClient>(engine, &exchangeMgr, attributeCache->GetBufferedCallback(),
-                                                                  app::ReadClient::InteractionType::Read);
-    if (readClient == nullptr)
-    {
-        // This is unlikely to work if we don't have memory, but let's try
-        OnDeviceConnectionFailureFn();
-        return;
-    }
-    CHIP_ERROR err = readClient->SendRequest(readParams);
+    CHIP_ERROR err = readInfo->readClient.SendRequest(readParams);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to read UTC time from trusted source");
         OnDeviceConnectionFailureFn();
         return;
     }
-    mAttributeCache = std::move(attributeCache);
-    mReadClient     = std::move(readClient);
+    mTimeReadInfo = std::move(readInfo);
 }
 
 void TimeSynchronizationServer::OnDeviceConnectionFailureFn()
@@ -343,20 +332,39 @@ void TimeSynchronizationServer::OnDeviceConnectionFailureFn()
     AttemptToGetFallbackNTPTimeFromDelegate();
 }
 
+void TimeSynchronizationServer::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+                                                const StatusIB & aStatus)
+{
+    if (aPath.mClusterId != Id || aStatus.IsFailure())
+    {
+        return;
+    }
+    switch (aPath.mAttributeId)
+    {
+    case Attributes::UTCTime::Id:
+        if (DataModel::Decode(*apData, mTimeReadInfo->utcTime) != CHIP_NO_ERROR)
+        {
+            mTimeReadInfo->utcTime.SetNull();
+        }
+        break;
+    case Attributes::Granularity::Id:
+        if (DataModel::Decode(*apData, mTimeReadInfo->granularity) != CHIP_NO_ERROR)
+        {
+            mTimeReadInfo->granularity = GranularityEnum::kNoTimeGranularity;
+        }
+        break;
+    default:
+        break;
+    }
+}
+
 void TimeSynchronizationServer::OnDone(ReadClient * apReadClient)
 {
-    using namespace chip::app::Clusters::TimeSynchronization::Attributes;
-
-    Granularity::TypeInfo::Type granularity = GranularityEnum::kNoTimeGranularity;
-    mAttributeCache->Get<Granularity::TypeInfo>(kRootEndpointId, granularity);
-
-    UTCTime::TypeInfo::Type time;
-    CHIP_ERROR err = mAttributeCache->Get<UTCTime::TypeInfo>(kRootEndpointId, time);
-    if (err == CHIP_NO_ERROR && !time.IsNull() && granularity != GranularityEnum::kNoTimeGranularity)
+    if (!mTimeReadInfo->utcTime.IsNull() && mTimeReadInfo->granularity != GranularityEnum::kNoTimeGranularity)
     {
         GranularityEnum ourGranularity;
         // Being conservative with granularity - nothing smaller than seconds because of network delay
-        switch (granularity)
+        switch (mTimeReadInfo->granularity)
         {
         case GranularityEnum::kMinutesGranularity:
         case GranularityEnum::kSecondsGranularity:
@@ -367,7 +375,8 @@ void TimeSynchronizationServer::OnDone(ReadClient * apReadClient)
             break;
         }
 
-        err = SetUTCTime(kRootEndpointId, time.Value(), ourGranularity, TimeSourceEnum::kNodeTimeCluster);
+        CHIP_ERROR err =
+            SetUTCTime(kRootEndpointId, mTimeReadInfo->utcTime.Value(), ourGranularity, TimeSourceEnum::kNodeTimeCluster);
         if (err == CHIP_NO_ERROR)
         {
             return;
@@ -377,6 +386,7 @@ void TimeSynchronizationServer::OnDone(ReadClient * apReadClient)
     // If we failed to set the UTC time, it doesn't hurt to try the backup - NTP system might have different permissions on the
     // system clock
     AttemptToGetFallbackNTPTimeFromDelegate();
+    mTimeReadInfo = nullptr;
 }
 #endif
 
@@ -392,8 +402,9 @@ void TimeSynchronizationServer::OnTimeSyncCompletionFn(TimeSourceEnum timeSource
         }
         return;
     }
-    mGranularity = granularity;
-    if (EMBER_ZCL_STATUS_SUCCESS != TimeSource::Set(kRootEndpointId, timeSource))
+    mGranularity         = granularity;
+    EmberAfStatus status = TimeSource::Set(kRootEndpointId, timeSource);
+    if (!(status == EMBER_ZCL_STATUS_SUCCESS || status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE))
     {
         ChipLogError(Zcl, "Writing TimeSource failed.");
     }
@@ -405,7 +416,8 @@ void TimeSynchronizationServer::OnFallbackNTPCompletionFn(bool timeSyncSuccessfu
     {
         mGranularity = GranularityEnum::kMillisecondsGranularity;
         // Non-matter SNTP because we know it's external and there's only one source
-        if (EMBER_ZCL_STATUS_SUCCESS != TimeSource::Set(kRootEndpointId, TimeSourceEnum::kNonMatterSNTP))
+        EmberAfStatus status = TimeSource::Set(kRootEndpointId, TimeSourceEnum::kNonMatterSNTP);
+        if (!(status == EMBER_ZCL_STATUS_SUCCESS || status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE))
         {
             ChipLogError(Zcl, "Writing TimeSource failed.");
         }
@@ -464,13 +476,10 @@ void TimeSynchronizationServer::Init()
     {
         ClearDSTOffset();
     }
-    System::Clock::Microseconds64 utcTime;
 
-    if (System::SystemClock().GetClock_RealTime(utcTime) == CHIP_NO_ERROR &&
-        !RuntimeOptionsProvider::Instance().GetSimulateNoInternalTime())
-    {
-        mGranularity = GranularityEnum::kMinutesGranularity;
-    }
+    // Set the granularity to none for now - this will force us to go to the delegate so it can
+    // properly report the time source
+    mGranularity = GranularityEnum::kNoTimeGranularity;
 
     // This can error, but it's not clear what should happen in this case. For now, just ignore it because we still
     // want time sync even if we can't register the deletgate here.
@@ -789,8 +798,9 @@ CHIP_ERROR TimeSynchronizationServer::SetUTCTime(EndpointId ep, uint64_t utcTime
         ChipLogError(Zcl, "Error setting UTC time on the device");
         return err;
     }
-    mGranularity = granularity;
-    if (EMBER_ZCL_STATUS_SUCCESS != TimeSource::Set(ep, source))
+    mGranularity         = granularity;
+    EmberAfStatus status = TimeSource::Set(ep, source);
+    if (!(status == EMBER_ZCL_STATUS_SUCCESS || status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE))
     {
         ChipLogError(Zcl, "Writing TimeSource failed.");
         return CHIP_IM_GLOBAL_STATUS(Failure);

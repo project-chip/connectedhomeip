@@ -38,7 +38,8 @@
 #include <platform/ConnectivityManager.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/ICDManager.h> // nogncheck
+#include <app/icd/ICDManager.h>  // nogncheck
+#include <app/icd/ICDNotifier.h> // nogncheck
 #endif
 
 using namespace chip::System::Clock::Literals;
@@ -49,12 +50,12 @@ namespace Messaging {
 ReliableMessageMgr::RetransTableEntry::RetransTableEntry(ReliableMessageContext * rc) :
     ec(*rc->GetExchangeContext()), nextRetransTime(0), sendCount(0)
 {
-    ec->SetMessageNotAcked(true);
+    ec->SetWaitingForAck(true);
 }
 
 ReliableMessageMgr::RetransTableEntry::~RetransTableEntry()
 {
-    ec->SetMessageNotAcked(false);
+    ec->SetWaitingForAck(false);
 }
 
 ReliableMessageMgr::ReliableMessageMgr(ObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool) :
@@ -158,20 +159,14 @@ void ReliableMessageMgr::ExecuteActions()
             // Do not StartTimer, we will schedule the timer at the end of the timer handler.
             mRetransTable.ReleaseObject(entry);
 
-            // Dropping our entry marked the exchange as not having an un-acked
-            // message... but of course it _does_ have an un-acked message and
-            // we have just given up on waiting for the ack.
-
-            ec->GetReliableMessageContext()->SetMessageNotAcked(true);
-
             return Loop::Continue;
         }
 
         entry->sendCount++;
-        ChipLogDetail(ExchangeManager,
-                      "Retransmitting MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange
-                      " Send Cnt %d",
-                      messageCounter, ChipLogValueExchange(&entry->ec.Get()), entry->sendCount);
+        ChipLogProgress(ExchangeManager,
+                        "Retransmitting MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange
+                        " Send Cnt %d",
+                        messageCounter, ChipLogValueExchange(&entry->ec.Get()), entry->sendCount);
 
         // Choose active/idle timeout from PeerActiveMode of session per 4.11.2.1. Retransmissions.
         System::Clock::Timestamp baseTimeout = entry->ec->GetSessionHandle()->GetMRPBaseTimeout();
@@ -204,7 +199,7 @@ void ReliableMessageMgr::Timeout(System::Layer * aSystemLayer, void * aAppState)
 
 CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, RetransTableEntry ** rEntry)
 {
-    VerifyOrDie(!rc->IsMessageNotAcked());
+    VerifyOrDie(!rc->IsWaitingForAck());
 
     *rEntry = mRetransTable.CreateObject(rc);
     if (*rEntry == nullptr)
@@ -326,19 +321,9 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
 
     if (err == CHIP_NO_ERROR)
     {
-#if CONFIG_DEVICE_LAYER && CHIP_CONFIG_ENABLE_ICD_SERVER
-        DeviceLayer::ChipDeviceEvent event;
-        // Here always set ExpectResponse to false.
-        // The Initial message sent from the Exchange Context will have set ExpectResponse to the correct value.
-        // If we are expecting a Response, the ICD will already be in a state waiting for the response (or timeout).
-        event.Type                       = DeviceLayer::DeviceEventType::kChipMsgSentEvent;
-        event.MessageSent.ExpectResponse = false;
-        CHIP_ERROR status                = DeviceLayer::PlatformMgr().PostEvent(&event);
-        if (status != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "Failed to post retransmit message sent event %" CHIP_ERROR_FORMAT, status.Format());
-        }
-#endif // CONFIG_DEVICE_LAYER
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        app::ICDNotifier::GetInstance().BroadcastNetworkActivityNotification();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #if CHIP_CONFIG_RESOLVE_PEER_ON_FIRST_TRANSMIT_FAILURE
         const ExchangeManager * exchangeMgr = entry->ec->GetExchangeMgr();
         // TODO: investigate why in ReliableMessageMgr::CheckResendApplicationMessageWithPeerExchange unit test released exchange

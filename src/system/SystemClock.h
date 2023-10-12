@@ -68,7 +68,7 @@ using Seconds64 = std::chrono::duration<uint64_t>;
 using Seconds32 = std::chrono::duration<uint32_t>;
 using Seconds16 = std::chrono::duration<uint16_t>;
 
-constexpr Seconds16 kZero{ 0 };
+inline constexpr Seconds16 kZero{ 0 };
 
 namespace Literals {
 

@@ -141,7 +141,7 @@ namespace DeviceLayer {
 
             KeyValueItem * FindItemForKey(NSString * key, NSError ** error) { return FindItemForKey(key, error, false); }
 
-        }
+        } // namespace
 
         KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 

@@ -30,6 +30,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.chip.chiptool.attestation.AttestationTestFragment
 import com.google.chip.chiptool.clusterclient.*
+import com.google.chip.chiptool.clusterclient.GroupSettingFragment
 import com.google.chip.chiptool.clusterclient.clusterinteraction.ClusterInteractionFragment
 import com.google.chip.chiptool.databinding.SelectActionFragmentBinding
 import com.google.chip.chiptool.provisioning.ProvisionNetworkType
@@ -71,6 +72,7 @@ class SelectActionFragment : Fragment() {
     binding.provisionCustomFlowBtn.setOnClickListener { handleProvisionCustomFlowClicked() }
     binding.wildcardBtn.setOnClickListener { handleWildcardClicked() }
     binding.unpairDeviceBtn.setOnClickListener { handleUnpairDeviceClicked() }
+    binding.groupSettingBtn.setOnClickListener { handleGroupSettingClicked() }
 
     return binding.root
   }
@@ -231,6 +233,10 @@ class SelectActionFragment : Fragment() {
   /** Notifies listener of provision-custom-flow button click. */
   private fun handleProvisionCustomFlowClicked() {
     showFragment(BarcodeFragment.newInstance(), false)
+  }
+
+  private fun handleGroupSettingClicked() {
+    showFragment(GroupSettingFragment.newInstance())
   }
 
   companion object {

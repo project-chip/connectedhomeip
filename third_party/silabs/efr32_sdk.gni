@@ -21,8 +21,10 @@ import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("silabs_board.gni")
 
-if (use_rs9116 || use_SiWx917) {
+if (use_rs9116) {
   wifi_sapi_root = "${chip_root}/third_party/silabs/wiseconnect-wifi-bt-sdk"
+} else if (use_SiWx917) {
+  wifi_sdk_root = "${chip_root}/third_party/silabs/wifi_sdk"
 }
 
 declare_args() {
@@ -155,6 +157,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/device_init/inc",
       "${efr32_sdk_root}/platform/service/hfxo_manager/inc",
       "${efr32_sdk_root}/platform/service/hfxo_manager/src",
+      "${efr32_sdk_root}/platform/service/iostream/inc",
       "${efr32_sdk_root}/platform/service/mpu/inc",
       "${efr32_sdk_root}/platform/service/power_manager/inc/",
       "${efr32_sdk_root}/platform/service/power_manager/src/",
@@ -195,6 +198,28 @@ template("efr32_sdk") {
       "${sl_ot_efr32_root}",
     ]
 
+    if (use_SiWx917) {
+      _include_dirs += [
+        "${wifi_sdk_root}/components/si91x/inc",
+        "${wifi_sdk_root}/components/si91x/memory",
+        "${wifi_sdk_root}/components/si91x/sl_net/inc",
+
+        # wifi component
+        "${wifi_sdk_root}/components/protocol/wifi/inc",
+
+        # si91x_support component
+        "${wifi_sdk_root}/components/si91x_support/inc",
+
+        # wifi_resources component
+        "${wifi_sdk_root}/resources/certificates",
+        "${wifi_sdk_root}/resources/defaults",
+        "${wifi_sdk_root}/resources/other",
+
+        # network_manager component
+        "${wifi_sdk_root}/components/service/network_manager/inc",
+      ]
+    }
+
     if (silabs_family != "mgm24") {
       _include_dirs += [
         "${efr32_sdk_root}/platform/radio/rail_lib/hal",
@@ -203,7 +228,11 @@ template("efr32_sdk") {
     }
 
     if (chip_enable_ble_rs911x) {
-      _include_dirs += [ "${wifi_sapi_root}/sapi/include" ]
+      if (use_rs9116) {
+        _include_dirs += [ "${wifi_sapi_root}/sapi/include" ]
+      } else {
+        _include_dirs += [ "${wifi_sdk_root}/components/si91x/ble/inc" ]
+      }
       _include_dirs += [ "${chip_root}/src/platform/silabs/rs911x" ]
     }
 
@@ -255,7 +284,11 @@ template("efr32_sdk") {
     }
 
     if (chip_enable_ble_rs911x) {
-      defines += [ "RSI_BLE_ENABLE=1" ]
+      defines += [
+        "RSI_BLE_ENABLE=1",
+        "BLE_ENABLE=1",
+        "RSI_LITTLE_ENDIAN=1",
+      ]
     }
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
@@ -284,7 +317,9 @@ template("efr32_sdk") {
       if (use_SiWx917) {
         defines += [
           "EXP_BOARD=1",
-          "CHIP_9117=1",
+          "CHIP_917",
+          "CHIP_9117",
+          "SL_WIFI_COMPONENT_INCLUDED",
         ]
       } else if (use_wf200) {
         defines += [
@@ -550,6 +585,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/bootloader/api/btl_interface_storage.c",
       "${efr32_sdk_root}/platform/bootloader/security/sha/crypto_sha.c",
       "${efr32_sdk_root}/platform/common/src/sl_slist.c",
+      "${efr32_sdk_root}/platform/common/src/sli_cmsis_os2_ext_task_register.c",
       "${efr32_sdk_root}/platform/emdrv/dmadrv/src/dmadrv.c",
       "${efr32_sdk_root}/platform/emdrv/gpiointerrupt/src/gpiointerrupt.c",
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_default.c",
@@ -592,6 +628,8 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_lfrco.c",
       "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_nvic.c",
       "${efr32_sdk_root}/platform/service/hfxo_manager/src/sl_hfxo_manager.c",
+      "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream.c",
+      "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream_rtt.c",
       "${efr32_sdk_root}/platform/service/mpu/src/sl_mpu.c",
       "${efr32_sdk_root}/platform/service/power_manager/src/sl_power_manager.c",
       "${efr32_sdk_root}/platform/service/power_manager/src/sl_power_manager_debug.c",
@@ -677,6 +715,7 @@ template("efr32_sdk") {
       "${silabs_gen_folder}/autogen/sl_board_default_init.c",
       "${silabs_gen_folder}/autogen/sl_device_init_clocks.c",
       "${silabs_gen_folder}/autogen/sl_event_handler.c",
+      "${silabs_gen_folder}/autogen/sl_iostream_handles.c",
     ]
     if (enable_dic) {
       sources += [
@@ -703,12 +742,24 @@ template("efr32_sdk") {
     }
 
     if (chip_enable_ble_rs911x) {
-      sources += [
-        "${wifi_sapi_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
-        "${wifi_sapi_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
-        "${wifi_sapi_root}/sapi/bluetooth/rsi_bt_common_apis.c",
-        "${wifi_sapi_root}/sapi/driver/rsi_bt_ble.c",
-      ]
+      if (use_rs9116) {
+        sources += [
+          "${wifi_sapi_root}/sapi/bluetooth/rsi_ble_gap_apis.c",
+          "${wifi_sapi_root}/sapi/bluetooth/rsi_ble_gatt_apis.c",
+          "${wifi_sapi_root}/sapi/bluetooth/rsi_bt_common_apis.c",
+          "${wifi_sapi_root}/sapi/driver/rsi_bt_ble.c",
+        ]
+      } else {
+        sources += [
+          "${wifi_sdk_root}/components/si91x/ble/src/rsi_ble_gap_apis.c",
+          "${wifi_sdk_root}/components/si91x/ble/src/rsi_ble_gatt_apis.c",
+          "${wifi_sdk_root}/components/si91x/ble/src/rsi_bt_ble.c",
+          "${wifi_sdk_root}/components/si91x/ble/src/rsi_bt_common_apis.c",
+          "${wifi_sdk_root}/components/si91x/ble/src/rsi_common_apis.c",
+          "${wifi_sdk_root}/components/si91x/ble/src/rsi_utils.c",
+          "${wifi_sdk_root}/components/si91x/ble/src/sl_si91x_ble.c",
+        ]
+      }
     } else {
       sources += [
         "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_mbedtls_context.c",

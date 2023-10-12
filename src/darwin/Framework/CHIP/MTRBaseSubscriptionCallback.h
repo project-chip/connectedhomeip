@@ -84,6 +84,11 @@ public:
         // Ensure we release the ReadClient before we tear down anything else,
         // so it can call our OnDeallocatePaths properly.
         mReadClient = nullptr;
+
+        // Make sure the block isn't run after object destruction
+        if (mInterimReportBlock) {
+            dispatch_block_cancel(mInterimReportBlock);
+        }
     }
 
     chip::app::BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
@@ -103,6 +108,10 @@ protected:
     // be immediately followed by OnDone and we want to do the deletion there.
     void ReportError(CHIP_ERROR aError, bool aCancelSubscription = true);
 
+    // Called at attribute/event report time to queue a block to report on the Matter queue so that for multi-packet reports, this
+    // block is run and reports in batch. No-op if the block is already queued.
+    void QueueInterimReport();
+
 private:
     void OnReportBegin() override;
 
@@ -110,10 +119,12 @@ private:
 
     // OnEventData and OnAttributeData must be implemented by subclasses.
     void OnEventData(const chip::app::EventHeader & aEventHeader, chip::TLV::TLVReader * apData,
-        const chip::app::StatusIB * apStatus) override = 0;
+        const chip::app::StatusIB * apStatus) override
+        = 0;
 
     void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::TLV::TLVReader * apData,
-        const chip::app::StatusIB & aStatus) override = 0;
+        const chip::app::StatusIB & aStatus) override
+        = 0;
 
     void OnError(CHIP_ERROR aError) override;
 
@@ -166,6 +177,7 @@ private:
     std::unique_ptr<chip::app::ClusterStateCache> mClusterStateCache;
     bool mHaveQueuedDeletion = false;
     OnDoneHandler _Nullable mOnDoneHandler = nil;
+    dispatch_block_t mInterimReportBlock = nil;
 };
 
 NS_ASSUME_NONNULL_END

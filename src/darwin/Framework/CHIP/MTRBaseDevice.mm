@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#import <Matter/MTRClusterConstants.h>
 #import <Matter/MTRDefines.h>
 
 #import "MTRAttributeTLVValueDecoder_Internal.h"
@@ -31,6 +32,7 @@
 #import "MTRSetupPayload_Internal.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
+#import "zap-generated/MTRCommandPayloads_Internal.h"
 
 #include "app/ConcreteAttributePath.h"
 #include "app/ConcreteCommandPath.h"
@@ -57,9 +59,9 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::Protocols::InteractionModel;
-using chip::Messaging::ExchangeManager;
 using chip::Optional;
 using chip::SessionHandle;
+using chip::Messaging::ExchangeManager;
 
 NSString * const MTRAttributePathKey = @"attributePath";
 NSString * const MTRCommandPathKey = @"commandPath";
@@ -475,7 +477,7 @@ public:
 }
 
 // Convert TLV data into data-value dictionary as described in MTRDeviceResponseHandler
-id _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data)
+NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data)
 {
     chip::TLV::TLVType dataTLVType = data->GetType();
     switch (dataTLVType) {
@@ -582,7 +584,17 @@ id _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data
             NSMutableDictionary * arrayElement = [NSMutableDictionary dictionary];
             [arrayElement setObject:value forKey:MTRDataKey];
             if (dataTLVType == chip::TLV::kTLVType_Structure) {
-                [arrayElement setObject:[NSNumber numberWithUnsignedLong:TagNumFromTag(tag)] forKey:MTRContextTagKey];
+                uint64_t tagNum;
+                if (IsContextTag(tag)) {
+                    tagNum = TagNumFromTag(tag);
+                } else if (IsProfileTag(tag)) {
+                    uint64_t profile = ProfileIdFromTag(tag);
+                    tagNum = (profile << kProfileIdShift) | TagNumFromTag(tag);
+                } else {
+                    MTR_LOG_ERROR("Skipping unknown tag type when decoding TLV structure.");
+                    continue;
+                }
+                [arrayElement setObject:[NSNumber numberWithUnsignedLongLong:tagNum] forKey:MTRContextTagKey];
             }
             [array addObject:arrayElement];
         }
@@ -679,14 +691,28 @@ static CHIP_ERROR MTREncodeTLVFromDataValueDictionary(id object, chip::TLV::TLVW
                 MTR_LOG_ERROR("Error: Structure element to encode has corrupt type: %@", [element class]);
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
-            NSNumber * elementTag = element[MTRContextTagKey];
+            id elementTag = element[MTRContextTagKey];
             id elementValue = element[MTRDataKey];
             if (!elementTag || !elementValue) {
                 MTR_LOG_ERROR("Error: Structure element to encode has corrupt value: %@", element);
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
+            if (![elementTag isKindOfClass:NSNumber.class]) {
+                MTR_LOG_ERROR("Error: Structure element to encode has corrupt tag type: %@", [elementTag class]);
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+
+            // Our tag might actually be a profile tag.
+            uint64_t tagValue = [elementTag unsignedLongLongValue];
+            TLV::Tag tag;
+            if (tagValue > UINT8_MAX) {
+                tag = TLV::ProfileTag(tagValue >> kProfileIdShift,
+                    (tagValue & ((1ull << kProfileIdShift) - 1)));
+            } else {
+                tag = TLV::ContextTag(static_cast<uint8_t>(tagValue));
+            }
             ReturnErrorOnFailure(
-                MTREncodeTLVFromDataValueDictionary(elementValue, writer, chip::TLV::ContextTag([elementTag unsignedCharValue])));
+                MTREncodeTLVFromDataValueDictionary(elementValue, writer, tag));
         }
         ReturnErrorOnFailure(writer.EndContainer(outer));
         return CHIP_NO_ERROR;
@@ -750,10 +776,10 @@ public:
 
     static bool MustUseTimedInvoke() { return false; }
 
-    id _Nullable GetDecodedObject() const { return decodedObj; }
+    NSDictionary<NSString *, id> * _Nullable GetDecodedObject() const { return decodedObj; }
 
 private:
-    id _Nullable decodedObj;
+    NSDictionary<NSString *, id> * _Nullable decodedObj;
 };
 
 // Callback bridge for MTRDataValueDictionaryCallback
@@ -765,7 +791,8 @@ public:
     static void OnSuccessFn(void * context, id value) { DispatchSuccess(context, value); }
 };
 
-template <typename DecodableValueType> class BufferedReadClientCallback final : public app::ReadClient::Callback {
+template <typename DecodableValueType>
+class BufferedReadClientCallback final : public app::ReadClient::Callback {
 public:
     using OnSuccessAttributeCallbackType
         = std::function<void(const ConcreteAttributePath & aPath, const DecodableValueType & aData)>;
@@ -925,6 +952,54 @@ private:
     NSArray<MTRAttributeRequestPath *> * attributePaths = [NSArray
         arrayWithObject:[MTRAttributeRequestPath requestPathWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID]];
     [self readAttributePaths:attributePaths eventPaths:nil params:params queue:queue completion:completion];
+}
+
+- (void)_readKnownAttributeWithEndpointID:(NSNumber *)endpointID
+                                clusterID:(NSNumber *)clusterID
+                              attributeID:(NSNumber *)attributeID
+                                   params:(MTRReadParams * _Nullable)params
+                                    queue:(dispatch_queue_t)queue
+                               completion:(void (^)(id _Nullable value, NSError * _Nullable error))completion
+{
+    auto * attributePath = [MTRAttributePath attributePathWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID];
+
+    auto innerCompletion = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        if (error != nil) {
+            completion(nil, error);
+            return;
+        }
+
+        // Preserving the old behavior: we don't fail on multiple reports, but
+        // just report the first one.
+        if (values.count == 0) {
+            completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:nil]);
+            return;
+        }
+
+        NSDictionary<NSString *, id> * value = values[0];
+        NSError * initError;
+        auto * report = [[MTRAttributeReport alloc] initWithResponseValue:value error:&initError];
+        if (initError != nil) {
+            completion(nil, initError);
+            return;
+        }
+
+        if (![report.path isEqual:attributePath]) {
+            // For some reason the server returned data for the wrong
+            // attribute, even though it happened to decode to our type.
+            completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:nil]);
+            return;
+        }
+
+        completion(report.value, report.error);
+    };
+
+    [self readAttributesWithEndpointID:endpointID
+                             clusterID:clusterID
+                           attributeID:attributeID
+                                params:params
+                                 queue:queue
+                            completion:innerCompletion];
 }
 
 - (void)readAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
@@ -1208,26 +1283,83 @@ exit:
                               queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
 {
+    // We don't have a way to communicate a non-default invoke timeout
+    // here for now.
+    // TODO: https://github.com/project-chip/connectedhomeip/issues/24563
+    [self _invokeCommandWithEndpointID:endpointID
+                             clusterID:clusterID
+                             commandID:commandID
+                         commandFields:commandFields
+                    timedInvokeTimeout:timeoutMs
+           serverSideProcessingTimeout:nil
+                                 queue:queue
+                            completion:completion];
+}
+
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(id)commandFields
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
+{
     endpointID = (endpointID == nil) ? nil : [endpointID copy];
     clusterID = (clusterID == nil) ? nil : [clusterID copy];
     commandID = (commandID == nil) ? nil : [commandID copy];
     // TODO: This is not going to deep-copy the NSArray instances in
     // commandFields.  We need to do something smarter here.
     commandFields = (commandFields == nil) ? nil : [commandFields copy];
-    timeoutMs = (timeoutMs == nil) ? nil : [timeoutMs copy];
+
+    serverSideProcessingTimeout = [serverSideProcessingTimeout copy];
+    if (serverSideProcessingTimeout != nil) {
+        serverSideProcessingTimeout = MTRClampedNumber(serverSideProcessingTimeout, @(0), @(UINT16_MAX));
+    }
+
+    timeoutMs = [timeoutMs copy];
+    if (timeoutMs != nil) {
+        timeoutMs = MTRClampedNumber(timeoutMs, @(1), @(UINT16_MAX));
+    }
 
     auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, MTRDataValueDictionaryCallback successCb,
             MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
+            NSData * attestationChallenge;
+            if ([clusterID isEqualToNumber:@(MTRClusterIDTypeOperationalCredentialsID)] &&
+                [commandID isEqualToNumber:@(MTRCommandIDTypeClusterOperationalCredentialsCommandAttestationRequestID)] && session->IsSecureSession()) {
+                // An AttestationResponse command needs to have an attestationChallenge
+                // to make sense of the results.  If we are doing an
+                // AttestationRequest, store the challenge now.
+                attestationChallenge = AsData(session->AsSecureSession()->GetCryptoContext().GetAttestationChallenge());
+            }
             // NSObjectCommandCallback guarantees that there will be exactly one call to either the success callback or the failure
             // callback.
-            auto onSuccessCb = [successCb, bridge](const app::ConcreteCommandPath & commandPath, const app::StatusIB & status,
+            auto onSuccessCb = [successCb, bridge, attestationChallenge](const app::ConcreteCommandPath & commandPath, const app::StatusIB & status,
                                    const MTRDataValueDictionaryDecodableType & responseData) {
                 auto resultArray = [[NSMutableArray alloc] init];
                 if (responseData.GetDecodedObject()) {
+                    auto response = responseData.GetDecodedObject();
+                    if (attestationChallenge != nil) {
+                        // Add the attestationChallenge to our data.
+                        NSArray<NSDictionary<NSString *, id> *> * value = response[MTRValueKey];
+                        NSMutableArray<NSDictionary<NSString *, id> *> * newValue = [[NSMutableArray alloc] initWithCapacity:(value.count + 1)];
+                        [newValue addObjectsFromArray:value];
+                        [newValue addObject:@{
+                            MTRContextTagKey : @(kAttestationChallengeTagValue),
+                            MTRDataKey : @ {
+                                MTRTypeKey : MTROctetStringValueType,
+                                MTRValueKey : attestationChallenge,
+                            },
+                        }];
+                        auto * newResponse = [NSMutableDictionary dictionaryWithCapacity:(response.count + 1)];
+                        [newResponse addEntriesFromDictionary:response];
+                        newResponse[MTRValueKey] = newValue;
+                        response = newResponse;
+                    }
                     [resultArray addObject:@ {
                         MTRCommandPathKey : [[MTRCommandPath alloc] initWithPath:commandPath],
-                        MTRDataKey : responseData.GetDecodedObject()
+                        MTRDataKey : response,
                     }];
                 } else {
                     [resultArray addObject:@ { MTRCommandPathKey : [[MTRCommandPath alloc] initWithPath:commandPath] }];
@@ -1260,16 +1392,61 @@ exit:
             ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, MTRDataValueDictionaryDecodableType(commandFields),
                 (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue])));
 
-            // We don't have a way to communicate a non-default invoke timeout
-            // here for now.
-            // TODO: https://github.com/project-chip/connectedhomeip/issues/24563
-            ReturnErrorOnFailure(commandSender->SendCommandRequest(session, NullOptional));
+            Optional<System::Clock::Timeout> invokeTimeout;
+            if (serverSideProcessingTimeout != nil) {
+                // Clamp to a number of seconds that will not overflow 32-bit
+                // int when converted to ms.
+                auto serverTimeoutInSeconds = System::Clock::Seconds16(serverSideProcessingTimeout.unsignedShortValue);
+                invokeTimeout.SetValue(session->ComputeRoundTripTimeout(serverTimeoutInSeconds));
+            }
+            ReturnErrorOnFailure(commandSender->SendCommandRequest(session, invokeTimeout));
 
             decoder.release();
             commandSender.release();
             return CHIP_NO_ERROR;
         });
     std::move(*bridge).DispatchAction(self);
+}
+
+- (void)_invokeKnownCommandWithEndpointID:(NSNumber *)endpointID
+                                clusterID:(NSNumber *)clusterID
+                                commandID:(NSNumber *)commandID
+                           commandPayload:(id)commandPayload
+                       timedInvokeTimeout:(NSNumber * _Nullable)timeout
+              serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                            responseClass:(Class _Nullable)responseClass
+                                    queue:(dispatch_queue_t)queue
+                               completion:(void (^)(id _Nullable response, NSError * _Nullable error))completion
+{
+    NSError * encodingError;
+    auto * commandFields = [commandPayload _encodeAsDataValue:&encodingError];
+    if (commandFields == nil) {
+        dispatch_async(queue, ^{
+            completion(nil, encodingError);
+        });
+        return;
+    }
+
+    auto responseHandler = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        id _Nullable response = nil;
+        if (error == nil) {
+            if (values.count != 1) {
+                error = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:nil];
+            } else if (responseClass != nil) {
+                response = [[responseClass alloc] initWithResponseValue:values[0] error:&error];
+            }
+        }
+        completion(response, error);
+    };
+
+    [self _invokeCommandWithEndpointID:endpointID
+                             clusterID:clusterID
+                             commandID:commandID
+                         commandFields:commandFields
+                    timedInvokeTimeout:timeout
+           serverSideProcessingTimeout:serverSideProcessingTimeout
+                                 queue:queue
+                            completion:responseHandler];
 }
 
 - (void)subscribeToAttributesWithEndpointID:(NSNumber * _Nullable)endpointID
@@ -1289,6 +1466,50 @@ exit:
                       reportHandler:reportHandler
             subscriptionEstablished:subscriptionEstablished
             resubscriptionScheduled:nil];
+}
+
+- (void)_subscribeToKnownAttributeWithEndpointID:(NSNumber *)endpointID
+                                       clusterID:(NSNumber *)clusterID
+                                     attributeID:(NSNumber *)attributeID
+                                          params:(MTRSubscribeParams *)params
+                                           queue:(dispatch_queue_t)queue
+                                   reportHandler:(void (^)(id _Nullable value, NSError * _Nullable error))reportHandler
+                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+{
+    auto * attributePath = [MTRAttributePath attributePathWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID];
+
+    auto innerReportHandler = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        if (error != nil) {
+            reportHandler(nil, error);
+            return;
+        }
+
+        for (NSDictionary<NSString *, id> * value in values) {
+            NSError * initError;
+            auto * report = [[MTRAttributeReport alloc] initWithResponseValue:value error:&initError];
+            if (initError != nil) {
+                reportHandler(nil, initError);
+                continue;
+            }
+
+            if (![report.path isEqual:attributePath]) {
+                // For some reason the server returned data for the wrong
+                // attribute, even though it happened to decode to our type.
+                reportHandler(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:nil]);
+                continue;
+            }
+
+            reportHandler(report.value, report.error);
+        }
+    };
+
+    [self subscribeToAttributesWithEndpointID:endpointID
+                                    clusterID:clusterID
+                                  attributeID:attributeID
+                                       params:params
+                                        queue:queue
+                                reportHandler:innerReportHandler
+                      subscriptionEstablished:subscriptionEstablished];
 }
 
 - (void)subscribeToAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths

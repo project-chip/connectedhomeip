@@ -26,9 +26,25 @@
 #include <app/EventHeader.h>
 #include <app/EventLoggingTypes.h>
 #include <app/EventPathParams.h>
+#include <lib/core/CHIPVendorIdentifiers.hpp>
+#include <lib/core/TLVTags.h>
 #include <system/SystemPacketBuffer.h>
 
 @class MTRDeviceController;
+
+// An AttestationResponse command needs to have an attestationChallenge
+// to make sense of the results.  Encode that with a profile-specific tag under
+// the Apple vendor id.  Let's select profile 0xFFFF just because, and use 0xFF
+// for the actual tag number, so that if someone accidentally casts it to a
+// uint8 (aka context tag) that will not collide with anything interesting.
+inline constexpr chip::TLV::Tag kAttestationChallengeTag = chip::TLV::ProfileTag(chip::VendorId::Apple, 0xFFFF, 0xFF);
+
+// We have no way to extract the tag value as a single thing, so just do it
+// manually.
+inline constexpr unsigned kProfileIdShift = 32;
+inline constexpr uint64_t kAttestationChallengeTagProfile = chip::TLV::ProfileIdFromTag(kAttestationChallengeTag);
+inline constexpr uint64_t kAttestationChallengeTagNumber = chip::TLV::TagNumFromTag(kAttestationChallengeTag);
+inline constexpr uint64_t kAttestationChallengeTagValue = (kAttestationChallengeTagProfile << kProfileIdShift) | kAttestationChallengeTagNumber;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -97,6 +113,78 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
                                                   clusterID:(chip::ClusterId)clusterID
                                                   commandID:(chip::CommandId)commandID
                                                       error:(NSError * __autoreleasing *)error;
+
+/**
+ * Like the public invokeCommandWithEndpointID but allows passing through a
+ * serverSideProcessingTimeout.
+ */
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(id)commandFields
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion;
+
+/**
+ * Like the public invokeCommandWithEndpointID but:
+ *
+ * 1) Allows passing through a serverSideProcessingTimeout.
+ * 2) Expects one of the command payload structs as commandPayload
+ * 3) On success, returns an instance of responseClass via the completion (or
+ *    nil if there is no responseClass, which indicates a status-only command).
+ */
+- (void)_invokeKnownCommandWithEndpointID:(NSNumber *)endpointID
+                                clusterID:(NSNumber *)clusterID
+                                commandID:(NSNumber *)commandID
+                           commandPayload:(id)commandPayload
+                       timedInvokeTimeout:(NSNumber * _Nullable)timeout
+              serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                            responseClass:(Class _Nullable)responseClass
+                                    queue:(dispatch_queue_t)queue
+                               completion:(void (^)(id _Nullable response, NSError * _Nullable error))completion;
+
+/**
+ * Like the public subscribeToAttributesWithEndpointID but:
+ *
+ * 1) Takes a concrete attribute path (not nullable).
+ * 2) Requires non-nil MTRSubscribeParams (since that's what MTRBaseClusters
+ *    have anyway).
+ * 3) For the report handler, hands out the right type of value for the given
+ *    attribute path.  This means we have to know the type ofthe attribute.
+ *
+ * The attribute path is not represented as MTRAttributePath just because it's
+ * probably less code to pass in the three numbers instead of creating an object
+ * at all the (numerous) callsites.
+ */
+- (void)_subscribeToKnownAttributeWithEndpointID:(NSNumber *)endpointID
+                                       clusterID:(NSNumber *)clusterID
+                                     attributeID:(NSNumber *)attributeID
+                                          params:(MTRSubscribeParams *)params
+                                           queue:(dispatch_queue_t)queue
+                                   reportHandler:(void (^)(id _Nullable value, NSError * _Nullable error))reportHandler
+                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished;
+
+/**
+ * Like the public readAttributesWithEndpointID but:
+ *
+ * 1) Takes a concrete attribute path (not nullable).
+ * 2) For the completion handler, hands out the right type of value for the given
+ *    attribute path.  This means we have to know the type ofthe attribute.
+ * 3) Only calls the completion with a single value.
+ *
+ * The attribute path is not represented as MTRAttributePath just because it's
+ * probably less code to pass in the three numbers instead of creating an object
+ * at all the (numerous) callsites.
+ */
+- (void)_readKnownAttributeWithEndpointID:(NSNumber *)endpointID
+                                clusterID:(NSNumber *)clusterID
+                              attributeID:(NSNumber *)attributeID
+                                   params:(MTRReadParams * _Nullable)params
+                                    queue:(dispatch_queue_t)queue
+                               completion:(void (^)(id _Nullable value, NSError * _Nullable error))completion;
+
 @end
 
 @interface MTRClusterPath ()
@@ -140,6 +228,6 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
 
 // Exported utility function
 // Convert TLV data into data-value dictionary as described in MTRDeviceResponseHandler
-id _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data);
+NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data);
 
 NS_ASSUME_NONNULL_END

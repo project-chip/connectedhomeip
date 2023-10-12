@@ -141,8 +141,8 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
 
     CharSpan charSpan = CharSpan::fromCharString("hello");
     jsonString        = "{\n"
-                 "   \"1:STRING\" : \"hello\"\n"
-                 "}\n";
+                        "   \"1:STRING\" : \"hello\"\n"
+                        "}\n";
     EncodeAndValidate(charSpan, jsonString);
 
     // Validated using https://base64.guru/converter/encode/hex

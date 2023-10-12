@@ -87,6 +87,12 @@ struct GAutoPtrDeleter<char>
 };
 
 template <>
+struct GAutoPtrDeleter<const char *>
+{
+    using deleter = GFree;
+};
+
+template <>
 struct GAutoPtrDeleter<GBytes>
 {
     using deleter = GBytesDeleter;
@@ -102,6 +108,12 @@ template <>
 struct GAutoPtrDeleter<GError>
 {
     using deleter = GErrorDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<GSource>
+{
+    using deleter = GObjectDeleter;
 };
 
 template <>

@@ -16,6 +16,7 @@
  */
 
 #include "TestCHIPoBLEStackMgr.h"
+#include <platform/CHIPDeviceConfig.h>
 #include <stdlib.h>
 
 int main(int argc, char * argv[])

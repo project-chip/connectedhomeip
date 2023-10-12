@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -46,5 +46,12 @@ struct ChipDeviceEvent;
 
 #define CHIP_SYSTEM_CONFIG_USE_LWIP 0
 #define CHIP_SYSTEM_CONFIG_USE_SOCKETS 1
+
+// Reduce packet buffer pool size (default 15) to reduce ram consumption
+#ifdef CONFIG_PM
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 0
+#else
+#define CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE 8
+#endif
 
 // ========== Platform-specific Configuration Overrides =========

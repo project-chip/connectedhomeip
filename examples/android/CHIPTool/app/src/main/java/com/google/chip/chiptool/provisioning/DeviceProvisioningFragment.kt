@@ -251,7 +251,7 @@ class DeviceProvisioningFragment : Fragment() {
     override fun onCommissioningComplete(nodeId: Long, errorCode: Int) {
       if (errorCode == STATUS_PAIRING_SUCCESS) {
         FragmentUtil.getHost(this@DeviceProvisioningFragment, Callback::class.java)
-          ?.onCommissioningComplete(0)
+          ?.onCommissioningComplete(0, nodeId)
       } else {
         showMessage(R.string.rendezvous_over_ble_pairing_failure_text)
         FragmentUtil.getHost(this@DeviceProvisioningFragment, Callback::class.java)
@@ -289,7 +289,7 @@ class DeviceProvisioningFragment : Fragment() {
   /** Callback from [DeviceProvisioningFragment] notifying any registered listeners. */
   interface Callback {
     /** Notifies that commissioning has been completed. */
-    fun onCommissioningComplete(code: Int)
+    fun onCommissioningComplete(code: Int, nodeId: Long = 0L)
   }
 
   companion object {
