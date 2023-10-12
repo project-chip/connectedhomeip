@@ -257,7 +257,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
 // ICD Init needs to be after data model init
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mReportScheduler);
+    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mReportScheduler, mSessionKeystore);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 #if defined(CHIP_APP_USE_ECHO)

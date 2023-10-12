@@ -28,9 +28,13 @@
 #include <nlunit-test.h>
 #include <system/SystemLayerImpl.h>
 
+#include <crypto/DefaultSessionKeystore.h>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::System;
+
+using TestSessionKeystoreImpl = Crypto::DefaultSessionKeystore;
 
 namespace {
 
@@ -63,8 +67,8 @@ public:
         {
             return FAILURE;
         }
-
-        ctx->mICDManager.Init(&ctx->testStorage, &ctx->GetFabricTable(), &mICDStateObserver);
+        TestSessionKeystoreImpl keystore;
+        ctx->mICDManager.Init(&ctx->testStorage, &ctx->GetFabricTable(), &mICDStateObserver, &keystore);
         return SUCCESS;
     }
 

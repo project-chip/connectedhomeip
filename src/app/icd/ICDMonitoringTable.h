@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include <crypto/CHIPCryptoPAL.h>
+#include <crypto/SessionKeystore.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
@@ -24,12 +26,17 @@
 #include <stddef.h>
 
 namespace chip {
+namespace Crypto {
+using SymmetricKeystore = SessionKeystore;
+}
+} // namespace chip
+
+namespace chip {
 
 inline constexpr size_t kICDMonitoringBufferSize = 40;
 
 struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
 {
-    static constexpr size_t kKeyMaxSize = 16;
 
     ICDMonitoringEntry(FabricIndex fabric = kUndefinedFabricIndex, NodeId nodeId = kUndefinedNodeId)
     {
@@ -37,17 +44,47 @@ struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
         this->checkInNodeID    = nodeId;
         this->monitoredSubject = nodeId;
     }
+
+    ICDMonitoringEntry(Crypto::SymmetricKeystore * keyStore, FabricIndex fabric = kUndefinedFabricIndex,
+                       NodeId nodeId = kUndefinedNodeId)
+    {
+        this->fabricIndex       = fabric;
+        this->checkInNodeID     = nodeId;
+        this->monitoredSubject  = nodeId;
+        this->symmetricKeystore = keyStore;
+    }
+
     bool IsValid() { return this->checkInNodeID != kUndefinedNodeId && this->fabricIndex != kUndefinedFabricIndex; }
     CHIP_ERROR UpdateKey(StorageKeyName & key) override;
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override;
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override;
     void Clear() override;
+    CHIP_ERROR SetKey(ByteSpan keyData);
+    CHIP_ERROR DeleteKey(void);
 
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-    chip::NodeId checkInNodeID    = static_cast<chip::NodeId>(0);
-    uint64_t monitoredSubject     = static_cast<uint64_t>(0);
-    chip::ByteSpan key;
-    uint16_t index = 0;
+    /**
+     * @brief Implement the key verification needed by the ICDManagement Server.
+     *        Since for some key implementations we cannot retrieve the key from the AES128KeyHandle
+     *        we must implement a way to deduce whether the verification key
+     *        received is the same or at least works as the same way as the one stored.
+     *
+     *        This method will produce a random number and then encrypt it with the keyData.
+     *        It will then decrypt it with the key stored in the entry. If the resulting decrypted
+     *        challenge matches the randomly generated number, then we can safely assume that both key are interchangeable.
+     *        This method cannot guarantee a perfect match since the probability of two keys generating the same output in AES128 is
+     *        not 0 but 1/2^128 which is small enough for our purposes.
+     *
+     * @param keyData
+     * @return bool True if the key is equivalent to the one stored, otherwise false
+     */
+    bool IsKeyEquivalent(ByteSpan keyData);
+
+    chip::FabricIndex fabricIndex                 = kUndefinedFabricIndex;
+    chip::NodeId checkInNodeID                    = kUndefinedNodeId;
+    uint64_t monitoredSubject                     = static_cast<uint64_t>(0);
+    Crypto::Aes128KeyHandle key                   = Crypto::Aes128KeyHandle();
+    uint16_t index                                = 0;
+    Crypto::SymmetricKeystore * symmetricKeystore = nullptr;
 };
 
 /**
@@ -64,8 +101,10 @@ struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
 
 struct ICDMonitoringTable
 {
-    ICDMonitoringTable(PersistentStorageDelegate & storage, FabricIndex fabric, uint16_t limit) :
-        mStorage(&storage), mFabric(fabric), mLimit(limit)
+    ICDMonitoringTable(PersistentStorageDelegate & storage, FabricIndex fabric, uint16_t limit,
+                       Crypto::SymmetricKeystore * symmetricKeystore) :
+        mStorage(&storage),
+        mFabric(fabric), mLimit(limit), mSymmetricKeystore(symmetricKeystore)
     {}
 
     /**
@@ -124,7 +163,8 @@ struct ICDMonitoringTable
 private:
     PersistentStorageDelegate * mStorage;
     FabricIndex mFabric;
-    uint16_t mLimit = 0;
+    uint16_t mLimit                                = 0;
+    Crypto::SymmetricKeystore * mSymmetricKeystore = nullptr;
 };
 
 } // namespace chip
