@@ -543,6 +543,7 @@ class ParserWithLines:
         # For this reason, every attempt should be made to make the grammar context free
         self.parser = Lark.open(
             'matter_grammar.lark', rel_to=__file__, start='idl', parser='lalr', propagate_positions=True,
+            maybe_placeholders=True,
             # separate callbacks to ignore from regular parsing (no tokens)
             # while still getting notified about them
             lexer_callbacks={
