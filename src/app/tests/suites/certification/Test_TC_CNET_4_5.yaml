@@ -55,7 +55,7 @@ tests:
 
           Below is an example:
 
-          ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 grlprivatewifi092010 1 0
+          ./chip-tool networkcommissioning add-or-update-wi-fi-network hex:47524C50726976617465 grlprivatewifi092010 1 0 --Breadcrumb 1
 
           Via the TH (chip-tool), verify the FAILSAFE_REQUIRED response for sending the AddOrUpdateWiFiNetwork command.
 
@@ -74,7 +74,7 @@ tests:
 
           Below is an example:
 
-          ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0
+          ./chip-tool networkcommissioning remove-network hex:47524C50726976617465 1 0 --Breadcrumb 1
 
           Via the TH (chip-tool), verify the FAILSAFE_REQUIRED response for sending the RemoveNetwork command.
 
@@ -87,13 +87,13 @@ tests:
           "Step 3: TH sends ConnectNetwork command to the DUT with NetworkID
           field set to PIXIT.CNET.WIFI_1ST_ACCE SSPOINT_SSID and Breadcrumb
           field set to 1"
-      PICS: CNET.S.C02.Rsp
+      PICS: CNET.S.C06.Rsp
       verification: |
           ./chip-tool networkcommissioning connect hex:<your network id in hex> 1 0
 
           Below is an example:
 
-          ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0
+          ./chip-tool networkcommissioning connect-network hex:47524C50726976617465 1 0 --Breadcrumb 1
 
           Via the TH (chip-tool), verify the FAILSAFE_REQUIRED response for sending the ConnectNetwork command.
 

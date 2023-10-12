@@ -64,7 +64,7 @@ tests:
 
           Below is an example:
 
-          ./chip-tool networkcommissioning remove-network 2111111122222222 54 0
+          ./chip-tool networkcommissioning remove-network 2111111122222222 54 0 --Breadcrumb 1
 
           Via the TH (chip-tool), Verify the NetworkConfigResponse that contains Networking Status value as 3 (NetworkIDNotFound).
 
@@ -92,7 +92,7 @@ tests:
 
           Below is an example:
 
-          ./chip-tool networkcommissioning connect-network 47524C50726976617465 54 0
+          ./chip-tool networkcommissioning connect-network 47524C50726976617465 54 0 --Breadcrumb 1
 
           Via the TH (chip-tool), Verify the ConnectNetworkResponse that contains Networking Status value as 3 (NetworkIDNotFound).
 

@@ -53,7 +53,7 @@ tests:
 
           Below is an example:
 
-          ./chip-tool networkcommissioning add-or-update-thread-network hex:1011101122222229 51 0
+          ./chip-tool networkcommissioning add-or-update-thread-network hex:1011101122222229 51 0 --Breadcrumb 1
 
           Via the TH (chip-tool), verify the FAILSAFE_REQUIRED response for sending the AddOrUpdateThreadNetwork command.
 
@@ -72,7 +72,7 @@ tests:
 
           Below is an example:
 
-          ./chip-tool networkcommissioning remove-network hex:1011101122222229 51 0
+          ./chip-tool networkcommissioning remove-network hex:1011101122222229 51 0 --Breadcrumb 1
 
           Via the TH (chip-tool), verify the FAILSAFE_REQUIRED response for sending the RemoveNetwork command.
 
@@ -91,7 +91,7 @@ tests:
 
           Below is an example:
 
-          ./chip-tool networkcommissioning connect-network hex:1011101122222229 51 0
+          ./chip-tool networkcommissioning connect-network hex:1011101122222229 51 0 --Breadcrumb 1
 
           Via the TH (chip-tool), verify the FAILSAFE_REQUIRED response for sending the ConnectNetwork command.
 

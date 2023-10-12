@@ -130,7 +130,13 @@ tests:
     - label: "Step 8: TH reads InterfaceEnabled attribute from the DUT"
       PICS: CNET.S.A0004
       verification: |
+          ./chip-tool networkcommissioning read interface-enabled 1 0
 
+           Via the TH (chip-tool), Verify the InterfaceEnabled attribute that contains bool value as True.
+
+           [1653473893.275901][29834:29839] CHIP:TOO: Endpoint: 0 Cluster: 0x0000_0031 Attribute 0x0000_0004 DataVersion: 1600858167
+           [1653473893.275964][29834:29839] CHIP:TOO:   InterfaceEnabled: TRUE
+           [1653473893.276084][29834:29839] CHIP:EM: Sending Standalone Ack for MessageCounter:13157245 on exchange 55578i
       disabled: true
 
     - label: "Step 9: TH reads LastNetworkingStatus attribute from the DUT"

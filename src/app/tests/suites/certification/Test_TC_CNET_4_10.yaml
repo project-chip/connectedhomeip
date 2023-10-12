@@ -92,7 +92,7 @@ tests:
 
           Below is an example:
 
-           ./chip-tool networkcommissioning  remove-network hex:1850171990782922 62 0
+           ./chip-tool networkcommissioning  remove-network hex:1850171990782922 62 0 --Breadcrumb 1
 
           Via the TH (chip-tool), Verify the NetworkConfigResponse that contains Networking Status value as 0 (success).
 
