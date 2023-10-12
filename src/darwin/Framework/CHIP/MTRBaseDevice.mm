@@ -954,6 +954,54 @@ private:
     [self readAttributePaths:attributePaths eventPaths:nil params:params queue:queue completion:completion];
 }
 
+- (void)_readKnownAttributeWithEndpointID:(NSNumber *)endpointID
+                                clusterID:(NSNumber *)clusterID
+                              attributeID:(NSNumber *)attributeID
+                                   params:(MTRReadParams * _Nullable)params
+                                    queue:(dispatch_queue_t)queue
+                               completion:(void (^)(id _Nullable value, NSError * _Nullable error))completion
+{
+    auto * attributePath = [MTRAttributePath attributePathWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID];
+
+    auto innerCompletion = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        if (error != nil) {
+            completion(nil, error);
+            return;
+        }
+
+        // Preserving the old behavior: we don't fail on multiple reports, but
+        // just report the first one.
+        if (values.count == 0) {
+            completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:nil]);
+            return;
+        }
+
+        NSDictionary<NSString *, id> * value = values[0];
+        NSError * initError;
+        auto * report = [[MTRAttributeReport alloc] initWithResponseValue:value error:&initError];
+        if (initError != nil) {
+            completion(nil, initError);
+            return;
+        }
+
+        if (![report.path isEqual:attributePath]) {
+            // For some reason the server returned data for the wrong
+            // attribute, even though it happened to decode to our type.
+            completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:nil]);
+            return;
+        }
+
+        completion(report.value, report.error);
+    };
+
+    [self readAttributesWithEndpointID:endpointID
+                             clusterID:clusterID
+                           attributeID:attributeID
+                                params:params
+                                 queue:queue
+                            completion:innerCompletion];
+}
+
 - (void)readAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths
                 eventPaths:(NSArray<MTREventRequestPath *> * _Nullable)eventPaths
                     params:(MTRReadParams * _Nullable)params
@@ -1418,6 +1466,50 @@ exit:
                       reportHandler:reportHandler
             subscriptionEstablished:subscriptionEstablished
             resubscriptionScheduled:nil];
+}
+
+- (void)_subscribeToKnownAttributeWithEndpointID:(NSNumber *)endpointID
+                                       clusterID:(NSNumber *)clusterID
+                                     attributeID:(NSNumber *)attributeID
+                                          params:(MTRSubscribeParams *)params
+                                           queue:(dispatch_queue_t)queue
+                                   reportHandler:(void (^)(id _Nullable value, NSError * _Nullable error))reportHandler
+                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+{
+    auto * attributePath = [MTRAttributePath attributePathWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID];
+
+    auto innerReportHandler = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+        if (error != nil) {
+            reportHandler(nil, error);
+            return;
+        }
+
+        for (NSDictionary<NSString *, id> * value in values) {
+            NSError * initError;
+            auto * report = [[MTRAttributeReport alloc] initWithResponseValue:value error:&initError];
+            if (initError != nil) {
+                reportHandler(nil, initError);
+                continue;
+            }
+
+            if (![report.path isEqual:attributePath]) {
+                // For some reason the server returned data for the wrong
+                // attribute, even though it happened to decode to our type.
+                reportHandler(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeSchemaMismatch userInfo:nil]);
+                continue;
+            }
+
+            reportHandler(report.value, report.error);
+        }
+    };
+
+    [self subscribeToAttributesWithEndpointID:endpointID
+                                    clusterID:clusterID
+                                  attributeID:attributeID
+                                       params:params
+                                        queue:queue
+                                reportHandler:innerReportHandler
+                      subscriptionEstablished:subscriptionEstablished];
 }
 
 - (void)subscribeToAttributePaths:(NSArray<MTRAttributeRequestPath *> * _Nullable)attributePaths

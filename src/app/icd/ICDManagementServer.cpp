@@ -1,21 +1,20 @@
-#include "IcdManagementServer.h"
-#include <app/icd/IcdMonitoringTable.h>
+#include "ICDManagementServer.h"
 
 using namespace chip;
 using namespace chip::Protocols;
 
 namespace chip {
 
-IcdManagementServer IcdManagementServer::mInstance;
+ICDManagementServer ICDManagementServer::mInstance;
 
-Status IcdManagementServer::RegisterClient(PersistentStorageDelegate & storage, FabricIndex fabric_index, chip::NodeId node_id,
+Status ICDManagementServer::RegisterClient(PersistentStorageDelegate & storage, FabricIndex fabric_index, chip::NodeId node_id,
                                            uint64_t monitored_subject, chip::ByteSpan key,
                                            Optional<chip::ByteSpan> verification_key, bool is_admin)
 {
-    IcdMonitoringTable table(storage, fabric_index, GetClientsSupportedPerFabric());
+    ICDMonitoringTable table(storage, fabric_index, GetClientsSupportedPerFabric(), mSymmetricKeystore);
 
     // Get current entry, if exists
-    IcdMonitoringEntry entry;
+    ICDMonitoringEntry entry(mSymmetricKeystore);
     CHIP_ERROR err = table.Find(node_id, entry);
     if (CHIP_NO_ERROR == err)
     {
@@ -23,7 +22,7 @@ Status IcdManagementServer::RegisterClient(PersistentStorageDelegate & storage, 
         if (!is_admin)
         {
             VerifyOrReturnError(verification_key.HasValue(), InteractionModel::Status::Failure);
-            VerifyOrReturnError(verification_key.Value().data_equal(entry.key), InteractionModel::Status::Failure);
+            VerifyOrReturnError(entry.IsKeyEquivalent(verification_key.Value()), InteractionModel::Status::Failure);
         }
     }
     else if (CHIP_ERROR_NOT_FOUND == err)
@@ -40,21 +39,30 @@ Status IcdManagementServer::RegisterClient(PersistentStorageDelegate & storage, 
     // Save
     entry.checkInNodeID    = node_id;
     entry.monitoredSubject = monitored_subject;
-    entry.key              = key;
-    err                    = table.Set(entry.index, entry);
+    err                    = entry.SetKey(key);
+    VerifyOrReturnError(CHIP_ERROR_INVALID_ARGUMENT != err, InteractionModel::Status::ConstraintError);
+    VerifyOrReturnError(CHIP_NO_ERROR == err, InteractionModel::Status::Failure);
+    err = table.Set(entry.index, entry);
+
+    // Delete key upon failure to prevent key storage leakage.
+    if (err != CHIP_NO_ERROR)
+    {
+        entry.DeleteKey();
+    }
+
     VerifyOrReturnError(CHIP_ERROR_INVALID_ARGUMENT != err, InteractionModel::Status::ConstraintError);
     VerifyOrReturnError(CHIP_NO_ERROR == err, InteractionModel::Status::Failure);
 
     return InteractionModel::Status::Success;
 }
 
-Status IcdManagementServer::UnregisterClient(PersistentStorageDelegate & storage, FabricIndex fabric_index, chip::NodeId node_id,
+Status ICDManagementServer::UnregisterClient(PersistentStorageDelegate & storage, FabricIndex fabric_index, chip::NodeId node_id,
                                              Optional<chip::ByteSpan> verificationKey, bool is_admin)
 {
-    IcdMonitoringTable table(storage, fabric_index, GetClientsSupportedPerFabric());
+    ICDMonitoringTable table(storage, fabric_index, GetClientsSupportedPerFabric(), mSymmetricKeystore);
 
     // Get current entry, if exists
-    IcdMonitoringEntry entry;
+    ICDMonitoringEntry entry(mSymmetricKeystore);
     CHIP_ERROR err = table.Find(node_id, entry);
     VerifyOrReturnError(CHIP_ERROR_NOT_FOUND != err, InteractionModel::Status::NotFound);
     VerifyOrReturnError(CHIP_NO_ERROR == err, InteractionModel::Status::Failure);
@@ -63,7 +71,7 @@ Status IcdManagementServer::UnregisterClient(PersistentStorageDelegate & storage
     if (!is_admin)
     {
         VerifyOrReturnError(verificationKey.HasValue(), InteractionModel::Status::Failure);
-        VerifyOrReturnError(verificationKey.Value().data_equal(entry.key), InteractionModel::Status::Failure);
+        VerifyOrReturnError(entry.IsKeyEquivalent(verificationKey.Value()), InteractionModel::Status::Failure);
     }
 
     err = table.Remove(entry.index);
@@ -72,7 +80,7 @@ Status IcdManagementServer::UnregisterClient(PersistentStorageDelegate & storage
     return InteractionModel::Status::Success;
 }
 
-Status IcdManagementServer::StayActiveRequest(FabricIndex fabric_index)
+Status ICDManagementServer::StayActiveRequest(FabricIndex fabric_index)
 {
     // TODO: Implementent stay awake logic for end device
     return InteractionModel::Status::UnsupportedCommand;

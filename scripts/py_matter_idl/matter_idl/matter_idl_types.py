@@ -256,8 +256,17 @@ class AttributeInstantiation:
 
 
 @dataclass
+class CommandInstantiation:
+    name: str
+
+    # Parsing meta data missing only when skip meta data is requested
+    parse_meta: Optional[ParseMetaData] = field(default=None)
+
+
+@dataclass
 class ServerClusterInstantiation:
     name: str
+    commands: List[CommandInstantiation] = field(default_factory=list)
     attributes: List[AttributeInstantiation] = field(default_factory=list)
     events_emitted: Set[str] = field(default_factory=set)
 

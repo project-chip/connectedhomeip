@@ -5286,7 +5286,7 @@ public:
     chip::VendorId vendorID  = static_cast<chip::VendorId>(0);
     uint16_t productID       = static_cast<uint16_t>(0);
     uint32_t softwareVersion = static_cast<uint32_t>(0);
-    DataModel::List<const OTADownloadProtocol> protocolsSupported;
+    DataModel::List<const DownloadProtocolEnum> protocolsSupported;
     Optional<uint16_t> hardwareVersion;
     Optional<chip::CharSpan> location;
     Optional<bool> requestorCanConsent;
@@ -5308,7 +5308,7 @@ public:
     chip::VendorId vendorID  = static_cast<chip::VendorId>(0);
     uint16_t productID       = static_cast<uint16_t>(0);
     uint32_t softwareVersion = static_cast<uint32_t>(0);
-    DataModel::DecodableList<OTADownloadProtocol> protocolsSupported;
+    DataModel::DecodableList<DownloadProtocolEnum> protocolsSupported;
     Optional<uint16_t> hardwareVersion;
     Optional<chip::CharSpan> location;
     Optional<bool> requestorCanConsent;
@@ -5336,7 +5336,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::QueryImageResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
 
-    OTAQueryStatus status = static_cast<OTAQueryStatus>(0);
+    StatusEnum status = static_cast<StatusEnum>(0);
     Optional<uint32_t> delayedActionTime;
     Optional<chip::CharSpan> imageURI;
     Optional<uint32_t> softwareVersion;
@@ -5358,7 +5358,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::QueryImageResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
 
-    OTAQueryStatus status = static_cast<OTAQueryStatus>(0);
+    StatusEnum status = static_cast<StatusEnum>(0);
     Optional<uint32_t> delayedActionTime;
     Optional<chip::CharSpan> imageURI;
     Optional<uint32_t> softwareVersion;
@@ -5418,8 +5418,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ApplyUpdateResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
 
-    OTAApplyUpdateAction action = static_cast<OTAApplyUpdateAction>(0);
-    uint32_t delayedActionTime  = static_cast<uint32_t>(0);
+    ApplyUpdateActionEnum action = static_cast<ApplyUpdateActionEnum>(0);
+    uint32_t delayedActionTime   = static_cast<uint32_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -5434,8 +5434,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ApplyUpdateResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
 
-    OTAApplyUpdateAction action = static_cast<OTAApplyUpdateAction>(0);
-    uint32_t delayedActionTime  = static_cast<uint32_t>(0);
+    ApplyUpdateActionEnum action = static_cast<ApplyUpdateActionEnum>(0);
+    uint32_t delayedActionTime   = static_cast<uint32_t>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ApplyUpdateResponse
@@ -5598,9 +5598,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AnnounceOTAProvider::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
-    chip::NodeId providerNodeID              = static_cast<chip::NodeId>(0);
-    chip::VendorId vendorID                  = static_cast<chip::VendorId>(0);
-    OTAAnnouncementReason announcementReason = static_cast<OTAAnnouncementReason>(0);
+    chip::NodeId providerNodeID               = static_cast<chip::NodeId>(0);
+    chip::VendorId vendorID                   = static_cast<chip::VendorId>(0);
+    AnnouncementReasonEnum announcementReason = static_cast<AnnouncementReasonEnum>(0);
     Optional<chip::ByteSpan> metadataForNode;
     chip::EndpointId endpoint = static_cast<chip::EndpointId>(0);
 
@@ -5617,9 +5617,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AnnounceOTAProvider::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
-    chip::NodeId providerNodeID              = static_cast<chip::NodeId>(0);
-    chip::VendorId vendorID                  = static_cast<chip::VendorId>(0);
-    OTAAnnouncementReason announcementReason = static_cast<OTAAnnouncementReason>(0);
+    chip::NodeId providerNodeID               = static_cast<chip::NodeId>(0);
+    chip::VendorId vendorID                   = static_cast<chip::VendorId>(0);
+    AnnouncementReasonEnum announcementReason = static_cast<AnnouncementReasonEnum>(0);
     Optional<chip::ByteSpan> metadataForNode;
     chip::EndpointId endpoint = static_cast<chip::EndpointId>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -5658,9 +5658,9 @@ struct TypeInfo
 namespace UpdateState {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
-    using DecodableType    = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
-    using DecodableArgType = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
+    using Type             = chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum;
+    using DecodableType    = chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum;
+    using DecodableArgType = chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UpdateState::Id; }
@@ -5727,7 +5727,7 @@ struct TypeInfo
         Attributes::DefaultOTAProviders::TypeInfo::DecodableType defaultOTAProviders;
         Attributes::UpdatePossible::TypeInfo::DecodableType updatePossible = static_cast<bool>(0);
         Attributes::UpdateState::TypeInfo::DecodableType updateState =
-            static_cast<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum>(0);
+            static_cast<chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum>(0);
         Attributes::UpdateStateProgress::TypeInfo::DecodableType updateStateProgress;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
@@ -5758,9 +5758,9 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
     static constexpr bool kIsFabricScoped = false;
 
-    OTAUpdateStateEnum previousState = static_cast<OTAUpdateStateEnum>(0);
-    OTAUpdateStateEnum newState      = static_cast<OTAUpdateStateEnum>(0);
-    OTAChangeReasonEnum reason       = static_cast<OTAChangeReasonEnum>(0);
+    UpdateStateEnum previousState = static_cast<UpdateStateEnum>(0);
+    UpdateStateEnum newState      = static_cast<UpdateStateEnum>(0);
+    ChangeReasonEnum reason       = static_cast<ChangeReasonEnum>(0);
     DataModel::Nullable<uint32_t> targetSoftwareVersion;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
@@ -5773,9 +5773,9 @@ public:
     static constexpr EventId GetEventId() { return Events::StateTransition::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
-    OTAUpdateStateEnum previousState = static_cast<OTAUpdateStateEnum>(0);
-    OTAUpdateStateEnum newState      = static_cast<OTAUpdateStateEnum>(0);
-    OTAChangeReasonEnum reason       = static_cast<OTAChangeReasonEnum>(0);
+    UpdateStateEnum previousState = static_cast<UpdateStateEnum>(0);
+    UpdateStateEnum newState      = static_cast<UpdateStateEnum>(0);
+    ChangeReasonEnum reason       = static_cast<ChangeReasonEnum>(0);
     DataModel::Nullable<uint32_t> targetSoftwareVersion;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
