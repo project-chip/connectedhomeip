@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright (c) 2022 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ echo
 echo "Storage Space Used By Key Directories:"
 for directory in "${listOfDirectories[@]}"; do
     if [ -d "$directory" ]; then
-        du -d1 -h "$directory"
+        du -d1 -h "$directory" | sort -h
+        echo
     fi
 done
