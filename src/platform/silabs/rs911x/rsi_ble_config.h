@@ -93,12 +93,28 @@
 #define RSI_TCP_IP_FEATURE_BIT_MAP                                                                                                 \
     (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT) //! TCP/IP feature select bitmap for selecting TCP/IP features
 #define RSI_CUSTOM_FEATURE_BIT_MAP SL_SI91X_FEAT_CUSTOM_FEAT_EXTENTION_VALID //! To set custom feature select bit map
-#define RSI_EXT_CUSTOM_FEATURE_BIT_MAP                                                                                             \
-    (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(1) | RAM_LEVEL_NWP_BASIC_MCU_ADV |                       \
-     SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0) #define RSI_EXT_TCPIP_FEATURE_BITMAP 0
 #define RSI_BT_FEATURE_BITMAP (SL_SI91X_BT_RF_TYPE | SL_SI91X_ENABLE_BLE_PROTOCOL)
 #define RSI_CONFIG_FEATURE_BITMAP 0
 #define RSI_TCP_IP_BYPASS RSI_ENABLE //! TCP IP BYPASS feature check
+
+#if WIFI_ENABLE_SECURITY_WPA3_TRANSITION                                     // Adding Support for WPA3 transition
+#ifdef CHIP_9117
+#define RSI_EXT_CUSTOM_FEATURE_BIT_MAP                                                                                             \
+    (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(1) | RAM_LEVEL_NWP_BASIC_MCU_ADV |                       \
+     SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0 | SL_SI91X_EXT_FEAT_IEEE_80211W)
+#else
+#define RSI_EXT_CUSTOM_FEATURE_BIT_MAP (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(2))
+#endif /* CHIP_9117 */
+#else
+#ifdef CHIP_9117
+#define RSI_EXT_CUSTOM_FEATURE_BIT_MAP                                                                                             \
+    (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(1) | RAM_LEVEL_NWP_BASIC_MCU_ADV |                       \
+     SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0)
+#else
+#define RSI_EXT_CUSTOM_FEATURE_BIT_MAP (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(2))
+#endif /* CHIP_9117 */
+#endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
+
 #else                                // For RS9116
 #define RSI_BLE_MAX_NBR_SLAVES (3)
 #define RSI_BLE_MAX_NBR_MASTERS (1)
