@@ -63,7 +63,7 @@ limitations under the License.
   </cluster>
 
   <!-- Feature Map -->
-  <bitmap name="Feature" type="BITMAP32">
+  <bitmap name="Feature" type="bitmap32">
     <cluster code="0x0071" />
     <cluster code="0x0072" />
     <field name="Condition" mask="0x01" />
@@ -72,14 +72,14 @@ limitations under the License.
   </bitmap>
 
   <!-- Cluster Data Types -->
-  <enum name="DegradationDirectionEnum" type="ENUM8">
+  <enum name="DegradationDirectionEnum" type="enum8">
     <cluster code="0x0071" />
     <cluster code="0x0072" />
     <item value="0" name="Up" />
     <item value="1" name="Down" />
   </enum>
 
-  <enum name="ChangeIndicationEnum" type="ENUM8">
+  <enum name="ChangeIndicationEnum" type="enum8">
     <cluster code="0x0071" />
     <cluster code="0x0072" />
     <item value="0" name="OK" />
@@ -87,7 +87,7 @@ limitations under the License.
     <item value="2" name="Critical" />
   </enum>
 
-  <enum name="ProductIdentifierTypeEnum" type="ENUM8">
+  <enum name="ProductIdentifierTypeEnum" type="enum8">
     <cluster code="0x0071" />
     <cluster code="0x0072" />
     <item value="0" name="UPC" />
@@ -105,12 +105,12 @@ limitations under the License.
   <struct name="ReplacementProductStruct">
     <cluster code="0x0071" />
     <item name="ProductIdentifierType" type="ProductIdentifierTypeEnum" optional="false"/>
-    <item name="ProductIdentifierValue" type="CHAR_STRING" length="20" optional="false"/>
+    <item name="ProductIdentifierValue" type="char_string" length="20" optional="false"/>
   </struct>
 
   <struct name="ReplacementProductStruct">
     <cluster code="0x0072" />
     <item name="ProductIdentifierType" type="ProductIdentifierTypeEnum" optional="false"/>
-    <item name="ProductIdentifierValue" type="CHAR_STRING" length="20" optional="false"/>
+    <item name="ProductIdentifierValue" type="char_string" length="20" optional="false"/>
   </struct>
 </configurator>

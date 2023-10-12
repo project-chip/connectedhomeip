@@ -23,7 +23,7 @@ limitations under the License.
           - Prefix: 0xFFF1 - Test vendor MC
           - Suffix: 0x0001 - Non-global attribute id
      -->
-    <attribute side="server" code="0xFFF10001" define="MEI_EXTENSION" type="INT8U" writable="false" optional="true" isNullable="false">ManufacturerExtension</attribute>
+    <attribute side="server" code="0xFFF10001" define="MEI_EXTENSION" type="int8u" writable="false" optional="true" isNullable="false">ManufacturerExtension</attribute>
 
     <!--
        Manufacturer specific extension command:
