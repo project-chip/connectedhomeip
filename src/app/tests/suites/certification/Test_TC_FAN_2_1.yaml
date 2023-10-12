@@ -57,7 +57,7 @@ tests:
       attribute: "PercentSetting"
       response:
           constraints:
-              type: Percent
+              type: percent
               minValue: 0
               maxValue: 100
 
@@ -67,6 +67,6 @@ tests:
       attribute: "PercentCurrent"
       response:
           constraints:
-              type: Percent
+              type: percent
               minValue: 0
               maxValue: 100
