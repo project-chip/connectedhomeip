@@ -259,7 +259,7 @@ MTR_PROVISIONALLY_AVAILABLE
  * @param queue      The queue on which completion will be called.
  * @param completion The completion that will be called to pass in the file paths for the requested logs.
  */
-- (void)getDiagnosticLogsOfTypes:(NSArray<NSNumber *> *)types
+- (void)downloadDiagnosticLogsOfTypes:(NSArray<NSNumber *> *)types
                          timeout:(NSNumber * _Nullable)timeout
                            queue:(dispatch_queue_t)queue
                       completion:(void (^)(NSError * _Nullable error, MTRDiagnosticLogResult * _Nullable logResult))completion MTR_PROVISIONALLY_AVAILABLE;
