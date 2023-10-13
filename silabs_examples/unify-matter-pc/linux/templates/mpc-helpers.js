@@ -17,7 +17,7 @@ function clusterInitName(zclCluster)
 
 function isUnifyEnumNameDifferent(n)
 {
-  if (n == "OnOffEffectIdentifier")
+  if (n == "EffectIdentifierEnum")
     return true
     if (n == "MoveMode") return true
     if (n == "StepMode") return true
@@ -26,7 +26,7 @@ function isUnifyEnumNameDifferent(n)
 function unifyEnumName(n)
 {
   console.log(n)
-  if (n == "OnOffEffectIdentifier") return "OffWithEffectEffectIdentifier"
+  if (n == "EffectIdentifierEnum") return "OffWithEffectEffectIdentifier"
   if (n == "MoveMode") return "MoveStepMode"
   if (n == "StepMode") return "MoveStepMode"
   else return n

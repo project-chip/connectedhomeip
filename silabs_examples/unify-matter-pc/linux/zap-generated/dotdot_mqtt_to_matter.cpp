@@ -118,7 +118,7 @@ static sl_status_t mpc_on_off_cluster_off_with_effect_command(const dotdot_unid_
     chip::EndpointId endpointId;
     chip::NodeId nodeId;
     SendableCommand<chip::app::Clusters::OnOff::Commands::OffWithEffect::Type> cmd;
-    cmd.Data().effectIdentifier = static_cast<OnOffEffectIdentifier>(effect_identifier);
+    cmd.Data().effectIdentifier = static_cast<EffectIdentifierEnum>(effect_identifier);
     cmd.Data().effectVariant = static_cast<uint8_t>(effect_variant);
 
     if (UIC_MQTT_DOTDOT_CALLBACK_TYPE_SUPPORT_CHECK == callback_type)
@@ -161,7 +161,7 @@ static sl_status_t mpc_on_off_cluster_on_with_timed_off_command(const dotdot_uni
     chip::EndpointId endpointId;
     chip::NodeId nodeId;
     SendableCommand<chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type> cmd;
-    cmd.Data().onOffControl = static_cast<chip::BitMask<OnOffControl>>(on_off_control);
+    cmd.Data().onOffControl = static_cast<chip::BitMask<OnOffControlBitmap>>(on_off_control);
     cmd.Data().onTime = static_cast<uint16_t>(on_time);
     cmd.Data().offWaitTime = static_cast<uint16_t>(off_wait_time);
 

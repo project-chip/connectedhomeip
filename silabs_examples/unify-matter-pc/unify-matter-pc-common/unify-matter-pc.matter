@@ -1,38 +1,6 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
-struct ModeTagStruct {
-    optional vendor_id mfgCode = 0;
-    enum16 value = 1;
-}
-
-struct ModeOptionStruct {
-    char_string<64> label = 0;
-    int8u mode = 1;
-    ModeTagStruct modeTags[] = 2;
-}
-
-struct ApplicationStruct {
-    int16u catalogVendorID = 0;
-    char_string applicationID = 1;
-}
-
-struct ErrorStateStruct {
-    enum8 errorStateID = 0;
-    optional char_string<64> errorStateLabel = 1;
-    optional char_string<64> errorStateDetails = 2;
-}
-
-struct LabelStruct {
-    char_string<16> label = 0;
-    char_string<16> value = 1;
-}
-
-struct OperationalStateStruct {
-    enum8 operationalStateID = 0;
-    optional char_string<64> operationalStateLabel = 1;
-}
-
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 client cluster Identify = 3 {
   enum EffectIdentifierEnum : ENUM8 {
@@ -160,6 +128,9 @@ client cluster Groups = 4 {
 client cluster Scenes = 5 {
   bitmap Feature : BITMAP32 {
     kSceneNames = 0x1;
+    kExplicit = 0x2;
+    kTableSize = 0x4;
+    kFabricScenes = 0x8;
   }
 
   bitmap ScenesCopyMode : BITMAP8 {
@@ -333,33 +304,33 @@ client cluster Scenes = 5 {
 
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
 client cluster OnOff = 6 {
-  enum OnOffDelayedAllOffEffectVariant : ENUM8 {
-    kFadeToOffIn0p8Seconds = 0;
+  enum DelayedAllOffEffectVariantEnum : ENUM8 {
+    kDelayedOffFastFade = 0;
     kNoFade = 1;
-    k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
+    kDelayedOffSlowFade = 2;
   }
 
-  enum OnOffDyingLightEffectVariant : ENUM8 {
-    k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
+  enum DyingLightEffectVariantEnum : ENUM8 {
+    kDyingLightFadeOff = 0;
   }
 
-  enum OnOffEffectIdentifier : ENUM8 {
+  enum EffectIdentifierEnum : ENUM8 {
     kDelayedAllOff = 0;
     kDyingLight = 1;
   }
 
-  enum OnOffStartUpOnOff : ENUM8 {
+  enum StartUpOnOffEnum : ENUM8 {
     kOff = 0;
     kOn = 1;
-    kTogglePreviousOnOff = 2;
+    kToggle = 2;
   }
 
   bitmap Feature : BITMAP32 {
     kLighting = 0x1;
-    kDeadFront = 0x2;
+    kDeadFrontBehavior = 0x2;
   }
 
-  bitmap OnOffControl : BITMAP8 {
+  bitmap OnOffControlBitmap : BITMAP8 {
     kAcceptOnlyWhenOn = 0x1;
   }
 
@@ -367,7 +338,7 @@ client cluster OnOff = 6 {
   readonly attribute optional boolean globalSceneControl = 16384;
   attribute optional int16u onTime = 16385;
   attribute optional int16u offWaitTime = 16386;
-  attribute access(write: manage) optional nullable OnOffStartUpOnOff startUpOnOff = 16387;
+  attribute access(write: manage) optional nullable StartUpOnOffEnum startUpOnOff = 16387;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -376,12 +347,12 @@ client cluster OnOff = 6 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct OffWithEffectRequest {
-    OnOffEffectIdentifier effectIdentifier = 0;
+    EffectIdentifierEnum effectIdentifier = 0;
     int8u effectVariant = 1;
   }
 
   request struct OnWithTimedOffRequest {
-    OnOffControl onOffControl = 0;
+    OnOffControlBitmap onOffControl = 0;
     int16u onTime = 1;
     int16u offWaitTime = 2;
   }
@@ -1141,20 +1112,20 @@ server cluster BasicInformation = 40 {
 
 /** Provides an interface for providing OTA software updates */
 client cluster OtaSoftwareUpdateProvider = 41 {
-  enum OTAApplyUpdateAction : ENUM8 {
+  enum ApplyUpdateActionEnum : ENUM8 {
     kProceed = 0;
     kAwaitNextAction = 1;
     kDiscontinue = 2;
   }
 
-  enum OTADownloadProtocol : ENUM8 {
+  enum DownloadProtocolEnum : ENUM8 {
     kBDXSynchronous = 0;
     kBDXAsynchronous = 1;
     kHTTPS = 2;
     kVendorSpecific = 3;
   }
 
-  enum OTAQueryStatus : ENUM8 {
+  enum StatusEnum : ENUM8 {
     kUpdateAvailable = 0;
     kBusy = 1;
     kNotAvailable = 2;
@@ -1172,7 +1143,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     vendor_id vendorID = 0;
     INT16U productID = 1;
     INT32U softwareVersion = 2;
-    OTADownloadProtocol protocolsSupported[] = 3;
+    DownloadProtocolEnum protocolsSupported[] = 3;
     optional INT16U hardwareVersion = 4;
     optional CHAR_STRING<2> location = 5;
     optional BOOLEAN requestorCanConsent = 6;
@@ -1180,7 +1151,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
   }
 
   response struct QueryImageResponse = 1 {
-    OTAQueryStatus status = 0;
+    StatusEnum status = 0;
     optional INT32U delayedActionTime = 1;
     optional CHAR_STRING<256> imageURI = 2;
     optional INT32U softwareVersion = 3;
@@ -1196,7 +1167,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
   }
 
   response struct ApplyUpdateResponse = 3 {
-    OTAApplyUpdateAction action = 0;
+    ApplyUpdateActionEnum action = 0;
     INT32U delayedActionTime = 1;
   }
 
@@ -1215,13 +1186,13 @@ client cluster OtaSoftwareUpdateProvider = 41 {
 
 /** Provides an interface for downloading and applying OTA software updates */
 client cluster OtaSoftwareUpdateRequestor = 42 {
-  enum OTAAnnouncementReason : ENUM8 {
+  enum AnnouncementReasonEnum : ENUM8 {
     kSimpleAnnouncement = 0;
     kUpdateAvailable = 1;
     kUrgentUpdateAvailable = 2;
   }
 
-  enum OTAChangeReasonEnum : ENUM8 {
+  enum ChangeReasonEnum : ENUM8 {
     kUnknown = 0;
     kSuccess = 1;
     kFailure = 2;
@@ -1229,7 +1200,7 @@ client cluster OtaSoftwareUpdateRequestor = 42 {
     kDelayByProvider = 4;
   }
 
-  enum OTAUpdateStateEnum : ENUM8 {
+  enum UpdateStateEnum : ENUM8 {
     kUnknown = 0;
     kIdle = 1;
     kQuerying = 2;
@@ -1248,9 +1219,9 @@ client cluster OtaSoftwareUpdateRequestor = 42 {
   }
 
   info event StateTransition = 0 {
-    OTAUpdateStateEnum previousState = 0;
-    OTAUpdateStateEnum newState = 1;
-    OTAChangeReasonEnum reason = 2;
+    UpdateStateEnum previousState = 0;
+    UpdateStateEnum newState = 1;
+    ChangeReasonEnum reason = 2;
     nullable INT32U targetSoftwareVersion = 3;
   }
 
@@ -1268,7 +1239,7 @@ client cluster OtaSoftwareUpdateRequestor = 42 {
 
   attribute ProviderLocation defaultOTAProviders[] = 0;
   readonly attribute boolean updatePossible = 1;
-  readonly attribute OTAUpdateStateEnum updateState = 2;
+  readonly attribute UpdateStateEnum updateState = 2;
   readonly attribute nullable int8u updateStateProgress = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1280,7 +1251,7 @@ client cluster OtaSoftwareUpdateRequestor = 42 {
   request struct AnnounceOTAProviderRequest {
     node_id providerNodeID = 0;
     vendor_id vendorID = 1;
-    OTAAnnouncementReason announcementReason = 2;
+    AnnouncementReasonEnum announcementReason = 2;
     optional OCTET_STRING<512> metadataForNode = 3;
     endpoint_no endpoint = 4;
   }
@@ -1327,6 +1298,10 @@ client cluster TimeFormatLocalization = 44 {
   enum HourFormatEnum : ENUM8 {
     k12hr = 0;
     k24hr = 1;
+  }
+
+  bitmap Feature : BITMAP32 {
+    kCalendarFormat = 0x1;
   }
 
   attribute HourFormatEnum hourFormat = 0;
@@ -2184,6 +2159,7 @@ client cluster GeneralDiagnostics = 51 {
   readonly attribute optional RadioFaultEnum activeRadioFaults[] = 6;
   readonly attribute optional NetworkFaultEnum activeNetworkFaults[] = 7;
   readonly attribute boolean testEventTriggersEnabled = 8;
+  readonly attribute optional int32u averageWearCount = 9;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3252,7 +3228,6 @@ client cluster IcdManagement = 70 {
   fabric_scoped struct MonitoringRegistrationStruct {
     fabric_sensitive node_id checkInNodeID = 1;
     fabric_sensitive int64u monitoredSubject = 2;
-    fabric_sensitive octet_string<16> key = 3;
     fabric_idx fabricIndex = 254;
   }
 
@@ -3814,6 +3789,10 @@ client cluster DishwasherAlarm = 93 {
     kWaterLevelError = 0x20;
   }
 
+  bitmap Feature : BITMAP32 {
+    kReset = 0x1;
+  }
+
   info event Notify = 0 {
     AlarmMap active = 0;
     AlarmMap inactive = 1;
@@ -4001,7 +3980,7 @@ client cluster HepaFilterMonitoring = 113 {
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
-    kReplacementProductList = 0x3;
+    kReplacementProductList = 0x4;
   }
 
   struct ReplacementProductStruct {
@@ -4050,7 +4029,7 @@ client cluster ActivatedCarbonFilterMonitoring = 114 {
   bitmap Feature : BITMAP32 {
     kCondition = 0x1;
     kWarning = 0x2;
-    kReplacementProductList = 0x3;
+    kReplacementProductList = 0x4;
   }
 
   struct ReplacementProductStruct {
@@ -4848,6 +4827,17 @@ client cluster WindowCovering = 258 {
 
 /** This cluster provides control of a barrier (garage door). */
 client cluster BarrierControl = 259 {
+  bitmap BarrierControlCapabilities : BITMAP8 {
+    kPartialBarrier = 0x1;
+  }
+
+  bitmap BarrierControlSafetyStatus : BITMAP16 {
+    kRemoteLockout = 0x1;
+    kTemperDetected = 0x2;
+    kFailedCommunication = 0x4;
+    kPositionFailure = 0x8;
+  }
+
   readonly attribute enum8 barrierMovingState = 1;
   readonly attribute bitmap16 barrierSafetyStatus = 2;
   readonly attribute bitmap8 barrierCapabilities = 3;
@@ -5567,9 +5557,18 @@ client cluster ColorControl = 768 {
 
 /** Attributes and commands for configuring a lighting ballast. */
 client cluster BallastConfiguration = 769 {
+  bitmap BallastStatusBitmap : BITMAP8 {
+    kBallastNonOperational = 0x1;
+    kLampFailure = 0x2;
+  }
+
+  bitmap LampAlarmModeBitmap : BITMAP8 {
+    kLampBurnHours = 0x1;
+  }
+
   readonly attribute int8u physicalMinLevel = 0;
   readonly attribute int8u physicalMaxLevel = 1;
-  readonly attribute optional bitmap8 ballastStatus = 2;
+  readonly attribute optional BallastStatusBitmap ballastStatus = 2;
   attribute int8u minLevel = 16;
   attribute int8u maxLevel = 17;
   attribute optional nullable int8u intrinsicBallastFactor = 20;
@@ -5579,7 +5578,7 @@ client cluster BallastConfiguration = 769 {
   attribute optional char_string<16> lampManufacturer = 49;
   attribute optional nullable int24u lampRatedHours = 50;
   attribute optional nullable int24u lampBurnHours = 51;
-  attribute optional bitmap8 lampAlarmMode = 52;
+  attribute optional LampAlarmModeBitmap lampAlarmMode = 52;
   attribute optional nullable int24u lampBurnHoursTripPoint = 53;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -7694,6 +7693,13 @@ endpoint 0 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
+
+    handle command ArmFailSafe;
+    handle command ArmFailSafeResponse;
+    handle command SetRegulatoryConfig;
+    handle command SetRegulatoryConfigResponse;
+    handle command CommissioningComplete;
+    handle command CommissioningCompleteResponse;
   }
 
   server cluster NetworkCommissioning {
@@ -7710,6 +7716,16 @@ endpoint 0 {
     callback attribute attributeList;
     ram      attribute featureMap default = 2;
     ram      attribute clusterRevision default = 1;
+
+    handle command ScanNetworks;
+    handle command ScanNetworksResponse;
+    handle command AddOrUpdateWiFiNetwork;
+    handle command AddOrUpdateThreadNetwork;
+    handle command RemoveNetwork;
+    handle command NetworkConfigResponse;
+    handle command ConnectNetwork;
+    handle command ConnectNetworkResponse;
+    handle command ReorderNetwork;
   }
 
   server cluster AdministratorCommissioning {
@@ -7721,6 +7737,10 @@ endpoint 0 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
+
+    handle command OpenCommissioningWindow;
+    handle command OpenBasicCommissioningWindow;
+    handle command RevokeCommissioning;
   }
 
   server cluster OperationalCredentials {
@@ -7735,6 +7755,19 @@ endpoint 0 {
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
     ram      attribute clusterRevision default = 1;
+
+    handle command AttestationRequest;
+    handle command AttestationResponse;
+    handle command CertificateChainRequest;
+    handle command CertificateChainResponse;
+    handle command CSRRequest;
+    handle command CSRResponse;
+    handle command AddNOC;
+    handle command UpdateNOC;
+    handle command NOCResponse;
+    handle command UpdateFabricLabel;
+    handle command RemoveFabric;
+    handle command AddTrustedRootCertificate;
   }
 }
 

@@ -252,13 +252,13 @@ sl_status_t mpc_onoff_cluster_parser(const chip::app::ConcreteDataAttributePath 
     }
     break;
     case OnOff::Attributes::StartUpOnOff::Id: {
-        chip::app::Clusters::OnOff::OnOffStartUpOnOff value;
+        chip::app::Clusters::OnOff::StartUpOnOffEnum value;
         if (info.startUpOnOff.IsNull())
-            value = chip::app::Clusters::OnOff::OnOffStartUpOnOff::kUnknownEnumValue;
+            value = chip::app::Clusters::OnOff::StartUpOnOffEnum::kUnknownEnumValue;
         else
             value = info.startUpOnOff.Value();
         sl_log_info(LOG_TAG, "StartUpOnOff: entries on read to %x : %u", path.mAttributeId, value);
-        attribute(mNode).set_reported<chip::app::Clusters::OnOff::OnOffStartUpOnOff>(value);
+        attribute(mNode).set_reported<chip::app::Clusters::OnOff::StartUpOnOffEnum>(value);
     }
     break;
     default:
