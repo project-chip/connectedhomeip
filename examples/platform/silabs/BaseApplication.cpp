@@ -752,3 +752,7 @@ void BaseApplication::OutputQrCode(bool refreshLCD)
         SILABS_LOG("Getting QR code failed!");
     }
 }
+
+bool BaseApplication::getWifiProvisionStatus(){
+    return sIsProvisioned;
+}
