@@ -25,6 +25,14 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          1. DUT supports CNET.S.F02(ET)
+          2. DUT has a Network Commissioning cluster on endpoint PIXIT.CNET.ENDPOINT_ETHERNET with FeatureMap attribute of 4
+          3. DUT has a valid Ethernet connection
+          4. TH can communicate with the DUT
+      disabled: true
+
     - label: "Step 1: Factory reset the DUT"
       verification: |
 

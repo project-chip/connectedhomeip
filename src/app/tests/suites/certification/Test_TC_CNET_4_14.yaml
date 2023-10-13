@@ -28,6 +28,14 @@ config:
 tests:
     - label: "Preconditions"
       verification: |
+          1. Commission TH and DUT on Thread setup on PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
+          2. The cluster Identifier 49 (0x0031) is present in the ServerList attribute
+          3. The FeatureMap attribute value is 2
+          4. MaxNetworks attribute value is at least 2 which is saved as 'MaxNetworksValue' for future use
+      disabled: true
+
+    - label: "Preconditions"
+      verification: |
           Commission TH and DUT on Thread setup
       disabled: true
 

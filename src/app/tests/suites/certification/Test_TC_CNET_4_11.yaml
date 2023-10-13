@@ -26,6 +26,14 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          1. DUT supports CNET.S.F00(WI)
+          2. DUT has a Network Commissioning cluster on endpoint PIXIT.CNET.ENDPOINT_WIFI with FeatureMap attribute of 1
+          3. DUT is commissioned on PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
+          4. TH can connect to two valid Wi-Fi access points: PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
+      disabled: true
+
     - label: "Commission TH and DUT over BLE to setup the Wi-Fi"
       verification: |
           All the below commands are to check the Pre-Condition note mentioned in D column.

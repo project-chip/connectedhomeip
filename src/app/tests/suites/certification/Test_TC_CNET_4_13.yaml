@@ -26,6 +26,14 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          1. Commission TH and DUT over BLE to setup the Wi-Fi on PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
+          2. The cluster Identifier 49 (0x0031) is present in the ServerList attribute
+          3. The FeatureMap attribute value is 1
+          4. MaxNetworks attribute value is at least 2 which is saved as 'MaxNetworksValue' for future use
+      disabled: true
+
     - label: "Commission TH and DUT over BLE to setup the Wi-Fi"
       verification: |
 
