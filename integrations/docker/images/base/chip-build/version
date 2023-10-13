@@ -1,1 +1,1 @@
-18 : [Silabs] Adds bugfix for symlink for docker use and optimize SDK download
+19 : [Silabs] Remove unnecessary files from the gecko-sdk for the docker image
