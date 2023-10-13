@@ -1107,7 +1107,7 @@ void ConnectivityManagerImpl::OnStationIPv6AddressAvailable(const ip_event_got_i
     event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
     event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV6_Assigned;
     PlatformMgr().PostEventOrDie(&event);
-#if CONFIG_ENABLE_ROUTE_HOOK
+#if defined(CONFIG_ENABLE_ROUTE_HOOK) && CONFIG_ENABLE_ROUTE_HOOK
     esp_route_hook_init(esp_netif_get_handle_from_ifkey(ESP32Utils::kDefaultWiFiStationNetifKey));
 #endif
 }
