@@ -70,6 +70,15 @@
 
 #define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 4
 
+// cached players that were seen before this window (in hours) will not be surfaced as "discovered"
+#define CHIP_DEVICE_CONFIG_STR_CACHE_LAST_DISCOVERED_HOURS 7 * 24
+
+// time (in sec) assumed to be required for player to wake up after sending WoL magic packet
+#define CHIP_DEVICE_CONFIG_STR_WAKE_UP_DELAY_SEC 10
+
+// delay (in sec) before which we assume undiscovered cached players may be in STR mode
+#define CHIP_DEVICE_CONFIG_STR_DISCOVERY_DELAY_SEC 5
+
 // Include the CHIPProjectConfig from config/standalone
 // Add this at the end so that we can hit our #defines first
 #include <CHIPProjectConfig.h>

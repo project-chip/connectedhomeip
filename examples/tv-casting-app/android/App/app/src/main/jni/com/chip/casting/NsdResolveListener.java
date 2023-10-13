@@ -149,6 +149,9 @@ public class NsdResolveListener implements NsdManager.ResolveListener {
               TAG,
               "Matching Video Player with the following information found for DiscoveredNodeData"
                   + videoPlayer);
+          long currentUnixTimeMS = System.currentTimeMillis();
+          Log.d(TAG, "Updating discovery timestamp for VideoPlayer to " + currentUnixTimeMS);
+          videoPlayer.setLastDiscoveredMs(currentUnixTimeMS);
           discoveredNodeData.setConnectableVideoPlayer(videoPlayer);
           return;
         }

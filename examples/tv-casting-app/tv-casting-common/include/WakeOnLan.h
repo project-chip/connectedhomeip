@@ -1,5 +1,7 @@
 /*
+ *
  *    Copyright (c) 2023 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,31 +16,18 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file defines and implements macros for verifying values that do not
- *      involve logging.
- */
+#include "MediaReadBase.h"
 
-#pragma once
+#include <controller/CHIPCluster.h>
 
-#include <nlassert.h>
+#include <app-common/zap-generated/cluster-objects.h>
 
-#define VerifyOrDieWithoutLogging(aCondition) nlABORT(aCondition)
+// READER CLASSES
 
-/**
- *  @def IgnoreUnusedVariable(aVariable)
- *
- *  @brief
- *    This casts the specified @a aVariable to void to quell any
- *    compiler-issued unused variable warnings or errors.
- *
- *  @code
- *  void foo (int err)
- *  {
- *      IgnoreUnusedVariable(err)
- *  }
- *  @endcode
- *
- */
-#define IgnoreUnusedVariable(aVariable) ((void) (aVariable))
+class MACAddressReader : public MediaReadBase<chip::app::Clusters::WakeOnLan::Attributes::MACAddress::TypeInfo>
+{
+public:
+    MACAddressReader() : MediaReadBase(chip::app::Clusters::WakeOnLan::Id) {}
+};
+
+CHIP_ERROR SendWakeOnLanPacket(chip::CharSpan * MACAddress);

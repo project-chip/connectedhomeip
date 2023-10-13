@@ -73,8 +73,11 @@ static_library("Linux") {
     "SystemTimeSupport.cpp",
   ]
 
+  deps = [ "${chip_root}/src/setup_payload" ]
+
   if (!chip_use_external_logging) {
     sources += [ "Logging.cpp" ]
+    deps += [ "${chip_root}/src/platform/logging:headers" ]
   }
 
   if (chip_enable_openthread) {
@@ -95,8 +98,6 @@ static_library("Linux") {
       "bluez/Types.h",
     ]
   }
-
-  deps = [ "${chip_root}/src/setup_payload" ]
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",

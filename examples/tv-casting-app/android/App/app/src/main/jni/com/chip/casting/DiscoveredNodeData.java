@@ -106,6 +106,19 @@ public class DiscoveredNodeData {
     this.numIPs = 1;
   }
 
+  public DiscoveredNodeData(VideoPlayer player) {
+    this.connectableVideoPlayer = player;
+    this.instanceName = player.getInstanceName();
+    this.hostName = player.getHostName();
+    this.deviceName = player.getDeviceName();
+    this.deviceType = player.getDeviceType();
+    this.vendorId = player.getVendorId();
+    this.productId = player.getProductId();
+    this.numIPs = player.getNumIPs();
+    this.ipAddresses = player.getIpAddresses();
+    this.port = player.getPort();
+  }
+
   void setConnectableVideoPlayer(VideoPlayer videoPlayer) {
     this.connectableVideoPlayer = videoPlayer;
   }
