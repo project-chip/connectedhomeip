@@ -1,0 +1,20 @@
+name: Dump disk space info
+description: Help debug running out of disk space on github CI
+runs:
+  using: "composite"
+  steps:
+    - name: Collect disk info
+      # Unfortunately current syntax for github wrapper actions only work for
+      # Javascript actions, and Docker container actions, which doesn't make it
+      # possible to wrap a shell script like the one below. The action below
+      # essentially wraps the shell commands we want to run into a Javascript
+      # wrapped action. This allow us to get the disk info usage before a job
+      # is run and after the job is run regardless if the job succeeds or
+      # fails.
+      uses: pyTooling/Actions/with-post-step@v0.4.5
+      if: ${{ runner.os == 'Linux' }}
+      with:
+        main: |-
+          exec ./scripts/dump_diskspace_info.sh
+        post: |-
+          exec ./scripts/dump_diskspace_info.sh

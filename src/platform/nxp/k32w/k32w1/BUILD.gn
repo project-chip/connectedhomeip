@@ -86,7 +86,7 @@ static_library("k32w1") {
     public_deps += [ "${mbedtls_root}:mbedtls" ]
   }
 
-  deps = []
+  deps = [ "${chip_root}/src/platform/logging:headers" ]
 
   if (chip_enable_openthread) {
     sources += [

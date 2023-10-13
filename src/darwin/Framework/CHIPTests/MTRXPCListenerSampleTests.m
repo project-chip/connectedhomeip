@@ -1677,6 +1677,126 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     sleep(1);
 }
 
+- (void)test015_MTRDeviceInteraction
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:mDeviceController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * endpoint = @(1);
+
+    __auto_type * onOffCluster = [[MTRClusterOnOff alloc] initWithDevice:device endpointID:endpoint queue:queue];
+
+    // Since we have no subscription, reads don't really work right.  We need to
+    // poll for values instead.
+    __auto_type pollForValue = ^(NSNumber * attributeID, NSDictionary<NSString *, id> * (^readBlock)(void), NSNumber * value) {
+        XCTestExpectation * expectation = [self expectationWithDescription:[NSString stringWithFormat:@"Polling for on/off=%@", value]];
+        __auto_type * path = [MTRAttributePath attributePathWithEndpointID:endpoint clusterID:@(MTRClusterIDTypeOnOffID) attributeID:attributeID];
+
+        __block dispatch_block_t poller = ^{
+            __auto_type * attrValue = readBlock();
+            if (attrValue == nil) {
+                dispatch_async(queue, poller);
+                return;
+            }
+
+            __auto_type * responseValue = @{
+                MTRAttributePathKey : path,
+                MTRDataKey : attrValue,
+            };
+
+            NSError * error;
+            __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:responseValue error:&error];
+            XCTAssertNil(error);
+            XCTAssertNotNil(report);
+            XCTAssertNil(report.error);
+            XCTAssertNotNil(report.value);
+
+            if ([report.value isEqual:value]) {
+                // Break cycle.
+                poller = nil;
+                [expectation fulfill];
+                return;
+            }
+
+            dispatch_async(queue, poller);
+        };
+
+        dispatch_async(queue, poller);
+        [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds + 5];
+    };
+
+    pollForValue(
+        @(MTRAttributeIDTypeClusterOnOffAttributeOnOffID), ^{
+            return [onOffCluster readAttributeOnOffWithParams:nil];
+        }, @(NO));
+    pollForValue(
+        @(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID), ^{
+            return [onOffCluster readAttributeOnTimeWithParams:nil];
+        }, @(0));
+
+    // Test that writes work.
+    [onOffCluster writeAttributeOnTimeWithValue:@{
+        MTRTypeKey : MTRUnsignedIntegerValueType,
+        MTRValueKey : @(100),
+    }
+                          expectedValueInterval:@(0)];
+
+    // Wait until the expected value is removed.
+    pollForValue(
+        @(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID), ^{
+            return [onOffCluster readAttributeOnTimeWithParams:nil];
+        }, @(0));
+
+    // Now wait until the new value is read.
+    pollForValue(
+        @(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID), ^{
+            return [onOffCluster readAttributeOnTimeWithParams:nil];
+        }, @(100));
+
+    [onOffCluster writeAttributeOnTimeWithValue:@{
+        MTRTypeKey : MTRUnsignedIntegerValueType,
+        MTRValueKey : @(0),
+    }
+                          expectedValueInterval:@(0)];
+
+    // Wait until the expected value is removed.
+    pollForValue(
+        @(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID), ^{
+            return [onOffCluster readAttributeOnTimeWithParams:nil];
+        }, @(100));
+
+    // Now wait until the new value is read.
+    pollForValue(
+        @(MTRAttributeIDTypeClusterOnOffAttributeOnTimeID), ^{
+            return [onOffCluster readAttributeOnTimeWithParams:nil];
+        }, @(00));
+
+    // Test that invokes work.
+    XCTestExpectation * onExpectation = [self expectationWithDescription:@"Turning on"];
+    [onOffCluster onWithParams:nil expectedValues:nil expectedValueInterval:nil completion:^(NSError * error) {
+        XCTAssertNil(error);
+        [onExpectation fulfill];
+    }];
+    [self waitForExpectations:@[ onExpectation ] timeout:kTimeoutInSeconds];
+
+    pollForValue(
+        @(MTRAttributeIDTypeClusterOnOffAttributeOnOffID), ^{
+            return [onOffCluster readAttributeOnOffWithParams:nil];
+        }, @(YES));
+
+    XCTestExpectation * offExpectation = [self expectationWithDescription:@"Turning off"];
+    [onOffCluster offWithParams:nil expectedValues:nil expectedValueInterval:nil completion:^(NSError * error) {
+        XCTAssertNil(error);
+        [offExpectation fulfill];
+    }];
+    [self waitForExpectations:@[ offExpectation ] timeout:kTimeoutInSeconds];
+
+    pollForValue(
+        @(MTRAttributeIDTypeClusterOnOffAttributeOnOffID), ^{
+            return [onOffCluster readAttributeOnOffWithParams:nil];
+        }, @(NO));
+}
+
 - (void)test900_SubscribeClusterStateCache
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"subscribe attributes by cache"];

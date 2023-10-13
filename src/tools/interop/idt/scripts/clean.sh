@@ -1,5 +1,6 @@
 #
 #    Copyright (c) 2023 Project CHIP Authors
+#    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,9 +15,10 @@
 #    limitations under the License.
 #
 
-# This file should be used as a configuration overlay to enable Factory Data.
-
-# Enable factory data support. 
-CONFIG_CHIP_FACTORY_DATA=y
-CONFIG_CHIP_FACTORY_DATA_BUILD=y
-CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE=y
+source idt/scripts/vars.sh
+if [[ "$(hostname)" == "$PIHOST" ]]; then
+    echo "Target env detected, cleaning"
+    sudo rm -R idt
+else
+    echo "Not in the target env, so not cleaning"
+fi
