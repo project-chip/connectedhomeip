@@ -269,4 +269,3 @@ RUN strip /usr/local/bin/protoc*
 # /usr/local/man contains cmake documentation
 RUN rm -rf /usr/local/doc/cmake
 RUN rm -rf /usr/local/man
-
