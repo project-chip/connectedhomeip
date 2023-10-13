@@ -29,13 +29,6 @@ config:
         type: group_id
         defaultValue: 0x0002
 
-    GroupKeyManagementEndpoint:
-        type: int16u
-        defaultValue: 0
-    GroupsEndpoint:
-        type: int16u
-        defaultValue: 0
-
 tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -58,7 +51,7 @@ tests:
           "Step 0a: preparation step for using commands from Groups cluster: Add
           KeySet"
       cluster: "Group Key Management"
-      endpoint: GroupKeyManagementEndpoint
+      endpoint: 0
       command: "KeySetWrite"
       arguments:
           values:
@@ -79,7 +72,7 @@ tests:
           "Step 0b: Preparation step for using commands from Groups cluster:
           Write Group Keys"
       cluster: "Group Key Management"
-      endpoint: GroupKeyManagementEndpoint
+      endpoint: 0
       command: "writeAttribute"
       attribute: "GroupKeyMap"
       arguments:
@@ -92,7 +85,7 @@ tests:
     - label: "Step 0c: TH sends a RemoveAllGroups command to DUT."
       PICS: G.S.C04.Rsp
       cluster: "Groups"
-      endpoint: GroupsEndpoint
+      endpoint: endpoint
       command: "RemoveAllGroups"
 
     - label:
@@ -334,7 +327,7 @@ tests:
     - label: "Step 4a: Reboot target device"
       PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
-      endpoint: GroupKeyManagementEndpoint
+      endpoint: 0
       command: "Reboot"
 
     - label: "Step 4a: Reboot target device(DUT)"
@@ -900,9 +893,9 @@ tests:
       command: "UnsignedNumberEquals"
       arguments:
           values:
-              - name: "value1"
+              - name: "Value1"
                 value: 0x00
-              - name: "value2"
+              - name: "Value2"
                 value: StoreStatus
       response:
           - values:
@@ -1053,9 +1046,9 @@ tests:
       command: "UnsignedNumberEquals"
       arguments:
           values:
-              - name: "value1"
+              - name: "Value1"
                 value: 0x00
-              - name: "value2"
+              - name: "Value2"
                 value: StoredStatus
       response:
           - values:
@@ -1088,7 +1081,7 @@ tests:
           KeySetRemove command to the GroupKeyManagement cluster with the
           GroupKeySetID field set to 0x01a1"
       cluster: "Group Key Management"
-      endpoint: GroupKeyManagementEndpoint
+      endpoint: 0
       command: "KeySetRemove"
       arguments:
           values:

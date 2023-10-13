@@ -26,10 +26,6 @@ config:
         type: group_id
         defaultValue: 0x0101
 
-    GroupKeyManagementEndpoint:
-        type: int16u
-        defaultValue: 0
-
 tests:
     - label: "Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -52,7 +48,7 @@ tests:
           "Step 0a: preparation step for using commands from Groups cluster: Add
           KeySet"
       cluster: "Group Key Management"
-      endpoint: GroupKeyManagementEndpoint
+      endpoint: 0
       command: "KeySetWrite"
       arguments:
           values:
@@ -73,7 +69,7 @@ tests:
           "Step 0b: Preparation step for using commands from Groups cluster:
           Write Group Keys"
       cluster: "Group Key Management"
-      endpoint: GroupKeyManagementEndpoint
+      endpoint: 0
       command: "writeAttribute"
       attribute: "GroupKeyMap"
       arguments:
@@ -100,7 +96,7 @@ tests:
 
     - label: "Install ACLs"
       cluster: "Access Control"
-      endpoint: GroupKeyManagementEndpoint
+      endpoint: 0
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
@@ -647,7 +643,7 @@ tests:
           KeySetRemove command to the GroupKeyManagement cluster with the
           GroupKeySetID field set to 0x01a1"
       cluster: "Group Key Management"
-      endpoint: GroupKeyManagementEndpoint
+      endpoint: 0
       command: "KeySetRemove"
       arguments:
           values:
