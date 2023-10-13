@@ -89,61 +89,61 @@
 #define RSI_BLE_CUSTOM_LEVEL_UUID (0x1FF1)
 
 #ifdef RSI_M4_INTERFACE
-  #define RSI_BLE_MAX_NBR_ATT_REC (20)
+#define RSI_BLE_MAX_NBR_ATT_REC (20)
 
-  #if (SIWX_917 | EXP_BOARD)
-    #define RSI_BLE_MAX_NBR_PERIPHERALS (1)
-  #else
-    #define RSI_BLE_MAX_NBR_SLAVES (1)
-  #endif
-
-  #define RSI_BLE_NUM_CONN_EVENTS (2)
+#if (SIWX_917 | EXP_BOARD)
+#define RSI_BLE_MAX_NBR_PERIPHERALS (1)
 #else
-  #define RSI_BLE_MAX_NBR_ATT_REC (80)
+#define RSI_BLE_MAX_NBR_SLAVES (1)
+#endif
 
-  #if (SIWX_917 | EXP_BOARD)
-     #define RSI_BLE_MAX_NBR_PERIPHERALS (3)
-  #else
-    #define RSI_BLE_MAX_NBR_SLAVES (3)
-  #endif
+#define RSI_BLE_NUM_CONN_EVENTS (2)
+#else
+#define RSI_BLE_MAX_NBR_ATT_REC (80)
 
-  #define RSI_BLE_NUM_CONN_EVENTS (20)
+#if (SIWX_917 | EXP_BOARD)
+ #define RSI_BLE_MAX_NBR_PERIPHERALS (3)
+#else
+#define RSI_BLE_MAX_NBR_SLAVES (3)
+#endif
+
+#define RSI_BLE_NUM_CONN_EVENTS (20)
 #endif
 
 
 
 
 #if (SIWX_917 | EXP_BOARD)
-    #define FRONT_END_SWITCH_SEL2 BIT(30)
-    #define RSI_EXT_TCPIP_FEATURE_BITMAP 0
-    #define RSI_BLE_MAX_NBR_CENTRALS (1)
-    #define RSI_FEATURE_BIT_MAP                                                                                                        \
+#define FRONT_END_SWITCH_SEL2 BIT(30)
+#define RSI_EXT_TCPIP_FEATURE_BITMAP 0
+#define RSI_BLE_MAX_NBR_CENTRALS (1)
+#define RSI_FEATURE_BIT_MAP                                                                                                        \
         (SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE | SL_SI91X_FEAT_DEV_TO_HOST_ULP_GPIO_1) //! To set wlan feature select bit map
-    #define RSI_TCP_IP_FEATURE_BIT_MAP                                                                                                 \
+#define RSI_TCP_IP_FEATURE_BIT_MAP                                                                                                 \
         (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT) //! TCP/IP feature select bitmap for selecting TCP/IP features
-    #define RSI_CUSTOM_FEATURE_BIT_MAP SL_SI91X_FEAT_CUSTOM_FEAT_EXTENTION_VALID //! To set custom feature select bit map
-    #define RSI_BT_FEATURE_BITMAP (SL_SI91X_BT_RF_TYPE | SL_SI91X_ENABLE_BLE_PROTOCOL)
-    #define RSI_CONFIG_FEATURE_BITMAP 0
-    #define RSI_TCP_IP_BYPASS RSI_ENABLE //! TCP IP BYPASS feature check
+#define RSI_CUSTOM_FEATURE_BIT_MAP SL_SI91X_FEAT_CUSTOM_FEAT_EXTENTION_VALID //! To set custom feature select bit map
+#define RSI_BT_FEATURE_BITMAP (SL_SI91X_BT_RF_TYPE | SL_SI91X_ENABLE_BLE_PROTOCOL)
+#define RSI_CONFIG_FEATURE_BITMAP 0
+#define RSI_TCP_IP_BYPASS RSI_ENABLE //! TCP IP BYPASS feature check
 
-    #ifdef CHIP_9117
-        #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION // Adding Support for WPA3 transition
-        #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP                                                                                             \
+#ifdef CHIP_9117
+#if WIFI_ENABLE_SECURITY_WPA3_TRANSITION // Adding Support for WPA3 transition
+#define RSI_EXT_CUSTOM_FEATURE_BIT_MAP                                                                                             \
             (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(1) | RAM_LEVEL_NWP_BASIC_MCU_ADV |                       \
             SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0 | SL_SI91X_EXT_FEAT_IEEE_80211W)
-        #else
-        #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP                                                                                             \
+#else
+#define RSI_EXT_CUSTOM_FEATURE_BIT_MAP                                                                                             \
             (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(1) | RAM_LEVEL_NWP_BASIC_MCU_ADV |                       \
             SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0)
-        #endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
-    #else  // EXP_BOARD
-        #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(2))
-    #endif /* CHIP_9117 */
+#endif /* WIFI_ENABLE_SECURITY_WPA3_TRANSITION */
+#else  // EXP_BOARD
+#define RSI_EXT_CUSTOM_FEATURE_BIT_MAP (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(2))
+#endif /* CHIP_9117 */
 
 #else // For RS9116
-    #define RSI_BLE_MAX_NBR_MASTERS (1)
+#define RSI_BLE_MAX_NBR_MASTERS (1)
     //! set handshake type of power mode
-    #define RSI_HAND_SHAKE_TYPE GPIO_BASED
+#define RSI_HAND_SHAKE_TYPE GPIO_BASED
 #endif // (SIWX_917 | EXP_BOARD)
 
 
