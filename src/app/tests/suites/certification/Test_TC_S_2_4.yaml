@@ -26,7 +26,7 @@ config:
         type: group_id
         defaultValue: 0x0001
 
-    GroupKeyManagement.Endpoint:
+    GroupKeyManagementEndpoint:
         type: int16u
         defaultValue: 0
 
@@ -43,7 +43,7 @@ tests:
           "Step 0a: preparation step for using commands from Groups cluster: Add
           KeySet"
       cluster: "Group Key Management"
-      endpoint: GroupKeyManagement.Endpoint
+      endpoint: GroupKeyManagementEndpoint
       command: "KeySetWrite"
       arguments:
           values:
@@ -64,7 +64,7 @@ tests:
           "Step 0b: Preparation step for using commands from Groups cluster:
           Write Group Keys"
       cluster: "Group Key Management"
-      endpoint: GroupKeyManagement.Endpoint
+      endpoint: GroupKeyManagementEndpoint
       command: "writeAttribute"
       attribute: "GroupKeyMap"
       arguments:
@@ -423,7 +423,7 @@ tests:
           KeySetRemove command to the GroupKeyManagement cluster with the
           GroupKeySetID field set to 0x01a1"
       cluster: "Group Key Management"
-      endpoint: GroupKeyManagement.Endpoint
+      endpoint: GroupKeyManagementEndpoint
       command: "KeySetRemove"
       arguments:
           values:
