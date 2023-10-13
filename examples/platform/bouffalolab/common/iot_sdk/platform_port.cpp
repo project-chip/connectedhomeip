@@ -46,9 +46,9 @@
 
 extern "C" {
 #include <bl_irq.h>
-#include <bl_sys.h>
-#include <bl_sec.h>
 #include <bl_rtc.h>
+#include <bl_sec.h>
+#include <bl_sys.h>
 #include <hal_board.h>
 #include <hal_boot2.h>
 #if CHIP_DEVICE_LAYER_TARGET_BL602
@@ -109,7 +109,7 @@ extern "C" void vApplicationIdleHook(void)
 }
 
 extern "C" void vApplicationGetIdleTaskMemory(StaticTask_t ** ppxIdleTaskTCBBuffer, StackType_t ** ppxIdleTaskStackBuffer,
-                                   uint32_t * pulIdleTaskStackSize)
+                                              uint32_t * pulIdleTaskStackSize)
 {
     /* If the buffers to be provided to the Idle task are declared inside this
     function then they must be declared static - otherwise they will be allocated on
@@ -132,7 +132,7 @@ extern "C" void vApplicationGetIdleTaskMemory(StaticTask_t ** ppxIdleTaskTCBBuff
 application must provide an implementation of vApplicationGetTimerTaskMemory()
 to provide the memory that is used by the Timer service task. */
 extern "C" void vApplicationGetTimerTaskMemory(StaticTask_t ** ppxTimerTaskTCBBuffer, StackType_t ** ppxTimerTaskStackBuffer,
-                                    uint32_t * pulTimerTaskStackSize)
+                                               uint32_t * pulTimerTaskStackSize)
 {
     /* If the buffers to be provided to the Timer task are declared inside this
     function then they must be declared static - otherwise they will be allocated on
@@ -243,20 +243,20 @@ extern "C" void bflb_assert(void) __attribute__((weak, alias("vAssertCalled")));
 // ================================================================================
 // Main Code
 // ================================================================================
-extern "C"  uint8_t _heap_start;
-extern "C"  size_t _heap_size; // @suppress("Type cannot be resolved")
+extern "C" uint8_t _heap_start;
+extern "C" size_t _heap_size; // @suppress("Type cannot be resolved")
 
 #if CHIP_DEVICE_LAYER_TARGET_BL602
-extern "C"  uint8_t _heap_wifi_start;
-extern "C"  uint8_t _heap_wifi_size; // @suppress("Type cannot be resolved")
+extern "C" uint8_t _heap_wifi_start;
+extern "C" uint8_t _heap_wifi_size; // @suppress("Type cannot be resolved")
 static const HeapRegion_t xHeapRegions[] = {
     { &_heap_start, (unsigned int) &_heap_size }, // set on runtime
     { &_heap_wifi_start, (unsigned int) &_heap_wifi_size },
     { NULL, 0 } /* Terminates the array. */
 };
 #elif CHIP_DEVICE_LAYER_TARGET_BL702
-extern "C"  uint8_t _heap2_start;
-extern "C"  uint8_t _heap2_size; // @suppress("Type cannot be resolved")
+extern "C" uint8_t _heap2_start;
+extern "C" uint8_t _heap2_size; // @suppress("Type cannot be resolved")
 static const HeapRegion_t xHeapRegions[] = {
     { &_heap_start, (size_t) &_heap_size },   // set on runtime
     { &_heap2_start, (size_t) &_heap2_size }, // set on runtime

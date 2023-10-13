@@ -42,7 +42,7 @@ template("bl_iot_sdk") {
       "BL702L=BL702L",
       "BFLB_USE_ROM_DRIVER=1",
       "BFLB_USE_HAL_DRIVER=1",
-      "CFG_COMPONENT_BLOG_ENABLE=0"
+      "CFG_COMPONENT_BLOG_ENABLE=0",
     ]
 
     include_dirs = []
@@ -333,8 +333,10 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_stage") {
-
-    defines = [ "EF_ENV_CACHE_TABLE_SIZE=64", "RHINO_CONFIG_WORKQUEUE=0" ]
+    defines = [
+      "EF_ENV_CACHE_TABLE_SIZE=64",
+      "RHINO_CONFIG_WORKQUEUE=0",
+    ]
     sources = [
       "${bl_iot_sdk_root}/components/stage/blfdt/src/fdt.c",
       "${bl_iot_sdk_root}/components/stage/blfdt/src/fdt_addresses.c",
@@ -447,7 +449,6 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_mbedtls") {
-
     defines = [ "MBEDTLS_ECP_ALT_KEEP_ORIGINAL=0" ]
     include_dirs =
         [ "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library" ]
@@ -601,8 +602,8 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/dec.c",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/log.c",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/poll.c",
-      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/work_q.c",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/utils.c",
+      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/work_q.c",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/hci_onchip/hci_driver.c",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/host/att.c",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/host/bl_host_assist.c",
@@ -696,7 +697,6 @@ template("bl_iot_sdk") {
       "${openthread_root}/src/core:libopenthread_core_headers",
     ]
   }
-
 
   config("${sdk_target_name}_config_factory_data") {
     include_dirs = [ "${bl_iot_sdk_root}/components/network/matter/matter_factory_data/include" ]

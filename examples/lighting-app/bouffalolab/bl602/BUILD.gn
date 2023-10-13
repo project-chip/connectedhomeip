@@ -110,8 +110,11 @@ bouffalolab_executable("lighting_app") {
   }
 
   defines += [ "CONF_ENABLE_FRAME_PTR=${enable_debug_frame_ptr}" ]
-  defines += [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
-  defines += [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST=${chip_enable_factory_data_test}" ]
+  defines +=
+      [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
+  defines += [
+    "CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST=${chip_enable_factory_data_test}",
+  ]
 
   bl_plat_name = "bl602"
   sources = [
@@ -208,7 +211,6 @@ bouffalolab_executable("lighting_app") {
       "${chip_root}/examples/common/pigweed/bouffalolab",
     ]
   } else if (chip_build_libshell) {
-
     deps += [ "${chip_root}/examples/shell/shell_common:shell_common" ]
 
     include_dirs += [
@@ -221,7 +223,7 @@ bouffalolab_executable("lighting_app") {
   if (enable_heap_monitoring) {
     sources += [ "${examples_plat_dir}/common/plat/MemMonitoring.cpp" ]
   }
-  
+
   cflags_c = [ "-Wno-sign-compare" ]
   ldscript = "${examples_plat_dir}/bl602/ldscripts/flash_rom.ld"
 
