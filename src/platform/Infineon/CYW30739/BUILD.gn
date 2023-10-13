@@ -63,7 +63,10 @@ static_library("CYW30739") {
     ]
   }
 
-  deps = [ "${chip_root}/src/crypto" ]
+  deps = [
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/platform/logging:headers",
+  ]
 
   public = [
     "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",

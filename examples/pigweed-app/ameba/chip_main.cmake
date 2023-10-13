@@ -60,6 +60,7 @@ target_include_directories(
     ${pigweed_dir}/pw_rpc/nanopb/public
 
     ${chip_dir_output}/gen/include
+    ${chip_dir}/third_party/nlassert/repo/include/
 )
 
 target_link_libraries(${chip_main} PUBLIC
