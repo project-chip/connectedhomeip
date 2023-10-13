@@ -318,7 +318,7 @@ private:
     void HandleDisconnect(esp_ble_gatts_cb_param_t * param);
     CHIPoBLEConState * GetConnectionState(uint16_t conId, bool allocate = false);
     bool ReleaseConnectionState(uint16_t conId);
-#if CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#if defined(CONFIG_ENABLE_ESP32_BLE_CONTROLLER) && CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     CHIP_ERROR HandleGAPConnect(esp_ble_gattc_cb_param_t p_data);
     CHIP_ERROR HandleGAPCentralConnect(esp_ble_gattc_cb_param_t p_data);
 
