@@ -23,14 +23,18 @@ config:
     cluster: "Scenes"
     endpoint: 1
     G1:
-        type: int16u
+        type: group_id
         defaultValue: 0x0001
     G2:
-        type: int16u
+        type: group_id
         defaultValue: 0x0002
 
-    GroupKeyManagement.Endpoint: 0
-    Groups.Endpoint: 1
+    GroupKeyManagement.Endpoint: 
+        type: int16u
+        defaultValue: 0
+    Groups.Endpoint: 
+        type: int16u
+        defaultValue: 0
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -1033,7 +1037,7 @@ tests:
       response:
           values:
               - name: "Status"
-                saveAs: StoreStatus
+                saveAs: StoredStatus
                 constraints:
                     anyOf: [0x00, 0x89]
               - name: "GroupID"
@@ -1052,16 +1056,16 @@ tests:
               - name: "Value1"
                 value: 0x00
               - name: "Value2"
-                value: StoreStatus
+                value: StoredStatus
       response:
           - values:
                 - name: "Equals"
-                  saveAs: ContinueTest
+                  saveAs: ContinueStep14
 
     - label:
           "Step 14c: TH sends a GetSceneMembership command to DUT with the
           GroupID field set to G2."
-      runIf: ContinueTest
+      runIf: ContinueStep14
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"
       arguments:
