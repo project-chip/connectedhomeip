@@ -209,10 +209,13 @@ int AppTask::Init()
 
     // Initialize device attestation config
 #ifdef CC13X4_26X4_ATTESTATION_CREDENTIALS
-    //SetDeviceAttestationCredentialsProvider(CC13X4_26X4::GetCC13X4_26X4DacProvider());
+#ifdef CC13XX_26XX_FACTORY_DATA
     SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
     SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
     SetCommissionableDataProvider(&mFactoryDataProvider);
+#else
+    SetDeviceAttestationCredentialsProvider(CC13X4_26X4::GetCC13X4_26X4DacProvider());
+#endif
 #else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif

@@ -49,3 +49,5 @@ matter_software_ver = "0x0001"
 matter_software_ver_str = "1.0d1"
 
 chip_openthread_ftd = false
+
+custom_factory_data = true

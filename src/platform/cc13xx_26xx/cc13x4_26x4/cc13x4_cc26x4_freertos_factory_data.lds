@@ -17,19 +17,20 @@
 
 /**
  * @file
- * Linkerscript for Matter executable with space reserved for the TI BIM.
+ * Linkerscript for a non-OTA Matter executable.
  */
 
-STACKSIZE = 0x800;
+STACKSIZE = 0x2000;
 
 MEMORY
 {
-    FLASH (RX)      : ORIGIN = 0x00000000, LENGTH = 0xFF800
+    FLASH (RX)      : ORIGIN = 0x00000000, LENGTH = 0x000FE800
+    FLASH_FACTORY_DATA (R) : ORIGIN = 0x000FE800, LENGTH = 0x900
     /*
      * Customer Configuration Area and Bootloader Backdoor configuration in
      * flash
      */
-   /* FLASH_CCFG (RX) : ORIGIN = 0x50000000, LENGTH = 0x00000800 */
+    FLASH_CCFG (RX) : ORIGIN = 0x50000000, LENGTH = 0x00000800
     SRAM (RWX)      : ORIGIN = 0x20000000, LENGTH = 0x00040000
     GPRAM (RWX)     : ORIGIN = 0x11000000, LENGTH = 0x00002000
     /* Explicitly placed off target for the storage of logging data.
@@ -42,6 +43,7 @@ MEMORY
 }
 
 REGION_ALIAS("REGION_TEXT", FLASH);
+REGION_ALIAS("REGION_FACTORY_DATA", FLASH_FACTORY_DATA);
 REGION_ALIAS("REGION_BSS", SRAM);
 REGION_ALIAS("REGION_DATA", SRAM);
 REGION_ALIAS("REGION_STACK", SRAM);
@@ -51,17 +53,8 @@ REGION_ALIAS("REGION_ARM_EXIDX", FLASH);
 REGION_ALIAS("REGION_ARM_EXTAB", FLASH);
 
 SECTIONS {
-    /* BIM header placed at the base of flash by default */
-    PROVIDE (_img_header_base_address =
-        DEFINED(_img_header_base_address) ? _img_header_base_address : 0x0);
- 
-    .oad_image_header (_img_header_base_address) : AT (_img_header_base_address) {
-        KEEP (*(.oad_image_header))
-    } > REGION_TEXT
-
-    /* interrupt vectors shifted to accommodate BIM header */
     PROVIDE (_intvecs_base_address =
-        DEFINED(_intvecs_base_address) ? _intvecs_base_address : 0x100);
+        DEFINED(_intvecs_base_address) ? _intvecs_base_address : 0x00);
 
     .resetVecs (_intvecs_base_address) : AT (_intvecs_base_address) {
         KEEP (*(.resetVecs))
@@ -73,6 +66,14 @@ SECTIONS {
     .vtable (_vtable_base_address) (NOLOAD) : {
         KEEP (*(.ramVecs))
     } > REGION_DATA
+
+    /* Define base address for the DAC arrays and struct */
+    PROVIDE (_factory_data_base_address =
+        DEFINED(_factory_data_base_address) ? _factory_data_base_address : 0xFE800);
+
+    .factory_data(_factory_data_base_address) : AT (_factory_data_base_address) {
+        KEEP (*(.factory_data_struct))
+    } > REGION_FACTORY_DATA 
 
     /*
      * UDMACC26XX_CONFIG_BASE below must match UDMACC26XX_CONFIG_BASE defined
@@ -221,17 +222,15 @@ SECTIONS {
     /* End of executable code/data, NVS is not part of the OTA image */
     PROVIDE (_flash_end_address = .);
 
-    /* Two pages of NV Memory (0x800 each) offset by 1 page for BIM/CCFG */
-    .nvs (0xFE800) (NOLOAD) : AT (0xFE800) ALIGN(0x2000) {
+    /* 5 pages of NV Memory (0x800 each) offset by 1 page for BIM/CCFG */
+    /*.nvs (NOLOAD) : ALIGN(0x2000) { */
+    .nvs (0xFB000) (NOLOAD) : AT (0xFB000) ALIGN(0x800) {
         *(.nvs)
     } > REGION_TEXT
 
-    /* CCFG is supplied by the BIM project */
-    /*
     .ccfg : {
         KEEP (*(.ccfg))
     } > FLASH_CCFG AT> FLASH_CCFG
-    */
 
     .bss : {
         __bss_start__ = .;

@@ -16,6 +16,8 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
+import("../factory_data_config.gni")
+
 assert(chip_device_platform == "cc13x2_26x2")
 
 if (chip_enable_openthread) {
@@ -32,8 +34,6 @@ static_library("cc13x2_26x2") {
     "../ConnectivityManagerImpl.cpp",
     "../DiagnosticDataProviderImpl.cpp",
     "../DiagnosticDataProviderImpl.h",
-    "../FactoryDataProvider.cpp",
-    "../FactoryDataProvider.h",
     "../KeyValueStoreManagerImpl.cpp",
     "../Logging.cpp",
     "../PlatformManagerImpl.cpp",
@@ -64,6 +64,12 @@ static_library("cc13x2_26x2") {
     ]
   }
 
+  if (custom_factory_data) {
+    sources += [
+      "../FactoryDataProvider.cpp",
+      "../FactoryDataProvider.h",
+    ]
+  }
   if (chip_enable_ota_requestor) {
     sources += [
       # this needs to be in the final link to place the data correctly

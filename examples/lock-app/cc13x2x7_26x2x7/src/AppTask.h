@@ -30,6 +30,10 @@
 
 #include <ti/drivers/apps/Button.h>
 
+#ifdef CC13XX_26XX_FACTORY_DATA
+#include <platform/cc13xx_26xx/FactoryDataProvider.h>
+#endif
+
 // Application-defined error codes in the CHIP_ERROR space.
 #define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)
 #define APP_ERROR_CREATE_TASK_FAILED CHIP_APPLICATION_ERROR(0x02)
@@ -84,6 +88,10 @@ private:
     bool mSyncClusterToButtonAction;
 
     static AppTask sAppTask;
+
+#ifdef CC13XX_26XX_FACTORY_DATA
+    chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
+#endif
 };
 
 inline AppTask & GetAppTask(void)

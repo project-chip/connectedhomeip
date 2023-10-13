@@ -210,14 +210,16 @@ int AppTask::Init()
 
     // Initialize device attestation config
 #ifdef CC13X2_26X2_ATTESTATION_CREDENTIALS
-    //SetDeviceAttestationCredentialsProvider(CC13X2_26X2::GetCC13X2_26X2DacProvider());
+#ifdef CC13XX_26XX_FACTORY_DATA
     SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
     SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
     SetCommissionableDataProvider(&mFactoryDataProvider);
 #else
+    SetDeviceAttestationCredentialsProvider(CC13X2_26X2::GetCC13X2_26X2DacProvider());
+#endif
+#else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
-    PLAT_LOG("set factorydataprovider");
 
     // Initialize Pump module
     PLAT_LOG("Initialize Pump");
@@ -239,7 +241,7 @@ int AppTask::Init()
     char buf[32] ={0};
     mFactoryDataProvider.GetVendorName(buf, 32);
     mFactoryDataProvider.GetHardwareVersionString(buf, 32);
-    //mFactoryDataProvider.GetRotatingDeviceIdUniqueId(buf);
+
     uint32_t iterationCount;
     mFactoryDataProvider.GetSpake2pIterationCount(iterationCount);
 

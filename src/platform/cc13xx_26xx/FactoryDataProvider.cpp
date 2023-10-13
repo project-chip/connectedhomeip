@@ -251,7 +251,6 @@ CHIP_ERROR FactoryDataProvider::GetVendorName(char * buf, size_t bufSize)
 CHIP_ERROR FactoryDataProvider::GetVendorId(uint16_t & vendorId)
 {
     ReturnErrorCodeIf(!mFactoryData.vendor_id.data, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
-    ChipLogProgress(DeviceLayer, "fetching vendor id");
     memcpy(&vendorId,mFactoryData.vendor_id.data, mFactoryData.vendor_id.len);
     return CHIP_NO_ERROR;
 }
