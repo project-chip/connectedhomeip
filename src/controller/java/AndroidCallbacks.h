@@ -25,6 +25,7 @@
 #include <lib/core/CHIPError.h>
 #include <list>
 #include <utility>
+#include <lib/support/JniTypeWrappers.h>
 
 namespace chip {
 namespace Controller {
@@ -42,8 +43,8 @@ struct GetConnectedDeviceCallback
 
     Callback::Callback<OnDeviceConnected> mOnSuccess;
     Callback::Callback<OnDeviceConnectionFailure> mOnFailure;
-    jobject mWrapperCallbackRef = nullptr;
-    jobject mJavaCallbackRef    = nullptr;
+    JniGlobalReference mWrapperCallbackRef;
+    JniGlobalReference mJavaCallbackRef;
 };
 
 struct ReportCallback : public app::ClusterStateCache::Callback
@@ -83,12 +84,12 @@ struct ReportCallback : public app::ClusterStateCache::Callback
     app::ReadClient * mReadClient = nullptr;
 
     app::ClusterStateCache mClusterCacheAdapter;
-    jobject mWrapperCallbackRef                 = nullptr;
-    jobject mSubscriptionEstablishedCallbackRef = nullptr;
-    jobject mResubscriptionAttemptCallbackRef   = nullptr;
-    jobject mReportCallbackRef                  = nullptr;
+    JniGlobalReference mWrapperCallbackRef;
+    JniGlobalReference mSubscriptionEstablishedCallbackRef;
+    JniGlobalReference mResubscriptionAttemptCallbackRef;
+    JniGlobalReference mReportCallbackRef;
     // NodeState Java object that will be returned to the application.
-    jobject mNodeStateObj = nullptr;
+    JniGlobalReference mNodeStateObj;
 };
 
 struct WriteAttributesCallback : public app::WriteClient::Callback
@@ -110,8 +111,8 @@ struct WriteAttributesCallback : public app::WriteClient::Callback
 
     app::WriteClient * mWriteClient = nullptr;
     app::ChunkedWriteCallback mChunkedWriteCallback;
-    jobject mWrapperCallbackRef = nullptr;
-    jobject mJavaCallbackRef    = nullptr;
+    JniGlobalReference mWrapperCallbackRef;
+    JniGlobalReference mJavaCallbackRef;
 };
 
 struct InvokeCallback : public app::CommandSender::Callback
@@ -132,8 +133,8 @@ struct InvokeCallback : public app::CommandSender::Callback
     void ReportError(const char * message, ChipError::StorageType errorCode);
 
     app::CommandSender * mCommandSender = nullptr;
-    jobject mWrapperCallbackRef         = nullptr;
-    jobject mJavaCallbackRef            = nullptr;
+    JniGlobalReference mWrapperCallbackRef;
+    JniGlobalReference mJavaCallbackRef;
 };
 
 } // namespace Controller

@@ -26,7 +26,6 @@
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
-#include <lib/support/JniTypeWrappers.h>
 #include <lib/support/jsontlv/JsonToTlv.h>
 #include <lib/support/jsontlv/TlvToJson.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -74,29 +73,11 @@ CHIP_ERROR ReportCallback::CreateChipEventPath(JNIEnv * env, const app::Concrete
 GetConnectedDeviceCallback::GetConnectedDeviceCallback(jobject wrapperCallback, jobject javaCallback) :
     mOnSuccess(OnDeviceConnectedFn, this), mOnFailure(OnDeviceConnectionFailureFn, this)
 {
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
-    mWrapperCallbackRef = env->NewGlobalRef(wrapperCallback);
-    if (mWrapperCallbackRef == nullptr)
-    {
-        ChipLogError(Controller, "Could not create global reference for Java callback");
-    }
-    mJavaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (mJavaCallbackRef == nullptr)
-    {
-        ChipLogError(Controller, "Could not create global reference for Java callback");
-    }
+    VerifyOrReturn(mWrapperCallbackRef.Init(wrapperCallback) == CHIP_NO_ERROR, ChipLogError(Controller, "Could not init mWrapperCallbackRef in %s",  __func__));
+    VerifyOrReturn(mJavaCallbackRef.Init(javaCallback) == CHIP_NO_ERROR, ChipLogError(Controller, "Could not init mJavaCallbackRef in %s",  __func__));
 }
 
-GetConnectedDeviceCallback::~GetConnectedDeviceCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
-    if (mJavaCallbackRef != nullptr)
-    {
-        env->DeleteGlobalRef(mJavaCallbackRef);
-    }
-}
+GetConnectedDeviceCallback::~GetConnectedDeviceCallback() {}
 
 void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, Messaging::ExchangeManager & exchangeMgr,
                                                      const SessionHandle & sessionHandle)
@@ -104,11 +85,14 @@ void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, Messaging::
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
     auto * self          = static_cast<GetConnectedDeviceCallback *>(context);
-    jobject javaCallback = self->mJavaCallbackRef;
+    VerifyOrReturn(self->mJavaCallbackRef.HasValidObjectRef(),
+        ChipLogError(Controller, "mJavaCallbackRef is not valid in %s",  __func__));
+    jobject javaCallback = self->mJavaCallbackRef.ObjectRef();
     JniLocalReferenceManager manager(env);
     // Release wrapper's global ref so application can clean up the actual callback underneath.
-    VerifyOrReturn(self->mWrapperCallbackRef != nullptr, ChipLogError(Controller, "mWrapperCallbackRef is null"));
-    JniObject wrapper(env, self->mWrapperCallbackRef);
+    VerifyOrReturn(self->mWrapperCallbackRef.HasValidObjectRef(),
+        ChipLogError(Controller, "mWrapperCallbackRef is not valid in %s",  __func__));
+    JniGlobalReference globalRef(std::move(self->mWrapperCallbackRef));
 
     jclass getConnectedDeviceCallbackCls = nullptr;
     JniReferences::GetInstance().GetLocalClassRef(
@@ -133,7 +117,9 @@ void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, con
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
     auto * self          = static_cast<GetConnectedDeviceCallback *>(context);
-    jobject javaCallback = self->mJavaCallbackRef;
+    VerifyOrReturn(self->mJavaCallbackRef.HasValidObjectRef(),
+        ChipLogError(Controller, "mJavaCallbackRef is not valid in %s",  __func__));
+    jobject javaCallback = self->mJavaCallbackRef.ObjectRef();
     JniLocalReferenceManager manager(env);
 
     jclass getConnectedDeviceCallbackCls = nullptr;
@@ -167,54 +153,20 @@ ReportCallback::ReportCallback(jobject wrapperCallback, jobject subscriptionEsta
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
     if (subscriptionEstablishedCallback != nullptr)
     {
-        mSubscriptionEstablishedCallbackRef = env->NewGlobalRef(subscriptionEstablishedCallback);
-        if (mSubscriptionEstablishedCallbackRef == nullptr)
-        {
-            ChipLogError(Controller, "Could not create global reference for Java callback");
-        }
+        VerifyOrReturn(mSubscriptionEstablishedCallbackRef.Init(subscriptionEstablishedCallback) == CHIP_NO_ERROR, ChipLogError(Controller, "Could not init mSubscriptionEstablishedCallbackRef in %s",  __func__));
     }
-    mReportCallbackRef = env->NewGlobalRef(reportCallback);
-    if (mReportCallbackRef == nullptr)
-    {
-        ChipLogError(Controller, "Could not create global reference for Java callback");
-    }
-    mWrapperCallbackRef = env->NewGlobalRef(wrapperCallback);
-    if (mWrapperCallbackRef == nullptr)
-    {
-        ChipLogError(Controller, "Could not create global reference for Java callback");
-    }
+
+    VerifyOrReturn(mReportCallbackRef.Init(reportCallback) == CHIP_NO_ERROR, ChipLogError(Controller, "Could not init mReportCallbackRef in %s",  __func__));
+    VerifyOrReturn(mWrapperCallbackRef.Init(wrapperCallback) == CHIP_NO_ERROR, ChipLogError(Controller, "Could not init mWrapperCallbackRef in %s",  __func__));
+
     if (resubscriptionAttemptCallback != nullptr)
     {
-        mResubscriptionAttemptCallbackRef = env->NewGlobalRef(resubscriptionAttemptCallback);
-        if (mResubscriptionAttemptCallbackRef == nullptr)
-        {
-            ChipLogError(Controller, "Could not create global reference for Java callback");
-        }
+        VerifyOrReturn(mResubscriptionAttemptCallbackRef.Init(resubscriptionAttemptCallback) == CHIP_NO_ERROR, ChipLogError(Controller, "Could not init mResubscriptionAttemptCallbackRef in %s",  __func__));
     }
 }
 
 ReportCallback::~ReportCallback()
 {
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
-    if (mSubscriptionEstablishedCallbackRef != nullptr)
-    {
-        env->DeleteGlobalRef(mSubscriptionEstablishedCallbackRef);
-        mSubscriptionEstablishedCallbackRef = nullptr;
-    }
-
-    if (mReportCallbackRef != nullptr)
-    {
-        env->DeleteGlobalRef(mReportCallbackRef);
-        mReportCallbackRef = nullptr;
-    }
-
-    if (mResubscriptionAttemptCallbackRef != nullptr)
-    {
-        env->DeleteGlobalRef(mResubscriptionAttemptCallbackRef);
-        mResubscriptionAttemptCallbackRef = nullptr;
-    }
-
     if (mReadClient != nullptr)
     {
         Platform::Delete(mReadClient);
@@ -233,8 +185,7 @@ void ReportCallback::OnReportBegin()
     VerifyOrReturn(nodeStateCtor != nullptr, ChipLogError(Controller, "Could not find NodeState constructor"));
     jobject nodeState = env->NewObject(nodeStateCls, nodeStateCtor);
     VerifyOrReturn(nodeState != nullptr, ChipLogError(Controller, "Could not create local object for nodeState"));
-    mNodeStateObj = env->NewGlobalRef(nodeState);
-    VerifyOrReturn(mNodeStateObj != nullptr, ChipLogError(Controller, "Could not create glboal reference for mNodeStateObj"));
+    VerifyOrReturn(mNodeStateObj.Init(nodeState) == CHIP_NO_ERROR, ChipLogError(Controller, "Could not init mNodeStateObj in %s",  __func__));
 }
 
 void ReportCallback::OnDeallocatePaths(app::ReadPrepareParams && aReadPrepareParams)
@@ -259,18 +210,16 @@ void ReportCallback::OnReportEnd()
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
     JniLocalReferenceManager manager(env);
-
-    jobject nodeStateObj = env->NewLocalRef(mNodeStateObj);
-    env->DeleteGlobalRef(mNodeStateObj);
-    mNodeStateObj = nullptr;
-    VerifyOrReturn(nodeStateObj != nullptr, ChipLogError(Controller, "Could not create local reference for nodeStateObj"));
+    VerifyOrReturn(mReportCallbackRef.HasValidObjectRef(), ChipLogError(Controller, "mReportCallbackRef is not valid in %s",  __func__));
+    jobject reportCallback = mReportCallbackRef.ObjectRef();
+    JniGlobalReference globalRef(std::move(mNodeStateObj));
     jmethodID onReportMethod;
-    err = JniReferences::GetInstance().FindMethod(env, mReportCallbackRef, "onReport", "(Lchip/devicecontroller/model/NodeState;)V",
+    err = JniReferences::GetInstance().FindMethod(env, reportCallback, "onReport", "(Lchip/devicecontroller/model/NodeState;)V",
                                                   &onReportMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onReport method"));
 
     DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mReportCallbackRef, onReportMethod, nodeStateObj);
+    env->CallVoidMethod(reportCallback, onReportMethod, globalRef.ObjectRef());
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
@@ -381,12 +330,13 @@ void ReportCallback::OnAttributeData(const app::ConcreteDataAttributePath & aPat
         env->NewObject(attributeStateCls, attributeStateCtor, value, jniByteArray.jniValue(), jsonString.jniValue());
     VerifyOrReturn(attributeStateObj != nullptr, ChipLogError(Controller, "Could not create AttributeState object"));
 
+    jobject nodeState = mNodeStateObj.ObjectRef();
     // Add AttributeState to NodeState
     jmethodID addAttributeMethod;
-    err = JniReferences::GetInstance().FindMethod(env, mNodeStateObj, "addAttribute",
+    err = JniReferences::GetInstance().FindMethod(env, nodeState, "addAttribute",
                                                   "(IJJLchip/devicecontroller/model/AttributeState;)V", &addAttributeMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find addAttribute method"));
-    env->CallVoidMethod(mNodeStateObj, addAttributeMethod, static_cast<jint>(aPath.mEndpointId),
+    env->CallVoidMethod(nodeState, addAttributeMethod, static_cast<jint>(aPath.mEndpointId),
                         static_cast<jlong>(aPath.mClusterId), static_cast<jlong>(aPath.mAttributeId), attributeStateObj);
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 
@@ -419,11 +369,13 @@ void ReportCallback::UpdateClusterDataVersion()
         return;
     }
 
+    jobject nodeState = mNodeStateObj.ObjectRef();
+
     // SetDataVersion to NodeState
     jmethodID setDataVersionMethod;
-    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, mNodeStateObj, "setDataVersion", "(IJJ)V", &setDataVersionMethod);
+    CHIP_ERROR err = JniReferences::GetInstance().FindMethod(env, nodeState, "setDataVersion", "(IJJ)V", &setDataVersionMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find setDataVersion method"));
-    env->CallVoidMethod(mNodeStateObj, setDataVersionMethod, static_cast<jint>(lastConcreteClusterPath.mEndpointId),
+    env->CallVoidMethod(nodeState, setDataVersionMethod, static_cast<jint>(lastConcreteClusterPath.mEndpointId),
                         static_cast<jlong>(lastConcreteClusterPath.mClusterId), static_cast<jlong>(committedDataVersion.Value()));
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
@@ -514,10 +466,11 @@ void ReportCallback::OnEventData(const app::EventHeader & aEventHeader, TLV::TLV
 
     // Add EventState to NodeState
     jmethodID addEventMethod;
-    err = JniReferences::GetInstance().FindMethod(env, mNodeStateObj, "addEvent", "(IJJLchip/devicecontroller/model/EventState;)V",
+    jobject nodeState = mNodeStateObj.ObjectRef();
+    err = JniReferences::GetInstance().FindMethod(env, nodeState, "addEvent", "(IJJLchip/devicecontroller/model/EventState;)V",
                                                   &addEventMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find addEvent method"));
-    env->CallVoidMethod(mNodeStateObj, addEventMethod, static_cast<jint>(aEventHeader.mPath.mEndpointId),
+    env->CallVoidMethod(nodeState, addEventMethod, static_cast<jint>(aEventHeader.mPath.mEndpointId),
                         static_cast<jlong>(aEventHeader.mPath.mClusterId), static_cast<jlong>(aEventHeader.mPath.mEventId),
                         eventStateObj);
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
@@ -591,10 +544,12 @@ void ReportCallback::OnDone(app::ReadClient *)
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
     JniLocalReferenceManager manager(env);
-    VerifyOrReturn(mWrapperCallbackRef != nullptr, ChipLogError(Controller, "mWrapperCallbackRef is null"));
-    JniObject wrapper(env, mWrapperCallbackRef);
+    VerifyOrReturn(mWrapperCallbackRef.HasValidObjectRef(), ChipLogError(Controller, "mWrapperCallbackRef is not valid in %s",  __func__));
+    JniGlobalReference globalRef(std::move(mWrapperCallbackRef));
     jmethodID onDoneMethod;
-    err = JniReferences::GetInstance().FindMethod(env, mReportCallbackRef, "onDone", "()V", &onDoneMethod);
+    VerifyOrReturn(mReportCallbackRef.HasValidObjectRef(), ChipLogError(Controller, "mReportCallbackRef is not valid in %s",  __func__));
+    jobject reportCallback = mReportCallbackRef.ObjectRef();
+    err = JniReferences::GetInstance().FindMethod(env, reportCallback, "onDone", "()V", &onDoneMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onDone method"));
 
     if (mReadClient != nullptr)
@@ -604,7 +559,7 @@ void ReportCallback::OnDone(app::ReadClient *)
     mReadClient = nullptr;
 
     DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mReportCallbackRef, onDoneMethod);
+    env->CallVoidMethod(reportCallback, onDoneMethod);
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
@@ -614,23 +569,24 @@ void ReportCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId)
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
     JniLocalReferenceManager manager(env);
     DeviceLayer::StackUnlock unlock;
-    JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef, aSubscriptionId);
+    VerifyOrReturn(mSubscriptionEstablishedCallbackRef.HasValidObjectRef(), ChipLogError(Controller," mSubscriptionEstablishedCallbackRef is not valid in %s",  __func__));
+    JniReferences::GetInstance().CallSubscriptionEstablished(mSubscriptionEstablishedCallbackRef.ObjectRef(), aSubscriptionId);
 }
 
 CHIP_ERROR ReportCallback::OnResubscriptionNeeded(app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause)
 {
-    VerifyOrReturnLogError(mResubscriptionAttemptCallbackRef != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturnError(env != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
     ReturnErrorOnFailure(app::ReadClient::Callback::OnResubscriptionNeeded(apReadClient, aTerminationCause));
     JniLocalReferenceManager manager(env);
     jmethodID onResubscriptionAttemptMethod;
+    VerifyOrReturnLogError(mResubscriptionAttemptCallbackRef.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    jobject resubscriptionAttemptCallbackRef = mResubscriptionAttemptCallbackRef.ObjectRef();
     ReturnLogErrorOnFailure(JniReferences::GetInstance().FindMethod(
-        env, mResubscriptionAttemptCallbackRef, "onResubscriptionAttempt", "(JJ)V", &onResubscriptionAttemptMethod));
+        env, resubscriptionAttemptCallbackRef, "onResubscriptionAttempt", "(JJ)V", &onResubscriptionAttemptMethod));
 
     DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mResubscriptionAttemptCallbackRef, onResubscriptionAttemptMethod,
+    env->CallVoidMethod(resubscriptionAttemptCallbackRef, onResubscriptionAttemptMethod,
                         static_cast<jlong>(aTerminationCause.AsInteger()),
                         static_cast<jlong>(apReadClient->ComputeTimeTillNextSubscription()));
     VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
@@ -654,7 +610,8 @@ void ReportCallback::ReportError(jobject attributePath, jobject eventPath, const
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
     JniLocalReferenceManager manager(env);
-    ChipLogError(Controller, "ReportCallback::ReportError is called with %u", errorCode);
+    VerifyOrReturn(mReportCallbackRef.HasValidObjectRef(), ChipLogError(Controller, "mReportCallbackRef is not valid in %s",  __func__));
+    jobject reportCallback = mReportCallbackRef.ObjectRef();
     jthrowable exception;
     err = AndroidControllerExceptions::GetInstance().CreateAndroidControllerException(env, message, errorCode, exception);
     VerifyOrReturn(
@@ -662,46 +619,24 @@ void ReportCallback::ReportError(jobject attributePath, jobject eventPath, const
         ChipLogError(Controller, "Unable to create AndroidControllerException on ReportCallback::ReportError: %s", ErrorStr(err)));
     jmethodID onErrorMethod;
     err = JniReferences::GetInstance().FindMethod(
-        env, mReportCallbackRef, "onError",
+        env, reportCallback, "onError",
         "(Lchip/devicecontroller/model/ChipAttributePath;Lchip/devicecontroller/model/ChipEventPath;Ljava/lang/Exception;)V",
         &onErrorMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onError method: %s", ErrorStr(err)));
 
     DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mReportCallbackRef, onErrorMethod, attributePath, eventPath, exception);
+    env->CallVoidMethod(reportCallback, onErrorMethod, attributePath, eventPath, exception);
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
 WriteAttributesCallback::WriteAttributesCallback(jobject wrapperCallback, jobject javaCallback) : mChunkedWriteCallback(this)
 {
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
-
-    mWrapperCallbackRef = env->NewGlobalRef(wrapperCallback);
-    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
-    if (mWrapperCallbackRef == nullptr)
-    {
-        ChipLogError(Controller, "Could not create global reference for Wrapper WriteAttributesCallback");
-        return;
-    }
-    mJavaCallbackRef = env->NewGlobalRef(javaCallback);
-    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
-    if (mJavaCallbackRef == nullptr)
-    {
-        ChipLogError(Controller, "Could not create global reference for Java WriteAttributesCallback");
-    }
+    VerifyOrReturn(mWrapperCallbackRef.Init(wrapperCallback) == CHIP_NO_ERROR, ChipLogError(Controller, "Could not init mWrapperCallbackRef for WriteAttributesCallback"));
+    VerifyOrReturn(mJavaCallbackRef.Init(javaCallback) == CHIP_NO_ERROR, ChipLogError(Controller, "Could not init mJavaCallbackRef in %s",  __func__));
 }
 
 WriteAttributesCallback::~WriteAttributesCallback()
 {
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
-    if (mJavaCallbackRef != nullptr)
-    {
-        env->DeleteGlobalRef(mJavaCallbackRef);
-        mJavaCallbackRef = nullptr;
-    }
-
     if (mWriteClient != nullptr)
     {
         Platform::Delete(mWriteClient);
@@ -727,12 +662,15 @@ void WriteAttributesCallback::OnResponse(const app::WriteClient * apWriteClient,
     }
 
     jmethodID onResponseMethod;
-    err = JniReferences::GetInstance().FindMethod(env, mJavaCallbackRef, "onResponse",
+    VerifyOrReturn(mJavaCallbackRef.HasValidObjectRef(),
+        ChipLogError(Controller, "mJavaCallbackRef is not valid in %s",  __func__));
+    jobject javaCallback = mJavaCallbackRef.ObjectRef();
+    err = JniReferences::GetInstance().FindMethod(env, javaCallback, "onResponse",
                                                   "(Lchip/devicecontroller/model/ChipAttributePath;)V", &onResponseMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onError method: %s", ErrorStr(err)));
 
     DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mJavaCallbackRef, onResponseMethod, attributePathObj);
+    env->CallVoidMethod(javaCallback, onResponseMethod, attributePathObj);
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
@@ -747,14 +685,17 @@ void WriteAttributesCallback::OnDone(app::WriteClient *)
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
     JniLocalReferenceManager manager(env);
-    VerifyOrReturn(mWrapperCallbackRef != nullptr, ChipLogError(Controller, "mWrapperCallbackRef is null"));
-    JniObject wrapper(env, mWrapperCallbackRef);
+    VerifyOrReturn(mWrapperCallbackRef.HasValidObjectRef(), ChipLogError(Controller, "mWrapperCallbackRef is not valid in %s",  __func__));
+    JniGlobalReference globalRef(std::move(mWrapperCallbackRef));
     jmethodID onDoneMethod;
-    err = JniReferences::GetInstance().FindMethod(env, mJavaCallbackRef, "onDone", "()V", &onDoneMethod);
+    VerifyOrReturn(mJavaCallbackRef.HasValidObjectRef(),
+        ChipLogError(Controller, "mJavaCallbackRef is not valid in %s",  __func__));
+    jobject javaCallback = mJavaCallbackRef.ObjectRef();
+    err = JniReferences::GetInstance().FindMethod(env, javaCallback, "onDone", "()V", &onDoneMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onDone method"));
 
     DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mJavaCallbackRef, onDoneMethod);
+    env->CallVoidMethod(javaCallback, onDoneMethod);
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
@@ -782,45 +723,27 @@ void WriteAttributesCallback::ReportError(jobject attributePath, const char * me
                                 "Unable to create AndroidControllerException on WriteAttributesCallback::ReportError: %s",
                                 ErrorStr(err)));
     jmethodID onErrorMethod;
-    err = JniReferences::GetInstance().FindMethod(env, mJavaCallbackRef, "onError",
+    VerifyOrReturn(mJavaCallbackRef.HasValidObjectRef(),
+        ChipLogError(Controller, "mJavaCallbackRef is not valid in %s",  __func__));
+    jobject javaCallback = mJavaCallbackRef.ObjectRef();
+    err = JniReferences::GetInstance().FindMethod(env, javaCallback, "onError",
                                                   "(Lchip/devicecontroller/model/ChipAttributePath;Ljava/lang/Exception;)V",
                                                   &onErrorMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onError method: %s", ErrorStr(err)));
 
     DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mJavaCallbackRef, onErrorMethod, attributePath, exception);
+    env->CallVoidMethod(javaCallback, onErrorMethod, attributePath, exception);
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
 InvokeCallback::InvokeCallback(jobject wrapperCallback, jobject javaCallback)
 {
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
-    mWrapperCallbackRef = env->NewGlobalRef(wrapperCallback);
-    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
-    if (mWrapperCallbackRef == nullptr)
-    {
-        ChipLogError(Controller, "Could not create global reference for Wrapper InvokeCallback");
-        return;
-    }
-    mJavaCallbackRef = env->NewGlobalRef(javaCallback);
-    VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
-    if (mJavaCallbackRef == nullptr)
-    {
-        ChipLogError(Controller, "Could not create global reference for Java InvokeCallback");
-    }
+    VerifyOrReturn(mWrapperCallbackRef.Init(wrapperCallback) == CHIP_NO_ERROR, ChipLogError(Controller, "Could not init mWrapperCallbackRef for InvokeCallback"));
+    VerifyOrReturn(mJavaCallbackRef.Init(javaCallback) == CHIP_NO_ERROR, ChipLogError(Controller, "Could not init mJavaCallbackRef in %s",  __func__));
 }
 
 InvokeCallback::~InvokeCallback()
 {
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
-    if (mJavaCallbackRef != nullptr)
-    {
-        env->DeleteGlobalRef(mJavaCallbackRef);
-        mJavaCallbackRef = nullptr;
-    }
-
     if (mCommandSender != nullptr)
     {
         Platform::Delete(mCommandSender);
@@ -838,19 +761,22 @@ void InvokeCallback::OnResponse(app::CommandSender * apCommandSender, const app:
     JniLocalReferenceManager manager(env);
     err = CreateInvokeElement(env, aPath, apData, invokeElementObj);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to create Java InvokeElement: %s", ErrorStr(err)));
-    err = JniReferences::GetInstance().FindMethod(env, mJavaCallbackRef, "onResponse",
+    VerifyOrReturn(mJavaCallbackRef.HasValidObjectRef(),
+        ChipLogError(Controller, "mJavaCallbackRef is not valid in %s",  __func__));
+    jobject javaCallback = mJavaCallbackRef.ObjectRef();
+    err = JniReferences::GetInstance().FindMethod(env, javaCallback, "onResponse",
                                                   "(Lchip/devicecontroller/model/InvokeElement;J)V", &onResponseMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onResponse method: %s", ErrorStr(err)));
 
     DeviceLayer::StackUnlock unlock;
     if (aStatusIB.mClusterStatus.HasValue())
     {
-        env->CallVoidMethod(mJavaCallbackRef, onResponseMethod, invokeElementObj,
+        env->CallVoidMethod(javaCallback, onResponseMethod, invokeElementObj,
                             static_cast<jlong>(aStatusIB.mClusterStatus.Value()));
     }
     else
     {
-        env->CallVoidMethod(mJavaCallbackRef, onResponseMethod, invokeElementObj,
+        env->CallVoidMethod(javaCallback, onResponseMethod, invokeElementObj,
                             static_cast<jlong>(Protocols::InteractionModel::Status::Success));
     }
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
@@ -867,14 +793,17 @@ void InvokeCallback::OnDone(app::CommandSender * apCommandSender)
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     VerifyOrReturn(env != nullptr, ChipLogError(Controller, "Could not get JNIEnv for current thread"));
     JniLocalReferenceManager manager(env);
-    VerifyOrReturn(mWrapperCallbackRef != nullptr, ChipLogError(Controller, "mWrapperCallbackRef is null"));
-    JniObject wrapper(env, mWrapperCallbackRef);
+    VerifyOrReturn(mWrapperCallbackRef.HasValidObjectRef(), ChipLogError(Controller, "mWrapperCallbackRef is not valid in %s",  __func__));
+    JniGlobalReference globalRef(std::move(mWrapperCallbackRef));
     jmethodID onDoneMethod;
-    err = JniReferences::GetInstance().FindMethod(env, mJavaCallbackRef, "onDone", "()V", &onDoneMethod);
+    VerifyOrReturn(mJavaCallbackRef.HasValidObjectRef(),
+        ChipLogError(Controller, "mJavaCallbackRef is not valid in %s",  __func__));
+    jobject javaCallback = mJavaCallbackRef.ObjectRef();
+    err = JniReferences::GetInstance().FindMethod(env, javaCallback, "onDone", "()V", &onDoneMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Could not find onDone method"));
 
     DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mJavaCallbackRef, onDoneMethod);
+    env->CallVoidMethod(javaCallback, onDoneMethod);
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
@@ -902,11 +831,14 @@ void InvokeCallback::ReportError(const char * message, ChipError::StorageType er
         ChipLogError(Controller, "Unable to create AndroidControllerException: %s on InvokeCallback::ReportError", ErrorStr(err)));
 
     jmethodID onErrorMethod;
-    err = JniReferences::GetInstance().FindMethod(env, mJavaCallbackRef, "onError", "(Ljava/lang/Exception;)V", &onErrorMethod);
+    VerifyOrReturn(mJavaCallbackRef.HasValidObjectRef(),
+        ChipLogError(Controller, "mJavaCallbackRef is not valid in %s",  __func__));
+    jobject javaCallback = mJavaCallbackRef.ObjectRef();
+    err = JniReferences::GetInstance().FindMethod(env, javaCallback, "onError", "(Ljava/lang/Exception;)V", &onErrorMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Unable to find onError method: %s", ErrorStr(err)));
 
     DeviceLayer::StackUnlock unlock;
-    env->CallVoidMethod(mJavaCallbackRef, onErrorMethod, exception);
+    env->CallVoidMethod(javaCallback, onErrorMethod, exception);
     VerifyOrReturn(!env->ExceptionCheck(), env->ExceptionDescribe());
 }
 
