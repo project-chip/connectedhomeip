@@ -59,25 +59,49 @@ CHIP_ERROR ManualDishWasherAlarmCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR ManualDishWasherAlarmSetRaiseCommandHandler(int argc, char ** argv)
 {
+    if (argc != 0)
+    {
+        return ManualDishWasherAlarmCommandHelpHandler(argc, argv);
+    }
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     EmberAfStatus status;
     DishwasherAlarmServer & serverInstance = DishwasherAlarmServer::Instance();
 
-    status = serverInstance.SetSupportedValue(1, 47);
+    BitMask<AlarmMap> supported;                       // Set dishwasher alarm supported value
+    supported.SetField(AlarmMap::kInflowError, 1);     // 0x01, 1
+    supported.SetField(AlarmMap::kDrainError, 1);      // 0x02, 2
+    supported.SetField(AlarmMap::kDoorError, 1);       // 0x04, 4
+    supported.SetField(AlarmMap::kTempTooLow, 1);      // 0x08, 8
+    supported.SetField(AlarmMap::kWaterLevelError, 1); // 0x20, 32
+
+    BitMask<AlarmMap> mask;                       // Set dishwasher alarm mask value
+    mask.SetField(AlarmMap::kInflowError, 1);     // 0x01, 1
+    mask.SetField(AlarmMap::kDrainError, 1);      // 0x02, 2
+    mask.SetField(AlarmMap::kDoorError, 1);       // 0x04, 4
+    mask.SetField(AlarmMap::kTempTooLow, 1);      // 0x08, 8
+    mask.SetField(AlarmMap::kWaterLevelError, 1); // 0x20, 32
+
+    BitMask<AlarmMap> state;                  // Set dishwasher alarm state value
+    state.SetField(AlarmMap::kDrainError, 1); // 0x02, 2
+    state.SetField(AlarmMap::kDoorError, 1);  // 0x04, 4
+    state.SetField(AlarmMap::kTempTooLow, 1); // 0x08, 8
+
+    status = serverInstance.SetSupportedValue(1, supported); // 0x2F, 47
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
-    status = serverInstance.SetMaskValue(1, 47);
+    status = serverInstance.SetMaskValue(1, mask); // 0x2F, 47
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
-    status = serverInstance.SetStateValue(1, 14, 0);
+    status = serverInstance.SetStateValue(1, state); // 0x0E, 14
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         err = CHIP_ERROR_INTERNAL;
@@ -94,25 +118,44 @@ exit:
 
 CHIP_ERROR ManualDishWasherAlarmSetLowerCommandHandler(int argc, char ** argv)
 {
+    if (argc != 0)
+    {
+        return ManualDishWasherAlarmCommandHelpHandler(argc, argv);
+    }
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     EmberAfStatus status;
     DishwasherAlarmServer & serverInstance = DishwasherAlarmServer::Instance();
 
-    status = serverInstance.SetSupportedValue(1, 47);
+    BitMask<AlarmMap> supported;                       // Set dishwasher alarm supported value
+    supported.SetField(AlarmMap::kInflowError, 1);     // 0x01, 1
+    supported.SetField(AlarmMap::kDrainError, 1);      // 0x02, 2
+    supported.SetField(AlarmMap::kDoorError, 1);       // 0x04, 4
+    supported.SetField(AlarmMap::kTempTooLow, 1);      // 0x08, 8
+    supported.SetField(AlarmMap::kWaterLevelError, 1); // 0x20, 32
+
+    BitMask<AlarmMap> mask;                       // Set dishwasher alarm mask value
+    mask.SetField(AlarmMap::kInflowError, 1);     // 0x01, 1
+    mask.SetField(AlarmMap::kDrainError, 1);      // 0x02, 2
+    mask.SetField(AlarmMap::kDoorError, 1);       // 0x04, 4
+    mask.SetField(AlarmMap::kTempTooLow, 1);      // 0x08, 8
+    mask.SetField(AlarmMap::kWaterLevelError, 1); // 0x20, 32
+
+    status = serverInstance.SetSupportedValue(1, supported); // 0x2F, 47
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
-    status = serverInstance.SetMaskValue(1, 47);
+    status = serverInstance.SetMaskValue(1, mask); // 0x2F, 47
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
-    status = serverInstance.SetStateValue(1, 14, 0);
+    status = serverInstance.SetStateValue(1, 0); // Set dishwasher alarm state value 0x00, 0
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         err = CHIP_ERROR_INTERNAL;

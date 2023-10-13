@@ -93,16 +93,10 @@ CHIP_ERROR ManualOperationalStateSetErrorCommandHandler(int argc, char ** argv)
     switch (error)
     {
     case to_underlying(OperationalState::ErrorStateEnum::kNoError):
-        err.errorStateID = to_underlying(OperationalState::ErrorStateEnum::kNoError);
-        break;
     case to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume):
-        err.errorStateID = to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume);
-        break;
     case to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation):
-        err.errorStateID = to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation);
-        break;
     case to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState):
-        err.errorStateID = to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState);
+        err.errorStateID = error;
         break;
     default:
         err.errorStateID = to_underlying(OperationalState::ErrorStateEnum::kUnknownEnumValue);
@@ -165,41 +159,19 @@ CHIP_ERROR ManualRVCOperationalStateSetErrorCommandHandler(int argc, char ** arg
 
     switch (error)
     {
-    case to_underlying(OperationalState::ErrorStateEnum::kNoError): // 0x00, 0
-        err.errorStateID = to_underlying(OperationalState::ErrorStateEnum::kNoError);
-        break;
-    case to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume): // 0x01, 1
-        err.errorStateID = to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume);
-        break;
-    case to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation): // 0x02, 2
-        err.errorStateID = to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation);
-        break;
-    case to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState): // 0x03, 3
-        err.errorStateID = to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState);
-        break;
+    case to_underlying(OperationalState::ErrorStateEnum::kNoError):                     // 0x00, 0
+    case to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume):       // 0x01, 1
+    case to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation):   // 0x02, 2
+    case to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState):       // 0x03, 3
     case to_underlying(RvcOperationalState::ErrorStateEnum::kFailedToFindChargingDock): // 0x40, 64
-        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kFailedToFindChargingDock);
-        break;
-    case to_underlying(RvcOperationalState::ErrorStateEnum::kStuck): // 0x41, 65
-        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kStuck);
-        break;
-    case to_underlying(RvcOperationalState::ErrorStateEnum::kDustBinMissing): // 0x42, 66
-        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kDustBinMissing);
-        break;
-    case to_underlying(RvcOperationalState::ErrorStateEnum::kDustBinFull): // 0x43, 67
-        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kDustBinFull);
-        break;
-    case to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankEmpty): // 0x44, 68
-        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankEmpty);
-        break;
-    case to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankMissing): // 0x45, 69
-        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankMissing);
-        break;
-    case to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankLidOpen): // 0x46, 70
-        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankLidOpen);
-        break;
-    case to_underlying(RvcOperationalState::ErrorStateEnum::kMopCleaningPadMissing): // 0x47, 71
-        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kMopCleaningPadMissing);
+    case to_underlying(RvcOperationalState::ErrorStateEnum::kStuck):                    // 0x41, 65
+    case to_underlying(RvcOperationalState::ErrorStateEnum::kDustBinMissing):           // 0x42, 66
+    case to_underlying(RvcOperationalState::ErrorStateEnum::kDustBinFull):              // 0x43, 67
+    case to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankEmpty):           // 0x44, 68
+    case to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankMissing):         // 0x45, 69
+    case to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankLidOpen):         // 0x46, 70
+    case to_underlying(RvcOperationalState::ErrorStateEnum::kMopCleaningPadMissing):    // 0x47, 71
+        err.errorStateID = error;
         break;
     default:
         err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kUnknownEnumValue);
