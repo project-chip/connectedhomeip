@@ -12,7 +12,6 @@
 #include <openthread/platform/logging.h>
 #endif
 
-#include "AppConfig.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -22,10 +21,6 @@
 #include "rail_assert_error_codes.h"
 #endif
 #endif // BRD4325A
-
-#ifdef BRD4325A // For SiWx917 Platform only
-#include "core_cm4.h"
-#endif
 
 #ifdef PW_RPC_ENABLED
 #include "PigweedLogger.h"

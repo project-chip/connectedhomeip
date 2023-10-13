@@ -267,7 +267,7 @@ limitations under the License.
   </cluster>
 
   <!-- Feature Map -->
-  <bitmap name="Feature" type="BITMAP32">
+  <bitmap name="Feature" type="bitmap32">
     <cluster code="0x040c"/>
     <cluster code="0x040d" />
     <cluster code="0x0413" />
@@ -287,7 +287,7 @@ limitations under the License.
   </bitmap>
 
   <!-- Cluster Data Types -->
-  <enum name="LevelValueEnum" type="ENUM8">
+  <enum name="LevelValueEnum" type="enum8">
     <cluster code="0x040c"/>
     <cluster code="0x040d" />
     <cluster code="0x0413" />
@@ -305,7 +305,7 @@ limitations under the License.
     <item name="Critical" value="0x04"/>
   </enum>
 
-  <enum name="MeasurementUnitEnum" type="ENUM8">
+  <enum name="MeasurementUnitEnum" type="enum8">
     <cluster code="0x040c"/>
     <cluster code="0x040d" />
     <cluster code="0x0413" />
@@ -326,7 +326,7 @@ limitations under the License.
     <item name="BQM3" value="0x07"/>
   </enum>
 
-  <enum name="MeasurementMediumEnum" type="ENUM8">
+  <enum name="MeasurementMediumEnum" type="enum8">
     <cluster code="0x040c"/>
     <cluster code="0x040d" />
     <cluster code="0x0413" />

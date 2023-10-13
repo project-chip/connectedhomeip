@@ -37,14 +37,14 @@ limitations under the License.
 
   </cluster>
 
-  <enum name="KeypadInputStatusEnum" type="ENUM8">
+  <enum name="KeypadInputStatusEnum" type="enum8">
     <cluster code="0x0509"/>
     <item name="Success" value="0x00"/>
     <item name="UnsupportedKey" value="0x01"/>
     <item name="InvalidKeyInCurrentState" value="0x02"/>
   </enum>
 
-  <enum name="CecKeyCode" type="ENUM8">
+  <enum name="CecKeyCode" type="enum8">
     <cluster code="0x0509"/>
     <item name="Select" value="0x00"/>
     <item name="Up" value="0x01"/>
@@ -140,7 +140,7 @@ limitations under the License.
     <item name="Data" value="0x76"/>
   </enum>
 
-  <bitmap name="Feature" type="BITMAP32">
+  <bitmap name="Feature" type="bitmap32">
     <cluster code="0x0509"/>
     <field name="NavigationKeyCodes" mask="0x1"/>
     <field name="LocationKeys" mask="0x2"/>

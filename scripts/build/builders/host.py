@@ -67,6 +67,7 @@ class HostApp(Enum):
     TV_CASTING = auto()
     BRIDGE = auto()
     JAVA_MATTER_CONTROLLER = auto()
+    KOTLIN_MATTER_CONTROLLER = auto()
     CONTACT_SENSOR = auto()
     DISHWASHER = auto()
     REFRIGERATOR = auto()
@@ -113,6 +114,8 @@ class HostApp(Enum):
             return 'bridge-app/linux'
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             return 'java-matter-controller'
+        elif self == HostApp.KOTLIN_MATTER_CONTROLLER:
+            return 'kotlin-matter-controller'
         elif self == HostApp.CONTACT_SENSOR:
             return 'contact-sensor-app/linux'
         elif self == HostApp.DISHWASHER:
@@ -197,6 +200,9 @@ class HostApp(Enum):
         elif self == HostApp.JAVA_MATTER_CONTROLLER:
             yield 'java-matter-controller'
             yield 'java-matter-controller.map'
+        elif self == HostApp.KOTLIN_MATTER_CONTROLLER:
+            yield 'kotlin-matter-controller'
+            yield 'kotlin-matter-controller.map'
         elif self == HostApp.CONTACT_SENSOR:
             yield 'contact-sensor-app'
             yield 'contact-sensor-app.map'
@@ -451,6 +457,15 @@ class HostBuilder(GnBuilder):
                     ],
                     title="Copying Manifest.txt to " + self.output_dir,
                 )
+            if exampleName == "kotlin-matter-controller":
+                self._Execute(
+                    [
+                        "cp",
+                        os.path.join(self.root, "Manifest.txt"),
+                        self.output_dir,
+                    ],
+                    title="Copying Manifest.txt to " + self.output_dir,
+                )
 
         if self.app == HostApp.TESTS and self.use_coverage:
             self.coverage_dir = os.path.join(self.output_dir, 'coverage')
@@ -483,6 +498,9 @@ class HostBuilder(GnBuilder):
 
         if self.app == HostApp.JAVA_MATTER_CONTROLLER:
             self.createJavaExecutable("java-matter-controller")
+
+        if self.app == HostApp.KOTLIN_MATTER_CONTROLLER:
+            self.createJavaExecutable("kotlin-matter-controller")
 
     def build_outputs(self):
         outputs = {}

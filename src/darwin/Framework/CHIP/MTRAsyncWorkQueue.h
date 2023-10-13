@@ -30,6 +30,12 @@ typedef NS_ENUM(NSInteger, MTRAsyncWorkOutcome) {
 /// being cancelled).
 typedef BOOL (^MTRAsyncWorkCompletionBlock)(MTRAsyncWorkOutcome outcome);
 
+typedef NS_ENUM(NSInteger, MTRBatchingOutcome) {
+    MTRNotBatched = 0,
+    MTRBatchedPartially, // some work was batched but the source item has work remaining
+    MTRBatchedFully, // the source item is now empty and can be dropped from the queue
+};
+
 /// An optional handler that controls batching of MTRAsyncWorkItem.
 ///
 /// When a work item is dequeued to run, if it is of a type that can be
@@ -47,15 +53,16 @@ typedef BOOL (^MTRAsyncWorkCompletionBlock)(MTRAsyncWorkOutcome outcome);
 /// `opaqueDataNext` is the data for the next item. The `fullyMerged` parameter
 /// will be initialized to NO by the caller.
 ///
-/// The handler is expected to mutate the data as needed to achieve batching.
-///
-/// If after the data mutations opaqueDataNext no longer requires any work, the
-/// handler should set `fullyMerged` to YES to indicate that the next item can
-/// be dropped from the queue. In this case, the handler may be called again to
-/// possibly also batch the work item after the one that was dropped.
+/// The handler is expected to mutate the data as needed to achieve batching,
+/// and return an `MTRBatchingOutcome` to indicate if any or all of the work
+/// from the next item was merged into the current item. A return value of
+/// `MTRBatchedFully` indicates that `opaqueDataNext` no longer requires any
+/// work and should be dropped from the queue. In this case, the handler may be
+/// called again to possibly also batch the work item after the one that was
+/// dropped.
 ///
 /// @see MTRAsyncWorkItem
-typedef void (^MTRAsyncWorkBatchingHandler)(id opaqueDataCurrent, id opaqueDataNext, BOOL * fullyMerged);
+typedef MTRBatchingOutcome (^MTRAsyncWorkBatchingHandler)(id opaqueDataCurrent, id opaqueDataNext);
 
 /// An optional handler than enables duplicate checking for MTRAsyncWorkItem.
 ///
@@ -99,6 +106,10 @@ MTR_TESTABLE
 
 /// Creates a work item that will run on the specified dispatch queue.
 - (instancetype)initWithQueue:(dispatch_queue_t)queue;
+
+/// A unique (modulo overflow) ID automatically assigned to each work item for
+/// the purpose of correlating log messages from the work queue.
+@property (readonly, nonatomic) uint64_t uniqueID;
 
 /// Called by the work queue to start this work item.
 ///
@@ -187,6 +198,14 @@ MTR_TESTABLE
 /// no further modifications may be made to it. Work item objects cannot be
 /// re-used.
 - (void)enqueueWorkItem:(MTRAsyncWorkItem<ContextType> *)item;
+
+/// Same as `enqueueWorkItem:` but includes the description in queue logging.
+- (void)enqueueWorkItem:(MTRAsyncWorkItem<ContextType> *)item
+            description:(nullable NSString *)description;
+
+/// Convenience for `enqueueWorkItem:description:` with a formatted string.
+- (void)enqueueWorkItem:(MTRAsyncWorkItem<ContextType> *)item
+    descriptionWithFormat:(NSString *)format, ... NS_FORMAT_FUNCTION(2, 3);
 
 /// Checks whether the queue already contains a work item matching the provided
 /// details. A client may call this method to avoid enqueueing duplicate work.

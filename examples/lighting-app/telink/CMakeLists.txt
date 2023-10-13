@@ -48,13 +48,21 @@ else()
   unset(GLOBAL_DTC_OVERLAY_FILE)
 endif()
 
+if(EXISTS "${CHIP_ROOT}/src/platform/telink/${FLASH_SIZE}_flash.overlay")
+  set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${FLASH_SIZE}_flash.overlay")
+  message(STATUS "Flash memory size is set to: " ${FLASH_SIZE} "b")
+else()
+  set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/2m_flash.overlay")
+  message(STATUS "Flash memory size is set to: 2mb")
+endif()
+
 if(DTC_OVERLAY_FILE)
   set(DTC_OVERLAY_FILE
-    "${DTC_OVERLAY_FILE} ${GLOBAL_DTC_OVERLAY_FILE} ${USB_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE}"
+    "${DTC_OVERLAY_FILE} ${GLOBAL_DTC_OVERLAY_FILE} ${USB_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE}"
     CACHE STRING "" FORCE
   )
 else()
-  set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${USB_DTC_OVERLAY_FILE}  ${LOCAL_DTC_OVERLAY_FILE})
+  set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${USB_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE})
 endif()
 
 set(CONF_FILE ${USB_CONF_OVERLAY_FILE} prj.conf)
@@ -97,10 +105,6 @@ chip_configure_data_model(app
     INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lighting-common/lighting-app.zap
 )
-
-if(CONFIG_CHIP_OTA_REQUESTOR)
-    target_sources(app PRIVATE ${TELINK_COMMON}/util/src/OTAUtil.cpp)
-endif()
 
 # Fix for unused swap parameter in: zephyr/include/zephyr/arch/riscv/irq.h:70
 add_compile_options(-Wno-error=unused-parameter)

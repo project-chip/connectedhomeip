@@ -502,8 +502,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 
 namespace UpdateState {
 EmberAfStatus Get(chip::EndpointId endpoint,
-                  chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum * value); // OTAUpdateStateEnum
-EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value);
+                  chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum * value); // UpdateStateEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum value);
 } // namespace UpdateState
 
 namespace UpdateStateProgress {
@@ -1979,14 +1979,14 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
 } // namespace ConfigStatus
 
 namespace CurrentPositionLiftPercentage {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // Percent
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // percent
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value);
 } // namespace CurrentPositionLiftPercentage
 
 namespace CurrentPositionTiltPercentage {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // Percent
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // percent
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value);
@@ -1999,14 +1999,14 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::
 } // namespace OperationalStatus
 
 namespace TargetPositionLiftPercent100ths {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // Percent100ths
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // percent100ths
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent100ths value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent100ths> & value);
 } // namespace TargetPositionLiftPercent100ths
 
 namespace TargetPositionTiltPercent100ths {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // Percent100ths
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // percent100ths
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent100ths value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent100ths> & value);
@@ -2018,14 +2018,14 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::WindowCovering
 } // namespace EndProductType
 
 namespace CurrentPositionLiftPercent100ths {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // Percent100ths
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // percent100ths
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent100ths value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent100ths> & value);
 } // namespace CurrentPositionLiftPercent100ths
 
 namespace CurrentPositionTiltPercent100ths {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // Percent100ths
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // percent100ths
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent100ths value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent100ths> & value);
@@ -2612,14 +2612,14 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::FanControl::Fa
 } // namespace FanModeSequence
 
 namespace PercentSetting {
-EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // Percent
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // percent
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
 EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value);
 } // namespace PercentSetting
 
 namespace PercentCurrent {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::Percent * value); // Percent
+EmberAfStatus Get(chip::EndpointId endpoint, chip::Percent * value); // percent
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
 } // namespace PercentCurrent
 
@@ -3021,8 +3021,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace PhysicalMaxLevel
 
 namespace BallastStatus {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // bitmap8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::BallastConfiguration::BallastStatusBitmap> * value); // BallastStatusBitmap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BallastConfiguration::BallastStatusBitmap> value);
 } // namespace BallastStatus
 
 namespace MinLevel {
@@ -3079,8 +3080,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace LampBurnHours
 
 namespace LampAlarmMode {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // bitmap8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::BitMask<chip::app::Clusters::BallastConfiguration::LampAlarmModeBitmap> * value); // LampAlarmModeBitmap
+EmberAfStatus Set(chip::EndpointId endpoint, chip::BitMask<chip::app::Clusters::BallastConfiguration::LampAlarmModeBitmap> value);
 } // namespace LampAlarmMode
 
 namespace LampBurnHoursTripPoint {

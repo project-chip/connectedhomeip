@@ -14,13 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <enum name="SwitchType" type="ENUM8">
+  <enum name="SwitchType" type="enum8">
     <item name="Toggle" value="0x00"/>
     <item name="Momentary" value="0x01"/>
     <item name="MultiFunction" value="0x02" introducedIn="ha-1.2-05-3520-29"/>
   </enum>
 
-  <enum name="SwitchActions" type="ENUM8">
+  <enum name="SwitchActions" type="enum8">
     <item name="On" value="0x0"/>
     <item name="Off" value="0x1"/>
     <item name="Toggle" value="0x2"/>
