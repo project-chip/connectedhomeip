@@ -180,18 +180,15 @@ exit:
 CHIP_ERROR BluezConnection::BluezC2Indicate(ConnectionDataBundle * data)
 {
     GAutoPtr<GError> error;
-    GIOStatus status;
     size_t len, written;
-
-    VerifyOrExit(data->mConn.mpC2 != nullptr, ChipLogError(DeviceLayer, "FAIL: C2 Indicate: %s", "NULL C2"));
 
     if (bluez_gatt_characteristic1_get_notify_acquired(data->mConn.mpC2) == TRUE)
     {
         auto * buf = static_cast<const char *>(g_variant_get_fixed_array(data->mData.get(), &len, sizeof(uint8_t)));
         VerifyOrExit(len <= static_cast<size_t>(std::numeric_limits<gssize>::max()),
                      ChipLogError(DeviceLayer, "FAIL: buffer too large in %s", __func__));
-        status = g_io_channel_write_chars(data->mConn.mC2Channel.mpChannel, buf, static_cast<gssize>(len), &written,
-                                          &MakeUniquePointerReceiver(error).Get());
+        auto status = g_io_channel_write_chars(data->mConn.mC2Channel.mpChannel, buf, static_cast<gssize>(len), &written,
+                                               &MakeUniquePointerReceiver(error).Get());
         VerifyOrExit(status == G_IO_STATUS_NORMAL, ChipLogError(DeviceLayer, "FAIL: C2 Indicate: %s", error->message));
     }
     else
@@ -200,16 +197,16 @@ CHIP_ERROR BluezConnection::BluezC2Indicate(ConnectionDataBundle * data)
     }
 
 exit:
-    Platform::Delete(data);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BluezConnection::SendBluezIndication(chip::System::PacketBufferHandle apBuf)
 {
-    ConnectionDataBundle * bundle;
     VerifyOrReturnError(!apBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT, ChipLogError(DeviceLayer, "apBuf is NULL in %s", __func__));
-    VerifyOrReturnError((bundle = Platform::New<ConnectionDataBundle>(*this, apBuf)) != nullptr, CHIP_ERROR_NO_MEMORY);
-    return PlatformMgrImpl().GLibMatterContextInvokeSync(BluezC2Indicate, bundle);
+    VerifyOrReturnError(mpC2 != nullptr, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "C2 is NULL in %s", __func__));
+
+    ConnectionDataBundle bundle(*this, apBuf);
+    return PlatformMgrImpl().GLibMatterContextInvokeSync(BluezC2Indicate, &bundle);
 }
 
 CHIP_ERROR BluezConnection::BluezDisconnect(BluezConnection * conn)
@@ -252,29 +249,25 @@ void BluezConnection::SendWriteRequestDone(GObject * aObject, GAsyncResult * aRe
 
 CHIP_ERROR BluezConnection::SendWriteRequestImpl(ConnectionDataBundle * data)
 {
-    GVariant * options = nullptr;
     GVariantBuilder optionsBuilder;
-
-    VerifyOrExit(data->mConn.mpC1 != nullptr, ChipLogError(DeviceLayer, "C1 is NULL in %s", __func__));
 
     g_variant_builder_init(&optionsBuilder, G_VARIANT_TYPE_ARRAY);
     g_variant_builder_add(&optionsBuilder, "{sv}", "type", g_variant_new_string("request"));
-    options = g_variant_builder_end(&optionsBuilder);
+    auto options = g_variant_builder_end(&optionsBuilder);
 
     bluez_gatt_characteristic1_call_write_value(data->mConn.mpC1, data->mData.release(), options, nullptr, SendWriteRequestDone,
                                                 const_cast<BluezConnection *>(&data->mConn));
 
-exit:
-    Platform::Delete(data);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BluezConnection::BluezSendWriteRequest(chip::System::PacketBufferHandle apBuf)
 {
-    ConnectionDataBundle * bundle;
     VerifyOrReturnError(!apBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT, ChipLogError(DeviceLayer, "apBuf is NULL in %s", __func__));
-    VerifyOrReturnError((bundle = Platform::New<ConnectionDataBundle>(*this, apBuf)) != nullptr, CHIP_ERROR_NO_MEMORY);
-    return PlatformMgrImpl().GLibMatterContextInvokeSync(SendWriteRequestImpl, bundle);
+    VerifyOrReturnError(mpC1 != nullptr, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "C1 is NULL in %s", __func__));
+
+    ConnectionDataBundle bundle(*this, apBuf);
+    return PlatformMgrImpl().GLibMatterContextInvokeSync(SendWriteRequestImpl, &bundle);
 }
 
 // BluezSubscribeCharacteristic callbacks
