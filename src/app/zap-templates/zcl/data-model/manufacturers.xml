@@ -177,6 +177,7 @@ Note:
   <mapping code="0x1097" translation="SyChip/Murata"/>
   <mapping code="0x1098" translation="OpenPeak"/>
   <mapping code="0x1099" translation="PassiveSystems"/>
+  <mapping code="0x109B" translation="Pioneer Corp"/>
   <mapping code="0x109A" translation="MMB Research"/>
   <mapping code="0x109B" translation="Leviton Manufacturing Company"/>
   <mapping code="0x109C" translation="Korea Electric Power Data Network Co., Ltd."/>
@@ -680,6 +681,7 @@ Note:
   <mapping code="0x134F" translation="Mediola Connected Living AG"/>
   <mapping code="0x1350" translation="Polynhome"/>
   <mapping code="0x1351" translation="HooRii Technology Co., Ltd."/>
+  <mapping code="0x1352" translation="Häfele SE &amp; Co KG"/>
   <mapping code="0x1353" translation="KIMIN Electronics Co., Ltd."/>
   <mapping code="0x1354" translation="Zyax AB"/>
   <mapping code="0x1355" translation="Baracoda SA"/>
@@ -725,7 +727,7 @@ Note:
   <mapping code="0x137D" translation="Shanghai Xiaodu Technology Limited"/>
   <mapping code="0x137E" translation="Nubert electronic GmbH"/>
   <mapping code="0x137F" translation="Shenzhen NEO Electronics Co. Ltd."/>
-  <mapping code="0x1380" translation="Grimsholm Products AB "/>
+  <mapping code="0x1380" translation="Grimsholm Products AB"/>
   <mapping code="0x1381" translation="Amazon Prime Video"/>
   <mapping code="0x1382" translation="ION INDUSTRIES B.V."/>
   <mapping code="0x1383" translation="Ayla Networks"/>
@@ -773,7 +775,7 @@ Note:
   <mapping code="0x140D" translation="Photon Sail Technologies Pte. Ltd."/>
   <mapping code="0x140E" translation="WiDom SRL"/>
   <mapping code="0x140F" translation="Sagemcom SAS"/>
-  <mapping code="0x1410" translation="Quectel Wireless Solutions Co., Ltd. "/>
+  <mapping code="0x1410" translation="Quectel Wireless Solutions Co., Ltd."/>
   <mapping code="0x1411" translation="Freedompro S.r.l."/>
   <mapping code="0x1412" translation="Disign Incorporated"/>
   <mapping code="0x1413" translation="1Home Solutions GmbH"/>
@@ -790,7 +792,7 @@ Note:
   <mapping code="0x141E" translation="TUO Accessories LLC"/>
   <mapping code="0x141F" translation="DUCTECH Co., Ltd"/>
   <mapping code="0x1420" translation="EcoFlow Inc."/>
-  <mapping code="0x1421" translation="Kwikset X Subu Muthu"/>
+  <mapping code="0x1421" translation="Kwikset"/>
   <mapping code="0x1422" translation="Zhuhai HiVi Technology Co., Ltd."/>
   <mapping code="0x1423" translation="Feit Electric Company, Inc."/>
   <mapping code="0x1424" translation="Alarm.com Incorporated"/>
@@ -821,10 +823,10 @@ Note:
   <mapping code="0x143D" translation="Shenzhen Champon Technology Co., Ltd"/>
   <mapping code="0x143E" translation="Acer Inc."/>
   <mapping code="0x143F" translation="Vestel Elektronik Sanayi ve Ticaret A.S."/>
-  <mapping code="0x1440" translation="VerLuce X Dennis Danville"/>
+  <mapping code="0x1440" translation="VerLuce"/>
   <mapping code="0x1441" translation="Shenzhen Snowball Technology Co., Ltd."/>
   <mapping code="0x1442" translation="REHAU Group"/>
-  <mapping code="0x1443" translation="GoodsiQ "/>
+  <mapping code="0x1443" translation="GoodsiQ"/>
   <mapping code="0x1444" translation="Last lock Inc."/>
   <mapping code="0x1445" translation="Finesse Decor"/>
   <mapping code="0x1446" translation="Take As Global, SL"/>
