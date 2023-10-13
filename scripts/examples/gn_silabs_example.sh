@@ -177,6 +177,7 @@ else
                     exit 1
                 fi
                 USE_WIFI=true
+                WIFI_NCP=true
                 optArgs+="chip_device_platform =\"efr32\" "
                 shift
                 shift
@@ -275,7 +276,15 @@ else
     if [ "$SILABS_BOARD" == "BRD4325B" ] || [ "$SILABS_BOARD" == "BRD4325C" ] || [ "$SILABS_BOARD" == "BRD4338A" ]; then
         echo "Compiling for 917 WiFi SOC"
         USE_WIFI=true
+        WIFI_NCP=false
         optArgs+="chip_device_platform =\"SiWx917\" "
+    fi
+
+    # Deprecated support for Light-swtich app for NCP combinations and Thermostat app for SiWx917
+    if [[ $ROOT == *"light-switch-app"* && "$WIFI_NCP" == true ]] ||
+        [[ $ROOT == *"thermostat"* && "$WIFI_NCP" == false && "$USE_WIFI" == true ]]; then
+        echo "Provided App and Build Options are not supported"
+        exit 1
     fi
 
     if [ "$USE_GIT_SHA_FOR_VERSION" == true ]; then
