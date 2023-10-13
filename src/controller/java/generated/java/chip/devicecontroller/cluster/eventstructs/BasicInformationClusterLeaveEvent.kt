@@ -17,18 +17,13 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
-import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-import java.util.Optional
-
-class BasicInformationClusterLeaveEvent (
-    val fabricIndex: UInt) {
-  override fun toString(): String  = buildString {
+class BasicInformationClusterLeaveEvent(val fabricIndex: UInt) {
+  override fun toString(): String = buildString {
     append("BasicInformationClusterLeaveEvent {\n")
     append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
@@ -45,10 +40,10 @@ class BasicInformationClusterLeaveEvent (
   companion object {
     private const val TAG_FABRIC_INDEX = 0
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : BasicInformationClusterLeaveEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): BasicInformationClusterLeaveEvent {
       tlvReader.enterStructure(tlvTag)
       val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
-      
+
       tlvReader.exitContainer()
 
       return BasicInformationClusterLeaveEvent(fabricIndex)

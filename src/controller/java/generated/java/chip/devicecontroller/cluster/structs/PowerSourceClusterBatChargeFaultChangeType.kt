@@ -20,16 +20,14 @@ import chip.devicecontroller.cluster.*
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
-import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-import java.util.Optional
-
-class PowerSourceClusterBatChargeFaultChangeType (
-    val current: List<UInt>,
-    val previous: List<UInt>) {
-  override fun toString(): String  = buildString {
+class PowerSourceClusterBatChargeFaultChangeType(
+  val current: List<UInt>,
+  val previous: List<UInt>
+) {
+  override fun toString(): String = buildString {
     append("PowerSourceClusterBatChargeFaultChangeType {\n")
     append("\tcurrent : $current\n")
     append("\tprevious : $previous\n")
@@ -57,23 +55,25 @@ class PowerSourceClusterBatChargeFaultChangeType (
     private const val TAG_CURRENT = 0
     private const val TAG_PREVIOUS = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : PowerSourceClusterBatChargeFaultChangeType {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): PowerSourceClusterBatChargeFaultChangeType {
       tlvReader.enterStructure(tlvTag)
-      val current = buildList<UInt> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_CURRENT))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getUInt(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
-      val previous = buildList<UInt> {
-      tlvReader.enterArray(ContextSpecificTag(TAG_PREVIOUS))
-      while(!tlvReader.isEndOfContainer()) {
-        add(tlvReader.getUInt(AnonymousTag))
-      }
-      tlvReader.exitContainer()
-    }
-      
+      val current =
+        buildList<UInt> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_CURRENT))
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getUInt(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+      val previous =
+        buildList<UInt> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_PREVIOUS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getUInt(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+
       tlvReader.exitContainer()
 
       return PowerSourceClusterBatChargeFaultChangeType(current, previous)
