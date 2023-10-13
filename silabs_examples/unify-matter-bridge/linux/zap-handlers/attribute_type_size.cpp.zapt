@@ -53,8 +53,13 @@ constexpr uint8_t ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES_SIZE  = ZCL_BITM
 {{/zcl_bitmaps}}
 
 {{#zcl_enums}}
+{{#if (unifyAppendClusterToAttrType parent.label name)}}
+constexpr uint8_t ZCL_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES = ZCL_ENUM8_ATTRIBUTE_TYPES;
+constexpr uint8_t ZCL_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES_SIZE  = ZCL_ENUM8_ATTRIBUTE_TYPES_SIZE;
+{{else}}
 constexpr uint8_t ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES = ZCL_ENUM8_ATTRIBUTE_TYPES;
 constexpr uint8_t ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPES_SIZE = ZCL_ENUM8_ATTRIBUTE_TYPES_SIZE;
+{{/if}}
 {{/zcl_enums}}
 
 {{#zcl_structs}}

@@ -122,6 +122,25 @@ function unifyCanUseChipBitMap(cluster_name, attribute_id) {
   return false;
 }
 
+// List of Cluster whose attributes/enum need cluster name append at start
+const attribute_type_need_cluster_name_append = {
+  "On/Off": {
+      "EffectIdentifierEnum": true,
+  },
+};
+
+function unifyAppendClusterToAttrType(cluster_name, attribute_type) {
+  if (attribute_type_need_cluster_name_append.hasOwnProperty(cluster_name)) {
+    const cluster = attribute_type_need_cluster_name_append[cluster_name];
+    const attribute_type_name = String(attribute_type);
+
+    if (cluster.hasOwnProperty(attribute_type_name)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 exports.unifySupportedCluster = unifySupportedCluster
 exports.unifyClusterName = unifyClusterName
 exports.unifySupportedClusterCommand = unifySupportedClusterCommand
@@ -135,3 +154,4 @@ exports.unifyClusterCommandArgument = unifyClusterCommandArgument
 exports.unifyTypeExists = unifyTypeExists
 exports.unifyCanPassThroughEnumValue = unifyCanPassThroughEnumValue
 exports.unifyCanUseChipBitMap = unifyCanUseChipBitMap
+exports.unifyAppendClusterToAttrType = unifyAppendClusterToAttrType
