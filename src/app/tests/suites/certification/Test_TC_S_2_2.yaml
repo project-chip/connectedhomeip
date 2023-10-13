@@ -29,10 +29,10 @@ config:
         type: group_id
         defaultValue: 0x0002
 
-    GroupKeyManagement.Endpoint: 
+    GroupKeyManagement.Endpoint:
         type: int16u
         defaultValue: 0
-    Groups.Endpoint: 
+    Groups.Endpoint:
         type: int16u
         defaultValue: 0
 

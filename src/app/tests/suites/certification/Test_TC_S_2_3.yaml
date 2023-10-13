@@ -23,10 +23,10 @@ config:
     cluster: "Scenes"
     endpoint: 1
     G1:
-        type: group_id 
+        type: group_id
         defaultValue: 0x0101
-    
-    GroupKeyManagement.Endpoint: 
+
+    GroupKeyManagement.Endpoint:
         type: int16u
         defaultValue: 0
 
