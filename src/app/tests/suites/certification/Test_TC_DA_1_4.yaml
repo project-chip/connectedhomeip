@@ -39,7 +39,7 @@ tests:
 
           (for all steps, PIs use equivalent command on their respective platform)
           set the $CHIP_ROOT environment variable to the location of the connectedhomeip directory or if you are validating image pls send this command in apps folder (cd to the connectedhomeip directory, use command `export CHIP_ROOT=$(pwd -P)`
-          For each scenario outlined in the sheet TC-DA-1.8 test cases, perform the following actions 
+          For each scenario outlined in the sheet TC-DA-1.8 test cases, perform the following actions
           - Start the TH using the required certificate set and PID. For chip-all-clusters-app, use the command given in the chip-all-clusters app command column
           - Have the DUT commission the TH. Verify that the DUT indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface.
           - factory reset the TH
@@ -192,7 +192,7 @@ tests:
           dac_origin_product_id fields is not present."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -223,7 +223,7 @@ tests:
           invalid, PID not present and VID not upper case"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -235,7 +235,7 @@ tests:
           On TH(all-clusters-app), Verify that the DUT(chip-tool) indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface
 
           [1693994403.341228][73449:73449] CHIP:DMG: }
-          [1693994403.341231][73449:73449] CHIP:DMG:  
+          [1693994403.341231][73449:73449] CHIP:DMG:
           [1693994403.341246][73449:73449] CHIP:EM: <<< [E:30736r S:60388 M:219410600 (Ack:261280417)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693994403.341254][73449:73449] CHIP:IN: (S) Sending msg 219410600 on secure session with LSID: 60388
           [1693994403.341291][73449:73449] CHIP:DMG: Command handler moving to [CommandSen]
@@ -257,7 +257,7 @@ tests:
           ECDSA_WITH_SHA1"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -285,7 +285,7 @@ tests:
     - label: "Step 4: CD Test Vector: The product_id_array field is missing."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -297,7 +297,7 @@ tests:
 
           On TH(all-clusters-app), Verify that the DUT(chip-tool) indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface
 
-          [1693993840.870308][72883:72883] CHIP:DMG:  
+          [1693993840.870308][72883:72883] CHIP:DMG:
           [1693993840.870320][72883:72883] CHIP:EM: <<< [E:37569r S:15994 M:123922316 (Ack:203861491)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693993840.870328][72883:72883] CHIP:IN: (S) Sending msg 123922316 on secure session with LSID: 15994
           [1693993840.870361][72883:72883] CHIP:DMG: Command handler moving to [CommandSen]
@@ -322,7 +322,7 @@ tests:
           past"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -356,7 +356,7 @@ tests:
           none of which matches the PID value in DAC."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -367,7 +367,7 @@ tests:
 
           On TH(all-clusters-app), Verify that the DUT(chip-tool) indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface
 
-          [1693997405.995023][74683:74683] CHIP:DMG:  
+          [1693997405.995023][74683:74683] CHIP:DMG:
           [1693997405.995034][74683:74683] CHIP:EM: <<< [E:36876r S:41477 M:993220 (Ack:208381418)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693997405.995041][74683:74683] CHIP:IN: (S) Sending msg 993220 on secure session with LSID: 41477
           [1693997405.995073][74683:74683] CHIP:DMG: Command handler moving to [CommandSen]
@@ -388,7 +388,7 @@ tests:
           field is wrong (TRUE for DAC and FALSE for PAI)"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -420,7 +420,7 @@ tests:
           the VID found in the DAC Subject DN."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -432,7 +432,7 @@ tests:
 
           On TH(all-clusters-app), Verify that the DUT(chip-tool) indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface
 
-          [1693994835.257566][73627:73627] CHIP:DMG:  
+          [1693994835.257566][73627:73627] CHIP:DMG:
           [1693994835.257577][73627:73627] CHIP:EM: <<< [E:23698r S:38764 M:255686193 (Ack:187772892)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693994835.257585][73627:73627] CHIP:IN: (S) Sending msg 255686193 on secure session with LSID: 38764
           [1693994835.257611][73627:73627] CHIP:DMG: Command handler moving to [CommandSen]
@@ -455,7 +455,7 @@ tests:
           uppercase hexadecimal digits"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -516,7 +516,7 @@ tests:
           Issuer field"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -527,7 +527,7 @@ tests:
 
           On TH(all-clusters-app), Verify that the DUT(chip-tool) indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface
 
-          [1693996330.239836][74189:74189] CHIP:DMG:  
+          [1693996330.239836][74189:74189] CHIP:DMG:
           [1693996330.239846][74189:74189] CHIP:EM: <<< [E:61254r S:58699 M:113843948 (Ack:144549851)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693996330.239854][74189:74189] CHIP:IN: (S) Sending msg 113843948 on secure session with LSID: 58699
           [1693996330.239877][74189:74189] CHIP:DMG: Command handler moving to [CommandSen]
@@ -551,7 +551,7 @@ tests:
           ECDSA_WITH_SHA1"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -588,7 +588,7 @@ tests:
           none of which matches the PID value in DAC."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -621,7 +621,7 @@ tests:
           secp256k1"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -632,7 +632,7 @@ tests:
 
           On TH(all-clusters-app), Verify that the DUT(chip-tool) indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface
 
-          [1693994760.408266][73595:73595] CHIP:DMG:  
+          [1693994760.408266][73595:73595] CHIP:DMG:
           [1693994760.408276][73595:73595] CHIP:EM: <<< [E:58926r S:22159 M:71363476 (Ack:241325210)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693994760.408282][73595:73595] CHIP:IN: (S) Sending msg 71363476 on secure session with LSID: 22159
           [1693994760.408309][73595:73595] CHIP:DMG: Command handler moving to [CommandSen]
@@ -656,7 +656,7 @@ tests:
           field is missing"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -688,7 +688,7 @@ tests:
           (SKID) extension"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -718,7 +718,7 @@ tests:
     - label: "Step 17: CD Test Vector: Invalid Signer Info version set to v2."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
           ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_signer_info_v2/test_case_vector.json --product-id 32768
@@ -753,7 +753,7 @@ tests:
           PAI, which is OK as optional)"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -784,7 +784,7 @@ tests:
           (AKID) extension"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -795,7 +795,7 @@ tests:
 
           On TH(all-clusters-app), Verify that the DUT(chip-tool) indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface
 
-          [1693995381.552754][73894:73894] CHIP:DMG:  
+          [1693995381.552754][73894:73894] CHIP:DMG:
           [1693995381.552761][73894:73894] CHIP:EM: <<< [E:37229r S:55064 M:5606557 (Ack:201777288)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693995381.552767][73894:73894] CHIP:IN: (S) Sending msg 5606557 on secure session with LSID: 55064
           [1693995381.552789][73894:73894] CHIP:DMG: Command handler moving to [CommandSen]
@@ -819,7 +819,7 @@ tests:
           extension"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -832,7 +832,7 @@ tests:
 
           [1693994276.553200][73374:73374] CHIP:DMG:     peer_address = UDP:[fe80::a70c:61dc:df51:6945%enxd03745ce8f62]:36473
           [1693994276.553203][73374:73374] CHIP:DMG: }
-          [1693994276.553206][73374:73374] CHIP:DMG:  
+          [1693994276.553206][73374:73374] CHIP:DMG:
           [1693994276.553217][73374:73374] CHIP:EM: <<< [E:65206r S:34371 M:72339643 (Ack:58486237)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693994276.553225][73374:73374] CHIP:IN: (S) Sending msg 72339643 on secure session with LSID: 34371
           [1693994276.553250][73374:73374] CHIP:DMG: Command handler moving to [CommandSen]
@@ -857,7 +857,7 @@ tests:
           "Step 21: CD Test Vector: The security_information field is missing."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -888,7 +888,7 @@ tests:
           field is wrong (present for DAC and not present for PAI)"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -899,7 +899,7 @@ tests:
 
           On TH(all-clusters-app), Verify that the DUT(chip-tool) indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface
 
-          [1693997515.751436][74733:74733] CHIP:DMG:  
+          [1693997515.751436][74733:74733] CHIP:DMG:
           [1693997515.751444][74733:74733] CHIP:EM: <<< [E:5171r S:65366 M:88404245 (Ack:115426625)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693997515.751449][74733:74733] CHIP:IN: (S) Sending msg 88404245 on secure session with LSID: 65366
           [1693997515.751471][74733:74733] CHIP:DMG: Command handler moving to [CommandSen]
@@ -920,7 +920,7 @@ tests:
           PAA which is authorized to sign the PAI."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -952,7 +952,7 @@ tests:
           array."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -988,7 +988,7 @@ tests:
           DAC."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -1000,7 +1000,7 @@ tests:
 
           On TH(all-clusters-app), Verify that the DUT(chip-tool) indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface
 
-          [1693994486.893297][73502:73502] CHIP:DMG:  
+          [1693994486.893297][73502:73502] CHIP:DMG:
           [1693994486.893313][73502:73502] CHIP:EM: <<< [E:21518r S:20806 M:104253722 (Ack:147833640)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693994486.893323][73502:73502] CHIP:IN: (S) Sending msg 104253722 on secure session with LSID: 20806
           [1693994486.893367][73502:73502] CHIP:DMG: Command handler moving to [CommandSen]
@@ -1025,7 +1025,7 @@ tests:
           PathLen field set to 2"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -1037,7 +1037,7 @@ tests:
 
           On TH(all-clusters-app), Verify that the DUT(chip-tool) indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface
 
-          [1693996848.934331][74418:74418] CHIP:DMG:  
+          [1693996848.934331][74418:74418] CHIP:DMG:
           [1693996848.934341][74418:74418] CHIP:EM: <<< [E:42022r S:36447 M:202045280 (Ack:89005990)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693996848.934346][74418:74418] CHIP:IN: (S) Sending msg 202045280 on secure session with LSID: 36447
           [1693996848.934373][74418:74418] CHIP:DMG: Command handler moving to [CommandSen]
@@ -1055,7 +1055,7 @@ tests:
           field is wrong (present for DAC and not present for PAI)"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -1089,7 +1089,7 @@ tests:
           "Step 28: CD Test Vector: Invalid Signer Info digest algorithm SHA1."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -1126,7 +1126,7 @@ tests:
           invalid VID encoding"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -1161,7 +1161,7 @@ tests:
           critical field is set as 'non-critical'"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -1197,7 +1197,7 @@ tests:
           uppercase hexadecimal digits"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -1228,7 +1228,7 @@ tests:
           field is missing"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -1263,7 +1263,7 @@ tests:
           that doesnt match the PID value in DAC."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -1299,7 +1299,7 @@ tests:
           critical field is set as 'non-critical'"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -1338,7 +1338,7 @@ tests:
           uppercase hexadecimal digits"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -1368,17 +1368,17 @@ tests:
           "Step 36: DAC Test Vector: Certificate Basic Constraint extension
           critical field is missing"
       verification: |
-          For Raspberry Pi device, perform a factory reset using the following command - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app. please use the equivalent command on your respective platform to perform a factory reset Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform 
+          For Raspberry Pi device, perform a factory reset using the following command - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app. please use the equivalent command on your respective platform to perform a factory reset Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
-          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_dac_ext_basic_critical_missing/test_case_vector.json --product-id 32768 
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_dac_ext_basic_critical_missing/test_case_vector.json --product-id 32768
 
-          Once TH(all-clusters-app) reach the commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform 
+          Once TH(all-clusters-app) reach the commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
 
           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
 
            On TH(all-clusters-app), Verify that the DUT(chip-tool) indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface
 
-          [1693997539.063813][74749:74749] CHIP:DMG:  
+          [1693997539.063813][74749:74749] CHIP:DMG:
           [1693997539.063820][74749:74749] CHIP:EM: <<< [E:17379r S:53226 M:29102807 (Ack:182470622)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693997539.063826][74749:74749] CHIP:IN: (S) Sending msg 29102807 on secure session with LSID: 53226
           [1693997539.063845][74749:74749] CHIP:DMG: Command handler moving to [CommandSen]
@@ -1402,7 +1402,7 @@ tests:
           field is set as 'non-critical'"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -1433,7 +1433,7 @@ tests:
           invalid PID and VID prefixes"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -1468,7 +1468,7 @@ tests:
           ECDSA_WITH_SHA1."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -1504,7 +1504,7 @@ tests:
           Matter OID"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -1531,7 +1531,7 @@ tests:
           none of which is a valid PAA authorized to sign the PAI."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -1566,7 +1566,7 @@ tests:
           field is wrong (present for DAC and not present for PAI)"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -1599,7 +1599,7 @@ tests:
           future"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
           ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_pai_valid_in_future/test_case_vector.json --product-id 32768
@@ -1611,7 +1611,7 @@ tests:
 
           1693994070.857421][73264:73264] CHIP:DMG:     peer_address = UDP:[fe80::a70c:61dc:df51:6945%enxd03745ce8f62]:59736
           [1693994070.857423][73264:73264] CHIP:DMG: }
-          [1693994070.857425][73264:73264] CHIP:DMG:  
+          [1693994070.857425][73264:73264] CHIP:DMG:
           [1693994070.857437][73264:73264] CHIP:EM: <<< [E:18036r S:31986 M:116453148 (Ack:226659157)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693994070.857443][73264:73264] CHIP:IN: (S) Sending msg 116453148 on secure session with LSID: 31986
           [1693994070.857472][73264:73264] CHIP:DMG: Command handler moving to [CommandSen]
@@ -1633,7 +1633,7 @@ tests:
           secp256k1"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -1665,7 +1665,7 @@ tests:
           uppercase hexadecimal digits"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -1697,7 +1697,7 @@ tests:
     - label: "Step 46: CD Test Vector: The certificate_id field is missing."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -1709,7 +1709,7 @@ tests:
           On TH(all-clusters-app), Verify that the DUT(chip-tool) indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface
 
           [1693996750.060075][74364:74364] CHIP:DMG: }
-          [1693996750.060078][74364:74364] CHIP:DMG:  
+          [1693996750.060078][74364:74364] CHIP:DMG:
           [1693996750.060094][74364:74364] CHIP:EM: <<< [E:50586r S:36416 M:141787643 (Ack:100004491)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693996750.060102][74364:74364] CHIP:IN: (S) Sending msg 141787643 on secure session with LSID: 36416
           [1693996750.060145][74364:74364] CHIP:DMG: Command handler moving to [CommandSen]
@@ -1729,7 +1729,7 @@ tests:
           PathLen field set to 2"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -1764,7 +1764,7 @@ tests:
           invalid PID and VID prefixes"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -1796,7 +1796,7 @@ tests:
           ignored"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -1830,7 +1830,7 @@ tests:
           v2(1)"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -1863,7 +1863,7 @@ tests:
           extension"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -1931,7 +1931,7 @@ tests:
     - label: "Step 53: CD Test Vector: The vendor_id field is missing."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -1962,7 +1962,7 @@ tests:
     - label: "Step 54: CD Test Vector: The version_number field is missing."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -1996,7 +1996,7 @@ tests:
           past"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -2028,7 +2028,7 @@ tests:
           uppercase hexadecimal digits"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -2060,7 +2060,7 @@ tests:
           invalid value."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -2093,7 +2093,7 @@ tests:
           critical field is missing"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -2129,7 +2129,7 @@ tests:
           ignored"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -2164,7 +2164,7 @@ tests:
           future"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -2176,7 +2176,7 @@ tests:
           On TH(all-clusters-app), Verify that the DUT(chip-tool) indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface
 
           [1693994108.296043][73284:73284] CHIP:DMG: }
-          [1693994108.296046][73284:73284] CHIP:DMG:  
+          [1693994108.296046][73284:73284] CHIP:DMG:
           [1693994108.296060][73284:73284] CHIP:EM: <<< [E:21442r S:39030 M:264066648 (Ack:200959608)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693994108.296069][73284:73284] CHIP:IN: (S) Sending msg 264066648 on secure session with LSID: 39030
           [1693994108.296124][73284:73284] CHIP:DMG: Command handler moving to [CommandSen]
@@ -2199,7 +2199,7 @@ tests:
           "Step 61: CD Test Vector: The certificate_id field has wrong length."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
           ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_cert_id_len_wrong/test_case_vector.json --product-id 32768
@@ -2229,7 +2229,7 @@ tests:
           PathLen field presence is wrong (present for DAC not present for PAI)"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -2264,7 +2264,7 @@ tests:
           invalid VID prefix"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -2296,7 +2296,7 @@ tests:
     - label: "Step 64: CD Test Vector: Invalid CMS version set to v2."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -2328,7 +2328,7 @@ tests:
           invalid VID encoding"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -2357,7 +2357,7 @@ tests:
     - label: "Step 66: CD Test Vector: The security_level field is missing."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -2387,7 +2387,7 @@ tests:
           extension"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -2417,9 +2417,9 @@ tests:
           field is missing"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
-          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform 
+          Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
           ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_pai_ext_basic_ca_missing/test_case_vector.json --product-id 32768
 
@@ -2450,7 +2450,7 @@ tests:
     - label: "Step 69: CD Test Vector: Invalid format_version field set to 2."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -2481,7 +2481,7 @@ tests:
           invalid, PID not present and VID not upper case"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -2516,7 +2516,7 @@ tests:
           (AKID) extension"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -2544,7 +2544,7 @@ tests:
     - label: "Step 72: CD Test Vector: The certification_type field is missing."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -2579,7 +2579,7 @@ tests:
           Issuer field"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -2615,7 +2615,7 @@ tests:
           field is set as 'non-critical'"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -2652,7 +2652,7 @@ tests:
           uppercase hexadecimal digits"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -2663,7 +2663,7 @@ tests:
 
           On TH(all-clusters-app), Verify that the DUT(chip-tool) indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface
 
-          [1693995260.012915][73834:73834] CHIP:DMG:  
+          [1693995260.012915][73834:73834] CHIP:DMG:
           [1693995260.012926][73834:73834] CHIP:EM: <<< [E:60855r S:8080 M:251599612 (Ack:56465607)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693995260.012933][73834:73834] CHIP:IN: (S) Sending msg 251599612 on secure session with LSID: 8080
           [1693995260.012973][73834:73834] CHIP:DMG: Command handler moving to [CommandSen]
@@ -2684,7 +2684,7 @@ tests:
           extension"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -2716,7 +2716,7 @@ tests:
           and dac_origin_product_id is present."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -2753,7 +2753,7 @@ tests:
           none of which is a valid PAA authorized to sign the PAI."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -2788,7 +2788,7 @@ tests:
           (SKID) extension"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -2820,7 +2820,7 @@ tests:
           DCL)."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -2851,7 +2851,7 @@ tests:
           PathLen field presence is wrong (present for DAC not present for PAI)"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -2863,7 +2863,7 @@ tests:
           On TH(all-clusters-app), Verify that the DUT(chip-tool) indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface
 
           [1693994441.928228][73474:73474] CHIP:DMG: }
-          [1693994441.928231][73474:73474] CHIP:DMG:  
+          [1693994441.928231][73474:73474] CHIP:DMG:
           [1693994441.928254][73474:73474] CHIP:EM: <<< [E:59402r S:246 M:229095428 (Ack:35299346)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693994441.928265][73474:73474] CHIP:IN: (S) Sending msg 229095428 on secure session with LSID: 246
           [1693994441.928323][73474:73474] CHIP:DMG: Command handler moving to [CommandSen]
@@ -2892,7 +2892,7 @@ tests:
           Matter OID"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -2924,7 +2924,7 @@ tests:
           field is missing"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -2959,7 +2959,7 @@ tests:
           field is wrong (present for DAC and not present for PAI)"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -2992,7 +2992,7 @@ tests:
           PathLen field set to 1"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -3026,7 +3026,7 @@ tests:
           invalid VID prefix"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -3060,7 +3060,7 @@ tests:
           v2(1)"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -3072,7 +3072,7 @@ tests:
 
           On TH(all-clusters-app), Verify that the DUT(chip-tool) indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface
 
-          [1693994702.874495][73568:73568] CHIP:DMG:  
+          [1693994702.874495][73568:73568] CHIP:DMG:
           [1693994702.874505][73568:73568] CHIP:EM: <<< [E:48921r S:51325 M:96774311 (Ack:264729104)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693994702.874510][73568:73568] CHIP:IN: (S) Sending msg 96774311 on secure session with LSID: 51325
           [1693994702.874533][73568:73568] CHIP:DMG: Command handler moving to [CommandSen]
@@ -3095,7 +3095,7 @@ tests:
           Issuer field"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -3108,7 +3108,7 @@ tests:
           On TH(all-clusters-app), Verify that the DUT(chip-tool) indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface
 
           [1693993773.557516][72869:72869] CHIP:DMG: }
-          [1693993773.557518][72869:72869] CHIP:DMG:  
+          [1693993773.557518][72869:72869] CHIP:DMG:
           [1693993773.557529][72869:72869] CHIP:EM: <<< [E:20914r S:10360 M:64900117 (Ack:58867763)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693993773.557537][72869:72869] CHIP:IN: (S) Sending msg 64900117 on secure session with LSID: 10360
           [1693993773.557569][72869:72869] CHIP:DMG: Command handler moving to [CommandSen]
@@ -3131,8 +3131,8 @@ tests:
     - label: "Step 89: CD Test Vector: The format_version field is missing."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
-           
+           please use the equivalent command on your respective platform to perform a factory reset
+
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
           ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_format_version_missing/test_case_vector.json --product-id 32768
@@ -3160,7 +3160,7 @@ tests:
     - label: "Step 90: CD Test Vector: The device_type_id field is missing."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -3196,7 +3196,7 @@ tests:
           Issuer field"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -3208,7 +3208,7 @@ tests:
 
           On TH(all-clusters-app), Verify that the DUT(chip-tool) indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface
 
-          [1693996797.931878][74392:74392] CHIP:DMG:  
+          [1693996797.931878][74392:74392] CHIP:DMG:
           [1693996797.931886][74392:74392] CHIP:EM: <<< [E:52113r S:36416 M:61307417 (Ack:229885016)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693996797.931891][74392:74392] CHIP:IN: (S) Sending msg 61307417 on secure session with LSID: 36416
           [1693996797.931930][74392:74392] CHIP:DMG: Command handler moving to [CommandSen]
@@ -3228,7 +3228,7 @@ tests:
           field is wrong (TRUE for DAC and FALSE for PAI)"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -3263,7 +3263,7 @@ tests:
           the PID found in the DAC Subject DN."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -3294,7 +3294,7 @@ tests:
     - label: "Step 94: CD Test Vector: Invalid CMS digest algorithm SHA1."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -3324,7 +3324,7 @@ tests:
     - label: "Step 95: CD Test Vector: Invalid CMS Signature."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
 
@@ -3335,7 +3335,7 @@ tests:
 
           On TH(all-clusters-app), Verify that the DUT(chip-tool) indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface
 
-          [1693994899.515996][73668:73668] CHIP:DMG:  
+          [1693994899.515996][73668:73668] CHIP:DMG:
           [1693994899.516006][73668:73668] CHIP:EM: <<< [E:6307r S:5804 M:155066286 (Ack:201427042)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693994899.516012][73668:73668] CHIP:IN: (S) Sending msg 155066286 on secure session with LSID: 5804
           [1693994899.516034][73668:73668] CHIP:DMG: Command handler moving to [CommandSen]
@@ -3359,7 +3359,7 @@ tests:
           PathLen field set to 1"
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -3393,7 +3393,7 @@ tests:
           SKID of a certificate unknown by Zigbee Alliance."
       verification: |
           For Raspberry Pi device, perform a factory reset using the following command  - sudo rm -rf /tmp/chip_* for the 'chip-all-clusters-app.
-           please use the equivalent command on your respective platform to perform a factory reset 
+           please use the equivalent command on your respective platform to perform a factory reset
 
 
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -3405,7 +3405,7 @@ tests:
 
           On TH(all-clusters-app), Verify that the DUT(chip-tool) indicates that the device is not genuine, or otherwise indicates a failure of device attestation, within its error handling APIs or user interface
 
-          [1693993614.289269][72826:72826] CHIP:DMG:  
+          [1693993614.289269][72826:72826] CHIP:DMG:
           [1693993614.289279][72826:72826] CHIP:EM: <<< [E:11915r S:25559 M:123399583 (Ack:174738663)] (S) Msg TX to 0:FFFFFFFB00000000 [0000] --- Type 0001:09 (IM:InvokeCommandResponse)
           [1693993614.289287][72826:72826] CHIP:IN: (S) Sending msg 123399583 on secure session with LSID: 25559
           [1693993614.289310][72826:72826] CHIP:DMG: Command handler moving to [CommandSen]
