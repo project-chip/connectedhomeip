@@ -526,7 +526,7 @@ client cluster BinaryInputBasic = 15 {
 }
 
 /** Cluster to control pulse width modulation */
-client cluster PulseWidthModulation = 28 {
+provisional client cluster PulseWidthModulation = 28 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -4630,7 +4630,7 @@ client cluster Thermostat = 513 {
 }
 
 /** An interface for controlling a fan in a heating/cooling system. */
-client cluster FanControl = 514 {
+provisional client cluster FanControl = 514 {
   enum AirflowDirectionEnum : ENUM8 {
     kForward = 0;
     kReverse = 1;
@@ -5041,7 +5041,7 @@ client cluster ColorControl = 768 {
 }
 
 /** Attributes and commands for configuring a lighting ballast. */
-client cluster BallastConfiguration = 769 {
+provisional client cluster BallastConfiguration = 769 {
   bitmap BallastStatusBitmap : BITMAP8 {
     kBallastNonOperational = 0x1;
     kLampFailure = 0x2;
