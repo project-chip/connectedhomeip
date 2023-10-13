@@ -42,6 +42,7 @@ template("bl_iot_sdk") {
       "BL702=BL702",
       "BFLB_USE_ROM_DRIVER=1",
       "BFLB_USE_HAL_DRIVER=1",
+      "CFG_COMPONENT_BLOG_ENABLE=0"
     ]
 
     include_dirs = []
@@ -53,6 +54,7 @@ template("bl_iot_sdk") {
       defines += invoker.defines
     }
 
+    cflags = [ "-Wundef" ]
     cflags_c = [
       "-include",
       rebase_path("${invoker.freertos_config}", root_build_dir),
@@ -404,6 +406,8 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_stage") {
+
+    defines = [ "EF_ENV_CACHE_TABLE_SIZE=64", "RHINO_CONFIG_WORKQUEUE=0" ]
     sources = [
       "${bl_iot_sdk_root}/components/stage/blfdt/src/fdt.c",
       "${bl_iot_sdk_root}/components/stage/blfdt/src/fdt_addresses.c",
@@ -425,7 +429,7 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/stage/yloop/src/select.c",
       "${bl_iot_sdk_root}/components/stage/yloop/src/yloop.c",
     ]
-    defines = [ "EF_ENV_CACHE_TABLE_SIZE=64" ]
+
     cflags_c = [ "-Wno-sign-compare" ]
     configs += [
       ":${sdk_target_name}_config_BSP_Driver",

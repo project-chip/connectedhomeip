@@ -37,9 +37,6 @@
 #include <bl702l_hbn.h>
 #endif
 
-#include <bl_rtc.h>
-#include <bl_sec.h>
-
 #ifdef CFG_USE_PSRAM
 #include <bl_psram.h>
 #endif
@@ -47,19 +44,21 @@
 
 #include <hosal_uart.h>
 
-#if CHIP_DEVICE_LAYER_TARGET_BL702L
-#include <rom_freertos_ext.h>
-#include <rom_hal_ext.h>
-#include <rom_lmac154_ext.h>
-#endif
-
 extern "C" {
 #include <bl_irq.h>
 #include <bl_sys.h>
+#include <bl_sec.h>
+#include <bl_rtc.h>
 #include <hal_board.h>
 #include <hal_boot2.h>
 #if CHIP_DEVICE_LAYER_TARGET_BL602
 #include <wifi_mgmr_ext.h>
+#endif
+
+#if CHIP_DEVICE_LAYER_TARGET_BL702L
+#include <rom_freertos_ext.h>
+#include <rom_hal_ext.h>
+#include <rom_lmac154_ext.h>
 #endif
 }
 
@@ -271,8 +270,8 @@ static const HeapRegion_t xHeapRegions[] = {
 #endif
 
 #ifdef CFG_USE_PSRAM
-extern "C" uint32_t __psram_bss_init_start;
-extern "C" uint32_t __psram_bss_init_end;
+extern "C" uint8_t __psram_bss_init_start;
+extern "C" uint8_t __psram_bss_init_end;
 
 static uint32_t __attribute__((section(".rsvd_data"))) psram_reset_count;
 
@@ -309,7 +308,7 @@ void do_psram_test()
             break;
         }
 
-        arch_memset4(&__psram_bss_init_start, 0, &__psram_bss_init_end - &__psram_bss_init_start);
+        memset(&__psram_bss_init_start, 0, &__psram_bss_init_end - &__psram_bss_init_start);
 
         psram_reset_count = 0xffffff00;
         return;

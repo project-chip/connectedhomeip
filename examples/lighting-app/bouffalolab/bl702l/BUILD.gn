@@ -114,24 +114,15 @@ bouffalolab_executable("lighting_app") {
     "START_ENTRY=bl702_main",
   ]
 
-  if (enable_debug_frame_ptr) {
-    defines += [ "CONF_ENABLE_FRAME_PTR=1" ]
-  }
-
+  defines += [ "CONF_ENABLE_FRAME_PTR=${enable_debug_frame_ptr}" ]
+  defines += [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
+  defines += [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST=${chip_enable_factory_data_test}" ]
   if (chip_config_network_layer_ble) {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1" ]
   }
 
   if (false == enable_reset_counter) {
     defines += [ "BOOT_PIN_RESET=16" ]
-  }
-
-  if (chip_enable_factory_data) {
-    defines += [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=1" ]
-  }
-
-  if (chip_enable_factory_data_test) {
-    defines += [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_TEST=1" ]
   }
 
   if ("BL704LDK" == board) {
@@ -143,8 +134,8 @@ bouffalolab_executable("lighting_app") {
     "${example_dir}/common/ZclCallbacks.cpp",
     "${examples_plat_dir}/common/iot_sdk/aos_task.c",
     "${examples_plat_dir}/common/iot_sdk/demo_pwm.c",
-    "${examples_plat_dir}/common/iot_sdk/platform_port.c",
-    "${examples_plat_dir}/common/iot_sdk/uart.c",
+    "${examples_plat_dir}/common/iot_sdk/platform_port.cpp",
+    "${examples_plat_dir}/common/iot_sdk/uart.cpp",
     "${examples_plat_dir}/common/plat/LEDWidget.cpp",
     "${examples_plat_dir}/common/plat/OTAConfig.cpp",
     "${examples_plat_dir}/common/plat/main.cpp",
@@ -166,10 +157,6 @@ bouffalolab_executable("lighting_app") {
     "${examples_plat_dir}/common/plat",
     "${examples_plat_dir}/common/iot_sdk",
   ]
-
-  if (enable_psram) {
-    defines += [ "CFG_USE_PSRAM=1" ]
-  }
 
   if (chip_enable_openthread) {
     deps += [
@@ -200,6 +187,7 @@ bouffalolab_executable("lighting_app") {
     ]
   }
 
+  defines += [ "CONFIG_ENABLE_CHIP_SHELL=${chip_build_libshell}" ]
   defines += [ "PW_RPC_ENABLED=${chip_enable_pw_rpc}" ]
   if (chip_enable_pw_rpc) {
     defines += [
@@ -252,30 +240,25 @@ bouffalolab_executable("lighting_app") {
       "${chip_root}/examples/common/pigweed/bouffalolab",
     ]
   } else {
-    if (chip_build_libshell) {
-      defines += [ "CONFIG_ENABLE_CHIP_SHELL=1" ]
 
-      deps += [ "${chip_root}/examples/shell/shell_common:shell_common" ]
+    if (chip_build_libshell) {
 
       include_dirs += [
         "${chip_root}/src/lib/shell",
         "${chip_root}/examples/shell/shell_common/include",
       ]
-    }
-    else {
-      defines += [ "CONFIG_ENABLE_CHIP_SHELL=0" ]
+
+      deps += [ "${chip_root}/examples/shell/shell_common:shell_common" ]
     }
   }
 
+  defines += [ "HEAP_MONITORING=${enable_heap_monitoring}" ]
   if (enable_heap_monitoring) {
     sources += [ "${examples_plat_dir}/common/plat/MemMonitoring.cpp" ]
-    defines += [ "HEAP_MONITORING=1" ]
   }
-  else {
-    defines += [ "HEAP_MONITORING=0" ]
-  }
-  
+
   if (enable_psram) {
+    defines += [ "CFG_USE_PSRAM=1" ]
     ldscript = "${examples_plat_dir}/bl702l/ldscripts/psram_flash_rom.ld"
   } else {
     ldscript = "${examples_plat_dir}/bl702l/ldscripts/flash_rom.ld"
