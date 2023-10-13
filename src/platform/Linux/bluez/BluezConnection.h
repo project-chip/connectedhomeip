@@ -59,10 +59,10 @@ public:
 private:
     struct ConnectionDataBundle
     {
-        ConnectionDataBundle(BluezConnection *, const chip::System::PacketBufferHandle &);
+        ConnectionDataBundle(const BluezConnection &, const chip::System::PacketBufferHandle &);
         ~ConnectionDataBundle() = default;
 
-        BluezConnection * mpConn;
+        const BluezConnection & mConn;
         GAutoPtr<GVariant> mData;
     };
 
