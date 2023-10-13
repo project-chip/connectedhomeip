@@ -13,9 +13,9 @@ WeakEnums:
     - StepMode
 
 EnumsNotUsedAsTypeInXML:
-    # List of enums that are not used in a DataModel Struct. By adding an enum
+    # List of enums that are not used as a type in XML. By adding an enum
     # to this list you prevent incorrectly assuming from code that you are
-    # able to use kUnknownEnumValue safely. This happens for derivate clusters
+    # able to use kUnknownEnumValue safely. This happens for derived clusters
     # such as ModeBase where there are CommonTag, DerivedClusterTags, MfgTags.
     - "DishwasherMode::ModeTag"
     - "LaundryWasherMode::ModeTag"
