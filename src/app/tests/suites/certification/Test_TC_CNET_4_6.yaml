@@ -40,18 +40,6 @@ tests:
       disabled: true
 
     - label:
-          "The cluster Identifier 49 (0x0031) is present in the ServerList
-          attribute"
-      verification: |
-
-      disabled: true
-
-    - label: "The FeatureMap attribute value is 2"
-      verification: |
-
-      disabled: true
-
-    - label:
           "Step 1: TH sends the AddOrUpdateThreadNetwork command to the DUT with
           the following fields: OperationalDataset field set to
           PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET Breadcrumb field set to 1"
