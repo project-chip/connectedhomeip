@@ -79,7 +79,6 @@ declare_args() {
   sl_ot_libs_path = "${efr32_sdk_root}/protocol/openthread"
   sl_ot_platform_abstraction =
       "${efr32_sdk_root}/protocol/openthread/platform-abstraction"
-  sl_openthread_root = "${efr32_sdk_root}/util/third_party/openthread"
 
   # board related pre-generated files path (default)
   sl_pre_gen_path =
@@ -270,6 +269,13 @@ template("efr32_sdk") {
 
       #"__STACK_SIZE=0",
     ]
+
+    if (!(use_silabs_thread_lib || use_silabs_thread_lib)) {
+      #Enabling this config temporarly to fix a build issue until
+      #official fix is pushed
+
+      defines += [ "OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE=1" ]
+    }
 
     # Temporary configuration to enable COAP specific configurations
     if (use_thread_coap_lib) {
