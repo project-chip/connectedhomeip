@@ -85,6 +85,7 @@ static_library("efr32") {
   }
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
+  deps = [ "${chip_root}/src/platform/logging:headers" ]
 
   # Add platform crypto implementation
   if (chip_crypto == "platform") {
@@ -105,7 +106,7 @@ static_library("efr32") {
   if (chip_enable_openthread) {
     public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
 
-    deps = [ "${chip_root}/third_party/openthread:openthread_cli" ]
+    deps += [ "${chip_root}/third_party/openthread:openthread_cli" ]
 
     sources += [
       "${silabs_platform_dir}/ThreadStackManagerImpl.h",

@@ -17,14 +17,14 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <enum name="OperationalStateEnum" type="ENUM8">
+  <enum name="OperationalStateEnum" type="enum8">
     <cluster code="0x0061"/>
     <item name="SeekingCharger" value="0x40"/>
     <item name="Charging"       value="0x41"/>
     <item name="Docked"         value="0x42"/>
   </enum>
 
-  <enum name="ErrorStateEnum" type="ENUM8">
+  <enum name="ErrorStateEnum" type="enum8">
     <cluster code="0x0061"/>
     <item name="FailedToFindChargingDock"   value="0x40"/>
     <item name="Stuck"                      value="0x41"/>
@@ -47,8 +47,8 @@ limitations under the License.
 
     <globalAttribute side="server" code="0xFFFD" value="1" />
 
-    <attribute side="server" code="0x0000" define="PHASE_LIST"              type="ARRAY" entryType="CHAR_STRING"                                     writable="false" isNullable="true"  optional="false">PhaseList</attribute>
-    <attribute side="server" code="0x0001" define="CURRENT_PHASE"           type="INT8U"                                    min="0x00" max="0x1F"    writable="false" isNullable="true"  optional="false">CurrentPhase</attribute>
+    <attribute side="server" code="0x0000" define="PHASE_LIST"              type="ARRAY" entryType="char_string"                                     writable="false" isNullable="true"  optional="false">PhaseList</attribute>
+    <attribute side="server" code="0x0001" define="CURRENT_PHASE"           type="int8u"                                    min="0x00" max="0x1F"    writable="false" isNullable="true"  optional="false">CurrentPhase</attribute>
     <attribute side="server" code="0x0002" define="COUNTDOWN_TIME"          type="elapsed_s"                                min="0"    max="259200"  writable="false" isNullable="true"  optional="true">CountdownTime</attribute>
     <attribute side="server" code="0x0003" define="OPERATIONAL_STATE_LIST"  type="ARRAY" entryType="OperationalStateStruct"                          writable="false"                    optional="false">OperationalStateList</attribute>
 
@@ -57,7 +57,7 @@ The type of this attribute in the spec is OperationalStateEnum, but the Operatio
 excludes the values from the base OperationalState cluster.  Just use ENUM8 for the type, so it allows
 both values from this cluster and from the base cluster.
 -->
-    <attribute side="server" code="0x0004" define="OPERATIONAL_STATE"       type="ENUM8"                                                             writable="false"                    optional="false">OperationalState</attribute>
+    <attribute side="server" code="0x0004" define="OPERATIONAL_STATE"       type="enum8"                                                             writable="false"                    optional="false">OperationalState</attribute>
     <attribute side="server" code="0x0005" define="OPERATIONAL_ERROR"       type="ErrorStateStruct"                                                  writable="false"                    optional="false">OperationalError</attribute>
 
     <command source="client" code="0x00" name="Pause" response="OperationalCommandResponse" optional="true">
@@ -88,7 +88,7 @@ both values from this cluster and from the base cluster.
 
      <event side="server" code="0x01" priority="info" name="OperationCompletion" optional="true">
       <description>OperationCompletion</description>
-      <field id="0" name="CompletionErrorCode"  type="ENUM8"                            optional="false"/>
+      <field id="0" name="CompletionErrorCode"  type="enum8"                            optional="false"/>
       <field id="1" name="TotalOperationalTime" type="elapsed_s"      isNullable="true" optional="true"/>
       <field id="2" name="PausedTime"           type="elapsed_s"      isNullable="true" optional="true"/>
     </event>

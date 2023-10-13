@@ -1,1 +1,1 @@
-16 : [Telink] Update Docker image (Zephyr update)
+18 : [Silabs] Adds bugfix for symlink for docker use and optimize SDK download

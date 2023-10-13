@@ -1,5 +1,6 @@
 #
 #    Copyright (c) 2023 Project CHIP Authors
+#    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -14,8 +15,21 @@
 #    limitations under the License.
 #
 
-# This file should be used as a configuration overlay to enable Shell.
+from capture.base import EcosystemCapture
 
-# Enable Shell support. 
-CONFIG_SHELL=y
-CONFIG_CHIP_LIB_SHELL=y
+
+class DemoExtEcosystem(EcosystemCapture):
+
+    def __init__(self, platform, artifact_dir: str) -> None:
+        self.artifact_dir = artifact_dir
+        self.platform = platform
+        self.message = "in the demo external ecosystem"
+
+    async def start_capture(self) -> None:
+        print("Start capture " + self.message)
+
+    async def stop_capture(self) -> None:
+        print("Stop capture " + self.message)
+
+    async def analyze_capture(self) -> None:
+        print("Analyze capture " + self.message)

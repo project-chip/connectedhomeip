@@ -25,27 +25,27 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <description>This cluster provides an interface for launching content on a media player device such as a TV or Speaker.</description>
 
-    <attribute side="server" code="0x0000" define="CONTENT_LAUNCHER_ACCEPT_HEADER"                 type="ARRAY" entryType="CHAR_STRING" length="254" writable="false" optional="true">AcceptHeader</attribute>
-    <attribute side="server" code="0x0001" define="CONTENT_LAUNCHER_SUPPORTED_STREAMING_PROTOCOLS" type="BITMAP32" default="0"                       writable="true"  optional="true">SupportedStreamingProtocols</attribute>
+    <attribute side="server" code="0x0000" define="CONTENT_LAUNCHER_ACCEPT_HEADER"                 type="ARRAY" entryType="char_string" length="254" writable="false" optional="true">AcceptHeader</attribute>
+    <attribute side="server" code="0x0001" define="CONTENT_LAUNCHER_SUPPORTED_STREAMING_PROTOCOLS" type="bitmap32" default="0"                       writable="true"  optional="true">SupportedStreamingProtocols</attribute>
 
     <command source="client" code="0x00" name="LaunchContent" response="LauncherResponse" optional="true">
       <description>Upon receipt, this SHALL launch the specified content with optional search criteria.</description>
       <arg name="Search" type="ContentSearchStruct"/>
-      <arg name="AutoPlay" type="BOOLEAN"/>
-      <arg name="Data" type="CHAR_STRING" optional="true"/>
+      <arg name="AutoPlay" type="boolean"/>
+      <arg name="Data" type="char_string" optional="true"/>
     </command>
 
     <command source="client" code="0x01" name="LaunchURL" response="LauncherResponse" optional="true">
       <description>Upon receipt, this SHALL launch content from the specified URL.</description>
-      <arg name="ContentURL" type="CHAR_STRING"/>
-      <arg name="DisplayString" type="CHAR_STRING" optional="true"/>
+      <arg name="ContentURL" type="char_string"/>
+      <arg name="DisplayString" type="char_string" optional="true"/>
       <arg name="BrandingInformation" type="BrandingInformationStruct" optional="true"/>
     </command>
 
     <command source="server" code="0x02" name="LauncherResponse" optional="true" disableDefaultResponse="true">
       <description>This command SHALL be generated in response to LaunchContent command.</description>
       <arg name="Status" type="ContentLaunchStatusEnum"/>
-      <arg name="Data" type="CHAR_STRING" optional="true"/>
+      <arg name="Data" type="char_string" optional="true"/>
     </command>
 
   </cluster>
@@ -57,11 +57,11 @@ limitations under the License.
 
   <struct name="AdditionalInfoStruct">
     <cluster code="0x050a"/>
-    <item name="Name" type="CHAR_STRING"/>
-    <item name="Value" type="CHAR_STRING"/>
+    <item name="Name" type="char_string"/>
+    <item name="Value" type="char_string"/>
   </struct>
 
-  <enum name="MetricTypeEnum" type="ENUM8">
+  <enum name="MetricTypeEnum" type="enum8">
     <cluster code="0x050a"/>
     <item name="Pixels" value="0x00"/>
     <item name="Percentage" value="0x01"/>
@@ -76,14 +76,14 @@ limitations under the License.
 
   <struct name="StyleInformationStruct">
     <cluster code="0x050a"/>
-    <item name="ImageURL" type="CHAR_STRING" optional="true"/>
-    <item name="Color" type="CHAR_STRING" optional="true"/>
+    <item name="ImageURL" type="char_string" optional="true"/>
+    <item name="Color" type="char_string" optional="true"/>
     <item name="Size" type="DimensionStruct" optional="true"/>
   </struct>
 
   <struct name="BrandingInformationStruct">
     <cluster code="0x050a"/>
-    <item name="ProviderName" type="CHAR_STRING"/>
+    <item name="ProviderName" type="char_string"/>
     <item name="Background" type="StyleInformationStruct" optional="true"/>
     <item name="Logo" type="StyleInformationStruct" optional="true"/>
     <item name="ProgressBar" type="StyleInformationStruct" optional="true"/>
@@ -92,7 +92,7 @@ limitations under the License.
   </struct>
 
 
-  <enum name="ParameterEnum" type="ENUM8">
+  <enum name="ParameterEnum" type="enum8">
     <cluster code="0x050a"/>
     <item name="Actor" value="0x00"/>
     <item name="Channel" value="0x01"/>
@@ -110,7 +110,7 @@ limitations under the License.
     <item name="Video" value="0x0D"/>
   </enum>
 
-  <enum name="ContentLaunchStatusEnum" type="ENUM8">
+  <enum name="ContentLaunchStatusEnum" type="enum8">
     <cluster code="0x050a"/>
     <item name="success" value="0x00"/>
     <item name="urlNotAvailable" value="0x01"/>
@@ -120,17 +120,17 @@ limitations under the License.
   <struct name="ParameterStruct">
     <cluster code="0x050a"/>
     <item name="Type" type="ParameterEnum"/>
-    <item name="Value" type="CHAR_STRING"/>
+    <item name="Value" type="char_string"/>
     <item name="ExternalIDList" type="AdditionalInfoStruct" array="true" optional="true"/>
   </struct>
 
-  <bitmap name="SupportedStreamingProtocol" type="BITMAP32">
+  <bitmap name="SupportedStreamingProtocol" type="bitmap32">
     <cluster code="0x050a"/>
     <field name="DASH" mask="0x1"/>
     <field name="HLS" mask="0x2"/>
   </bitmap>
 
-  <bitmap name="Feature" type="BITMAP32">
+  <bitmap name="Feature" type="bitmap32">
     <cluster code="0x050a"/>
     <field name="ContentSearch" mask="0x1"/>
     <field name="URLPlayback" mask="0x2"/>
