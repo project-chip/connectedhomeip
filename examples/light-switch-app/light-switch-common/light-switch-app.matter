@@ -165,7 +165,7 @@ server cluster Groups = 4 {
 }
 
 /** Attributes and commands for scene configuration and manipulation. */
-client cluster Scenes = 5 {
+provisional client cluster Scenes = 5 {
   bitmap Feature : BITMAP32 {
     kSceneNames = 0x1;
     kExplicit = 0x2;

@@ -125,7 +125,7 @@ client cluster Groups = 4 {
 }
 
 /** Attributes and commands for scene configuration and manipulation. */
-client cluster Scenes = 5 {
+provisional client cluster Scenes = 5 {
   bitmap Feature : BITMAP32 {
     kSceneNames = 0x1;
     kExplicit = 0x2;
@@ -6572,7 +6572,7 @@ client cluster ElectricalMeasurement = 2820 {
 }
 
 /** The Test Cluster is meant to validate the generated code */
-client cluster UnitTesting = 4294048773 {
+internal client cluster UnitTesting = 4294048773 {
   enum SimpleEnum : ENUM8 {
     kUnspecified = 0;
     kValueA = 1;
@@ -7018,7 +7018,7 @@ client cluster UnitTesting = 4294048773 {
 }
 
 /** The Fault Injection Cluster provide a means for a test harness to configure faults(for example triggering a fault in the system). */
-client cluster FaultInjection = 4294048774 {
+internal client cluster FaultInjection = 4294048774 {
   enum FaultType : ENUM8 {
     kUnspecified = 0;
     kSystemFault = 1;
