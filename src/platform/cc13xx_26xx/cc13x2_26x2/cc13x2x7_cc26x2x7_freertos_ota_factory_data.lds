@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2020 Texas Instruments Incorporated
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,21 +18,23 @@
 
 /**
  * @file
- * Linkerscript for a non-OTA Matter executable.
+ * Linkerscript for Matter executable with space reserved for the TI BIM.
  */
 
-STACKSIZE = 0x2000;
+STACKSIZE = 0x800;
+RESERVED_RAM_SIZE_BLE_ROM = 0x00000FDF;
+
 
 MEMORY
 {
-    FLASH (RX)      : ORIGIN = 0x00000000, LENGTH = 0x000FE800
-    FLASH_FACTORY_DATA (R) : ORIGIN = 0x000FE800, LENGTH = 0x900
-    /*
-     * Customer Configuration Area and Bootloader Backdoor configuration in
-     * flash
-     */
-    FLASH_CCFG (RX) : ORIGIN = 0x50000000, LENGTH = 0x00000800
-    SRAM (RWX)      : ORIGIN = 0x20000000, LENGTH = 0x00040000
+    /* last two pages removed for BIM, Flash Bootloader, and Factory Data. CCFG is supplied by the BIM project */
+    /* FLASH (RX)      : ORIGIN = 0x00000000, LENGTH = 0x000affa8 */
+    /* FLASH_CCFG (RX) : ORIGIN = 0x000affa8, LENGTH = 0x00000058 */
+    FLASH (RX)      : ORIGIN = 0x00000000, LENGTH = 0x000ac000
+    FLASH_FACTORY_DATA (R)  : ORIGIN = 0x000ac000, LENGTH = 0x00000900
+    /* BLE ROM reserves RAM at the beginning of the ram image, size RESERVED_RAM_SIZE_BLE_ROM */
+    /* SRAM (RWX)      : ORIGIN = 0x20000000, LENGTH = 0x00024000 */
+    SRAM (RWX)      : ORIGIN = 0x20000FDF, LENGTH = 0x00023021
     GPRAM (RWX)     : ORIGIN = 0x11000000, LENGTH = 0x00002000
     /* Explicitly placed off target for the storage of logging data.
      * The data placed here is NOT loaded onto the target device.
@@ -43,7 +46,7 @@ MEMORY
 }
 
 REGION_ALIAS("REGION_TEXT", FLASH);
-REGION_ALIAS("REGION_FACTORY_DATA", FLASH_FACTORY_DATA);
+REGION_ALIAS("REGION_FACTORY_DATA", FLASH_FACTORY_DATA); 
 REGION_ALIAS("REGION_BSS", SRAM);
 REGION_ALIAS("REGION_DATA", SRAM);
 REGION_ALIAS("REGION_STACK", SRAM);
@@ -53,23 +56,32 @@ REGION_ALIAS("REGION_ARM_EXIDX", FLASH);
 REGION_ALIAS("REGION_ARM_EXTAB", FLASH);
 
 SECTIONS {
+    /* BIM header placed at the base of flash by default */
+    PROVIDE (_img_header_base_address =
+        DEFINED(_img_header_base_address) ? _img_header_base_address : 0x0);
+ 
+    .oad_image_header (_img_header_base_address) : AT (_img_header_base_address) {
+        KEEP (*(.oad_image_header))
+    } > REGION_TEXT
+
+    /* interrupt vectors shifted to accomodate BIM header */
     PROVIDE (_intvecs_base_address =
-        DEFINED(_intvecs_base_address) ? _intvecs_base_address : 0x00);
+        DEFINED(_intvecs_base_address) ? _intvecs_base_address : 0x100);
 
     .resetVecs (_intvecs_base_address) : AT (_intvecs_base_address) {
         KEEP (*(.resetVecs))
     } > REGION_TEXT
 
     PROVIDE (_vtable_base_address =
-        DEFINED(_vtable_base_address) ? _vtable_base_address : 0x20000000);
+        DEFINED(_vtable_base_address) ? _vtable_base_address : 0x20000000 + RESERVED_RAM_SIZE_BLE_ROM);
 
-    .vtable (_vtable_base_address) (NOLOAD) : {
+    .ramVecs (_vtable_base_address) (NOLOAD) : {
         KEEP (*(.ramVecs))
     } > REGION_DATA
 
     /* Define base address for the DAC arrays and struct */
     PROVIDE (_factory_data_base_address =
-        DEFINED(_factory_data_base_address) ? _factory_data_base_address : 0xFE800);
+        DEFINED(_factory_data_base_address) ? _factory_data_base_address : 0xAC000);
 
     .factory_data(_factory_data_base_address) : AT (_factory_data_base_address) {
         KEEP (*(.factory_data_struct))
@@ -79,9 +91,9 @@ SECTIONS {
      * UDMACC26XX_CONFIG_BASE below must match UDMACC26XX_CONFIG_BASE defined
      * by ti/drivers/dma/UDMACC26XX.h
      * The user is allowed to change UDMACC26XX_CONFIG_BASE to move it away from
-     * the default address 0x2000_0400, but remember it must be 1024 bytes aligned.
+     * the default address 0x2000_1800, but remember it must be 1024 bytes aligned.
      */
-    UDMACC26XX_CONFIG_BASE = 0x20000400;
+    UDMACC26XX_CONFIG_BASE = 0x20001800;
 
     /*
      * Define absolute addresses for the DMA channels.
@@ -174,6 +186,18 @@ SECTIONS {
     UDMACC26XX_dmaSpi1TxAltControlTableEntry_is_placed = 0;
     .dmaSpi1TxAltControlTableEntry DMA_SPI1_TX_ALT_CONTROL_TABLE_ENTRY_ADDRESS (NOLOAD) : AT (DMA_SPI1_TX_ALT_CONTROL_TABLE_ENTRY_ADDRESS) {*(.dmaSpi1TxAltControlTableEntry)} > REGION_DATA
 
+
+
+    /* if a ROM-only symbol is present, then ROM is being used.
+     * Reserve memory for surgically placed config constants.
+     */
+    _rom_rodata_start = 0x2000;
+    _rom_rodata_size = DEFINED(ROM_RODATA_SIZE) ? 0 : DEFINED(ROM_RODATA_SIZE_NO_OAD) ? 0x330 : 0;
+
+    .rom_rodata_reserve (_rom_rodata_start): {
+        . += _rom_rodata_size;
+    } > REGION_TEXT AT> REGION_TEXT
+
     .text : {
         CREATE_OBJECT_SYMBOLS
         *(.text)
@@ -222,15 +246,16 @@ SECTIONS {
     /* End of executable code/data, NVS is not part of the OTA image */
     PROVIDE (_flash_end_address = .);
 
-    /* 5 pages of NV Memory (0x800 each) offset by 1 page for BIM/CCFG */
-    /*.nvs (NOLOAD) : ALIGN(0x2000) { */
-    .nvs (0xFB000) (NOLOAD) : AT (0xFB000) ALIGN(0x800) {
+    .nvs (0xA8000) (NOLOAD) : AT (0xA0000) ALIGN(0x2000) {
         *(.nvs)
     } > REGION_TEXT
 
+    /* CCFG is supplied by the BIM project */
+    /*
     .ccfg : {
         KEEP (*(.ccfg))
     } > FLASH_CCFG AT> FLASH_CCFG
+    */
 
     .bss : {
         __bss_start__ = .;

@@ -1,2 +1,4 @@
 ecdsa>=0.17.0
 intelhex
+jsonschema
+ecdsa

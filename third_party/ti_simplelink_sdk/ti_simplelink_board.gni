@@ -16,6 +16,7 @@ declare_args() {
   # TI SimpleLink board used
   ti_simplelink_board = ""
   ti_simplelink_device = ""
+  custom_factory_data = true
 }
 
 if (ti_simplelink_board == "") {

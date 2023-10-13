@@ -32,6 +32,8 @@ static_library("cc13x4_26x4") {
     "../ConnectivityManagerImpl.cpp",
     "../DiagnosticDataProviderImpl.cpp",
     "../DiagnosticDataProviderImpl.h",
+    "../FactoryDataProvider.cpp",
+    "../FactoryDataProvider.h",
     "../KeyValueStoreManagerImpl.cpp",
     "../Logging.cpp",
     "../PlatformManagerImpl.cpp",

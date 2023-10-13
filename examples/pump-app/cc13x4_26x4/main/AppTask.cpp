@@ -207,6 +207,16 @@ int AppTask::Init()
     sAppRightHandle                = Button_open(CONFIG_BTN_RIGHT, &buttonParams);
     Button_setCallback(sAppRightHandle, ButtonRightEventHandler);
 
+    // Initialize device attestation config
+#ifdef CC13X4_26X4_ATTESTATION_CREDENTIALS
+    //SetDeviceAttestationCredentialsProvider(CC13X4_26X4::GetCC13X4_26X4DacProvider());
+    SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
+    SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
+    SetCommissionableDataProvider(&mFactoryDataProvider);
+#else
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
+
     // Initialize Pump module
     PLAT_LOG("Initialize Pump");
     PumpMgr().Init();
@@ -222,14 +232,10 @@ int AppTask::Init()
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     chip::Server::GetInstance().Init(initParams);
 
-    // Initialize device attestation config
-#ifdef CC13X4_26X4_ATTESTATION_CREDENTIALS
-    SetDeviceAttestationCredentialsProvider(CC13X4_26X4::GetCC13X4_26X4DacProvider());
-#else
-    SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-#endif
-
     ConfigurationMgr().LogDeviceConfig();
+    char buf[32] ={0};
+    mFactoryDataProvider.GetVendorName(buf, 32);
+    mFactoryDataProvider.GetHardwareVersionString(buf, 32);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     InitializeOTARequestor();
