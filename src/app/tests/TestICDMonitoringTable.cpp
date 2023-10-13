@@ -119,11 +119,7 @@ void TestSaveAndLoadRegistrationValue(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.monitoredSubject);
-
-// Cannot compare nor retrieve Data if using PSA crypto
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer1a, sizeof(kKeyBuffer1a)));
-#endif
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1a)));
 
     // Retrieve second entry
     err = loading.Get(1, entry);
@@ -131,11 +127,7 @@ void TestSaveAndLoadRegistrationValue(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.monitoredSubject);
-
-// Cannot compare nor retrieve Data if using PSA crypto
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer2a, sizeof(kKeyBuffer2a)));
-#endif
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
 
     // No more entries
     err = loading.Get(2, entry);
@@ -155,11 +147,7 @@ void TestSaveAndLoadRegistrationValue(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId13 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.monitoredSubject);
-
-// Cannot compare nor retrieve Data if using PSA crypto
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer1b, sizeof(kKeyBuffer1b)));
-#endif
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1b)));
 
     // Retrieve second entry (not modified)
     err = loading.Get(1, entry);
@@ -167,11 +155,7 @@ void TestSaveAndLoadRegistrationValue(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.monitoredSubject);
-
-// Cannot compare nor retrieve Data if using PSA crypto
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer2a, sizeof(kKeyBuffer2a)));
-#endif
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
 }
 
 void TestSaveAllInvalidRegistrationValues(nlTestSuite * aSuite, void * aContext)
@@ -257,10 +241,7 @@ void TestSaveLoadRegistrationValueForMultipleFabrics(nlTestSuite * aSuite, void 
     NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.monitoredSubject);
-
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer1a, sizeof(kKeyBuffer1a)));
-#endif
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1a)));
 
     // Retrieve fabric2, second entry
     err = table1.Get(1, entry);
@@ -268,10 +249,7 @@ void TestSaveLoadRegistrationValueForMultipleFabrics(nlTestSuite * aSuite, void 
     NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.monitoredSubject);
-
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer1b, sizeof(kKeyBuffer1b)));
-#endif
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1b)));
 
     // Retrieve fabric2, first entry
     err = table2.Get(0, entry);
@@ -279,10 +257,7 @@ void TestSaveLoadRegistrationValueForMultipleFabrics(nlTestSuite * aSuite, void 
     NL_TEST_ASSERT(aSuite, kTestFabricIndex2 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId21 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId22 == entry.monitoredSubject);
-
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer2a, sizeof(kKeyBuffer2a)));
-#endif
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
 }
 
 void TestDeleteValidEntryFromStorage(nlTestSuite * aSuite, void * context)
@@ -325,10 +300,7 @@ void TestDeleteValidEntryFromStorage(nlTestSuite * aSuite, void * context)
     NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.monitoredSubject);
-
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer1a, sizeof(kKeyBuffer1a)));
-#endif
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1a)));
 
     // Retrieve second entry (not modified)
     err = table1.Get(1, entry);
@@ -336,10 +308,7 @@ void TestDeleteValidEntryFromStorage(nlTestSuite * aSuite, void * context)
     NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.monitoredSubject);
-
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer2a, sizeof(kKeyBuffer2a)));
-#endif
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
 
     // Remove (existing)
     err = table1.Remove(0);
@@ -354,10 +323,7 @@ void TestDeleteValidEntryFromStorage(nlTestSuite * aSuite, void * context)
     NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.monitoredSubject);
-
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer2a, sizeof(kKeyBuffer2a)));
-#endif
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
 
     // Retrieve fabric2, first entry
     err = table2.Get(0, entry);
@@ -365,10 +331,7 @@ void TestDeleteValidEntryFromStorage(nlTestSuite * aSuite, void * context)
     NL_TEST_ASSERT(aSuite, kTestFabricIndex2 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId21 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId22 == entry.monitoredSubject);
-
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer2a, sizeof(kKeyBuffer2a)));
-#endif
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
 
     // Remove all (fabric 1)
     err = table1.RemoveAll();
@@ -383,10 +346,7 @@ void TestDeleteValidEntryFromStorage(nlTestSuite * aSuite, void * context)
     NL_TEST_ASSERT(aSuite, kTestFabricIndex2 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId21 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId22 == entry.monitoredSubject);
-
-#if !CHIP_CRYPTO_PSA
-    NL_TEST_ASSERT(aSuite, 0 == memcmp(entry.key.As<chip::Crypto::Aes128KeyByteArray>(), kKeyBuffer2a, sizeof(kKeyBuffer2a)));
-#endif
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
 
     // Remove all (fabric 2)
     err = table2.RemoveAll();
