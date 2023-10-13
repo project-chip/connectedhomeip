@@ -166,13 +166,6 @@ else()
     unset(GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE)
 endif()
 
-set(BLOCK_SIZE "1024")
-
-# get code-partition mcuboot_partition size
-dt_nodelabel(dts_partition_path NODELABEL "boot_partition")
-dt_reg_size(mcuboot_size PATH ${dts_partition_path})
-math(EXPR boot_blocks "${mcuboot_size} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
-
 if (CONFIG_CHIP_OTA_IMAGE_BUILD)
     add_custom_target(build_mcuboot ALL
         COMMAND
@@ -184,7 +177,7 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
         COMMAND
         dd if=${PROJECT_BINARY_DIR}/../modules/chip-module/build_mcuboot/zephyr/zephyr.bin of=${PROJECT_BINARY_DIR}/zephyr.bin
         COMMAND
-        dd if=${PROJECT_BINARY_DIR}/zephyr.signed.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=${BLOCK_SIZE} seek=${boot_blocks}
+        dd if=${PROJECT_BINARY_DIR}/zephyr.signed.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=100
     )
 
     chip_ota_image(chip-ota-image
@@ -196,21 +189,16 @@ if (CONFIG_CHIP_OTA_IMAGE_BUILD)
     add_dependencies(chip-ota-image ${ZEPHYR_FINAL_EXECUTABLE})
 endif()
 
-# get code-partition factory_partition address
-dt_nodelabel(dts_partition_path NODELABEL "factory_partition")
-dt_reg_addr(factory_size PATH ${dts_partition_path})
-math(EXPR factory_blocks "${factory_size} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
-
 if (CONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE)
-  add_custom_target(merge_factory_data ALL
-    COMMAND
-    dd if=${PROJECT_BINARY_DIR}/factory/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=${BLOCK_SIZE} seek=${factory_blocks}
-  )
-  if (CONFIG_CHIP_OTA_IMAGE_BUILD)
+    add_custom_target(merge_factory_data ALL
+        COMMAND
+        dd if=${PROJECT_BINARY_DIR}/factory/factory_data.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=1024 seek=1052
+    )
+if (CONFIG_CHIP_OTA_IMAGE_BUILD)
     add_dependencies(merge_factory_data merge_mcuboot)
-  else()
+else()
     add_dependencies(merge_factory_data ${ZEPHYR_FINAL_EXECUTABLE})
-  endif()
+endif()
 endif()
 
 # ==============================================================================

@@ -33,13 +33,6 @@ for creating your own application.
     $ west build -b <build_target>
     ```
 
-    Also use key `-DFLASH_SIZE`, if your board has memory size different from 2
-    MB, for example, `-DFLASH_SIZE=1m` or `-DFLASH_SIZE=1m`:
-
-    ```bash
-    $ west build -b tlsr9518adk80d -- -DFLASH_SIZE=4m
-    ```
-
 4. Flash binary:
 
     ```
@@ -107,7 +100,7 @@ feature for another Telink example:
 
 After build application with enabled OTA feature, use next binary files:
 
--   zephyr.bin - main binary to flash PCB (Use at least 2MB PCB).
+-   zephyr.bin - main binary to flash PCB (Use 2MB PCB).
 -   zephyr-ota.bin - binary for OTA Provider
 
 All binaries has the same SW version. To test OTA “zephyr-ota.bin” should have
