@@ -1,4 +1,5 @@
 /** {{description}} */
+{{#if apiMaturity}}{{apiMaturity}} {{/if~}}
 {{#if generateClientCluster}}client {{else}}server {{/if~}}
 cluster {{asUpperCamelCase name}} = {{!}}
      {{~#if manufacturerCode}}
