@@ -17,13 +17,18 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
+import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class WiFiNetworkDiagnosticsClusterConnectionStatusEvent(val connectionStatus: UInt) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class WiFiNetworkDiagnosticsClusterConnectionStatusEvent (
+    val connectionStatus: UInt) {
+  override fun toString(): String  = buildString {
     append("WiFiNetworkDiagnosticsClusterConnectionStatusEvent {\n")
     append("\tconnectionStatus : $connectionStatus\n")
     append("}\n")
@@ -40,13 +45,10 @@ class WiFiNetworkDiagnosticsClusterConnectionStatusEvent(val connectionStatus: U
   companion object {
     private const val TAG_CONNECTION_STATUS = 0
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): WiFiNetworkDiagnosticsClusterConnectionStatusEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : WiFiNetworkDiagnosticsClusterConnectionStatusEvent {
       tlvReader.enterStructure(tlvTag)
       val connectionStatus = tlvReader.getUInt(ContextSpecificTag(TAG_CONNECTION_STATUS))
-
+      
       tlvReader.exitContainer()
 
       return WiFiNetworkDiagnosticsClusterConnectionStatusEvent(connectionStatus)

@@ -17,13 +17,20 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag
 import chip.tlv.Tag
+import chip.tlv.TlvParsingException
 import chip.tlv.TlvReader
 import chip.tlv.TlvWriter
 
-class AudioOutputClusterOutputInfoStruct(val index: UInt, val outputType: UInt, val name: String) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class AudioOutputClusterOutputInfoStruct (
+    val index: UInt,
+    val outputType: UInt,
+    val name: String) {
+  override fun toString(): String  = buildString {
     append("AudioOutputClusterOutputInfoStruct {\n")
     append("\tindex : $index\n")
     append("\toutputType : $outputType\n")
@@ -46,12 +53,12 @@ class AudioOutputClusterOutputInfoStruct(val index: UInt, val outputType: UInt, 
     private const val TAG_OUTPUT_TYPE = 1
     private const val TAG_NAME = 2
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AudioOutputClusterOutputInfoStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : AudioOutputClusterOutputInfoStruct {
       tlvReader.enterStructure(tlvTag)
       val index = tlvReader.getUInt(ContextSpecificTag(TAG_INDEX))
       val outputType = tlvReader.getUInt(ContextSpecificTag(TAG_OUTPUT_TYPE))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
-
+      
       tlvReader.exitContainer()
 
       return AudioOutputClusterOutputInfoStruct(index, outputType, name)
