@@ -270,6 +270,13 @@ template("efr32_sdk") {
       #"__STACK_SIZE=0",
     ]
 
+    if (!(use_silabs_thread_lib || use_silabs_thread_lib)) {
+      #Enabling this config temporarly to fix a build issue until
+      #official fix is pushed
+
+      defines += [ "OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE=1" ]
+    }
+
     # Temporary configuration to enable COAP specific configurations
     if (use_thread_coap_lib) {
       defines += [ "SL_USE_COAP_CONFIG=1" ]

@@ -102,10 +102,6 @@
 
 #define OPENTHREAD_CONFIG_DETERMINISTIC_ECDSA_ENABLE 0
 
-// Enabling this config temporarly to fix a build issue until
-// official fix is pushed
-#define OPENTHREAD_CONFIG_MAC_CSL_RECEIVER_ENABLE 1
-
 // Use the SiLabs-supplied default platform configuration for remainder
 // of OpenThread config options.
 //
