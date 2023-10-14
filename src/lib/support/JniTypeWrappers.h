@@ -19,8 +19,8 @@
 
 #include <cstdint>
 #include <jni.h>
-#include <lib/support/JniReferences.h>
 #include <lib/support/CHIPJNIError.h>
+#include <lib/support/JniReferences.h>
 #include <lib/support/Span.h>
 #include <string>
 
@@ -221,8 +221,9 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    JniGlobalReference(JniGlobalReference && aOther) {
-        mObjectRef = aOther.mObjectRef;
+    JniGlobalReference(JniGlobalReference && aOther)
+    {
+        mObjectRef        = aOther.mObjectRef;
         aOther.mObjectRef = nullptr;
     }
 
@@ -237,10 +238,7 @@ public:
 
     jobject ObjectRef() { return mObjectRef; }
 
-    bool HasValidObjectRef()
-    {
-        return mObjectRef != nullptr;
-    }
+    bool HasValidObjectRef() { return mObjectRef != nullptr; }
 
 private:
     jobject mObjectRef = nullptr;

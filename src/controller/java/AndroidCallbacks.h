@@ -23,9 +23,9 @@
 #include <controller/CHIPDeviceController.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/JniTypeWrappers.h>
 #include <list>
 #include <utility>
-#include <lib/support/JniTypeWrappers.h>
 
 namespace chip {
 namespace Controller {
