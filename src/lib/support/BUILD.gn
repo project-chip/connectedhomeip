@@ -107,6 +107,49 @@ source_set("memory") {
   ]
 }
 
+source_set("text_only_logging") {
+  sources = [
+    "logging/TextOnlyLogging.cpp",
+    "logging/TextOnlyLogging.h",
+  ]
+
+  public_deps = [
+    ":attributes",
+    ":logging_constants",
+    ":verifymacros_no_logging",
+    "${chip_root}/src/lib/core:chip_config_header",
+  ]
+
+  if (chip_pw_tokenizer_logging) {
+    public_deps += [ "${dir_pw_tokenizer}" ]
+  }
+
+  deps = [
+    ":memory",
+    "${chip_root}/src/lib/core:chip_config_header",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+}
+
+source_set("verifymacros") {
+  sources = [ "CodeUtils.h" ]
+
+  public_deps = [
+    ":attributes",
+    ":text_only_logging",
+    ":verifymacros_no_logging",
+    "${chip_root}/src/lib/core:chip_config_header",
+    "${chip_root}/src/lib/core:error",
+    "${nlassert_root}:nlassert",
+  ]
+}
+
+source_set("span") {
+  sources = [ "Span.h" ]
+
+  public_deps = [ ":verifymacros" ]
+}
+
 source_set("chip_version_header") {
   sources = get_target_outputs(":gen_chip_version")
 
@@ -132,7 +175,6 @@ static_library("support") {
     "CHIPArgParser.cpp",
     "CHIPCounter.h",
     "CHIPMemString.h",
-    "CodeUtils.h",
     "DLLUtil.h",
     "DefaultStorageKeyAllocator.h",
     "Defer.h",
@@ -172,8 +214,6 @@ static_library("support") {
     "logging/BinaryLogging.cpp",
     "logging/BinaryLogging.h",
     "logging/CHIPLogging.h",
-    "logging/TextOnlyLogging.cpp",
-    "logging/TextOnlyLogging.h",
     "verhoeff/Verhoeff.cpp",
     "verhoeff/Verhoeff.h",
     "verhoeff/Verhoeff10.cpp",
@@ -203,11 +243,13 @@ static_library("support") {
     ":logging_constants",
     ":memory",
     ":safeint",
+    ":span",
+    ":text_only_logging",
+    ":verifymacros",
     ":verifymacros_no_logging",
     "${chip_root}/src/lib/core:chip_config_header",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/platform:platform_buildconfig",
-    "${chip_root}/src/platform/logging:headers",
     "${nlassert_root}:nlassert",
     "${nlio_root}:nlio",
   ]

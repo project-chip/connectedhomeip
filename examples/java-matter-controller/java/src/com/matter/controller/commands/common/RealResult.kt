@@ -19,24 +19,23 @@
 package com.matter.controller.commands.common
 
 /**
- * Implements a Result where an error string is associated with its failure state.
+ * Represents a result that can either indicate success or failure with an associated error message.
  *
- * <p>A `Result` is just a booean of true/false that is exposed via `getResult`. This class will
- * contain either a `true` value for `Success` or a `false` value in which case the failure will
- * also have an error string explaining the reason of the failure associated with it.
+ * In the context of RealResult, success is represented by [Success] and failure by [Error]. When
+ * there is an error, an error message explains the reason for the failure.
  */
-class RealResult(val result: Boolean, val error: String?) {
-  constructor() : this(true, null)
+sealed class RealResult {
+  data class Error(val error: String) : RealResult()
 
-  constructor(error: String?) : this(false, error)
+  object Success : RealResult()
 
   companion object {
     fun success(): RealResult {
-      return RealResult()
+      return Success
     }
 
     fun error(error: String?): RealResult {
-      return RealResult(error)
+      return error?.let { Error(it) } ?: Success
     }
   }
 }
