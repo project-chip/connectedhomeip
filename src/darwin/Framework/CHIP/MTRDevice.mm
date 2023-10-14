@@ -192,6 +192,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #ifdef DEBUG
 @protocol MTRDeviceUnitTestDelegate <MTRDeviceDelegate>
 - (void)unitTestReportEndForDevice:(MTRDevice *)device;
+- (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device;
+- (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device;
 @end
 #endif
 
@@ -235,11 +237,25 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue
 {
     MTR_LOG_INFO("%@ setDelegate %@", self, delegate);
+
+    BOOL setUpSubscription = YES;
+
+    // For unit testing only
+#ifdef DEBUG
+    id testDelegate = delegate;
+    if ([testDelegate respondsToSelector:@selector(unitTestShouldSetUpSubscriptionForDevice:)]) {
+        setUpSubscription = [testDelegate unitTestShouldSetUpSubscriptionForDevice:self];
+    }
+#endif
+
     os_unfair_lock_lock(&self->_lock);
 
     _weakDelegate = [MTRWeakReference weakReferenceWithObject:delegate];
     _delegateQueue = queue;
-    [self _setupSubscription];
+
+    if (setUpSubscription) {
+        [self _setupSubscription];
+    }
 
     os_unfair_lock_unlock(&self->_lock);
 }
@@ -974,7 +990,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                                 MTR_LOG_ERROR("Read attribute work item [%llu] failed (will retry): %@", workItemID, error);
                                 completion(MTRAsyncWorkNeedsRetry);
                             } else {
-                                MTR_LOG_DEFAULT("Read attribute work item [%llu] failed (giving up): %@", workItemID, error);
+                                if (error) {
+                                    MTR_LOG_DEFAULT("Read attribute work item [%llu] failed (giving up): %@", workItemID, error);
+                                }
                                 completion(MTRAsyncWorkComplete);
                             }
                         }];
@@ -998,13 +1016,25 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     expectedValueInterval = MTRClampedNumber(expectedValueInterval, @(1), @(UINT32_MAX));
     MTRAttributePath * attributePath = [MTRAttributePath attributePathWithEndpointID:endpointID
                                                                            clusterID:clusterID
+
                                                                          attributeID:attributeID];
-    // Commit change into expected value cache
-    NSDictionary * newExpectedValueDictionary = @{ MTRAttributePathKey : attributePath, MTRDataKey : value };
-    uint64_t expectedValueID;
-    [self setExpectedValues:@[ newExpectedValueDictionary ]
-        expectedValueInterval:expectedValueInterval
-              expectedValueID:&expectedValueID];
+
+    BOOL useValueAsExpectedValue = YES;
+#ifdef DEBUG
+    id delegate = _weakDelegate.strongObject;
+    if ([delegate respondsToSelector:@selector(unitTestShouldSkipExpectedValuesForWrite:)]) {
+        useValueAsExpectedValue = ![delegate unitTestShouldSkipExpectedValuesForWrite:self];
+    }
+#endif
+
+    uint64_t expectedValueID = 0;
+    if (useValueAsExpectedValue) {
+        // Commit change into expected value cache
+        NSDictionary * newExpectedValueDictionary = @{ MTRAttributePathKey : attributePath, MTRDataKey : value };
+        [self setExpectedValues:@[ newExpectedValueDictionary ]
+            expectedValueInterval:expectedValueInterval
+                  expectedValueID:&expectedValueID];
+    }
 
     MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
     uint64_t workItemID = workItem.uniqueID; // capture only the ID, not the work item
@@ -1026,7 +1056,9 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                   if (error) {
                                       MTR_LOG_ERROR("Write attribute work item [%llu] failed: %@", workItemID, error);
-                                      [self removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
+                                      if (useValueAsExpectedValue) {
+                                          [self removeExpectedValueForAttributePath:attributePath expectedValueID:expectedValueID];
+                                      }
                                   }
                                   completion(MTRAsyncWorkComplete);
                               }];
