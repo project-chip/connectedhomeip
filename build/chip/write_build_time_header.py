@@ -18,7 +18,7 @@ import os
 from datetime import datetime, timezone
 
 SCRIPT_DIR = os.path.abspath(os.path.dirname(__file__))
-FALLBACK_LKGT_FILENAME = os.path.abspath(os.path.join(SCRIPT_DIR, 'fallback_lkgt'))
+FALLBACK_LKGT_FILENAME = os.path.abspath(os.path.join(SCRIPT_DIR, 'fallback_last_known_good_time'))
 
 
 def utc_time_in_matter_epoch_s(time: datetime):
