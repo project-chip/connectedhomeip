@@ -238,8 +238,8 @@ public:
     jobject ObjectRef() { return mObjectRef; }
 
     bool HasValidObjectRef()
-    { 
-        return mObjectRef != nullptr; 
+    {
+        return mObjectRef != nullptr;
     }
 
 private:
