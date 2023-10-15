@@ -32,8 +32,7 @@ void DurationTimer::start()
 {
     chip::System::Clock::Timestamp tv1 = chip::System::SystemClock().GetMonotonicTimestamp();
 
-    //chip::System::Clock::ToTimeval(tv1, t1);
-    ToTimeval(tv1, t1);
+    chip::System::Clock::ToTimeval(tv1, t1);
 
     ChipLogDetail(DeviceLayer, "Timer: %s start time: %s ", label.c_str(), toTimeStr(&t1).c_str());
 }
@@ -43,8 +42,7 @@ void DurationTimer::stop()
 
     chip::System::Clock::Timestamp tv2 = chip::System::SystemClock().GetMonotonicTimestamp();
 
-    //chip::System::Clock::ToTimeval(tv2, t2);
-   ToTimeval(tv2, t2);
+    chip::System::Clock::ToTimeval(tv2, t2);
 
     ChipLogDetail(DeviceLayer, "Timer: %s stop time: %s ", label.c_str(), toTimeStr(&t2).c_str());
 
@@ -63,14 +61,6 @@ double DurationTimer::duration()
 }
 
 // utility method
-void DurationTimer::ToTimeval(chip::System::Clock::Microseconds64 in, timeval & out)
-{
-    chip::System::Clock::Seconds32 seconds = std::chrono::duration_cast<chip::System::Clock::Seconds32>(in);
-    in -= seconds;
-    out.tv_sec  = static_cast<time_t>(seconds.count());
-    out.tv_usec = static_cast<suseconds_t>(in.count());
-}
-
 string DurationTimer::toTimeStr(timeval * time)
 {
     char * buff = new char[DATETIME_LEN];
