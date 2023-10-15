@@ -1,4 +1,4 @@
-#include "DurationTimer.h"
+#include <system/DurationTimer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <stdint.h>
 #include <string>
@@ -16,6 +16,7 @@ using namespace std::literals;
 
 // todo add description
 namespace chip {
+
 namespace timing {
 
 #define DATETIME_PATTERN ("%Y-%m-%dT%H:%M:%S")
@@ -24,14 +25,15 @@ namespace timing {
 
 #define ISO8601_LEN (sizeof "1970-01-01T23:59:59.123456Z")
 
-#if CHIP_DEVICE_USES_SYS_TIME
+#ifdef CHIP_DEVICE_USES_SYS_TIME
 
 // member functions
 void DurationTimer::start()
 {
     chip::System::Clock::Timestamp tv1 = chip::System::SystemClock().GetMonotonicTimestamp();
 
-    chip::System::Clock::ToTimeval(tv1, t1);
+    //chip::System::Clock::ToTimeval(tv1, t1);
+    ToTimeval(tv1, t1);
 
     ChipLogDetail(DeviceLayer, "Timer: %s start time: %s ", label.c_str(), toTimeStr(&t1).c_str());
 }
@@ -41,7 +43,8 @@ void DurationTimer::stop()
 
     chip::System::Clock::Timestamp tv2 = chip::System::SystemClock().GetMonotonicTimestamp();
 
-    chip::System::Clock::ToTimeval(tv2, t2);
+    //chip::System::Clock::ToTimeval(tv2, t2);
+   ToTimeval(tv2, t2);
 
     ChipLogDetail(DeviceLayer, "Timer: %s stop time: %s ", label.c_str(), toTimeStr(&t2).c_str());
 
@@ -60,6 +63,14 @@ double DurationTimer::duration()
 }
 
 // utility method
+void DurationTimer::ToTimeval(chip::System::Clock::Microseconds64 in, timeval & out)
+{
+    chip::System::Clock::Seconds32 seconds = std::chrono::duration_cast<chip::System::Clock::Seconds32>(in);
+    in -= seconds;
+    out.tv_sec  = static_cast<time_t>(seconds.count());
+    out.tv_usec = static_cast<suseconds_t>(in.count());
+}
+
 string DurationTimer::toTimeStr(timeval * time)
 {
     char * buff = new char[DATETIME_LEN];
@@ -73,7 +84,7 @@ string DurationTimer::toTimeStr(timeval * time)
 }
 #endif
 
-#if CHIP_DEVICE_USES_TIME_H
+#ifdef CHIP_DEVICE_USES_TIME_H
 // member functions
 void DurationTimer::start()
 {
