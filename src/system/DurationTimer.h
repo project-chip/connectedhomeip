@@ -3,6 +3,7 @@
 #include <string>
 
 #include <system/SystemConfig.h>
+
 /**
  * Uses SystemClock.h HAVE_CLOCK_GETTIME to determine board type i.e. esp32 or nRF etc.
  * CHIP_DEVICE_USES_SYS_TIME flag indicates nRF board whose clock implementation is available in Syste,Clock.h.

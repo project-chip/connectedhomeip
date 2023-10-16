@@ -1,3 +1,4 @@
+
 #include <system/DurationTimer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <stdint.h>
@@ -8,6 +9,7 @@
 #endif
 
 #if CHIP_DEVICE_USES_TIME_H
+
 #include <time.h>
 #endif
 
@@ -26,7 +28,6 @@ namespace timing {
 #define ISO8601_LEN (sizeof "1970-01-01T23:59:59.123456Z")
 
 #ifdef CHIP_DEVICE_USES_SYS_TIME
-
 // member functions
 void DurationTimer::start()
 {
@@ -73,6 +74,7 @@ string DurationTimer::toTimeStr(timeval * time)
     return str;
 }
 #endif
+
 
 #ifdef CHIP_DEVICE_USES_TIME_H
 // member functions
