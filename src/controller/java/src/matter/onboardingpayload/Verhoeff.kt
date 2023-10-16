@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-package chip.onboardingpayload
+package matter.onboardingpayload
 
 object Verhoeff {
   fun dihedralMultiply(x: Int, y: Int, n: Int): Int {

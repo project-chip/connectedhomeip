@@ -23,14 +23,11 @@ config:
     cluster: "Scenes"
     endpoint: 1
     G1:
-        type: int16u
+        type: group_id
         defaultValue: 0x0001
     G2:
-        type: int16u
+        type: group_id
         defaultValue: 0x0002
-
-    GroupKeyManagement.Endpoint: 0
-    Groups.Endpoint: 1
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -54,7 +51,7 @@ tests:
           "Step 0a: preparation step for using commands from Groups cluster: Add
           KeySet"
       cluster: "Group Key Management"
-      endpoint: GroupKeyManagement.Endpoint
+      endpoint: 0
       command: "KeySetWrite"
       arguments:
           values:
@@ -75,7 +72,7 @@ tests:
           "Step 0b: Preparation step for using commands from Groups cluster:
           Write Group Keys"
       cluster: "Group Key Management"
-      endpoint: GroupKeyManagement.Endpoint
+      endpoint: 0
       command: "writeAttribute"
       attribute: "GroupKeyMap"
       arguments:
@@ -88,7 +85,7 @@ tests:
     - label: "Step 0c: TH sends a RemoveAllGroups command to DUT."
       PICS: G.S.C04.Rsp
       cluster: "Groups"
-      endpoint: Groups.Endpoint
+      endpoint: endpoint
       command: "RemoveAllGroups"
 
     - label:
@@ -330,7 +327,7 @@ tests:
     - label: "Step 4a: Reboot target device"
       PICS: PICS_SDK_CI_ONLY
       cluster: "SystemCommands"
-      endpoint: GroupKeyManagement.Endpoint
+      endpoint: 0
       command: "Reboot"
 
     - label: "Step 4a: Reboot target device(DUT)"
@@ -1033,7 +1030,7 @@ tests:
       response:
           values:
               - name: "Status"
-                saveAs: StoreStatus
+                saveAs: StoredStatus
                 constraints:
                     anyOf: [0x00, 0x89]
               - name: "GroupID"
@@ -1052,16 +1049,16 @@ tests:
               - name: "Value1"
                 value: 0x00
               - name: "Value2"
-                value: StoreStatus
+                value: StoredStatus
       response:
           - values:
                 - name: "Equals"
-                  saveAs: ContinueTest
+                  saveAs: ContinueStep14
 
     - label:
           "Step 14c: TH sends a GetSceneMembership command to DUT with the
           GroupID field set to G2."
-      runIf: ContinueTest
+      runIf: ContinueStep14
       PICS: S.S.C06.Rsp
       command: "GetSceneMembership"
       arguments:
@@ -1084,7 +1081,7 @@ tests:
           KeySetRemove command to the GroupKeyManagement cluster with the
           GroupKeySetID field set to 0x01a1"
       cluster: "Group Key Management"
-      endpoint: GroupKeyManagement.Endpoint
+      endpoint: 0
       command: "KeySetRemove"
       arguments:
           values:

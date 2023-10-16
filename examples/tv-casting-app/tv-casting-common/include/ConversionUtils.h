@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2023 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,26 +16,8 @@
  *    limitations under the License.
  */
 
-package chip.onboardingpayload
+#include "TargetVideoPlayerInfo.h"
 
-enum class OptionalQRCodeInfoType {
-  TYPE_UNKNOWN,
-  TYPE_STRING,
-  TYPE_INT32,
-  TYPE_INT64,
-  TYPE_UINT32,
-  TYPE_UINT64
-}
+#include <lib/dnssd/Resolver.h>
 
-open class OptionalQRCodeInfo {
-  var tag: Int = 0
-  var type: OptionalQRCodeInfoType = OptionalQRCodeInfoType.TYPE_UNKNOWN
-  var data: String? = null
-  var int32: Int = 0
-}
-
-class OptionalQRCodeInfoExtension : OptionalQRCodeInfo() {
-  var int64: Long = 0
-  var uint32: Long = 0
-  var uint64: Long = 0
-}
+CHIP_ERROR ConvertToDiscoveredNodeData(TargetVideoPlayerInfo * inPlayer, chip::Dnssd::DiscoveredNodeData & outNodeData);

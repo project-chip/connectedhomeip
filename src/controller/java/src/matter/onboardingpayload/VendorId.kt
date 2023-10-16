@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-package chip.onboardingpayload
+package matter.onboardingpayload
 
 /**
  * code="0x0000" is defined as "Matter Standard" in the official CSA alliance manufacturer ID

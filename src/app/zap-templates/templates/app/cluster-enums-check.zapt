@@ -9,6 +9,7 @@ namespace app {
 namespace Clusters {
 {{#zcl_clusters}}
 {{#zcl_enums}}
+{{#unless (isInConfigList (concat (asUpperCamelCase ../name) "::" label) "EnumsNotUsedAsTypeInXML")}}
 static auto __attribute__((unused)) EnsureKnownEnumValue({{asUpperCamelCase ../name}}::{{asType label}} val)
 {
     using EnumType = {{asUpperCamelCase ../name}}::{{asType label}};
@@ -33,6 +34,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue({{asUpperCamelCase ../n
         return static_cast<EnumType>({{first_unused_enum_value mode="first_unused"}});
     }
 }
+{{/unless}}
 {{/zcl_enums}}
 
 {{/zcl_clusters}}
