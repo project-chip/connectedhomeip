@@ -23,7 +23,7 @@
 echo "Disk Space Usage:"
 df -h
 
-listOfDirectories=("third_party/" ".environment/" "out/", "$HOME/.cipd-cache-dir/", "$HOME/.cache/")
+listOfDirectories=("third_party/" ".environment/" "out/" "$HOME/.cipd-cache-dir/" "$HOME/.cache/")
 
 pipCacheDir=$(python -m pip cache dir)
 exitcode=$?
@@ -36,10 +36,11 @@ echo
 echo "Storage Space Used By Key Directories:"
 for directory in "${listOfDirectories[@]}"; do
     if [ -d "$directory" ]; then
+        echo "Directory exist: $directory   , asdf"
         du -d1 -h "$directory" | sort -h
         echo
     else
-        echo "Directory doesn't exist, skipping: $directory"
+        echo "Directory doesn't exist, skipping: $directory   , asdf"
         echo
     fi
 done
