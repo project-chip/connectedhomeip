@@ -40,8 +40,10 @@ runs:
       # this point onwards.
       shell: bash
       run: |
-        du -sh $HOME/asdf/
-        rm -rf $HOME/asdf/
+        if [ -d $HOME/asdf/ ]; then
+          du -sh $HOME/asdf/
+          rm -rf $HOME/asdf/
+        fi      
     - name: Dump disk info after checkout submodule & Bootstrap
       shell: bash
       run: scripts/dump_diskspace_info.sh
