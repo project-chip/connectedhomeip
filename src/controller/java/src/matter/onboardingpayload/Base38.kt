@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-package chip.onboardingpayload
+package matter.onboardingpayload
 
 private val kCodes =
   charArrayOf(

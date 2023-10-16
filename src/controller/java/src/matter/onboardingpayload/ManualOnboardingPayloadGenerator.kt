@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-package chip.onboardingpayload
+package matter.onboardingpayload
 
 class ManualOnboardingPayloadGenerator(private val payloadContents: OnboardingPayload) {
   private var skipPayloadValidation = false
