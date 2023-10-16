@@ -199,7 +199,7 @@ const char * BluezConnection::GetPeerAddress() const
 
 gboolean BluezConnection::WriteHandlerCallback(GIOChannel * aChannel, GIOCondition aCond, BluezConnection * apConn)
 {
-    uint8_t * buf  = nullptr;
+    uint8_t buf[512 /* characteristic max size per BLE specification */];
     bool isSuccess = false;
     GVariant * newVal;
     ssize_t len;
@@ -210,8 +210,7 @@ gboolean BluezConnection::WriteHandlerCallback(GIOChannel * aChannel, GIOConditi
 
     ChipLogDetail(DeviceLayer, "C1 %s MTU: %d", __func__, apConn->GetMTU());
 
-    buf = g_new(uint8_t, apConn->GetMTU());
-    len = read(g_io_channel_unix_get_fd(aChannel), buf, apConn->GetMTU());
+    len = read(g_io_channel_unix_get_fd(aChannel), buf, sizeof(buf));
     VerifyOrExit(len > 0, ChipLogError(DeviceLayer, "FAIL: short read in %s (%zd)", __func__, len));
 
     // Casting len to size_t is safe, since we ensured that it's not negative.
@@ -222,7 +221,6 @@ gboolean BluezConnection::WriteHandlerCallback(GIOChannel * aChannel, GIOConditi
     isSuccess = true;
 
 exit:
-    g_free(buf);
     return isSuccess ? G_SOURCE_CONTINUE : G_SOURCE_REMOVE;
 }
 
