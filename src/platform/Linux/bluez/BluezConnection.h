@@ -48,12 +48,10 @@ public:
     bool IsNotifyAcquired() const { return mNotifyAcquired; }
     void SetNotifyAcquired(bool aNotifyAcquired) { mNotifyAcquired = aNotifyAcquired; }
 
-    using CharCallbackFunc = gboolean(GIOChannel *, GIOCondition, BluezConnection *);
-
     /// Setup callback for receiving data from the CHIP TX characteristic on the remote peripheral device
-    void SetupWriteCallback(int aSocketFd, CharCallbackFunc aCallback);
+    void SetupWriteHandler(int aSocketFd);
     /// Setup callback for receiving HUP event on the notification channel
-    void SetupNotifyCallback(int aSocketFd, CharCallbackFunc aCallback, bool aAdditionalAdvertising = false);
+    void SetupNotifyHandler(int aSocketFd, bool aAdditionalAdvertising = false);
 
     /// Send indication to the CHIP RX characteristic on the remote peripheral device
     CHIP_ERROR SendIndication(chip::System::PacketBufferHandle apBuf);
@@ -89,6 +87,9 @@ private:
 
     static CHIP_ERROR BluezDisconnect(BluezConnection * apConn);
 
+    static gboolean WriteHandlerCallback(GIOChannel * aChannel, GIOCondition aCond, BluezConnection * apConn);
+    static gboolean NotifyHandlerCallback(GIOChannel * aChannel, GIOCondition aCond, BluezConnection * apConn);
+
     static CHIP_ERROR SendIndicationImpl(ConnectionDataBundle * data);
 
     static void SendWriteRequestDone(GObject * aObject, GAsyncResult * aResult, gpointer apConn);
@@ -108,18 +109,18 @@ private:
     bool mNotifyAcquired = false;
     uint16_t mMtu        = 0;
 
-    IOChannel mC1Channel = { 0 };
-    IOChannel mC2Channel = { 0 };
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    IOChannel mC3Channel = { 0 };
-#endif
+    BluezGattService1 * mpService = nullptr;
 
-public:
-    BluezGattService1 * mpService   = nullptr;
     BluezGattCharacteristic1 * mpC1 = nullptr;
+    IOChannel mC1Channel            = { 0 };
+
     BluezGattCharacteristic1 * mpC2 = nullptr;
-    // additional data characteristics
+    IOChannel mC2Channel            = { 0 };
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     BluezGattCharacteristic1 * mpC3 = nullptr;
+    IOChannel mC3Channel            = { 0 };
+#endif
 };
 
 } // namespace Internal

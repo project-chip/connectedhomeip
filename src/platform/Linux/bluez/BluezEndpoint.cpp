@@ -310,35 +310,6 @@ static gboolean BluezCharacteristicWriteValueError(BluezGattCharacteristic1 * aC
     return TRUE;
 }
 
-static gboolean BluezCharacteristicWriteFD(GIOChannel * aChannel, GIOCondition aCond, BluezConnection * apConn)
-{
-    GVariant * newVal;
-    uint8_t * buf = nullptr;
-    ssize_t len;
-    bool isSuccess = false;
-
-    VerifyOrExit(!(aCond & G_IO_HUP), ChipLogError(DeviceLayer, "INFO: socket disconnected in %s", __func__));
-    VerifyOrExit(!(aCond & (G_IO_ERR | G_IO_NVAL)), ChipLogError(DeviceLayer, "INFO: socket error in %s", __func__));
-    VerifyOrExit(aCond == G_IO_IN, ChipLogError(DeviceLayer, "FAIL: error in %s", __func__));
-
-    ChipLogDetail(DeviceLayer, "c1 %s mtu, %d", __func__, apConn->GetMTU());
-
-    buf = g_new(uint8_t, apConn->GetMTU());
-    len = read(g_io_channel_unix_get_fd(aChannel), buf, apConn->GetMTU());
-    VerifyOrExit(len > 0, ChipLogError(DeviceLayer, "FAIL: short read in %s (%zd)", __func__, len));
-
-    // Casting len to size_t is safe, since we ensured that it's not negative.
-    newVal = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, buf, static_cast<size_t>(len), sizeof(uint8_t));
-
-    bluez_gatt_characteristic1_set_value(apConn->mpC1, newVal);
-    BLEManagerImpl::HandleRXCharWrite(apConn, buf, static_cast<size_t>(len));
-    isSuccess = true;
-
-exit:
-    g_free(buf);
-    return isSuccess ? G_SOURCE_CONTINUE : G_SOURCE_REMOVE;
-}
-
 static void Bluez_gatt_characteristic1_complete_acquire_write_with_fd(GDBusMethodInvocation * invocation, int fd, guint16 mtu)
 {
     GUnixFDList * fd_list = g_unix_fd_list_new();
@@ -346,11 +317,6 @@ static void Bluez_gatt_characteristic1_complete_acquire_write_with_fd(GDBusMetho
     g_dbus_method_invocation_return_value_with_unix_fd_list(invocation, g_variant_new("(@hq)", g_variant_new_handle(index), mtu),
                                                             fd_list);
     g_object_unref(fd_list);
-}
-
-static gboolean bluezCharacteristicDestroyFD(GIOChannel *, GIOCondition, BluezConnection *)
-{
-    return G_SOURCE_REMOVE;
 }
 
 static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
@@ -390,7 +356,7 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
         return FALSE;
     }
 
-    conn->SetupWriteCallback(fds[0], BluezCharacteristicWriteFD);
+    conn->SetupWriteHandler(fds[0]);
     bluez_gatt_characteristic1_set_write_acquired(aChar, TRUE);
 
     Bluez_gatt_characteristic1_complete_acquire_write_with_fd(aInvocation, fds[1], conn->GetMTU());
@@ -453,7 +419,7 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
         return FALSE;
     }
 
-    conn->SetupNotifyCallback(fds[0], bluezCharacteristicDestroyFD, isAdditionalAdvertising);
+    conn->SetupNotifyHandler(fds[0], isAdditionalAdvertising);
     bluez_gatt_characteristic1_set_notify_acquired(aChar, TRUE);
     conn->SetNotifyAcquired(true);
 

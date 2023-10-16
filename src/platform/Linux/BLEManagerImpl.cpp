@@ -552,30 +552,18 @@ void BLEManagerImpl::CHIPoBluez_ConnectionClosed(BLE_CONNECTION_OBJECT conId)
 
 void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    BluezConnection * connection = static_cast<BluezConnection *>(conId);
-
-    VerifyOrExit(connection != nullptr, ChipLogError(DeviceLayer, "Connection is NULL in HandleTXCharCCCDWrite"));
-    VerifyOrExit(connection->mpC2 != nullptr, ChipLogError(DeviceLayer, "C2 is NULL in HandleTXCharCCCDWrite"));
+    VerifyOrReturn(conId != BLE_CONNECTION_UNINITIALIZED,
+                   ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
 
     // Post an event to the Chip queue to process either a CHIPoBLE Subscribe or Unsubscribe based on
     // whether the client is enabling or disabling indications.
-    {
-        ChipDeviceEvent event;
-        event.Type = connection->IsNotifyAcquired() ? DeviceEventType::kCHIPoBLESubscribe : DeviceEventType::kCHIPoBLEUnsubscribe;
-        event.CHIPoBLESubscribe.ConId = connection;
-        PlatformMgr().PostEventOrDie(&event);
-    }
+    ChipDeviceEvent event;
+    event.Type = conId->IsNotifyAcquired() ? DeviceEventType::kCHIPoBLESubscribe : DeviceEventType::kCHIPoBLEUnsubscribe;
+    event.CHIPoBLESubscribe.ConId = conId;
+    PlatformMgr().PostEventOrDie(&event);
 
-    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received", connection->IsNotifyAcquired() ? "subscribe" : "unsubscribe");
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %s", ErrorStr(err));
-        // TODO: fail connection
-    }
+    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received",
+                    (event.Type == DeviceEventType::kCHIPoBLESubscribe) ? "subscribe" : "unsubscribe");
 }
 
 void BLEManagerImpl::HandleTXComplete(BLE_CONNECTION_OBJECT conId)

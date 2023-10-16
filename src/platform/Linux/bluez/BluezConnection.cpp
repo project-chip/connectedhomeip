@@ -151,11 +151,13 @@ CHIP_ERROR BluezConnection::Init()
                 {
                     mpC2 = char1;
                 }
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
                 else if ((BluezIsCharOnService(char1, mpService) == TRUE) &&
                          (strcmp(bluez_gatt_characteristic1_get_uuid(char1), CHIP_PLAT_BLE_UUID_C3_STRING) == 0))
                 {
                     mpC3 = char1;
                 }
+#endif
                 else
                 {
                     g_object_unref(char1);
@@ -201,7 +203,36 @@ const char * BluezConnection::GetPeerAddress() const
     return bluez_device1_get_address(mpDevice);
 }
 
-void BluezConnection::SetupWriteCallback(int aSocketFd, CharCallbackFunc aCallback)
+gboolean BluezConnection::WriteHandlerCallback(GIOChannel * aChannel, GIOCondition aCond, BluezConnection * apConn)
+{
+    uint8_t * buf  = nullptr;
+    bool isSuccess = false;
+    GVariant * newVal;
+    ssize_t len;
+
+    VerifyOrExit(!(aCond & G_IO_HUP), ChipLogError(DeviceLayer, "INFO: socket disconnected in %s", __func__));
+    VerifyOrExit(!(aCond & (G_IO_ERR | G_IO_NVAL)), ChipLogError(DeviceLayer, "INFO: socket error in %s", __func__));
+    VerifyOrExit(aCond == G_IO_IN, ChipLogError(DeviceLayer, "FAIL: error in %s", __func__));
+
+    ChipLogDetail(DeviceLayer, "C1 %s MTU: %d", __func__, apConn->GetMTU());
+
+    buf = g_new(uint8_t, apConn->GetMTU());
+    len = read(g_io_channel_unix_get_fd(aChannel), buf, apConn->GetMTU());
+    VerifyOrExit(len > 0, ChipLogError(DeviceLayer, "FAIL: short read in %s (%zd)", __func__, len));
+
+    // Casting len to size_t is safe, since we ensured that it's not negative.
+    newVal = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, buf, static_cast<size_t>(len), sizeof(uint8_t));
+
+    bluez_gatt_characteristic1_set_value(apConn->mpC1, newVal);
+    BLEManagerImpl::HandleRXCharWrite(apConn, buf, static_cast<size_t>(len));
+    isSuccess = true;
+
+exit:
+    g_free(buf);
+    return isSuccess ? G_SOURCE_CONTINUE : G_SOURCE_REMOVE;
+}
+
+void BluezConnection::SetupWriteHandler(int aSocketFd)
 {
     auto channel = g_io_channel_unix_new(aSocketFd);
     g_io_channel_set_encoding(channel, nullptr, nullptr);
@@ -209,7 +240,7 @@ void BluezConnection::SetupWriteCallback(int aSocketFd, CharCallbackFunc aCallba
     g_io_channel_set_buffered(channel, FALSE);
 
     auto watchSource = g_io_create_watch(channel, static_cast<GIOCondition>(G_IO_HUP | G_IO_IN | G_IO_ERR | G_IO_NVAL));
-    g_source_set_callback(watchSource, G_SOURCE_FUNC(aCallback), this, nullptr);
+    g_source_set_callback(watchSource, G_SOURCE_FUNC(WriteHandlerCallback), this, nullptr);
 
     mC1Channel.mpChannel    = channel;
     mC1Channel.mWatchSource = watchSource;
@@ -217,7 +248,12 @@ void BluezConnection::SetupWriteCallback(int aSocketFd, CharCallbackFunc aCallba
     PlatformMgrImpl().GLibMatterContextAttachSource(watchSource);
 }
 
-void BluezConnection::SetupNotifyCallback(int aSocketFd, CharCallbackFunc aCallback, bool aAdditionalAdvertising)
+gboolean BluezConnection::NotifyHandlerCallback(GIOChannel *, GIOCondition, BluezConnection *)
+{
+    return G_SOURCE_REMOVE;
+}
+
+void BluezConnection::SetupNotifyHandler(int aSocketFd, bool aAdditionalAdvertising)
 {
     auto channel = g_io_channel_unix_new(aSocketFd);
     g_io_channel_set_encoding(channel, nullptr, nullptr);
@@ -225,7 +261,7 @@ void BluezConnection::SetupNotifyCallback(int aSocketFd, CharCallbackFunc aCallb
     g_io_channel_set_buffered(channel, FALSE);
 
     auto watchSource = g_io_create_watch(channel, static_cast<GIOCondition>(G_IO_HUP | G_IO_ERR | G_IO_NVAL));
-    g_source_set_callback(watchSource, G_SOURCE_FUNC(aCallback), this, nullptr);
+    g_source_set_callback(watchSource, G_SOURCE_FUNC(NotifyHandlerCallback), this, nullptr);
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     if (aAdditionalAdvertising)
