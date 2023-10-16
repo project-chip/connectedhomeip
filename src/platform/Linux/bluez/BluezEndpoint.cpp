@@ -375,6 +375,11 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
 
     ChipLogDetail(DeviceLayer, "BluezCharacteristicAcquireWrite is called, conn: %p", conn);
 
+    VerifyOrReturnValue(
+        g_variant_lookup(aOptions, "mtu", "q", &mtu), FALSE, ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "MTU negotiation failed"));
+    conn->SetMTU(mtu);
+
     if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, fds) < 0)
     {
 #if CHIP_ERROR_LOGGING
@@ -384,11 +389,6 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "FD creation failed");
         return FALSE;
     }
-
-    VerifyOrReturnValue(
-        g_variant_lookup(aOptions, "mtu", "q", &mtu), FALSE, ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "MTU negotiation failed"));
-    conn->SetMTU(mtu);
 
     conn->SetupWriteCallback(fds[0], BluezCharacteristicWriteFD);
     bluez_gatt_characteristic1_set_write_acquired(aChar, TRUE);
