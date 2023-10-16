@@ -380,7 +380,7 @@ static void spi_dmaTransfertComplete(SPIDRV_HandleData_t * pxHandle, Ecode_t tra
 }
 
 /*********************************************************************
- * @fn         int16_t rsi_spi_transfer(uint8_t *ptrBuf,uint16_t bufLen,uint8_t *valBuf,uint8_t mode)
+ * @fn         int16_t rsi_spi_transfer(uint8_t *ptrBuf, uint16_t bufLen, uint8_t *valBuf, uint8_t mode)
  * @param[in]  uint8_t *tx_buff, pointer to the buffer with the data to be transfered
  * @param[in]  uint8_t *rx_buff, pointer to the buffer to store the data received
  * @param[in]  uint16_t transfer_length, Number of bytes to send and receive
