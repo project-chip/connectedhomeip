@@ -16,8 +16,8 @@ import logging
 from typing import Any, Optional
 
 from matter_idl.matter_idl_types import (Attribute, Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType,
-                                         DeviceTypeConfigurator, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, Struct,
-                                         StructQuality, StructTag)
+                                         DeviceTypeConfigurator, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
+                                         Struct, StructQuality, StructTag)
 
 from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
