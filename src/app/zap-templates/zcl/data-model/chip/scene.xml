@@ -32,7 +32,7 @@ limitations under the License.
     <item name="AttributeValueList" type="AttributeValuePair" array="true"/>
   </struct>
 
-  <domain>CHIP</domain>
+  <domain name="CHIP"/>
   <cluster apiMaturity="provisional">
     <name>Scenes</name>
     <domain>General</domain>
