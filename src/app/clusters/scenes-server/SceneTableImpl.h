@@ -28,7 +28,7 @@
 namespace chip {
 namespace scenes {
 
-static constexpr uint16_t kMaxScenesPerFabric   = MATTER_SCENES_TABLE_SIZE / 2;
+static constexpr uint16_t kMaxScenesPerFabric   = (MATTER_SCENES_TABLE_SIZE - 1) / 2;
 static constexpr uint16_t kMaxScenesPerEndpoint = MATTER_SCENES_TABLE_SIZE;
 
 using clusterId = chip::ClusterId;

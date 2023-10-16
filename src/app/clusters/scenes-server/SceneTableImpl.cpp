@@ -929,7 +929,7 @@ void DefaultSceneTableImpl::SetTableSize(uint16_t endpointSceneTableSize)
 {
     // Verify the endpoint passed size respects the limits of the device configuration
     mMaxScenesPerEndpoint = (kMaxScenesPerEndpoint < endpointSceneTableSize) ? kMaxScenesPerEndpoint : endpointSceneTableSize;
-    mMaxScenesPerFabric   = static_cast<uint16_t>(mMaxScenesPerEndpoint / 2);
+    mMaxScenesPerFabric   = static_cast<uint16_t>((mMaxScenesPerEndpoint - 1) / 2);
 }
 
 DefaultSceneTableImpl::SceneEntryIterator * DefaultSceneTableImpl::IterateSceneEntries(FabricIndex fabric)
