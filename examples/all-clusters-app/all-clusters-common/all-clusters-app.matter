@@ -3636,8 +3636,6 @@ server cluster DoorLock = 257 {
   readonly attribute int16u numberOfPINUsersSupported = 18;
   readonly attribute int16u numberOfRFIDUsersSupported = 19;
   readonly attribute int8u numberOfWeekDaySchedulesSupportedPerUser = 20;
-  readonly attribute int8u numberOfYearDaySchedulesSupportedPerUser = 21;
-  readonly attribute int8u numberOfHolidaySchedulesSupported = 22;
   readonly attribute int8u maxPINCodeLength = 23;
   readonly attribute int8u minPINCodeLength = 24;
   readonly attribute int8u maxRFIDCodeLength = 25;
@@ -7152,8 +7150,6 @@ endpoint 1 {
     ram      attribute numberOfPINUsersSupported default = 10;
     ram      attribute numberOfRFIDUsersSupported default = 10;
     ram      attribute numberOfWeekDaySchedulesSupportedPerUser default = 10;
-    ram      attribute numberOfYearDaySchedulesSupportedPerUser default = 10;
-    ram      attribute numberOfHolidaySchedulesSupported default = 0;
     ram      attribute maxPINCodeLength default = 6;
     ram      attribute minPINCodeLength default = 6;
     ram      attribute maxRFIDCodeLength default = 20;
@@ -7172,7 +7168,7 @@ endpoint 1 {
     ram      attribute wrongCodeEntryLimit default = 3;
     ram      attribute userCodeTemporaryDisableTime default = 10;
     ram      attribute requirePINforRemoteOperation default = 0;
-    ram      attribute featureMap default = 0x1D13;
+    ram      attribute featureMap default = 0x11B3;
     ram      attribute clusterRevision default = 6;
 
     handle command LockDoor;
