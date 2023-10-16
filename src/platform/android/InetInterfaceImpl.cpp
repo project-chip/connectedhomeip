@@ -1,8 +1,8 @@
 
+#include <ifaddrs.h>
 #include <inet/InetInterfaceImpl.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <ifaddrs.h>
 #include <net/if.h>
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 namespace chip {

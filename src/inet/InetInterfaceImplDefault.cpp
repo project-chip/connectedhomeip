@@ -25,7 +25,7 @@ struct if_nameindex * if_nameindexImpl(void)
 {
     return if_nameindex();
 }
-void if_freenameindexImpl(struct if_nameindex *inArray)
+void if_freenameindexImpl(struct if_nameindex * inArray)
 {
     if_freenameindex(inArray);
 }

@@ -18,8 +18,8 @@
 #pragma once
 
 // Define if_nameindex to be implemented in the platform layer
-#include <system/SystemConfig.h>
 #include <net/if.h>
+#include <system/SystemConfig.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 namespace chip {
