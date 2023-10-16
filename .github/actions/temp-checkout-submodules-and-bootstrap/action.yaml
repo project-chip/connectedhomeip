@@ -34,6 +34,14 @@ runs:
       uses: ./.github/actions/bootstrap
       with:
         platform: ${{ inputs.platform }}
+    - name: Test to see what happens if I try to removing a directory that is non-existent
+      # If there is a bootstrap-cache miss, and bootstrap installs CIPD itself,
+      # there is roughly 1.4GB that remains in this cache that is useless from
+      # this point onwards.
+      shell: bash
+      run: |
+        du -sh $HOME/asdf/
+        rm -rf $HOME/asdf/
     - name: Dump disk info after checkout submodule & Bootstrap
       shell: bash
       run: scripts/dump_diskspace_info.sh
