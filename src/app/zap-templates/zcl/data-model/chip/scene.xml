@@ -32,8 +32,8 @@ limitations under the License.
     <item name="AttributeValueList" type="AttributeValuePair" array="true"/>
   </struct>
 
+  <domain>CHIP</domain>
   <cluster apiMaturity="provisional">
-    <domain>CHIP</domain>
     <name>Scenes</name>
     <domain>General</domain>
     <description>Attributes and commands for scene configuration and manipulation.</description>
