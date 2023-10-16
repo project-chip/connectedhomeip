@@ -15,7 +15,7 @@
 #   limitations under the License.
 #
 
-ARG VERSION=1
+ARG VERSION=20
 FROM connectedhomeip/chip-cirque-device-base:${VERSION}
 
 COPY out/debug/chip-resource-monitoring-app /usr/bin/
