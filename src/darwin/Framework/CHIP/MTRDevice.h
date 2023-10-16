@@ -42,29 +42,6 @@ typedef NS_ENUM(NSInteger, MTRDiagnosticLogType) {
 
 @protocol MTRDeviceDelegate;
 
-MTR_PROVISIONALLY_AVAILABLE
-@interface MTRDiagnosticLogResult : NSObject
-
-/**
- * The URL representing the location of the end user support log file that was downloaded.
- * If no end user support log was requested or retrieved, this will be set to nil.
- */
-@property (readonly, nonatomic, nullable) NSURL * endUserSupportLog;
-
-/**
- * The URL representing the location of the network diagnostics log file that was downloaded.
- * If no network diagnostics log was requested or retreived, this will be set to nil.
- */
-@property (readonly, nonatomic, nullable) NSURL * networkDiagnosticsLog;
-
-/**
- * The URL representing the location of the crash log file that was downloaded.
- * If no crash log was requested or retrieved, this will be set to nil.
- */
-@property (readonly, nonatomic, nullable) NSURL * crashLog;
-
-@end
-
 @interface MTRDevice : NSObject
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -252,7 +229,7 @@ MTR_PROVISIONALLY_AVAILABLE
 - (void)downloadLogOfType:(MTRDiagnosticLogType)type
                   timeout:(NSTimeInterval)timeout
                     queue:(dispatch_queue_t)queue
-               completion:(void (^)(MTRDiagnosticLogResult * _Nullable logResult, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+               completion:(void (^)(NSURL * _Nullable logURL, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 @end
 
