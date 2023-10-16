@@ -70,6 +70,7 @@ class BaseApplication
 public:
     BaseApplication() = default;
     virtual ~BaseApplication(){};
+    static bool sIsProvisioned;
 
     /**
      * @brief Create AppTask task and Event Queue
