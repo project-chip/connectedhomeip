@@ -25,8 +25,8 @@
 namespace chip {
 namespace Inet {
 // Define if_nameindex to be implemented in the platform layer
-struct if_nameindex * if_nameindexImpl(void);
-void if_freenameindexImpl(struct if_nameindex *);
+struct if_nameindex * if_nameindexImpl();
+void if_freenameindexImpl(struct if_nameindex * inArray);
 } // namespace Inet
 } // namespace chip
 #endif

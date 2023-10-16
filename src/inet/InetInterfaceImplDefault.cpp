@@ -20,7 +20,7 @@
 #include <net/if.h>
 namespace chip {
 namespace Inet {
-struct if_nameindex * if_nameindexImpl(void)
+struct if_nameindex * if_nameindexImpl()
 {
     return if_nameindex();
 }

@@ -45,7 +45,7 @@ void if_freenameindexImpl(struct if_nameindex * inArray)
     Platform::MemoryFree(inArray);
 }
 
-struct if_nameindex * if_nameindexImpl(void)
+struct if_nameindex * if_nameindexImpl()
 {
     int err;
     size_t intfIter              = 0;
