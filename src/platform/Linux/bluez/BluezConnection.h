@@ -70,8 +70,8 @@ private:
         IOChannel() = default;
         ~IOChannel();
 
-        GIOChannel * mpChannel;
-        GSource * mWatchSource;
+        GAutoPtr<GIOChannel> mChannel;
+        GAutoPtr<GSource> mWatchSource;
     };
 
     struct ConnectionDataBundle

@@ -60,6 +60,11 @@ struct GErrorDeleter
     void operator()(GError * object) { g_error_free(object); }
 };
 
+struct GIOChannelDeleter
+{
+    void operator()(GIOChannel * object) { g_io_channel_unref(object); }
+};
+
 struct GVariantDeleter
 {
     void operator()(GVariant * object) { g_variant_unref(object); }
@@ -108,6 +113,12 @@ template <>
 struct GAutoPtrDeleter<GError>
 {
     using deleter = GErrorDeleter;
+};
+
+template <>
+struct GAutoPtrDeleter<GIOChannel>
+{
+    using deleter = GIOChannelDeleter;
 };
 
 template <>

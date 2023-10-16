@@ -83,14 +83,8 @@ BluezConnection::~BluezConnection()
 BluezConnection::IOChannel::~IOChannel()
 {
     if (mWatchSource != nullptr)
-    {
-        g_source_destroy(mWatchSource);
-        g_source_unref(mWatchSource);
-    }
-    if (mpChannel != nullptr)
-    {
-        g_io_channel_unref(mpChannel);
-    }
+        // Make sure the source is detached before destroying the channel.
+        g_source_destroy(mWatchSource.get());
 }
 
 BluezConnection::ConnectionDataBundle::ConnectionDataBundle(const BluezConnection & aConn,
@@ -242,8 +236,8 @@ void BluezConnection::SetupWriteHandler(int aSocketFd)
     auto watchSource = g_io_create_watch(channel, static_cast<GIOCondition>(G_IO_HUP | G_IO_IN | G_IO_ERR | G_IO_NVAL));
     g_source_set_callback(watchSource, G_SOURCE_FUNC(WriteHandlerCallback), this, nullptr);
 
-    mC1Channel.mpChannel    = channel;
-    mC1Channel.mWatchSource = watchSource;
+    mC1Channel.mChannel.reset(channel);
+    mC1Channel.mWatchSource.reset(watchSource);
 
     PlatformMgrImpl().GLibMatterContextAttachSource(watchSource);
 }
@@ -266,14 +260,14 @@ void BluezConnection::SetupNotifyHandler(int aSocketFd, bool aAdditionalAdvertis
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     if (aAdditionalAdvertising)
     {
-        mC3Channel.mpChannel    = channel;
-        mC3Channel.mWatchSource = watchSource;
+        mC3Channel.mChannel.reset(channel);
+        mC3Channel.mWatchSource.reset(watchSource);
     }
     else
 #endif
     {
-        mC2Channel.mpChannel    = channel;
-        mC2Channel.mWatchSource = watchSource;
+        mC2Channel.mChannel.reset(channel);
+        mC2Channel.mWatchSource.reset(watchSource);
     }
 
     PlatformMgrImpl().GLibMatterContextAttachSource(watchSource);
@@ -291,7 +285,7 @@ CHIP_ERROR BluezConnection::SendIndicationImpl(ConnectionDataBundle * data)
         auto * buf = static_cast<const char *>(g_variant_get_fixed_array(data->mData.get(), &len, sizeof(uint8_t)));
         VerifyOrExit(len <= static_cast<size_t>(std::numeric_limits<gssize>::max()),
                      ChipLogError(DeviceLayer, "FAIL: buffer too large in %s", __func__));
-        auto status = g_io_channel_write_chars(data->mConn.mC2Channel.mpChannel, buf, static_cast<gssize>(len), &written,
+        auto status = g_io_channel_write_chars(data->mConn.mC2Channel.mChannel.get(), buf, static_cast<gssize>(len), &written,
                                                &MakeUniquePointerReceiver(error).Get());
         VerifyOrExit(status == G_IO_STATUS_NORMAL, ChipLogError(DeviceLayer, "FAIL: C2 Indicate: %s", error->message));
     }
