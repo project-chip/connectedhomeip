@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,22 +16,17 @@
  *    limitations under the License.
  */
 
-#include <lib/core/TLV.h>
-#include <string>
+#include <algorithm>
+#include <json/json.h>
 
 namespace chip {
+std::string PrettyPrintJsonString(const std::string & jsonString)
+{
+    Json::Reader reader;
+    Json::Value jsonObject;
+    reader.parse(jsonString, jsonObject);
+    Json::StyledWriter writer;
+    return writer.write(jsonObject);
+}
 
-/*
- * Given a TLVReader positioned at a particular cluster data payload, this function converts
- * the TLV data into a JSON object representation.
- *
- * NOTE: This only accepts data model payloads for events/commands/attributes. It does not support
- * arbitrary TLV conversion to JSON.
- */
-CHIP_ERROR TlvToJson(TLV::TLVReader & reader, std::string & jsonString);
-
-/*
- * Given a TLV encoded byte array, this function converts it into JSON object.
- */
-CHIP_ERROR TlvToJson(const ByteSpan & tlv, std::string & jsonString);
 } // namespace chip
