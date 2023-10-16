@@ -42,6 +42,7 @@ template("bl_iot_sdk") {
       "BL602_USE_HAL_DRIVER=1",
 
       "CFG_CHIP_BL602",
+      "CFG_COMPONENT_BLOG_ENABLE=0",
     ]
 
     include_dirs = []
@@ -53,6 +54,7 @@ template("bl_iot_sdk") {
       defines += invoker.defines
     }
 
+    cflags = [ "-Wundef" ]
     cflags_c = [
       "-include",
       rebase_path("${invoker.freertos_config}", root_build_dir),
@@ -64,7 +66,7 @@ template("bl_iot_sdk") {
 
     if (defined(invoker.enable_debug_frame_ptr) &&
         invoker.enable_debug_frame_ptr) {
-      cflags = [ "-fno-omit-frame-pointer" ]
+      cflags += [ "-fno-omit-frame-pointer" ]
     }
   }
 
@@ -208,7 +210,10 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_hosal") {
-    defines = [ "CFG_BLE_ENABLE" ]
+    defines = [
+      "CFG_BLE_ENABLE",
+      "CONF_BL602_USE_1M_FLASH=0",
+    ]
     sources = [
       "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_adc.c",
       "${bl_iot_sdk_root}/components/platform/hosal/bl602_hal/bl_boot2.c",
@@ -353,6 +358,10 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_stage") {
+    defines = [
+      "EF_ENV_CACHE_TABLE_SIZE=64",
+      "RHINO_CONFIG_WORKQUEUE=0",
+    ]
     sources = [
       "${bl_iot_sdk_root}/components/stage/blfdt/src/fdt.c",
       "${bl_iot_sdk_root}/components/stage/blfdt/src/fdt_addresses.c",
@@ -375,7 +384,6 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/stage/yloop/src/yloop.c",
     ]
 
-    defines = [ "EF_ENV_CACHE_TABLE_SIZE=64" ]
     cflags_c = [ "-Wno-sign-compare" ]
     configs += [
       ":${sdk_target_name}_config_BSP_Driver",
@@ -468,6 +476,7 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_mbedtls") {
+    defines = [ "MBEDTLS_ECP_ALT_KEEP_ORIGINAL=0" ]
     include_dirs =
         [ "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library" ]
 
@@ -694,6 +703,8 @@ template("bl_iot_sdk") {
       "TD_DIAGNOSIS_STA",
       "OS_USING_FREERTOS",
       "CFG_VIRT_DEV_MAX=1",
+      "TDLS_ENABLE=0",
+      "CONFIG_NEWLIB_NANO_FORMAT=0",
     ]
     include_dirs = [
       "${bl_iot_sdk_root}/components/os/bl_os_adapter/bl_os_adapter/include",
@@ -716,6 +727,7 @@ template("bl_iot_sdk") {
     defines = [
       "BL602_MATTER_SUPPORT",
       "LWIP_IPV6",
+      "CONFIG_WPA_WAPI_PSK=0",
     ]
 
     include_dirs = [

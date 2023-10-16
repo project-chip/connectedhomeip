@@ -20,12 +20,10 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
-#include <app/server/Server.h>
 #include <platform/telink/OTAImageProcessorImpl.h>
 #endif
 
 #if CONFIG_BOOTLOADER_MCUBOOT
-#include <app/server/Server.h>
 #include <zephyr/dfu/mcuboot.h>
 #endif
 

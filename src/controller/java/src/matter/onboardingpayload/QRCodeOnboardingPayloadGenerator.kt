@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-package chip.onboardingpayload
+package matter.onboardingpayload
 
 import chip.tlv.AnonymousTag
 import chip.tlv.ContextSpecificTag

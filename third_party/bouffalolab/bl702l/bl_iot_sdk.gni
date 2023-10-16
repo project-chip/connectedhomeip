@@ -18,8 +18,6 @@ import("//build_overrides/mbedtls.gni")
 import("//build_overrides/openthread.gni")
 import("${chip_root}/src/lib/lib.gni")
 
-import("${mbedtls_root}/mbedtls.gni")
-
 declare_args() {
   bl_iot_sdk_root = "${chip_root}/third_party/bouffalolab/repo"
 
@@ -44,6 +42,7 @@ template("bl_iot_sdk") {
       "BL702L=BL702L",
       "BFLB_USE_ROM_DRIVER=1",
       "BFLB_USE_HAL_DRIVER=1",
+      "CFG_COMPONENT_BLOG_ENABLE=0",
     ]
 
     include_dirs = []
@@ -55,6 +54,7 @@ template("bl_iot_sdk") {
       defines += invoker.defines
     }
 
+    cflags = [ "-Wundef" ]
     cflags_c = [
       "-include",
       rebase_path("${invoker.freertos_config}", root_build_dir),
@@ -66,7 +66,7 @@ template("bl_iot_sdk") {
 
     if (defined(invoker.enable_debug_frame_ptr) &&
         invoker.enable_debug_frame_ptr) {
-      cflags = [ "-fno-omit-frame-pointer" ]
+      cflags += [ "-fno-omit-frame-pointer" ]
     }
   }
 
@@ -189,9 +189,10 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_hosal") {
+    defines = [ "CFG_FPGA=0" ]
     if (defined(invoker.chip_config_network_layer_ble) &&
         invoker.chip_config_network_layer_ble) {
-      defines = [ "CFG_BLE_ENABLE" ]
+      defines += [ "CFG_BLE_ENABLE" ]
     }
 
     sources = [
@@ -252,9 +253,9 @@ template("bl_iot_sdk") {
       "-Wno-old-style-declaration",
       "-Wno-stringop-overflow",
       "-Wno-format-truncation",
-
       "-Wno-shadow",
     ]
+
     configs += [
       ":${sdk_target_name}_config_soc",
       ":${sdk_target_name}_config_BSP_Driver",
@@ -264,6 +265,7 @@ template("bl_iot_sdk") {
       ":${sdk_target_name}_config_fs",
       ":${sdk_target_name}_config_utils",
     ]
+
     if (defined(invoker.chip_config_network_layer_ble) &&
         invoker.chip_config_network_layer_ble) {
       configs += [ ":${sdk_target_name}_config_ble" ]
@@ -314,8 +316,8 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/libc/newlibc/stdatomic.c",
       "${bl_iot_sdk_root}/components/libc/newlibc/syscalls.c",
     ]
-    configs += [ ":${sdk_target_name}_config_bl702l_rom_a0" ]
     cflags_c = [ "-Wno-builtin-declaration-mismatch" ]
+    configs += [ ":${sdk_target_name}_config_bl702l_rom_a0" ]
     public_configs = [ ":${sdk_target_name}_config" ]
   }
 
@@ -331,6 +333,10 @@ template("bl_iot_sdk") {
   }
 
   source_set("${sdk_target_name}_stage") {
+    defines = [
+      "EF_ENV_CACHE_TABLE_SIZE=64",
+      "RHINO_CONFIG_WORKQUEUE=0",
+    ]
     sources = [
       "${bl_iot_sdk_root}/components/stage/blfdt/src/fdt.c",
       "${bl_iot_sdk_root}/components/stage/blfdt/src/fdt_addresses.c",
@@ -353,7 +359,6 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/stage/yloop/src/yloop.c",
     ]
 
-    defines = [ "EF_ENV_CACHE_TABLE_SIZE=64" ]
     cflags_c = [ "-Wno-sign-compare" ]
     configs += [
       ":${sdk_target_name}_config_bl702l_rom_a0",
@@ -433,6 +438,98 @@ template("bl_iot_sdk") {
     ]
   }
 
+  config("${sdk_target_name}_config_mbedtls") {
+    include_dirs = [
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/include",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port",
+      "${chip_root}/src/platform/bouffalolab/BL702L",
+    ]
+
+    defines = [ "MBEDTLS_CONFIG_FILE=\"bl702l-chip-mbedtls-config.h\"" ]
+  }
+
+  source_set("${sdk_target_name}_mbedtls") {
+    defines = [ "MBEDTLS_ECP_ALT_KEEP_ORIGINAL=0" ]
+    include_dirs =
+        [ "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library" ]
+
+    sources = [
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/aes_alt.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/bignum_hw.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/ecp_alt.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/ecp_curves_alt.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/hw_common.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/hw_common.h",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/sha1_alt.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/sha256_alt.c",
+    ]
+
+    sources += [
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/bignum_ext.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_entropy_poll.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/mbedtls_port_mem.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/net_sockets.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/pkparse.c",
+    ]
+
+    sources += [
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/aes.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/asn1parse.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/asn1write.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/base64.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/bignum.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ccm.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/cipher.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/cipher_wrap.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/cmac.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/constant_time.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ctr_drbg.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ecdh.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ecdsa.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ecjpake.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ecp.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ecp_curves.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/entropy.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/hkdf.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/hmac_drbg.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/md.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/oid.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/pem.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/pk.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/pk_wrap.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/pkcs5.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/pkwrite.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/platform.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/platform_util.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/sha256.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/sha512.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ssl_ciphersuites.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ssl_cli.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ssl_cookie.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ssl_msg.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ssl_srv.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ssl_tls.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509_create.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509_crt.c",
+      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509write_csr.c",
+    ]
+
+    cflags_c = [
+      "-Wno-sign-compare",
+      "-Wno-implicit-function-declaration",
+    ]
+    configs += [
+      ":${sdk_target_name}_config_BSP_Driver",
+      ":${sdk_target_name}_config_hosal",
+      ":${sdk_target_name}_config_bl702l_rom_a0",
+    ]
+    public_configs = [
+      ":${sdk_target_name}_config",
+      ":${sdk_target_name}_config_mbedtls",
+    ]
+  }
+
   config("${sdk_target_name}_config_ble") {
     include_dirs = [
       "${bl_iot_sdk_root}/components/network/ble/btblecontroller/btble_inc",
@@ -503,24 +600,8 @@ template("bl_iot_sdk") {
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/atomic_c.c",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/buf.c",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/dec.c",
-      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/dummy.c",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/log.c",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/poll.c",
-      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/source/aes_decrypt.c",
-      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/source/aes_encrypt.c",
-      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/source/cbc_mode.c",
-      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/source/ccm_mode.c",
-      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/source/cmac_mode.c",
-      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/source/ctr_mode.c",
-      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/source/ctr_prng.c",
-      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/source/ecc.c",
-      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/source/ecc_dh.c",
-      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/source/ecc_dsa.c",
-      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/source/ecc_platform_specific.c",
-      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/source/hmac.c",
-      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/source/hmac_prng.c",
-      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/source/sha256.c",
-      "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/tinycrypt/source/utils.c",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/utils.c",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/common/work_q.c",
       "${bl_iot_sdk_root}/components/network/ble/blestack/src/hci_onchip/hci_driver.c",
@@ -614,96 +695,6 @@ template("bl_iot_sdk") {
     public_deps = [
       "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
       "${openthread_root}/src/core:libopenthread_core_headers",
-    ]
-  }
-  config("${sdk_target_name}_config_mbedtls") {
-    include_dirs = [
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/include",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port",
-      "${chip_root}/src/platform/bouffalolab/BL702L",
-    ]
-
-    defines = [ "MBEDTLS_CONFIG_FILE=\"bl702l-chip-mbedtls-config.h\"" ]
-  }
-
-  source_set("${sdk_target_name}_mbedtls") {
-    include_dirs =
-        [ "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library" ]
-
-    sources = [
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/aes_alt.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/bignum_hw.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/ecp_alt.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/ecp_curves_alt.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/hw_common.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/hw_common.h",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/sha1_alt.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_acc/sha256_alt.c",
-    ]
-
-    sources += [
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/bignum_ext.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/hw_entropy_poll.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/mbedtls_port_mem.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/net_sockets.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/port/pkparse.c",
-    ]
-
-    sources += [
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/aes.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/asn1parse.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/asn1write.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/base64.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/bignum.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ccm.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/cipher.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/cipher_wrap.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/cmac.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/constant_time.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ctr_drbg.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ecdh.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ecdsa.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ecjpake.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ecp.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ecp_curves.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/entropy.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/hkdf.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/hmac_drbg.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/md.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/oid.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/pem.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/pk.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/pk_wrap.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/pkcs5.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/pkwrite.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/platform.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/platform_util.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/sha256.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/sha512.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ssl_ciphersuites.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ssl_cli.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ssl_cookie.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ssl_msg.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ssl_srv.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/ssl_tls.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509_create.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509_crt.c",
-      "${bl_iot_sdk_root}/components/security/mbedtls_lts/mbedtls/library/x509write_csr.c",
-    ]
-
-    cflags_c = [
-      "-Wno-sign-compare",
-      "-Wno-implicit-function-declaration",
-    ]
-    configs += [
-      ":${sdk_target_name}_config_BSP_Driver",
-      ":${sdk_target_name}_config_hosal",
-      ":${sdk_target_name}_config_bl702l_rom_a0",
-    ]
-    public_configs = [
-      ":${sdk_target_name}_config",
-      ":${sdk_target_name}_config_mbedtls",
     ]
   }
 

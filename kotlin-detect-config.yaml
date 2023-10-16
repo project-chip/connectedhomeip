@@ -24,13 +24,13 @@ style:
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImSubscribeCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/Main.kt"
             - "**/src/controller/java/src/chip/jsontlv/JsonToTlv.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/Base38.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadParser.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/OnboardingPayload.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/QRCodeBasicOnboardingPayloadGenerator.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/QRCodeOnboardingPayloadGenerator.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/QRCodeOnboardingPayloadParser.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/VendorId.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/Base38.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/ManualOnboardingPayloadParser.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/QRCodeBasicOnboardingPayloadGenerator.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/QRCodeOnboardingPayloadGenerator.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/QRCodeOnboardingPayloadParser.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/VendorId.kt"
             - "**/src/controller/java/src/chip/tlv/tags.kt"
             - "**/src/controller/java/src/chip/tlv/TlvWriter.kt"
             - "**/src/controller/java/src/chip/tlv/types.kt"
@@ -41,8 +41,8 @@ style:
             - "**/src/controller/java/tests/chip/devicecontroller/cluster/ChipClusterEventStructTest.kt"
             - "**/src/controller/java/tests/chip/devicecontroller/cluster/ChipClusterStructTest.kt"
             - "**/src/controller/java/tests/chip/jsontlv/JsonToTlvToJsonTest.kt"
-            - "**/src/controller/java/tests/chip/onboardingpayload/ManualCodeTest.kt"
-            - "**/src/controller/java/tests/chip/onboardingpayload/QRCodeTest.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/ManualCodeTest.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/QRCodeTest.kt"
             - "**/src/controller/java/tests/chip/tlv/TlvReaderTest.kt"
             - "**/src/controller/java/tests/chip/tlv/TlvReadWriteTest.kt"
             - "**/src/controller/java/tests/chip/tlv/TlvWriterTest.kt"
@@ -107,7 +107,7 @@ style:
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkShortCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkVendorCommand.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/UnpairCommand.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/Verhoeff.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/Verhoeff.kt"
     MaxLineLength:
         excludes:
             - "**/examples/android/CHIPTest/app/src/main/java/com/tcl/chip/chiptest/MainActivity.kt"
@@ -128,12 +128,12 @@ style:
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairOnNetworkLongImSubscribeCommand.kt"
             - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/jsontlv/TlvToJson.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadParser.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/OnboardingPayload.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/QRCodeBasicOnboardingPayloadGenerator.kt"
-            - "**/src/controller/java/tests/chip/onboardingpayload/ManualCodeTest.kt"
-            - "**/src/controller/java/tests/chip/onboardingpayload/QRCodeTest.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/ManualOnboardingPayloadParser.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/QRCodeBasicOnboardingPayloadGenerator.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/ManualCodeTest.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/QRCodeTest.kt"
     UnusedParameter:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/bluetooth/BluetoothManager.kt"
@@ -145,8 +145,8 @@ style:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/EnterNetworkFragment.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/CommandManager.kt"
             - "**/src/controller/java/generated/java/**/*"
-            - "**/src/controller/java/src/chip/onboardingpayload/Verhoeff.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/OnboardingPayload.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/Verhoeff.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
     UnusedPrivateProperty:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/CHIPToolActivity.kt"
@@ -154,13 +154,13 @@ style:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterInteractionFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/EnterNetworkFragment.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/MatterCommand.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/Base38.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/Base38.kt"
     ForbiddenComment:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/MultiAdminClientFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterInteractionFragment.kt"
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/AddressCommissioningFragment.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/QRCodeOnboardingPayloadParser.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/QRCodeOnboardingPayloadParser.kt"
     ExplicitItLambdaParameter:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterDetailFragment.kt"
@@ -172,9 +172,9 @@ style:
             - "**/src/controller/java/src/chip/tlv/TlvReader.kt"
             - "**/src/controller/java/src/chip/jsontlv/JsonToTlv.kt"
             - "**/src/controller/java/src/chip/jsontlv/TlvToJson.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadParser.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/Base38.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/ManualOnboardingPayloadParser.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/Base38.kt"
     SerialVersionUIDInSerializableClass:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/HistoryCommand.kt"
@@ -182,7 +182,7 @@ style:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/setuppayloadscanner/BarcodeFragment.kt"
             - "**/src/controller/java/generated/java/**/*"
-            - "**/src/controller/java/src/chip/onboardingpayload/OnboardingPayload.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
     UseCheckOrError:
         excludes:
             - "**/src/controller/java/generated/java/**/*"
@@ -192,18 +192,18 @@ style:
         excludes:
             - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/jsontlv/JsonToTlv.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/Verhoeff10.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/Verhoeff10.kt"
     UtilityClassWithPublicConstructor:
         excludes:
-            - "**/src/controller/java/src/chip/onboardingpayload/Verhoeff.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/Verhoeff.kt"
     MayBeConst:
         excludes:
             - "**/src/controller/java/generated/java/**/*"
-            - "**/src/controller/java/src/chip/onboardingpayload/Base38.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/Base38.kt"
     FunctionOnlyReturningConstant:
         excludes:
             - "**/src/controller/java/generated/java/**/*"
-            - "**/src/controller/java/src/chip/onboardingpayload/QRCodeOnboardingPayloadGenerator.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/QRCodeOnboardingPayloadGenerator.kt"
 
 exceptions:
     TooGenericExceptionCaught:
@@ -215,8 +215,8 @@ exceptions:
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/Argument.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/Main.kt"
             - "**/src/controller/java/generated/java/**/*"
-            - "**/src/controller/java/tests/chip/onboardingpayload/ManualCodeTest.kt"
-            - "**/src/controller/java/tests/chip/onboardingpayload/QRCodeTest.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/ManualCodeTest.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/QRCodeTest.kt"
     SwallowedException:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/SensorClientFragment.kt"
@@ -239,8 +239,8 @@ naming:
             - "**/src/controller/java/tests/chip/tlv/TlvWriterTest.kt"
             - "**/src/controller/java/tests/chip/tlv/TlvReaderTest.kt"
             - "**/src/controller/java/tests/chip/jsontlv/JsonToTlvToJsonTest.kt"
-            - "**/src/controller/java/tests/chip/onboardingpayload/ManualCodeTest.kt"
-            - "**/src/controller/java/tests/chip/onboardingpayload/QRCodeTest.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/ManualCodeTest.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/QRCodeTest.kt"
             - "**/examples/android/CHIPTest/app/src/test/java/com/tcl/chip/chiptest/ExampleUnitTest.kt"
     ConstructorParameterNaming:
         excludes:
@@ -249,7 +249,7 @@ naming:
     TopLevelPropertyNaming:
         excludes:
             - "**/src/controller/java/generated/java/**/*"
-            - "**/src/controller/java/src/chip/onboardingpayload/OnboardingPayload.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
 
 performance:
     SpreadOperator:
@@ -261,12 +261,12 @@ potential-bugs:
     EqualsWithHashCodeExist:
         excludes:
             - "**/src/controller/java/generated/java/**/*"
-            - "**/src/controller/java/src/chip/onboardingpayload/OnboardingPayload.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
     ImplicitDefaultLocale:
         excludes:
             - "**/src/controller/java/generated/java/**/*"
-            - "**/src/controller/java/src/chip/onboardingpayload/OnboardingPayload.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
 
 complexity:
     TooManyFunctions:
@@ -286,14 +286,14 @@ complexity:
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/pairing/PairingCommand.kt"
             - "**/src/controller/java/generated/java/**/*"
             - "**/src/controller/java/src/chip/jsontlv/JsonToTlv.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/OnboardingPayload.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
             - "**/src/controller/java/src/chip/tlv/TlvReader.kt"
             - "**/src/controller/java/src/chip/tlv/TlvWriter.kt"
             - "**/src/controller/java/src/matter/controller/MatterControllerImpl.kt"
             - "**/src/controller/java/src/matter/controller/CompletionListenerAdapter.kt"
             - "**/src/controller/java/tests/chip/jsontlv/JsonToTlvToJsonTest.kt"
-            - "**/src/controller/java/tests/chip/onboardingpayload/ManualCodeTest.kt"
-            - "**/src/controller/java/tests/chip/onboardingpayload/QRCodeTest.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/ManualCodeTest.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/QRCodeTest.kt"
             - "**/src/controller/java/tests/chip/tlv/TlvReadWriteTest.kt"
     NestedBlockDepth:
         excludes:
@@ -304,18 +304,18 @@ complexity:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/clusterclient/clusterinteraction/ClusterDetailFragment.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/Command.kt"
             - "**/src/controller/java/generated/java/**/*"
-            - "**/src/controller/java/src/chip/onboardingpayload/OnboardingPayload.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/OnboardingPayload.kt"
     LongMethod:
         excludes:
             - "**/examples/android/CHIPTool/app/src/main/java/com/google/chip/chiptool/provisioning/AddressCommissioningFragment.kt"
             - "**/examples/java-matter-controller/java/src/com/matter/controller/commands/common/CommandManager.kt"
             - "**/src/controller/java/generated/java/**/*"
-            - "**/src/controller/java/src/chip/onboardingpayload/Base38.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
-            - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadParser.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/Base38.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/ManualOnboardingPayloadParser.kt"
             - "**/src/controller/java/tests/chip/jsontlv/JsonToTlvToJsonTest.kt"
-            - "**/src/controller/java/tests/chip/onboardingpayload/ManualCodeTest.kt"
-            - "**/src/controller/java/tests/chip/onboardingpayload/QRCodeTest.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/ManualCodeTest.kt"
+            - "**/src/controller/java/tests/matter/onboardingpayload/QRCodeTest.kt"
             - "**/src/controller/java/tests/chip/tlv/TlvReaderTest.kt"
     LargeClass:
         excludes:
@@ -331,7 +331,7 @@ complexity:
     ComplexCondition:
         excludes:
             - "**/src/controller/java/generated/java/**/*"
-            - "**/src/controller/java/src/chip/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
+            - "**/src/controller/java/src/matter/onboardingpayload/ManualOnboardingPayloadGenerator.kt"
 
 empty-blocks:
     EmptyFunctionBlock:
