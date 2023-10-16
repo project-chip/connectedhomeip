@@ -13,9 +13,7 @@ inputs:
     required: false
     default: bootstrap-logs
 runs:
-  #Intentionally breaking all CI actions on this PR as I am trying to iterate without bogging down CI to understand
-  #why we lose out on some space.
-  #using: "composite"
+  using: "composite"
   steps:
     - name: Dump disk info
       uses: ./.github/actions/dump-disk-info
@@ -24,8 +22,14 @@ runs:
       with:
         platform: ${{ inputs.platform }}
         extra-parameters: ${{ inputs.extra-submodule-parameters }}
+    - name: Dump disk info after checkout submodule
+      shell: bash
+      run: scripts/dump_diskspace_info.sh
     - name: Bootstrap Cache
       uses: ./.github/actions/bootstrap-cache
+    - name: Dump disk info after bootstrap-cache
+      shell: bash
+      run: scripts/dump_diskspace_info.sh
     - name: Bootstrap
       uses: ./.github/actions/bootstrap
       with:

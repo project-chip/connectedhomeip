@@ -424,7 +424,7 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
             - name: Checkout submodules & Bootstrap
-              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              uses: ./.github/actions/temp-checkout-submodules-and-bootstrap
               with:
                 platform: linux
 
