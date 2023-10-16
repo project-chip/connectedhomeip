@@ -29,11 +29,4 @@ std::string PrettyPrintJsonString(const std::string & jsonString)
     return writer.write(jsonObject);
 }
 
-std::string MakeJsonSingleLine(const std::string & jsonString)
-{
-    std::string str = PrettyPrintJsonString(jsonString);
-    str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end());
-    return str;
-}
-
 } // namespace chip

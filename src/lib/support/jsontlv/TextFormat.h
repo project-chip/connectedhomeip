@@ -27,10 +27,4 @@ namespace chip {
  */
 std::string PrettyPrintJsonString(const std::string & jsonString);
 
-/*
- * Reformats the input Json string as a single-line string with no spaces or newlines.
- * The input can be any string, as long as it's valid Json.
- */
-std::string MakeJsonSingleLine(const std::string & jsonString);
-
 } // namespace chip
