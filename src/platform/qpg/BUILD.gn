@@ -50,7 +50,7 @@ static_library("qpg") {
     "qpgConfig.h",
   ]
 
-  deps = []
+  deps = [ "${chip_root}/src/platform/logging:headers" ]
 
   public = [ "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h" ]
 

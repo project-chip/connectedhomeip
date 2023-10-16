@@ -30,13 +30,8 @@ import java.util.logging.Logger
  */
 class FutureResult {
   private var realResult: RealResult? = null
-  private var timeoutMs: Long = 0
-  private val logger = Logger.getLogger(FutureResult::class.java.name)
   private val lock = Object()
-
-  fun setTimeoutMs(timeoutMs: Long) {
-    this.timeoutMs = timeoutMs
-  }
+  var timeoutMs: Long = 0
 
   fun setRealResult(realResult: RealResult) {
     synchronized(lock) {
@@ -52,17 +47,21 @@ class FutureResult {
     val start = System.currentTimeMillis()
     synchronized(lock) {
       while (realResult == null) {
+        val remainingTime = timeoutMs - (System.currentTimeMillis() - start)
+        if (remainingTime <= 0) {
+          throw TimeoutException("Timeout!")
+        }
+
         try {
-          if (System.currentTimeMillis() > start + timeoutMs) {
-            throw TimeoutException("Timeout!")
-          }
-          lock.wait()
+          lock.wait(remainingTime)
         } catch (e: InterruptedException) {
           logger.log(Level.INFO, "Wait Result failed with exception: " + e.message)
         }
       }
-      if (realResult?.result == false) {
-        logger.log(Level.INFO, "Error: ${realResult?.error}")
+
+      val errorResult = realResult as? RealResult.Error
+      if (errorResult != null) {
+        logger.log(Level.INFO, "Error: ${errorResult.error}")
         throw TimeoutException("Received failure test result")
       }
     }
@@ -70,5 +69,9 @@ class FutureResult {
 
   fun clear() {
     synchronized(lock) { realResult = null }
+  }
+
+  companion object {
+    private val logger = Logger.getLogger(FutureResult::class.java.name)
   }
 }

@@ -32,6 +32,8 @@ if (chip_enable_openthread) {
 }
 
 static_library("stm32") {
+  deps = [ "${chip_root}/src/setup_payload" ]
+
   if (stm32_board == "STM32WB5MM-DK") {
     sources = [
       "../FreeRTOS/SystemTimeSupport.cpp",
@@ -61,9 +63,10 @@ static_library("stm32") {
       "STM32FreeRtosHooks.h",
       "SystemPlatformConfig.h",
     ]
+
+    deps += [ "${chip_root}/src/platform/logging:headers" ]
   }
 
-  deps = [ "${chip_root}/src/setup_payload" ]
   public = [ "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h" ]
   public_deps = [
     "${chip_root}/src/crypto",
