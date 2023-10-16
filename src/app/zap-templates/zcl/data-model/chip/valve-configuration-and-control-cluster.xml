@@ -18,37 +18,35 @@ limitations under the License.
   <domain name="CHIP"/>
 
   <bitmap name="Feature" type="bitmap32">
-    <cluster code="0x0081"/>
+    <cluster code="0xXXXX"/>
     <field name="TimeSync" mask="0x1"/>
     <field name="Level" mask="0x2"/>
   </bitmap>
 
   <bitmap name="ValveFaultBitmap" type="bitmap16">
-    <cluster code="0x0081"/>
+    <cluster code="0xXXXX"/>
     <field name="GeneralFault" mask="0x1"/>
     <field name="Blocked" mask="0x2"/>
-    <field name="Leaking" mask="0x4"/>
+    <field name="Leak" mask="0x4"/>
   </bitmap>
 
   <enum name="ValveStateEnum" type="enum8">
-    <cluster code="0x0081"/>
+    <cluster code="0xXXXX"/>
     <item name="Open" value="0x0"/>
     <item name="Closed" value="0x1"/>
   </enum>
 
-  <cluster apiMaturity="provisional">
+  <cluster>
     <name>Valve Configuration and Control</name>
     <domain>HVAC</domain>
-    <code>0x0081</code>
+    <code>0xXXXX</code>
     <define>VALVE_CONFIGURATION_AND_CONTROL_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
     <description>This cluster is used to configure a valve.</description>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
 
-    <!-- min max definition for attribute size larger than 2 bytes is not allowed by zap codegen https://github.com/project-chip/zap/issues/1187 -->
-    <!-- Therefore, this check needs to be done in code. -->
-    <attribute side="server" code="0x0000" define="OPEN_DURATION" type="elapsed_s" isNullable="true" writable="true" optional="false">
+    <attribute side="server" code="0x0000" define="OPEN_DURATION" type="elapsed_s" isNullable="true" min="1" writable="true" optional="false">
       <description>OpenDuration</description>
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
@@ -64,16 +62,20 @@ limitations under the License.
     </attribute>
     <attribute side="server" code="0x0006" define="CURRENT_LEVEL" type="percent" isNullable="true" min="0" max="100" writable="false" optional="true">CurrentLevel</attribute>
     <attribute side="server" code="0x0007" define="TARGET_LEVEL" type="percent" isNullable="true" min="0" max="100" writable="false" optional="true">TargetLevel</attribute>
-    <attribute side="server" code="0x0008" define="OPEN_LEVEL" type="percent" isNullable="true" min="1" max="100" writable="true" default="100" optional="true">
+    <attribute side="server" code="0x0008" define="START_UP_LEVEL" type="percent" isNullable="false" min="1" max="100" writable="true" optional="true">
+      <description>StartUpLevel</description>
+      <access op="read" privilege="view"/>
+      <access op="write" privilege="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0009" define="OPEN_LEVEL" type="percent" isNullable="false" min="1" max="100" writable="true" default="100" optional="true">
       <description>OpenLevel</description>
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x0009" define="VALVE_FAULT" type="ValveFaultBitmap" isNullable="false" writable="false" optional="true">ValveFault</attribute>
+    <attribute side="server" code="0x000A" define="VALVE_FAULT" type="ValveFaultBitmap" isNullable="false" writable="false" optional="true">ValveFault</attribute>
 
     <command source="client" code="0x00" name="Open" optional="false">
       <description>This command is used to set the valve to its fully open position.</description>
-      <arg name="OpenDuration" type="elapsed_s" optional="true"/>
     </command>
 
     <command source="client" code="0x01" name="Close" optional="false">
@@ -83,16 +85,15 @@ limitations under the License.
     <command source="client" code="0x02" name="SetLevel" optional="true">
       <description>This command is used to set the valve to a specific level.</description>
       <arg name="Level" type="percent"/>
-      <arg name="OpenDuration" type="elapsed_s" optional="true"/>
     </command>
 
     <event side="server" code="0x00" priority="info" name="ValveStateChanged" optional="true">
-      <description>This event SHALL be generated when the valve changes state, either opens or closes.</description>
+      <description>ValveStateChanged</description>
       <field id="0" name="ValveState" type="ValveStateEnum"/>
     </event>
 
     <event side="server" code="0x01" priority="info" name="ValveFault" optional="true">
-      <description>This event SHALL be generated when the valve registers a fault.</description>
+      <description>ValveFault</description>
       <field id="0" name="ValveFault" type="ValveFaultBitmap"/>
     </event>
   </cluster>
