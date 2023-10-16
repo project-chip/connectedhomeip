@@ -88,12 +88,12 @@ limitations under the License.
     </command>
 
     <event side="server" code="0x00" priority="info" name="ValveStateChanged" optional="true">
-      <description>ValveStateChanged</description>
+      <description>This event SHALL be generated when the valve changes state, either opens or closes.</description>
       <field id="0" name="ValveState" type="ValveStateEnum"/>
     </event>
 
     <event side="server" code="0x01" priority="info" name="ValveFault" optional="true">
-      <description>ValveFault</description>
+      <description>This event SHALL be generated when the valve registers a fault.</description>
       <field id="0" name="ValveFault" type="ValveFaultBitmap"/>
     </event>
   </cluster>

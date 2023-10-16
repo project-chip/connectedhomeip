@@ -21,7 +21,7 @@ limitations under the License.
     <cluster code="0x0080"/>
     <field name="Visual" mask="0x1"/>
     <field name="Audible" mask="0x2"/>
-    <field name="AlarmSuppress" mask="0x4"/>
+    <field name="AlarmSupress" mask="0x4"/>
     <field name="SensitivityLevel" mask="0x8"/>
   </bitmap>
 
@@ -38,7 +38,7 @@ limitations under the License.
     <item name="Low" value="0x2"/>
   </enum>
 
-  <cluster apiMaturity="provisional">
+  <cluster>
     <name>Boolean Sensor Configuration</name>
     <domain>Measurement &amp; Sensing</domain>
     <code>0x0080</code>
@@ -48,20 +48,20 @@ limitations under the License.
     <description>This cluster is used to configure a boolean sensor.</description>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
 
-    <attribute side="server" code="0x0000" define="SENSITIVITY_LEVEL" type="SensitivityEnum" isNullable="false" min="0" max="2" writable="true" optional="true">SensitivityLevel</attribute>
+    <attribute side="server" code="0x0000" define="SENSITIVITY_LEVEL" type="SensitivityEnum" isNullable="false" writable="true" optional="true">SensitivityLevel</attribute>
     <attribute side="server" code="0x0001" define="ALARMS_ACTIVE" type="AlarmModeBitmap" isNullable="false" writable="false" optional="true">AlarmsActive</attribute>
-    <attribute side="server" code="0x0002" define="ALARMS_SUPPRESSED" type="AlarmModeBitmap" isNullable="false" writable="false" optional="true">AlarmsSuppressed</attribute>
-    <attribute side="server" code="0x0003" define="ALARMS_ENABLED" type="AlarmModeBitmap" isNullable="false" writable="true" optional="true">AlarmsEnabled</attribute>
+    <attribute side="server" code="0x0002" define="ALARMS_SUPPRESSED" type="AlarmModeBitmap" isNullable="false" writable="false" optional="true">AlarmsActive</attribute>
+    <attribute side="server" code="0x0003" define="ALARMS_ENABLED" type="AlarmModeBitmap" isNullable="false" writable="true" optional="true">SensitivityLevel</attribute>
 
-    <command source="client" code="0x00" name="SuppressRequest" optional="true">
+    <command source="client" code="0x00" name="SupressRequest" optional="true">
       <description>This command is used to suppress the specified alarm.</description>
-      <arg name="AlarmsToSuppress" type="AlarmModeBitmap"/>
+      <arg name="AlarmToSuppress" type="AlarmModeBitmap"/>
     </command>
 
     <event side="server" code="0x00" priority="info" name="AlarmsStateChanged" optional="true">
       <description>This event SHALL be generated when any bits in the AlarmsActive and/or AlarmsSuppressed attributes change.</description>
       <field id="0" name="AlarmsActive" type="AlarmModeBitmap"/>
-      <field id="1" name="AlarmsSuppressed" type="AlarmModeBitmap" optional="true"/>
+      <field id="0" name="AlarmsSuppressed" type="AlarmModeBitmap" optional="true"/>
     </event>
 
     <event side="server" code="0x01" priority="info" name="SensorFault" optional="true">
