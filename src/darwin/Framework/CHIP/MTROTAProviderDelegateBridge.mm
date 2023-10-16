@@ -641,9 +641,9 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
 
                 ChipLogDetail(Controller, "QueryImage: application responded with: %s", [[data description] UTF8String]);
 
-                auto hasUpdate = [data.status isEqual:@(MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable)];
-                auto isBDXProtocolSupported = [commandParams.protocolsSupported
-                    containsObject:@(MTROtaSoftwareUpdateProviderOTADownloadProtocolBDXSynchronous)];
+                auto hasUpdate = [data.status isEqual:@(MTROTASoftwareUpdateProviderStatusUpdateAvailable)];
+                auto isBDXProtocolSupported =
+                    [commandParams.protocolsSupported containsObject:@(MTROTASoftwareUpdateProviderDownloadProtocolBDXSynchronous)];
 
                 // The logic we are following here is if none of the protocols supported by the requestor are supported by us, we
                 // can't transfer the image even if we had an image available and we would return a Protocol Not Supported status.
@@ -656,8 +656,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                 // If the protocol requested is not supported, return status - Protocol Not Supported
                 if (!isBDXProtocolSupported) {
                     Commands::QueryImageResponse::Type response;
-                    response.status
-                        = static_cast<OTAQueryStatus>(MTROTASoftwareUpdateProviderOTAQueryStatusDownloadProtocolNotSupported);
+                    response.status = static_cast<StatusEnum>(MTROTASoftwareUpdateProviderStatusDownloadProtocolNotSupported);
                     handler->AddResponse(cachedCommandPath, response);
                     handle.Release();
                     return;
@@ -682,7 +681,7 @@ void MTROTAProviderDelegateBridge::HandleQueryImage(
                         ChipLogError(
                             Controller, "Responding with Busy due to being in the middle of handling another BDX transfer");
                         Commands::QueryImageResponse::Type response;
-                        response.status = static_cast<OTAQueryStatus>(MTROTASoftwareUpdateProviderOTAQueryStatusBusy);
+                        response.status = static_cast<StatusEnum>(MTROTASoftwareUpdateProviderStatusBusy);
                         response.delayedActionTime.SetValue(delegateResponse.delayedActionTime.ValueOr(kDelayedActionTimeSeconds));
                         handler->AddResponse(cachedCommandPath, response);
                         handle.Release();
@@ -864,7 +863,7 @@ CHIP_ERROR MTROTAProviderDelegateBridge::ConvertToQueryImageParams(
     auto iterator = commandData.protocolsSupported.begin();
     NSMutableArray * protocolsSupported = [[NSMutableArray alloc] init];
     while (iterator.Next()) {
-        OTADownloadProtocol protocol = iterator.GetValue();
+        DownloadProtocolEnum protocol = iterator.GetValue();
         [protocolsSupported addObject:[NSNumber numberWithInt:to_underlying(protocol)]];
     }
     ReturnErrorOnFailure(iterator.GetStatus());
@@ -892,7 +891,7 @@ void MTROTAProviderDelegateBridge::ConvertFromQueryImageResponseParams(
     const MTROTASoftwareUpdateProviderClusterQueryImageResponseParams * responseParams,
     Commands::QueryImageResponse::Type & response)
 {
-    response.status = static_cast<OTAQueryStatus>([responseParams.status intValue]);
+    response.status = static_cast<StatusEnum>([responseParams.status intValue]);
 
     if (responseParams.delayedActionTime) {
         response.delayedActionTime.SetValue([responseParams.delayedActionTime unsignedIntValue]);
@@ -935,7 +934,7 @@ void MTROTAProviderDelegateBridge::ConvertFromApplyUpdateRequestResponseParms(
     const MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams * responseParams,
     Commands::ApplyUpdateResponse::Type & response)
 {
-    response.action = static_cast<OTAApplyUpdateAction>([responseParams.action intValue]);
+    response.action = static_cast<ApplyUpdateActionEnum>([responseParams.action intValue]);
     response.delayedActionTime = [responseParams.delayedActionTime unsignedIntValue];
 }
 

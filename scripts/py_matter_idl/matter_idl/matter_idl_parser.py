@@ -19,10 +19,10 @@ except ModuleNotFoundError:
     from matter_idl.matter_idl_types import AccessPrivilege
 
 from matter_idl.matter_idl_types import (ApiMaturity, Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality,
-                                         AttributeStorage, Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry,
-                                         DataType, DeviceType, Endpoint, Enum, Event, EventPriority, EventQuality, Field,
-                                         FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct, StructQuality,
-                                         StructTag)
+                                         AttributeStorage, Bitmap, Cluster, ClusterSide, Command, CommandInstantiation,
+                                         CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority,
+                                         EventQuality, Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct,
+                                         StructQuality, StructTag)
 
 
 def UnionOfAllFlags(flags_list):
@@ -396,6 +396,11 @@ class MatterIdlTransformer(Transformer):
         return AttributeInstantiation(parse_meta=meta, name=id, storage=storage, default=default)
 
     @v_args(meta=True, inline=True)
+    def endpoint_command_instantiation(self, meta, id):
+        meta = None if self.skip_meta else ParseMetaData(meta)
+        return CommandInstantiation(parse_meta=meta, name=id)
+
+    @v_args(meta=True, inline=True)
     def endpoint_emitted_event(self, meta, id):
         meta = None if self.skip_meta else ParseMetaData(meta)
         return id
@@ -452,15 +457,18 @@ class MatterIdlTransformer(Transformer):
         meta = None if self.skip_meta else ParseMetaData(meta)
 
         attributes = []
+        commands = []
         events = set()
 
         for item in content:
             if isinstance(item, AttributeInstantiation):
                 attributes.append(item)
+            elif isinstance(item, CommandInstantiation):
+                commands.append(item)
             else:
                 events.add(item)
         return AddServerClusterToEndpointTransform(
-            ServerClusterInstantiation(parse_meta=meta, name=id, attributes=attributes, events_emitted=events))
+            ServerClusterInstantiation(parse_meta=meta, name=id, attributes=attributes, events_emitted=events, commands=commands))
 
     @v_args(inline=True)
     def cluster_content(self, api_maturity, element):
@@ -535,6 +543,7 @@ class ParserWithLines:
         # For this reason, every attempt should be made to make the grammar context free
         self.parser = Lark.open(
             'matter_grammar.lark', rel_to=__file__, start='idl', parser='lalr', propagate_positions=True,
+            maybe_placeholders=True,
             # separate callbacks to ignore from regular parsing (no tokens)
             # while still getting notified about them
             lexer_callbacks={

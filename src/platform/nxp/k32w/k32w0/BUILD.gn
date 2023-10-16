@@ -104,7 +104,7 @@ static_library("k32w0") {
     }
   }
 
-  deps = []
+  deps = [ "${chip_root}/src/platform/logging:headers" ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 

@@ -1,0 +1,2 @@
+Main-Class: com.matter.controller.MainKt
+Class-Path: ../lib/third_party/connectedhomeip/src/controller/java/*.jar ../lib/third_party/connectedhomeip/third_party/java_deps/stub_src/Android.jar ../lib/third_party/connectedhomeip/third_party/java_deps/json-20220924.jar ../lib/third_party/connectedhomeip/third_party/java_deps/jsr305-3.0.2.jar ../lib/third_party/connectedhomeip/third_party/java_deps/kotlin-stdlib-1.8.20.jar ../lib/third_party/connectedhomeip/third_party/java_deps/kotlinx-coroutines-core-jvm-1.7.3.jar
