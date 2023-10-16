@@ -49,9 +49,6 @@ public:
     BluezConnection(BluezEndpoint * apEndpoint, BluezDevice1 * apDevice);
     ~BluezConnection();
 
-    CHIP_ERROR SendBluezIndication(chip::System::PacketBufferHandle apBuf);
-    CHIP_ERROR CloseBluezConnection();
-
     const char * GetPeerAddress() const;
 
     uint16_t GetMTU() const { return mMtu; }
@@ -60,12 +57,15 @@ public:
     bool IsNotifyAcquired() const { return mNotifyAcquired; }
     void SetNotifyAcquired(bool aNotifyAcquired) { mNotifyAcquired = aNotifyAcquired; }
 
+    CHIP_ERROR SendIndication(chip::System::PacketBufferHandle apBuf);
     /// Write to the CHIP RX characteristic on the remote peripheral device
-    CHIP_ERROR BluezSendWriteRequest(chip::System::PacketBufferHandle apBuf);
+    CHIP_ERROR SendWriteRequest(chip::System::PacketBufferHandle apBuf);
     /// Subscribe to the CHIP TX characteristic on the remote peripheral device
-    CHIP_ERROR BluezSubscribeCharacteristic();
+    CHIP_ERROR SubscribeCharacteristic();
     /// Unsubscribe from the CHIP TX characteristic on the remote peripheral device
-    CHIP_ERROR BluezUnsubscribeCharacteristic();
+    CHIP_ERROR UnsubscribeCharacteristic();
+
+    CHIP_ERROR CloseConnection();
 
 private:
     struct ConnectionDataBundle

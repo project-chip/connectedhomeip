@@ -173,6 +173,32 @@ exit:
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR BluezConnection::BluezDisconnect(BluezConnection * conn)
+{
+    GAutoPtr<GError> error;
+    gboolean success;
+
+    ChipLogDetail(DeviceLayer, "%s peer=%s", __func__, conn->GetPeerAddress());
+
+    success = bluez_device1_call_disconnect_sync(conn->mpDevice, nullptr, &MakeUniquePointerReceiver(error).Get());
+    VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: Disconnect: %s", error->message));
+
+exit:
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BluezConnection::CloseConnection()
+{
+    return PlatformMgrImpl().GLibMatterContextInvokeSync(BluezDisconnect, this);
+}
+
+const char * BluezConnection::GetPeerAddress() const
+{
+    return bluez_device1_get_address(mpDevice);
+}
+
+// SendIndication callbacks
+
 CHIP_ERROR BluezConnection::BluezC2Indicate(ConnectionDataBundle * data)
 {
     GAutoPtr<GError> error;
@@ -196,7 +222,7 @@ exit:
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BluezConnection::SendBluezIndication(chip::System::PacketBufferHandle apBuf)
+CHIP_ERROR BluezConnection::SendIndication(chip::System::PacketBufferHandle apBuf)
 {
     VerifyOrReturnError(!apBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT, ChipLogError(DeviceLayer, "apBuf is NULL in %s", __func__));
     VerifyOrReturnError(mpC2 != nullptr, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "C2 is NULL in %s", __func__));
@@ -205,31 +231,7 @@ CHIP_ERROR BluezConnection::SendBluezIndication(chip::System::PacketBufferHandle
     return PlatformMgrImpl().GLibMatterContextInvokeSync(BluezC2Indicate, &bundle);
 }
 
-CHIP_ERROR BluezConnection::BluezDisconnect(BluezConnection * conn)
-{
-    GAutoPtr<GError> error;
-    gboolean success;
-
-    ChipLogDetail(DeviceLayer, "%s peer=%s", __func__, conn->GetPeerAddress());
-
-    success = bluez_device1_call_disconnect_sync(conn->mpDevice, nullptr, &MakeUniquePointerReceiver(error).Get());
-    VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: Disconnect: %s", error->message));
-
-exit:
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR BluezConnection::CloseBluezConnection()
-{
-    return PlatformMgrImpl().GLibMatterContextInvokeSync(BluezDisconnect, this);
-}
-
-const char * BluezConnection::GetPeerAddress() const
-{
-    return bluez_device1_get_address(mpDevice);
-}
-
-// BluezSendWriteRequest callbacks
+// SendWriteRequest callbacks
 
 void BluezConnection::SendWriteRequestDone(GObject * aObject, GAsyncResult * aResult, gpointer apConnection)
 {
@@ -237,7 +239,7 @@ void BluezConnection::SendWriteRequestDone(GObject * aObject, GAsyncResult * aRe
     GAutoPtr<GError> error;
     gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c1, aResult, &MakeUniquePointerReceiver(error).Get());
 
-    VerifyOrReturn(success == TRUE, ChipLogError(DeviceLayer, "FAIL: BluezSendWriteRequest : %s", error->message));
+    VerifyOrReturn(success == TRUE, ChipLogError(DeviceLayer, "FAIL: SendWriteRequest : %s", error->message));
     BLEManagerImpl::HandleWriteComplete(static_cast<BluezConnection *>(apConnection));
 }
 
@@ -255,7 +257,7 @@ CHIP_ERROR BluezConnection::SendWriteRequestImpl(ConnectionDataBundle * data)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BluezConnection::BluezSendWriteRequest(chip::System::PacketBufferHandle apBuf)
+CHIP_ERROR BluezConnection::SendWriteRequest(chip::System::PacketBufferHandle apBuf)
 {
     VerifyOrReturnError(!apBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT, ChipLogError(DeviceLayer, "apBuf is NULL in %s", __func__));
     VerifyOrReturnError(mpC1 != nullptr, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "C1 is NULL in %s", __func__));
@@ -264,7 +266,7 @@ CHIP_ERROR BluezConnection::BluezSendWriteRequest(chip::System::PacketBufferHand
     return PlatformMgrImpl().GLibMatterContextInvokeSync(SendWriteRequestImpl, &bundle);
 }
 
-// BluezSubscribeCharacteristic callbacks
+// SubscribeCharacteristic callbacks
 
 void BluezConnection::OnCharacteristicChanged(GDBusProxy * aInterface, GVariant * aChangedProperties,
                                               const gchar * const * aInvalidatedProps, gpointer apConnection)
@@ -286,7 +288,7 @@ void BluezConnection::SubscribeCharacteristicDone(GObject * aObject, GAsyncResul
     GAutoPtr<GError> error;
     gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c2, aResult, &MakeUniquePointerReceiver(error).Get());
 
-    VerifyOrReturn(success == TRUE, ChipLogError(DeviceLayer, "FAIL: BluezSubscribeCharacteristic : %s", error->message));
+    VerifyOrReturn(success == TRUE, ChipLogError(DeviceLayer, "FAIL: SubscribeCharacteristic : %s", error->message));
 
     BLEManagerImpl::HandleSubscribeOpComplete(static_cast<BluezConnection *>(apConnection), true);
 }
@@ -305,12 +307,12 @@ exit:
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BluezConnection::BluezSubscribeCharacteristic()
+CHIP_ERROR BluezConnection::SubscribeCharacteristic()
 {
     return PlatformMgrImpl().GLibMatterContextInvokeSync(SubscribeCharacteristicImpl, this);
 }
 
-// BluezUnsubscribeCharacteristic callbacks
+// UnsubscribeCharacteristic callbacks
 
 void BluezConnection::UnsubscribeCharacteristicDone(GObject * aObject, GAsyncResult * aResult, gpointer apConnection)
 {
@@ -318,7 +320,7 @@ void BluezConnection::UnsubscribeCharacteristicDone(GObject * aObject, GAsyncRes
     GAutoPtr<GError> error;
     gboolean success = bluez_gatt_characteristic1_call_write_value_finish(c2, aResult, &MakeUniquePointerReceiver(error).Get());
 
-    VerifyOrReturn(success == TRUE, ChipLogError(DeviceLayer, "FAIL: BluezUnsubscribeCharacteristic : %s", error->message));
+    VerifyOrReturn(success == TRUE, ChipLogError(DeviceLayer, "FAIL: UnsubscribeCharacteristic : %s", error->message));
 
     // Stop listening to the TX characteristic changes
     g_signal_handlers_disconnect_by_data(c2, apConnection);
@@ -335,7 +337,7 @@ exit:
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR BluezConnection::BluezUnsubscribeCharacteristic()
+CHIP_ERROR BluezConnection::UnsubscribeCharacteristic()
 {
     return PlatformMgrImpl().GLibMatterContextInvokeSync(UnsubscribeCharacteristicImpl, this);
 }

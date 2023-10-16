@@ -363,8 +363,7 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
     VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_TX),
                  ChipLogError(DeviceLayer, "SubscribeCharacteristic() called with invalid characteristic ID"));
 
-    VerifyOrExit(conId->BluezSubscribeCharacteristic() == CHIP_NO_ERROR,
-                 ChipLogError(DeviceLayer, "BluezSubscribeCharacteristic() failed"));
+    VerifyOrExit(conId->SubscribeCharacteristic() == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "SubscribeCharacteristic() failed"));
     result = true;
 
 exit:
@@ -382,8 +381,8 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
     VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_TX),
                  ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() called with invalid characteristic ID"));
 
-    VerifyOrExit(conId->BluezUnsubscribeCharacteristic() == CHIP_NO_ERROR,
-                 ChipLogError(DeviceLayer, "BluezUnsubscribeCharacteristic() failed"));
+    VerifyOrExit(conId->UnsubscribeCharacteristic() == CHIP_NO_ERROR,
+                 ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() failed"));
     result = true;
 
 exit:
@@ -398,7 +397,7 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
                  ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
     ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (con %p)", conId);
 
-    VerifyOrExit(conId->CloseBluezConnection() == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "CloseBluezConnection() failed"));
+    VerifyOrExit(conId->CloseConnection() == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "CloseConnection() failed"));
     result = true;
 
 exit:
@@ -412,8 +411,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 
     VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
                  ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
-    VerifyOrExit(conId->SendBluezIndication(std::move(pBuf)) == CHIP_NO_ERROR,
-                 ChipLogError(DeviceLayer, "SendBluezIndication() failed"));
+    VerifyOrExit(conId->SendIndication(std::move(pBuf)) == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "SendIndication() failed"));
     result = true;
 
 exit:
@@ -432,8 +430,7 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::Ch
     VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_RX),
                  ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid characteristic ID"));
 
-    VerifyOrExit(conId->BluezSendWriteRequest(std::move(pBuf)) == CHIP_NO_ERROR,
-                 ChipLogError(DeviceLayer, "BluezSendWriteRequest() failed"));
+    VerifyOrExit(conId->SendWriteRequest(std::move(pBuf)) == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "SendWriteRequest() failed"));
     result = true;
 
 exit:
