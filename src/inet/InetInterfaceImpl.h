@@ -17,13 +17,14 @@
 
 #pragma once
 
-// Define if_nameindex to be implemented in the platform layer
-#include <net/if.h>
 #include <system/SystemConfig.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+#include <net/if.h>
+
 namespace chip {
 namespace Inet {
+// Define if_nameindex to be implemented in the platform layer
 struct if_nameindex * if_nameindexImpl(void);
 void if_freenameindexImpl(struct if_nameindex *);
 } // namespace Inet

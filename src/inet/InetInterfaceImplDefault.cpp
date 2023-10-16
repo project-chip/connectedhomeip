@@ -14,11 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <inet/InetInterfaceImpl.h>
-#include <net/if.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+#include <net/if.h>
 namespace chip {
 namespace Inet {
 struct if_nameindex * if_nameindexImpl(void)
