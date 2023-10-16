@@ -44,18 +44,27 @@ class SpecDefinitions:
         self.__responses_by_id: dict[int, dict[int, Struct]] = {}
         self.__attributes_by_id: dict[int, dict[int, Attribute]] = {}
         self.__events_by_id: dict[int, dict[int, Event]] = {}
+        self.__device_type_by_id: dict[int, Cluster] = {}
 
         self.__clusters_by_name: dict[str, int] = {}
         self.__commands_by_name: dict[str, int] = {}
         self.__responses_by_name: dict[str, int] = {}
         self.__attributes_by_name: dict[str, int] = {}
         self.__events_by_name: dict[str, int] = {}
+        self.__device_id_by_name: dict[str, Cluster] = {}
 
         self.__bitmaps_by_name: dict[str, dict[str, Bitmap]] = {}
         self.__enums_by_name: dict[str, dict[str, Enum]] = {}
         self.__structs_by_name: dict[str, dict[str, Struct]] = {}
 
         idl = ParseXmls(sources)
+
+        for device_type in idl.device_types:
+            device_id: int = device_type.deviceId
+            name: str = device_type.typeName
+
+            self.__device_type_by_id[device_id] = device_type
+            self.__device_id_by_name[name] = device_id
 
         for cluster in idl.clusters:
             code: int = cluster.code
@@ -164,6 +173,21 @@ class SpecDefinitions:
             return event
 
         return None
+
+    def get_device_id_by_name(self, device_name: str):
+        return self.__device_id_by_name.get(device_name)
+
+    def get_device_type_by_name(self, device_type_name: str):
+        device_id = self.get_device_id_by_name(device_type_name)
+        if not device_id:
+            return None
+        return self.__device_type_by_id.get(device_id)
+
+    def get_device_name_by_id(self, device_id: int):
+        device_type = self.__device_type_by_id.get(device_id)
+        if not device_type:
+            return None
+        return device_type.typeName
 
     def get_command_names(self, cluster_name: str) -> List[str]:
         targets = self.__get_targets_by_cluster_name(
