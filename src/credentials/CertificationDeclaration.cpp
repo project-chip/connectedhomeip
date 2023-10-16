@@ -143,6 +143,7 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
     certElements.ProductIdsCount = 0;
     while ((err = reader.Next(AnonymousTag())) == CHIP_NO_ERROR)
     {
+        VerifyOrReturnError(certElements.ProductIdsCount < kMaxProductIdsCount, CHIP_ERROR_INVALID_ARGUMENT);
         ReturnErrorOnFailure(reader.Get(certElements.ProductIds[certElements.ProductIdsCount++]));
     }
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
@@ -194,6 +195,7 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
         while ((err = reader.Next(kTLVType_ByteString, AnonymousTag())) == CHIP_NO_ERROR)
         {
             VerifyOrReturnError(reader.GetLength() == kKeyIdentifierLength, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+            VerifyOrReturnError(certElements.AuthorizedPAAListCount < kMaxAuthorizedPAAListCount, CHIP_ERROR_INVALID_ARGUMENT);
 
             ReturnErrorOnFailure(
                 reader.GetBytes(certElements.AuthorizedPAAList[certElements.AuthorizedPAAListCount++], kKeyIdentifierLength));
@@ -470,7 +472,10 @@ CHIP_ERROR EncodeSignerInfo(const ByteSpan & signerKeyId, const P256ECDSASignatu
             ASN1_END_SEQUENCE;
 
             // signatureAlgorithm OBJECT IDENTIFIER ecdsa-with-SHA256 (1.2.840.10045.4.3.2)
-            ASN1_START_SEQUENCE { ASN1_ENCODE_OBJECT_ID(kOID_SigAlgo_ECDSAWithSHA256); }
+            ASN1_START_SEQUENCE
+            {
+                ASN1_ENCODE_OBJECT_ID(kOID_SigAlgo_ECDSAWithSHA256);
+            }
             ASN1_END_SEQUENCE;
 
             uint8_t asn1SignatureBuf[kMax_ECDSA_Signature_Length_Der];

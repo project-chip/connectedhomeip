@@ -642,10 +642,9 @@ def get_and_validate_args():
     basic_args.add_argument('--part_number', type=str, required=False, help='Provide human-readable product number')
 
     part_gen_args = parser.add_argument_group('Partition generator options')
-    part_gen_args.add_argument('--offset', type=allow_any_int, default=0x104000,
+    part_gen_args.add_argument('--offset', type=allow_any_int,
                                help='Partition offset - an address in devices NVM memory, where factory data will be stored')
-    part_gen_args.add_argument('--size', type=allow_any_int, default=0x1000,
-                               help='The maximum partition size')
+    part_gen_args.add_argument('--size', type=allow_any_int, help='The maximum partition size')
 
     args = parser.parse_args()
 

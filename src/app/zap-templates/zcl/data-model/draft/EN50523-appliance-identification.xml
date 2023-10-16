@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <enum name="ProductTypeId" type="ENUM16">
+  <enum name="ProductTypeId" type="enum16">
     <item name="WhiteGoods" value="0x0000"/>
     <item name="Dishwasher" value="0x5601"/>
     <item name="TumbleDryer" value="0x5602"/>
@@ -27,7 +27,7 @@ limitations under the License.
     <item name="RefrigeratorFreezer" value="0x6601"/>
   </enum>
 
-  <enum name="CecedSpecificationVersion" type="ENUM8">
+  <enum name="CecedSpecificationVersion" type="enum8">
     <item name="CompliantWithV10NotCertified" value="0x10"/>
     <item name="CompliantWithV10Certified" value="0x1A"/>
   </enum>

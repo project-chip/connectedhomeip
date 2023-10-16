@@ -125,7 +125,7 @@ void TestSubscriptionMaxCount(nlTestSuite * inSuite, void * inContext)
     // First set a large MaxCount before Init
     uint16_t countMaxToSave = 2 * CHIP_IM_MAX_NUM_SUBSCRIPTIONS;
     CHIP_ERROR err          = storage.SyncSetKeyValue(chip::DefaultStorageKeyAllocator::SubscriptionResumptionMaxCount().KeyName(),
-                                             &countMaxToSave, sizeof(uint16_t));
+                                                      &countMaxToSave, sizeof(uint16_t));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Then write something beyond CHIP_IM_MAX_NUM_SUBSCRIPTIONS

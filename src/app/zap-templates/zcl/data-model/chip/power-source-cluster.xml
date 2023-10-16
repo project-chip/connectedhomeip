@@ -26,37 +26,37 @@ limitations under the License.
     <description>This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node.</description>
     
     <attribute side="server" code="0x0000" define="POWER_SOURCE_STATUS" type="PowerSourceStatusEnum" writable="false">Status</attribute>
-    <attribute side="server" code="0x0001" define="POWER_SOURCE_ORDER" type="INT8U" min="0x00" max="0xFF" writable="false">Order</attribute>
-    <attribute side="server" code="0x0002" define="POWER_SOURCE_DESCRIPTION" type="CHAR_STRING" length="60" writable="false">Description</attribute>
+    <attribute side="server" code="0x0001" define="POWER_SOURCE_ORDER" type="int8u" min="0x00" max="0xFF" writable="false">Order</attribute>
+    <attribute side="server" code="0x0002" define="POWER_SOURCE_DESCRIPTION" type="char_string" length="60" writable="false">Description</attribute>
 
-    <attribute side="server" code="0x0003" define="POWER_SOURCE_WIRED_ASSESSED_INPUT_VOLTAGE" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">WiredAssessedInputVoltage</attribute>
-    <attribute side="server" code="0x0004" define="POWER_SOURCE_WIRED_ASSESSED_INPUT_FREQUENCY" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="true" isNullable="true">WiredAssessedInputFrequency</attribute>
+    <attribute side="server" code="0x0003" define="POWER_SOURCE_WIRED_ASSESSED_INPUT_VOLTAGE" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">WiredAssessedInputVoltage</attribute>
+    <attribute side="server" code="0x0004" define="POWER_SOURCE_WIRED_ASSESSED_INPUT_FREQUENCY" type="int16u" min="0x0000" max="0xFFFF" writable="false" optional="true" isNullable="true">WiredAssessedInputFrequency</attribute>
     <attribute side="server" code="0x0005" define="POWER_SOURCE_WIRED_CURRENT_TYPE" type="WiredCurrentTypeEnum" writable="false" optional="true">WiredCurrentType</attribute>
-    <attribute side="server" code="0x0006" define="POWER_SOURCE_WIRED_ASSESSED_CURRENT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">WiredAssessedCurrent</attribute>
-    <attribute side="server" code="0x0007" define="POWER_SOURCE_WIRED_NOMINAL_VOLTAGE" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">WiredNominalVoltage</attribute>
-    <attribute side="server" code="0x0008" define="POWER_SOURCE_WIRED_MAXIMUM_CURRENT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">WiredMaximumCurrent</attribute>
-    <attribute side="server" code="0x0009" define="POWER_SOURCE_WIRED_PRESENT" type="BOOLEAN" writable="false" optional="true">WiredPresent</attribute>
+    <attribute side="server" code="0x0006" define="POWER_SOURCE_WIRED_ASSESSED_CURRENT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">WiredAssessedCurrent</attribute>
+    <attribute side="server" code="0x0007" define="POWER_SOURCE_WIRED_NOMINAL_VOLTAGE" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">WiredNominalVoltage</attribute>
+    <attribute side="server" code="0x0008" define="POWER_SOURCE_WIRED_MAXIMUM_CURRENT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">WiredMaximumCurrent</attribute>
+    <attribute side="server" code="0x0009" define="POWER_SOURCE_WIRED_PRESENT" type="boolean" writable="false" optional="true">WiredPresent</attribute>
     <attribute side="server" code="0x000A" define="POWER_SOURCE_ACTIVE_WIRED_FAULTS" type="ARRAY" entryType="WiredFaultEnum" length="8" writable="false" optional="true">ActiveWiredFaults</attribute>
 
-    <attribute side="server" code="0x000B" define="POWER_SOURCE_BAT_VOLTAGE" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">BatVoltage</attribute>
-    <attribute side="server" code="0x000C" define="POWER_SOURCE_BAT_PERCENT_REMAINING" type="INT8U" min="0x00" max="0xC8" writable="false" optional="true" isNullable="true">BatPercentRemaining</attribute>
-    <attribute side="server" code="0x000D" define="POWER_SOURCE_BAT_TIME_REMAINING" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">BatTimeRemaining</attribute>
+    <attribute side="server" code="0x000B" define="POWER_SOURCE_BAT_VOLTAGE" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">BatVoltage</attribute>
+    <attribute side="server" code="0x000C" define="POWER_SOURCE_BAT_PERCENT_REMAINING" type="int8u" min="0x00" max="0xC8" writable="false" optional="true" isNullable="true">BatPercentRemaining</attribute>
+    <attribute side="server" code="0x000D" define="POWER_SOURCE_BAT_TIME_REMAINING" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">BatTimeRemaining</attribute>
     <attribute side="server" code="0x000E" define="POWER_SOURCE_BAT_CHARGE_LEVEL" type="BatChargeLevelEnum" writable="false" optional="true">BatChargeLevel</attribute>
-    <attribute side="server" code="0x000F" define="POWER_SOURCE_BAT_REPLACEMENT_NEEDED" type="BOOLEAN" writable="false" optional="true">BatReplacementNeeded</attribute>
+    <attribute side="server" code="0x000F" define="POWER_SOURCE_BAT_REPLACEMENT_NEEDED" type="boolean" writable="false" optional="true">BatReplacementNeeded</attribute>
     <attribute side="server" code="0x0010" define="POWER_SOURCE_BAT_REPLACEABILITY" type="BatReplaceabilityEnum" writable="false" optional="true">BatReplaceability</attribute>
-    <attribute side="server" code="0x0011" define="POWER_SOURCE_BAT_PRESENT" type="BOOLEAN" writable="false" optional="true">BatPresent</attribute>
+    <attribute side="server" code="0x0011" define="POWER_SOURCE_BAT_PRESENT" type="boolean" writable="false" optional="true">BatPresent</attribute>
     <attribute side="server" code="0x0012" define="POWER_SOURCE_ACTIVE_BAT_FAULTS" type="ARRAY" entryType="BatFaultEnum" length="8" writable="false" optional="true">ActiveBatFaults</attribute>
-    <attribute side="server" code="0x0013" define="POWER_SOURCE_BAT_REPLACEMENT_DESCRIPTION" type="CHAR_STRING" length="60" writable="false" optional="true">BatReplacementDescription</attribute>
+    <attribute side="server" code="0x0013" define="POWER_SOURCE_BAT_REPLACEMENT_DESCRIPTION" type="char_string" length="60" writable="false" optional="true">BatReplacementDescription</attribute>
     <attribute side="server" code="0x0014" define="POWER_SOURCE_BAT_COMMON_DESIGNATION" type="BatCommonDesignationEnum" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatCommonDesignation</attribute>
-    <attribute side="server" code="0x0015" define="POWER_SOURCE_BAT_ANSI_DESIGNATION" type="CHAR_STRING" length="20" writable="false" optional="true">BatANSIDesignation</attribute>
-    <attribute side="server" code="0x0016" define="POWER_SOURCE_BAT_IEC_DESIGNATION" type="CHAR_STRING" length="20" writable="false" optional="true">BatIECDesignation</attribute>
+    <attribute side="server" code="0x0015" define="POWER_SOURCE_BAT_ANSI_DESIGNATION" type="char_string" length="20" writable="false" optional="true">BatANSIDesignation</attribute>
+    <attribute side="server" code="0x0016" define="POWER_SOURCE_BAT_IEC_DESIGNATION" type="char_string" length="20" writable="false" optional="true">BatIECDesignation</attribute>
     <attribute side="server" code="0x0017" define="POWER_SOURCE_BAT_APPROVED_CHEMISTRY" type="BatApprovedChemistryEnum" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatApprovedChemistry</attribute>
-    <attribute side="server" code="0x0018" define="POWER_SOURCE_BAT_CAPACITY" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatCapacity</attribute>
-    <attribute side="server" code="0x0019" define="POWER_SOURCE_BAT_QUANTITY" type="INT8U" min="0x00" max="0xFF" writable="false" optional="true">BatQuantity</attribute>
+    <attribute side="server" code="0x0018" define="POWER_SOURCE_BAT_CAPACITY" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatCapacity</attribute>
+    <attribute side="server" code="0x0019" define="POWER_SOURCE_BAT_QUANTITY" type="int8u" min="0x00" max="0xFF" writable="false" optional="true">BatQuantity</attribute>
     <attribute side="server" code="0x001A" define="POWER_SOURCE_BAT_CHARGE_STATE" type="BatChargeStateEnum" writable="false" optional="true">BatChargeState</attribute>
-    <attribute side="server" code="0x001B" define="POWER_SOURCE_BAT_TIME_TO_FULL_CHARGE" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">BatTimeToFullCharge</attribute>
-    <attribute side="server" code="0x001C" define="POWER_SOURCE_BAT_FUNCTIONAL_WHILE_CHARGING" type="BOOLEAN" writable="false" optional="true">BatFunctionalWhileCharging</attribute>
-    <attribute side="server" code="0x001D" define="POWER_SOURCE_BAT_CHARGING_CURRENT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">BatChargingCurrent</attribute>
+    <attribute side="server" code="0x001B" define="POWER_SOURCE_BAT_TIME_TO_FULL_CHARGE" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">BatTimeToFullCharge</attribute>
+    <attribute side="server" code="0x001C" define="POWER_SOURCE_BAT_FUNCTIONAL_WHILE_CHARGING" type="boolean" writable="false" optional="true">BatFunctionalWhileCharging</attribute>
+    <attribute side="server" code="0x001D" define="POWER_SOURCE_BAT_CHARGING_CURRENT" type="int32u" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true" isNullable="true">BatChargingCurrent</attribute>
     <attribute side="server" code="0x001E" define="POWER_SOURCE_ACTIVE_BAT_CHARGE_FAULTS" type="ARRAY" entryType="BatChargeFaultEnum" length="16" writable="false" optional="true">ActiveBatChargeFaults</attribute>
     <attribute side="server" code="0x001F" define="POWER_SOURCE_ENDPOINT_LIST" type="ARRAY" entryType="endpoint_no" writable="false">EndpointList</attribute>
 
@@ -80,7 +80,7 @@ limitations under the License.
 
   </cluster>
 
-  <bitmap name="Feature" type="BITMAP32">
+  <bitmap name="Feature" type="bitmap32">
     <cluster code="0x002F"/>
     <field name="Wired" mask="0x1"/>
     <field name="Battery" mask="0x2"/>
@@ -88,21 +88,21 @@ limitations under the License.
     <field name="Replaceable" mask="0x8"/>
   </bitmap>
 
-  <enum name="WiredFaultEnum" type="ENUM8">
+  <enum name="WiredFaultEnum" type="enum8">
     <cluster code="0x002F"/>
     <item name="Unspecified" value="0x00"/>
     <item name="OverVoltage" value="0x01"/>
     <item name="UnderVoltage" value="0x02"/>
   </enum>
 
-  <enum name="BatFaultEnum" type="ENUM8">
+  <enum name="BatFaultEnum" type="enum8">
     <cluster code="0x002F"/>
     <item name="Unspecified" value="0x00"/>
     <item name="OverTemp" value="0x01"/>
     <item name="UnderTemp" value="0x02"/>
   </enum>
 
-  <enum name="BatChargeFaultEnum" type="ENUM8">
+  <enum name="BatChargeFaultEnum" type="enum8">
     <cluster code="0x002F"/>
     <item name="Unspecified" value="0x00"/>
     <item name="AmbientTooHot" value="0x01"/>
@@ -117,7 +117,7 @@ limitations under the License.
     <item name="SafetyTimeout" value="0x0A"/>
   </enum>
 
-  <enum name="PowerSourceStatusEnum" type="ENUM8">
+  <enum name="PowerSourceStatusEnum" type="enum8">
     <cluster code="0x002F"/>
     <item name="Unspecified" value="0x00"/>
     <item name="Active" value="0x01"/>
@@ -125,20 +125,20 @@ limitations under the License.
     <item name="Unavailable" value="0x03"/>
   </enum>
 
-  <enum name="WiredCurrentTypeEnum" type="ENUM8">
+  <enum name="WiredCurrentTypeEnum" type="enum8">
     <cluster code="0x002F"/>
     <item name="AC" value="0x00"/>
     <item name="DC" value="0x01"/>
   </enum>
 
-  <enum name="BatChargeLevelEnum" type="ENUM8">
+  <enum name="BatChargeLevelEnum" type="enum8">
     <cluster code="0x002F"/>
     <item name="OK" value="0x00"/>
     <item name="Warning" value="0x01"/>
     <item name="Critical" value="0x02"/>
   </enum>
 
-  <enum name="BatReplaceabilityEnum" type="ENUM8">
+  <enum name="BatReplaceabilityEnum" type="enum8">
     <cluster code="0x002F"/>
     <item name="Unspecified" value="0x00"/>
     <item name="NotReplaceable" value="0x01"/>
@@ -146,7 +146,7 @@ limitations under the License.
     <item name="FactoryReplaceable" value="0x03"/>
   </enum>
 
-  <enum name="BatChargeStateEnum" type="ENUM8">
+  <enum name="BatChargeStateEnum" type="enum8">
     <cluster code="0x002F"/>
     <item name="Unknown" value="0x00"/>
     <item name="IsCharging" value="0x01"/>
@@ -154,7 +154,7 @@ limitations under the License.
     <item name="IsNotCharging" value="0x03"/>
   </enum>
 
-  <enum name="BatCommonDesignationEnum" type="ENUM16">
+  <enum name="BatCommonDesignationEnum" type="enum16">
     <cluster code="0x002F"/>
     <item name="Unspecified" value="0"/>
     <item name="AAA" value="1"/>
@@ -239,7 +239,7 @@ limitations under the License.
     <item name="32600" value="80"/>
   </enum>
 
-  <enum name="BatApprovedChemistryEnum" type="ENUM16">
+  <enum name="BatApprovedChemistryEnum" type="enum16">
     <cluster code="0x002F"/>
     <item name="Unspecified" value="0"/>
     <item name="Alkaline" value="1"/>

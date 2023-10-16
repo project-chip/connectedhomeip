@@ -49,21 +49,21 @@ typedef uint8_t InteractionModelRevision;
 typedef uint32_t SubscriptionId;
 typedef uint8_t SceneId;
 
-constexpr CompressedFabricId kUndefinedCompressedFabricId = 0ULL;
-constexpr FabricId kUndefinedFabricId                     = 0ULL;
+inline constexpr CompressedFabricId kUndefinedCompressedFabricId = 0ULL;
+inline constexpr FabricId kUndefinedFabricId                     = 0ULL;
 
-constexpr FabricIndex kUndefinedFabricIndex = 0;
-constexpr FabricIndex kMinValidFabricIndex  = 1;
-constexpr FabricIndex kMaxValidFabricIndex  = UINT8_MAX - 1;
+inline constexpr FabricIndex kUndefinedFabricIndex = 0;
+inline constexpr FabricIndex kMinValidFabricIndex  = 1;
+inline constexpr FabricIndex kMaxValidFabricIndex  = UINT8_MAX - 1;
 
-constexpr EndpointId kInvalidEndpointId = 0xFFFF;
-constexpr EndpointId kRootEndpointId    = 0;
-constexpr ListIndex kInvalidListIndex   = 0xFFFF; // List index is a uint16 thus 0xFFFF is a invalid list index.
-constexpr KeysetId kInvalidKeysetId     = 0xFFFF;
+inline constexpr EndpointId kInvalidEndpointId = 0xFFFF;
+inline constexpr EndpointId kRootEndpointId    = 0;
+inline constexpr ListIndex kInvalidListIndex   = 0xFFFF; // List index is a uint16 thus 0xFFFF is a invalid list index.
+inline constexpr KeysetId kInvalidKeysetId     = 0xFFFF;
 
 // Invalid IC identifier is provisional. Value will most likely change when identifying token is defined
 // https://github.com/project-chip/connectedhomeip/issues/24251
-constexpr uint64_t kInvalidIcId = 0;
+inline constexpr uint64_t kInvalidIcId = 0;
 
 // These are MEIs, 0xFFFF is not a valid manufacturer code,
 // thus 0xFFFF'FFFF is not a valid MEI.
@@ -72,6 +72,8 @@ static constexpr AttributeId kInvalidAttributeId = 0xFFFF'FFFF;
 static constexpr CommandId kInvalidCommandId     = 0xFFFF'FFFF;
 static constexpr EventId kInvalidEventId         = 0xFFFF'FFFF;
 static constexpr FieldId kInvalidFieldId         = 0xFFFF'FFFF;
+
+static constexpr uint16_t kMaxVendorId = VendorId::TestVendor4;
 
 static constexpr uint16_t ExtractIdFromMEI(uint32_t aMEI)
 {
@@ -86,6 +88,11 @@ static constexpr uint16_t ExtractVendorFromMEI(uint32_t aMEI)
     return static_cast<uint16_t>((aMEI & kVendorMask) >> kVendorShift);
 }
 
+static constexpr bool IsValidVendorId(uint16_t aVendorId)
+{
+    return aVendorId <= kMaxVendorId;
+}
+
 constexpr bool IsValidClusterId(ClusterId aClusterId)
 {
     const auto id     = ExtractIdFromMEI(aClusterId);
@@ -94,7 +101,7 @@ constexpr bool IsValidClusterId(ClusterId aClusterId)
     // cluster.
     //
     // Cluster id suffixes in the range 0xFC00 to 0xFFFE indicate an MS cluster.
-    return (vendor == 0x0000 && id <= 0x7FFF) || (vendor >= 0x0001 && vendor <= 0xFFFE && id >= 0xFC00 && id <= 0xFFFE);
+    return IsValidVendorId(vendor) && ((vendor == 0x0000 && id <= 0x7FFF) || (vendor >= 0x0001 && id >= 0xFC00 && id <= 0xFFFE));
 }
 
 constexpr bool IsGlobalAttribute(AttributeId aAttributeId)
@@ -113,7 +120,17 @@ constexpr bool IsValidAttributeId(AttributeId aAttributeId)
     // Attribute id suffixes in the range 0x0000 to 0x4FFF indicate a non-global
     // attribute (standard or MS).  The vendor id must not be wildcard in this
     // case.
-    return (id <= 0x4FFF && vendor != 0xFFFF) || IsGlobalAttribute(aAttributeId);
+    return (id <= 0x4FFF && IsValidVendorId(vendor)) || IsGlobalAttribute(aAttributeId);
+}
+
+constexpr bool IsValidCommandId(CommandId aCommandId)
+{
+    const auto id     = ExtractIdFromMEI(aCommandId);
+    const auto vendor = ExtractVendorFromMEI(aCommandId);
+
+    // Command id suffixes must be in the range 0x00 to 0xFF, and the prefix
+    // must be a valid prefix (standard or MC).
+    return id <= 0xFF && IsValidVendorId(vendor);
 }
 
 constexpr bool IsValidDeviceTypeId(DeviceTypeId aDeviceTypeId)

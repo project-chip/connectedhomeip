@@ -82,6 +82,7 @@ exclude:
     - "src/controller/java/zap-generated/**/*" # not formatted: generated files
     - "scripts/setup/bootstrap.sh" # tries to quote loop variable
     - "integrations/docker/build-all.sh" # tries to quote loop variable
+    - "pigweed.json" # TODO(#29547). This file is temporary copy from pigweed repo that has minor edits. No restyle help in diff.
 
 changed_paths:
     maximum: 100000
@@ -137,7 +138,7 @@ restylers:
       interpreters: []
     - name: clang-format
       enabled: true
-      image: restyled/restyler-clang-format:v9.0.0
+      image: restyled/restyler-clang-format:v16.0.6
       command:
           - clang-format
           - "-i"

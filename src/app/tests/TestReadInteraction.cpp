@@ -36,11 +36,11 @@
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
 #include <lib/support/CHIPCounter.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
@@ -321,6 +321,9 @@ bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint)
 
 class TestReadInteraction
 {
+    using Seconds16      = System::Clock::Seconds16;
+    using Milliseconds32 = System::Clock::Milliseconds32;
+
 public:
     static void TestReadClient(nlTestSuite * apSuite, void * apContext);
     static void TestReadUnexpectedSubscriptionId(nlTestSuite * apSuite, void * apContext);
@@ -349,6 +352,7 @@ public:
     static void TestReadChunking(nlTestSuite * apSuite, void * apContext);
     static void TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeRoundtrip(nlTestSuite * apSuite, void * apContext);
+    static void TestSubscribeEarlyReport(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeWildcard(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribePartialOverlap(nlTestSuite * apSuite, void * apContext);
@@ -2097,6 +2101,144 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadClients() == 0);
     engine->Shutdown();
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestReadInteraction::TestSubscribeEarlyReport(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+
+    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+
+    MockInteractionModelApp delegate;
+    auto * engine                         = chip::app::InteractionModelEngine::GetInstance();
+    ReportSchedulerImpl * reportScheduler = app::reporting::GetDefaultReportScheduler();
+    err                                   = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), reportScheduler);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
+
+    ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
+    chip::app::EventPathParams eventPathParams[1];
+    readPrepareParams.mpEventPathParamsList                = eventPathParams;
+    readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEventEndpointId;
+    readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestEventClusterId;
+
+    readPrepareParams.mEventPathParamsListSize = 1;
+
+    readPrepareParams.mpAttributePathParamsList    = nullptr;
+    readPrepareParams.mAttributePathParamsListSize = 0;
+
+    readPrepareParams.mMinIntervalFloorSeconds   = 1;
+    readPrepareParams.mMaxIntervalCeilingSeconds = 5;
+
+    readPrepareParams.mKeepSubscriptions = true;
+
+    {
+        app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &ctx.GetExchangeManager(), delegate,
+                                   chip::app::ReadClient::InteractionType::Subscribe);
+        readPrepareParams.mpEventPathParamsList[0].mIsUrgentEvent = true;
+        delegate.mGotEventResponse                                = false;
+        err                                                       = readClient.SendRequest(readPrepareParams);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        ctx.DrainAndServiceIO();
+        System::Clock::Timestamp startTime = gMockClock.GetMonotonicTimestamp();
+
+        NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
+        NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
+        delegate.mpReadHandler = engine->ActiveHandlerAt(0);
+
+        NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
+        NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
+
+        NL_TEST_ASSERT(apSuite,
+                       reportScheduler->GetMinTimestampForHandler(delegate.mpReadHandler) ==
+                           gMockClock.GetMonotonicTimestamp() + Seconds16(readPrepareParams.mMinIntervalFloorSeconds));
+        NL_TEST_ASSERT(apSuite,
+                       reportScheduler->GetMaxTimestampForHandler(delegate.mpReadHandler) ==
+                           gMockClock.GetMonotonicTimestamp() + Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds));
+
+        // Confirm that the node is scheduled to run
+        NL_TEST_ASSERT(apSuite, reportScheduler->IsReportScheduled(delegate.mpReadHandler));
+        ReportScheduler::ReadHandlerNode * node = reportScheduler->GetReadHandlerNode(delegate.mpReadHandler);
+        NL_TEST_ASSERT(apSuite, node != nullptr);
+
+        GenerateEvents(apSuite, apContext);
+
+        // modify the node's min timestamp to be 50ms later than the timer expiration time
+        node->SetIntervalTimeStamps(delegate.mpReadHandler, startTime + Milliseconds32(50));
+        NL_TEST_ASSERT(apSuite,
+                       reportScheduler->GetMinTimestampForHandler(delegate.mpReadHandler) ==
+                           gMockClock.GetMonotonicTimestamp() + Seconds16(readPrepareParams.mMinIntervalFloorSeconds) +
+                               Milliseconds32(50));
+
+        NL_TEST_ASSERT(apSuite, reportScheduler->GetMinTimestampForHandler(delegate.mpReadHandler) > startTime);
+        NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->IsDirty());
+
+        // Advance monotonic timestamp for min interval to elapse
+        gMockClock.AdvanceMonotonic(Seconds16(readPrepareParams.mMinIntervalFloorSeconds));
+        NL_TEST_ASSERT(apSuite, !InteractionModelEngine::GetInstance()->GetReportingEngine().IsRunScheduled());
+        // Service Timer expired event
+        ctx.GetIOContext().DriveIO();
+
+        // Verify the ReadHandler is considered as reportable even if its node's min timestamp has not expired
+        NL_TEST_ASSERT(apSuite,
+                       reportScheduler->GetMinTimestampForHandler(delegate.mpReadHandler) > gMockClock.GetMonotonicTimestamp());
+        NL_TEST_ASSERT(apSuite, reportScheduler->IsReportableNow(delegate.mpReadHandler));
+        NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->GetReportingEngine().IsRunScheduled());
+
+        // Service Engine Run
+        ctx.GetIOContext().DriveIO();
+        // Service EventManagement event
+        ctx.GetIOContext().DriveIO();
+        ctx.GetIOContext().DriveIO();
+        NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
+
+        // Check the logic works for timer expiring at maximum as well
+        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsDirty());
+        delegate.mGotEventResponse = false;
+        NL_TEST_ASSERT(apSuite,
+                       reportScheduler->GetMinTimestampForHandler(delegate.mpReadHandler) ==
+                           gMockClock.GetMonotonicTimestamp() + Seconds16(readPrepareParams.mMinIntervalFloorSeconds));
+        NL_TEST_ASSERT(apSuite,
+                       reportScheduler->GetMaxTimestampForHandler(delegate.mpReadHandler) ==
+                           gMockClock.GetMonotonicTimestamp() + Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds));
+
+        // Confirm that the node is scheduled to run
+        NL_TEST_ASSERT(apSuite, reportScheduler->IsReportScheduled(delegate.mpReadHandler));
+        NL_TEST_ASSERT(apSuite, node != nullptr);
+
+        // modify the node's max timestamp to be 50ms later than the timer expiration time
+        node->SetIntervalTimeStamps(delegate.mpReadHandler, gMockClock.GetMonotonicTimestamp() + Milliseconds32(50));
+        NL_TEST_ASSERT(apSuite,
+                       reportScheduler->GetMaxTimestampForHandler(delegate.mpReadHandler) ==
+                           gMockClock.GetMonotonicTimestamp() + Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds) +
+                               Milliseconds32(50));
+
+        // Advance monotonic timestamp for min interval to elapse
+        gMockClock.AdvanceMonotonic(Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds));
+
+        NL_TEST_ASSERT(apSuite, !InteractionModelEngine::GetInstance()->GetReportingEngine().IsRunScheduled());
+        // Service Timer expired event
+        ctx.GetIOContext().DriveIO();
+
+        // Verify the ReadHandler is considered as reportable even if its node's min timestamp has not expired
+        NL_TEST_ASSERT(apSuite,
+                       reportScheduler->GetMaxTimestampForHandler(delegate.mpReadHandler) > gMockClock.GetMonotonicTimestamp());
+        NL_TEST_ASSERT(apSuite, reportScheduler->IsReportableNow(delegate.mpReadHandler));
+        NL_TEST_ASSERT(apSuite, !reportScheduler->IsReportScheduled(delegate.mpReadHandler));
+        NL_TEST_ASSERT(apSuite, !delegate.mpReadHandler->IsDirty());
+        NL_TEST_ASSERT(apSuite, InteractionModelEngine::GetInstance()->GetReportingEngine().IsRunScheduled());
+        // Service Engine Run
+        ctx.GetIOContext().DriveIO();
+        // Service EventManagement event
+        ctx.GetIOContext().DriveIO();
+        ctx.GetIOContext().DriveIO();
+        NL_TEST_ASSERT(apSuite, reportScheduler->IsReportScheduled(delegate.mpReadHandler));
+        NL_TEST_ASSERT(apSuite, !InteractionModelEngine::GetInstance()->GetReportingEngine().IsRunScheduled());
+    }
 }
 
 void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite, void * apContext)
@@ -4796,6 +4938,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestICDProcessSubscribeRequestInvalidIdleModeInterval", chip::app::TestReadInteraction::TestICDProcessSubscribeRequestInvalidIdleModeInterval),
 #endif // #if CHIP_CONFIG_ENABLE_ICD_SERVER
     NL_TEST_DEF("TestSubscribeRoundtrip", chip::app::TestReadInteraction::TestSubscribeRoundtrip),
+    NL_TEST_DEF("TestSubscribeEarlyReport", chip::app::TestReadInteraction::TestSubscribeEarlyReport),
     NL_TEST_DEF("TestPostSubscribeRoundtripChunkReport", chip::app::TestReadInteraction::TestPostSubscribeRoundtripChunkReport),
     NL_TEST_DEF("TestReadClientReceiveInvalidMessage", chip::app::TestReadInteraction::TestReadClientReceiveInvalidMessage),
     NL_TEST_DEF("TestSubscribeClientReceiveInvalidStatusResponse", chip::app::TestReadInteraction::TestSubscribeClientReceiveInvalidStatusResponse),

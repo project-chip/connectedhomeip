@@ -230,27 +230,41 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
 	  a random jitter interval is added to it to avoid periodicity. The random jitter is selected
 	  within range [-JITTER; +JITTER].
 
-config CHIP_ICD_SUBSCRIPTION_HANDLING
-	bool "Enables platform specific handling of ICD subscriptions"
+choice CHIP_LAST_FABRIC_REMOVED_ACTION
+	prompt "An action to perform after removing the last fabric"
+	default CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
+
+	config CHIP_LAST_FABRIC_REMOVED_NONE
+	bool "After removing the last fabric do not perform any action"
 	help
-	  Enables platform specific implementation that handles ICD subscription requests
-	  and selects subscription report interval value considering maximum interval preferred
-	  by the publisher.
+	  After removing the last fabric the device will not perform factory reset
+	  or reboot. The current state will be left as it is and the BLE advertising
+	  will not start automatically.
 
-if CHIP_ICD_SUBSCRIPTION_HANDLING
-
-config CHIP_MAX_PREFERRED_SUBSCRIPTION_REPORT_INTERVAL
-	int "Maximum preferred interval of sending subscription reports (s)"
-	default 60
+	config CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
+	bool "After removing the last fabric erase NVS and reboot"
 	help
-	  Provides maximum preferred interval to be used by a publisher for negotiation
-	  of the final maximum subscription report interval, after receiving a subscription
-	  request from the initiator. This value should be selected as a compromise between
-	  keeping the power consumption low due to not sending reports too often, and allowing
-	  the initiator device to detect the publisher absence reasonably fast due to not sending
-	  the reports too rarely. The current algorithm is to select bigger value from the one
-	  requested by the initiator and the one preferred by the publisher.
+	  After removing the last fabric the device will perform the factory reset and
+	  then reboot. The current RAM state will be removed and the new commissioning to
+	  the new fabric will use the initial fabric index. This option is the most safe.
 
-endif # CHIP_ICD_SUBSCRIPTION_HANDLING
+	config CHIP_LAST_FABRIC_REMOVED_ERASE_AND_PAIRING_START
+	bool "After removing the last fabric erase NVS and start Bluetooth LE advertising"
+	help
+	  After removing the last fabric the device will perform the factory reset without 
+	  rebooting and start the Bluetooth LE advertisement automatically.
+	  The current RAM state will be saved and the new commissioning to the next 
+	  fabric will use the next possible fabric index. This option should not be used for
+	  devices that normally do not advertise Bluetooth LE on boot to keep their original 
+	  behavior.
+
+	config CHIP_LAST_FABRIC_REMOVED_ERASE_ONLY
+	bool "After removing the last fabric erase NVS only"
+	help
+	  After removing the last fabric the device will perform the factory reset only without
+	  rebooting. The current RAM state will be saved and the new commissioning to the next 
+	  fabric will use the next possible fabric index.
+
+endchoice
 
 endif # CHIP

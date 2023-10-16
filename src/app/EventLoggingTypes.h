@@ -26,7 +26,7 @@
 #include <lib/core/TLV.h>
 #include <system/SystemPacketBuffer.h>
 
-constexpr size_t kNumPriorityLevel = 3;
+inline constexpr size_t kNumPriorityLevel = 3;
 namespace chip {
 namespace app {
 

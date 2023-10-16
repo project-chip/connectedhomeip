@@ -65,7 +65,7 @@ tests:
     - label:
           "Step 3: TH sends KeySetRead command to GroupKeyManagement cluster
           with GroupKeySetID as 0x01a"
-      PICS: GRPKEY.S.C01.Rsp
+      PICS: GRPKEY.S.C01.Rsp && GRPKEY.S.C02.Tx
       command: "KeySetRead"
       arguments:
           values:
@@ -575,7 +575,7 @@ tests:
     - label:
           "Step 18: TH sends KeySetRead command to GroupKeyManagement cluster
           with GroupKeySetID as 0x01a"
-      PICS: GRPKEY.S.C01.Rsp
+      PICS: GRPKEY.S.C01.Rsp && GRPKEY.S.C02.Tx
       command: "KeySetRead"
       arguments:
           values:
@@ -703,7 +703,7 @@ tests:
                 value: "y"
 
     - label:
-          "Step 23: TH again sends KeySetWrite command to DUT with any other
+          "Step 22: TH again sends KeySetWrite command to DUT with any other
           GroupKeySetID not used yet."
       PICS: GRPKEY.S.C00.Rsp && PICS_SKIP_SAMPLE_APP
       command: "KeySetWrite"
@@ -724,7 +724,7 @@ tests:
       response:
           error: RESOURCE_EXHAUSTED
 
-    - label: "Step 24: TH sends KeySetReadAllIndices command to DUT."
+    - label: "Step 23: TH sends KeySetReadAllIndices command to DUT."
       verification: |
           ./chip-tool groupkeymanagement key-set-read-all-indices 1 0
 
@@ -736,7 +736,7 @@ tests:
           [1692342735.277550][8297:8300] CHIP:TOO:       [2]: 1
           [1692342735.277554][8297:8300] CHIP:TOO:       [3]: 0
           [1692342735.277557][8297:8300] CHIP:TOO:    }
-      PICS: GRPKEY.S.C05.Rsp && PICS_SKIP_SAMPLE_APP
+      PICS: GRPKEY.S.C04.Rsp && GRPKEY.S.C05.Tx && PICS_SKIP_SAMPLE_APP
       cluster: "LogCommands"
       command: "UserPrompt"
       arguments:
@@ -747,7 +747,7 @@ tests:
                 value: "y"
 
     - label:
-          "Step 22: TH removes the Group key set that was added by sending a
+          "Step 24: TH removes the Group key set that was added by sending a
           KeySetRemove command to the GroupKeyManagement cluster with the
           GroupKeySetID field set to 0x0"
       PICS: GRPKEY.S.C03.Rsp
@@ -760,7 +760,7 @@ tests:
           error: INVALID_COMMAND
 
     - label:
-          "Step 23: TH removes the Group key set that was added by sending a
+          "Step 25: TH removes the Group key set that was added by sending a
           KeySetRemove command to the GroupKeyManagement cluster with the
           GroupKeySetID field set to 0x01b that does not exist in the
           GroupKeyMap attribute list."

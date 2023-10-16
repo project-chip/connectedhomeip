@@ -95,7 +95,28 @@ tests:
           "Step 3a: Perform an OTA update on the device that requires a reboot.
           Allow for the DUT to update and fully reboot."
       verification: |
-          Perform an OTA update on the device that requires a reboot. Allow for the DUT to update and fully reboot..
+          To perform an OTA update on Thread device follow the cmmds below:
+
+          Step-1 :Run the below command in the path, Where we built the OTA provider app . (In this example , the path is  connectedhomeip/out/debug ./chip-ota-provider-app -f  )
+
+          ./chip-ota-provider-app -f ~/chip_repos/connectedhomeip/examples/all-clusters-app/nrfconnect/build2/zephyr/matter.ota
+
+          Execute the  command using chip-tool and verify the response as below.
+
+          Step-2: ./chip-tool pairing onnetwork 2 20202021
+
+          [1659104612.593187][62366:62371] CHIP:CTL: Successfully finished commissioning step 'ReadCommissioningInfo'
+
+          Step-3 : ./chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": [{"cluster": 41, "endpoint": null, "deviceType": null}]}]' 2 0
+
+          [1651101661960] [90832:7598169] CHIP: [DMG]                                 status = 0x00 (SUCCESS),
+
+
+          Step-4: ./chip-tool otasoftwareupdaterequestor write default-otaproviders '[{"fabricIndex": 1, "providerNodeID": 2, "endpoint": 0}]' 1 0
+
+          Step-5: ./chip-tool otasoftwareupdaterequestor announce-otaprovider 2 0 0 0 1 0
+
+          Make sure the OTA update is succesful. Refer OTA testcases for the command & its output. .
       cluster: "LogCommands"
       command: "UserPrompt"
       PICS: PICS_USER_PROMPT

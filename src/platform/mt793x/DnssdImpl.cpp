@@ -71,7 +71,7 @@ bool IsSupportedProtocol(DnssdServiceProtocol protocol)
 
 uint32_t GetInterfaceId(chip::Inet::InterfaceId interfaceId)
 {
-    return interfaceId.IsPresent() ? (uint32_t)(void *) interfaceId.GetPlatformInterface() : kDNSServiceInterfaceIndexAny;
+    return interfaceId.IsPresent() ? (uint32_t) (void *) interfaceId.GetPlatformInterface() : kDNSServiceInterfaceIndexAny;
 }
 
 std::string GetFullType(const char * type, DnssdServiceProtocol protocol)

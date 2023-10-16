@@ -281,7 +281,7 @@ public:
 
     // Non-copyable
     OpCertStoreTransaction(OpCertStoreTransaction const &) = delete;
-    void operator=(OpCertStoreTransaction const &) = delete;
+    void operator=(OpCertStoreTransaction const &)         = delete;
 
     OperationalCertificateStore * operator->() { return &mStore; }
 

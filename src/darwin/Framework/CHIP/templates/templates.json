@@ -20,10 +20,6 @@
             "path": "../../../../../src/app/zap-templates/partials/header.zapt"
         },
         {
-            "name": "MTRCallbackBridge",
-            "path": "partials/MTRCallbackBridge.zapt"
-        },
-        {
             "name": "encode_value",
             "path": "partials/encode_value.zapt"
         },
@@ -53,16 +49,6 @@
         }
     ],
     "templates": [
-        {
-            "path": "MTRCallbackBridge.zapt",
-            "name": "Objc MTRCallbackBridge header",
-            "output": "src/darwin/Framework/CHIP/zap-generated/MTRCallbackBridge.h"
-        },
-        {
-            "path": "MTRCallbackBridge-src.zapt",
-            "name": "Objc MTRCallbackBridge",
-            "output": "src/darwin/Framework/CHIP/zap-generated/MTRCallbackBridge.mm"
-        },
         {
             "path": "MTRBaseClusters_Internal.zapt",
             "name": "Objc ZCL asynchronous API Internal Header",

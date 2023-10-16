@@ -17,12 +17,11 @@
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/bouffalolab/BL702/NetworkCommissioningDriver.h>
-#include <platform/bouffalolab/BL702/WiFiInterface.h>
+#include <platform/bouffalolab/BL702/wifi_mgmr_portable.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer::Internal;
 
-//#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
@@ -33,23 +32,22 @@ CHIP_ERROR BLWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
     size_t ssidLen        = 0;
     size_t credentialsLen = 0;
 
-    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiSSID, mSavedNetwork.ssid, sizeof(mSavedNetwork.ssid),
-                                                   &ssidLen);
-    SuccessOrExit(err);
-    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiPassword, mSavedNetwork.credentials,
-                                                   sizeof(mSavedNetwork.credentials), &credentialsLen);
-    SuccessOrExit(err);
-
-    mSavedNetwork.credentialsLen                            = credentialsLen;
-    mSavedNetwork.ssidLen                                   = ssidLen;
-    mSavedNetwork.credentials[mSavedNetwork.credentialsLen] = '\0';
-    mSavedNetwork.ssid[mSavedNetwork.ssidLen]               = '\0';
-
-    mStagingNetwork        = mSavedNetwork;
     mpScanCallback         = nullptr;
     mpConnectCallback      = nullptr;
     mpStatusChangeCallback = networkStatusChangeCallback;
-    mScanSpecific          = false;
+
+    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiSSID, mSavedNetwork.credentials,
+                                                   sizeof(mSavedNetwork.credentials), &credentialsLen);
+    SuccessOrExit(err);
+    err = PersistedStorage::KeyValueStoreMgr().Get(BLConfig::kConfigKey_WiFiPassword, mSavedNetwork.ssid,
+                                                   sizeof(mSavedNetwork.ssid), &ssidLen);
+    SuccessOrExit(err);
+
+    mSavedNetwork.credentialsLen = credentialsLen;
+    mSavedNetwork.ssidLen        = ssidLen;
+
+    mStagingNetwork = mSavedNetwork;
+    mScanSpecific   = false;
 
 exit:
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
@@ -123,6 +121,7 @@ Status BLWiFiDriver::RemoveNetwork(ByteSpan networkId, MutableCharSpan & outDebu
 Status BLWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCharSpan & outDebugText)
 {
     outDebugText.reduce_size(0);
+
     // Only one network is supported now
     VerifyOrReturnError(index == 0, Status::kOutOfRange);
     VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
@@ -132,7 +131,34 @@ Status BLWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, MutableCh
 CHIP_ERROR BLWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
     ChipLogProgress(NetworkProvisioning, "ConnectWiFiNetwork");
-    wifiInterface_connect((char *) ssid, (char *) key);
+    // Valid Credentials length are:
+    // - 0 bytes: Unsecured (open) connection
+    // - 5 bytes: WEP-64 passphrase
+    // - 10 hexadecimal ASCII characters: WEP-64 40-bit hex raw PSK
+    // - 13 bytes: WEP-128 passphrase
+    // - 26 hexadecimal ASCII characters: WEP-128 104-bit hex raw PSK
+    // - 8..63 bytes: WPA/WPA2/WPA3 passphrase
+    // - 64 bytes: WPA/WPA2/WPA3 raw hex PSK
+    // Note 10 hex WEP64 and 13 bytes / 26 hex WEP128 passphrase are covered by 8~63 bytes WPA passphrase, so we don't check WEP64
+    // hex and WEP128 passphrase.
+    if (keyLen == BLWiFiDriver::WiFiCredentialLength::kOpen || keyLen == BLWiFiDriver::WiFiCredentialLength::kWEP64 ||
+        (keyLen >= BLWiFiDriver::WiFiCredentialLength::kMinWPAPSK && keyLen <= BLWiFiDriver::WiFiCredentialLength::kMaxWPAPSK))
+    {
+        wifiInterface_disconnect();
+        vTaskDelay(500);
+        if (keyLen == BLWiFiDriver::WiFiCredentialLength::kOpen)
+        {
+            wifiInterface_connect((char *) ssid, NULL);
+        }
+        else
+        {
+            wifiInterface_connect((char *) ssid, (char *) key);
+        }
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_STRING_LENGTH;
+    }
     ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManager::kWiFiStationState_Connecting);
     return CHIP_NO_ERROR;
 }
@@ -161,13 +187,11 @@ void BLWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
-    ChipLogProgress(NetworkProvisioning, "BL702 Network Commissioning ConnectNetwork: SSID: %.*s",
-                    static_cast<int>(networkId.size()), networkId.data());
+    ChipLogProgress(NetworkProvisioning, "BL NetworkCommissioningDelegate: SSID: %.*s", static_cast<int>(networkId.size()),
+                    networkId.data());
 
-    mStagingNetwork.ssid[mStagingNetwork.ssidLen]               = '\0';
-    mStagingNetwork.credentials[mStagingNetwork.credentialsLen] = '\0';
     err               = ConnectWiFiNetwork(reinterpret_cast<const char *>(mStagingNetwork.ssid), mStagingNetwork.ssidLen,
-                             reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);
+                                           reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);
     mpConnectCallback = callback;
 
 exit:
@@ -183,14 +207,34 @@ exit:
     }
 }
 
-void BLWiFiDriver::OnScanWiFiNetworkDone(void * arg)
+void BLWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
 {
-    netbus_fs_scan_ind_cmd_msg_t * pmsg = (netbus_fs_scan_ind_cmd_msg_t *) arg;
-    size_t i = 0, ap_num = pmsg->num;
+    if (callback != nullptr)
+    {
+        ChipLogError(NetworkProvisioning, "ssid.data(): %s", ssid.data());
+
+        if (ssid.data())
+        {
+            memset(mScanSSID, 0, sizeof(mScanSSID));
+            memcpy(mScanSSID, ssid.data(), ssid.size());
+            mScanSpecific = true;
+        }
+        mpScanCallback = callback;
+        wifiInterface_startScan();
+    }
+}
+
+void BLWiFiDriver::OnScanWiFiNetworkDone(void * opaque)
+{
+    netbus_wifi_mgmr_msg_cmd_t * pkg_data = (netbus_wifi_mgmr_msg_cmd_t *) ((struct pkg_protocol *) opaque)->payload;
+    netbus_fs_scan_ind_cmd_msg_t * pmsg   = (netbus_fs_scan_ind_cmd_msg_t *) ((netbus_fs_scan_ind_cmd_msg_t *) pkg_data);
+
+    size_t i = 0, ap_num = 0;
     WiFiScanResponse *pScanResponse, *p;
 
     for (i = 0; i < pmsg->num; i++)
     {
+        ChipLogProgress(DeviceLayer, "OnScanWiFiNetworkDone %s", pmsg->records[i].ssid);
         if (mScanSpecific && !strcmp(mScanSSID, (char *) (pmsg->records[i].ssid)))
         {
             ap_num = 1;
@@ -198,7 +242,7 @@ void BLWiFiDriver::OnScanWiFiNetworkDone(void * arg)
         }
     }
 
-    if (0 == ap_num || (mScanSpecific && ap_num == pmsg->num))
+    if (0 == pmsg->num || (mScanSpecific && 0 == ap_num))
     {
         ChipLogProgress(DeviceLayer, "No AP found");
         if (mpScanCallback != nullptr)
@@ -209,7 +253,15 @@ void BLWiFiDriver::OnScanWiFiNetworkDone(void * arg)
         return;
     }
 
-    p = pScanResponse = (WiFiScanResponse *) malloc(sizeof(WiFiScanResponse) * ap_num);
+    if (ap_num)
+    {
+        p = pScanResponse = (WiFiScanResponse *) malloc(sizeof(WiFiScanResponse) * ap_num);
+    }
+    else
+    {
+        p = pScanResponse = (WiFiScanResponse *) malloc(sizeof(WiFiScanResponse) * pmsg->num);
+        ap_num            = pmsg->num;
+    }
     for (i = 0; i < pmsg->num; i++)
     {
         if (mScanSpecific && strcmp(mScanSSID, (char *) (pmsg->records[i].ssid)))
@@ -218,9 +270,9 @@ void BLWiFiDriver::OnScanWiFiNetworkDone(void * arg)
         }
 
         p->security.SetRaw(pmsg->records[i].auth_mode);
-        p->ssidLen = strlen((char *) pmsg->records[i].ssid) < chip::DeviceLayer::Internal::kMaxWiFiSSIDLength
-            ? strlen((char *) pmsg->records[i].ssid)
-            : chip::DeviceLayer::Internal::kMaxWiFiSSIDLength;
+        p->ssidLen  = strlen((char *) pmsg->records[i].ssid) < chip::DeviceLayer::Internal::kMaxWiFiSSIDLength
+             ? strlen((char *) pmsg->records[i].ssid)
+             : chip::DeviceLayer::Internal::kMaxWiFiSSIDLength;
         p->channel  = pmsg->records[i].channel;
         p->wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
         p->rssi     = pmsg->records[i].rssi;
@@ -254,39 +306,25 @@ void BLWiFiDriver::OnScanWiFiNetworkDone(void * arg)
     free(pScanResponse);
 }
 
-void BLWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
-{
-    if (callback != nullptr)
-    {
-        if (ssid.data())
-        {
-            memset(mScanSSID, 0, sizeof(mScanSSID));
-            memcpy(mScanSSID, ssid.data(), ssid.size());
-            mScanSpecific = true;
-        }
-        mpScanCallback = callback;
-        wifiInterface_startScan();
-    }
-}
-
 CHIP_ERROR GetConfiguredNetwork(Network & network)
 {
-    struct bflbwifi_ap_record ap_info;
+    struct bflbwifi_ap_record * pApInfo = wifiInterface_getApInfo();
 
-    ChipLogProgress(DeviceLayer, "GetConfiguredNetwork");
-
-    if (!wifiInterface_getApInfo(&ap_info))
+    if (NULL == pApInfo)
     {
         return CHIP_ERROR_INTERNAL;
     }
 
-    uint8_t length = strnlen(reinterpret_cast<const char *>(ap_info.ssid), DeviceLayer::Internal::kMaxWiFiSSIDLength);
+    ChipLogProgress(DeviceLayer, "GetConfiguredNetwork [%s]", pApInfo->ssid);
+
+    uint8_t length = strnlen(reinterpret_cast<const char *>(pApInfo->ssid), DeviceLayer::Internal::kMaxWiFiSSIDLength);
     if (length > sizeof(network.networkID))
     {
         ChipLogError(DeviceLayer, "SSID too long");
         return CHIP_ERROR_INTERNAL;
     }
-    memcpy(network.networkID, ap_info.ssid, length);
+
+    memcpy(network.networkID, pApInfo->ssid, length);
     network.networkIDLen = length;
     return CHIP_NO_ERROR;
 }
@@ -308,6 +346,7 @@ void BLWiFiDriver::OnNetworkStatusChange()
 
     if (ConnectivityMgrImpl().GetWiFiStationState() == ConnectivityManager::kWiFiStationState_Connected)
     {
+        ChipLogProgress(DeviceLayer, "OnNetworkStatusChange kWiFiStationState_Connected, %s", configuredNetwork.networkID);
         staConnected = true;
     }
 
@@ -364,7 +403,64 @@ bool BLWiFiDriver::WiFiNetworkIterator::Next(Network & item)
     return true;
 }
 
+void NetworkEventHandler(const ChipDeviceEvent * event, intptr_t arg)
+{
+    if (!(DeviceEventType::IsPlatformSpecific(event->Type) && DeviceEventType::IsPublic(event->Type)))
+    {
+        return;
+    }
+
+    switch (event->Type)
+    {
+    case kWiFiOnInitDone:
+        break;
+    case kWiFiOnConnected:
+        BLWiFiDriver::GetInstance().OnNetworkStatusChange();
+        break;
+    case kGotIpAddress:
+        ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManagerImpl::kWiFiStationState_Connected);
+        ConnectivityMgrImpl().OnConnectivityChanged(deviceInterface_getNetif());
+        break;
+    case kGotIpv6Address:
+        ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManagerImpl::kWiFiStationState_Connected);
+        ConnectivityMgrImpl().OnConnectivityChanged(deviceInterface_getNetif());
+        break;
+    case kWiFiOnDisconnected:
+        if (ConnectivityManager::kWiFiStationState_Connecting == ConnectivityMgrImpl().GetWiFiStationState())
+        {
+            ConnectivityMgrImpl().ChangeWiFiStationState(ConnectivityManager::kWiFiStationState_Connecting_Failed);
+        }
+        break;
+    default:
+        ChipLogProgress(DeviceLayer, "Undefined network commission event type %x.\r\n", event->Type);
+        break;
+    }
+}
+
+extern "C" void wifi_event_handler(uint32_t code)
+{
+    ChipDeviceEvent event;
+
+    memset(&event, 0, sizeof(ChipDeviceEvent));
+    switch (code)
+    {
+    case VIRT_NET_EV_ON_CONNECTED:
+        event.Type = kWiFiOnConnected;
+        PlatformMgr().PostEventOrDie(&event);
+        break;
+    case VIRT_NET_EV_ON_GOT_IP:
+        event.Type = kGotIpAddress;
+        PlatformMgr().PostEventOrDie(&event);
+        break;
+    case VIRT_NET_EV_ON_DISCONNECT:
+        event.Type = kWiFiOnDisconnected;
+        PlatformMgr().PostEventOrDie(&event);
+        break;
+    default:
+        ChipLogProgress(DeviceLayer, "[APP] [EVT] Unknown code %lu \r\n", code);
+    }
+}
+
 } // namespace NetworkCommissioning
 } // namespace DeviceLayer
 } // namespace chip
-//#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI

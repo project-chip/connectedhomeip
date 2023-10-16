@@ -16,7 +16,7 @@ name:
     4.2.3. [TC-SMOKECO-2.3] Primary Functionality - CO Alarm with DUT as Server
 
 PICS:
-    - SMOKECO.S
+    - SMOKECO.S.F01
 
 config:
     nodeId: 0x12344321
@@ -104,7 +104,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read costate 1 1
+          ./chip-tool smokecoalarm read costate 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0002 DataVersion: 1795725838
           [TOO]   COState: 1
@@ -144,7 +144,7 @@ tests:
                 value: "y"
 
     - label: "Step 10: TH reads TestInProgress attribute from DUT"
-      PICS: SMOKECO.S.A0005
+      PICS: SMOKECO.S.A0005 && SMOKECO.M.ManuallyControlledTest
       command: "readAttribute"
       attribute: "TestInProgress"
       response:
@@ -190,7 +190,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read costate 1 1
+          ./chip-tool smokecoalarm read costate 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0002 DataVersion: 1795725838
           [TOO]   COState: 2
@@ -241,7 +241,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read costate 1 1
+          ./chip-tool smokecoalarm read costate 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0002 DataVersion: 1795725838
           [TOO]   COState: 0

@@ -14,9 +14,6 @@ __RAM_END = 0x4200C000 + 256K - __EM_SIZE; /* leave 8K left for BLE */
 __RAM_TCM_LEN = (16K + 16K + 48K + 64K + 64K - 16K - 16K);
 __RAM_WIFI_LEN = (__RAM_END - __RAM_START - __RAM_TCM_LEN);
 
-__OCRAM_START_ADDRESS = 0x42030000 + 0x8000;
-__OCRAM_SIZE = 112K;
-
 MEMORY
 {
   rom       (rxai!w) : ORIGIN = 0x21015000, LENGTH = 44K
@@ -201,13 +198,13 @@ SECTIONS
 
   .boot2 (NOLOAD) :
   {
-      PROVIDE ( __boot2_pt_addr_start = . );
-      *(.bss.boot2_partition_table)
-      PROVIDE ( __boot2_pt_addr_end   = . );
+    PROVIDE ( __boot2_pt_addr_start = . );
+    *(.bss.boot2_partition_table)
+    PROVIDE ( __boot2_pt_addr_end   = . );
 
-      PROVIDE ( __boot2_flashCfg_start = . );
-      *(.bss.boot2_flashCfg)
-      PROVIDE ( __boot2_flashCfg_end = . );
+    PROVIDE ( __boot2_flashCfg_start = . );
+    *(.bss.boot2_flashCfg)
+    PROVIDE ( __boot2_flashCfg_end = . );
 
   } > ram_tcm
 
@@ -216,11 +213,16 @@ SECTIONS
     PROVIDE( __bss_start = ADDR(.bss) );
     PROVIDE( __bss_end = ADDR(.bss) + SIZEOF(.bss) );
 
-    *(.sbss*)
+    *(.sbss)
+    *(EXCLUDE_FILE(*libCHIP.a:BL602.PlatformManagerImpl.cpp.o) .sbss.*)
     *(.gnu.linkonce.sb.*)
-    *(.bss .bss.*)
+    *(.bss)
+    *(EXCLUDE_FILE(*libCHIP.a:BL602.PlatformManagerImpl.cpp.o) .bss.*)
     *(.gnu.linkonce.b.*)
-    *(COMMON)
+    *(EXCLUDE_FILE(*libCHIP.a:BL602.PlatformManagerImpl.cpp.o) COMMON)
+
+    . = ALIGN(4);
+    *libCHIP.a:BL602.PlatformManagerImpl.cpp.o(.sbss.* .bss.* COMMON)
   } > ram_tcm
 
   .stack (NOLOAD)   :
@@ -257,9 +259,6 @@ SECTIONS
   PROVIDE( _ld_ram_addr1 = ORIGIN(ram_tcm) );
   PROVIDE( _ld_ram_size2 = LENGTH(ram_wifi) );
   PROVIDE( _ld_ram_addr2 = ORIGIN(ram_wifi) );
-
-  PROVIDE(__ocram_start_addr = __OCRAM_START_ADDRESS);
-  PROVIDE(__ocram_size = __OCRAM_SIZE);
 
   /*BOOT2 sections*/
   PROVIDE ( __boot2_pt_addr_src = BOOT2_PT_ADDR );

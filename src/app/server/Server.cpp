@@ -252,13 +252,13 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mReportScheduler);
-    mICDEventManager.Init(&mICDManager);
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
-
     // This initializes clusters, so should come after lower level initialization.
     InitDataModelHandler();
+
+// ICD Init needs to be after data model init
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    mICDManager.Init(mDeviceStorage, &GetFabricTable(), mReportScheduler, mSessionKeystore);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 #if defined(CHIP_APP_USE_ECHO)
     err = InitEchoHandler(&mExchangeMgr);
@@ -495,7 +495,6 @@ void Server::Shutdown()
     Access::ResetAccessControlToDefault();
     Credentials::SetGroupDataProvider(nullptr);
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    mICDEventManager.Shutdown();
     mICDManager.Shutdown();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     mAttributePersister.Shutdown();

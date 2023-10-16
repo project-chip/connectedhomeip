@@ -190,8 +190,8 @@ CHIP_ERROR ExampleDACProvider::SignWithDeviceAttestationKey(const ByteSpan & mes
     Crypto::P256ECDSASignature signature;
     Crypto::P256Keypair keypair;
 
-    VerifyOrReturnError(IsSpanUsable(out_signature_buffer), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(IsSpanUsable(message_to_sign), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!out_signature_buffer.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!message_to_sign.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_signature_buffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     // In a non-exemplary implementation, the public key is not needed here. It is used here merely because

@@ -33,9 +33,9 @@ class NetworkCommissioningClusterNetworkInfoStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_NETWORK_I_D), networkID)
       put(ContextSpecificTag(TAG_CONNECTED), connected)
       endStructure()
@@ -46,8 +46,8 @@ class NetworkCommissioningClusterNetworkInfoStruct(
     private const val TAG_NETWORK_I_D = 0
     private const val TAG_CONNECTED = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): NetworkCommissioningClusterNetworkInfoStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): NetworkCommissioningClusterNetworkInfoStruct {
+      tlvReader.enterStructure(tlvTag)
       val networkID = tlvReader.getByteArray(ContextSpecificTag(TAG_NETWORK_I_D))
       val connected = tlvReader.getBoolean(ContextSpecificTag(TAG_CONNECTED))
 

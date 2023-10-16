@@ -36,7 +36,7 @@ protected:
     ~Uncopyable() = default;
 
 private:
-    Uncopyable(const Uncopyable &) = delete;
+    Uncopyable(const Uncopyable &)             = delete;
     Uncopyable & operator=(const Uncopyable &) = delete;
 };
 
@@ -79,7 +79,7 @@ public:
     CHIP_ERROR SetCurrentPhase(const app::DataModel::Nullable<uint8_t> & aPhase);
 
     /**
-     * Set current operational state.
+     * Set current operational state to aOpState and the operational error to kNoError.
      * NOTE: This method cannot be used to set the error state. The error state must be set via the
      * OnOperationalErrorDetected method.
      * @param aOpState The operational state that should now be the current one.

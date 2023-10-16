@@ -82,8 +82,7 @@ static id _Nullable DecodeEventPayloadForOnOffCluster(EventId aEventId, TLV::TLV
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForOnOffSwitchConfigurationCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForOnOffSwitchConfigurationCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::OnOffSwitchConfiguration;
     switch (aEventId) {
@@ -119,8 +118,7 @@ static id _Nullable DecodeEventPayloadForBinaryInputBasicCluster(EventId aEventI
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForPulseWidthModulationCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForPulseWidthModulationCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::PulseWidthModulation;
     switch (aEventId) {
@@ -198,8 +196,7 @@ static id _Nullable DecodeEventPayloadForAccessControlCluster(EventId aEventId, 
                 memberValue = nil;
             } else {
                 memberValue = [MTRAccessControlClusterAccessControlEntryStruct new];
-                memberValue.privilege =
-                    [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.latestValue.Value().privilege)];
+                memberValue.privilege = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.latestValue.Value().privilege)];
                 memberValue.authMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.latestValue.Value().authMode)];
                 if (cppValue.latestValue.Value().subjects.IsNull()) {
                     memberValue.subjects = nil;
@@ -472,8 +469,7 @@ static id _Nullable DecodeEventPayloadForBasicInformationCluster(EventId aEventI
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForOTASoftwareUpdateProviderCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForOTASoftwareUpdateProviderCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::OtaSoftwareUpdateProvider;
     switch (aEventId) {
@@ -485,8 +481,7 @@ static id _Nullable DecodeEventPayloadForOTASoftwareUpdateProviderCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForOTASoftwareUpdateRequestorCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForOTASoftwareUpdateRequestorCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::OtaSoftwareUpdateRequestor;
     switch (aEventId) {
@@ -596,8 +591,7 @@ static id _Nullable DecodeEventPayloadForOTASoftwareUpdateRequestorCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForLocalizationConfigurationCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForLocalizationConfigurationCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::LocalizationConfiguration;
     switch (aEventId) {
@@ -609,8 +603,7 @@ static id _Nullable DecodeEventPayloadForLocalizationConfigurationCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForTimeFormatLocalizationCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForTimeFormatLocalizationCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::TimeFormatLocalization;
     switch (aEventId) {
@@ -634,8 +627,7 @@ static id _Nullable DecodeEventPayloadForUnitLocalizationCluster(EventId aEventI
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForPowerSourceConfigurationCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForPowerSourceConfigurationCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::PowerSourceConfiguration;
     switch (aEventId) {
@@ -815,8 +807,7 @@ static id _Nullable DecodeEventPayloadForPowerSourceCluster(EventId aEventId, TL
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForGeneralCommissioningCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForGeneralCommissioningCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::GeneralCommissioning;
     switch (aEventId) {
@@ -828,8 +819,7 @@ static id _Nullable DecodeEventPayloadForGeneralCommissioningCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForNetworkCommissioningCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForNetworkCommissioningCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::NetworkCommissioning;
     switch (aEventId) {
@@ -1090,8 +1080,7 @@ static id _Nullable DecodeEventPayloadForSoftwareDiagnosticsCluster(EventId aEve
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForThreadNetworkDiagnosticsCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForThreadNetworkDiagnosticsCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ThreadNetworkDiagnostics;
     switch (aEventId) {
@@ -1172,8 +1161,7 @@ static id _Nullable DecodeEventPayloadForThreadNetworkDiagnosticsCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForWiFiNetworkDiagnosticsCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForWiFiNetworkDiagnosticsCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::WiFiNetworkDiagnostics;
     switch (aEventId) {
@@ -1241,8 +1229,7 @@ static id _Nullable DecodeEventPayloadForWiFiNetworkDiagnosticsCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForEthernetNetworkDiagnosticsCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForEthernetNetworkDiagnosticsCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::EthernetNetworkDiagnostics;
     switch (aEventId) {
@@ -1357,8 +1344,7 @@ static id _Nullable DecodeEventPayloadForTimeSynchronizationCluster(EventId aEve
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForBridgedDeviceBasicInformationCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForBridgedDeviceBasicInformationCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::BridgedDeviceBasicInformation;
     switch (aEventId) {
@@ -1567,8 +1553,7 @@ static id _Nullable DecodeEventPayloadForSwitchCluster(EventId aEventId, TLV::TL
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForAdministratorCommissioningCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForAdministratorCommissioningCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::AdministratorCommissioning;
     switch (aEventId) {
@@ -1580,8 +1565,7 @@ static id _Nullable DecodeEventPayloadForAdministratorCommissioningCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForOperationalCredentialsCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForOperationalCredentialsCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::OperationalCredentials;
     switch (aEventId) {
@@ -1694,8 +1678,7 @@ static id _Nullable DecodeEventPayloadForLaundryWasherModeCluster(EventId aEvent
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForRefrigeratorAndTemperatureControlledCabinetModeCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForRefrigeratorAndTemperatureControlledCabinetModeCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::RefrigeratorAndTemperatureControlledCabinetMode;
     switch (aEventId) {
@@ -1707,8 +1690,7 @@ static id _Nullable DecodeEventPayloadForRefrigeratorAndTemperatureControlledCab
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForLaundryWasherControlsCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForLaundryWasherControlsCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::LaundryWasherControls;
     switch (aEventId) {
@@ -2251,8 +2233,7 @@ static id _Nullable DecodeEventPayloadForRVCOperationalStateCluster(EventId aEve
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForHEPAFilterMonitoringCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForHEPAFilterMonitoringCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::HepaFilterMonitoring;
     switch (aEventId) {
@@ -2264,8 +2245,7 @@ static id _Nullable DecodeEventPayloadForHEPAFilterMonitoringCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForActivatedCarbonFilterMonitoringCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ActivatedCarbonFilterMonitoring;
     switch (aEventId) {
@@ -2374,8 +2354,7 @@ static id _Nullable DecodeEventPayloadForDoorLockCluster(EventId aEventId, TLV::
                             auto & entry_2 = iter_2.GetValue();
                             MTRDoorLockClusterCredentialStruct * newElement_2;
                             newElement_2 = [MTRDoorLockClusterCredentialStruct new];
-                            newElement_2.credentialType =
-                                [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.credentialType)];
+                            newElement_2.credentialType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.credentialType)];
                             newElement_2.credentialIndex = [NSNumber numberWithUnsignedShort:entry_2.credentialIndex];
                             [array_2 addObject:newElement_2];
                         }
@@ -2459,8 +2438,7 @@ static id _Nullable DecodeEventPayloadForDoorLockCluster(EventId aEventId, TLV::
                             auto & entry_2 = iter_2.GetValue();
                             MTRDoorLockClusterCredentialStruct * newElement_2;
                             newElement_2 = [MTRDoorLockClusterCredentialStruct new];
-                            newElement_2.credentialType =
-                                [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.credentialType)];
+                            newElement_2.credentialType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_2.credentialType)];
                             newElement_2.credentialIndex = [NSNumber numberWithUnsignedShort:entry_2.credentialIndex];
                             [array_2 addObject:newElement_2];
                         }
@@ -2575,8 +2553,7 @@ static id _Nullable DecodeEventPayloadForBarrierControlCluster(EventId aEventId,
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForPumpConfigurationAndControlCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForPumpConfigurationAndControlCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::PumpConfigurationAndControl;
     switch (aEventId) {
@@ -2799,8 +2776,7 @@ static id _Nullable DecodeEventPayloadForFanControlCluster(EventId aEventId, TLV
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForThermostatUserInterfaceConfigurationCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForThermostatUserInterfaceConfigurationCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ThermostatUserInterfaceConfiguration;
     switch (aEventId) {
@@ -2824,8 +2800,7 @@ static id _Nullable DecodeEventPayloadForColorControlCluster(EventId aEventId, T
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForBallastConfigurationCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForBallastConfigurationCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::BallastConfiguration;
     switch (aEventId) {
@@ -2837,8 +2812,7 @@ static id _Nullable DecodeEventPayloadForBallastConfigurationCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForIlluminanceMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForIlluminanceMeasurementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::IlluminanceMeasurement;
     switch (aEventId) {
@@ -2850,8 +2824,7 @@ static id _Nullable DecodeEventPayloadForIlluminanceMeasurementCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForTemperatureMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForTemperatureMeasurementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::TemperatureMeasurement;
     switch (aEventId) {
@@ -2887,8 +2860,7 @@ static id _Nullable DecodeEventPayloadForFlowMeasurementCluster(EventId aEventId
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForRelativeHumidityMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForRelativeHumidityMeasurementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::RelativeHumidityMeasurement;
     switch (aEventId) {
@@ -2912,8 +2884,7 @@ static id _Nullable DecodeEventPayloadForOccupancySensingCluster(EventId aEventI
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForCarbonMonoxideConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForCarbonMonoxideConcentrationMeasurementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::CarbonMonoxideConcentrationMeasurement;
     switch (aEventId) {
@@ -2925,8 +2896,7 @@ static id _Nullable DecodeEventPayloadForCarbonMonoxideConcentrationMeasurementC
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForCarbonDioxideConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForCarbonDioxideConcentrationMeasurementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::CarbonDioxideConcentrationMeasurement;
     switch (aEventId) {
@@ -2938,8 +2908,7 @@ static id _Nullable DecodeEventPayloadForCarbonDioxideConcentrationMeasurementCl
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForNitrogenDioxideConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForNitrogenDioxideConcentrationMeasurementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::NitrogenDioxideConcentrationMeasurement;
     switch (aEventId) {
@@ -2951,8 +2920,7 @@ static id _Nullable DecodeEventPayloadForNitrogenDioxideConcentrationMeasurement
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForOzoneConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForOzoneConcentrationMeasurementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::OzoneConcentrationMeasurement;
     switch (aEventId) {
@@ -2964,8 +2932,7 @@ static id _Nullable DecodeEventPayloadForOzoneConcentrationMeasurementCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForPM25ConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForPM25ConcentrationMeasurementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::Pm25ConcentrationMeasurement;
     switch (aEventId) {
@@ -2977,8 +2944,7 @@ static id _Nullable DecodeEventPayloadForPM25ConcentrationMeasurementCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForFormaldehydeConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForFormaldehydeConcentrationMeasurementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::FormaldehydeConcentrationMeasurement;
     switch (aEventId) {
@@ -2990,8 +2956,7 @@ static id _Nullable DecodeEventPayloadForFormaldehydeConcentrationMeasurementClu
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForPM1ConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForPM1ConcentrationMeasurementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::Pm1ConcentrationMeasurement;
     switch (aEventId) {
@@ -3003,8 +2968,7 @@ static id _Nullable DecodeEventPayloadForPM1ConcentrationMeasurementCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForPM10ConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForPM10ConcentrationMeasurementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::Pm10ConcentrationMeasurement;
     switch (aEventId) {
@@ -3016,8 +2980,7 @@ static id _Nullable DecodeEventPayloadForPM10ConcentrationMeasurementCluster(
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForTotalVolatileOrganicCompoundsConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForTotalVolatileOrganicCompoundsConcentrationMeasurementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement;
     switch (aEventId) {
@@ -3029,8 +2992,7 @@ static id _Nullable DecodeEventPayloadForTotalVolatileOrganicCompoundsConcentrat
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForRadonConcentrationMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForRadonConcentrationMeasurementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::RadonConcentrationMeasurement;
     switch (aEventId) {
@@ -3186,8 +3148,7 @@ static id _Nullable DecodeEventPayloadForAccountLoginCluster(EventId aEventId, T
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForElectricalMeasurementCluster(
-    EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+static id _Nullable DecodeEventPayloadForElectricalMeasurementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ElectricalMeasurement;
     switch (aEventId) {
@@ -3318,6 +3279,18 @@ static id _Nullable DecodeEventPayloadForUnitTestingCluster(EventId aEventId, TL
 
         return value;
     }
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
+static id _Nullable DecodeEventPayloadForSampleMEICluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::SampleMei;
+    switch (aEventId) {
     default: {
         break;
     }
@@ -3608,6 +3581,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::UnitTesting::Id: {
         return DecodeEventPayloadForUnitTestingCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::SampleMei::Id: {
+        return DecodeEventPayloadForSampleMEICluster(aPath.mEventId, aReader, aError);
     }
     default: {
         break;

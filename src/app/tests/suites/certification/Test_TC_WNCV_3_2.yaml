@@ -26,6 +26,22 @@ config:
     cluster: "Window Covering"
     endpoint: 1
 
+    Step1bWaitTime:
+        type: int16u
+        defaultValue: 10000
+    Step2bWaitTime:
+        type: int16u
+        defaultValue: 500
+    Step2eWaitTime:
+        type: int16u
+        defaultValue: 1000
+    Step4bWaitTime:
+        type: int16u
+        defaultValue: 1000
+    Step5aWaitTime:
+        type: int16u
+        defaultValue: 500
+
 tests:
     - label: "Step 0: Wait for the commissioned device to be retrieved"
       cluster: "DelayCommands"
@@ -50,7 +66,7 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 10000
+                value: Step1bWaitTime
 
     ###
     ### Mandatory Depends on the FeatureMap
@@ -62,7 +78,7 @@ tests:
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           constraints:
-              type: Percent100ths
+              type: percent100ths
               minValue: 0
               maxValue: 9999
 
@@ -75,7 +91,7 @@ tests:
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008
       response:
           constraints:
-              type: Percent
+              type: percent
               minValue: 0
               maxValue: 99
 
@@ -88,7 +104,7 @@ tests:
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           constraints:
-              type: Percent100ths
+              type: percent100ths
               minValue: 0
               maxValue: 9999
 
@@ -101,7 +117,7 @@ tests:
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A0009
       response:
           constraints:
-              type: Percent
+              type: percent
               minValue: 0
               maxValue: 99
 
@@ -120,7 +136,7 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 100
+                value: Step2bWaitTime
 
     ### Mandatory Depends on the FeatureMap
     - label:
@@ -148,7 +164,7 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 2000
+                value: Step2eWaitTime
 
     ######## DownOrClose Reports #######
     ### Step 3x -> Check DownOrClose Mid term effects
@@ -244,7 +260,7 @@ tests:
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000e
       response:
           constraints:
-              type: Percent100ths
+              type: percent100ths
               minValue: 1
               maxValue: 10000
 
@@ -257,7 +273,7 @@ tests:
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A0008
       response:
           constraints:
-              type: Percent
+              type: percent
               minValue: 1
               maxValue: 100
 
@@ -270,7 +286,7 @@ tests:
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000f
       response:
           constraints:
-              type: Percent100ths
+              type: percent100ths
               minValue: 1
               maxValue: 10000
 
@@ -283,7 +299,7 @@ tests:
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A0009
       response:
           constraints:
-              type: Percent
+              type: percent
               minValue: 1
               maxValue: 100
 
@@ -302,7 +318,7 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 3000
+                value: Step4bWaitTime
 
     ### Must Be ZERO
     # The value of bit 0..1 must be 00b & if (LF) value of bit 2..3 must be 00b & if (TL) value of bit 4..5 must be 00b
@@ -322,7 +338,7 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 1000
+                value: Step5aWaitTime
 
     ### Mandatory Depends on the FeatureMap shall be tested as equals CurrentPositionLiftPercent100ths
     - label:
@@ -333,7 +349,7 @@ tests:
       PICS: WNCV.S.F00 && WNCV.S.F02 && WNCV.S.A000b
       response:
           constraints:
-              type: Percent100ths
+              type: percent100ths
               minValue: 1
               maxValue: 10000
 
@@ -346,6 +362,6 @@ tests:
       PICS: WNCV.S.F01 && WNCV.S.F04 && WNCV.S.A000c
       response:
           constraints:
-              type: Percent100ths
+              type: percent100ths
               minValue: 1
               maxValue: 10000

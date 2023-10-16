@@ -178,37 +178,28 @@ typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
         if (otaProviderDelegate != nil) {
             if (![otaProviderDelegate respondsToSelector:@selector(handleQueryImageForNodeID:controller:params:completion:)]
-                && ![otaProviderDelegate respondsToSelector:@selector(handleQueryImageForNodeID:
-                                                                                     controller:params:completionHandler:)]) {
+                && ![otaProviderDelegate respondsToSelector:@selector(handleQueryImageForNodeID:controller:params:completionHandler:)]) {
                 MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleQueryImageForNodeID");
                 return nil;
             }
             if (![otaProviderDelegate respondsToSelector:@selector(handleApplyUpdateRequestForNodeID:controller:params:completion:)]
-                && ![otaProviderDelegate
-                    respondsToSelector:@selector(handleApplyUpdateRequestForNodeID:controller:params:completionHandler:)]) {
+                && ![otaProviderDelegate respondsToSelector:@selector(handleApplyUpdateRequestForNodeID:controller:params:completionHandler:)]) {
                 MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleApplyUpdateRequestForNodeID");
                 return nil;
             }
-            if (![otaProviderDelegate respondsToSelector:@selector(handleNotifyUpdateAppliedForNodeID:
-                                                                                           controller:params:completion:)]
+            if (![otaProviderDelegate respondsToSelector:@selector(handleNotifyUpdateAppliedForNodeID:controller:params:completion:)]
                 && ![otaProviderDelegate
                     respondsToSelector:@selector(handleNotifyUpdateAppliedForNodeID:controller:params:completionHandler:)]) {
                 MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleNotifyUpdateAppliedForNodeID");
                 return nil;
             }
-            if (![otaProviderDelegate respondsToSelector:@selector
-                                      (handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:)]
-                && ![otaProviderDelegate respondsToSelector:@selector
-                                         (handleBDXTransferSessionBeginForNodeID:
-                                                                      controller:fileDesignator:offset:completionHandler:)]) {
+            if (![otaProviderDelegate respondsToSelector:@selector(handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:)]
+                && ![otaProviderDelegate respondsToSelector:@selector(handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completionHandler:)]) {
                 MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleBDXTransferSessionBeginForNodeID");
                 return nil;
             }
-            if (![otaProviderDelegate
-                    respondsToSelector:@selector(handleBDXQueryForNodeID:controller:blockSize:blockIndex:bytesToSkip:completion:)]
-                && ![otaProviderDelegate
-                    respondsToSelector:@selector(handleBDXQueryForNodeID:
-                                                              controller:blockSize:blockIndex:bytesToSkip:completionHandler:)]) {
+            if (![otaProviderDelegate respondsToSelector:@selector(handleBDXQueryForNodeID:controller:blockSize:blockIndex:bytesToSkip:completion:)]
+                && ![otaProviderDelegate respondsToSelector:@selector(handleBDXQueryForNodeID:controller:blockSize:blockIndex:bytesToSkip:completionHandler:)]) {
                 MTR_LOG_ERROR("Error: MTROTAProviderDelegate does not support handleBDXQueryForNodeID");
                 return nil;
             }

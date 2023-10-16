@@ -282,6 +282,25 @@ exit:
     return (err == CHIP_NO_ERROR);
 }
 
+JNI_METHOD(jboolean, WasRecentlyDiscoverable)
+(JNIEnv * env, jobject, jobject videoPlayer)
+{
+    chip::DeviceLayer::StackLock lock;
+
+    ChipLogProgress(AppServer, "JNI_METHOD WasRecentlyDiscoverable called");
+
+    TargetVideoPlayerInfo targetVideoPlayerInfo;
+    CHIP_ERROR err = convertJVideoPlayerToTargetVideoPlayerInfo(videoPlayer, targetVideoPlayerInfo);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogError(AppServer,
+                              "Conversion from jobject VideoPlayer to TargetVideoPlayerInfo * failed: %" CHIP_ERROR_FORMAT,
+                              err.Format()));
+    return targetVideoPlayerInfo.WasRecentlyDiscoverable();
+
+exit:
+    return false; // default to false
+}
+
 JNI_METHOD(void, shutdownAllSubscriptions)(JNIEnv * env, jobject)
 {
     chip::DeviceLayer::StackLock lock;

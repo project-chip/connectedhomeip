@@ -32,6 +32,7 @@
 #include <lib/support/FibonacciUtils.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
+#include <platform/LockTracker.h>
 
 namespace chip {
 namespace app {
@@ -44,8 +45,9 @@ ReadClient::ReadClient(InteractionModelEngine * apImEngine, Messaging::ExchangeM
     mpCallback(apCallback), mOnConnectedCallback(HandleDeviceConnected, this),
     mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
 {
+    assertChipStackLockedByCurrentThread();
+
     mpExchangeMgr    = apExchangeMgr;
-    mpCallback       = apCallback;
     mInteractionType = aInteractionType;
 
     mpImEngine = apImEngine;
@@ -90,6 +92,8 @@ void ReadClient::StopResubscription()
 
 ReadClient::~ReadClient()
 {
+    assertChipStackLockedByCurrentThread();
+
     if (IsSubscriptionType())
     {
         StopResubscription();

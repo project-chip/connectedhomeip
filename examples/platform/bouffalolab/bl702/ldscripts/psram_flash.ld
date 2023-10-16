@@ -3,16 +3,16 @@ OUTPUT_ARCH( "riscv" )
 ENTRY( bl702_start )
 
 __EM_SIZE = DEFINED(ble_controller_init) ? 8K : 0K;
-__SHA_LINK_CFG_SIZE = DEFINED(mbedtls_sha256_init) ? 72 : 0;
+__OCRAM_BSS_REGION_SIZE = 12K;
 __CACHE_SIZE = DEFINED(__CACHE_SIZE) ? __CACHE_SIZE : 16K;
 __stack_size = DEFINED(__stack_size) ? __stack_size : 2K;
 
 MEMORY
 {
   flash  (rxai!w) : ORIGIN = 0x23000000, LENGTH = (2M)
-  tcm_ocram (wxa) : ORIGIN = 0x42010000 + __CACHE_SIZE, LENGTH = (64K - __CACHE_SIZE + 64K - __EM_SIZE - __stack_size - __SHA_LINK_CFG_SIZE)
-  sha_ocram (wxa) : ORIGIN = ORIGIN(tcm_ocram) + LENGTH(tcm_ocram), LENGTH = __SHA_LINK_CFG_SIZE
-  sys_stack (wxa) : ORIGIN = ORIGIN(tcm_ocram) + LENGTH(tcm_ocram) + __SHA_LINK_CFG_SIZE, LENGTH = __stack_size
+  tcm_ocram (wxa) : ORIGIN = 0x42010000 + __CACHE_SIZE, LENGTH = (64K - __CACHE_SIZE + 64K - __OCRAM_BSS_REGION_SIZE - __stack_size - __EM_SIZE)
+  ocram_bss (wxa) : ORIGIN = ORIGIN(tcm_ocram) + LENGTH(tcm_ocram), LENGTH = __OCRAM_BSS_REGION_SIZE
+  sys_stack (wxa) : ORIGIN = ORIGIN(tcm_ocram) + LENGTH(tcm_ocram) + __OCRAM_BSS_REGION_SIZE, LENGTH = __stack_size
   hbnram    (wxa) : ORIGIN = 0x40010000, LENGTH = (4K)
   psram     (wxa) : ORIGIN = 0x26000000, LENGTH = (2M)
 }
@@ -207,6 +207,21 @@ SECTIONS
     PROVIDE ( __boot2_flashCfg_end = . );
   } >tcm_ocram
 
+  .ocram_bss (NOLOAD) :
+  {
+    PROVIDE( __ocram_bss_start = ADDR(.ocram_bss) );
+    PROVIDE( __ocram_bss_end = ADDR(.ocram_bss) + SIZEOF(.ocram_bss) );
+
+    *libCHIP.a:BL702.PlatformManagerImpl.cpp.o(.sbss.* .bss.* COMMON)
+    . = ALIGN(4);
+    *(.sha_ocram*)
+
+  } > ocram_bss
+
+  . = ALIGN(4);
+  PROVIDE( _heap2_start = .);
+  PROVIDE( _heap2_size = ADDR(.stack) - _heap2_start );
+
   .bss_psram (NOLOAD) :
   {
     PROVIDE( __bss_psram_start = ADDR(.bss_psram) );
@@ -227,6 +242,12 @@ SECTIONS
     KEEP(*libMatterDeviceInfoProviderExample.a:*(.bss.*))
 
     . = ALIGN(16);
+    KEEP(*libopenthread-ftd.a:*(.sbss.*))
+    KEEP(*libopenthread-ftd.a:*(.bss.*))
+    KEEP(*libopenthread-mtd.a:*(.sbss.*))
+    KEEP(*libopenthread-mtd.a:*(.bss.*))
+    
+    . = ALIGN(16);
     KEEP(*src/app/clusters/*/bouffalolab*.cpp.o(.sbss.*))
     KEEP(*src/app/clusters/*/bouffalolab*.cpp.o(.bss.*))
 
@@ -245,6 +266,18 @@ SECTIONS
     . = ALIGN(16);
     KEEP(*sdk_lwip.*.c.o(.sbss.*))
     KEEP(*sdk_lwip.*.c.o(.bss.*))
+
+    . = ALIGN(16);
+    KEEP(*sdk_lwip.*.c.o(.sbss.*))
+    KEEP(*sdk_lwip.*.c.o(.bss.*))
+
+    . = ALIGN(16);
+    KEEP(*libopenthread_br.a:*(.sbss.*))
+    KEEP(*libopenthread_br.a:*(.bss.*))
+    
+    . = ALIGN(16);
+    KEEP(*third_party/tcplp*.c.o(.bss.*))
+    KEEP(*third_party/tcplp*.c.o(.bss.*))
 
     . = ALIGN(16);
     KEEP(*stack_main.o(.bss.*))
@@ -272,26 +305,8 @@ SECTIONS
 
   . = ALIGN(8);
   PROVIDE( _heap_start = . );
-  PROVIDE( _heap_size = ADDR(.stack) - _heap_start );
+  PROVIDE( _heap_size = ADDR(.ocram_bss) - _heap_start );
 
-  PROVIDE( _heap2_start = 0 );
-  PROVIDE( _heap2_size = 0 );
-
-  .psram   (NOLOAD) :
-  {
-    *(.wifi_ram*)
-    . = ALIGN(16);
-  } > psram
-
-  . = ALIGN(8);
-  PROVIDE( _heap3_start = .);
-  PROVIDE( _heap3_size = ORIGIN(psram) + LENGTH(psram) - _heap3_start );
-
-  .sha_ocram (NOLOAD) :
-  {
-    *(.sha_ocram*)
-  } > sha_ocram
-  
   .stack (NOLOAD) :
   {
     PROVIDE ( _sp_base = . );

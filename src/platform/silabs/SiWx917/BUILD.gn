@@ -75,6 +75,7 @@ static_library("SiWx917") {
   }
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
+  deps = [ "${chip_root}/src/platform/logging:headers" ]
 
   # Add platform crypto implementation
   if (chip_crypto == "platform") {

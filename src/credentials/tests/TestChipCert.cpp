@@ -28,11 +28,11 @@
 #include <credentials/examples/LastKnownGoodTimeCertificateValidityPolicyExample.h>
 #include <credentials/examples/StrictCertificateValidityPolicyExample.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/core/PeerId.h>
 #include <lib/core/TLV.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
@@ -186,7 +186,7 @@ static void TestChipCert_ChipToX509(nlTestSuite * inSuite, void * inContext)
 
     // Error Case:
     MutableByteSpan outCert(outCertBuf);
-    err = ConvertChipCertToX509Cert(ByteSpan(sTestCert_Node01_01_Err01_Chip, sTestCert_Node01_01_Err01_Chip_Len), outCert);
+    err = ConvertChipCertToX509Cert(sTestCert_Node01_01_Err01_Chip, outCert);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_TLV_TAG);
 }
 
@@ -2059,12 +2059,12 @@ static void TestChipCert_ExtractPublicKeyAndSKID(nlTestSuite * inSuite, void * i
     struct TestCase
     {
         uint8_t Cert;
-        const uint8_t * ExpectedPublicKey;
-        const uint8_t * ExpectedSKID;
+        ByteSpan ExpectedPublicKey;
+        ByteSpan ExpectedSKID;
     };
 
     // clang-format off
-    static constexpr TestCase sTestCases[] = {
+    static const TestCase sTestCases[] = {
         // Cert                  ExpectedPublicKey              ExpectedSKID
         // =======================================================================================
         {  TestCert::kRoot01,    sTestCert_Root01_PublicKey,    sTestCert_Root01_SubjectKeyId    },
@@ -2094,12 +2094,12 @@ static void TestChipCert_ExtractPublicKeyAndSKID(nlTestSuite * inSuite, void * i
         P256PublicKeySpan publicKey;
         err = ExtractPublicKeyFromChipCert(cert, publicKey);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, publicKey.data_equal(P256PublicKeySpan(testCase.ExpectedPublicKey)));
+        NL_TEST_ASSERT(inSuite, publicKey.data_equal(testCase.ExpectedPublicKey));
 
         CertificateKeyId skid;
         err = ExtractSKIDFromChipCert(cert, skid);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, skid.data_equal(CertificateKeyId(testCase.ExpectedSKID)));
+        NL_TEST_ASSERT(inSuite, skid.data_equal(testCase.ExpectedSKID));
     }
 }
 

@@ -25,7 +25,7 @@ import java.util.Optional
 
 class ApplicationLauncherClusterApplicationEPStruct(
   val application: ApplicationLauncherClusterApplicationStruct,
-  val endpoint: Optional<Int>
+  val endpoint: Optional<UInt>
 ) {
   override fun toString(): String = buildString {
     append("ApplicationLauncherClusterApplicationEPStruct {\n")
@@ -34,9 +34,9 @@ class ApplicationLauncherClusterApplicationEPStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       application.toTlv(ContextSpecificTag(TAG_APPLICATION), this)
       if (endpoint.isPresent) {
         val optendpoint = endpoint.get()
@@ -50,8 +50,8 @@ class ApplicationLauncherClusterApplicationEPStruct(
     private const val TAG_APPLICATION = 0
     private const val TAG_ENDPOINT = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ApplicationLauncherClusterApplicationEPStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ApplicationLauncherClusterApplicationEPStruct {
+      tlvReader.enterStructure(tlvTag)
       val application =
         ApplicationLauncherClusterApplicationStruct.fromTlv(
           ContextSpecificTag(TAG_APPLICATION),
@@ -59,7 +59,7 @@ class ApplicationLauncherClusterApplicationEPStruct(
         )
       val endpoint =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENDPOINT))) {
-          Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_ENDPOINT)))
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT)))
         } else {
           Optional.empty()
         }

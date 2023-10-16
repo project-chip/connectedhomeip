@@ -60,6 +60,7 @@ target_include_directories(
     ${pigweed_dir}/pw_rpc/nanopb/public
 
     ${chip_dir_output}/gen/include
+    ${chip_dir}/third_party/nlassert/repo/include/
 )
 
 target_link_libraries(${chip_main} PUBLIC
@@ -82,7 +83,6 @@ list(
     -DINET_CONFIG_ENABLE_IPV4=0
     -DCHIP_PROJECT=1
     -DCHIP_DEVICE_LAYER_TARGET=Ameba
-    -DUSE_ZAP_CONFIG
     -DCHIP_HAVE_CONFIG_H
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
     -DCONFIG_ENABLE_PW_RPC=1

@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# Auto-generated scripts for harness use only, please review before automation. The endpoints and cluster names are currently set to default
 
 name: 22.4.1. [TC-SC-4.1] Commissionable Node Discovery [DUT as Commissionee]
 
@@ -753,7 +752,10 @@ tests:
       verification: |
           Run the below open-commissioning-window in TH Terminal
 
-          ./chip-tool pairing open-commissioning-window 1 1 200 2000 3840
+          The user needs to change this command to match the longDiscriminator override.
+          use the same discriminator as the longDiscriminator of the DUT.
+
+          ./chip-tool pairing open-commissioning-window 1 1 200 2000 <discriminator>
 
           verify success on TH (Chip-tool) logs:
 
@@ -890,7 +892,7 @@ tests:
           represented as a variable length decimal number in ASCII without
           leading zeros"
       # The device type is not broadcasted by the accessory under CI.
-      PICS: MCORE.SC.VENDOR_SUBTYPE
+      PICS: MCORE.SC.DEVTYPE_SUBTYPE
       cluster: "DiscoveryCommands"
       command: "FindCommissionableByDeviceType"
       arguments:
@@ -1063,7 +1065,9 @@ tests:
           DUT should start to send Commissionable Node Discovery DNS-SD
           advertisements"
       verification: |
-          If the device supports Discovery for an extended period of time, the Device should continue to advertise. Use the avahi-browse command and you should see the _matterc._udp advertisement
+          If the device supports Extended Discovery, pass the PROMPT before the extended time period expires.
+
+          the Device should continue to advertise. Use the avahi-browse command and you should see the _matterc._udp advertisement
 
           Reference Raspberrypi device is not supporting extended discovery.
       cluster: "LogCommands"
@@ -1201,10 +1205,19 @@ tests:
               - name: "value"
                 value: deviceType
 
+    #TODO
     - label: "Step 10h: Check Commissioning Mode (_CM)"
-      PICS: MCORE.SC.EXTENDED_DISCOVERY
-      cluster: "DiscoveryCommands"
-      command: "FindCommissionableByCommissioningMode"
+      verification: |
+          subtype _CM must not be present
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_SKIP_SAMPLE_APP && MCORE.SC.EXTENDED_DISCOVERY
+      arguments:
+          values:
+              - name: "message"
+                value: "Enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
 
     # TXT Records
 
@@ -1275,7 +1288,7 @@ tests:
           an unsigned integer with units of milliseconds and shall be encoded as
           a variable length decimal number in ASCII, omitting leading zeros.
           Shall not exceed 65535."
-      PICS: MCORE.SC.SAI_OP_DISCOVERY_KEY
+      PICS: MCORE.SC.SAI_OP_DISCOVERY_KEY && MCORE.SC.EXTENDED_DISCOVERY
       cluster: "DiscoveryCommands"
       command: "FindCommissionable"
       response:

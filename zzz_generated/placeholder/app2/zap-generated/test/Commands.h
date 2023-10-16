@@ -321,7 +321,7 @@ private:
         {
         case 0: {
             LogStep(0, "DUT sends ResetCounts command to TH");
-            VerifyOrDo(!ShouldSkip("DGTHREAD.C.C00.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            VerifyOrDo(!ShouldSkip("DGWIFI.S.C00.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitCommand(GetEndpoint(0), WiFiNetworkDiagnostics::Id, WiFiNetworkDiagnostics::Commands::ResetCounts::Id);
         }
         }
@@ -1634,188 +1634,6 @@ private:
     }
 };
 
-class Test_TC_LVL_2_3_SimulatedSuite : public TestCommand
-{
-public:
-    Test_TC_LVL_2_3_SimulatedSuite() : TestCommand("Test_TC_LVL_2_3_Simulated", 24)
-    {
-        AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
-        AddArgument("cluster", &mCluster);
-        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
-        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
-    }
-
-    ~Test_TC_LVL_2_3_SimulatedSuite() {}
-
-private:
-    chip::Optional<chip::NodeId> mNodeId;
-    chip::Optional<chip::CharSpan> mCluster;
-    chip::Optional<chip::EndpointId> mEndpoint;
-    chip::Optional<uint16_t> mTimeout;
-
-    chip::EndpointId GetEndpoint(chip::EndpointId endpoint) { return mEndpoint.HasValue() ? mEndpoint.Value() : endpoint; }
-
-    //
-    // Tests methods
-    //
-
-    void OnResponse(const chip::app::StatusIB & status, chip::TLV::TLVReader * data) override
-    {
-        bool shouldContinue = false;
-
-        switch (mTestIndex - 1)
-        {
-        case 21:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 22:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 23:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        default:
-            LogErrorOnFailure(ContinueOnChipMainThread(CHIP_ERROR_INVALID_ARGUMENT));
-        }
-
-        if (shouldContinue)
-        {
-            ContinueOnChipMainThread(CHIP_NO_ERROR);
-        }
-    }
-
-    CHIP_ERROR DoTestStep(uint16_t testIndex) override
-    {
-        using namespace chip::app::Clusters;
-        switch (testIndex)
-        {
-        case 0: {
-            LogStep(0, "Read mandatory attribute CurrentLevel");
-            return WaitAttribute(GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::CurrentLevel::Id);
-        }
-        case 1: {
-            LogStep(1, "Read mandatory attribute OnLevel");
-            return WaitAttribute(GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::OnLevel::Id);
-        }
-        case 2: {
-            LogStep(2, "Read mandatory attribute Options");
-            return WaitAttribute(GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::Options::Id);
-        }
-        case 3: {
-            LogStep(3, "Read optional attribute RemainingTime");
-            return WaitAttribute(GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::RemainingTime::Id);
-        }
-        case 4: {
-            LogStep(4, "Read optional attribute StartUpCurrentLevel");
-            return WaitAttribute(GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::StartUpCurrentLevel::Id);
-        }
-        case 5: {
-            LogStep(5, "Read optional attribute CurrentFrequency");
-            return WaitAttribute(GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::CurrentFrequency::Id);
-        }
-        case 6: {
-            LogStep(6, "Read optional attribute MinFrequency");
-            return WaitAttribute(GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::MinFrequency::Id);
-        }
-        case 7: {
-            LogStep(7, "Read optional attribute MaxFrequency");
-            return WaitAttribute(GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::MaxFrequency::Id);
-        }
-        case 8: {
-            LogStep(8, "Read optional attribute MinLevel");
-            return WaitAttribute(GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::MinLevel::Id);
-        }
-        case 9: {
-            LogStep(9, "Read optional attribute MaxLevel");
-            return WaitAttribute(GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::MaxLevel::Id);
-        }
-        case 10: {
-            LogStep(10, "Read optional attribute OnOffTransitionTime");
-            return WaitAttribute(GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::OnOffTransitionTime::Id);
-        }
-        case 11: {
-            LogStep(11, "Read optional attribute OnTransitionTime");
-            return WaitAttribute(GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::OnTransitionTime::Id);
-        }
-        case 12: {
-            LogStep(12, "Read optional attribute OffTransitionTime");
-            return WaitAttribute(GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::OffTransitionTime::Id);
-        }
-        case 13: {
-            LogStep(13, "Read optional attribute DefaultMoveRate");
-            return WaitAttribute(GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::DefaultMoveRate::Id);
-        }
-        case 14: {
-            LogStep(14, "Write mandatory attribute OnLevel");
-            return WaitAttribute(GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::OnLevel::Id);
-        }
-        case 15: {
-            LogStep(15, "Write mandatory attribute Options");
-            return WaitAttribute(GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::Options::Id);
-        }
-        case 16: {
-            LogStep(16, "Write optional attribute OnOffTransitionTime");
-            return WaitAttribute(GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::OnOffTransitionTime::Id);
-        }
-        case 17: {
-            LogStep(17, "Write optional attribute OnTransitionTime");
-            return WaitAttribute(GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::OnTransitionTime::Id);
-        }
-        case 18: {
-            LogStep(18, "Write optional attribute OffTransitionTime");
-            return WaitAttribute(GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::OffTransitionTime::Id);
-        }
-        case 19: {
-            LogStep(19, "Write optional attribute DefaultMoveRate");
-            return WaitAttribute(GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::DefaultMoveRate::Id);
-        }
-        case 20: {
-            LogStep(20, "Write optional attribute StartUpCurrentLevel");
-            return WaitAttribute(GetEndpoint(1), LevelControl::Id, LevelControl::Attributes::StartUpCurrentLevel::Id);
-        }
-        case 21: {
-            LogStep(21,
-                    "Configure TH such that it implements mandatory and none of the optional attributes of the server-side of the "
-                    "cluster, and that it also reflects this in global attributes such as FeatureMap and AttributeList.Commission "
-                    "DUT to TH again");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
-            value.expectedValue.Emplace();
-            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
-            return UserPrompt(kIdentityAlpha, value);
-        }
-        case 22: {
-            LogStep(22, "DUT reads all supported optional attributes from TH one at a time in a manufacturer specific order");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
-            value.expectedValue.Emplace();
-            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
-            return UserPrompt(kIdentityAlpha, value);
-        }
-        case 23: {
-            LogStep(23,
-                    "DUT writes a suitable value to all supported optional attributes on the TH one at a time in a manufacturer "
-                    "specific order");
-            VerifyOrDo(!ShouldSkip("PICS_SKIP_SAMPLE_APP"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            ListFreer listFreer;
-            chip::app::Clusters::LogCommands::Commands::UserPrompt::Type value;
-            value.message = chip::Span<const char>("Enter 'y' after successgarbage: not in length on purpose", 23);
-            value.expectedValue.Emplace();
-            value.expectedValue.Value() = chip::Span<const char>("ygarbage: not in length on purpose", 1);
-            return UserPrompt(kIdentityAlpha, value);
-        }
-        }
-        return CHIP_NO_ERROR;
-    }
-};
-
 class Test_TC_OO_3_2_SimulatedSuite : public TestCommand
 {
 public:
@@ -1955,10 +1773,6 @@ std::unique_ptr<TestCommand> GetTestCommand(std::string testName)
     {
         return std::unique_ptr<Test_TC_DGTHREAD_3_4_SimulatedSuite>(new Test_TC_DGTHREAD_3_4_SimulatedSuite());
     }
-    if (testName == "Test_TC_LVL_2_3_Simulated")
-    {
-        return std::unique_ptr<Test_TC_LVL_2_3_SimulatedSuite>(new Test_TC_LVL_2_3_SimulatedSuite());
-    }
     if (testName == "Test_TC_OO_3_2_Simulated")
     {
         return std::unique_ptr<Test_TC_OO_3_2_SimulatedSuite>(new Test_TC_OO_3_2_SimulatedSuite());
@@ -1984,6 +1798,5 @@ void PrintTestCommands()
     ChipLogError(chipTool, "\t* Test_TC_CC_7_5_Simulated");
     ChipLogError(chipTool, "\t* Test_TC_CC_9_4_Simulated");
     ChipLogError(chipTool, "\t* Test_TC_DGTHREAD_3_4_Simulated");
-    ChipLogError(chipTool, "\t* Test_TC_LVL_2_3_Simulated");
     ChipLogError(chipTool, "\t* Test_TC_OO_3_2_Simulated");
 }

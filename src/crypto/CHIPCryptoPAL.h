@@ -42,78 +42,78 @@
 namespace chip {
 namespace Crypto {
 
-constexpr size_t kMax_x509_Certificate_Length = 600;
+inline constexpr size_t kMax_x509_Certificate_Length = 600;
 
-constexpr size_t kP256_FE_Length                        = 32;
-constexpr size_t kP256_ECDSA_Signature_Length_Raw       = (2 * kP256_FE_Length);
-constexpr size_t kP256_Point_Length                     = (2 * kP256_FE_Length + 1);
-constexpr size_t kSHA256_Hash_Length                    = 32;
-constexpr size_t kSHA1_Hash_Length                      = 20;
-constexpr size_t kSubjectKeyIdentifierLength            = kSHA1_Hash_Length;
-constexpr size_t kAuthorityKeyIdentifierLength          = kSHA1_Hash_Length;
-constexpr size_t kMaxCertificateSerialNumberLength      = 20;
-constexpr size_t kMaxCertificateDistinguishedNameLength = 200;
-constexpr size_t kMaxCRLDistributionPointURLLength      = 100;
+inline constexpr size_t kP256_FE_Length                        = 32;
+inline constexpr size_t kP256_ECDSA_Signature_Length_Raw       = (2 * kP256_FE_Length);
+inline constexpr size_t kP256_Point_Length                     = (2 * kP256_FE_Length + 1);
+inline constexpr size_t kSHA256_Hash_Length                    = 32;
+inline constexpr size_t kSHA1_Hash_Length                      = 20;
+inline constexpr size_t kSubjectKeyIdentifierLength            = kSHA1_Hash_Length;
+inline constexpr size_t kAuthorityKeyIdentifierLength          = kSHA1_Hash_Length;
+inline constexpr size_t kMaxCertificateSerialNumberLength      = 20;
+inline constexpr size_t kMaxCertificateDistinguishedNameLength = 200;
+inline constexpr size_t kMaxCRLDistributionPointURLLength      = 100;
 
-constexpr const char * kValidCDPURIHttpPrefix  = "http://";
-constexpr const char * kValidCDPURIHttpsPrefix = "https://";
+inline constexpr const char * kValidCDPURIHttpPrefix  = "http://";
+inline constexpr const char * kValidCDPURIHttpsPrefix = "https://";
 
-constexpr size_t CHIP_CRYPTO_GROUP_SIZE_BYTES      = kP256_FE_Length;
-constexpr size_t CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES = kP256_Point_Length;
+inline constexpr size_t CHIP_CRYPTO_GROUP_SIZE_BYTES      = kP256_FE_Length;
+inline constexpr size_t CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES = kP256_Point_Length;
 
-constexpr size_t CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES      = 16;
-constexpr size_t CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES = 16;
+inline constexpr size_t CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES      = 16;
+inline constexpr size_t CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES = 16;
 
-constexpr size_t kMax_ECDH_Secret_Length     = kP256_FE_Length;
-constexpr size_t kMax_ECDSA_Signature_Length = kP256_ECDSA_Signature_Length_Raw;
-constexpr size_t kMAX_FE_Length              = kP256_FE_Length;
-constexpr size_t kMAX_Point_Length           = kP256_Point_Length;
-constexpr size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
+inline constexpr size_t kMax_ECDH_Secret_Length     = kP256_FE_Length;
+inline constexpr size_t kMax_ECDSA_Signature_Length = kP256_ECDSA_Signature_Length_Raw;
+inline constexpr size_t kMAX_FE_Length              = kP256_FE_Length;
+inline constexpr size_t kMAX_Point_Length           = kP256_Point_Length;
+inline constexpr size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
 
 // Minimum required CSR length buffer length is relatively small since it's a single
 // P256 key and no metadata/extensions are expected to be honored by the CA.
-constexpr size_t kMIN_CSR_Buffer_Size = 255;
+inline constexpr size_t kMIN_CSR_Buffer_Size = 255;
 
 [[deprecated("This constant is no longer used by common code and should be replaced by kMIN_CSR_Buffer_Size. Checks that a CSR is "
              "<= kMAX_CSR_Buffer_size must be updated. This remains to keep valid buffers working from previous public API "
              "usage.")]] constexpr size_t kMAX_CSR_Buffer_Size = 255;
 
-constexpr size_t CHIP_CRYPTO_HASH_LEN_BYTES = kSHA256_Hash_Length;
+inline constexpr size_t CHIP_CRYPTO_HASH_LEN_BYTES = kSHA256_Hash_Length;
 
-constexpr size_t kSpake2p_Min_PBKDF_Salt_Length  = 16;
-constexpr size_t kSpake2p_Max_PBKDF_Salt_Length  = 32;
-constexpr uint32_t kSpake2p_Min_PBKDF_Iterations = 1000;
-constexpr uint32_t kSpake2p_Max_PBKDF_Iterations = 100000;
+inline constexpr size_t kSpake2p_Min_PBKDF_Salt_Length  = 16;
+inline constexpr size_t kSpake2p_Max_PBKDF_Salt_Length  = 32;
+inline constexpr uint32_t kSpake2p_Min_PBKDF_Iterations = 1000;
+inline constexpr uint32_t kSpake2p_Max_PBKDF_Iterations = 100000;
 
-constexpr size_t kP256_PrivateKey_Length = CHIP_CRYPTO_GROUP_SIZE_BYTES;
-constexpr size_t kP256_PublicKey_Length  = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
+inline constexpr size_t kP256_PrivateKey_Length = CHIP_CRYPTO_GROUP_SIZE_BYTES;
+inline constexpr size_t kP256_PublicKey_Length  = CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES;
 
-constexpr size_t kAES_CCM128_Key_Length   = 128u / 8u;
-constexpr size_t kAES_CCM128_Block_Length = kAES_CCM128_Key_Length;
-constexpr size_t kAES_CCM128_Nonce_Length = 13;
-constexpr size_t kAES_CCM128_Tag_Length   = 16;
+inline constexpr size_t kAES_CCM128_Key_Length   = 128u / 8u;
+inline constexpr size_t kAES_CCM128_Block_Length = kAES_CCM128_Key_Length;
+inline constexpr size_t kAES_CCM128_Nonce_Length = 13;
+inline constexpr size_t kAES_CCM128_Tag_Length   = 16;
 
-constexpr size_t CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES = kAES_CCM128_Nonce_Length;
+inline constexpr size_t CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES = kAES_CCM128_Nonce_Length;
 
 /* These sizes are hardcoded here to remove header dependency on underlying crypto library
  * in a public interface file. The validity of these sizes is verified by static_assert in
  * the implementation files.
  */
-constexpr size_t kMAX_Spake2p_Context_Size     = 1024;
-constexpr size_t kMAX_P256Keypair_Context_Size = 512;
+inline constexpr size_t kMAX_Spake2p_Context_Size     = 1024;
+inline constexpr size_t kMAX_P256Keypair_Context_Size = 512;
 
-constexpr size_t kEmitDerIntegerWithoutTagOverhead = 1; // 1 sign stuffer
-constexpr size_t kEmitDerIntegerOverhead           = 3; // Tag + Length byte + 1 sign stuffer
+inline constexpr size_t kEmitDerIntegerWithoutTagOverhead = 1; // 1 sign stuffer
+inline constexpr size_t kEmitDerIntegerOverhead           = 3; // Tag + Length byte + 1 sign stuffer
 
-constexpr size_t kMAX_Hash_SHA256_Context_Size = CHIP_CONFIG_SHA256_CONTEXT_SIZE;
+inline constexpr size_t kMAX_Hash_SHA256_Context_Size = CHIP_CONFIG_SHA256_CONTEXT_SIZE;
 
-constexpr size_t kSpake2p_WS_Length                 = kP256_FE_Length + 8;
-constexpr size_t kSpake2p_VerifierSerialized_Length = kP256_FE_Length + kP256_Point_Length;
+inline constexpr size_t kSpake2p_WS_Length                 = kP256_FE_Length + 8;
+inline constexpr size_t kSpake2p_VerifierSerialized_Length = kP256_FE_Length + kP256_Point_Length;
 
-constexpr char kVIDPrefixForCNEncoding[]    = "Mvid:";
-constexpr char kPIDPrefixForCNEncoding[]    = "Mpid:";
-constexpr size_t kVIDandPIDHexLength        = sizeof(uint16_t) * 2;
-constexpr size_t kMax_CommonNameAttr_Length = 64;
+inline constexpr char kVIDPrefixForCNEncoding[]    = "Mvid:";
+inline constexpr char kPIDPrefixForCNEncoding[]    = "Mpid:";
+inline constexpr size_t kVIDandPIDHexLength        = sizeof(uint16_t) * 2;
+inline constexpr size_t kMax_CommonNameAttr_Length = 64;
 
 /*
  * Overhead to encode a raw ECDSA signature in X9.62 format in ASN.1 DER
@@ -131,14 +131,14 @@ constexpr size_t kMax_CommonNameAttr_Length = 64;
  *
  * There is 1 sequence of 2 integers. Overhead is SEQ_OVERHEAD + (2 * INT_OVERHEAD) = 3 + (2 * 3) = 9.
  */
-constexpr size_t kMax_ECDSA_X9Dot62_Asn1_Overhead = 9;
-constexpr size_t kMax_ECDSA_Signature_Length_Der  = kMax_ECDSA_Signature_Length + kMax_ECDSA_X9Dot62_Asn1_Overhead;
+inline constexpr size_t kMax_ECDSA_X9Dot62_Asn1_Overhead = 9;
+inline constexpr size_t kMax_ECDSA_Signature_Length_Der  = kMax_ECDSA_Signature_Length + kMax_ECDSA_X9Dot62_Asn1_Overhead;
 
 static_assert(kMax_ECDH_Secret_Length >= kP256_FE_Length, "ECDH shared secret is too short for crypto suite");
 static_assert(kMax_ECDSA_Signature_Length >= kP256_ECDSA_Signature_Length_Raw,
               "ECDSA signature buffer length is too short for crypto suite");
 
-constexpr size_t kCompressedFabricIdentifierSize = 8;
+inline constexpr size_t kCompressedFabricIdentifierSize = 8;
 
 /**
  * Spake2+ parameters for P256
@@ -580,8 +580,8 @@ public:
 
     Aes128KeyHandle(const Aes128KeyHandle &) = delete;
     Aes128KeyHandle(Aes128KeyHandle &&)      = delete;
-    void operator=(const Aes128KeyHandle &) = delete;
-    void operator=(Aes128KeyHandle &&) = delete;
+    void operator=(const Aes128KeyHandle &)  = delete;
+    void operator=(Aes128KeyHandle &&)       = delete;
 
     /**
      * @brief Get internal context cast to the desired key representation

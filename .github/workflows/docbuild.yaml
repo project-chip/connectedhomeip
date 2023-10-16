@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Checkout the code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: matter
           fetch-depth: 0

@@ -117,7 +117,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read battery-alert 1 1
+          ./chip-tool smokecoalarm read battery-alert 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0003 DataVersion: 1795725838
           [TOO]   BatteryAlert: 1
@@ -168,7 +168,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read battery-alert 1 1
+          ./chip-tool smokecoalarm read battery-alert 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0003 DataVersion: 1795725838
           [TOO]   BatteryAlert: 2
@@ -219,7 +219,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read battery-alert 1 1
+          ./chip-tool smokecoalarm read battery-alert 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0003 DataVersion: 1795725838
           [TOO]   BatteryAlert: 0
@@ -281,7 +281,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read hardware-fault-alert 1 1
+          ./chip-tool smokecoalarm read hardware-fault-alert 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0006 DataVersion: 1795725838
           [TOO]   HardwareFaultAlert: TRUE
@@ -333,7 +333,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read hardware-fault-alert 1 1
+          ./chip-tool smokecoalarm read hardware-fault-alert 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0006 DataVersion: 1795725838
           [TOO]   HardwareFaultAlert: FALSE
@@ -395,7 +395,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read end-of-service-alert 1 1
+          ./chip-tool smokecoalarm read end-of-service-alert 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0007 DataVersion: 1795725838
           [TOO]   EndOfServiceAlert: 1
@@ -447,7 +447,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read end-of-service-alert 1 1
+          ./chip-tool smokecoalarm read end-of-service-alert 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0007 DataVersion: 1795725838
           [TOO]   EndOfServiceAlert: 0
@@ -511,7 +511,7 @@ tests:
     - label:
           "Step 38: TH waits for a report of TestInProgress attribute from DUT
           with a timeout of 180 seconds"
-      PICS: SMOKECO.S.A0005
+      PICS: SMOKECO.S.A0005 && SMOKECO.M.ManuallyControlledTest
       command: "waitForReport"
       attribute: "TestInProgress"
       timeout: 180
@@ -521,7 +521,7 @@ tests:
               type: boolean
 
     - label: "Step 39: TH reads ExpressedState attribute from DUT"
-      PICS: SMOKECO.S.A0000
+      PICS: SMOKECO.S.A0000 && SMOKECO.M.ManuallyControlledTest
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -532,7 +532,7 @@ tests:
     - label:
           "Step 40: TH waits for a report of TestInProgress attribute from DUT
           with a timeout of 180 seconds"
-      PICS: SMOKECO.S.A0005
+      PICS: SMOKECO.S.A0005 && SMOKECO.M.ManuallyControlledTest
       command: "waitForReport"
       attribute: "TestInProgress"
       timeout: 180
@@ -542,7 +542,7 @@ tests:
               type: boolean
 
     - label: "Step 41: TH reads SelfTestComplete event from DUT"
-      PICS: SMOKECO.S.E05
+      PICS: SMOKECO.S.E05 && SMOKECO.M.ManuallyControlledTest
       command: "readEvent"
       event: "SelfTestComplete"
       eventNumber: "LastReceivedEventNumber + 1"
@@ -550,7 +550,7 @@ tests:
           value: {}
 
     - label: "Step 42: TH reads ExpressedState attribute from DUT"
-      PICS: SMOKECO.S.A0000
+      PICS: SMOKECO.S.A0000 && SMOKECO.M.ManuallyControlledTest
       command: "readAttribute"
       attribute: "ExpressedState"
       response:
@@ -559,7 +559,7 @@ tests:
               type: enum8
 
     - label: "Step 43: TH reads AllClear event from DUT"
-      PICS: SMOKECO.S.E0a
+      PICS: SMOKECO.S.E0a && SMOKECO.M.ManuallyControlledTest
       command: "readEvent"
       event: "AllClear"
       eventNumber: "LastReceivedEventNumber + 1"
@@ -577,7 +577,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read test-in-progress 1 1
+          ./chip-tool smokecoalarm read test-in-progress 1 1
 
           This step needs to be completed quickly
 

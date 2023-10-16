@@ -15,7 +15,7 @@
 name: Recent Fail Summary
 on:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "10 0 * * *"
   workflow_dispatch:
 
 concurrency:
@@ -25,21 +25,34 @@ jobs:
   list_workflows:
     name: Summarize Recent Workflow Failures
     runs-on: ubuntu-latest
+    permissions: write-all
     steps:
-      - uses: actions/checkout@v3
-      - run: pip install pandas python-slugify
+      - uses: actions/checkout@v4
+      - run: pip install pandas python-slugify pyyaml tabulate
       - name: Run Summarization Script
         run: python scripts/tools/summarize_fail.py
         env:
           GH_TOKEN: ${{ github.token }}
+      - name: Update Docs
+        uses: test-room-7/action-update-file@v1
+        with:
+          file-path: docs/daily_pass_percentage.md
+          commit-msg: Update daily pass percentage
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          branch: daily_pass_percentage
       - name: Upload Logs
         uses: actions/upload-artifact@v3
         with:
           name: workflow-fail-summary
           path: |
-            run_list.json
+            fail_run_list.json
+            all_run_list.json
             recent_fails.csv
             recent_fails_frequency.csv
+            failure_cause_summary.csv
+            workflow_pass_rate.csv
+            workflow_pass_rate.sqlite3
             recent_fails_logs
+            workflow_pass_rate
           retention-days: 5
         

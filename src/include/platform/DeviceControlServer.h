@@ -49,8 +49,8 @@ private:
     ~DeviceControlServer() = default;
 
     // No copy, move or assignment.
-    DeviceControlServer(const DeviceControlServer &)  = delete;
-    DeviceControlServer(const DeviceControlServer &&) = delete;
+    DeviceControlServer(const DeviceControlServer &)             = delete;
+    DeviceControlServer(const DeviceControlServer &&)            = delete;
     DeviceControlServer & operator=(const DeviceControlServer &) = delete;
 };
 

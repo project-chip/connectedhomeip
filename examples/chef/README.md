@@ -210,3 +210,30 @@ To add new devices for chef:
     `examples/chef/devices`.
     -   This is gated by the workflow in `.github/workflows/zap_templates.yaml`.
 -   All devices added to the repository are built in CD.
+
+## Manufacturer Extensions / Custom Clusters
+
+You may add vendor-defined features to chef. The
+`rootnode_onofflight_meisample*` device showcases its usage by using the Sample
+MEI cluster which is defined on
+`src/app/zap-templates/zcl/data-model/chip/sample-mei-cluster.xml`
+
+This cluster has
+
+-   One boolean attribute: `flip-flop`
+-   A `ping` command with no arguments
+-   A command/response pair `add-arguments`. The command takes two uint8
+    arguments and the response command returns their sum.
+
+You may test the `Sample MEI` via chip-tool using the following commands:
+
+```
+# commissioning of on-network chef device
+chip-tool pairing onnetwork 1 20202021
+# tests command to sum arguments: returns 30
+chip-tool samplemei add-arguments 1 1 10 20
+# sets Flip-Flop to false
+chip-tool samplemei write flip-flop 0 1 1
+# reads Flip-Flop
+chip-tool samplemei read flip-flop 1 1
+```
