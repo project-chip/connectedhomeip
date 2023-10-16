@@ -114,7 +114,6 @@ app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
 #endif /* SL_WIFI */
 
-
 #if !(defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER)
 bool sIsEnabled          = false;
 bool sIsAttached         = false;
@@ -414,8 +413,8 @@ void BaseApplication::LightEventHandler()
     {
 #ifdef SL_WIFI
         BaseApplication::sIsProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
-        sIsEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
-        sIsAttached    = ConnectivityMgr().IsWiFiStationConnected();
+        sIsEnabled                      = ConnectivityMgr().IsWiFiStationEnabled();
+        sIsAttached                     = ConnectivityMgr().IsWiFiStationConnected();
 #endif /* SL_WIFI */
 #if CHIP_ENABLE_OPENTHREAD
         sIsEnabled  = ConnectivityMgr().IsThreadEnabled();
@@ -753,6 +752,7 @@ void BaseApplication::OutputQrCode(bool refreshLCD)
     }
 }
 
-bool BaseApplication::getWifiProvisionStatus(){
+bool BaseApplication::getWifiProvisionStatus()
+{
     return BaseApplication::sIsProvisioned;
 }
