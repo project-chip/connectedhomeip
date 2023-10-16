@@ -280,6 +280,7 @@ class DeviceType:
     code: int
     version: int
 
+
 @dataclass
 class DeviceTypeConfigurator:
     name: str
