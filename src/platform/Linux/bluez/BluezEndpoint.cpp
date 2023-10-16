@@ -415,12 +415,17 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
 #if CHIP_ERROR_LOGGING
     char * errStr;
 #endif // CHIP_ERROR_LOGGING
-    BluezConnection * conn = nullptr;
+    BluezConnection * conn       = nullptr;
+    bool isAdditionalAdvertising = false;
     GAutoPtr<GVariant> option_mtu;
     uint16_t mtu;
 
     BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apEndpoint);
     VerifyOrReturnValue(endpoint != nullptr, FALSE, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    isAdditionalAdvertising = (aChar == endpoint->mpC3);
+#endif
 
     if (bluez_gatt_characteristic1_get_notifying(aChar))
     {
@@ -448,7 +453,7 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
         return FALSE;
     }
 
-    conn->SetupNotifyCallback(fds[0], bluezCharacteristicDestroyFD);
+    conn->SetupNotifyCallback(fds[0], bluezCharacteristicDestroyFD, isAdditionalAdvertising);
     bluez_gatt_characteristic1_set_notify_acquired(aChar, TRUE);
     conn->SetNotifyAcquired(true);
 

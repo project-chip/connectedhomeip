@@ -74,6 +74,10 @@ BluezConnection::~BluezConnection()
         g_object_unref(mpC1);
     if (mpC2)
         g_object_unref(mpC2);
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    if (mpC3)
+        g_object_unref(mpC2);
+#endif
 }
 
 BluezConnection::IOChannel::~IOChannel()
@@ -213,7 +217,7 @@ void BluezConnection::SetupWriteCallback(int aSocketFd, CharCallbackFunc aCallba
     PlatformMgrImpl().GLibMatterContextAttachSource(watchSource);
 }
 
-void BluezConnection::SetupNotifyCallback(int aSocketFd, CharCallbackFunc aCallback)
+void BluezConnection::SetupNotifyCallback(int aSocketFd, CharCallbackFunc aCallback, bool aAdditionalAdvertising)
 {
     auto channel = g_io_channel_unix_new(aSocketFd);
     g_io_channel_set_encoding(channel, nullptr, nullptr);
@@ -223,8 +227,18 @@ void BluezConnection::SetupNotifyCallback(int aSocketFd, CharCallbackFunc aCallb
     auto watchSource = g_io_create_watch(channel, static_cast<GIOCondition>(G_IO_HUP | G_IO_ERR | G_IO_NVAL));
     g_source_set_callback(watchSource, G_SOURCE_FUNC(aCallback), this, nullptr);
 
-    mC2Channel.mpChannel    = channel;
-    mC2Channel.mWatchSource = watchSource;
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    if (aAdditionalAdvertising)
+    {
+        mC3Channel.mpChannel    = channel;
+        mC3Channel.mWatchSource = watchSource;
+    }
+    else
+#endif
+    {
+        mC2Channel.mpChannel    = channel;
+        mC2Channel.mWatchSource = watchSource;
+    }
 
     PlatformMgrImpl().GLibMatterContextAttachSource(watchSource);
 }

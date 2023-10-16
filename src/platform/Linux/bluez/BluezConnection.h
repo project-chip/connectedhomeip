@@ -53,7 +53,7 @@ public:
     /// Setup callback for receiving data from the CHIP TX characteristic on the remote peripheral device
     void SetupWriteCallback(int aSocketFd, CharCallbackFunc aCallback);
     /// Setup callback for receiving HUP event on the notification channel
-    void SetupNotifyCallback(int aSocketFd, CharCallbackFunc aCallback);
+    void SetupNotifyCallback(int aSocketFd, CharCallbackFunc aCallback, bool aAdditionalAdvertising = false);
 
     /// Send indication to the CHIP RX characteristic on the remote peripheral device
     CHIP_ERROR SendIndication(chip::System::PacketBufferHandle apBuf);
@@ -110,6 +110,9 @@ private:
 
     IOChannel mC1Channel = { 0 };
     IOChannel mC2Channel = { 0 };
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    IOChannel mC3Channel = { 0 };
+#endif
 
 public:
     BluezGattService1 * mpService   = nullptr;
