@@ -27,7 +27,7 @@ happens for thread devices. Relevant patches from lwIP main that should be
 applied back to any Matter device using an older version of lwIP:
 
 https://git.savannah.nongnu.org/cgit/lwip.git/commit/?id=7807f706f357d2eea85d9927d970991dc4b1ef90
-https://git.savannah.nongnu.org/cgit/lwip.git/commit/?id=7807f706f357d2eea85d9927d970991dc4b1ef90
+https://git.savannah.nongnu.org/cgit/lwip.git/commit/?id=6f700a157d1049a06ab9c467057d71e98e7798de
 
 ## Important upstream patches
 
