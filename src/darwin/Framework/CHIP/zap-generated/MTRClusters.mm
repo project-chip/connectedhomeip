@@ -736,9 +736,9 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeScenesID) attributeID:@(MTRAttributeIDTypeClusterScenesAttributeSceneTableSizeID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeRemainingCapacityWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFabricSceneInfoWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeScenesID) attributeID:@(MTRAttributeIDTypeClusterScenesAttributeRemainingCapacityID) params:params];
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeScenesID) attributeID:@(MTRAttributeIDTypeClusterScenesAttributeFabricSceneInfoID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params

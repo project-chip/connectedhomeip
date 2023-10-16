@@ -99,6 +99,48 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRScenesClusterSceneInfoStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _sceneCount = @(0);
+
+        _currentScene = @(0);
+
+        _currentGroup = @(0);
+
+        _sceneValid = @(0);
+
+        _remainingCapacity = @(0);
+
+        _fabricIndex = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRScenesClusterSceneInfoStruct alloc] init];
+
+    other.sceneCount = self.sceneCount;
+    other.currentScene = self.currentScene;
+    other.currentGroup = self.currentGroup;
+    other.sceneValid = self.sceneValid;
+    other.remainingCapacity = self.remainingCapacity;
+    other.fabricIndex = self.fabricIndex;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: sceneCount:%@; currentScene:%@; currentGroup:%@; sceneValid:%@; remainingCapacity:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _sceneCount, _currentScene, _currentGroup, _sceneValid, _remainingCapacity, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDescriptorClusterDeviceTypeStruct
 - (instancetype)init
 {

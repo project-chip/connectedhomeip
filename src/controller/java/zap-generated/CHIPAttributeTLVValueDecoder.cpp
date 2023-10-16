@@ -492,8 +492,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                        value);
             return value;
         }
-        case Attributes::RemainingCapacity::Id: {
-            using TypeInfo = Attributes::RemainingCapacity::TypeInfo;
+        case Attributes::FabricSceneInfo::Id: {
+            using TypeInfo = Attributes::FabricSceneInfo::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -501,11 +501,79 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 return nullptr;
             }
             jobject value;
-            std::string valueClassName     = "java/lang/Integer";
-            std::string valueCtorSignature = "(I)V";
-            jint jnivalue                  = static_cast<jint>(cppValue);
-            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue,
-                                                                       value);
+            chip::JniReferences::GetInstance().CreateArrayList(value);
+
+            auto iter_value_0 = cppValue.begin();
+            while (iter_value_0.Next())
+            {
+                auto & entry_0 = iter_value_0.GetValue();
+                jobject newElement_0;
+                jobject newElement_0_sceneCount;
+                std::string newElement_0_sceneCountClassName     = "java/lang/Integer";
+                std::string newElement_0_sceneCountCtorSignature = "(I)V";
+                jint jninewElement_0_sceneCount                  = static_cast<jint>(entry_0.sceneCount);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_sceneCountClassName.c_str(),
+                                                                           newElement_0_sceneCountCtorSignature.c_str(),
+                                                                           jninewElement_0_sceneCount, newElement_0_sceneCount);
+                jobject newElement_0_currentScene;
+                std::string newElement_0_currentSceneClassName     = "java/lang/Integer";
+                std::string newElement_0_currentSceneCtorSignature = "(I)V";
+                jint jninewElement_0_currentScene                  = static_cast<jint>(entry_0.currentScene);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_currentSceneClassName.c_str(),
+                                                                           newElement_0_currentSceneCtorSignature.c_str(),
+                                                                           jninewElement_0_currentScene, newElement_0_currentScene);
+                jobject newElement_0_currentGroup;
+                std::string newElement_0_currentGroupClassName     = "java/lang/Integer";
+                std::string newElement_0_currentGroupCtorSignature = "(I)V";
+                jint jninewElement_0_currentGroup                  = static_cast<jint>(entry_0.currentGroup);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_currentGroupClassName.c_str(),
+                                                                           newElement_0_currentGroupCtorSignature.c_str(),
+                                                                           jninewElement_0_currentGroup, newElement_0_currentGroup);
+                jobject newElement_0_sceneValid;
+                std::string newElement_0_sceneValidClassName     = "java/lang/Boolean";
+                std::string newElement_0_sceneValidCtorSignature = "(Z)V";
+                jboolean jninewElement_0_sceneValid              = static_cast<jboolean>(entry_0.sceneValid);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(newElement_0_sceneValidClassName.c_str(),
+                                                                               newElement_0_sceneValidCtorSignature.c_str(),
+                                                                               jninewElement_0_sceneValid, newElement_0_sceneValid);
+                jobject newElement_0_remainingCapacity;
+                std::string newElement_0_remainingCapacityClassName     = "java/lang/Integer";
+                std::string newElement_0_remainingCapacityCtorSignature = "(I)V";
+                jint jninewElement_0_remainingCapacity                  = static_cast<jint>(entry_0.remainingCapacity);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    newElement_0_remainingCapacityClassName.c_str(), newElement_0_remainingCapacityCtorSignature.c_str(),
+                    jninewElement_0_remainingCapacity, newElement_0_remainingCapacity);
+                jobject newElement_0_fabricIndex;
+                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+                jint jninewElement_0_fabricIndex                  = static_cast<jint>(entry_0.fabricIndex);
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_fabricIndexClassName.c_str(),
+                                                                           newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                           jninewElement_0_fabricIndex, newElement_0_fabricIndex);
+
+                jclass sceneInfoStructStructClass_1;
+                err = chip::JniReferences::GetInstance().GetClassRef(
+                    env, "chip/devicecontroller/ChipStructs$ScenesClusterSceneInfoStruct", sceneInfoStructStructClass_1);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Zcl, "Could not find class ChipStructs$ScenesClusterSceneInfoStruct");
+                    return nullptr;
+                }
+                jmethodID sceneInfoStructStructCtor_1 =
+                    env->GetMethodID(sceneInfoStructStructClass_1, "<init>",
+                                     "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Boolean;Ljava/lang/"
+                                     "Integer;Ljava/lang/Integer;)V");
+                if (sceneInfoStructStructCtor_1 == nullptr)
+                {
+                    ChipLogError(Zcl, "Could not find ChipStructs$ScenesClusterSceneInfoStruct constructor");
+                    return nullptr;
+                }
+
+                newElement_0 = env->NewObject(sceneInfoStructStructClass_1, sceneInfoStructStructCtor_1, newElement_0_sceneCount,
+                                              newElement_0_currentScene, newElement_0_currentGroup, newElement_0_sceneValid,
+                                              newElement_0_remainingCapacity, newElement_0_fabricIndex);
+                chip::JniReferences::GetInstance().AddToList(value, newElement_0);
+            }
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {

@@ -313,15 +313,36 @@ static id _Nullable DecodeAttributeValueForScenesCluster(AttributeId aAttributeI
         value = [NSNumber numberWithUnsignedShort:cppValue];
         return value;
     }
-    case Attributes::RemainingCapacity::Id: {
-        using TypeInfo = Attributes::RemainingCapacity::TypeInfo;
+    case Attributes::FabricSceneInfo::Id: {
+        using TypeInfo = Attributes::FabricSceneInfo::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedChar:cppValue];
+        NSArray * _Nonnull value;
+        { // Scope for our temporary variables
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                MTRScenesClusterSceneInfoStruct * newElement_0;
+                newElement_0 = [MTRScenesClusterSceneInfoStruct new];
+                newElement_0.sceneCount = [NSNumber numberWithUnsignedChar:entry_0.sceneCount];
+                newElement_0.currentScene = [NSNumber numberWithUnsignedChar:entry_0.currentScene];
+                newElement_0.currentGroup = [NSNumber numberWithUnsignedShort:entry_0.currentGroup];
+                newElement_0.sceneValid = [NSNumber numberWithBool:entry_0.sceneValid];
+                newElement_0.remainingCapacity = [NSNumber numberWithUnsignedChar:entry_0.remainingCapacity];
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                [array_0 addObject:newElement_0];
+            }
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                *aError = err;
+                return nil;
+            }
+            value = array_0;
+        }
         return value;
     }
     default: {

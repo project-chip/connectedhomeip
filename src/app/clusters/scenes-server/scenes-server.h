@@ -34,6 +34,28 @@ namespace Scenes {
 class ScenesServer : public CommandHandlerInterface, public AttributeAccessInterface
 {
 public:
+    static constexpr size_t kScenesServerMaxEndpointCount =
+        EMBER_AF_SCENES_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+    static_assert(kScenesServerMaxEndpointCount <= kEmberInvalidEndpointIndex, "Scenes endpoint count error");
+    static constexpr uint8_t kScenesServerMaxFabricCount = CHIP_CONFIG_MAX_FABRICS;
+
+    // FabricSceneInfo
+    class FabricSceneInfo
+    {
+    public:
+        Structs::SceneInfoStruct::Type * GetFabricSceneInfo(EndpointId endpoint);
+        Structs::SceneInfoStruct::Type * GetSceneInfoStruct(EndpointId endpoint, FabricIndex fabric);
+        CHIP_ERROR SetSceneInfoStruct(EndpointId endpoint, FabricIndex fabric, Structs::SceneInfoStruct::Type & sceneInfoStruct);
+        void ClearSceneInfoStruct(EndpointId endpoint, FabricIndex fabric);
+
+    private:
+        CHIP_ERROR FindFabricSceneInfoIndex(EndpointId endpoint, size_t & endpointIndex);
+        CHIP_ERROR FindSceneInfoStructIndex(FabricIndex fabric, size_t endpointIndex, uint8_t & index);
+
+        Structs::SceneInfoStruct::Type mSceneInfoStructs[kScenesServerMaxEndpointCount][kScenesServerMaxFabricCount];
+        uint8_t mSceneInfoStructsCount[kScenesServerMaxEndpointCount] = { 0 };
+    };
+
     static ScenesServer & Instance();
 
     CHIP_ERROR Init();
@@ -45,15 +67,24 @@ public:
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
+    // SceneInfoStruct Accessors
+    Structs::SceneInfoStruct::Type * GetSceneInfoStruct(EndpointId endpoint, FabricIndex fabric);
+    CHIP_ERROR SetSceneInfoStruct(EndpointId endpoint, FabricIndex fabric, Structs::SceneInfoStruct::Type & sceneInfoStruct);
+
     // Callbacks
     void GroupWillBeRemoved(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId);
-    void MakeSceneInvalid(EndpointId aEndpointId);
+    void MakeSceneInvalid(EndpointId aEndpointId, FabricIndex aFabricIx);
+    void MakeSceneInvalidForAllFabrics(EndpointId aEndpointId);
     void StoreCurrentScene(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId, SceneId aSceneId);
     void RecallScene(FabricIndex aFabricIx, EndpointId aEndpointId, GroupId aGroupId, SceneId aSceneId);
 
+    // Handlers for extension field sets
     bool IsHandlerRegistered(EndpointId aEndpointId, scenes::SceneHandler * handler);
     void RegisterSceneHandler(EndpointId aEndpointId, scenes::SceneHandler * handler);
     void UnregisterSceneHandler(EndpointId aEndpointId, scenes::SceneHandler * handler);
+
+    // Fabric
+    void RemoveFabric(EndpointId aEndpointId, FabricIndex aFabricIndex);
 
 private:
     ScenesServer() : CommandHandlerInterface(Optional<EndpointId>(), Id), AttributeAccessInterface(Optional<EndpointId>(), Id) {}
@@ -75,6 +106,9 @@ private:
 
     // Group Data Provider
     Credentials::GroupDataProvider * mGroupProvider = nullptr;
+
+    // FabricSceneInfo
+    FabricSceneInfo mFabricSceneInfo;
 
     // Instance
     static ScenesServer mInstance;

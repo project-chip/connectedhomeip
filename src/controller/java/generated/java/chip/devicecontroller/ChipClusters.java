@@ -1012,7 +1012,7 @@ public class ChipClusters {
     private static final long NAME_SUPPORT_ATTRIBUTE_ID = 4L;
     private static final long LAST_CONFIGURED_BY_ATTRIBUTE_ID = 5L;
     private static final long SCENE_TABLE_SIZE_ATTRIBUTE_ID = 6L;
-    private static final long REMAINING_CAPACITY_ATTRIBUTE_ID = 7L;
+    private static final long FABRIC_SCENE_INFO_ATTRIBUTE_ID = 7L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long EVENT_LIST_ATTRIBUTE_ID = 65530L;
@@ -1600,6 +1600,10 @@ public class ChipClusters {
       void onSuccess(@Nullable Long value);
     }
 
+    public interface FabricSceneInfoAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.ScenesClusterSceneInfoStruct> value);
+    }
+
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -1791,29 +1795,34 @@ public class ChipClusters {
         }, SCENE_TABLE_SIZE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readRemainingCapacityAttribute(
-        IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, REMAINING_CAPACITY_ATTRIBUTE_ID);
+    public void readFabricSceneInfoAttribute(
+        FabricSceneInfoAttributeCallback callback) {
+      readFabricSceneInfoAttributeWithFabricFilter(callback, true);
+    }
+
+    public void readFabricSceneInfoAttributeWithFabricFilter(
+        FabricSceneInfoAttributeCallback callback, boolean isFabricFiltered) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FABRIC_SCENE_INFO_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.ScenesClusterSceneInfoStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, REMAINING_CAPACITY_ATTRIBUTE_ID, true);
+        }, FABRIC_SCENE_INFO_ATTRIBUTE_ID, isFabricFiltered);
     }
 
-    public void subscribeRemainingCapacityAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, REMAINING_CAPACITY_ATTRIBUTE_ID);
+    public void subscribeFabricSceneInfoAttribute(
+        FabricSceneInfoAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, FABRIC_SCENE_INFO_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            List<ChipStructs.ScenesClusterSceneInfoStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
           }
-        }, REMAINING_CAPACITY_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, FABRIC_SCENE_INFO_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(

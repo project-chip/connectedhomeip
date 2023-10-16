@@ -158,9 +158,9 @@ namespace SceneTableSize {
 static constexpr AttributeId Id = 0x00000006;
 } // namespace SceneTableSize
 
-namespace RemainingCapacity {
+namespace FabricSceneInfo {
 static constexpr AttributeId Id = 0x00000007;
-} // namespace RemainingCapacity
+} // namespace FabricSceneInfo
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

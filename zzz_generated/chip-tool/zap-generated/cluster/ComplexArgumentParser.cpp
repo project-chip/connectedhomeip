@@ -283,6 +283,66 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Scenes::Structs::Exten
     ComplexArgumentParser::Finalize(request.attributeValueList);
 }
 
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Scenes::Structs::SceneInfoStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("SceneInfoStruct.sceneCount", "sceneCount", value.isMember("sceneCount")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("SceneInfoStruct.currentScene", "currentScene", value.isMember("currentScene")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("SceneInfoStruct.currentGroup", "currentGroup", value.isMember("currentGroup")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("SceneInfoStruct.sceneValid", "sceneValid", value.isMember("sceneValid")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("SceneInfoStruct.remainingCapacity", "remainingCapacity",
+                                                                  value.isMember("remainingCapacity")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "sceneCount");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.sceneCount, value["sceneCount"]));
+    valueCopy.removeMember("sceneCount");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "currentScene");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.currentScene, value["currentScene"]));
+    valueCopy.removeMember("currentScene");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "currentGroup");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.currentGroup, value["currentGroup"]));
+    valueCopy.removeMember("currentGroup");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "sceneValid");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.sceneValid, value["sceneValid"]));
+    valueCopy.removeMember("sceneValid");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "remainingCapacity");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.remainingCapacity, value["remainingCapacity"]));
+    valueCopy.removeMember("remainingCapacity");
+
+    if (value.isMember("fabricIndex"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    }
+    valueCopy.removeMember("fabricIndex");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Scenes::Structs::SceneInfoStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.sceneCount);
+    ComplexArgumentParser::Finalize(request.currentScene);
+    ComplexArgumentParser::Finalize(request.currentGroup);
+    ComplexArgumentParser::Finalize(request.sceneValid);
+    ComplexArgumentParser::Finalize(request.remainingCapacity);
+    ComplexArgumentParser::Finalize(request.fabricIndex);
+}
+
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::Descriptor::Structs::DeviceTypeStruct::Type & request,
                                         Json::Value & value)

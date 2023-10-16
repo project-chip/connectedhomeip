@@ -657,6 +657,135 @@ void CHIPScenesLastConfiguredByAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
+CHIPScenesFabricSceneInfoAttributeCallback::CHIPScenesFabricSceneInfoAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPScenesClusterFabricSceneInfoAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPScenesFabricSceneInfoAttributeCallback::~CHIPScenesFabricSceneInfoAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPScenesFabricSceneInfoAttributeCallback::CallbackFn(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Scenes::Structs::SceneInfoStruct::DecodableType> & list)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+    std::unique_ptr<CHIPScenesFabricSceneInfoAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPScenesFabricSceneInfoAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject arrayListObj;
+    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+
+    auto iter_arrayListObj_0 = list.begin();
+    while (iter_arrayListObj_0.Next())
+    {
+        auto & entry_0 = iter_arrayListObj_0.GetValue();
+        jobject newElement_0;
+        jobject newElement_0_sceneCount;
+        std::string newElement_0_sceneCountClassName     = "java/lang/Integer";
+        std::string newElement_0_sceneCountCtorSignature = "(I)V";
+        jint jninewElement_0_sceneCount                  = static_cast<jint>(entry_0.sceneCount);
+        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_sceneCountClassName.c_str(),
+                                                                   newElement_0_sceneCountCtorSignature.c_str(),
+                                                                   jninewElement_0_sceneCount, newElement_0_sceneCount);
+        jobject newElement_0_currentScene;
+        std::string newElement_0_currentSceneClassName     = "java/lang/Integer";
+        std::string newElement_0_currentSceneCtorSignature = "(I)V";
+        jint jninewElement_0_currentScene                  = static_cast<jint>(entry_0.currentScene);
+        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_currentSceneClassName.c_str(),
+                                                                   newElement_0_currentSceneCtorSignature.c_str(),
+                                                                   jninewElement_0_currentScene, newElement_0_currentScene);
+        jobject newElement_0_currentGroup;
+        std::string newElement_0_currentGroupClassName     = "java/lang/Integer";
+        std::string newElement_0_currentGroupCtorSignature = "(I)V";
+        jint jninewElement_0_currentGroup                  = static_cast<jint>(entry_0.currentGroup);
+        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_currentGroupClassName.c_str(),
+                                                                   newElement_0_currentGroupCtorSignature.c_str(),
+                                                                   jninewElement_0_currentGroup, newElement_0_currentGroup);
+        jobject newElement_0_sceneValid;
+        std::string newElement_0_sceneValidClassName     = "java/lang/Boolean";
+        std::string newElement_0_sceneValidCtorSignature = "(Z)V";
+        jboolean jninewElement_0_sceneValid              = static_cast<jboolean>(entry_0.sceneValid);
+        chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(newElement_0_sceneValidClassName.c_str(),
+                                                                       newElement_0_sceneValidCtorSignature.c_str(),
+                                                                       jninewElement_0_sceneValid, newElement_0_sceneValid);
+        jobject newElement_0_remainingCapacity;
+        std::string newElement_0_remainingCapacityClassName     = "java/lang/Integer";
+        std::string newElement_0_remainingCapacityCtorSignature = "(I)V";
+        jint jninewElement_0_remainingCapacity                  = static_cast<jint>(entry_0.remainingCapacity);
+        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+            newElement_0_remainingCapacityClassName.c_str(), newElement_0_remainingCapacityCtorSignature.c_str(),
+            jninewElement_0_remainingCapacity, newElement_0_remainingCapacity);
+        jobject newElement_0_fabricIndex;
+        std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
+        std::string newElement_0_fabricIndexCtorSignature = "(I)V";
+        jint jninewElement_0_fabricIndex                  = static_cast<jint>(entry_0.fabricIndex);
+        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_fabricIndexClassName.c_str(),
+                                                                   newElement_0_fabricIndexCtorSignature.c_str(),
+                                                                   jninewElement_0_fabricIndex, newElement_0_fabricIndex);
+
+        jclass sceneInfoStructStructClass_1;
+        err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$ScenesClusterSceneInfoStruct",
+                                                             sceneInfoStructStructClass_1);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "Could not find class ChipStructs$ScenesClusterSceneInfoStruct");
+            return;
+        }
+        jmethodID sceneInfoStructStructCtor_1 = env->GetMethodID(sceneInfoStructStructClass_1, "<init>",
+                                                                 "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/"
+                                                                 "lang/Boolean;Ljava/lang/Integer;Ljava/lang/Integer;)V");
+        if (sceneInfoStructStructCtor_1 == nullptr)
+        {
+            ChipLogError(Zcl, "Could not find ChipStructs$ScenesClusterSceneInfoStruct constructor");
+            return;
+        }
+
+        newElement_0 = env->NewObject(sceneInfoStructStructClass_1, sceneInfoStructStructCtor_1, newElement_0_sceneCount,
+                                      newElement_0_currentScene, newElement_0_currentGroup, newElement_0_sceneValid,
+                                      newElement_0_remainingCapacity, newElement_0_fabricIndex);
+        chip::JniReferences::GetInstance().AddToList(arrayListObj, newElement_0);
+    }
+
+    env->ExceptionClear();
+    env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
+}
+
 CHIPScenesGeneratedCommandListAttributeCallback::CHIPScenesGeneratedCommandListAttributeCallback(jobject javaCallback,
                                                                                                  bool keepAlive) :
     chip::Callback::Callback<CHIPScenesClusterGeneratedCommandListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)

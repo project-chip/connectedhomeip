@@ -74,6 +74,7 @@ matter_structs_sources = [
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/structs/RvcRunModeClusterModeTagStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/structs/ScenesClusterAttributeValuePair.kt",
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/structs/ScenesClusterExtensionFieldSet.kt",
+  "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/structs/ScenesClusterSceneInfoStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/structs/SoftwareDiagnosticsClusterThreadMetricsStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/structs/TargetNavigatorClusterTargetInfoStruct.kt",
   "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/structs/ThermostatClusterThermostatScheduleTransition.kt",

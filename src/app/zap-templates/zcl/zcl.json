@@ -221,7 +221,7 @@
             "FeatureMap",
             "ThreadMetrics"
         ],
-        "Scenes": ["SceneCount", "RemainingCapacity"],
+        "Scenes": ["SceneCount"],
         "Unit Testing": [
             "struct_attr",
             "nullable_struct",

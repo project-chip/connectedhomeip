@@ -7464,7 +7464,6 @@
           Scenes:
               # New scenes bits not stable yet.
               - SceneTableSize
-              - RemainingCapacity
           FanControl:
               # New Fan Control bits not stable yet.
               - AirflowDirection
@@ -7737,6 +7736,13 @@
           GeneralDiagnostics:
               # Not in the spec yet.
               - AverageWearCount
+              # New things, not quite finalized.
+          Scenes:
+              - FabricSceneInfo
+      structs:
+          # New things, not quite finalized.
+          Scenes:
+              - SceneInfoStruct
   renames:
       enums:
           OTASoftwareUpdateProvider:
