@@ -66,6 +66,8 @@ bool is_wifi_disconnection_event = false;
 /* Declare a variable to hold connection time intervals */
 uint32_t retryInterval              = WLAN_MIN_RETRY_TIMER_MS;
 volatile bool scan_results_complete = false;
+volatile bool bg_scan_results_complete = false;
+volatile bool scan_in_progress = false;
 #define WIFI_SCAN_TIMEOUT_TICK 10000
 
 extern osSemaphoreId_t sl_rs_ble_init_sem;
@@ -293,6 +295,7 @@ sl_status_t scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_t *
     {
         callback_status       = *(sl_status_t *) scan_result;
         scan_results_complete = true;
+        scan_in_progress = false;
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION
         wfx_rsi.sec.security = WFX_SEC_WPA3;
 #else
@@ -378,7 +381,8 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
 sl_status_t bg_scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_t * result, uint32_t result_length, void * arg)
 {
     callback_status       = show_scan_results(result);
-    scan_results_complete = true;
+    bg_scan_results_complete = true;
+    scan_in_progress = false;
     return SL_STATUS_OK;
 }
 /***************************************************************************************
@@ -398,6 +402,11 @@ static void wfx_rsi_save_ap_info() // translation
     ssid_arg.length = strlen(wfx_rsi.sec.ssid);
     memcpy(ssid_arg.value, (int8_t *) &wfx_rsi.sec.ssid[0], ssid_arg.length);
     sl_wifi_set_scan_callback(scan_callback_handler, NULL);
+    if(scan_in_progress)
+    {
+      return;
+    }
+    scan_in_progress = true;
     status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &ssid_arg, &wifi_scan_configuration);
     if (SL_STATUS_IN_PROGRESS == status)
     {
@@ -670,20 +679,29 @@ void wfx_rsi_task(void * arg)
                 advanced_scan_configuration.trigger_level_change = ADV_RSSI_TOLERANCE_THRESHOLD;
                 advanced_scan_configuration.enable_multi_probe   = ADV_MULTIPROBE;
                 status = sl_wifi_set_advanced_scan_configuration(&advanced_scan_configuration);
-                /* Terminate with end of scan which is no ap sent back */
-                wifi_scan_configuration.type                   = SL_WIFI_SCAN_TYPE_ADV_SCAN;
-                wifi_scan_configuration.periodic_scan_interval = ADV_SCAN_PERIODICITY;
+
+                if (wfx_rsi.dev_state & WFX_RSI_ST_STA_CONNECTED)
+                {
+                    /* Terminate with end of scan which is no ap sent back */
+                    wifi_scan_configuration.type                   = SL_WIFI_SCAN_TYPE_ADV_SCAN;
+                    wifi_scan_configuration.periodic_scan_interval = ADV_SCAN_PERIODICITY;
+                }
+                else
+                {
+                    wifi_scan_configuration                        = default_wifi_scan_configuration;
+                }
                 sl_wifi_set_scan_callback(bg_scan_callback_handler, NULL);
+                scan_in_progress = true;
                 status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, NULL, &wifi_scan_configuration);
                 if (SL_STATUS_IN_PROGRESS == status)
                 {
                     printf("Scanning...\r\n");
                     const uint32_t start = osKernelGetTickCount();
-                    while (!scan_results_complete && (osKernelGetTickCount() - start) <= WIFI_SCAN_TIMEOUT_TICK)
+                    while (!bg_scan_results_complete && (osKernelGetTickCount() - start) <= WIFI_SCAN_TIMEOUT_TICK)
                     {
                         osThreadYield();
                     }
-                    status = scan_results_complete ? callback_status : SL_STATUS_TIMEOUT;
+                    status = bg_scan_results_complete ? callback_status : SL_STATUS_TIMEOUT;
                 }
             }
         }
