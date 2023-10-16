@@ -39,6 +39,9 @@ class BluezConnection
 public:
     struct IOChannel
     {
+        IOChannel() = default;
+        ~IOChannel();
+
         GIOChannel * mpChannel;
         GSource * mWatchSource;
     };
@@ -103,8 +106,8 @@ public:
     // additional data characteristics
     BluezGattCharacteristic1 * mpC3 = nullptr;
 
-    struct IOChannel mC1Channel = { 0 };
-    struct IOChannel mC2Channel = { 0 };
+    IOChannel mC1Channel = { 0 };
+    IOChannel mC2Channel = { 0 };
 };
 
 } // namespace Internal

@@ -67,28 +67,26 @@ BluezConnection::BluezConnection(BluezEndpoint * apEndpoint, BluezDevice1 * apDe
 
 BluezConnection::~BluezConnection()
 {
-    if (mpDevice)
-        g_object_unref(mpDevice);
+    g_object_unref(mpDevice);
     if (mpService)
         g_object_unref(mpService);
     if (mpC1)
         g_object_unref(mpC1);
     if (mpC2)
         g_object_unref(mpC2);
-    if (mC1Channel.mWatchSource)
+}
+
+BluezConnection::IOChannel::~IOChannel()
+{
+    if (mWatchSource != nullptr)
     {
-        g_source_destroy(mC1Channel.mWatchSource);
-        g_source_unref(mC1Channel.mWatchSource);
+        g_source_destroy(mWatchSource);
+        g_source_unref(mWatchSource);
     }
-    if (mC1Channel.mpChannel)
-        g_io_channel_unref(mC1Channel.mpChannel);
-    if (mC2Channel.mWatchSource)
+    if (mpChannel != nullptr)
     {
-        g_source_destroy(mC2Channel.mWatchSource);
-        g_source_unref(mC2Channel.mWatchSource);
+        g_io_channel_unref(mpChannel);
     }
-    if (mC2Channel.mpChannel)
-        g_io_channel_unref(mC2Channel.mpChannel);
 }
 
 BluezConnection::ConnectionDataBundle::ConnectionDataBundle(const BluezConnection & aConn,
@@ -102,8 +100,6 @@ CHIP_ERROR BluezConnection::Init()
     // populate the service and the characteristics
     GList * objects = nullptr;
     GList * l;
-
-    VerifyOrExit(mpEndpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
 
     if (!mpEndpoint->mIsCentral)
     {
@@ -214,9 +210,7 @@ CHIP_ERROR BluezConnection::BluezDisconnect(BluezConnection * conn)
     GAutoPtr<GError> error;
     gboolean success;
 
-    VerifyOrExit(conn->mpDevice != nullptr, ChipLogError(DeviceLayer, "FAIL: Disconnect: %s", "NULL Device"));
-
-    ChipLogDetail(DeviceLayer, "%s peer=%s", __func__, bluez_device1_get_address(conn->mpDevice));
+    ChipLogDetail(DeviceLayer, "%s peer=%s", __func__, conn->GetPeerAddress());
 
     success = bluez_device1_call_disconnect_sync(conn->mpDevice, nullptr, &MakeUniquePointerReceiver(error).Get());
     VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: Disconnect: %s", error->message));
