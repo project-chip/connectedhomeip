@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-package chip.onboardingpayload
+package matter.onboardingpayload
 
 // See section 5.1.2. QR Code in the Matter specification
 const val kDiscriminatorLongBits = 12

@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-package chip.onboardingpayload
+package matter.onboardingpayload
 
 /** Parser for scanned QR code or Manual Pairing Code. */
 class OnboardingPayloadParser {

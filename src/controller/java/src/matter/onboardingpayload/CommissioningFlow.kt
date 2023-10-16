@@ -15,26 +15,14 @@
  *    limitations under the License.
  */
 
-package chip.onboardingpayload
+package matter.onboardingpayload
 
-enum class OptionalQRCodeInfoType {
-  TYPE_UNKNOWN,
-  TYPE_STRING,
-  TYPE_INT32,
-  TYPE_INT64,
-  TYPE_UINT32,
-  TYPE_UINT64
-}
-
-open class OptionalQRCodeInfo {
-  var tag: Int = 0
-  var type: OptionalQRCodeInfoType = OptionalQRCodeInfoType.TYPE_UNKNOWN
-  var data: String? = null
-  var int32: Int = 0
-}
-
-class OptionalQRCodeInfoExtension : OptionalQRCodeInfo() {
-  var int64: Long = 0
-  var uint32: Long = 0
-  var uint64: Long = 0
+/**
+ * Enum values for possible flows for out-of-box commissioning that a Matter device manufacturer may
+ * select for a given product.
+ */
+enum class CommissioningFlow(val value: Int) {
+  STANDARD(0), // Device automatically enters pairing mode upon power-up
+  USER_ACTION_REQUIRED(1), // Device requires a user interaction to enter pairing mode
+  CUSTOM(2) // Commissioning steps should be retrieved from the distributed compliance ledger
 }

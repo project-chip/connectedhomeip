@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-package chip.onboardingpayload
+package matter.onboardingpayload
 
 /** Implements Verhoeff's check-digit algorithm for base-10 strings. */
 class Verhoeff10 {
