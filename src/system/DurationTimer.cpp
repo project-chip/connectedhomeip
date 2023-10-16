@@ -1,13 +1,15 @@
-#include "DurationTimer.h"
+
+#include <system/DurationTimer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <stdint.h>
 #include <string>
 
-#if defined(CHIP_DEVICE_IS_NRF)
+#if CHIP_DEVICE_USES_SYS_TIME
 #include <system/SystemClock.h>
 #endif
 
-#if defined(CHIP_DEVICE_IS_ESP32) || defined(CHIP_DEVICE_IS_ESP32_2)
+#if CHIP_DEVICE_USES_TIME_H
+
 #include <time.h>
 #endif
 
@@ -16,6 +18,7 @@ using namespace std::literals;
 
 // todo add description
 namespace chip {
+
 namespace timing {
 
 #define DATETIME_PATTERN ("%Y-%m-%dT%H:%M:%S")
@@ -24,19 +27,7 @@ namespace timing {
 
 #define ISO8601_LEN (sizeof "1970-01-01T23:59:59.123456Z")
 
-#ifdef CHIP_DEVICE_IS_NRF
-/*const FabricTable * fabricTable;
-System::Clock::Seconds32 lastKnownGoodChipEpochTime;
-err = mFabricsTable->GetLastKnownGoodChipEpochTime(lastKnownGoodChipEpochTime);
-if (err != CHIP_NO_ERROR)
-{
-    // If we have no time available, the Validity Policy will
-    // determine what to do.
-    ChipLogError(DeviceLayer, "Failed to retrieve Last Known Good UTC Time");
-}*/
-
-/**   DurationTimer implementations   */
-
+#ifdef CHIP_DEVICE_USES_SYS_TIME
 // member functions
 void DurationTimer::start()
 {
@@ -84,7 +75,8 @@ string DurationTimer::toTimeStr(timeval * time)
 }
 #endif
 
-#ifdef CHIP_DEVICE_IS_ESP32
+
+#ifdef CHIP_DEVICE_USES_TIME_H
 // member functions
 void DurationTimer::start()
 {
