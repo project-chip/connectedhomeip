@@ -72,22 +72,22 @@ RUN set -x \
     && chmod -R a+w /opt/android/sdk/licenses \
     && : # last line
 
-# Required for the Tizen SDK
+# Required for the Tizen SDK:
+#   - zip
+# Required for the Open IoT SDK platform
+#   - expect
+#   - telnet
+#   - srecord
+# For java builds:
+#   - openjdk-8-jdk
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
     zip \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && : # last line
-
-# Required for the Open IoT SDK platform
-RUN set -x \
-    && apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
     expect \
     telnet \
     srecord \
+    openjdk-8-jdk \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
