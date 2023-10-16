@@ -491,17 +491,17 @@ class MatterIdlTransformer(Transformer):
                          code=code, api_maturity=api_maturity)
 
         for item in content:
-            if type(item) == Enum:
+            if isinstance(item, Enum):
                 result.enums.append(item)
-            elif type(item) == Bitmap:
+            elif isinstance(item, Bitmap):
                 result.bitmaps.append(item)
-            elif type(item) == Event:
+            elif isinstance(item, Event):
                 result.events.append(item)
-            elif type(item) == Attribute:
+            elif isinstance(item, Attribute):
                 result.attributes.append(item)
-            elif type(item) == Struct:
+            elif isinstance(item, Struct):
                 result.structs.append(item)
-            elif type(item) == Command:
+            elif isinstance(item, Command):
                 result.commands.append(item)
             else:
                 raise Exception("UNKNOWN cluster content item: %r" % item)
