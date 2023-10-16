@@ -280,6 +280,12 @@ class DeviceType:
     code: int
     version: int
 
+@dataclass
+class DeviceTypeConfigurator:
+    name: str
+    typeName: str
+    deviceId: int
+
 
 @dataclass
 class Endpoint:
@@ -294,6 +300,7 @@ class Endpoint:
 class Idl:
     clusters: List[Cluster] = field(default_factory=list)
     endpoints: List[Endpoint] = field(default_factory=list)
+    device_types: List[DeviceType] = field(default_factory=list)
 
     # IDL file name is available only if parsing provides a file name
     parse_file_name: Optional[str] = field(default=None)

@@ -16,8 +16,8 @@ import logging
 from typing import Any, Optional
 
 from matter_idl.matter_idl_types import (Attribute, Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType,
-                                         Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, Struct, StructQuality,
-                                         StructTag)
+                                         DeviceTypeConfigurator, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, Struct,
+                                         StructQuality, StructTag)
 
 from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
@@ -484,6 +484,67 @@ class ClusterGlobalAttributeHandler(BaseHandler):
         self.context.AddIdlPostProcessor(self)
 
 
+class DevicePropertyHandler(BaseHandler):
+    """Handles /configurator/deviceType/[deviceID,name,typename,profileid] elements."""
+
+    def __init__(self, context: Context, device_type: DeviceTypeConfigurator, name: str):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._device_type = device_type
+        self.name = name
+
+    def HandleContent(self, content: str):
+        try:
+            setattr(self._device_type, self.name,  ParseInt(content))
+        except:
+            setattr(self._device_type, self.name,  content.replace(' ', ''))
+
+
+class DeviceTypeHandler(BaseHandler):
+    """Handles /configurator/deviceType elements."""
+
+    def __init__(self, context: Context, idl: Optional[Idl]):
+        super().__init__(context)
+
+        self._device_type = DeviceTypeConfigurator(
+            typeName="TYPE-NAME-MISSING",
+            name="NAME-MISSING",
+            deviceId=-1,
+        )
+        self._idl = idl
+
+    def GetNextProcessor(self, name: str, attrs):
+        if name.lower() == 'deviceid':
+            return DevicePropertyHandler(self.context, self._device_type, name=name)
+        elif name.lower() == 'name':
+            return DevicePropertyHandler(self.context, self._device_type, name=name)
+        elif name.lower() == 'typename':
+            return DevicePropertyHandler(self.context, self._device_type, name=name)
+        elif name.lower() == 'profileid':
+            return DevicePropertyHandler(self.context, self._device_type, name=name)
+        elif name.lower() == 'domain':
+            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+        elif name.lower() == 'class':
+            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+        elif name.lower() == 'scope':
+            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+        elif name.lower() == 'superset':
+            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+        elif name.lower() == 'clusters':
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        else:
+            return BaseHandler(self.context)
+
+    def EndProcessing(self):
+        if not self._idl:
+            raise Exception("Missing idl")
+        # if self._device_type.name == "NAME-MISSING":
+        #     raise Exception("Missing cluster name")
+        elif self._device_type.deviceId == -1:
+            raise Exception("Missing deviceId")
+
+        self._idl.device_types.append(self._device_type)
+
+
 class ClusterHandler(BaseHandler):
     """Handles /configurator/cluster elements."""
 
@@ -652,7 +713,7 @@ class ConfiguratorHandler(BaseHandler):
         elif name.lower() == 'devicetype':
             # A list of device types in 'matter-devices.xml'
             # Useful for conformance tests, but does not seem usable for serialization logic
-            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+            return DeviceTypeHandler(self.context, self._idl)
         elif name.lower() == 'global':
             return GlobalHandler(self.context)
         else:
