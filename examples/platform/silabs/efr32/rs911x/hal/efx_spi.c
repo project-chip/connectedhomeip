@@ -279,17 +279,11 @@ sl_status_t sl_wfx_host_spiflash_cs_deassert(void)
 sl_status_t sl_wfx_host_pre_bootloader_spi_transfer(void)
 {
 #if SL_SPICTRL_MUX
-    xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
-    if (spi_enabled)
+    if (sl_wfx_host_spi_cs_deassert() != SL_STATUS_OK)
     {
-        if (ECODE_EMDRV_SPIDRV_OK != SPIDRV_DeInit(SL_SPIDRV_HANDLE))
-        {
-            xSemaphoreGive(spi_sem_sync_hdl);
-            SILABS_LOG("%s error.", __func__);
-            return SL_STATUS_FAIL;
-        }
-        spi_enabled = false;
+        return SL_STATUS_FAIL;
     }
+    xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
 #endif // SL_SPICTRL_MUX
     // bootloader_init takes care of SPIDRV_Init()
     int32_t status = bootloader_init();
@@ -334,17 +328,11 @@ sl_status_t sl_wfx_host_post_bootloader_spi_transfer(void)
 sl_status_t sl_wfx_host_pre_lcd_spi_transfer(void)
 {
 #if SL_SPICTRL_MUX
-    xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
-    if (spi_enabled)
+    if (sl_wfx_host_spi_cs_deassert() != SL_STATUS_OK)
     {
-        if (ECODE_EMDRV_SPIDRV_OK != SPIDRV_DeInit(SL_SPIDRV_HANDLE))
-        {
-            xSemaphoreGive(spi_sem_sync_hdl);
-            SILABS_LOG("%s error.", __func__);
-            return SL_STATUS_FAIL;
-        }
-        spi_enabled = false;
+        return SL_STATUS_FAIL;
     }
+    xSemaphoreTake(spi_sem_sync_hdl, portMAX_DELAY);
 #endif // SL_SPICTRL_MUX
     // sl_memlcd_refresh takes care of SPIDRV_Init()
     if (SL_STATUS_OK != sl_memlcd_refresh(sl_memlcd_get()))
