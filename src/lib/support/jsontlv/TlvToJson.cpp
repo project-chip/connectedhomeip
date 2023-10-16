@@ -22,6 +22,7 @@
 #include <lib/support/Base64.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/jsontlv/ElementTypes.h>
+#include <lib/support/jsontlv/JsonToTlv.h>
 #include <lib/support/jsontlv/TlvToJson.h>
 
 namespace chip {
@@ -34,6 +35,9 @@ namespace {
 // JSON format never has this and TLV payload contains "implicit profile"
 // and this value is never stored.
 constexpr uint32_t kTemporaryImplicitProfileId = 0xFF01;
+
+// Add the bytes for tag(1:control + 2:tag + 4:length) and structure(1:struct + 1:close container)
+constexpr uint32_t kExtraSpaceForStructTag = 9;
 
 /// RAII to switch the implicit profile id for a reader
 class ImplicitProfileIdChange
@@ -379,4 +383,25 @@ std::string MakeJsonSingleLine(const std::string & jsonString)
     return str;
 }
 
+CHIP_ERROR SingleElementTlvToJson(uint32_t id, const TLV::TLVReader & tlv, std::string & jsonString)
+{
+    TLV::TLVWriter writer;
+    TLV::TLVReader readerForTLV;
+    size_t bufferLen = tlv.GetTotalLength() + kExtraSpaceForStructTag;
+    readerForTLV.Init(tlv);
+    Platform::ScopedMemoryBufferWithSize<uint8_t> buffer;
+    VerifyOrReturnError(buffer.Calloc(bufferLen), CHIP_ERROR_NO_MEMORY);
+    writer.Init(buffer.Get(), buffer.AllocatedSize());
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outer));
+    TLV::Tag tag;
+    ReturnErrorOnFailure(ConvertTlvTag(id, tag));
+    ReturnErrorOnFailure(writer.CopyElement(tag, readerForTLV));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    TLV::TLVReader readerForJson;
+    readerForJson.Init(buffer.Get(), writer.GetLengthWritten());
+    ReturnErrorOnFailure(readerForJson.Next());
+    // Convert TLV to JSON
+    return TlvToJson(readerForJson, jsonString);
+}
 } // namespace chip

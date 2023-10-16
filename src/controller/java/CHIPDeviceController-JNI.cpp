@@ -2222,28 +2222,6 @@ exit:
     }
 }
 
-// Convert Json to Tlv, and remove the outer structure
-CHIP_ERROR ConvertJsonToTlvWithoutStruct(const std::string & json, MutableByteSpan & data)
-{
-    Platform::ScopedMemoryBufferWithSize<uint8_t> buf;
-    VerifyOrReturnError(buf.Calloc(data.size()), CHIP_ERROR_NO_MEMORY);
-    MutableByteSpan dataWithStruct(buf.Get(), buf.AllocatedSize());
-    ReturnErrorOnFailure(JsonToTlv(json, dataWithStruct));
-    TLV::TLVReader tlvReader;
-    TLV::TLVType outerContainer = TLV::kTLVType_Structure;
-    tlvReader.Init(dataWithStruct);
-    ReturnErrorOnFailure(tlvReader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
-    ReturnErrorOnFailure(tlvReader.EnterContainer(outerContainer));
-    ReturnErrorOnFailure(tlvReader.Next());
-
-    TLV::TLVWriter tlvWrite;
-    tlvWrite.Init(data);
-    ReturnErrorOnFailure(tlvWrite.CopyElement(TLV::AnonymousTag(), tlvReader));
-    ReturnErrorOnFailure(tlvWrite.Finalize());
-    data.reduce_size(tlvWrite.GetLengthWritten());
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR PutPreencodedWriteAttribute(app::WriteClient & writeClient, app::ConcreteDataAttributePath & path, const ByteSpan & data)
 {
     TLV::TLVReader reader;
@@ -2374,7 +2352,7 @@ JNI_METHOD(void, write)
             size_t length = jsonUtfJniString.size();
             VerifyOrExit(tlvBytes.Calloc(length), err = CHIP_ERROR_NO_MEMORY);
             MutableByteSpan data(tlvBytes.Get(), tlvBytes.AllocatedSize());
-            SuccessOrExit(err = ConvertJsonToTlvWithoutStruct(jsonString, data));
+            SuccessOrExit(err = SingleAttributeJsonToTlv(jsonString, data));
             SuccessOrExit(err = PutPreencodedWriteAttribute(*writeClient, path, data));
         }
     }

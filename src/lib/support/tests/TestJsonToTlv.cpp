@@ -317,6 +317,59 @@ int Initialize(void * apSuite)
     return SUCCESS;
 }
 
+void TestSingleAttributeJsonToTlv(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVReader reader;
+    bool expectedVal       = false;
+    std::string jsonString = "{\n"
+                             "   \"1:BOOL\" : true\n"
+                             "}\n";
+
+    MutableByteSpan data(gBuf1);
+    err = SingleAttributeJsonToTlv(jsonString, data);
+    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    reader.Init(data);
+    err = reader.Next();
+    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    err = reader.Get(expectedVal);
+    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(gSuite, expectedVal == true);
+}
+
+void TestSingleAttributeJsonToTlvWithLargeTag(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVReader reader;
+    bool expectedVal       = false;
+    std::string jsonString = "{\n"
+                             "   \"300:BOOL\" : true\n"
+                             "}\n";
+
+    MutableByteSpan data(gBuf1);
+    err = SingleAttributeJsonToTlv(jsonString, data);
+    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    reader.Init(data);
+    err = reader.Next();
+    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    err = reader.Get(expectedVal);
+    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(gSuite, expectedVal == true);
+}
+
+void TestSingleAttributeJsonToTlvWithInvalidTag(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    // uint32_max + 1 = 4294967296
+    std::string jsonString = "{\n"
+                             "   \"4294967296:BOOL\" : true\n"
+                             "}\n";
+
+    MutableByteSpan data(gBuf1);
+    err = SingleAttributeJsonToTlv(jsonString, data);
+    NL_TEST_ASSERT(gSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+}
+
 int Finalize(void * aContext)
 {
     chip::Platform::MemoryShutdown();
@@ -328,6 +381,9 @@ const nlTest sTests[] =
 {
     NL_TEST_DEF("TestConverter", TestConverter),
     NL_TEST_DEF("Test32BitConvert", Test32BitConvert),
+    NL_TEST_DEF("TestSingleAttributeJsonToTlv", TestSingleAttributeJsonToTlv),
+    NL_TEST_DEF("TestSingleAttributeJsonToTlvWithLargeTag", TestSingleAttributeJsonToTlvWithLargeTag),
+    NL_TEST_DEF("TestSingleAttributeJsonToTlvWithInvalidTag", TestSingleAttributeJsonToTlvWithInvalidTag),
     NL_TEST_SENTINEL()
 };
 // clang-format on

@@ -466,4 +466,29 @@ CHIP_ERROR ConvertTlvTag(const uint64_t tagNumber, TLV::Tag & tag)
 {
     return InternalConvertTlvTag(tagNumber, tag);
 }
+
+CHIP_ERROR SingleAttributeJsonToTlv(const std::string & jsonString, MutableByteSpan & tlv)
+{
+    Platform::ScopedMemoryBufferWithSize<uint8_t> buf;
+    VerifyOrReturnError(buf.Calloc(tlv.size()), CHIP_ERROR_NO_MEMORY);
+    MutableByteSpan dataWithStruct(buf.Get(), buf.AllocatedSize());
+    ReturnErrorOnFailure(JsonToTlv(jsonString, dataWithStruct));
+    TLV::TLVReader tlvReader;
+    TLV::TLVType outerContainer = TLV::kTLVType_Structure;
+    tlvReader.Init(dataWithStruct);
+    ReturnErrorOnFailure(tlvReader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
+    ReturnErrorOnFailure(tlvReader.EnterContainer(outerContainer));
+    CHIP_ERROR err = tlvReader.Next();
+    if (err == CHIP_ERROR_UNKNOWN_IMPLICIT_TLV_TAG)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    ReturnErrorOnFailure(err);
+    TLV::TLVWriter tlvWrite;
+    tlvWrite.Init(tlv);
+    ReturnErrorOnFailure(tlvWrite.CopyElement(TLV::AnonymousTag(), tlvReader));
+    ReturnErrorOnFailure(tlvWrite.Finalize());
+    tlv.reduce_size(tlvWrite.GetLengthWritten());
+    return CHIP_NO_ERROR;
+}
 } // namespace chip

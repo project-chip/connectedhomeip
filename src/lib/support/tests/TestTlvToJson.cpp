@@ -233,6 +233,56 @@ void TestConverter(nlTestSuite * inSuite, void * inContext)
     EncodeAndValidate(structList, jsonString);
 }
 
+void TestSingleElementTlvToJson(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err     = CHIP_NO_ERROR;
+    uint32_t testTagId = 1;
+    std::string jsonString;
+    std::string expectedJsonString = "{\n"
+                                     "   \"1:BOOL\" : true\n"
+                                     "}\n";
+    SetupBuf();
+    err = DataModel::Encode(gWriter, TLV::AnonymousTag(), true);
+    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    err = gWriter.Finalize();
+    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+
+    gReader.Init(gStore, gWriter.GetLengthWritten());
+    err = gReader.Next();
+    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+
+    err = SingleElementTlvToJson(testTagId, gReader, jsonString);
+    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+
+    bool matches = Matches(expectedJsonString, jsonString);
+    NL_TEST_ASSERT(gSuite, matches);
+}
+
+void TestSingleElementTlvToJsonWithLargeTag(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err     = CHIP_NO_ERROR;
+    uint32_t testTagId = 300;
+    std::string jsonString;
+    std::string expectedJsonString = "{\n"
+                                     "   \"300:BOOL\" : true\n"
+                                     "}\n";
+    SetupBuf();
+    err = DataModel::Encode(gWriter, TLV::AnonymousTag(), true);
+    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+    err = gWriter.Finalize();
+    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+
+    gReader.Init(gStore, gWriter.GetLengthWritten());
+    err = gReader.Next();
+    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+
+    err = SingleElementTlvToJson(testTagId, gReader, jsonString);
+    NL_TEST_ASSERT(gSuite, err == CHIP_NO_ERROR);
+
+    bool matches = Matches(expectedJsonString, jsonString);
+    NL_TEST_ASSERT(gSuite, matches);
+}
+
 int Initialize(void * apSuite)
 {
     VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
@@ -246,7 +296,10 @@ int Finalize(void * aContext)
     return SUCCESS;
 }
 
-const nlTest sTests[] = { NL_TEST_DEF("TestConverter", TestConverter), NL_TEST_SENTINEL() };
+const nlTest sTests[] = { NL_TEST_DEF("TestConverter", TestConverter),
+                          NL_TEST_DEF("TestSingleElementTlvToJson", TestSingleElementTlvToJson),
+                          NL_TEST_DEF("TestSingleElementTlvToJsonWithLargeTag", TestSingleElementTlvToJsonWithLargeTag),
+                          NL_TEST_SENTINEL() };
 
 } // namespace
 

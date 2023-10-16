@@ -39,4 +39,14 @@ CHIP_ERROR JsonToTlv(const std::string & jsonString, TLV::TLVWriter & writer);
  */
 CHIP_ERROR ConvertTlvTag(const uint64_t tagNumber, TLV::Tag & tag);
 
+/*
+ * Each Request from Write Interaction only accept a single TLV attribute without a structure container.
+ * However, JSON input to the JsonToTlv function has a structure container.
+ * This function removes the structure container and tag from a JSON object and encodes
+ * it with an anonymous tag. PutPreencodedWriteAttribute in WriteClient would consume this bytespan result.
+ * @param[in] jsonString      a string with tlv struct content that has a single attribute value in it with the attribute id
+ *                            as the key and the attribute value as the value.
+ * @param[out]   tlv          a mutable bytespan with data encode by annonymous tag without attribute key and struct containner.
+ */
+CHIP_ERROR SingleAttributeJsonToTlv(const std::string & jsonString, MutableByteSpan & tlv);
 } // namespace chip
