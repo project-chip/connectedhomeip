@@ -37,15 +37,6 @@ struct BluezEndpoint;
 class BluezConnection
 {
 public:
-    struct IOChannel
-    {
-        IOChannel() = default;
-        ~IOChannel();
-
-        GIOChannel * mpChannel;
-        GSource * mWatchSource;
-    };
-
     BluezConnection(BluezEndpoint * apEndpoint, BluezDevice1 * apDevice);
     ~BluezConnection();
 
@@ -57,6 +48,14 @@ public:
     bool IsNotifyAcquired() const { return mNotifyAcquired; }
     void SetNotifyAcquired(bool aNotifyAcquired) { mNotifyAcquired = aNotifyAcquired; }
 
+    using CharCallbackFunc = gboolean(GIOChannel *, GIOCondition, BluezConnection *);
+
+    /// Setup callback for receiving data from the CHIP TX characteristic on the remote peripheral device
+    void SetupWriteCallback(int aSocketFd, CharCallbackFunc aCallback);
+    /// Setup callback for receiving HUP event on the notification channel
+    void SetupNotifyCallback(int aSocketFd, CharCallbackFunc aCallback);
+
+    /// Send indication to the CHIP RX characteristic on the remote peripheral device
     CHIP_ERROR SendIndication(chip::System::PacketBufferHandle apBuf);
     /// Write to the CHIP RX characteristic on the remote peripheral device
     CHIP_ERROR SendWriteRequest(chip::System::PacketBufferHandle apBuf);
@@ -68,6 +67,15 @@ public:
     CHIP_ERROR CloseConnection();
 
 private:
+    struct IOChannel
+    {
+        IOChannel() = default;
+        ~IOChannel();
+
+        GIOChannel * mpChannel;
+        GSource * mWatchSource;
+    };
+
     struct ConnectionDataBundle
     {
         ConnectionDataBundle(const BluezConnection &, const chip::System::PacketBufferHandle &);
@@ -79,8 +87,9 @@ private:
 
     CHIP_ERROR Init();
 
-    static CHIP_ERROR BluezC2Indicate(ConnectionDataBundle * data);
     static CHIP_ERROR BluezDisconnect(BluezConnection * apConn);
+
+    static CHIP_ERROR SendIndicationImpl(ConnectionDataBundle * data);
 
     static void SendWriteRequestDone(GObject * aObject, GAsyncResult * aResult, gpointer apConn);
     static CHIP_ERROR SendWriteRequestImpl(ConnectionDataBundle * data);
@@ -99,15 +108,15 @@ private:
     bool mNotifyAcquired = false;
     uint16_t mMtu        = 0;
 
+    IOChannel mC1Channel = { 0 };
+    IOChannel mC2Channel = { 0 };
+
 public:
     BluezGattService1 * mpService   = nullptr;
     BluezGattCharacteristic1 * mpC1 = nullptr;
     BluezGattCharacteristic1 * mpC2 = nullptr;
     // additional data characteristics
     BluezGattCharacteristic1 * mpC3 = nullptr;
-
-    IOChannel mC1Channel = { 0 };
-    IOChannel mC2Channel = { 0 };
 };
 
 } // namespace Internal

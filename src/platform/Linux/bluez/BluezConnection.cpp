@@ -197,9 +197,41 @@ const char * BluezConnection::GetPeerAddress() const
     return bluez_device1_get_address(mpDevice);
 }
 
+void BluezConnection::SetupWriteCallback(int aSocketFd, CharCallbackFunc aCallback)
+{
+    auto channel = g_io_channel_unix_new(aSocketFd);
+    g_io_channel_set_encoding(channel, nullptr, nullptr);
+    g_io_channel_set_close_on_unref(channel, TRUE);
+    g_io_channel_set_buffered(channel, FALSE);
+
+    auto watchSource = g_io_create_watch(channel, static_cast<GIOCondition>(G_IO_HUP | G_IO_IN | G_IO_ERR | G_IO_NVAL));
+    g_source_set_callback(watchSource, G_SOURCE_FUNC(aCallback), this, nullptr);
+
+    mC1Channel.mpChannel    = channel;
+    mC1Channel.mWatchSource = watchSource;
+
+    PlatformMgrImpl().GLibMatterContextAttachSource(watchSource);
+}
+
+void BluezConnection::SetupNotifyCallback(int aSocketFd, CharCallbackFunc aCallback)
+{
+    auto channel = g_io_channel_unix_new(aSocketFd);
+    g_io_channel_set_encoding(channel, nullptr, nullptr);
+    g_io_channel_set_close_on_unref(channel, TRUE);
+    g_io_channel_set_buffered(channel, FALSE);
+
+    auto watchSource = g_io_create_watch(channel, static_cast<GIOCondition>(G_IO_HUP | G_IO_ERR | G_IO_NVAL));
+    g_source_set_callback(watchSource, G_SOURCE_FUNC(aCallback), this, nullptr);
+
+    mC2Channel.mpChannel    = channel;
+    mC2Channel.mWatchSource = watchSource;
+
+    PlatformMgrImpl().GLibMatterContextAttachSource(watchSource);
+}
+
 // SendIndication callbacks
 
-CHIP_ERROR BluezConnection::BluezC2Indicate(ConnectionDataBundle * data)
+CHIP_ERROR BluezConnection::SendIndicationImpl(ConnectionDataBundle * data)
 {
     GAutoPtr<GError> error;
     size_t len, written;
@@ -228,7 +260,7 @@ CHIP_ERROR BluezConnection::SendIndication(chip::System::PacketBufferHandle apBu
     VerifyOrReturnError(mpC2 != nullptr, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "C2 is NULL in %s", __func__));
 
     ConnectionDataBundle bundle(*this, apBuf);
-    return PlatformMgrImpl().GLibMatterContextInvokeSync(BluezC2Indicate, &bundle);
+    return PlatformMgrImpl().GLibMatterContextInvokeSync(SendIndicationImpl, &bundle);
 }
 
 // SendWriteRequest callbacks

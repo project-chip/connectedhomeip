@@ -310,32 +310,28 @@ static gboolean BluezCharacteristicWriteValueError(BluezGattCharacteristic1 * aC
     return TRUE;
 }
 
-static gboolean BluezCharacteristicWriteFD(GIOChannel * aChannel, GIOCondition aCond, gpointer apEndpoint)
+static gboolean BluezCharacteristicWriteFD(GIOChannel * aChannel, GIOCondition aCond, BluezConnection * apConn)
 {
     GVariant * newVal;
     uint8_t * buf = nullptr;
     ssize_t len;
     bool isSuccess = false;
 
-    BluezConnection * conn = static_cast<BluezConnection *>(apEndpoint);
-
-    VerifyOrExit(conn != nullptr, ChipLogError(DeviceLayer, "No CHIP Bluez connection in %s", __func__));
-
     VerifyOrExit(!(aCond & G_IO_HUP), ChipLogError(DeviceLayer, "INFO: socket disconnected in %s", __func__));
     VerifyOrExit(!(aCond & (G_IO_ERR | G_IO_NVAL)), ChipLogError(DeviceLayer, "INFO: socket error in %s", __func__));
     VerifyOrExit(aCond == G_IO_IN, ChipLogError(DeviceLayer, "FAIL: error in %s", __func__));
 
-    ChipLogDetail(DeviceLayer, "c1 %s mtu, %d", __func__, conn->GetMTU());
+    ChipLogDetail(DeviceLayer, "c1 %s mtu, %d", __func__, apConn->GetMTU());
 
-    buf = g_new(uint8_t, conn->GetMTU());
-    len = read(g_io_channel_unix_get_fd(aChannel), buf, conn->GetMTU());
+    buf = g_new(uint8_t, apConn->GetMTU());
+    len = read(g_io_channel_unix_get_fd(aChannel), buf, apConn->GetMTU());
     VerifyOrExit(len > 0, ChipLogError(DeviceLayer, "FAIL: short read in %s (%zd)", __func__, len));
 
     // Casting len to size_t is safe, since we ensured that it's not negative.
     newVal = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, buf, static_cast<size_t>(len), sizeof(uint8_t));
 
-    bluez_gatt_characteristic1_set_value(conn->mpC1, newVal);
-    BLEManagerImpl::HandleRXCharWrite(conn, buf, static_cast<size_t>(len));
+    bluez_gatt_characteristic1_set_value(apConn->mpC1, newVal);
+    BLEManagerImpl::HandleRXCharWrite(apConn, buf, static_cast<size_t>(len));
     isSuccess = true;
 
 exit:
@@ -352,7 +348,7 @@ static void Bluez_gatt_characteristic1_complete_acquire_write_with_fd(GDBusMetho
     g_object_unref(fd_list);
 }
 
-static gboolean bluezCharacteristicDestroyFD(GIOChannel * aChannel, GIOCondition aCond, gpointer apEndpoint)
+static gboolean bluezCharacteristicDestroyFD(GIOChannel *, GIOCondition, BluezConnection *)
 {
     return G_SOURCE_REMOVE;
 }
@@ -361,8 +357,6 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
                                                 GVariant * aOptions, gpointer apEndpoint)
 {
     int fds[2] = { -1, -1 };
-    GIOChannel * channel;
-    GSource * watchSource;
 #if CHIP_ERROR_LOGGING
     char * errStr;
 #endif // CHIP_ERROR_LOGGING
@@ -396,17 +390,7 @@ static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "MTU negotiation failed"));
     conn->SetMTU(mtu);
 
-    channel = g_io_channel_unix_new(fds[0]);
-    g_io_channel_set_encoding(channel, nullptr, nullptr);
-    g_io_channel_set_close_on_unref(channel, TRUE);
-    g_io_channel_set_buffered(channel, FALSE);
-    conn->mC1Channel.mpChannel = channel;
-
-    watchSource = g_io_create_watch(channel, static_cast<GIOCondition>(G_IO_HUP | G_IO_IN | G_IO_ERR | G_IO_NVAL));
-    g_source_set_callback(watchSource, G_SOURCE_FUNC(BluezCharacteristicWriteFD), conn, nullptr);
-    PlatformMgrImpl().GLibMatterContextAttachSource(watchSource);
-    conn->mC1Channel.mWatchSource = watchSource;
-
+    conn->SetupWriteCallback(fds[0], BluezCharacteristicWriteFD);
     bluez_gatt_characteristic1_set_write_acquired(aChar, TRUE);
 
     Bluez_gatt_characteristic1_complete_acquire_write_with_fd(aInvocation, fds[1], conn->GetMTU());
@@ -428,8 +412,6 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
                                                  GVariant * aOptions, gpointer apEndpoint)
 {
     int fds[2] = { -1, -1 };
-    GIOChannel * channel;
-    GSource * watchSource;
 #if CHIP_ERROR_LOGGING
     char * errStr;
 #endif // CHIP_ERROR_LOGGING
@@ -466,24 +448,14 @@ static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aCha
         return FALSE;
     }
 
-    channel = g_io_channel_unix_new(fds[0]);
-    g_io_channel_set_encoding(channel, nullptr, nullptr);
-    g_io_channel_set_close_on_unref(channel, TRUE);
-    g_io_channel_set_buffered(channel, FALSE);
-    conn->mC2Channel.mpChannel = channel;
-
-    watchSource = g_io_create_watch(channel, static_cast<GIOCondition>(G_IO_HUP | G_IO_ERR | G_IO_NVAL));
-    g_source_set_callback(watchSource, G_SOURCE_FUNC(bluezCharacteristicDestroyFD), conn, nullptr);
-    PlatformMgrImpl().GLibMatterContextAttachSource(watchSource);
-    conn->mC1Channel.mWatchSource = watchSource;
-
+    conn->SetupNotifyCallback(fds[0], bluezCharacteristicDestroyFD);
     bluez_gatt_characteristic1_set_notify_acquired(aChar, TRUE);
+    conn->SetNotifyAcquired(true);
 
     // same reply as for AcquireWrite
     Bluez_gatt_characteristic1_complete_acquire_write_with_fd(aInvocation, fds[1], conn->GetMTU());
     close(fds[1]);
 
-    conn->SetNotifyAcquired(true);
     BLEManagerImpl::HandleTXCharCCCDWrite(conn);
 
     return TRUE;
