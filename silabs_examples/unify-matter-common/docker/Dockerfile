@@ -8,9 +8,9 @@ WORKDIR /
 
 ARG ARCH="arm64"
 
-ARG TARGET_DEPS="libavahi-client-dev:${ARCH}=0.8-5* libssl-dev:${ARCH}=1.1.1n-0* libsystemd-dev:${ARCH}=247.3-7* libwrap0-dev:${ARCH}=7.6.q-31 uthash-dev:${ARCH}=2.1.0-1 \
+ARG TARGET_DEPS="libavahi-client-dev:${ARCH}=0.8-5* libssl-dev:${ARCH}=1.1.1w-0* libsystemd-dev:${ARCH}=247.3-7* libwrap0-dev:${ARCH}=7.6.q-31 uthash-dev:${ARCH}=2.1.0-1 \
   libsqlite3-dev:${ARCH}=3.34.1-3 libedit-dev:${ARCH}=3.1-20191231-2+b1 libyaml-cpp0.6:${ARCH}=0.6.3-9 libmosquitto-dev:${ARCH}=2.0.11-1\
-  libreadline-dev:${ARCH}=8.1-1 libncurses5-dev:${ARCH}=6.2+20201114-2+deb11u1 libncursesw5-dev:${ARCH}=6.2+20201114-2+deb11u1 libyaml-cpp-dev:${ARCH}=0.6.3-9 \
+  libreadline-dev:${ARCH}=8.1-1 libncurses5-dev:${ARCH}=6.2+20201114-2+deb11u2 libncursesw5-dev:${ARCH}=6.2+20201114-2+deb11u2 libyaml-cpp-dev:${ARCH}=0.6.3-9 \
   libboost-atomic-dev:${ARCH}=1.74.0.3 libboost-chrono-dev:${ARCH}=1.74.0.3 libboost-date-time-dev:${ARCH}=1.74.0.3 \
   libboost-filesystem-dev:${ARCH}=1.74.0.3 libboost-regex-dev:${ARCH}=1.74.0.3 libboost-program-options-dev:${ARCH}=1.74.0.3 \
   libboost-serialization-dev:${ARCH}=1.74.0.3 libboost-system-dev:${ARCH}=1.74.0.3 libboost-thread-dev:${ARCH}=1.74.0.3 \
@@ -22,7 +22,7 @@ ARG HOST_DEPS="ninja-build=1.10.1-1 git=1:2.30.2-1* git-lfs=2.13.2-1+b5 \
   gcc=4:10.2.1-1 g++=4:10.2.1-1 gdb-multiarch=10.1-1.7 \
   build-essential=12.9 \
   clang=1:11.0-51+nmu5 nlohmann-json3-dev=3.9.1-1 \
-  libdbus-glib-1-dev=0.110-6 libssl-dev=1.1.1n-0* \
+  libdbus-glib-1-dev=0.110-6 libssl-dev=1.1.1w-0* \
   libgirepository1.0-dev=1.66.1-1+b1 \
   fakeroot=1.25.3-1.1"
 
