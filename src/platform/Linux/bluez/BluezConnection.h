@@ -48,9 +48,21 @@ public:
     bool IsNotifyAcquired() const { return mNotifyAcquired; }
     void SetNotifyAcquired(bool aNotifyAcquired) { mNotifyAcquired = aNotifyAcquired; }
 
-    /// Setup callback for receiving data from the CHIP TX characteristic on the remote peripheral device
+    /**
+     * @brief Setup callback for receiving data from the CHIP TX characteristic on
+     *        the remote peripheral device.
+     *
+     * @note This function takes the ownership of the passed file descriptor and
+     *       will close it when the connection is closed.
+     */
     void SetupWriteHandler(int aSocketFd);
-    /// Setup callback for receiving HUP event on the notification channel
+
+    /**
+     * @brief Setup callback for receiving HUP event on the notification channel.
+     *
+     * @note This function takes the ownership of the passed file descriptor and
+     *       will close it when the connection is closed.
+     */
     void SetupNotifyHandler(int aSocketFd, bool aAdditionalAdvertising = false);
 
     /// Send indication to the CHIP RX characteristic on the remote peripheral device
@@ -113,10 +125,8 @@ private:
 
     BluezGattCharacteristic1 * mpC1 = nullptr;
     IOChannel mC1Channel            = { 0 };
-
     BluezGattCharacteristic1 * mpC2 = nullptr;
     IOChannel mC2Channel            = { 0 };
-
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     BluezGattCharacteristic1 * mpC3 = nullptr;
     IOChannel mC3Channel            = { 0 };
