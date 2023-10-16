@@ -513,9 +513,9 @@ class MatterIdlTransformer(Transformer):
         endpoints = []
 
         for item in items:
-            if type(item) == Cluster:
+            if isinstance(item, Cluster):
                 clusters.append(item)
-            elif type(item) == Endpoint:
+            elif isinstance(item, Endpoint):
                 endpoints.append(item)
             else:
                 raise Exception("UNKNOWN idl content item: %r" % item)
