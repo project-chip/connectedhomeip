@@ -6,6 +6,8 @@ changelog:
       - scripts
       - external dependency
       - submodules
+      - integrations
+      - documentation
     authors:
       - restyled-io
       - octocat
@@ -31,9 +33,13 @@ changelog:
     - title: Spec Alignment Changes
       labels:
         - spec
-    - title: INet Layer Changes
+    - title: Transport/Messaging Layer Changes
       labels:
         - inet
+        - transport
+        - messaging
+        - protocols
+        - lwip
     - title: Crypto Changes
       labels:
         - crypto
@@ -49,6 +55,7 @@ changelog:
     - title: System Level Changes
       labels:
         - system
+        - attestation
     - title: App Level Changes
       labels:
         - app
@@ -67,6 +74,3 @@ changelog:
       labels:
         - gn
         - build
-    - title: Other Changes
-      labels:
-        - "*"
