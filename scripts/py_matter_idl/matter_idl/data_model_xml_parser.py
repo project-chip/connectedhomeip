@@ -24,7 +24,7 @@ except ImportError:
 
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
-    from matter_idl.zapxml import ParseSource, ParseXmls
+    from matter_idl.data_model_xml import ParseSource, ParseXmls
 
 
 if __name__ == '__main__':

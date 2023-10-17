@@ -29,6 +29,6 @@ class DataModelXmlHandler(BaseHandler):
 
     def GetNextProcessor(self, name, attrs):
         if name.lower() == 'cluster':
-            return ClusterHandler(self.context, self._idl)
+            return ClusterHandler(self.context, self._idl, attrs)
         else:
             return BaseHandler(self.context)

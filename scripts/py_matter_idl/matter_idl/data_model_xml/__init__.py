@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from typing import List, Optional, Union
 
 from matter_idl.matter_idl_types import Idl
-from matter_idl.zapxml.handlers import Context, DataModelXmlHandler
+from matter_idl.data_model_xml.handlers import Context, DataModelXmlHandler
 
 
 class ParseHandler(xml.sax.handler.ContentHandler):
