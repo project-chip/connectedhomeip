@@ -90,7 +90,6 @@ class ClusterHandler(BaseHandler):
 
     def GetNextProcessor(self, name: str, attrs):
         # TODO:
-        #   - features
         #   - dataTypes (enum, bitmap, list???, struct)
         #   - attributes
         #   - commands
