@@ -21,7 +21,7 @@ from matter_idl.matter_idl_types import (Attribute, Bitmap, Cluster, ClusterSide
 
 from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
-from .parsing import NormalizeName, ParseInt
+from .parsing import AttributesToBitFieldConstantEntry, AttributesToField, NormalizeName, ParseInt
 
 LOGGER = logging.getLogger('data-model-xml-parser')
 
@@ -41,13 +41,8 @@ class FeaturesHandler(BaseHandler):
         if name in {"section", "optionalConform"}:
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "feature":
-            assert ("bit" in attrs)
-            assert ("name" in attrs)
-
-            self._bitmap.entries.append(ConstantEntry(
-                name="k" + NormalizeName(attrs["name"]),
-                code=1 << ParseInt(attrs["bit"])
-            ))
+            self._bitmap.entries.append(
+                AttributesToBitFieldConstantEntry(attrs))
 
             # assume everything handled. Sub-item is only section
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
@@ -73,16 +68,13 @@ class BitmapHandler(BaseHandler):
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "bitfield":
-            assert ("name" in attrs)
-            assert ("bit" in attrs)
             self._bitmap.entries.append(
-                ConstantEntry(
-                    name="k" + NormalizeName(attrs["name"]), code=1 << ParseInt(attrs["bit"]))
-            )
+                AttributesToBitFieldConstantEntry(attrs))
             # Assume fully handled. We do not parse "mandatoryConform and such"
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
             return BaseHandler(self.context)
+
 
 class StructHandler(BaseHandler):
     def __init__(self, context: Context, cluster: Cluster, attrs):
@@ -99,20 +91,22 @@ class StructHandler(BaseHandler):
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "field":
-            assert ("name" in attrs)
-            assert ("id" in attrs)
-            assert ("type" in attrs)
 
             # TODO:
             #   - is_list would be useful here
             #   - qualities (NULLABLE, OPTIONAL, FABRIC_SENSITIVE)
             #   - data type: min/max length and min/max value
-            self._struct.fields.append(Field(
-                name=NormalizeName(attrs["name"]),
-                code=ParseInt(attrs["id"]),
-                data_type=DataType(name=attrs["type"])
-            ))
+            self._struct.fields.append(AttributesToField(attrs))
 
+            # TODO: min/max is via:
+            #    <constraint type="lengthBetween" from="16" to="100"/>
+            #    <constraint type="between" from="MinScaledValue+1" to="32767"/>
+            #    <constraint type="between" from="0" to="2048"/>
+            #    <constraint type="maxLength" value="16"/>
+            #    <constraint type="minLength" value="11"/>
+            # Test via:
+            #    Switch.xml
+            #    AccountLogin.xml
 
             # Assume fully handled.
             #
