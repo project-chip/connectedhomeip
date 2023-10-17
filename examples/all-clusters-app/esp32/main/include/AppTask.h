@@ -19,7 +19,6 @@
 
 #pragma once
 #include <lock/AppEvent.h>
-#include <lock/BoltLockManager.h>
 #include <platform/CHIPDeviceLayer.h>
 
 // Application-defined error codes in the CHIP_ERROR space.
