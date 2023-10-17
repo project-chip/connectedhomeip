@@ -62,7 +62,9 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
 
     ICDManagementServer::GetInstance().SetSymmetricKeystore(mSymmetricKeystore);
 
-    VerifyOrDie(kFastPollingInterval.count() < activeModeInterval);
+    // Removing the check for now since it is possible for the Fast polling
+    // to be superior to the activeModeInterval fornow
+    // VerifyOrDie(kFastPollingInterval.count() < activeModeInterval);
 
     UpdateICDMode();
     UpdateOperationState(OperationalState::ActiveMode);
