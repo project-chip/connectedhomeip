@@ -14,7 +14,7 @@
 
 from .base import BaseHandler
 from .context import Context
-from .handlers import ConfiguratorHandler
+from .handlers import ClusterHandler
 
 from matter_idl.matter_idl_types import Idl
 
@@ -28,8 +28,7 @@ class DataModelXmlHandler(BaseHandler):
         self._idl = idl
 
     def GetNextProcessor(self, name, attrs):
-        # if name.lower() == 'configurator':
-        #    return ConfiguratorHandler(self.context, self._idl)
-
-        # FIXME: implement
-        return BaseHandler(self.context)
+        if name.lower() == 'cluster':
+            return ClusterHandler(self.context, self._idl)
+        else:
+            return BaseHandler(self.context)

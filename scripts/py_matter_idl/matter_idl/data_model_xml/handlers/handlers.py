@@ -26,8 +26,8 @@ from .parsing import AttrsToAccessPrivilege, AttrsToAttribute, ParseInt
 LOGGER = logging.getLogger('data-model-xml-parser')
 
 
-class ConfiguratorHandler(BaseHandler):
-    """ Handling /configurator elements."""
+class ClusterHandler(BaseHandler):
+    """ Handling /cluster elements."""
 
     def __init__(self, context: Context, idl: Idl):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
