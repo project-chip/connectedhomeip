@@ -71,12 +71,8 @@ private:
 
     static_assert((CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS) <= (CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC * kMillisecondsPerSecond),
                   "Spec requires the IdleModeInterval be equal or greater to the ActiveModeInterval.");
-    static_assert((CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS) >= 300,
-                  "Spec requires the ActiveModeThreshold to be equal or greater to 300ms");
     uint32_t mActiveInterval_ms = CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS;
 
-    static_assert((CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS) >= 300,
-                  "Spec requires the ActiveModeThreshold to be equal or greater to 300ms.");
     uint16_t mActiveThreshold_ms = CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS;
 
     uint32_t mICDCounter = 0;
