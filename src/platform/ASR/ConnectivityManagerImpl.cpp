@@ -572,11 +572,6 @@ void ConnectivityManagerImpl::lega_wifi_connect_state(lega_wifi_event_e stat)
     }
 }
 
-void ConnectivityManagerImpl::lega_wifi_scan_ind(lega_wlan_scan_result_t * result)
-{
-    NetworkCommissioning::ASRWiFiDriver::GetInstance().OnScanWiFiNetworkDone(result);
-}
-
 void ConnectivityManagerImpl::lega_wifi_get_ip_ind(lega_wlan_ip_stat_t * pnet)
 {
     ChipLogProgress(DeviceLayer, "Got ip : %s, gw : %s, mask : %s, mac : %s", pnet->ip, pnet->gate, pnet->mask, pnet->macaddr);
@@ -627,7 +622,6 @@ void ConnectivityManagerImpl::lega_wlan_err_stat_handler(lega_wlan_err_status_e 
 
 CHIP_ERROR ConnectivityManagerImpl::WiFi_init(void)
 {
-    lega_wlan_scan_compeleted_cb_register(ConnectivityManagerImpl::lega_wifi_scan_ind);
     lega_wlan_stat_chg_cb_register(ConnectivityManagerImpl::lega_wifi_connect_state);
     lega_wlan_ip_got_cb_register(ConnectivityManagerImpl::lega_wifi_get_ip_ind);
     lega_wlan_ip6_got_cb_register(ConnectivityManagerImpl::lega_wifi_get_ip6_ind);

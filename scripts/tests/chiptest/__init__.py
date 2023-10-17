@@ -157,7 +157,6 @@ def _GetInDevelopmentTests() -> Set[str]:
                                              # TestEventTriggersEnabled is true, which it's not in CI.
         "Test_TC_SMOKECO_2_6.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
                                              # TestEventTriggersEnabled is true, which it's not in CI.
-        "Test_TC_S_2_4.yaml",  # https://github.com/project-chip/connectedhomeip/issues/29117
     }
 
 
@@ -176,9 +175,7 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "Test_TC_ACE_1_6.yaml",    # Test fails only in chip-repl: Refer--> https://github.com/project-chip/connectedhomeip/pull/27910#issuecomment-1632485584
         "Test_TC_IDM_1_2.yaml",              # chip-repl does not support AnyCommands (19/07/2023)
         "TestGroupKeyManagementCluster.yaml",  # chip-repl does not support EqualityCommands (2023-08-04)
-        "Test_TC_S_2_2.yaml",              # chip-repl does not support scenes cluster commands
-        "Test_TC_S_2_3.yaml",              # chip-repl does not support scenes cluster commands
-        "Test_TC_S_2_4.yaml",              # chip-repl does not support scenes cluster commands
+        "Test_TC_S_2_2.yaml",              # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_MOD_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_MOD_3_2.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_MOD_3_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster

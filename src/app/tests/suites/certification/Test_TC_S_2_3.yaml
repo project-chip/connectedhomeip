@@ -23,9 +23,8 @@ config:
     cluster: "Scenes"
     endpoint: 1
     G1:
-        type: int16u
+        type: group_id
         defaultValue: 0x0101
-    GroupKeyManagement.Endpoint: 0
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -49,7 +48,7 @@ tests:
           "Step 0a: preparation step for using commands from Groups cluster: Add
           KeySet"
       cluster: "Group Key Management"
-      endpoint: GroupKeyManagement.Endpoint
+      endpoint: 0
       command: "KeySetWrite"
       arguments:
           values:
@@ -70,7 +69,7 @@ tests:
           "Step 0b: Preparation step for using commands from Groups cluster:
           Write Group Keys"
       cluster: "Group Key Management"
-      endpoint: GroupKeyManagement.Endpoint
+      endpoint: 0
       command: "writeAttribute"
       attribute: "GroupKeyMap"
       arguments:
@@ -97,7 +96,7 @@ tests:
 
     - label: "Install ACLs"
       cluster: "Access Control"
-      endpoint: GroupKeyManagement.Endpoint
+      endpoint: 0
       command: "writeAttribute"
       attribute: "ACL"
       arguments:
@@ -644,7 +643,7 @@ tests:
           KeySetRemove command to the GroupKeyManagement cluster with the
           GroupKeySetID field set to 0x01a1"
       cluster: "Group Key Management"
-      endpoint: GroupKeyManagement.Endpoint
+      endpoint: 0
       command: "KeySetRemove"
       arguments:
           values:

@@ -1,1 +1,1 @@
-18 : [Silabs] Adds bugfix for symlink for docker use and optimize SDK download
+21 : [chip-build-java] Ensure java is actually available in the docker image

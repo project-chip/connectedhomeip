@@ -75,12 +75,12 @@ jobs:
                  $JAVA_PATH/bin/java \
                    -cp 'third_party/java_deps/artifacts/*:out/linux-x64-tests/lib/src/controller/java/*' \
                    org.junit.runner.JUnitCore       \
-                   chip.tlv.TlvWriterTest           \
-                   chip.tlv.TlvReadWriteTest        \
-                   chip.tlv.TlvReaderTest           \
-                   chip.jsontlv.JsonToTlvToJsonTest \
-                   chip.onboardingpayload.ManualCodeTest \
-                   chip.onboardingpayload.QRCodeTest
+                   matter.tlv.TlvWriterTest           \
+                   matter.tlv.TlvReadWriteTest        \
+                   matter.tlv.TlvReaderTest           \
+                   matter.jsontlv.JsonToTlvToJsonTest \
+                   matter.onboardingpayload.ManualCodeTest \
+                   matter.onboardingpayload.QRCodeTest
             - name: Build Java Matter Controller and all clusters app
               run: |
                   scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
@@ -140,7 +140,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "im" \
-                     --tool-args "onnetwork-long-im-read --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --tool-args "onnetwork-long-im-read --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000" \
                      --factoryreset \
                   '
             - name: Run IM Write Test
@@ -162,7 +162,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-java-matter-controller \
                      --tool-cluster "im" \
-                     --tool-args "onnetwork-long-im-subscribe --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --tool-args "onnetwork-long-im-subscribe --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000" \
                      --factoryreset \
                   '
             - name: Run Pairing AlreadyDiscovered Test
@@ -229,7 +229,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-kotlin-matter-controller \
                      --tool-cluster "im" \
-                     --tool-args "onnetwork-long-im-read --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --tool-args "onnetwork-long-im-read --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000" \
                      --factoryreset \
                   '
             - name: Run Kotlin IM Write Test
@@ -251,7 +251,7 @@ jobs:
                      --app-args "--discriminator 3840 --interface-id -1" \
                      --tool-path out/linux-x64-kotlin-matter-controller \
                      --tool-cluster "im" \
-                     --tool-args "onnetwork-long-im-subscribe --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --tool-args "onnetwork-long-im-subscribe --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 3000" \
                      --factoryreset \
                   '                                                  
             - name: Uploading core files

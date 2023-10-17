@@ -19,9 +19,9 @@ package chip.devicecontroller.cluster
 import chip.devicecontroller.cluster.eventstructs.UnitTestingClusterTestEventEvent
 import chip.devicecontroller.cluster.eventstructs.UnitTestingClusterTestFabricScopedEventEvent
 import chip.devicecontroller.cluster.structs.UnitTestingClusterSimpleStruct
-import chip.tlv.AnonymousTag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.AnonymousTag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 import org.junit.Test
 
 class ChipClusterEventStructTest {
