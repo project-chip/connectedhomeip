@@ -12,10 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 from typing import Optional
 
 from matter_idl.generators.types import GetDataTypeSizeInBits, IsSignedDataType
-from matter_idl.matter_idl_types import AccessPrivilege, Attribute, AttributeQuality, ConstantEntry, DataType, Field, FieldQuality
+from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, ConstantEntry, DataType, Event,
+                                         EventPriority, Field, FieldQuality)
+
+LOGGER = logging.getLogger('data-model-xml-data-parsing')
 
 
 def ParseInt(value: str, data_type: Optional[DataType] = None) -> int:
@@ -28,7 +32,7 @@ def ParseInt(value: str, data_type: Optional[DataType] = None) -> int:
         parsed = int(value[2:], 16)
         if data_type and IsSignedDataType(data_type):
             bits = GetDataTypeSizeInBits(data_type)
-            assert(bits) # size MUST be known
+            assert (bits)  # size MUST be known
             if parsed & (1 << (bits - 1)):
                 parsed -= 1 << bits
         return parsed
@@ -79,3 +83,27 @@ def AttributesToBitFieldConstantEntry(attrs) -> ConstantEntry:
     assert ("bit" in attrs)
 
     return ConstantEntry(name="k" + NormalizeName(attrs["name"]), code=1 << ParseInt(attrs["bit"]))
+
+
+def AttributesToEvent(attrs) -> Event:
+    assert ("name" in attrs)
+    assert ("id" in attrs)
+    assert ("priority" in attrs)
+
+    if attrs["priority"] == "critical":
+        priority = EventPriority.CRITICAL
+    elif attrs["priority"] == "info":
+        priority = EventPriority.INFO
+    elif attrs["priority"] == "debug":
+        priority = EventPriority.DEBUG
+    elif attrs["priority"] == "desc":
+        LOGGER.warn("Found an event with 'desc' priority: %r" % attrs)
+        priority = EventPriority.CRITICAL
+    else:
+        raise Exception("UNKNOWN event priority: %r" % attrs["priority"])
+
+    return Event(
+        name=NormalizeName(attrs["name"]),
+        code=ParseInt(attrs["id"]),
+        priority=priority,
+        fields=[])

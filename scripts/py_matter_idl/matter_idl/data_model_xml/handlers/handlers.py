@@ -21,7 +21,7 @@ from matter_idl.matter_idl_types import (Attribute, Bitmap, Cluster, ClusterSide
 
 from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
-from .parsing import AttributesToBitFieldConstantEntry, AttributesToField, NormalizeName, ParseInt
+from .parsing import AttributesToBitFieldConstantEntry, AttributesToEvent, AttributesToField, NormalizeName, ParseInt
 
 LOGGER = logging.getLogger('data-model-xml-parser')
 
@@ -117,6 +117,29 @@ class StructHandler(BaseHandler):
             return BaseHandler(self.context)
 
 
+class EventHandler(BaseHandler):
+    def __init__(self, context: Context, cluster: Cluster, attrs):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._cluster = cluster
+        self._event = AttributesToEvent(attrs)
+
+    def EndProcessing(self):
+        self._cluster.events.append(self._event)
+
+    def GetNextProcessor(self, name: str, attrs):
+        if name == "section":
+            # Documentation data, skipped
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "field":
+            # TODO: same processing as structs:
+            #   optional/nullable
+            #   add constraint handling
+            self._event.fields.append(AttributesToField(attrs))
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        else:
+            return BaseHandler(self.context)
+
+
 class EnumHandler(BaseHandler):
     def __init__(self, context: Context, cluster: Cluster, attrs):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
@@ -143,6 +166,21 @@ class EnumHandler(BaseHandler):
             )
             # Assume fully handled
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        else:
+            return BaseHandler(self.context)
+
+
+class EventsHandler(BaseHandler):
+    def __init__(self, context: Context, cluster: Cluster):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._cluster = cluster
+
+    def GetNextProcessor(self, name: str, attrs):
+        if name == "section":
+            # Documentation data, skipped
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "event":
+            return EventHandler(self.context, self._cluster, attrs)
         else:
             return BaseHandler(self.context)
 
@@ -210,9 +248,6 @@ class ClusterHandler(BaseHandler):
         #   - dataTypes (enum, bitmap, list???, struct)
         #   - attributes
         #   - commands
-        #   - events
-        #   - ??? classification
-        #   - ??? identifiers
         if name == "revisionHistory":
             # Revision history COULD be used to find the latest revision of a cluster
             # however current IDL files do NOT have a revision info field
@@ -224,8 +259,7 @@ class ClusterHandler(BaseHandler):
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "classification":
-            # Not an obvious u
-            # derived could have meaning
+            # Not an obvious mapping in the existing data model.
             #
             # TODO IFF hierarchy == derived, we should use baseCluster
             #
@@ -236,5 +270,7 @@ class ClusterHandler(BaseHandler):
             return FeaturesHandler(self.context, self._cluster)
         elif name == "dataTypes":
             return DataTypesHandler(self.context, self._cluster)
+        elif name == "events":
+            return EventsHandler(self.context, self._cluster)
         else:
             return BaseHandler(self.context)
