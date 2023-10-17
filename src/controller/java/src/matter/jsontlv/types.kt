@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-package chip.jsontlv
+package matter.jsontlv
 
 internal const val JSON_VALUE_TYPE_INT = "INT"
 internal const val JSON_VALUE_TYPE_UINT = "UINT"

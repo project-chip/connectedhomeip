@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-package chip.tlv
+package matter.tlv
 
 /** Converts bytes in a Little Endian format into Long integer. */
 internal fun ByteArray.fromLittleEndianToLong(isSigned: Boolean = false): Long =

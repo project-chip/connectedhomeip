@@ -17,9 +17,9 @@
 
 package chip.devicecontroller.cluster
 
-import chip.tlv.NullValue
-import chip.tlv.Tag
-import chip.tlv.TlvReader
+import matter.tlv.NullValue
+import matter.tlv.Tag
+import matter.tlv.TlvReader
 
 fun TlvReader.getBoolean(tag: Tag): Boolean {
   return getBool(tag)
