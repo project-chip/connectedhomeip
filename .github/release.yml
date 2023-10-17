@@ -16,6 +16,9 @@ changelog:
       - github-labels
       - buildjet
   categories:
+    - title: Highlighted Fixes
+      labels:
+        - release note
     - title: Security Fixes
       labels:
         - security
