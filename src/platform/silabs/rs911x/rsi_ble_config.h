@@ -20,11 +20,11 @@
 
 #include "rsi_ble_apis.h"
 #if (SIWX_917 | EXP_BOARD)
-#include "rsi_bt_common_apis.h"
 #include "rsi_user.h"
 #else
 #include <rsi_data_types.h>
 #endif
+
 /******************************************************
  * *                      Macros
  * ******************************************************/
@@ -57,18 +57,6 @@
 #define RSI_BLE_DEV_NAME "CCP_DEVICE"
 #define RSI_BLE_SET_RAND_ADDR "00:23:A7:12:34:56"
 
-#define CLEAR_WHITELIST (0x00)
-#define ADD_DEVICE_TO_WHITELIST (0x01)
-#define DELETE_DEVICE_FROM_WHITELIST (0x02)
-
-#define CLEAR_ACCEPTLIST (0x00)
-#define ADD_DEVICE_TO_ACCEPTLIST (0x01)
-#define DELETE_DEVICE_FROM_ACCEPTLIST (0x02)
-
-#define RSI_BLE_TX_OCTETS 251
-#define RSI_BLE_TX_TIME 2120 // microseconds
-#define RSI_BLE_MATTER_CUSTOM_SERVICE_DATA_LENGTH 240
-
 #define ALL_PHYS (0x00)
 
 #define RSI_BLE_DEV_ADDR_RESOLUTION_ENABLE (0)
@@ -84,46 +72,31 @@
 #define RSI_BLE_NAME_SPACE (0x01)
 #define RSI_BLE_DESCRIPTION (0x010B)
 
+#define RSI_BLE_MAX_NBR_ATT_REC (80)
+
 //! BLE characteristic custom service uuid
 #define RSI_BLE_CUSTOM_SERVICE_UUID (0xFFF6)
 #define RSI_BLE_CUSTOM_LEVEL_UUID (0x1FF1)
-
-#ifdef RSI_M4_INTERFACE
-#define RSI_BLE_MAX_NBR_ATT_REC (20)
-
-#if (SIWX_917 | EXP_BOARD)
-#define RSI_BLE_MAX_NBR_PERIPHERALS (1)
-#else
-#define RSI_BLE_MAX_NBR_SLAVES (1)
-#endif //(SIWX_917 | EXP_BOARD)
-
-#define RSI_BLE_NUM_CONN_EVENTS (2)
-#else // !RSI_M4_INTERFACE
-#define RSI_BLE_MAX_NBR_ATT_REC (80)
+#define RSI_BLE_TX_OCTETS 251
+#define RSI_BLE_TX_TIME 2120
+#define RSI_BLE_MATTER_CUSTOM_SERVICE_DATA_LENGTH 240
 
 #if (SIWX_917 | EXP_BOARD)
+#define RSI_EXT_TCPIP_FEATURE_BITMAP 0
+#define CLEAR_ACCEPTLIST (0x00)
+#define ADD_DEVICE_TO_ACCEPTLIST (0x01)
+#define DELETE_DEVICE_FROM_ACCEPTLIST (0x02)
 #define RSI_BLE_MAX_NBR_PERIPHERALS (3)
-#else
-#define RSI_BLE_MAX_NBR_SLAVES (3)
-#endif //(SIWX_917 | EXP_BOARD)
-
-#define RSI_BLE_NUM_CONN_EVENTS (20)
-#endif //RSI_M4_INTERFACE
-
-#define RSI_BLE_MAX_NBR_ATT_SERV (10)
-
-#if (SIWX_917 | EXP_BOARD)
 #define RSI_BLE_MAX_NBR_CENTRALS (1)
-#define FRONT_END_SWITCH_SEL2 BIT(30)
 #define RSI_FEATURE_BIT_MAP                                                                                                        \
     (SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE | SL_SI91X_FEAT_DEV_TO_HOST_ULP_GPIO_1) //! To set wlan feature select bit map
 #define RSI_TCP_IP_FEATURE_BIT_MAP                                                                                                 \
     (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT) //! TCP/IP feature select bitmap for selecting TCP/IP features
 #define RSI_CUSTOM_FEATURE_BIT_MAP SL_SI91X_FEAT_CUSTOM_FEAT_EXTENTION_VALID //! To set custom feature select bit map
-#define RSI_EXT_TCPIP_FEATURE_BITMAP 0
 #define RSI_BT_FEATURE_BITMAP (SL_SI91X_BT_RF_TYPE | SL_SI91X_ENABLE_BLE_PROTOCOL)
 #define RSI_CONFIG_FEATURE_BITMAP 0
 #define RSI_TCP_IP_BYPASS RSI_ENABLE //! TCP IP BYPASS feature check
+
 #ifdef CHIP_9117
 #if WIFI_ENABLE_SECURITY_WPA3_TRANSITION // Adding Support for WPA3 transition
 #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP                                                                                             \
@@ -137,10 +110,19 @@
 #else  // EXP_BOARD
 #define RSI_EXT_CUSTOM_FEATURE_BIT_MAP (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(2))
 #endif /* CHIP_9117 */
-#else // !(SIWX_917 | EXP_BOARD)
-    #define RSI_BLE_MAX_NBR_MASTERS (1)
-    #define RSI_HAND_SHAKE_TYPE GPIO_BASED
-#endif // (SIWX_917 | EXP_BOARD)
+
+#else // For RS9116
+#define RSI_BLE_MAX_NBR_SLAVES (3)
+#define RSI_BLE_MAX_NBR_MASTERS (1)
+//! set handshake type of power mode
+#define RSI_HAND_SHAKE_TYPE GPIO_BASED
+#endif
+#define CLEAR_WHITELIST (0x00)
+#define ADD_DEVICE_TO_WHITELIST (0x01)
+#define DELETE_DEVICE_FROM_WHITELIST (0x02)
+#define RSI_BLE_NUM_CONN_EVENTS (20)
+
+#define RSI_BLE_MAX_NBR_ATT_SERV (10)
 
 #define RSI_BLE_GATT_ASYNC_ENABLE (1)
 #define RSI_BLE_GATT_INIT (0)
