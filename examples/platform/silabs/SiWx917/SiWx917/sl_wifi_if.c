@@ -342,7 +342,7 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
     ARGS_CHECK_NULL_POINTER(scan_result);
     int x;
     wfx_wifi_scan_result_t ap;
-    for (x = 0; x < (int)scan_result->scan_count; x++)
+    for (x = 0; x < (int) scan_result->scan_count; x++)
     {
         strcpy(&ap.ssid[0], (char *) &scan_result->scan_info[x].ssid);
         if (wfx_rsi.scan_ssid)
@@ -377,7 +377,7 @@ sl_status_t show_scan_results(sl_wifi_scan_result_t * scan_result)
 }
 sl_status_t bg_scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_t * result, uint32_t result_length, void * arg)
 {
-    callback_status       = show_scan_results(result);
+    callback_status          = show_scan_results(result);
     bg_scan_results_complete = true;
     return SL_STATUS_OK;
 }
@@ -391,7 +391,7 @@ sl_status_t bg_scan_callback_handler(sl_wifi_event_t event, sl_wifi_scan_result_
  *******************************************************************************************/
 static void wfx_rsi_save_ap_info() // translation
 {
-    if(wfx_rsi.dev_state & WFX_RSI_ST_SCANSTARTED)
+    if (wfx_rsi.dev_state & WFX_RSI_ST_SCANSTARTED)
     {
         return;
     }
@@ -683,7 +683,7 @@ void wfx_rsi_task(void * arg)
                 }
                 else
                 {
-                    wifi_scan_configuration                        = default_wifi_scan_configuration;
+                    wifi_scan_configuration = default_wifi_scan_configuration;
                 }
                 sl_wifi_set_scan_callback(bg_scan_callback_handler, NULL);
                 wfx_rsi.dev_state |= WFX_RSI_ST_SCANSTARTED;
