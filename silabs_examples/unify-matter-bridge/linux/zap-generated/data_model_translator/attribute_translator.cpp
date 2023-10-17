@@ -3748,14 +3748,14 @@ FanControlAttributeAccess::Read(const ConcreteReadAttributePath& aPath, Attribut
             }
             break;
         }
-        case MN::PercentSetting::Id: { // type is Percent
+        case MN::PercentSetting::Id: { // type is percent
             MN::PercentSetting::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
             }
             break;
         }
-        case MN::PercentCurrent::Id: { // type is Percent
+        case MN::PercentCurrent::Id: { // type is percent
             MN::PercentCurrent::TypeInfo::Type value;
             if (attribute_state_cache::get_instance().get(atr_path, value)) {
                 return aEncoder.Encode(value);
