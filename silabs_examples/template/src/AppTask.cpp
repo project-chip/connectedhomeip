@@ -37,10 +37,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 #define APP_FUNCTION_BUTTON 0
 #define APP_LIGHT_SWITCH 1
-#endif // SL_CATALOG_SIMPLE_BUTTON_PRESENT
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;

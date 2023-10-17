@@ -23,6 +23,7 @@
 
 #include "SensorsCallbacks.h"
 #include "AppTask.h"
+#include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #if SL_SENSOR_TYPE == 1
 #include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
@@ -44,6 +45,8 @@ static int16_t mSimulatedTempArray[SIMULATED_TEMP_ARRAY_SIZE] = {2152,2435,1966,
 static int16_t mMinMeasuredTemp = mSimulatedTempArray[mCurrentTempIndex];
 static int16_t mMaxMeasuredTemp = mSimulatedTempArray[mCurrentTempIndex];
 #endif
+
+using namespace ::chip::DeviceLayer::Silabs;
 
 void SilabsSensors::InitSensor(void)
 {
@@ -70,11 +73,11 @@ void SilabsSensors::ActionTriggered(AppEvent * aEvent)
 #if SL_SENSOR_TYPE == 1
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        if(aEvent->ButtonEvent.Action == SL_SIMPLE_BUTTON_PRESSED)
+        if(aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
         {
             mIsSensorTriggered = true;
         }
-        else if (aEvent->ButtonEvent.Action == SL_SIMPLE_BUTTON_RELEASED)
+        else if (aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
         {
             mIsSensorTriggered = false;
         }
@@ -88,7 +91,7 @@ void SilabsSensors::ActionTriggered(AppEvent * aEvent)
 
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        if(aEvent->ButtonEvent.Action == SL_SIMPLE_BUTTON_PRESSED)
+        if(aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
         {
             if(++mCurrentTempIndex >= SIMULATED_TEMP_ARRAY_SIZE)
             {
@@ -119,11 +122,11 @@ void SilabsSensors::ActionTriggered(AppEvent * aEvent)
 #elif SL_SENSOR_TYPE == 3
     if (aEvent->Type == AppEvent::kEventType_Button)
     {
-        if(aEvent->ButtonEvent.Action == SL_SIMPLE_BUTTON_PRESSED)
+        if(aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonPressed))
         {
             mIsSensorTriggered = true;
         }
-        else if (aEvent->ButtonEvent.Action == SL_SIMPLE_BUTTON_RELEASED)
+        else if (aEvent->ButtonEvent.Action == static_cast<uint8_t>(SilabsPlatform::ButtonAction::ButtonReleased))
         {
             mIsSensorTriggered = false;
         }

@@ -43,11 +43,8 @@
 #define SENSOR_LED 0
 #endif
 
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
-
 #define APP_FUNCTION_BUTTON 0
 #define APP_SENSOR_SWITCH 1
-#endif
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
@@ -134,7 +131,6 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 }
 
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
 {
 
@@ -153,7 +149,6 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
         sAppTask.PostEvent(&button_event);
     }
 }
-#endif
 
 void AppTask::SetAppLED(bool state)
 {

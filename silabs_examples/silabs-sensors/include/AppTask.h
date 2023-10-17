@@ -29,9 +29,6 @@
 #include "AppEvent.h"
 #include "BaseApplication.h"
 #include "FreeRTOS.h"
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
-#include "sl_simple_button_instances.h"
-#endif
 #include "timers.h" // provides FreeRTOS timer support
 #include <ble/BLEEndPoint.h>
 #include <lib/core/CHIPError.h>
@@ -71,7 +68,6 @@ public:
     static void SetAppLED(bool state);
 
     CHIP_ERROR StartAppTask();
-#ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
     /**
      * @brief Event handler when a button is pressed
      * Function posts an event for button processing
@@ -81,7 +77,6 @@ public:
      *                  SL_SIMPLE_BUTTON_RELEASED or SL_SIMPLE_BUTTON_DISABLED
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
-#endif
     // void PostSensorActionRequest(int32_t aActor, LightingManager::Action_t aAction);
 
 private:
