@@ -1,7 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
- *    Copyright (c) 2019-2023 Google LLC.
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,13 +14,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <inet/InetInterfaceImpl.h>
 
-package chip.tlv
-
-/**
- * Represents a single TLV element.
- *
- * @property tag the tag of the element and its associated data
- * @property value the value of the element
- */
-data class Element(val tag: Tag, val value: Value)
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
+#include <net/if.h>
+namespace chip {
+namespace Inet {
+struct if_nameindex * if_nameindexImpl()
+{
+    return if_nameindex();
+}
+void if_freenameindexImpl(struct if_nameindex * inArray)
+{
+    if_freenameindex(inArray);
+}
+} // namespace Inet
+} // namespace chip
+#endif

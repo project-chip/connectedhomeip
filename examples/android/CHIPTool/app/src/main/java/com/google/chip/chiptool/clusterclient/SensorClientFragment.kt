@@ -17,8 +17,6 @@ import chip.devicecontroller.ReportCallback
 import chip.devicecontroller.model.ChipAttributePath
 import chip.devicecontroller.model.ChipEventPath
 import chip.devicecontroller.model.NodeState
-import chip.tlv.AnonymousTag
-import chip.tlv.TlvReader
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.databinding.SensorClientFragmentBinding
@@ -32,6 +30,8 @@ import java.util.Calendar
 import java.util.Date
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import matter.tlv.AnonymousTag
+import matter.tlv.TlvReader
 
 class SensorClientFragment : Fragment() {
   private val deviceController: ChipDeviceController

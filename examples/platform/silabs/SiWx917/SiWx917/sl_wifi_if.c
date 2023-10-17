@@ -35,6 +35,10 @@
 #include "task.h"
 #include "wfx_host_events.h"
 
+#if (EXP_BOARD)
+#include "rsi_bt_common_apis.h"
+#endif
+
 #include "ble_config.h"
 
 #include "dhcp_client.h"

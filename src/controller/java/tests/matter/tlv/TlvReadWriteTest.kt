@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-package chip.tlv
+package matter.tlv
 
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.assertFailsWith
