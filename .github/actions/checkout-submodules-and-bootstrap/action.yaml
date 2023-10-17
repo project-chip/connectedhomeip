@@ -34,10 +34,8 @@ runs:
       # this point onwards.
       shell: bash
       run: |
-        if [ -d $HOME/.cipd-cache-dir/ ]; then
-          du -sh $HOME/.cipd-cache-dir/
-          rm -rf $HOME/.cipd-cache-dir/
-        fi
+        du -sh $HOME/.cipd-cache-dir/ || true
+        rm -rf $HOME/.cipd-cache-dir/ || echo "Removing cipd cache dir failed"
     - name: Dump disk info after checkout submodule & Bootstrap
       shell: bash
       run: scripts/dump_diskspace_info.sh
