@@ -44,7 +44,7 @@ def NormalizeName(name: str) -> str:
     for separator in " /-":
         name = name.replace(separator, '_')
     while '__' in name:
-       name = name.replace('__', '_')
+        name = name.replace('__', '_')
 
     # TODO: should we handle acronyms in some way?
 
@@ -55,6 +55,5 @@ def NormalizeName(name: str) -> str:
     while '_' in name:
         idx = name.find('_')
         name = name[:idx] + name[idx+1].upper() + name[idx+2:]
-
 
     return name

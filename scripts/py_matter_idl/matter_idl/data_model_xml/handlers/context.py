@@ -83,7 +83,6 @@ class Context:
         self._not_handled: set[str] = set()
         self._idl_post_processors: list[IdlPostProcessor] = []
 
-
     def GetCurrentLocationMeta(self) -> Optional[ParseMetaData]:
         if not self.locator:
             return None

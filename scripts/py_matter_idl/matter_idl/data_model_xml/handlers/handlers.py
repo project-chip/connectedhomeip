@@ -21,9 +21,10 @@ from matter_idl.matter_idl_types import (Attribute, Bitmap, Cluster, ClusterSide
 
 from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
-from .parsing import ParseInt, NormalizeName
+from .parsing import NormalizeName, ParseInt
 
 LOGGER = logging.getLogger('data-model-xml-parser')
+
 
 class FeaturesHandler(BaseHandler):
 
@@ -40,12 +41,12 @@ class FeaturesHandler(BaseHandler):
         if name in {"section", "optionalConform"}:
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "feature":
-            assert("bit" in attrs)
-            assert("name" in attrs)
+            assert ("bit" in attrs)
+            assert ("name" in attrs)
 
             self._bitmap.entries.append(ConstantEntry(
-                name = "k" + NormalizeName(attrs["name"]),
-                code = 1 << ParseInt(attrs["bit"])
+                name="k" + NormalizeName(attrs["name"]),
+                code=1 << ParseInt(attrs["bit"])
             ))
 
             # assume everything handled. Sub-item is only section
@@ -53,13 +54,15 @@ class FeaturesHandler(BaseHandler):
         else:
             return BaseHandler(self.context)
 
+
 class BitmapHandler(BaseHandler):
     def __init__(self, context: Context, cluster: Cluster, attrs):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._cluster = cluster
 
         # TODO: base type is GUESSED here because xml does not contain it
-        self._bitmap = Bitmap(name=NormalizeName(attrs["name"]), base_type="bitmap32", entries=[])
+        self._bitmap = Bitmap(name=NormalizeName(
+            attrs["name"]), base_type="bitmap32", entries=[])
 
     def EndProcessing(self):
         if self._bitmap.entries:
@@ -70,15 +73,17 @@ class BitmapHandler(BaseHandler):
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "bitfield":
-            assert("name" in attrs)
-            assert("bit" in attrs)
+            assert ("name" in attrs)
+            assert ("bit" in attrs)
             self._bitmap.entries.append(
-                ConstantEntry(name="k" + NormalizeName(attrs["name"]), code=1 << ParseInt(attrs["bit"]))
+                ConstantEntry(
+                    name="k" + NormalizeName(attrs["name"]), code=1 << ParseInt(attrs["bit"]))
             )
             # Assume fully handled. We do not parse "mandatoryConform and such"
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
             return BaseHandler(self.context)
+
 
 class EnumHandler(BaseHandler):
     def __init__(self, context: Context, cluster: Cluster, attrs):
@@ -86,7 +91,8 @@ class EnumHandler(BaseHandler):
         self._cluster = cluster
 
         # TODO: base type is GUESSED here because xml does not contain it
-        self._enum = Enum(name=NormalizeName(attrs["name"]), base_type="enum32", entries=[])
+        self._enum = Enum(name=NormalizeName(
+            attrs["name"]), base_type="enum32", entries=[])
 
     def EndProcessing(self):
         if self._enum.entries:
@@ -97,15 +103,17 @@ class EnumHandler(BaseHandler):
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "item":
-            assert("name" in attrs)
-            assert("value" in attrs)
+            assert ("name" in attrs)
+            assert ("value" in attrs)
             self._enum.entries.append(
-                ConstantEntry(name="k" + NormalizeName(attrs["name"]), code=ParseInt(attrs["value"]))
+                ConstantEntry(
+                    name="k" + NormalizeName(attrs["name"]), code=ParseInt(attrs["value"]))
             )
             # Assume fully handled
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
             return BaseHandler(self.context)
+
 
 class DataTypesHandler(BaseHandler):
     def __init__(self, context: Context, cluster: Cluster):
@@ -139,8 +147,8 @@ class ClusterHandler(BaseHandler):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._idl = idl
 
-        assert("name" in attrs)
-        assert("id" in attrs)
+        assert ("name" in attrs)
+        assert ("id" in attrs)
 
         self._cluster = Cluster(
             side=ClusterSide.CLIENT,
@@ -160,7 +168,8 @@ class ClusterHandler(BaseHandler):
             ('int16u', 65533, 'clusterRevision', False),
         ]
         for data_type, code, name, is_list in to_add:
-            self._cluster.attributes.append(Attribute(definition=Field(data_type=DataType(name=data_type), code=code, name=name, is_list=is_list)))
+            self._cluster.attributes.append(Attribute(definition=Field(
+                data_type=DataType(name=data_type), code=code, name=name, is_list=is_list)))
 
     def EndProcessing(self):
         self._idl.clusters.append(self._cluster)
@@ -185,7 +194,7 @@ class ClusterHandler(BaseHandler):
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "classification":
             # Not an obvious u
-            # derived could have meaning 
+            # derived could have meaning
             #
             # TODO IFF hierarchy == derived, we should use baseCluster
             #

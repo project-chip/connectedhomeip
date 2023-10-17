@@ -18,8 +18,8 @@ import xml.sax.handler
 from dataclasses import dataclass
 from typing import List, Optional, Union
 
-from matter_idl.matter_idl_types import Idl
 from matter_idl.data_model_xml.handlers import Context, DataModelXmlHandler
+from matter_idl.matter_idl_types import Idl
 
 
 class ParseHandler(xml.sax.handler.ContentHandler):
@@ -59,7 +59,8 @@ class ParseHandler(xml.sax.handler.ContentHandler):
     def startDocument(self):
         if self._include_meta_data and self._locator:
             self._context.locator = self._locator
-        self._processing_stack = [DataModelXmlHandler(self._context, self._idl)]
+        self._processing_stack = [
+            DataModelXmlHandler(self._context, self._idl)]
 
     def endDocument(self):
         if len(self._processing_stack) != 1:
