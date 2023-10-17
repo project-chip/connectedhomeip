@@ -21,7 +21,7 @@ from matter_idl.matter_idl_types import (Attribute, Bitmap, Cluster, ClusterSide
 
 from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
-from .parsing import AttributesToBitFieldConstantEntry, AttributesToEvent, AttributesToField, NormalizeName, ParseInt
+from .parsing import AttributesToBitFieldConstantEntry, AttributesToEvent, AttributesToField, NormalizeName, ParseInt, StringToAccessPrivilege
 
 LOGGER = logging.getLogger('data-model-xml-parser')
 
@@ -140,8 +140,9 @@ class EventHandler(BaseHandler):
             # assume handled (we do not record conformance in IDL)
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "access":
-            # TODO: access handling here ...
-            return BaseHandler(self.context)
+            if "readPrivilege" in attrs:
+                self._event.readacl = StringToAccessPrivilege(attrs["readPrivilege"])
+            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         else:
             return BaseHandler(self.context)
 

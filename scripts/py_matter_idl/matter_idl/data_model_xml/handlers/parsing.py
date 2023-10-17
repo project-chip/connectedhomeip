@@ -107,3 +107,16 @@ def AttributesToEvent(attrs) -> Event:
         code=ParseInt(attrs["id"]),
         priority=priority,
         fields=[])
+
+
+def StringToAccessPrivilege(value: str) -> AccessPrivilege:
+    if value == "view":
+        return AccessPrivilege.VIEW
+    elif value == "operate":
+        return AccessPrivilege.OPERATE
+    elif value == "manage":
+        return AccessPrivilege.MANAGE
+    elif value == "admin":
+        return AccessPrivilege.ADMINISTER
+    else:
+        raise Exception("UNKNOWN privilege level: %r" % value)
