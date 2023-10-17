@@ -24,13 +24,16 @@ changelog:
         - bug
     - title: Bluetooth Related Changes
       labels:
-        - bluetooth
+        - ble
     - title: Spec Alignment Changes
       labels:
         - spec
     - title: INet Layer Changes
       labels:
         - inet
+    - title: Crypto Changes
+      labels:
+        - crypto
     - title: Core Library Changes
       labels:
         - lib
@@ -43,11 +46,24 @@ changelog:
     - title: System Level Changes
       labels:
         - system
+    - title: App Level Changes
+      labels:
+        - app
     - title: Platform Changes
       labels:
         - platform
         - darwin
         - android
+    - title: Example App Changes
+      labels:
+        - examples
+    - title: Test Changes
+      labels:
+        - tests
+    - title: Build Related Changes
+      labels:
+        - gn
+        - build
     - title: Other Changes
       labels:
         - "*"
