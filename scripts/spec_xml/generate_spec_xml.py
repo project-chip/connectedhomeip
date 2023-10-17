@@ -55,11 +55,16 @@ def main(scraper, spec_root, output_dir, dry_run):
     clusters_output_dir = os.path.abspath(os.path.join(output_dir, 'clusters'))
     dm_clusters_list = ['ACL-Cluster.adoc', 'Binding-Cluster.adoc', 'bridge-clusters.adoc',
                         'Descriptor-Cluster.adoc', 'Group-Key-Management-Cluster.adoc', 'Label-Cluster.adoc']
+    sdm_exclude_list = ['AdminAssistedCommissioningFlows.adoc', 'BulkDataExchange.adoc', 'CommissioningFlows.adoc',
+                        'DeviceCommissioningFlows.adoc', 'DistributedComplianceLedger.adoc', 'OTAFileFormat.adoc']
+    app_exclude_list = ['appliances.adoc', 'closures.adoc', 'general.adoc',
+                        'hvac.adoc', 'lighting.adoc', 'meas_and_sense.adoc', 'robots.adoc']
+    media_exclude_list = ['media.adoc', 'VideoPlayerArchitecture.adoc']
 
     if not os.path.exists(clusters_output_dir):
         os.makedirs(clusters_output_dir)
 
-    def scrape_cluster(filename):
+    def scrape_cluster(filename: str) -> None:
         xml = os.path.basename(filename).replace('.adoc', '.xml')
         xml_path = os.path.abspath(os.path.join(clusters_output_dir, xml))
         cmd = [scraper, 'cluster', filename, xml_path, '-nd']
@@ -68,12 +73,15 @@ def main(scraper, spec_root, output_dir, dry_run):
         else:
             subprocess.run(cmd)
 
-    for filename in glob.glob(f'{sdm_clusters_dir}/*.adoc'):
-        scrape_cluster(filename)
-    for filename in glob.glob(f'{app_clusters_dir}/*.adoc'):
-        scrape_cluster(filename)
-    for filename in glob.glob(f'{media_clusters_dir}/*.adoc'):
-        scrape_cluster(filename)
+    def scrape_all_clusters(dir: str, exclude_list: list[str] = []) -> None:
+        for filename in glob.glob(f'{dir}/*.adoc'):
+            if os.path.basename(filename) in exclude_list:
+                continue
+            scrape_cluster(filename)
+
+    scrape_all_clusters(sdm_clusters_dir, sdm_exclude_list)
+    scrape_all_clusters(app_clusters_dir, app_exclude_list)
+    scrape_all_clusters(media_clusters_dir, media_exclude_list)
     for f in dm_clusters_list:
         filename = f'{dm_clusters_dir}/{f}'
         scrape_cluster(filename)
