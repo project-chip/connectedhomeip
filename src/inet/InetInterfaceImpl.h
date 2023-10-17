@@ -24,7 +24,9 @@
 
 namespace chip {
 namespace Inet {
-// Define if_nameindex to be implemented in the platform layer
+// Some platforms have broken if_nameindex and if_freenameindex implementations.
+// Allow platforms to either wrap a non-broken platform implementation or have a custom
+// implementation.
 struct if_nameindex * if_nameindexImpl();
 void if_freenameindexImpl(struct if_nameindex * inArray);
 } // namespace Inet
