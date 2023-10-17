@@ -153,8 +153,8 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9528a-lock-dfu' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9528a lock-app \
-                    out/telink-tlsr9528a-lock/zephyr/zephyr.elf \
+                    telink tlsr9528a lock-app-dfu \
+                    out/telink-tlsr9528a-lock-dfu/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output
