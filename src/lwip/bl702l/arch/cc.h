@@ -28,11 +28,7 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
-#if CHIP_CONFIG_MEMORY_MGMT_MALLOC
-#include <malloc.h>
-#endif
-
-#if __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -83,7 +79,7 @@ extern uint8_t __attribute__((section(".bss.lwip_IGMP_GROUP"))) memp_memory_IGMP
 extern uint8_t __attribute__((section(".bss.lwip_TCP_PCB"))) memp_memory_TCP_PCB_base[];
 extern uint8_t __attribute__((section(".bss.lwip_SYS_TIMEOUT"))) memp_memory_SYS_TIMEOUT_base[];
 
-#if __cplusplus
+#ifdef __cplusplus
 }
 #endif
 

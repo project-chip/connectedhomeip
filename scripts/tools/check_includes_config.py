@@ -162,5 +162,6 @@ ALLOW: Dict[str, Set[str]] = {
     # Not intended for embedded clients
     'src/lib/support/jsontlv/JsonToTlv.cpp': {'sstream'},
     'src/lib/support/jsontlv/JsonToTlv.h': {'string'},
-    'src/lib/support/jsontlv/TlvToJson.h': {'string'}
+    'src/lib/support/jsontlv/TlvToJson.h': {'string'},
+    'src/lib/support/jsontlv/TextFormat.h': {'string'}
 }

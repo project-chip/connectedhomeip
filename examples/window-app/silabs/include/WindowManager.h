@@ -160,7 +160,6 @@ private:
 
     LEDWidget mStatusLED;
     LEDWidget mActionLED;
-
 #ifdef DISPLAY_ENABLED
     Timer mIconTimer;
     LcdIcon mIcon = LcdIcon::None;

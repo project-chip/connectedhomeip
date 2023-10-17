@@ -19,6 +19,7 @@
 
 #include <cstdint>
 #include <jni.h>
+#include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/Span.h>
 #include <string>
@@ -203,22 +204,43 @@ private:
     bool mlocalFramePushed = false;
 };
 
-class JniObject
+class JniGlobalReference
 {
 public:
-    JniObject(JNIEnv * aEnv, jobject aObjectRef) : mEnv(aEnv), mObjectRef(aObjectRef) {}
-    ~JniObject()
+    JniGlobalReference() {}
+
+    CHIP_ERROR Init(jobject aObjectRef)
     {
-        if (mEnv != nullptr && mObjectRef != nullptr)
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
+        VerifyOrReturnError(aObjectRef != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
+        VerifyOrReturnError(mObjectRef == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        mObjectRef = env->NewGlobalRef(aObjectRef);
+        VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
+        VerifyOrReturnError(mObjectRef != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
+        return CHIP_NO_ERROR;
+    }
+
+    JniGlobalReference(JniGlobalReference && aOther)
+    {
+        mObjectRef        = aOther.mObjectRef;
+        aOther.mObjectRef = nullptr;
+    }
+
+    ~JniGlobalReference()
+    {
+        JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+        if (env != nullptr && mObjectRef != nullptr)
         {
-            mEnv->DeleteGlobalRef(mObjectRef);
+            env->DeleteGlobalRef(mObjectRef);
         }
     }
 
-    jobject objectRef() { return mObjectRef; }
+    jobject ObjectRef() { return mObjectRef; }
+
+    bool HasValidObjectRef() { return mObjectRef != nullptr; }
 
 private:
-    JNIEnv * mEnv      = nullptr;
     jobject mObjectRef = nullptr;
 };
 

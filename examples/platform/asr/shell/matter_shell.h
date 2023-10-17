@@ -43,7 +43,7 @@ void asr_matter_reset(Reset_t type);
 void asr_matter_onoff(int value);
 void asr_matter_sensors(bool enable, int temp, int humi, int pressure);
 void asr_matter_ota(uint32_t timeout);
-#if CONFIG_ENABLE_CHIP_SHELL
+#ifdef CONFIG_ENABLE_CHIP_SHELL
 void RegisterLightCommands();
 #endif
 #ifdef __cplusplus

@@ -22,12 +22,14 @@ static_library("jsontlv") {
   sources = [
     "ElementTypes.h",
     "JsonToTlv.cpp",
+    "TextFormat.cpp",
     "TlvJson.cpp",
     "TlvToJson.cpp",
   ]
 
   public = [
     "JsonToTlv.h",
+    "TextFormat.h",
     "TlvJson.h",
     "TlvToJson.h",
   ]
