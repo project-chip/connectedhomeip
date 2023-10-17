@@ -14,11 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import click
 import glob
 import os
 import subprocess
 import sys
+
+import click
 
 DEFAULT_CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 DEFAULT_OUTPUT_DIR = os.path.abspath(os.path.join(DEFAULT_CHIP_ROOT, 'data_model'))
