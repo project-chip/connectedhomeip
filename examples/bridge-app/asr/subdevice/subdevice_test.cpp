@@ -42,7 +42,7 @@ using namespace ::chip::System;
 using namespace ::chip::Platform;
 using namespace ::chip::app::Clusters;
 
-#if ENABLE_ASR_BRIDGE_SUBDEVICE_TEST
+#ifdef ENABLE_ASR_BRIDGE_SUBDEVICE_TEST
 
 static const int kNodeLabelSize = 32;
 // Current ZCL implementation of Struct uses a max-size array of 254 bytes

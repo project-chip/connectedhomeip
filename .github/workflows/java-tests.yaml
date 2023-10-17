@@ -75,10 +75,10 @@ jobs:
                  $JAVA_PATH/bin/java \
                    -cp 'third_party/java_deps/artifacts/*:out/linux-x64-tests/lib/src/controller/java/*' \
                    org.junit.runner.JUnitCore       \
-                   chip.tlv.TlvWriterTest           \
-                   chip.tlv.TlvReadWriteTest        \
-                   chip.tlv.TlvReaderTest           \
-                   chip.jsontlv.JsonToTlvToJsonTest \
+                   matter.tlv.TlvWriterTest           \
+                   matter.tlv.TlvReadWriteTest        \
+                   matter.tlv.TlvReaderTest           \
+                   matter.jsontlv.JsonToTlvToJsonTest \
                    matter.onboardingpayload.ManualCodeTest \
                    matter.onboardingpayload.QRCodeTest
             - name: Build Java Matter Controller and all clusters app
