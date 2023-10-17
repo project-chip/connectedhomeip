@@ -39,8 +39,9 @@ runs:
       # there is roughly 1.4GB that remains in this cache that is useless from
       # this point onwards.
       shell: bash
+      continue-on-error: true
       run: |
-        du -sh $HOME/asdf/ || true
+        du -sh $HOME/asdf/
         rm -rf $HOME/asdf/ || echo "Removing cipd cache dir failed"
     - name: Dump disk info after checkout submodule & Bootstrap
       shell: bash
