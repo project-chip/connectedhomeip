@@ -58,7 +58,6 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     VerifyOrDie(ICDNotifier::GetInstance().Subscribe(this) == CHIP_NO_ERROR);
     mSymmetricKeystore = symmetricKeystore;
 
-
     ICDManagementServer::GetInstance().SetSymmetricKeystore(mSymmetricKeystore);
 
     // Removing the check for now since it is possible for the Fast polling
