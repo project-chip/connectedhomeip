@@ -19,21 +19,6 @@ changelog:
     - title: Security Fixes
       labels:
         - security
-    - title: Core Changes
-      labels:
-        - core
-    - title: Controller Changes
-      labels:
-        - controller
-    - title: INet Layer Changes
-      labels:
-        - inet
-    - title: Core Library Changes
-      labels:
-        - inet
-    - title: System Level Changes
-      labels:
-        - system
     - title: Bug Fixes
       labels:
         - bug
@@ -43,6 +28,21 @@ changelog:
     - title: Spec Alignment Changes
       labels:
         - spec
+    - title: INet Layer Changes
+      labels:
+        - inet
+    - title: Core Library Changes
+      labels:
+        - lib
+    - title: Core Changes
+      labels:
+        - core
+    - title: Controller Changes
+      labels:
+        - controller
+    - title: System Level Changes
+      labels:
+        - system
     - title: Platform Changes
       labels:
         - platform
