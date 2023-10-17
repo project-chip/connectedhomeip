@@ -25,9 +25,6 @@ config:
     G1:
         type: group_id
         defaultValue: 0x0101
-    one:
-      type: int8u
-      defaultValue: 1
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -53,14 +50,14 @@ tests:
       arguments:
           values:
               - name: "arg1"
-                value: maxScenes - one
+                value: maxScenes - 1
               - name: "arg2"
                 value: 0
       response:
           values:
               - name: "returnValue"
                 saveAs: maxScenesMinusOne
-                value: maxScenes - one
+                value: maxScenes - 1
 
     - label: "Arithmetic operation to get the fabric Capacity"
       cluster: "Unit Testing"
