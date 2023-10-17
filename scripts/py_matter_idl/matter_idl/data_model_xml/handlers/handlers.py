@@ -53,6 +53,33 @@ class FeaturesHandler(BaseHandler):
         else:
             return BaseHandler(self.context)
 
+class BitmapHandler(BaseHandler):
+    def __init__(self, context: Context, cluster: Cluster, attrs):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._cluster = cluster
+
+        # TODO: base type is GUESSED here because xml does not contain it
+        self._bitmap = Bitmap(name=NormalizeName(attrs["name"]), base_type="bitmap32", entries=[])
+
+    def EndProcessing(self):
+        if self._bitmap.entries:
+            self._cluster.bitmaps.append(self._bitmap)
+
+    def GetNextProcessor(self, name: str, attrs):
+        if name == "section":
+            # Documentation data, skipped
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "bitfield":
+            assert("name" in attrs)
+            assert("bit" in attrs)
+            self._bitmap.entries.append(
+                ConstantEntry(name="k" + NormalizeName(attrs["name"]), code=1 << ParseInt(attrs["bit"]))
+            )
+            # Assume fully handled. We do not parse "mandatoryConform and such"
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        else:
+            return BaseHandler(self.context)
+
 class EnumHandler(BaseHandler):
     def __init__(self, context: Context, cluster: Cluster, attrs):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
@@ -70,10 +97,12 @@ class EnumHandler(BaseHandler):
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "item":
-            # Assume fuly handled
+            assert("name" in attrs)
+            assert("value" in attrs)
             self._enum.entries.append(
                 ConstantEntry(name="k" + NormalizeName(attrs["name"]), code=ParseInt(attrs["value"]))
             )
+            # Assume fully handled
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
             return BaseHandler(self.context)
@@ -95,8 +124,7 @@ class DataTypesHandler(BaseHandler):
         elif name == "enum":
             return EnumHandler(self.context, self._cluster, attrs)
         elif name == "bitmap":
-            # FIXME
-            return BaseHandler(self.context)
+            return BitmapHandler(self.context, self._cluster, attrs)
         elif name == "struct":
             # FIXME
             return BaseHandler(self.context)
