@@ -55,7 +55,7 @@ limitations under the License.
 
     <command source="client" code="0x00" name="SupressRequest" optional="true">
       <description>This command is used to suppress the specified alarm.</description>
-      <arg name="AlarmToSuppress" type="AlarmModeBitmap"/>
+      <arg name="AlarmsToSuppress" type="AlarmModeBitmap"/>
     </command>
 
     <event side="server" code="0x00" priority="info" name="AlarmsStateChanged" optional="true">
