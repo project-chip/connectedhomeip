@@ -4,6 +4,8 @@ changelog:
   exclude:
     labels:
       - scripts
+      - external dependency
+      - submodules
     authors:
       - restyled-io
       - octocat
