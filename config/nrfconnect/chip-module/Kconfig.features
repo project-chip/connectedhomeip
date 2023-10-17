@@ -230,4 +230,41 @@ config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
 	  a random jitter interval is added to it to avoid periodicity. The random jitter is selected
 	  within range [-JITTER; +JITTER].
 
+choice CHIP_LAST_FABRIC_REMOVED_ACTION
+	prompt "An action to perform after removing the last fabric"
+	default CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
+
+	config CHIP_LAST_FABRIC_REMOVED_NONE
+	bool "After removing the last fabric do not perform any action"
+	help
+	  After removing the last fabric the device will not perform factory reset
+	  or reboot. The current state will be left as it is and the BLE advertising
+	  will not start automatically.
+
+	config CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
+	bool "After removing the last fabric erase NVS and reboot"
+	help
+	  After removing the last fabric the device will perform the factory reset and
+	  then reboot. The current RAM state will be removed and the new commissioning to
+	  the new fabric will use the initial fabric index. This option is the most safe.
+
+	config CHIP_LAST_FABRIC_REMOVED_ERASE_AND_PAIRING_START
+	bool "After removing the last fabric erase NVS and start Bluetooth LE advertising"
+	help
+	  After removing the last fabric the device will perform the factory reset without 
+	  rebooting and start the Bluetooth LE advertisement automatically.
+	  The current RAM state will be saved and the new commissioning to the next 
+	  fabric will use the next possible fabric index. This option should not be used for
+	  devices that normally do not advertise Bluetooth LE on boot to keep their original 
+	  behavior.
+
+	config CHIP_LAST_FABRIC_REMOVED_ERASE_ONLY
+	bool "After removing the last fabric erase NVS only"
+	help
+	  After removing the last fabric the device will perform the factory reset only without
+	  rebooting. The current RAM state will be saved and the new commissioning to the next 
+	  fabric will use the next possible fabric index.
+
+endchoice
+
 endif # CHIP

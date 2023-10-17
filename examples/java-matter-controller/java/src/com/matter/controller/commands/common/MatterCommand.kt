@@ -20,7 +20,6 @@ package com.matter.controller.commands.common
 import chip.devicecontroller.ChipDeviceController
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
-import java.util.logging.Logger
 
 abstract class MatterCommand(
   private val chipDeviceController: ChipDeviceController,
@@ -104,15 +103,11 @@ abstract class MatterCommand(
   }
 
   fun waitCompleteMs(timeoutMs: Long) {
-    futureResult.setTimeoutMs(timeoutMs)
+    futureResult.timeoutMs = timeoutMs
     futureResult.waitResult()
   }
 
   fun clear() {
     futureResult.clear()
-  }
-
-  companion object {
-    private val logger = Logger.getLogger(MatterCommand::class.java.name)
   }
 }

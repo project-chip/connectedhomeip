@@ -71,6 +71,7 @@ class AndroidApp(Enum):
     TV_SERVER = auto()
     TV_CASTING_APP = auto()
     JAVA_MATTER_CONTROLLER = auto()
+    KOTLIN_MATTER_CONTROLLER = auto()
     VIRTUAL_DEVICE_APP = auto()
 
     def AppName(self):
@@ -353,7 +354,7 @@ class AndroidBuilder(Builder):
 
             args_str = ""
             for key, value in gn_args.items():
-                if type(value) == bool:
+                if type(value) is bool:
                     if value:
                         args_str += "%s=true " % (key)
                     else:

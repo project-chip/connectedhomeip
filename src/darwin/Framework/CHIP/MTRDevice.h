@@ -91,10 +91,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
  *
  * @return a data-value dictionary of the attribute as described in MTRDeviceResponseHandler
  */
-- (NSDictionary<NSString *, id> *)readAttributeWithEndpointID:(NSNumber *)endpointID
-                                                    clusterID:(NSNumber *)clusterID
-                                                  attributeID:(NSNumber *)attributeID
-                                                       params:(MTRReadParams * _Nullable)params;
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeWithEndpointID:(NSNumber *)endpointID
+                                                              clusterID:(NSNumber *)clusterID
+                                                            attributeID:(NSNumber *)attributeID
+                                                                 params:(MTRReadParams * _Nullable)params;
 
 /**
  * Write to attribute in a designated attribute path

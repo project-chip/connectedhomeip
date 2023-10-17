@@ -42,6 +42,18 @@
 
 @property uint16_t deviceType;
 
+@property NSString * hostName;
+
+@property NSString * instanceName;
+
+@property uint16_t port;
+
+@property NSString * MACAddress;
+
+@property uint64_t lastDiscoveredMs;
+
+@property bool isAsleep;
+
 /**
  @brief true, if all the required fields are initialized, false otherwise
  */
@@ -54,7 +66,12 @@
                     deviceName:(NSString *)deviceName
                       vendorId:(uint16_t)vendorId
                      productId:(uint16_t)productId
-                    deviceType:(uint16_t)deviceType;
+                    deviceType:(uint16_t)deviceType
+                      hostName:(NSString *)hostName
+                  instanceName:(NSString *)instanceName
+                          port:(uint16_t)port
+                    MACAddress:(NSString *)MACAddress
+              lastDiscoveredMs:(uint64_t)lastDiscoveredMs;
 
 @end
 

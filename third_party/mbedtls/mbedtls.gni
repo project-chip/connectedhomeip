@@ -29,6 +29,8 @@ template("mbedtls_target") {
       "-Wno-unused-but-set-parameter",
       "-Wno-format-nonliteral",  # Because of mbedtls_debug_print_msg
       "-Wno-conversion",  # Lots of -Wconversion warnings, sadly.
+      "-Wno-undef",  # At least MBEDTLS_AESNI_HAVE_CODE is used without being
+                     # defined.
     ]
 
     if (is_clang) {

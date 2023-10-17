@@ -41,7 +41,8 @@ function usage() { # status
     info "Usage: $0 [OPTIONS] [--project=... [PROJECT OPTIONS]]"
     info "Options:"
     info "  --build-env-dir=DIR   Directory to create (host) build environment in"
-    info "  --project=DIR         Sub-directory to build, eg examples/lighting-app/linux"
+    info "  --project=DIR         directory to build, absolute or relative to chip root,"
+    info "                        eg examples/lighting-app/linux or /my/dir/my/app"
     info ""
     info "Project options (mapped to GN build args):"
     info "  --enable-<ARG>[=no]   Enables (or disables with '=no') a bool build arg"
@@ -68,6 +69,7 @@ function main() { # ...
     # Parse global options, process VAR=VALUE style arguments, and collect project options
     BUILD_ENV_DIR=
     PROJECT=
+    PROJECT_PATH=
     PROJECT_ARGS=()
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -87,10 +89,8 @@ function main() { # ...
     [[ -n "$PROJECT" || -n "$BUILD_ENV_DIR" ]] || usage 1
 
     if [[ -n "$PROJECT" ]]; then
-        local subdir="$(cd "${CHIP_ROOT}/${PROJECT}" 2>/dev/null && pwd)"
-        [[ -n "$subdir" && -r "${subdir}/.gn" ]] || fail "Invalid project '${PROJECT}'"
-        PROJECT="${subdir#${CHIP_ROOT}/}"
-        [[ "$subdir" == "${CHIP_ROOT}/${PROJECT}" ]] || fail "Unable to determine project path"
+        PROJECT_PATH="$(cd "${CHIP_ROOT}" 2>/dev/null && cd "${PROJECT}" 2>/dev/null && pwd)"
+        [[ -n "$PROJECT_PATH" && -r "${PROJECT_PATH}/.gn" ]] || fail "Invalid project '${PROJECT}' - missing .gn at '${PROJECT_PATH}'"
     fi
 
     check_binary gn GN
@@ -177,13 +177,13 @@ function gn_generate() { # [project options]
     ensure_no_clobber "${BUILD_DIR}/args.gn"
 
     # Pass --script-executable to all `gn` calls so scripts run in our venv
-    local gn=(gn --script-executable="${BUILD_ENV_DIR}/bin/python" --root="${CHIP_ROOT}/${PROJECT}")
+    local gn=(gn --script-executable="${BUILD_ENV_DIR}/bin/python" --root="${PROJECT_PATH}")
 
     # Run gn gen with an empty args.gn first so we can list all arguments
     info "Configuring gn build arguments (see $BUILD_DIR/args.configured for full list)"
     {
         echo "# ${CONFIGURE_MARKER}"
-        echo "# project root: ${PROJECT}"
+        echo "# project root: ${PROJECT_PATH}"
     } >"${BUILD_DIR}/args.gn"
     "${gn[@]}" -q gen "$BUILD_DIR"
 

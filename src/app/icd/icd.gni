@@ -20,4 +20,8 @@ declare_args() {
   # Matter SDK Configuration flag to enable ICD client functionality
   # TODO - Add Specifics when the design is refined
   chip_enable_icd_client = false
+
+  # Matter SDK Configuration flag to make the ICD manager emit a report on entering active mode
+  chip_report_on_active_mode = false
+  icd_max_notification_subscribers = 1
 }

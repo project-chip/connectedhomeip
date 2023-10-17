@@ -298,8 +298,8 @@ connstring
 conntype
 const
 ContentApp
-ContentApp's
 ContentAppPlatform
+ContentApp's
 ContentLaunch
 ContentLauncher
 continuousHinting
@@ -477,6 +477,7 @@ edaf
 edc
 EDR
 ee
+eea
 EEE
 eef
 ef
@@ -659,6 +660,8 @@ ICMP
 IDF
 IDL
 IDLs
+idt
+IDT
 idx
 ifconfig
 ifdef
@@ -789,6 +792,8 @@ LightingApp
 LightingColor
 LightingState
 LinkSoftwareAndDocumentationPack
+lladdr
+LLADDR
 LocalConfigDisabled
 localedef
 localhost
@@ -926,6 +931,7 @@ nl
 NLUnitTest
 NLUnitTests
 nmcli
+nmtui
 noc
 NodeId
 nongnu
@@ -1021,11 +1027,14 @@ params
 PartNumber
 PASE
 Passcode
+passRetained
+passwd
 PBKDF
 pbuf
 pbufs
 pbxproj
 PCA
+pcap
 pcaps
 PDFs
 PDK
@@ -1051,6 +1060,7 @@ PlatformManager
 PlatformManagerImpl
 plt
 png
+Podman
 PollControl
 pollInterval
 polymorphism
@@ -1147,8 +1157,8 @@ REPL
 repo
 req
 Requestor
-Requestor's
 RequestorCanConsent
+Requestor's
 Requestors
 responder
 RestrictedEvent
@@ -1167,6 +1177,7 @@ rootfs
 RPC
 RPCs
 RPi
+RPi's
 RPis
 RSA
 rsn
@@ -1202,8 +1213,8 @@ SDB
 SDC
 SDHC
 SDK
-SDK's
 sdkconfig
+SDK's
 SDKs
 SDKTARGETSYSROOT
 sdl

@@ -22,6 +22,8 @@
 
 #include <platform/NetworkCommissioning.h>
 
+#include "CHIPDevicePlatformConfig.h"
+
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
