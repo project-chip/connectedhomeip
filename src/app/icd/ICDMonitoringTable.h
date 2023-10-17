@@ -63,14 +63,15 @@ struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
      * @brief Set the Key object
      *        This method will create a new keyHandle. The key handle might contain either
      *        the raw key or a keyID depending on which Crypto implementation is used.
-     *        In any case, to prevent key leakage, one should either call the DeleteKey method
+     *        To avoid leaking keys, API consumers must either call the DeleteKey method
      *        or save the entry within the ICDMonitoring Table before this object goes out of scope.
      *
-     *        In some implementation Calling SetKey() twice on the same ICDMonitoringEntry will result
-     *        in the first Key being deleted from the keyStore to prevent key leakage and this even if
-     *        the entry was previously saved in the table since the key storage is decoupled from the
-     *        ICDMonitoringTableStorage. One should use a new object or manually clear the content of
-     *        the key handle prior to calling SetKey() again.
+     *       Calling SetKey() on an ICDMonitoringEntry that already has a valid key handle will lead to
+     *       the old key being deleted if the key handle is a key id, not raw data.  This can lead to keys
+     *       that were already persisted via the ICDMonitoring table getting lost.
+     *
+     *       Therefore a new entry object should be used for each key when adding entries to the ICDMonitoring
+     *       table.
      *
      * @param keyData A byte span containing the raw key
      * @return CHIP_ERROR CHIP_NO_ERROR     success
