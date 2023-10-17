@@ -18,12 +18,13 @@
 #pragma once
 
 #include "esp_ota_ops.h"
+#include "sdkconfig.h"
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <lib/core/OTAImageHeader.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
 
-#if defined(CONFIG_ENABLE_ENCRYPTED_OTA) && CONFIG_ENABLE_ENCRYPTED_OTA
+#ifdef CONFIG_ENABLE_ENCRYPTED_OTA
 #include <esp_encrypted_img.h>
 #endif // CONFIG_ENABLE_ENCRYPTED_OTA
 
@@ -42,7 +43,7 @@ public:
     bool IsFirstImageRun() override;
     CHIP_ERROR ConfirmCurrentImage() override;
 
-#if defined(CONFIG_ENABLE_ENCRYPTED_OTA) && CONFIG_ENABLE_ENCRYPTED_OTA
+#ifdef CONFIG_ENABLE_ENCRYPTED_OTA
     // @brief This API initializes the handling of encrypted OTA image
     // @param key null terminated RSA-3072 key in PEM format
     // @return CHIP_NO_ERROR on success, appropriate error code otherwise
@@ -66,7 +67,7 @@ private:
     esp_ota_handle_t mOTAUpdateHandle;
     OTAImageHeaderParser mHeaderParser;
 
-#if defined(CONFIG_ENABLE_ENCRYPTED_OTA) && CONFIG_ENABLE_ENCRYPTED_OTA
+#ifdef CONFIG_ENABLE_ENCRYPTED_OTA
     CHIP_ERROR DecryptStart();
     CHIP_ERROR DecryptEnd();
     void DecryptAbort();

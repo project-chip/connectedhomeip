@@ -30,16 +30,16 @@
 
 #include "sdkconfig.h"
 
-#if defined(CONFIG_BT_BLUEDROID_ENABLED) && CONFIG_BT_BLUEDROID_ENABLED
+#ifdef CONFIG_BT_BLUEDROID_ENABLED
 
 #include "esp_bt.h"
 #include "esp_gap_ble_api.h"
-#if defined(CONFIG_ENABLE_ESP32_BLE_CONTROLLER) && CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 #include "esp_gattc_api.h"
 #endif
 #include "esp_gatts_api.h"
 #include <lib/core/CHIPCallback.h>
-#elif defined(CONFIG_BT_NIMBLE_ENABLED) && CONFIG_BT_NIMBLE_ENABLED
+#elif defined(CONFIG_BT_NIMBLE_ENABLED)
 
 /* min max macros in NimBLE can cause build issues with generic min max
  * functions defined in CHIP.*/
@@ -60,13 +60,12 @@ struct ble_gatt_char_context
 
 #endif
 
-#if defined(CONFIG_ENABLE_ESP32_BLE_CONTROLLER) && CONFIG_ENABLE_ESP32_BLE_CONTROLLER && defined(CONFIG_BT_NIMBLE_ENABLED) &&      \
-    CONFIG_BT_NIMBLE_ENABLED
+#if defined(CONFIG_ENABLE_ESP32_BLE_CONTROLLER) && defined(CONFIG_BT_NIMBLE_ENABLED)
 #include "nimble/blecent.h"
 #endif
 
 #include "ble/Ble.h"
-#if defined(CONFIG_ENABLE_ESP32_BLE_CONTROLLER) && CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 #include <ble/BleLayer.h>
 #include <ble/BleUUID.h>
 #include <platform/ESP32/ChipDeviceScanner.h>
@@ -78,7 +77,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-#if defined(CONFIG_ENABLE_ESP32_BLE_CONTROLLER) && CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 void HandleIncomingBleConnection(Ble::BLEEndPoint * bleEP);
 
 enum class BleScanState : uint8_t
@@ -126,7 +125,7 @@ struct BLEScanConfig
 class BLEManagerImpl final : public BLEManager,
                              private Ble::BleLayer,
                              private Ble::BlePlatformDelegate,
-#if defined(CONFIG_ENABLE_ESP32_BLE_CONTROLLER) && CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
                              private Ble::BleApplicationDelegate,
                              private Ble::BleConnectionDelegate,
                              private ChipDeviceScannerDelegate
@@ -137,9 +136,9 @@ class BLEManagerImpl final : public BLEManager,
 public:
     uint8_t scanResponseBuffer[MAX_SCAN_RSP_DATA_LEN];
     BLEManagerImpl() {}
-#if defined(CONFIG_ENABLE_ESP32_BLE_CONTROLLER) && CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     CHIP_ERROR ConfigureBle(uint32_t aAdapterId, bool aIsCentral);
-#if defined(CONFIG_BT_BLUEDROID_ENABLED) && CONFIG_BT_BLUEDROID_ENABLED
+#ifdef CONFIG_BT_BLUEDROID_ENABLED
     static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_if, esp_ble_gattc_cb_param_t * param);
 #endif
 #endif
@@ -166,7 +165,7 @@ private:
     CHIP_ERROR _SetDeviceName(const char * deviceName);
     uint16_t _NumConnections(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
-#if defined(CONFIG_ENABLE_ESP32_BLE_CONTROLLER) && CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     void HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * event);
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
 #endif
@@ -193,17 +192,17 @@ private:
 
     void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) override;
     // ===== Members that implement virtual methods on BleConnectionDelegate.
-#if defined(CONFIG_ENABLE_ESP32_BLE_CONTROLLER) && CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 
     void NewConnection(chip::Ble::BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
     void NewConnection(chip::Ble::BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override{};
     CHIP_ERROR CancelConnection() override;
 
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
-#if defined(CONFIG_BT_NIMBLE_ENABLED) && CONFIG_BT_NIMBLE_ENABLED
+#ifdef CONFIG_BT_NIMBLE_ENABLED
     virtual void OnDeviceScanned(const struct ble_hs_adv_fields & fields, const ble_addr_t & addr,
                                  const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
-#elif defined(CONFIG_BT_BLUEDROID_ENABLED) && CONFIG_BT_BLUEDROID_ENABLED
+#elif defined(CONFIG_BT_BLUEDROID_ENABLED)
     virtual void OnDeviceScanned(esp_ble_addr_type_t & addr_type, esp_bd_addr_t & addr,
                                  const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
 #endif
@@ -241,10 +240,10 @@ private:
         kMaxDeviceNameLength = 16
     };
 
-#if defined(CONFIG_ENABLE_ESP32_BLE_CONTROLLER) && CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     BLEAdvConfig mBLEAdvConfig;
 #endif
-#if defined(CONFIG_BT_NIMBLE_ENABLED) && CONFIG_BT_NIMBLE_ENABLED
+#ifdef CONFIG_BT_NIMBLE_ENABLED
     uint16_t mSubscribedConIds[kMaxConnections];
 #endif
 
@@ -279,9 +278,9 @@ private:
 
     CHIPoBLEConState mCons[kMaxConnections];
     CHIPoBLEServiceMode mServiceMode;
-#if defined(CONFIG_BT_BLUEDROID_ENABLED) && CONFIG_BT_BLUEDROID_ENABLED
+#ifdef CONFIG_BT_BLUEDROID_ENABLED
     esp_gatt_if_t mAppIf;
-#elif defined(CONFIG_BT_NIMBLE_ENABLED) && CONFIG_BT_NIMBLE_ENABLED
+#elif defined(CONFIG_BT_NIMBLE_ENABLED)
     uint16_t mNumGAPCons;
 #endif
     uint16_t mServiceAttrHandle;
@@ -307,7 +306,7 @@ private:
     static void HandleFastAdvertisementTimer(System::Layer * systemLayer, void * context);
     void HandleFastAdvertisementTimer();
 
-#if defined(CONFIG_BT_BLUEDROID_ENABLED) && CONFIG_BT_BLUEDROID_ENABLED
+#ifdef CONFIG_BT_BLUEDROID_ENABLED
     void HandleGATTControlEvent(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t * param);
     void HandleGATTCommEvent(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t * param);
     void HandleRXCharWrite(esp_ble_gatts_cb_param_t * param);
@@ -318,7 +317,7 @@ private:
     void HandleDisconnect(esp_ble_gatts_cb_param_t * param);
     CHIPoBLEConState * GetConnectionState(uint16_t conId, bool allocate = false);
     bool ReleaseConnectionState(uint16_t conId);
-#if defined(CONFIG_ENABLE_ESP32_BLE_CONTROLLER) && CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     CHIP_ERROR HandleGAPConnect(esp_ble_gattc_cb_param_t p_data);
     CHIP_ERROR HandleGAPCentralConnect(esp_ble_gattc_cb_param_t p_data);
 
@@ -330,7 +329,7 @@ private:
     static void HandleGATTEvent(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t * param);
     static void HandleGAPEvent(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t * param);
 
-#elif CONFIG_BT_NIMBLE_ENABLED
+#elif defined(CONFIG_BT_NIMBLE_ENABLED)
     void HandleRXCharRead(struct ble_gatt_char_context * param);
     void HandleRXCharWrite(struct ble_gatt_char_context * param);
     void HandleTXCharWrite(struct ble_gatt_char_context * param);
@@ -362,7 +361,7 @@ private:
     void HandleC3CharRead(struct ble_gatt_char_context * param);
 #endif /* CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING */
 
-#if defined(CONFIG_ENABLE_ESP32_BLE_CONTROLLER) && CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     static int btshell_on_mtu(uint16_t conn_handle, const struct ble_gatt_error * error, uint16_t mtu, void * arg);
 
     bool SubOrUnsubChar(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
@@ -373,7 +372,7 @@ private:
     CHIP_ERROR HandleRXNotify(struct ble_gap_event * event);
 #endif
 #endif
-#if defined(CONFIG_ENABLE_ESP32_BLE_CONTROLLER) && CONFIG_ENABLE_ESP32_BLE_CONTROLLER
+#ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
     static void CancelConnect(void);
     static void HandleConnectTimeout(chip::System::Layer *, void * context);
     void InitiateScan(BleScanState scanType);

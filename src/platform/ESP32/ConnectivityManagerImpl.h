@@ -96,7 +96,7 @@ private:
     CHIP_ERROR _Init(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
 
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_ETHERNET) && CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
     CHIP_ERROR InitEthernet(void);
     void OnEthernetPlatformEvent(const ChipDeviceEvent * event);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
@@ -167,7 +167,7 @@ private:
     void OnStationIPv6AddressAvailable(const ip_event_got_ip6_t & got_ip);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_ETHERNET) && CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+#if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
     void OnEthernetIPv4AddressAvailable(const ip_event_got_ip_t & got_ip);
     void OnEthernetIPv4AddressLost(void);
     void OnEthernetIPv6AddressAvailable(const ip_event_got_ip6_t & got_ip);
