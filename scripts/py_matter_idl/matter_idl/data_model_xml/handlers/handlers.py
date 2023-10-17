@@ -53,6 +53,55 @@ class FeaturesHandler(BaseHandler):
         else:
             return BaseHandler(self.context)
 
+class EnumHandler(BaseHandler):
+    def __init__(self, context: Context, cluster: Cluster, attrs):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._cluster = cluster
+
+        # TODO: base type is GUESSED here because xml does not contain it
+        self._enum = Enum(name=NormalizeName(attrs["name"]), base_type="enum32", entries=[])
+
+    def EndProcessing(self):
+        if self._enum.entries:
+            self._cluster.enums.append(self._enum)
+
+    def GetNextProcessor(self, name: str, attrs):
+        if name == "section":
+            # Documentation data, skipped
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "item":
+            # Assume fuly handled
+            self._enum.entries.append(
+                ConstantEntry(name="k" + NormalizeName(attrs["name"]), code=ParseInt(attrs["value"]))
+            )
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        else:
+            return BaseHandler(self.context)
+
+class DataTypesHandler(BaseHandler):
+    def __init__(self, context: Context, cluster: Cluster):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._cluster = cluster
+
+    def GetNextProcessor(self, name: str, attrs):
+        if name == "section":
+            # Documentation data, skipped
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "number":
+            # Seems like a documentation of a number format
+            #
+            # TODO: actually ensure this has no meaning
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "enum":
+            return EnumHandler(self.context, self._cluster, attrs)
+        elif name == "bitmap":
+            # FIXME
+            return BaseHandler(self.context)
+        elif name == "struct":
+            # FIXME
+            return BaseHandler(self.context)
+        else:
+            return BaseHandler(self.context)
 
 
 class ClusterHandler(BaseHandler):
@@ -117,5 +166,7 @@ class ClusterHandler(BaseHandler):
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "features":
             return FeaturesHandler(self.context, self._cluster)
+        elif name == "dataTypes":
+            return DataTypesHandler(self.context, self._cluster)
         else:
             return BaseHandler(self.context)
