@@ -3,7 +3,7 @@
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 server cluster Identify = 3 {
-  enum EffectIdentifierEnum : ENUM8 {
+  enum EffectIdentifierEnum : enum8 {
     kBlink = 0;
     kBreathe = 1;
     kOkay = 2;
@@ -12,11 +12,11 @@ server cluster Identify = 3 {
     kStopEffect = 255;
   }
 
-  enum EffectVariantEnum : ENUM8 {
+  enum EffectVariantEnum : enum8 {
     kDefault = 0;
   }
 
-  enum IdentifyTypeEnum : ENUM8 {
+  enum IdentifyTypeEnum : enum8 {
     kNone = 0;
     kLightOutput = 1;
     kVisibleIndicator = 2;
@@ -49,11 +49,11 @@ server cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 server cluster Groups = 4 {
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kGroupNames = 0x1;
   }
 
-  bitmap NameSupportBitmap : BITMAP8 {
+  bitmap NameSupportBitmap : bitmap8 {
     kGroupNames = 0x80;
   }
 
@@ -118,7 +118,7 @@ server cluster Groups = 4 {
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 server cluster Descriptor = 29 {
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kTagList = 0x1;
   }
 
@@ -151,13 +151,13 @@ server cluster Descriptor = 29 {
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
 server cluster AccessControl = 31 {
-  enum AccessControlEntryAuthModeEnum : ENUM8 {
+  enum AccessControlEntryAuthModeEnum : enum8 {
     kPASE = 1;
     kCASE = 2;
     kGroup = 3;
   }
 
-  enum AccessControlEntryPrivilegeEnum : ENUM8 {
+  enum AccessControlEntryPrivilegeEnum : enum8 {
     kView = 1;
     kProxyView = 2;
     kOperate = 3;
@@ -165,7 +165,7 @@ server cluster AccessControl = 31 {
     kAdminister = 5;
   }
 
-  enum ChangeTypeEnum : ENUM8 {
+  enum ChangeTypeEnum : enum8 {
     kChanged = 0;
     kAdded = 1;
     kRemoved = 2;
@@ -223,7 +223,7 @@ server cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 server cluster BasicInformation = 40 {
-  enum ColorEnum : ENUM8 {
+  enum ColorEnum : enum8 {
     kBlack = 0;
     kNavy = 1;
     kGreen = 2;
@@ -247,7 +247,7 @@ server cluster BasicInformation = 40 {
     kGold = 20;
   }
 
-  enum ProductFinishEnum : ENUM8 {
+  enum ProductFinishEnum : enum8 {
     kOther = 0;
     kMatte = 1;
     kSatin = 2;
@@ -310,7 +310,7 @@ server cluster BasicInformation = 40 {
 
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 server cluster PowerSource = 47 {
-  enum BatApprovedChemistryEnum : ENUM16 {
+  enum BatApprovedChemistryEnum : enum16 {
     kUnspecified = 0;
     kAlkaline = 1;
     kLithiumCarbonFluoride = 2;
@@ -346,7 +346,7 @@ server cluster PowerSource = 47 {
     kZincCerium = 32;
   }
 
-  enum BatChargeFaultEnum : ENUM8 {
+  enum BatChargeFaultEnum : enum8 {
     kUnspecified = 0;
     kAmbientTooHot = 1;
     kAmbientTooCold = 2;
@@ -360,20 +360,20 @@ server cluster PowerSource = 47 {
     kSafetyTimeout = 10;
   }
 
-  enum BatChargeLevelEnum : ENUM8 {
+  enum BatChargeLevelEnum : enum8 {
     kOK = 0;
     kWarning = 1;
     kCritical = 2;
   }
 
-  enum BatChargeStateEnum : ENUM8 {
+  enum BatChargeStateEnum : enum8 {
     kUnknown = 0;
     kIsCharging = 1;
     kIsAtFullCharge = 2;
     kIsNotCharging = 3;
   }
 
-  enum BatCommonDesignationEnum : ENUM16 {
+  enum BatCommonDesignationEnum : enum16 {
     kUnspecified = 0;
     kAAA = 1;
     kAA = 2;
@@ -457,38 +457,38 @@ server cluster PowerSource = 47 {
     k32600 = 80;
   }
 
-  enum BatFaultEnum : ENUM8 {
+  enum BatFaultEnum : enum8 {
     kUnspecified = 0;
     kOverTemp = 1;
     kUnderTemp = 2;
   }
 
-  enum BatReplaceabilityEnum : ENUM8 {
+  enum BatReplaceabilityEnum : enum8 {
     kUnspecified = 0;
     kNotReplaceable = 1;
     kUserReplaceable = 2;
     kFactoryReplaceable = 3;
   }
 
-  enum PowerSourceStatusEnum : ENUM8 {
+  enum PowerSourceStatusEnum : enum8 {
     kUnspecified = 0;
     kActive = 1;
     kStandby = 2;
     kUnavailable = 3;
   }
 
-  enum WiredCurrentTypeEnum : ENUM8 {
+  enum WiredCurrentTypeEnum : enum8 {
     kAC = 0;
     kDC = 1;
   }
 
-  enum WiredFaultEnum : ENUM8 {
+  enum WiredFaultEnum : enum8 {
     kUnspecified = 0;
     kOverVoltage = 1;
     kUnderVoltage = 2;
   }
 
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kWired = 0x1;
     kBattery = 0x2;
     kRechargeable = 0x4;
@@ -542,7 +542,7 @@ server cluster PowerSource = 47 {
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 server cluster GeneralCommissioning = 48 {
-  enum CommissioningErrorEnum : ENUM8 {
+  enum CommissioningErrorEnum : enum8 {
     kOK = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
@@ -550,7 +550,7 @@ server cluster GeneralCommissioning = 48 {
     kBusyWithOtherAdmin = 4;
   }
 
-  enum RegulatoryLocationTypeEnum : ENUM8 {
+  enum RegulatoryLocationTypeEnum : enum8 {
     kIndoor = 0;
     kOutdoor = 1;
     kIndoorOutdoor = 2;
@@ -606,7 +606,7 @@ server cluster GeneralCommissioning = 48 {
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 server cluster NetworkCommissioning = 49 {
-  enum NetworkCommissioningStatusEnum : ENUM8 {
+  enum NetworkCommissioningStatusEnum : enum8 {
     kSuccess = 0;
     kOutOfRange = 1;
     kBoundsExceeded = 2;
@@ -622,7 +622,7 @@ server cluster NetworkCommissioning = 49 {
     kUnknownError = 12;
   }
 
-  enum WiFiBandEnum : ENUM8 {
+  enum WiFiBandEnum : enum8 {
     k2G4 = 0;
     k3G65 = 1;
     k5G = 2;
@@ -631,13 +631,13 @@ server cluster NetworkCommissioning = 49 {
     k1G = 5;
   }
 
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kWiFiNetworkInterface = 0x1;
     kThreadNetworkInterface = 0x2;
     kEthernetNetworkInterface = 0x4;
   }
 
-  bitmap WiFiSecurityBitmap : BITMAP8 {
+  bitmap WiFiSecurityBitmap : bitmap8 {
     kUnencrypted = 0x1;
     kWEP = 0x2;
     kWPAPersonal = 0x4;
@@ -746,13 +746,13 @@ server cluster NetworkCommissioning = 49 {
 
 /** The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics. */
 server cluster DiagnosticLogs = 50 {
-  enum IntentEnum : ENUM8 {
+  enum IntentEnum : enum8 {
     kEndUserSupport = 0;
     kNetworkDiag = 1;
     kCrashLogs = 2;
   }
 
-  enum StatusEnum : ENUM8 {
+  enum StatusEnum : enum8 {
     kSuccess = 0;
     kExhausted = 1;
     kNoLogs = 2;
@@ -760,7 +760,7 @@ server cluster DiagnosticLogs = 50 {
     kDenied = 4;
   }
 
-  enum TransferProtocolEnum : ENUM8 {
+  enum TransferProtocolEnum : enum8 {
     kResponsePayload = 0;
     kBDX = 1;
   }
@@ -783,7 +783,7 @@ server cluster DiagnosticLogs = 50 {
 
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster GeneralDiagnostics = 51 {
-  enum BootReasonEnum : ENUM8 {
+  enum BootReasonEnum : enum8 {
     kUnspecified = 0;
     kPowerOnReboot = 1;
     kBrownOutReset = 2;
@@ -793,7 +793,7 @@ server cluster GeneralDiagnostics = 51 {
     kSoftwareReset = 6;
   }
 
-  enum HardwareFaultEnum : ENUM8 {
+  enum HardwareFaultEnum : enum8 {
     kUnspecified = 0;
     kRadio = 1;
     kSensor = 2;
@@ -807,7 +807,7 @@ server cluster GeneralDiagnostics = 51 {
     kTamperDetected = 10;
   }
 
-  enum InterfaceTypeEnum : ENUM8 {
+  enum InterfaceTypeEnum : enum8 {
     kUnspecified = 0;
     kWiFi = 1;
     kEthernet = 2;
@@ -815,14 +815,14 @@ server cluster GeneralDiagnostics = 51 {
     kThread = 4;
   }
 
-  enum NetworkFaultEnum : ENUM8 {
+  enum NetworkFaultEnum : enum8 {
     kUnspecified = 0;
     kHardwareFailure = 1;
     kNetworkJammed = 2;
     kConnectionFailed = 3;
   }
 
-  enum RadioFaultEnum : ENUM8 {
+  enum RadioFaultEnum : enum8 {
     kUnspecified = 0;
     kWiFiFault = 1;
     kCellularFault = 2;
@@ -888,13 +888,13 @@ server cluster GeneralDiagnostics = 51 {
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
 server cluster AdministratorCommissioning = 60 {
-  enum CommissioningWindowStatusEnum : ENUM8 {
+  enum CommissioningWindowStatusEnum : enum8 {
     kWindowNotOpen = 0;
     kEnhancedWindowOpen = 1;
     kBasicWindowOpen = 2;
   }
 
-  enum StatusCode : ENUM8 {
+  enum StatusCode : enum8 {
     kBusy = 2;
     kPAKEParameterError = 3;
     kWindowNotOpen = 4;
@@ -929,12 +929,12 @@ server cluster AdministratorCommissioning = 60 {
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 server cluster OperationalCredentials = 62 {
-  enum CertificateChainTypeEnum : ENUM8 {
+  enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
     kPAICertificate = 2;
   }
 
-  enum NodeOperationalCertStatusEnum : ENUM8 {
+  enum NodeOperationalCertStatusEnum : enum8 {
     kOK = 0;
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
@@ -1045,12 +1045,12 @@ server cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 server cluster GroupKeyManagement = 63 {
-  enum GroupKeySecurityPolicyEnum : ENUM8 {
+  enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
     kCacheAndSync = 1;
   }
 
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kCacheAndSync = 0x1;
   }
 
@@ -1117,25 +1117,25 @@ server cluster GroupKeyManagement = 63 {
 
 /** This cluster provides an interface for observing and managing the state of smoke and CO alarms. */
 server cluster SmokeCoAlarm = 92 {
-  enum AlarmStateEnum : ENUM8 {
+  enum AlarmStateEnum : enum8 {
     kNormal = 0;
     kWarning = 1;
     kCritical = 2;
   }
 
-  enum ContaminationStateEnum : ENUM8 {
+  enum ContaminationStateEnum : enum8 {
     kNormal = 0;
     kLow = 1;
     kWarning = 2;
     kCritical = 3;
   }
 
-  enum EndOfServiceEnum : ENUM8 {
+  enum EndOfServiceEnum : enum8 {
     kNormal = 0;
     kExpired = 1;
   }
 
-  enum ExpressedStateEnum : ENUM8 {
+  enum ExpressedStateEnum : enum8 {
     kNormal = 0;
     kSmokeAlarm = 1;
     kCOAlarm = 2;
@@ -1147,18 +1147,18 @@ server cluster SmokeCoAlarm = 92 {
     kInterconnectCO = 8;
   }
 
-  enum MuteStateEnum : ENUM8 {
+  enum MuteStateEnum : enum8 {
     kNotMuted = 0;
     kMuted = 1;
   }
 
-  enum SensitivityEnum : ENUM8 {
+  enum SensitivityEnum : enum8 {
     kHigh = 0;
     kStandard = 1;
     kLow = 2;
   }
 
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kSmokeAlarm = 0x1;
     kCOAlarm = 0x2;
   }
