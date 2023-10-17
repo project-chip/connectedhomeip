@@ -99,7 +99,7 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
     CHIP_ERROR InitEthernet(void);
     void OnEthernetPlatformEvent(const ChipDeviceEvent * event);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     using Flags = GenericConnectivityManagerImpl_WiFi::ConnectivityFlags;
