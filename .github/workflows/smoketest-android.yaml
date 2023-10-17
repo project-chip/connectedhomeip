@@ -52,6 +52,7 @@ jobs:
               # This should not generally be needed, however android CI runs out of space
               # We do not need pigweed cross compile here because we use android NDK
               # compilers. Removing this package save significant amount of space.
+              continue-on-error: true
               run: |
                 du -sh .environment/cipd/packages/arm
                 rm -rf .environment/cipd/packages/arm
