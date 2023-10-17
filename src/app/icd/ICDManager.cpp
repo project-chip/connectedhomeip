@@ -58,12 +58,12 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     VerifyOrDie(ICDNotifier::GetInstance().Subscribe(this) == CHIP_NO_ERROR);
     mSymmetricKeystore = symmetricKeystore;
 
-    uint32_t activeModeInterval = ICDManagementServer::GetInstance().GetActiveModeIntervalMs();
 
     ICDManagementServer::GetInstance().SetSymmetricKeystore(mSymmetricKeystore);
 
     // Removing the check for now since it is possible for the Fast polling
     // to be superior to the activeModeInterval fornow
+    // uint32_t activeModeInterval = ICDManagementServer::GetInstance().GetActiveModeIntervalMs();
     // VerifyOrDie(kFastPollingInterval.count() < activeModeInterval);
 
     UpdateICDMode();
