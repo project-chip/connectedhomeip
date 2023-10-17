@@ -64,8 +64,8 @@ bool hasNotifiedWifiConnectivity = false;
 bool is_wifi_disconnection_event = false;
 
 /* Declare a variable to hold connection time intervals */
-uint32_t retryInterval              = WLAN_MIN_RETRY_TIMER_MS;
-volatile bool scan_results_complete = false;
+uint32_t retryInterval                 = WLAN_MIN_RETRY_TIMER_MS;
+volatile bool scan_results_complete    = false;
 volatile bool bg_scan_results_complete = false;
 #define WIFI_SCAN_TIMEOUT_TICK 10000
 
