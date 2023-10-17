@@ -1,0 +1,33 @@
+# .github/release.yml
+
+changelog:
+  exclude:
+    labels:
+      - scripts
+    authors:
+      - restyled-io
+      - octocat
+      - pullapprove
+      - jira
+      - issue-label-bot
+      - github-actions
+      - github-labels
+      - buildjet
+  categories:
+    - title: Security Fixes
+      labels:
+        - security
+    - title: Bug Fixes
+      labels:
+        - bug
+    - title: Spec Alignment Fixes
+      labels:
+        - spec
+    - title: Platform Fixes
+      labels:
+        - platform
+        - darwin
+        - android
+    - title: Other Changes
+      labels:
+        - "*"
