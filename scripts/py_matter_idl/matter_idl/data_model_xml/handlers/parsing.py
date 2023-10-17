@@ -34,3 +34,27 @@ def ParseInt(value: str, data_type: Optional[DataType] = None) -> int:
     else:
         return int(value)
 
+
+def NormalizeName(name: str) -> str:
+    """Convert a free form name from the spec into a programming language
+       name that is appropriate for matter IDL.
+    """
+
+    # Trim human name separators
+    for separator in " /-":
+        name = name.replace(separator, '_')
+    while '__' in name:
+       name = name.replace('__', '_')
+
+    # TODO: should we handle acronyms in some way?
+
+    # At this point, we remove all _ and make sure _ is followed by an uppercase
+    while name.endswith('_'):
+        name = name[:-1]
+
+    while '_' in name:
+        idx = name.find('_')
+        name = name[:idx] + name[idx+1].upper() + name[idx+2:]
+
+
+    return name

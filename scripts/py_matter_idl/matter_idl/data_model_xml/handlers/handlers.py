@@ -21,9 +21,38 @@ from matter_idl.matter_idl_types import (Attribute, Bitmap, Cluster, ClusterSide
 
 from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
-from .parsing import ParseInt
+from .parsing import ParseInt, NormalizeName
 
 LOGGER = logging.getLogger('data-model-xml-parser')
+
+class FeaturesHandler(BaseHandler):
+
+    def __init__(self, context: Context, cluster: Cluster):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._cluster = cluster
+        self._bitmap = Bitmap(name="Feature", base_type="bitmap32", entries=[])
+
+    def EndProcessing(self):
+        if self._bitmap.entries:
+            self._cluster.bitmaps.append(self._bitmap)
+
+    def GetNextProcessor(self, name: str, attrs):
+        if name in {"section", "optionalConform"}:
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "feature":
+            assert("bit" in attrs)
+            assert("name" in attrs)
+
+            self._bitmap.entries.append(ConstantEntry(
+                name = "k" + NormalizeName(attrs["name"]),
+                code = 1 << ParseInt(attrs["bit"])
+            ))
+
+            # assume everything handled. Sub-item is only section
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        else:
+            return BaseHandler(self.context)
+
 
 
 class ClusterHandler(BaseHandler):
@@ -38,10 +67,13 @@ class ClusterHandler(BaseHandler):
 
         self._cluster = Cluster(
             side=ClusterSide.CLIENT,
-            name=attrs["name"],
+            name=NormalizeName(attrs["name"]),
             code=ParseInt(attrs["id"]),
             parse_meta=context.GetCurrentLocationMeta()
         )
+
+        # TODO: add global attributes by default as they are not in XMLs?
+        # NOTE: feature map should be populated separatly
 
     def EndProcessing(self):
         self._idl.clusters.append(self._cluster)
@@ -59,5 +91,19 @@ class ClusterHandler(BaseHandler):
             # Revision history COULD be used to find the latest revision of a cluster
             # however current IDL files do NOT have a revision info field
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "section":
+            # Documentation data, skipped
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "classification":
+            # Not an obvious u
+            # derived could have meaning 
+            #
+            # TODO IFF hierarchy == derived, we should use baseCluster
+            #
+            # Other elements like role, picsCode, scope and primaryTransaction seem
+            # to not be used
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "features":
+            return FeaturesHandler(self.context, self._cluster)
         else:
             return BaseHandler(self.context)
