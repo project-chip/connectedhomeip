@@ -17,6 +17,11 @@ RUN set -x \
 RUN wget https://github.com/SiliconLabs/gecko_sdk/releases/download/v4.3.2/gecko-sdk.zip -O /tmp/gecko_sdk.zip \
     && unzip /tmp/gecko_sdk.zip -d /tmp/gecko_sdk \
     && rm -rf /tmp/gecko_sdk.zip \
+    # Deleting files that are not needed to save space
+    && rm -rf /tmp/gecko_sdk/protocol/flex /tmp/gecko_sdk/protocol/z-wave /tmp/gecko_sdk/protocol/zigbee /tmp/gecko_sdk/protocol/wisun \
+    && find /tmp/gecko_sdk/protocol/bluetooth /tmp/gecko_sdk/platform -name "*.a" -type f -delete \
+    && find /tmp/gecko_sdk/protocol/openthread -name "*efr32mg21*" -delete \
+    && find /tmp/gecko_sdk/protocol/openthread -name "*efr32mg13*" -delete \
     && : # last line
 
 # Clone WiSeConnect Wi-Fi and Bluetooth Software 2.8.2 (4fa5c5f)

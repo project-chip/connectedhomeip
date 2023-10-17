@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,26 +16,15 @@
  *    limitations under the License.
  */
 
-package chip.onboardingpayload
+#include <string>
 
-enum class OptionalQRCodeInfoType {
-  TYPE_UNKNOWN,
-  TYPE_STRING,
-  TYPE_INT32,
-  TYPE_INT64,
-  TYPE_UINT32,
-  TYPE_UINT64
-}
+namespace chip {
+/*
+ * Pretty-prints the input Json string using standard library pretty-printer.
+ * This pretty-printer generates a Json string in a human friendly format with 3 space indentation
+ * and nice representation of arrays and objects.
+ * The input can be any string, as long as it's valid Json.
+ */
+std::string PrettyPrintJsonString(const std::string & jsonString);
 
-open class OptionalQRCodeInfo {
-  var tag: Int = 0
-  var type: OptionalQRCodeInfoType = OptionalQRCodeInfoType.TYPE_UNKNOWN
-  var data: String? = null
-  var int32: Int = 0
-}
-
-class OptionalQRCodeInfoExtension : OptionalQRCodeInfo() {
-  var int64: Long = 0
-  var uint32: Long = 0
-  var uint64: Long = 0
-}
+} // namespace chip

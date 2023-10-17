@@ -35,9 +35,6 @@
 
 #include "sl_board_control.h"
 
-#if (defined(EFR32MG24) && defined(SL_WIFI))
-#include "spi_multiplex.h"
-#endif
 #define LCD_SIZE 128
 #define QR_CODE_VERSION 4
 #define QR_CODE_MODULE_SIZE 3

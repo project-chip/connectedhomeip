@@ -30,18 +30,6 @@ extern "C" {
 }
 #endif
 
-typedef struct
-{
-    char wifi_mode;     /* refer to hal_wifi_type_t*/
-    char security;      /* security mode, refer to lega_wlan_security_e */
-    char wifi_ssid[32]; /* in station mode, indicate SSID of the wlan needs to be connected.
-                           in softap mode, indicate softap SSID*/
-    char wifi_key[64];  /* in station mode, indicate Security key of the wlan needs to be connected,
-                           in softap mode, indicate softap password.(ignored in an open system.) */
-    uint32_t ssid_len;
-    uint32_t key_len;
-} lega_wlan_wifi_conf;
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -77,6 +65,11 @@ public:
     static CHIP_ERROR StoreWiFiSecurityCode(uint32_t security);
     static CHIP_ERROR wifi_get_mode(uint32_t & security);
     static CHIP_ERROR wifi_set_mode(uint32_t security);
+
+    static void lega_wifi_scan_ind(lega_wlan_scan_result_t * result);
+    static CHIP_ERROR StartScanWiFiNetworks(ByteSpan ssid);
+    static lega_wlan_scan_ap_record_t * GetScanResults(void);
+    static uint8_t GetScanApNum(void);
 };
 
 } // namespace Internal

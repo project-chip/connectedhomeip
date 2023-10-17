@@ -43,38 +43,71 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-/**
- *    @file
- *          Provides Bluez dbus implementation for BLE
- */
-
 #pragma once
 
-#include <lib/core/CHIPError.h>
-#include <system/SystemPacketBuffer.h>
+#include <stdint.h>
 
+#include <gio/gio.h>
+#include <glib.h>
+
+#include <ble/CHIPBleServiceData.h>
+#include <lib/core/CHIPError.h>
+
+#include "BluezConnection.h"
 #include "Types.h"
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
+struct BLEAdvConfig;
+
+struct BluezEndpoint
+{
+    char * mpOwningName; // Bus owning name
+
+    // Adapter properties
+    char * mpAdapterName;
+    char * mpAdapterAddr;
+
+    // Paths for objects published by this service
+    char * mpRootPath;
+    char * mpAdvPath;
+    char * mpServicePath;
+
+    // Objects (interfaces) subscibed to by this service
+    GDBusObjectManager * mpObjMgr = nullptr;
+    BluezAdapter1 * mpAdapter     = nullptr;
+    BluezDevice1 * mpDevice       = nullptr;
+
+    // Objects (interfaces) published by this service
+    GDBusObjectManagerServer * mpRoot;
+    BluezGattService1 * mpService;
+    BluezGattCharacteristic1 * mpC1;
+    BluezGattCharacteristic1 * mpC2;
+    // additional data characteristics
+    BluezGattCharacteristic1 * mpC3;
+
+    // map device path to the connection
+    GHashTable * mpConnMap;
+    uint32_t mAdapterId;
+    bool mIsCentral;
+    char * mpAdvertisingUUID;
+    chip::Ble::ChipBLEDeviceIdentificationInfo mDeviceIdInfo;
+    ChipAdvType mType;  ///< Advertisement type.
+    uint16_t mDuration; ///< Advertisement interval (in ms).
+    bool mIsAdvertising;
+    char * mpPeerDevicePath;
+    GCancellable * mpConnectCancellable = nullptr;
+};
+
 CHIP_ERROR InitBluezBleLayer(bool aIsCentral, const char * apBleAddr, const BLEAdvConfig & aBleAdvConfig,
                              BluezEndpoint *& apEndpoint);
 CHIP_ERROR ShutdownBluezBleLayer(BluezEndpoint * apEndpoint);
-CHIP_ERROR SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf);
-CHIP_ERROR CloseBluezConnection(BLE_CONNECTION_OBJECT apConn);
 CHIP_ERROR StartBluezAdv(BluezEndpoint * apEndpoint);
 CHIP_ERROR StopBluezAdv(BluezEndpoint * apEndpoint);
 CHIP_ERROR BluezGattsAppRegister(BluezEndpoint * apEndpoint);
 CHIP_ERROR BluezAdvertisementSetup(BluezEndpoint * apEndpoint);
-
-/// Write to the CHIP RX characteristic on the remote peripheral device
-CHIP_ERROR BluezSendWriteRequest(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf);
-/// Subscribe to the CHIP TX characteristic on the remote peripheral device
-CHIP_ERROR BluezSubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn);
-/// Unsubscribe from the CHIP TX characteristic on the remote peripheral device
-CHIP_ERROR BluezUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn);
 
 CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice, BluezEndpoint * apEndpoint);
 void CancelConnect(BluezEndpoint * apEndpoint);

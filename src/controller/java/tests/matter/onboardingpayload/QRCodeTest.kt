@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-package chip.onboardingpayload
+package matter.onboardingpayload
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertEquals

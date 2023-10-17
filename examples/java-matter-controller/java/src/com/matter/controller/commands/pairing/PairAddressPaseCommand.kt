@@ -43,7 +43,7 @@ class PairAddressPaseCommand(controller: ChipDeviceController, credsIssue: Crede
     currentCommissioner()
       .establishPaseConnection(
         getNodeId(),
-        getRemoteAddr().getHostAddress(),
+        getRemoteAddr().address.hostAddress,
         getRemotePort(),
         getSetupPINCode()
       )
