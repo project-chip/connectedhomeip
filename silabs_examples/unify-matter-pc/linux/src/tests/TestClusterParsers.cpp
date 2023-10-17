@@ -351,7 +351,7 @@ static void TestMPCParserInvokeOnOffSUOnOff(nlTestSuite * inSuite, void * aConte
     chip::TLV::TLVReader reader;
     System::PacketBufferHandle buffer = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     auto bufferRef = buffer.Retain();
-    chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> value;
+    chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::StartUpOnOffEnum> value;
     value.SetNull();
 
     chip::app::ConcreteDataAttributePath path(0, Id, Attributes::StartUpOnOff::Id);
