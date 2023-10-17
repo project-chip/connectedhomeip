@@ -355,6 +355,14 @@ class TlvReader(bytes: ByteArray) : Iterable<Element> {
     return bytes.size == index
   }
 
+  private fun Element.encodedLength() =
+    Tag.encode(value.toType().encode(), tag).size + value.encode().size
+
+  /** Returns true if this reader is currently pointing to the last element in the TLV data. */
+  fun isLastElement(): Boolean {
+    return peekElement().encodedLength() == getRemainingLength()
+  }
+
   /** Resets the reader to the start of the provided byte array. */
   fun reset() {
     index = 0
