@@ -46,7 +46,7 @@ static_library("cc13x2_26x2") {
     "SystemPlatformConfig.h",
   ]
 
-  deps = []
+  deps = [ "${chip_root}/src/platform/logging:headers" ]
 
   public_deps = [
     "${chip_root}/src/crypto",

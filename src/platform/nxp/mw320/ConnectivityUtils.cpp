@@ -243,7 +243,7 @@ double ConnectivityUtils::ConvertFrequenceToFloat(const iw_freq * in)
 InterfaceTypeEnum ConnectivityUtils::GetInterfaceConnectionType(const char * ifname)
 {
     // MW320 only has the wifi interface
-    InterfaceTypeEnum ret = InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
+    InterfaceTypeEnum ret = InterfaceTypeEnum::kWiFi;
     return ret;
 }
 

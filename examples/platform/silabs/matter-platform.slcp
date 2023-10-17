@@ -94,6 +94,12 @@ configuration:
 - {name: SL_BOARD_ENABLE_VCOM, value: '0'}
 - {name: EMDRV_UARTDRV_FLOW_CONTROL_ENABLE, value: '0'}
 
+template_contribution:
+  - name: mbedtls_ssl_content_len_in_requirement
+    value: 900
+  - name: mbedtls_ssl_content_len_out_requirement
+    value: 900
+
 requires:
 - condition: [device_series_1]
   name: uartdrv_usart

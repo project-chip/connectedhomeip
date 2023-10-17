@@ -73,6 +73,7 @@ if(${IDF_TARGET} STREQUAL "esp32")
     list(APPEND PRIV_REQUIRES_LIST spidriver screen-framework)
 endif()
 
+
 if (CONFIG_ENABLE_PW_RPC)
 # Append additional directories for RPC build
 set(PRIV_INCLUDE_DIRS_LIST  "${PRIV_INCLUDE_DIRS_LIST}"

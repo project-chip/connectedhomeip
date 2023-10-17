@@ -115,19 +115,35 @@ CHIP_ERROR ScenesServer::Init()
 
     for (auto endpoint : EnabledEndpointsWithServerCluster(Id))
     {
-        EmberAfStatus status = Attributes::FeatureMap::Set(endpoint, to_underlying(Feature::kSceneNames));
+        uint32_t featureMap  = 0;
+        EmberAfStatus status = Attributes::FeatureMap::Get(endpoint, &featureMap);
+        if (EMBER_ZCL_STATUS_SUCCESS == status)
+        {
+            // Setting NameSupport attribute value to 0x80 if the feature bit is set
+            //  The bit of 7 (0x80) the NameSupport attribute indicates whether or not scene names are supported
+            //
+            //  According to spec, bit 7 (Scene Names) MUST match feature bit 0 (Scene Names)
+            uint8_t nameSupport =
+                (featureMap & to_underlying(Feature::kSceneNames)) ? static_cast<uint8_t>(0x80) : static_cast<uint8_t>(0x00);
+            status = Attributes::NameSupport::Set(endpoint, nameSupport);
+            if (EMBER_ZCL_STATUS_SUCCESS != status)
+            {
+                ChipLogDetail(Zcl, "ERR: setting NameSupport on Endpoint %hu Status: %x", endpoint, status);
+            }
+        }
+        else
+        {
+            ChipLogDetail(Zcl, "ERR: getting the scenes FeatureMap on Endpoint %hu Status: %x", endpoint, status);
+        }
+
+        // Explicit AttributeValuePairs is mandatory for matter so we force it here
+        featureMap |= to_underlying(Feature::kExplicit);
+        status = Attributes::FeatureMap::Set(endpoint, featureMap);
         if (EMBER_ZCL_STATUS_SUCCESS != status)
         {
-            ChipLogDetail(Zcl, "ERR: setting feature map on Endpoint %hu Status: %x", endpoint, status);
+            ChipLogDetail(Zcl, "ERR: setting the scenes FeatureMap on Endpoint %hu Status: %x", endpoint, status);
         }
-        //  The bit of 7 the NameSupport attribute indicates whether or not scene names are supported
-        //
-        //  According to spec, bit 7 (Scene Names) MUST match feature bit 0 (Scene Names)
-        status = Attributes::NameSupport::Set(endpoint, 0x80);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
-        {
-            ChipLogDetail(Zcl, "ERR: setting NameSupport on Endpoint %hu Status: %x", endpoint, status);
-        }
+
         status = Attributes::LastConfiguredBy::SetNull(endpoint);
         if (EMBER_ZCL_STATUS_SUCCESS != status)
         {
@@ -194,7 +210,15 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
     auto fieldSetIter = req.extensionFieldSets.begin();
 
     uint8_t EFSCount = 0;
-    SceneData storageData(req.sceneName, transitionTimeMs);
+
+    uint32_t featureMap = 0;
+    ReturnOnFailure(AddResponseOnError(ctx, response, Attributes::FeatureMap::Get(ctx.mRequestPath.mEndpointId, &featureMap)));
+
+    SceneData storageData(CharSpan(), transitionTimeMs);
+    if (featureMap & to_underlying(Feature::kSceneNames))
+    {
+        storageData.SetName(req.sceneName);
+    }
 
     // Goes through all EFS in command
     while (fieldSetIter.Next() && EFSCount < scenes::kMaxClustersPerScene)
@@ -369,6 +393,14 @@ CHIP_ERROR StoreSceneParse(const FabricIndex & fabricIdx, const EndpointId & end
     }
     else
     {
+        uint32_t featureMap = 0;
+        ReturnErrorOnFailure(
+            StatusIB(ToInteractionModelStatus(Attributes::FeatureMap::Get(endpointID, &featureMap))).ToChipError());
+        // Check if we still support scenes name in case an OTA changed that, if we don't, set name to empty
+        if (!(featureMap & to_underlying(Feature::kSceneNames)))
+        {
+            scene.mStorageData.SetName(CharSpan());
+        }
         scene.mStorageData.mExtensionFieldSets.Clear();
     }
 
@@ -715,11 +747,15 @@ void ScenesServer::HandleRecallScene(HandlerContext & ctx, const Commands::Recal
     if (CHIP_NO_ERROR == err)
     {
         status = Attributes::SceneValid::Set(ctx.mRequestPath.mEndpointId, true);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
-        {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, ToInteractionModelStatus(status));
-            return;
-        }
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, ToInteractionModelStatus(status));
+        return;
+    }
+
+    if (CHIP_ERROR_NOT_FOUND == err)
+    {
+        // TODO : implement proper mapping between CHIP_ERROR and IM Status
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::NotFound);
+        return;
     }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, StatusIB(err).mStatus);

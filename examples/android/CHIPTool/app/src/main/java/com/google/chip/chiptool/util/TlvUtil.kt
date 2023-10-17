@@ -1,11 +1,11 @@
 package com.google.chip.chiptool.util
 
-import chip.tlv.AnonymousTag
-import chip.tlv.ArrayValue
-import chip.tlv.NullValue
-import chip.tlv.StructureValue
-import chip.tlv.Tag
-import chip.tlv.TlvReader
+import matter.tlv.AnonymousTag
+import matter.tlv.ArrayValue
+import matter.tlv.NullValue
+import matter.tlv.StructureValue
+import matter.tlv.Tag
+import matter.tlv.TlvReader
 
 /**
  * Encodes TLV into kotlin Object. If the TLV reader is positioned TLV Structure, Object will return
