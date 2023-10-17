@@ -25,12 +25,12 @@ def ParseInt(value: str, data_type: Optional[DataType] = None) -> int:
     Supports decimal or hex values prefixed with '0x'
     """
     if value.startswith('0x'):
-        value = int(value[2:], 16)
+        parsed = int(value[2:], 16)
         if data_type and IsSignedDataType(data_type):
             bits = GetDataTypeSizeInBits(data_type)
-            if value & (1 << (bits - 1)):
-                value -= 1 << bits
-        return value
+            if parsed & (1 << (bits - 1)):
+                parsed -= 1 << bits
+        return parsed
     else:
         return int(value)
 
