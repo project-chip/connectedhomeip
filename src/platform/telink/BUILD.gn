@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2021-2023 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -43,7 +43,6 @@ static_library("telink") {
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
     "ConnectivityManagerImpl.h",
-    "ICDUtil.cpp",
     "InetPlatformConfig.h",
     "KeyValueStoreManagerImpl.h",
     "PlatformManagerImpl.h",
@@ -57,6 +56,7 @@ static_library("telink") {
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
+  deps = [ "${chip_root}/src/platform/logging:headers" ]
 
   defines = [ "CHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=<lib/address_resolve/AddressResolve_DefaultImpl.h>" ]
 
@@ -82,7 +82,7 @@ static_library("telink") {
         "../OpenThread/OpenThreadDnssdImpl.cpp",
         "../OpenThread/OpenThreadDnssdImpl.h",
       ]
-      deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
+      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
   }
 
@@ -90,6 +90,13 @@ static_library("telink") {
     sources += [
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",
+    ]
+  }
+
+  if (chip_enable_bootloader_mcuboot) {
+    sources += [
+      "OTAUtil.cpp",
+      "OTAUtil.h",
     ]
   }
 }

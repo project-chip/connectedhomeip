@@ -17,12 +17,12 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
-class DoorLockClusterCredentialStruct(val credentialType: Int, val credentialIndex: Int) {
+class DoorLockClusterCredentialStruct(val credentialType: UInt, val credentialIndex: UInt) {
   override fun toString(): String = buildString {
     append("DoorLockClusterCredentialStruct {\n")
     append("\tcredentialType : $credentialType\n")
@@ -30,9 +30,9 @@ class DoorLockClusterCredentialStruct(val credentialType: Int, val credentialInd
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_CREDENTIAL_TYPE), credentialType)
       put(ContextSpecificTag(TAG_CREDENTIAL_INDEX), credentialIndex)
       endStructure()
@@ -43,10 +43,10 @@ class DoorLockClusterCredentialStruct(val credentialType: Int, val credentialInd
     private const val TAG_CREDENTIAL_TYPE = 0
     private const val TAG_CREDENTIAL_INDEX = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): DoorLockClusterCredentialStruct {
-      tlvReader.enterStructure(tag)
-      val credentialType = tlvReader.getInt(ContextSpecificTag(TAG_CREDENTIAL_TYPE))
-      val credentialIndex = tlvReader.getInt(ContextSpecificTag(TAG_CREDENTIAL_INDEX))
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DoorLockClusterCredentialStruct {
+      tlvReader.enterStructure(tlvTag)
+      val credentialType = tlvReader.getUInt(ContextSpecificTag(TAG_CREDENTIAL_TYPE))
+      val credentialIndex = tlvReader.getUInt(ContextSpecificTag(TAG_CREDENTIAL_INDEX))
 
       tlvReader.exitContainer()
 

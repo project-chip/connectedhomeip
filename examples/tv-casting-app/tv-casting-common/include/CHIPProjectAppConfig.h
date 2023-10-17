@@ -53,6 +53,11 @@
 
 #define CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART 0
 
+// For casting, we need to allow more ACL entries, and more complex entries
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY 20
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY 20
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC 20
+
 // Enable some test-only interaction model APIs.
 #define CONFIG_BUILD_FOR_HOST_UNIT_TEST 1
 
@@ -64,6 +69,15 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_TEST_SETUP_PARAMS 0
 
 #define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 4
+
+// cached players that were seen before this window (in hours) will not be surfaced as "discovered"
+#define CHIP_DEVICE_CONFIG_STR_CACHE_LAST_DISCOVERED_HOURS 7 * 24
+
+// time (in sec) assumed to be required for player to wake up after sending WoL magic packet
+#define CHIP_DEVICE_CONFIG_STR_WAKE_UP_DELAY_SEC 10
+
+// delay (in sec) before which we assume undiscovered cached players may be in STR mode
+#define CHIP_DEVICE_CONFIG_STR_DISCOVERY_DELAY_SEC 5
 
 // Include the CHIPProjectConfig from config/standalone
 // Add this at the end so that we can hit our #defines first

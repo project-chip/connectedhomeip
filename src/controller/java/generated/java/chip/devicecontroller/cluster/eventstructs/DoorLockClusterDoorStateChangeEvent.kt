@@ -17,21 +17,21 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
-class DoorLockClusterDoorStateChangeEvent(val doorState: Int) {
+class DoorLockClusterDoorStateChangeEvent(val doorState: UInt) {
   override fun toString(): String = buildString {
     append("DoorLockClusterDoorStateChangeEvent {\n")
     append("\tdoorState : $doorState\n")
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_DOOR_STATE), doorState)
       endStructure()
     }
@@ -40,9 +40,9 @@ class DoorLockClusterDoorStateChangeEvent(val doorState: Int) {
   companion object {
     private const val TAG_DOOR_STATE = 0
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): DoorLockClusterDoorStateChangeEvent {
-      tlvReader.enterStructure(tag)
-      val doorState = tlvReader.getInt(ContextSpecificTag(TAG_DOOR_STATE))
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): DoorLockClusterDoorStateChangeEvent {
+      tlvReader.enterStructure(tlvTag)
+      val doorState = tlvReader.getUInt(ContextSpecificTag(TAG_DOOR_STATE))
 
       tlvReader.exitContainer()
 

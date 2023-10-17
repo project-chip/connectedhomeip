@@ -25,9 +25,14 @@
  */
 #pragma once
 
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/Optional.h>
 #include <system/SystemClock.h>
 #include <system/SystemConfig.h>
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <lwip/opt.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 namespace chip {
 
@@ -122,15 +127,23 @@ namespace chip {
  *
  */
 #ifndef CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE
-#if LWIP_PBUF_FROM_CUSTOM_POOLS
-#define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS
-#elif PBUF_POOL_SIZE
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+
+#if !LWIP_PBUF_FROM_CUSTOM_POOLS && PBUF_POOL_SIZE != 0
 #define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE std::min(PBUF_POOL_SIZE, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS)
-#elif CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE != 0
+#else
+#define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS
+#endif // !LWIP_PBUF_FROM_CUSTOM_POOLS && PBUF_POOL_SIZE != 0
+
+#else // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+#if CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE != 0
 #define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE std::min(CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS)
 #else
 #define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS
-#endif // PBUF_POOL_SIZE
+#endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE != 0
+
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 #endif // CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE
 
 /**
@@ -167,7 +180,7 @@ namespace chip {
 #endif
 #endif // CHIP_CONFIG_MRP_RETRY_INTERVAL_SENDER_BOOST
 
-constexpr System::Clock::Milliseconds32 kDefaultActiveTime = System::Clock::Milliseconds16(4000);
+inline constexpr System::Clock::Milliseconds32 kDefaultActiveTime = System::Clock::Milliseconds16(4000);
 
 /**
  *  @brief

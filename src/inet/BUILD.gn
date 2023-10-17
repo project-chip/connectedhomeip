@@ -103,6 +103,7 @@ static_library("inet") {
   ]
 
   if (chip_system_config_use_lwip) {
+    sources += [ "EndPointStateLwIP.cpp" ]
     public_deps += [ "${chip_root}/src/lwip" ]
   }
 
@@ -138,6 +139,12 @@ static_library("inet") {
       "InetFaultInjection.h",
     ]
     public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
+  }
+
+  if (current_os == "android") {
+    public_deps += [ "${chip_root}/src/platform/android:inet" ]
+  } else {
+    sources += [ "InetInterfaceImplDefault.cpp" ]
   }
 
   cflags = [ "-Wconversion" ]

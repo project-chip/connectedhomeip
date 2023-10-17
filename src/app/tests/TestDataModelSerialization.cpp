@@ -105,7 +105,7 @@ void TestDataModelSerialization::DumpBuf()
     //
     // Enable this once the TLV pretty printer has been checked in.
     //
-#if ENABLE_TLV_PRINT_OUT
+#if defined(ENABLE_TLV_PRINT_OUT) && ENABLE_TLV_PRINT_OUT
     TLV::Debug::Print(reader);
 #endif
 }

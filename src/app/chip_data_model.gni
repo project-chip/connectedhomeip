@@ -203,6 +203,10 @@ template("chip_data_model") {
       cflags = []
     }
 
+    if (!defined(defines)) {
+      defines = []
+    }
+
     foreach(cluster, _cluster_sources) {
       if (cluster == "door-lock-server") {
         sources += [
@@ -262,8 +266,8 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/DefaultTimeSyncDelegate.cpp",
           "${_app_root}/clusters/${cluster}/TimeSyncDataProvider.cpp",
         ]
-        cflags +=
-            [ "-DTIME_SYNC_ENABLE_TSC_FEATURE=${time_sync_enable_tsc_feature}" ]
+        defines +=
+            [ "TIME_SYNC_ENABLE_TSC_FEATURE=${time_sync_enable_tsc_feature}" ]
       } else if (cluster == "scenes-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
@@ -284,8 +288,7 @@ template("chip_data_model") {
         ]
       } else if (cluster == "icd-management-server") {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
-
-        deps += [ "${chip_root}/src/app/icd:cluster-srcs" ]
+        deps += [ "${chip_root}/src/app/icd:cluster" ]
       } else if (cluster == "resource-monitoring-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",

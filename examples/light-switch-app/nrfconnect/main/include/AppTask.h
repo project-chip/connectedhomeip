@@ -33,18 +33,17 @@
 #include "DFUOverSMP.h"
 #endif
 
-#ifdef CONFIG_CHIP_ICD_SUBSCRIPTION_HANDLING
-#include "ICDUtil.h"
-#endif
-
 #include <cstdint>
 
 struct k_timer;
 struct Identify;
+class AppFabricTableDelegate;
 
 class AppTask
 {
 public:
+    friend class AppFabricTableDelegate;
+
     static AppTask & Instance()
     {
         static AppTask sAppTask;

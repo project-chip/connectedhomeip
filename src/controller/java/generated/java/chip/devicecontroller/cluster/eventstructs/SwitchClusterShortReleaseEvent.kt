@@ -17,21 +17,21 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
-class SwitchClusterShortReleaseEvent(val previousPosition: Int) {
+class SwitchClusterShortReleaseEvent(val previousPosition: UInt) {
   override fun toString(): String = buildString {
     append("SwitchClusterShortReleaseEvent {\n")
     append("\tpreviousPosition : $previousPosition\n")
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_PREVIOUS_POSITION), previousPosition)
       endStructure()
     }
@@ -40,9 +40,9 @@ class SwitchClusterShortReleaseEvent(val previousPosition: Int) {
   companion object {
     private const val TAG_PREVIOUS_POSITION = 0
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): SwitchClusterShortReleaseEvent {
-      tlvReader.enterStructure(tag)
-      val previousPosition = tlvReader.getInt(ContextSpecificTag(TAG_PREVIOUS_POSITION))
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): SwitchClusterShortReleaseEvent {
+      tlvReader.enterStructure(tlvTag)
+      val previousPosition = tlvReader.getUInt(ContextSpecificTag(TAG_PREVIOUS_POSITION))
 
       tlvReader.exitContainer()
 

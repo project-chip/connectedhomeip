@@ -17,15 +17,15 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
 import java.util.Optional
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class ChannelClusterChannelInfoStruct(
-  val majorNumber: Int,
-  val minorNumber: Int,
+  val majorNumber: UInt,
+  val minorNumber: UInt,
   val name: Optional<String>,
   val callSign: Optional<String>,
   val affiliateCallSign: Optional<String>
@@ -40,9 +40,9 @@ class ChannelClusterChannelInfoStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_MAJOR_NUMBER), majorNumber)
       put(ContextSpecificTag(TAG_MINOR_NUMBER), minorNumber)
       if (name.isPresent) {
@@ -68,10 +68,10 @@ class ChannelClusterChannelInfoStruct(
     private const val TAG_CALL_SIGN = 3
     private const val TAG_AFFILIATE_CALL_SIGN = 4
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ChannelClusterChannelInfoStruct {
-      tlvReader.enterStructure(tag)
-      val majorNumber = tlvReader.getInt(ContextSpecificTag(TAG_MAJOR_NUMBER))
-      val minorNumber = tlvReader.getInt(ContextSpecificTag(TAG_MINOR_NUMBER))
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ChannelClusterChannelInfoStruct {
+      tlvReader.enterStructure(tlvTag)
+      val majorNumber = tlvReader.getUInt(ContextSpecificTag(TAG_MAJOR_NUMBER))
+      val minorNumber = tlvReader.getUInt(ContextSpecificTag(TAG_MINOR_NUMBER))
       val name =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
           Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))

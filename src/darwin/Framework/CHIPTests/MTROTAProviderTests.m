@@ -331,14 +331,14 @@ typedef void (^BDXTransferEndHandler)(NSNumber * nodeID, MTRDeviceController * c
 - (void)respondNotAvailableWithCompletion:(QueryImageCompletion)completion
 {
     __auto_type * responseParams = [[MTROTASoftwareUpdateProviderClusterQueryImageResponseParams alloc] init];
-    responseParams.status = @(MTROTASoftwareUpdateProviderOTAQueryStatusNotAvailable);
+    responseParams.status = @(MTROTASoftwareUpdateProviderStatusNotAvailable);
     completion(responseParams, nil);
 }
 
 - (void)respondBusyWithDelay:(NSNumber *)delay completion:(QueryImageCompletion)completion
 {
     __auto_type * responseParams = [[MTROTASoftwareUpdateProviderClusterQueryImageResponseParams alloc] init];
-    responseParams.status = @(MTROTASoftwareUpdateProviderOTAQueryStatusBusy);
+    responseParams.status = @(MTROTASoftwareUpdateProviderStatusBusy);
     responseParams.delayedActionTime = delay;
     completion(responseParams, nil);
 }
@@ -351,7 +351,7 @@ typedef void (^BDXTransferEndHandler)(NSNumber * nodeID, MTRDeviceController * c
                        completion:(QueryImageCompletion)completion
 {
     __auto_type * responseParams = [[MTROTASoftwareUpdateProviderClusterQueryImageResponseParams alloc] init];
-    responseParams.status = @(MTROTASoftwareUpdateProviderOTAQueryStatusUpdateAvailable);
+    responseParams.status = @(MTROTASoftwareUpdateProviderStatusUpdateAvailable);
     responseParams.delayedActionTime = delay;
     responseParams.imageURI = uri;
     // TODO: Figure out whether we need better
@@ -369,7 +369,7 @@ typedef void (^BDXTransferEndHandler)(NSNumber * nodeID, MTRDeviceController * c
     }];
 }
 
-- (void)respondToApplyUpdateRequestWithAction:(MTROTASoftwareUpdateProviderOTAApplyUpdateAction)action
+- (void)respondToApplyUpdateRequestWithAction:(MTROTASoftwareUpdateProviderApplyUpdateAction)action
                                    completion:(ApplyUpdateRequestCompletion)completion
 {
     __auto_type * params = [[MTROTASoftwareUpdateProviderClusterApplyUpdateResponseParams alloc] init];
@@ -426,7 +426,7 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
                               nodeID:(NSNumber *)nodeID
                      softwareVersion:(NSNumber *)softwareVersion
                softwareVersionString:(NSString *)softwareVersionString
-                   applyUpdateAction:(MTROTASoftwareUpdateProviderOTAApplyUpdateAction)applyUpdateAction
+                   applyUpdateAction:(MTROTASoftwareUpdateProviderApplyUpdateAction)applyUpdateAction
                             testcase:(XCTestCase *)testcase;
 
 @property (nonatomic, readonly) XCTestExpectation * queryExpectation;
@@ -444,7 +444,7 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
                               nodeID:(NSNumber *)nodeID
                      softwareVersion:(NSNumber *)softwareVersion
                softwareVersionString:(NSString *)softwareVersionString
-                   applyUpdateAction:(MTROTASoftwareUpdateProviderOTAApplyUpdateAction)applyUpdateAction
+                   applyUpdateAction:(MTROTASoftwareUpdateProviderApplyUpdateAction)applyUpdateAction
                             testcase:(MTROTAProviderTests *)testcase
 {
     if (!(self = [super init])) {
@@ -555,7 +555,7 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
         [self.applyUpdateRequestExpectation fulfill];
     };
 
-    if (applyUpdateAction == MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed) {
+    if (applyUpdateAction == MTROTASoftwareUpdateProviderApplyUpdateActionProceed) {
         sOTAProviderDelegate.notifyUpdateAppliedHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
             MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams * params, MTRStatusCompletion completion) {
             XCTAssertEqualObjects(nodeID, nodeID);
@@ -822,7 +822,7 @@ static BOOL sNeedsStackShutdown = YES;
     __auto_type * params = [[MTROTASoftwareUpdateRequestorClusterAnnounceOTAProviderParams alloc] init];
     params.providerNodeID = [sController controllerNodeID];
     params.vendorID = @(kTestVendorId);
-    params.announcementReason = @(MTROTASoftwareUpdateRequestorOTAAnnouncementReasonSimpleAnnouncement);
+    params.announcementReason = @(MTROTASoftwareUpdateRequestorAnnouncementReasonSimpleAnnouncement);
     params.endpoint = @(kOTAProviderEndpointId);
 
     __auto_type * cluster = [[MTRClusterOTASoftwareUpdateRequestor alloc] initWithDevice:device endpointID:@(0) queue:queue];
@@ -1026,7 +1026,7 @@ static BOOL sNeedsStackShutdown = YES;
                                                              nodeID:@(kDeviceId1)
                                                     softwareVersion:kUpdatedSoftwareVersion_5
                                               softwareVersionString:kUpdatedSoftwareVersionString_5
-                                                  applyUpdateAction:MTROTASoftwareUpdateProviderOTAApplyUpdateActionDiscontinue
+                                                  applyUpdateAction:MTROTASoftwareUpdateProviderApplyUpdateActionDiscontinue
                                                            testcase:self];
     // We do not expect the update to actually be applied here.
     checker.notifyUpdateAppliedExpectation.inverted = YES;
@@ -1084,7 +1084,7 @@ static BOOL sNeedsStackShutdown = YES;
                                                              nodeID:@(kDeviceId1)
                                                     softwareVersion:kUpdatedSoftwareVersion_5
                                               softwareVersionString:kUpdatedSoftwareVersionString_5
-                                                  applyUpdateAction:MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed
+                                                  applyUpdateAction:MTROTASoftwareUpdateProviderApplyUpdateActionProceed
                                                            testcase:self];
 
     // Advertise ourselves as an OTA provider.
@@ -1395,7 +1395,7 @@ static BOOL sNeedsStackShutdown = YES;
 
         XCTAssertTrue([[NSFileManager defaultManager] contentsEqualAtPath:otaImageFilePath andPath:otaDownloadedFilePath]);
 
-        [sOTAProviderDelegate respondToApplyUpdateRequestWithAction:MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed
+        [sOTAProviderDelegate respondToApplyUpdateRequestWithAction:MTROTASoftwareUpdateProviderApplyUpdateActionProceed
                                                          completion:completion];
 
         if (isDeviceID1) {
@@ -1508,7 +1508,7 @@ static BOOL sNeedsStackShutdown = YES;
                                                              nodeID:@(kDeviceId3)
                                                     softwareVersion:kUpdatedSoftwareVersion_5
                                               softwareVersionString:kUpdatedSoftwareVersionString_5
-                                                  applyUpdateAction:MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed
+                                                  applyUpdateAction:MTROTASoftwareUpdateProviderApplyUpdateActionProceed
                                                            testcase:self];
 
     // Advertise ourselves as an OTA provider.
@@ -1539,7 +1539,7 @@ static BOOL sNeedsStackShutdown = YES;
                                                              nodeID:@(kDeviceId3)
                                                     softwareVersion:kUpdatedSoftwareVersion_10
                                               softwareVersionString:kUpdatedSoftwareVersionString_10
-                                                  applyUpdateAction:MTROTASoftwareUpdateProviderOTAApplyUpdateActionProceed
+                                                  applyUpdateAction:MTROTASoftwareUpdateProviderApplyUpdateActionProceed
                                                            testcase:self];
 
     // Advertise ourselves as an OTA provider.

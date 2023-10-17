@@ -1,1 +1,1 @@
-11 : [ESP32] Update IDF to release v5.1.1
+21 : [chip-build-java] Ensure java is actually available in the docker image

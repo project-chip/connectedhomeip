@@ -41,7 +41,7 @@ const char basePath[] = "./src/app/tests/suites/commands/delay/scripts/";
 const char * getScriptsFolder() { return basePath; }
 } // namespace
 
-constexpr const char * kDefaultKey = "default";
+inline constexpr const char * kDefaultKey = "default";
 
 @interface TestDeviceControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property TestCommandBridge * commandBridge;
@@ -58,7 +58,7 @@ constexpr const char * kDefaultKey = "default";
 
 NS_ASSUME_NONNULL_END
 
-constexpr uint16_t kTimeoutInSeconds = 90;
+inline constexpr uint16_t kTimeoutInSeconds = 90;
 
 class TestCommandBridge : public CHIPCommandBridge,
                           public ValueChecker,
@@ -111,7 +111,7 @@ public:
     CHIP_ERROR WaitForMs(
         const char * _Nullable identity, const chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type & value)
     {
-        dispatch_time_t delayTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(value.ms * NSEC_PER_MSEC));
+        dispatch_time_t delayTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t) (value.ms * NSEC_PER_MSEC));
         dispatch_after(delayTime, mCallbackQueue, ^(void) {
             NextTest();
         });
@@ -310,7 +310,8 @@ protected:
         return ConstraintsChecker::CheckConstraintIsHexString(itemName, value, expectHexString);
     }
 
-    template <typename T> bool CheckConstraintContains(const char * _Nonnull itemName, const NSArray * _Nonnull current, T expected)
+    template <typename T>
+    bool CheckConstraintContains(const char * _Nonnull itemName, const NSArray * _Nonnull current, T expected)
     {
         for (id currentElement in current) {
             if ([currentElement isEqualToNumber:@(expected)]) {
@@ -322,7 +323,8 @@ protected:
         return false;
     }
 
-    template <typename T> bool CheckConstraintExcludes(const char * _Nonnull itemName, const NSArray * _Nonnull current, T expected)
+    template <typename T>
+    bool CheckConstraintExcludes(const char * _Nonnull itemName, const NSArray * _Nonnull current, T expected)
     {
         for (id currentElement in current) {
             if ([currentElement isEqualToNumber:@(expected)]) {
@@ -388,7 +390,8 @@ protected:
         return CheckConstraintNotValue(itemName, current, @(expected));
     }
 
-    template <typename T> bool CheckConstraintNotValue(const char * _Nonnull itemName, NSError * _Nullable current, T expected)
+    template <typename T>
+    bool CheckConstraintNotValue(const char * _Nonnull itemName, NSError * _Nullable current, T expected)
     {
         NSNumber * currentValue = @(MTRErrorToCHIPErrorCode(current).AsInteger());
         return CheckConstraintNotValue(itemName, currentValue, @(expected));
@@ -540,25 +543,29 @@ protected:
         return CheckValue(itemName, currentValue, expected);
     }
 
-    template <typename T> bool CheckValue(const char * _Nonnull itemName, NSNumber * _Nonnull current, T expected)
+    template <typename T>
+    bool CheckValue(const char * _Nonnull itemName, NSNumber * _Nonnull current, T expected)
     {
         return CheckValue(itemName, current, @(expected));
     }
 
-    template <typename T> bool CheckValue(const char * _Nonnull itemName, id _Nonnull current, T expected)
+    template <typename T>
+    bool CheckValue(const char * _Nonnull itemName, id _Nonnull current, T expected)
     {
         NSNumber * currentValue = current;
         return CheckValue(itemName, currentValue, @(expected));
     }
 
-    template <typename T> bool CheckValue(const char * _Nonnull itemName, NSError * _Nullable current, T expected)
+    template <typename T>
+    bool CheckValue(const char * _Nonnull itemName, NSError * _Nullable current, T expected)
     {
 
         NSNumber * currentValue = @(current.code);
         return CheckValue(itemName, currentValue, @(expected));
     }
 
-    template <typename T, typename U> bool CheckValue(const char * _Nonnull itemName, T current, U expected)
+    template <typename T, typename U>
+    bool CheckValue(const char * _Nonnull itemName, T current, U expected)
     {
 
         return ValueChecker::CheckValue(itemName, current, expected);

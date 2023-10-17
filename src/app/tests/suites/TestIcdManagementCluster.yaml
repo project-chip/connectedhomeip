@@ -167,20 +167,11 @@ tests:
       response:
           value:
               [
-                  {
-                      CheckInNodeID: 101,
-                      MonitoredSubject: 1001,
-                      Key: "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
-                  },
-                  {
-                      CheckInNodeID: 201,
-                      MonitoredSubject: 2001,
-                      Key:
-                          "\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f",
-                  },
+                  { CheckInNodeID: 101, MonitoredSubject: 1001 },
+                  { CheckInNodeID: 201, MonitoredSubject: 2001 },
               ]
 
-    - label: "Register 1.1"
+    - label: "Register 1.1 (update)"
       command: "RegisterClient"
       arguments:
           values:
@@ -201,17 +192,8 @@ tests:
       response:
           value:
               [
-                  {
-                      CheckInNodeID: 101,
-                      MonitoredSubject: 1002,
-                      Key: "\x01\x11\x21\x31\x41\x51\x61\x71\x81\x91\xa1\xb1\xc1\xd1\xe1\xf1",
-                  },
-                  {
-                      CheckInNodeID: 201,
-                      MonitoredSubject: 2001,
-                      Key:
-                          "\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f",
-                  },
+                  { CheckInNodeID: 101, MonitoredSubject: 1002 },
+                  { CheckInNodeID: 201, MonitoredSubject: 2001 },
               ]
 
     - label: "Register 2.2 (wrong verification key)"
@@ -238,16 +220,8 @@ tests:
       response:
           value:
               [
-                  {
-                      CheckInNodeID: 101,
-                      MonitoredSubject: 1002,
-                      Key: "\x01\x11\x21\x31\x41\x51\x61\x71\x81\x91\xa1\xb1\xc1\xd1\xe1\xf1",
-                  },
-                  {
-                      CheckInNodeID: 201,
-                      MonitoredSubject: 2002,
-                      Key: "\x02\x12\x22\x32\x42\x52\x62\x72\x82\x92\xa2\xb2\xc2\xd2\xe2\x2f",
-                  },
+                  { CheckInNodeID: 101, MonitoredSubject: 1002 },
+                  { CheckInNodeID: 201, MonitoredSubject: 2002 },
               ]
 
     - label: "Unregister 1.1 (wrong key)"
@@ -263,14 +237,7 @@ tests:
       command: "readAttribute"
       attribute: "RegisteredClients"
       response:
-          value:
-              [
-                  {
-                      CheckInNodeID: 201,
-                      MonitoredSubject: 2002,
-                      Key: "\x02\x12\x22\x32\x42\x52\x62\x72\x82\x92\xa2\xb2\xc2\xd2\xe2\x2f",
-                  },
-              ]
+          value: [{ CheckInNodeID: 201, MonitoredSubject: 2002 }]
 
     - label: "Unregister 2.1"
       command: "UnregisterClient"

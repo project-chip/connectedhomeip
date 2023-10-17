@@ -23,14 +23,17 @@
 
 #include "FreeRTOS.h"
 #include "timers.h"
+
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 
-#define APP_BUTTON_PRESS_JITTER 50
-#define APP_BUTTON_PRESS_SHORT 1500
-#define APP_BUTTON_PRESS_LONG 5000
+#define APP_BUTTON_PRESSED_ITVL 50
+#define APP_BUTTON_PRESS_JITTER 100
+#define APP_BUTTON_PRESS_SHORT 1000
+#define APP_BUTTON_PRESS_LONG 4000
+#define APP_TIMER_EVENT_DEFAULT_ITVL 1000
 
 #define APP_LIGHT_ENDPOINT_ID 1
 #define APP_REBOOT_RESET_COUNT 3
@@ -58,6 +61,8 @@ public:
         APP_EVENT_TIMER         = 0x00000010,
         APP_EVENT_BTN_SHORT     = 0x00000020,
         APP_EVENT_FACTORY_RESET = 0x00000040,
+        APP_EVENT_BTN_LONG      = 0x00000080,
+        APP_EVENT_BTN_ISR       = 0x00000100,
 
         APP_EVENT_LIGHTING_ONOFF = 0x00010000,
         APP_EVENT_LIGHTING_LEVEL = 0x00020000,
@@ -69,7 +74,8 @@ public:
         APP_EVENT_IDENTIFY_STOP     = 0x04000000,
         APP_EVENT_IDENTIFY_MASK     = APP_EVENT_IDENTIFY_START | APP_EVENT_IDENTIFY_IDENTIFY | APP_EVENT_IDENTIFY_STOP,
 
-        APP_EVENT_ALL_MASK = APP_EVENT_LIGHTING_MASK | APP_EVENT_TIMER | APP_EVENT_BTN_SHORT | APP_EVENT_IDENTIFY_MASK,
+        APP_EVENT_ALL_MASK = APP_EVENT_LIGHTING_MASK | APP_EVENT_TIMER | APP_EVENT_BTN_SHORT | APP_EVENT_BTN_LONG |
+            APP_EVENT_BTN_ISR | APP_EVENT_IDENTIFY_MASK,
     };
 
     void SetEndpointId(EndpointId endpointId)
@@ -81,6 +87,9 @@ public:
     EndpointId GetEndpointId(void) { return mEndpointId; }
     void PostEvent(app_event_t event);
     void ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction);
+#ifdef BOOT_PIN_RESET
+    static void ButtonEventHandler(void * arg);
+#endif
 
     static void IdentifyStartHandler(Identify *);
     static void IdentifyStopHandler(Identify *);
@@ -106,7 +115,6 @@ private:
 #ifdef BOOT_PIN_RESET
     static void ButtonInit(void);
     static bool ButtonPressed(void);
-    static void ButtonEventHandler(void * arg);
 #endif
 
     static void ScheduleInit(intptr_t arg);

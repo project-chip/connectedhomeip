@@ -15,6 +15,7 @@
 #
 
 import json
+import logging
 import os
 import subprocess
 from dataclasses import dataclass
@@ -143,8 +144,6 @@ def _GetExtraSlowTests() -> Set[str]:
 def _GetInDevelopmentTests() -> Set[str]:
     """Tests that fail in YAML for some reason."""
     return {
-        "Test_TC_TIMESYNC_1_1.yaml",         # Time sync SDK is not yet ready
-        "Test_TC_TIMESYNC_2_3.yaml",         # Time sync SDK is not yet ready
         "Test_TC_PSCFG_1_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
         "Test_TC_PSCFG_2_1.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
         "Test_TC_PSCFG_2_2.yaml",  # Power source configuration cluster is deprecated and removed from all-clusters
@@ -158,8 +157,6 @@ def _GetInDevelopmentTests() -> Set[str]:
                                              # TestEventTriggersEnabled is true, which it's not in CI.
         "Test_TC_SMOKECO_2_6.yaml",          # chip-repl does not support local timeout (07/20/2023) and test assumes
                                              # TestEventTriggersEnabled is true, which it's not in CI.
-        "Test_TC_IDM_1_2.yaml",  # Broken harness: https://github.com/project-chip/connectedhomeip/issues/29115
-        "Test_TC_S_2_4.yaml",  # https://github.com/project-chip/connectedhomeip/issues/29117
     }
 
 
@@ -178,9 +175,7 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "Test_TC_ACE_1_6.yaml",    # Test fails only in chip-repl: Refer--> https://github.com/project-chip/connectedhomeip/pull/27910#issuecomment-1632485584
         "Test_TC_IDM_1_2.yaml",              # chip-repl does not support AnyCommands (19/07/2023)
         "TestGroupKeyManagementCluster.yaml",  # chip-repl does not support EqualityCommands (2023-08-04)
-        "Test_TC_S_2_2.yaml",              # chip-repl does not support scenes cluster commands
-        "Test_TC_S_2_3.yaml",              # chip-repl does not support scenes cluster commands
-        "Test_TC_S_2_4.yaml",              # chip-repl does not support scenes cluster commands
+        "Test_TC_S_2_2.yaml",              # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_MOD_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_MOD_3_2.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_MOD_3_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
@@ -192,8 +187,13 @@ def _GetChipReplUnsupportedTests() -> Set[str]:
         "Test_TC_G_2_4.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_RVCRUNM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         "Test_TC_RVCCLEANM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_TCCM_3_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
+        "Test_TC_TCTL_2_1.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
         # chip-repl and chip-tool disagree on what the YAML here should look like: https://github.com/project-chip/connectedhomeip/issues/29110
         "TestClusterMultiFabric.yaml",
+        "Test_TC_ACL_2_5.yaml",            # chip-repl does not support LastReceivedEventNumber : https://github.com/project-chip/connectedhomeip/issues/28884
+        "Test_TC_ACL_2_6.yaml",            # chip-repl does not support LastReceivedEventNumber : https://github.com/project-chip/connectedhomeip/issues/28884
+        "Test_TC_RVCCLEANM_3_3.yaml",            # chip-repl does not support EqualityCommands pseudo-cluster
     }
 
 
@@ -231,7 +231,7 @@ def target_for_name(name: str):
         return TestTarget.LOCK
     if name.startswith("OTA_"):
         return TestTarget.OTA
-    if name.startswith("Test_TC_BRBINFO_"):
+    if name.startswith("Test_TC_BRBINFO_") or name.startswith("Test_TC_ACT_"):
         return TestTarget.BRIDGE
     return TestTarget.ALL_CLUSTERS
 
@@ -244,8 +244,13 @@ def tests_with_command(chip_tool: str, is_manual: bool):
     if is_manual:
         cmd += "-manual"
 
-    result = subprocess.run([chip_tool, "tests", cmd], capture_output=True)
-    result.check_returncode()
+    cmd = [chip_tool, "tests", cmd]
+    result = subprocess.run(cmd, capture_output=True, encoding="utf-8")
+    if result.returncode != 0:
+        logging.error(f'Failed to run {cmd}:')
+        logging.error('STDOUT: ' + result.stdout)
+        logging.error('STDERR: ' + result.stderr)
+        result.check_returncode()
 
     test_tags = set()
     if is_manual:
@@ -253,7 +258,7 @@ def tests_with_command(chip_tool: str, is_manual: bool):
 
     in_development_tests = [s.replace(".yaml", "") for s in _GetInDevelopmentTests()]
 
-    for name in result.stdout.decode("utf8").split("\n"):
+    for name in result.stdout.split("\n"):
         if not name:
             continue
 

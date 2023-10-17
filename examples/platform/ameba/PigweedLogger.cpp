@@ -18,7 +18,7 @@
 #include "FreeRTOS.h"
 #include "pw_sys_io_ameba/init.h"
 #include "semphr.h"
-#include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/logging/TextOnlyLogging.h>
 #include <pw_hdlc/encoder.h>
 #include <pw_stream/sys_io_stream.h>
 

@@ -152,7 +152,7 @@ void rsi_rtc_init_timer(void)
      * An unscaled dividend (dividend = argument + 1).
      * So we need to send argument substracted by 1
      */
-    rtcc_init.presc = (RTCC_CntPresc_TypeDef)(CMU_PrescToLog2(SL_SLEEPTIMER_FREQ_DIVIDER - 1));
+    rtcc_init.presc = (RTCC_CntPresc_TypeDef) (CMU_PrescToLog2(SL_SLEEPTIMER_FREQ_DIVIDER - 1));
 
     RTCC_Init(&rtcc_init);
 

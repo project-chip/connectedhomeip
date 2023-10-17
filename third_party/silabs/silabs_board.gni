@@ -15,6 +15,7 @@
 declare_args() {
   # EFR32 board used
   silabs_board = ""
+  silabs_board_lower = ""
 
   # LCD is enabled by default
   # Boards BRD4166A, BRD2601B, BRD2703A and BRD4319A do not have a LCD so they disable it explicitly
@@ -47,6 +48,9 @@ declare_args() {
 
   # Disable UART log forwarding by default
   sl_uart_log_output = false
+
+  # Self-provision enabled
+  use_provision_channel = false
 }
 
 declare_args() {
@@ -106,6 +110,7 @@ if (silabs_board == "BRD4304A") {
   disable_lcd = true
   show_qr_code = false
   wifi_soc = true
+  silabs_board_lower = "brd4325b"
 } else if (silabs_board == "BRD4325C") {
   silabs_family = "SiWx917-common"
   silabs_mcu = "SiWG917M111MGTBA"
@@ -113,6 +118,7 @@ if (silabs_board == "BRD4304A") {
   show_qr_code = false
   wifi_soc = true
   wifi_soc_common_flash = true
+  silabs_board_lower = "brd4325c"
 } else if (silabs_board == "BRD4325G") {
   silabs_family = "SiWx917-common"
   silabs_mcu = "SiWG917M111MGTBA"
@@ -120,13 +126,15 @@ if (silabs_board == "BRD4304A") {
   show_qr_code = false
   wifi_soc = true
   wifi_soc_common_flash = true
+  silabs_board_lower = "brd4325g"
 } else if (silabs_board == "BRD4338A") {
   silabs_family = "SiWx917-common"
   silabs_mcu = "SiWG917M111MGTBA"
-  disable_lcd = true
-  show_qr_code = false
+  disable_lcd = false
+  show_qr_code = true
   wifi_soc = true
   wifi_soc_common_flash = true
+  silabs_board_lower = "brd4338a"
 } else if (silabs_board == "BRD4180A") {
   assert(
       false,
@@ -134,7 +142,9 @@ if (silabs_board == "BRD4304A") {
   silabs_family = "efr32mg21"
   silabs_mcu = "EFR32MG21A020F1024IM32"
 } else if (silabs_board == "BRD4186A" || silabs_board == "BRD4187A") {
-  print("RevA is deprecated, We suggest using BRD4186C (rev C)")
+  variant = string_replace(silabs_board, "A", "C")
+  print(
+      "${silabs_board} is deprecated. It is recommended to use the 'C' variant of this board (${variant})")
   silabs_family = "efr32mg24"
   silabs_mcu = "EFR32MG24A010F1536GM48"
 } else if (silabs_board == "BRD4186C") {
@@ -194,9 +204,9 @@ if (silabs_board == "BRD4304A") {
   silabs_family = "mgm24"
   silabs_mcu = "MGM240SD22VNA"
 } else {
-  print(
-      "Please provide a valid value for SILABS_BOARD env variable (currently supported BRD4304A, BRD4161A, BRD4163A, BRD4164A BRD4166A, BRD4170A, BRD4186C, BRD4187C, BRD2601B, BRD2703A, BRD4317A, BRD2704A)")
-  assert(false, "The board ${silabs_board} is unsupported")
+  assert(
+      false,
+      "The board ${silabs_board} is unsupported. A list of supported board can be found here https://t.ly/_b3SK")
 }
 
 # qr code cannot be true if lcd is disabled

@@ -1577,7 +1577,7 @@ tests:
           "Step 10a: Writes (sets back) default value of MinHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.F01 && TSTAT.S.A0015 && TSTAT.S.A0003
+      PICS: TSTAT.S.F00 && TSTAT.S.A0015 && TSTAT.S.A0003
       arguments:
           value: AbsMinHeatSetpointLimitValue
 
@@ -1585,21 +1585,21 @@ tests:
           "Step 10a: Writes (sets back) default value of MinHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "MinHeatSetpointLimit"
-      PICS: TSTAT.S.F01 && TSTAT.S.A0015 && !TSTAT.S.A0003
+      PICS: TSTAT.S.F00 && TSTAT.S.A0015 && !TSTAT.S.A0003
       arguments:
           value: 700
 
     - label: "Step 10a: Writes (sets back)default value of MaxHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F01 && TSTAT.S.A0016 && !TSTAT.S.F05 && TSTAT.S.A0004
+      PICS: TSTAT.S.F00 && TSTAT.S.A0016 && !TSTAT.S.F05 && TSTAT.S.A0004
       arguments:
           value: AbsMaxHeatSetpointLimitValue
 
     - label: "Step 10a: Writes (sets back)default value of MaxHeatSetpointLimit"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F01 && TSTAT.S.A0016 && !TSTAT.S.F05 && !TSTAT.S.A0004
+      PICS: TSTAT.S.F00 && TSTAT.S.A0016 && !TSTAT.S.F05 && !TSTAT.S.A0004
       arguments:
           value: 3000
 
@@ -1607,7 +1607,7 @@ tests:
           "Step 10a: Writes MaxHeatSetpointLimit That meets the deadband of 2.5C"
       command: "writeAttribute"
       attribute: "MaxHeatSetpointLimit"
-      PICS: TSTAT.S.F01 && TSTAT.S.A0016 && TSTAT.S.F05
+      PICS: TSTAT.S.F00 && TSTAT.S.A0016 && TSTAT.S.F05
       arguments:
           value: 2950
 
@@ -1736,20 +1736,52 @@ tests:
               anyOf: [4, 5]
 
     - label:
-          "Step 12: Write Attribute command for ControlSequenceOfOperation with
-          a new valid value"
+          "Step 12: TH writes value 1 for attribute ControlSequenceOfOperation.
+          If TSTAT.S.F01 is true & TSTAT.S.F00 is false"
       command: "writeAttribute"
       attribute: "ControlSequenceOfOperation"
-      PICS: TSTAT.S.F00 || TSTAT.S.F01
+      PICS: TSTAT.S.F01 && !TSTAT.S.F00
       arguments:
-          value: 2
+          value: 1
 
     - label: "Step 12: Read it back again to confirm the successful write"
       command: "readAttribute"
       attribute: "ControlSequenceOfOperation"
-      PICS: TSTAT.S.F00 || TSTAT.S.F01
+      PICS: TSTAT.S.F01 && !TSTAT.S.F00
       response:
-          value: 2
+          value: 1
+
+    - label:
+          "Step 12: TH writes value 3 for attribute ControlSequenceOfOperation.
+          If TSTAT.S.F00 is true & TSTAT.S.F01 is false"
+      command: "writeAttribute"
+      attribute: "ControlSequenceOfOperation"
+      PICS: TSTAT.S.F00 && !TSTAT.S.F01
+      arguments:
+          value: 3
+
+    - label: "Step 12: Read it back again to confirm the successful write"
+      command: "readAttribute"
+      attribute: "ControlSequenceOfOperation"
+      PICS: TSTAT.S.F00 && !TSTAT.S.F01
+      response:
+          value: 3
+
+    - label:
+          "Step 12: TH writes value 4 for attribute ControlSequenceOfOperation.
+          If TSTAT.S.F01 & TSTAT.S.F00 are true"
+      command: "writeAttribute"
+      attribute: "ControlSequenceOfOperation"
+      PICS: TSTAT.S.F00 && TSTAT.S.F01
+      arguments:
+          value: 4
+
+    - label: "Step 12: Read it back again to confirm the successful write"
+      command: "readAttribute"
+      attribute: "ControlSequenceOfOperation"
+      PICS: TSTAT.S.F00 && TSTAT.S.F01
+      response:
+          value: 4
 
     - label:
           "Writes MaxHeatSetpointLimit attribute to default value of 2950 to

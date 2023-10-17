@@ -29,8 +29,8 @@ class JniReferences
 {
 public:
     // No copy, move or assignment.
-    JniReferences(const JniReferences &)  = delete;
-    JniReferences(const JniReferences &&) = delete;
+    JniReferences(const JniReferences &)             = delete;
+    JniReferences(const JniReferences &&)            = delete;
     JniReferences & operator=(const JniReferences &) = delete;
 
     static JniReferences & GetInstance()
@@ -58,7 +58,7 @@ public:
 
     /**
      * @brief
-     *   Creates a jclass reference to the given class type.
+     *   Creates a global jclass reference to the given class type.
      *
      *   This must be called after SetJavaVm().
      *
@@ -67,6 +67,19 @@ public:
      * @param[out] outCls A Java reference to the class matching clsType.
      */
     CHIP_ERROR GetClassRef(JNIEnv * env, const char * clsType, jclass & outCls);
+
+    /**
+     * @brief
+     *   Creates a local jclass reference to the given class type.
+     *
+     *   This must be called after SetJavaVm().
+     *
+     * @param[in] env The JNIEnv for finding a Java class and creating a new Java reference.
+     * @param[in] clsType The fully-qualified Java class name to find, e.g. java/lang/IllegalStateException.
+     * @param[out] outCls A Java reference to the class matching clsType.
+     */
+    CHIP_ERROR GetLocalClassRef(JNIEnv * env, const char * clsType, jclass & outCls);
+
     CHIP_ERROR FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature,
                           jmethodID * methodId);
     void CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint argument);

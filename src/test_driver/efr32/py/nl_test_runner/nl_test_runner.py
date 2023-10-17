@@ -23,7 +23,7 @@ import time
 from typing import Any
 
 import serial  # type: ignore
-from pw_hdlc.rpc import HdlcRpcClient, default_channels, write_to_file
+from pw_hdlc import rpc
 
 # RPC Protos
 from nl_test_service import nl_test_pb2  # isort:skip
@@ -81,10 +81,10 @@ def flash_device(device: str, flash_image: str, **kwargs):
 def get_hdlc_rpc_client(device: str, baudrate: int, output: Any, **kwargs):
     """Get the HdlcRpcClient based on arguments."""
     serial_device = serial.Serial(device, baudrate, timeout=1)
-    def read(): return serial_device.read(8192)
+    reader = rpc.SerialReader(serial_device, 8192)
     write = serial_device.write
-    return HdlcRpcClient(read, PROTOS, default_channels(write),
-                         lambda data: write_to_file(data, output))
+    return rpc.HdlcRpcClient(reader, PROTOS, rpc.default_channels(write),
+                             lambda data: rpc.write_to_file(data, output))
 
 
 def runner(client) -> int:
@@ -133,8 +133,8 @@ def main() -> int:
     if args.flash_image:
         flash_device(**vars(args))
         time.sleep(1)  # Give time for device to boot
-    client = get_hdlc_rpc_client(**vars(args))
-    return runner(client)
+    with get_hdlc_rpc_client(**vars(args)) as client:
+        return runner(client)
 
 
 if __name__ == '__main__':

@@ -24,6 +24,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceConfig.h>
 
 #include "account-login/AccountLoginManager.h"
 #include "application-basic/ApplicationBasicManager.h"

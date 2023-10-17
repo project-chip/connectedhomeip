@@ -58,7 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                  fabricID:(NSNumber * _Nullable)fabricID
                                            validityPeriod:(NSDateInterval *)validityPeriod
                                                     error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    API_AVAILABLE(ios(16.6), macos(13.5), watchos(9.6), tvos(16.6));
+    MTR_AVAILABLE(ios(16.6), macos(13.5), watchos(9.6), tvos(16.6));
 
 /**
  * As above, but defaults to no expiration time.
@@ -67,7 +67,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                  issuerID:(NSNumber * _Nullable)issuerID
                                                  fabricID:(NSNumber * _Nullable)fabricID
                                                     error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Create an intermediate X.509 DER encoded certificate that has the
@@ -96,7 +96,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          fabricID:(NSNumber * _Nullable)fabricID
                                                    validityPeriod:(NSDateInterval *)validityPeriod
                                                             error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    API_AVAILABLE(ios(16.6), macos(13.5), watchos(9.6), tvos(16.6));
+    MTR_AVAILABLE(ios(16.6), macos(13.5), watchos(9.6), tvos(16.6));
 
 /**
  * As above, but defaults to no expiration time.
@@ -107,7 +107,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                          issuerID:(NSNumber * _Nullable)issuerID
                                                          fabricID:(NSNumber * _Nullable)fabricID
                                                             error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Create an X.509 DER encoded certificate that has the
@@ -142,7 +142,7 @@ NS_ASSUME_NONNULL_BEGIN
                                            caseAuthenticatedTags:(NSSet<NSNumber *> * _Nullable)caseAuthenticatedTags
                                                   validityPeriod:(NSDateInterval *)validityPeriod
                                                            error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    API_AVAILABLE(ios(16.6), macos(13.5), watchos(9.6), tvos(16.6));
+    MTR_AVAILABLE(ios(16.6), macos(13.5), watchos(9.6), tvos(16.6));
 
 /**
  * As above, but defaults to no expiration time.
@@ -154,7 +154,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                           nodeID:(NSNumber *)nodeID
                                            caseAuthenticatedTags:(NSSet<NSNumber *> * _Nullable)caseAuthenticatedTags
                                                            error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Check whether the given keypair's public key matches the given certificate's
@@ -207,7 +207,7 @@ NS_ASSUME_NONNULL_BEGIN
  * represented in the X.509v3 DER format).
  */
 + (MTRCertificateDERBytes _Nullable)convertMatterCertificate:(MTRCertificateTLVBytes)matterCertificate
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 /**
  * Extract the public key from the given PKCS#10 certificate signing request.
@@ -216,7 +216,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (NSData * _Nullable)publicKeyFromCSR:(MTRCSRDERBytes)csr
                                  error:(NSError * __autoreleasing _Nullable * _Nullable)error
-    API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+    MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
 @end
 

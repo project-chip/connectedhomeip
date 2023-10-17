@@ -593,6 +593,10 @@ class TestStep:
                 self._test.event)
             self._test.endpoint = self._config_variable_substitution(
                 self._test.endpoint)
+            self._test.group_id = self._config_variable_substitution(
+                self._test.group_id)
+            self._test.node_id = self._config_variable_substitution(
+                self._test.node_id)
             test.update_arguments(self.arguments)
             test.update_responses(self.responses)
 
@@ -1080,9 +1084,8 @@ class TestStep:
                     variable_info = self._runtime_config_variable_storage[token]
                     if type(variable_info) is dict and 'defaultValue' in variable_info:
                         variable_info = variable_info['defaultValue']
-                    if variable_info is not None:
-                        tokens[idx] = variable_info
-                        substitution_occured = True
+                    tokens[idx] = variable_info
+                    substitution_occured = True
 
             if len(tokens) == 1:
                 return tokens[0]

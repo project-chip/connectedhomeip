@@ -17,12 +17,12 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
-class ActionsClusterStateChangedEvent(val actionID: Int, val invokeID: Long, val newState: Int) {
+class ActionsClusterStateChangedEvent(val actionID: UInt, val invokeID: ULong, val newState: UInt) {
   override fun toString(): String = buildString {
     append("ActionsClusterStateChangedEvent {\n")
     append("\tactionID : $actionID\n")
@@ -31,9 +31,9 @@ class ActionsClusterStateChangedEvent(val actionID: Int, val invokeID: Long, val
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ACTION_I_D), actionID)
       put(ContextSpecificTag(TAG_INVOKE_I_D), invokeID)
       put(ContextSpecificTag(TAG_NEW_STATE), newState)
@@ -46,11 +46,11 @@ class ActionsClusterStateChangedEvent(val actionID: Int, val invokeID: Long, val
     private const val TAG_INVOKE_I_D = 1
     private const val TAG_NEW_STATE = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ActionsClusterStateChangedEvent {
-      tlvReader.enterStructure(tag)
-      val actionID = tlvReader.getInt(ContextSpecificTag(TAG_ACTION_I_D))
-      val invokeID = tlvReader.getLong(ContextSpecificTag(TAG_INVOKE_I_D))
-      val newState = tlvReader.getInt(ContextSpecificTag(TAG_NEW_STATE))
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ActionsClusterStateChangedEvent {
+      tlvReader.enterStructure(tlvTag)
+      val actionID = tlvReader.getUInt(ContextSpecificTag(TAG_ACTION_I_D))
+      val invokeID = tlvReader.getULong(ContextSpecificTag(TAG_INVOKE_I_D))
+      val newState = tlvReader.getUInt(ContextSpecificTag(TAG_NEW_STATE))
 
       tlvReader.exitContainer()
 

@@ -17,15 +17,15 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.AnonymousTag
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.AnonymousTag
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class RvcRunModeClusterModeOptionStruct(
   val label: String,
-  val mode: Int,
+  val mode: UInt,
   val modeTags: List<RvcRunModeClusterModeTagStruct>
 ) {
   override fun toString(): String = buildString {
@@ -36,16 +36,16 @@ class RvcRunModeClusterModeOptionStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_LABEL), label)
       put(ContextSpecificTag(TAG_MODE), mode)
-      startList(ContextSpecificTag(TAG_MODE_TAGS))
+      startArray(ContextSpecificTag(TAG_MODE_TAGS))
       for (item in modeTags.iterator()) {
         item.toTlv(AnonymousTag, this)
       }
-      endList()
+      endArray()
       endStructure()
     }
   }
@@ -55,13 +55,13 @@ class RvcRunModeClusterModeOptionStruct(
     private const val TAG_MODE = 1
     private const val TAG_MODE_TAGS = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): RvcRunModeClusterModeOptionStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): RvcRunModeClusterModeOptionStruct {
+      tlvReader.enterStructure(tlvTag)
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
-      val mode = tlvReader.getInt(ContextSpecificTag(TAG_MODE))
+      val mode = tlvReader.getUInt(ContextSpecificTag(TAG_MODE))
       val modeTags =
         buildList<RvcRunModeClusterModeTagStruct> {
-          tlvReader.enterList(ContextSpecificTag(TAG_MODE_TAGS))
+          tlvReader.enterArray(ContextSpecificTag(TAG_MODE_TAGS))
           while (!tlvReader.isEndOfContainer()) {
             add(RvcRunModeClusterModeTagStruct.fromTlv(AnonymousTag, tlvReader))
           }

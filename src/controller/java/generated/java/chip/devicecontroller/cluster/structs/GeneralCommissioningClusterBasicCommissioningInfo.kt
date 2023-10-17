@@ -17,14 +17,14 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class GeneralCommissioningClusterBasicCommissioningInfo(
-  val failSafeExpiryLengthSeconds: Int,
-  val maxCumulativeFailsafeSeconds: Int
+  val failSafeExpiryLengthSeconds: UInt,
+  val maxCumulativeFailsafeSeconds: UInt
 ) {
   override fun toString(): String = buildString {
     append("GeneralCommissioningClusterBasicCommissioningInfo {\n")
@@ -33,9 +33,9 @@ class GeneralCommissioningClusterBasicCommissioningInfo(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_FAIL_SAFE_EXPIRY_LENGTH_SECONDS), failSafeExpiryLengthSeconds)
       put(ContextSpecificTag(TAG_MAX_CUMULATIVE_FAILSAFE_SECONDS), maxCumulativeFailsafeSeconds)
       endStructure()
@@ -46,12 +46,15 @@ class GeneralCommissioningClusterBasicCommissioningInfo(
     private const val TAG_FAIL_SAFE_EXPIRY_LENGTH_SECONDS = 0
     private const val TAG_MAX_CUMULATIVE_FAILSAFE_SECONDS = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): GeneralCommissioningClusterBasicCommissioningInfo {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(
+      tlvTag: Tag,
+      tlvReader: TlvReader
+    ): GeneralCommissioningClusterBasicCommissioningInfo {
+      tlvReader.enterStructure(tlvTag)
       val failSafeExpiryLengthSeconds =
-        tlvReader.getInt(ContextSpecificTag(TAG_FAIL_SAFE_EXPIRY_LENGTH_SECONDS))
+        tlvReader.getUInt(ContextSpecificTag(TAG_FAIL_SAFE_EXPIRY_LENGTH_SECONDS))
       val maxCumulativeFailsafeSeconds =
-        tlvReader.getInt(ContextSpecificTag(TAG_MAX_CUMULATIVE_FAILSAFE_SECONDS))
+        tlvReader.getUInt(ContextSpecificTag(TAG_MAX_CUMULATIVE_FAILSAFE_SECONDS))
 
       tlvReader.exitContainer()
 

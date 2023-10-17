@@ -2435,6 +2435,12 @@ class ChipClusters:
                 "type": "bool",
                 "reportable": True,
             },
+            0x00000009: {
+                "attributeName": "AverageWearCount",
+                "attributeId": 0x00000009,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -12100,6 +12106,71 @@ class ChipClusters:
             },
         },
     }
+    _SAMPLE_MEI_CLUSTER_INFO = {
+        "clusterName": "SampleMei",
+        "clusterId": 0xFFF1FC20,
+        "commands": {
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "Ping",
+                "args": {
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "AddArguments",
+                "args": {
+                    "arg1": "int",
+                    "arg2": "int",
+                },
+            },
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "FlipFlop",
+                "attributeId": 0x00000000,
+                "type": "bool",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000FFF8: {
+                "attributeName": "GeneratedCommandList",
+                "attributeId": 0x0000FFF8,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFF9: {
+                "attributeName": "AcceptedCommandList",
+                "attributeId": 0x0000FFF9,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFA: {
+                "attributeName": "EventList",
+                "attributeId": 0x0000FFFA,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFB: {
+                "attributeName": "AttributeList",
+                "attributeId": 0x0000FFFB,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+                "reportable": True,
+            },
+        },
+    }
 
     _CLUSTER_ID_DICT = {
         0x00000003: _IDENTIFY_CLUSTER_INFO,
@@ -12199,6 +12270,7 @@ class ChipClusters:
         0x00000B04: _ELECTRICAL_MEASUREMENT_CLUSTER_INFO,
         0xFFF1FC05: _UNIT_TESTING_CLUSTER_INFO,
         0xFFF1FC06: _FAULT_INJECTION_CLUSTER_INFO,
+        0xFFF1FC20: _SAMPLE_MEI_CLUSTER_INFO,
     }
 
     _CLUSTER_NAME_DICT = {
@@ -12299,6 +12371,7 @@ class ChipClusters:
         "ElectricalMeasurement": _ELECTRICAL_MEASUREMENT_CLUSTER_INFO,
         "UnitTesting": _UNIT_TESTING_CLUSTER_INFO,
         "FaultInjection": _FAULT_INJECTION_CLUSTER_INFO,
+        "SampleMei": _SAMPLE_MEI_CLUSTER_INFO,
     }
 
     def __init__(self, chipstack):

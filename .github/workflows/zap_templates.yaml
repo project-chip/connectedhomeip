@@ -32,7 +32,7 @@ jobs:
 
         runs-on: ubuntu-20.04
         container:
-            image: ghcr.io/project-chip/chip-build:1
+            image: ghcr.io/project-chip/chip-build:20
         defaults:
             run:
                 shell: sh
@@ -40,7 +40,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:

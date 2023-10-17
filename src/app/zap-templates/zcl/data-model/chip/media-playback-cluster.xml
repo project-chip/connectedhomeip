@@ -27,12 +27,12 @@ limitations under the License.
 
     <globalAttribute side="server" code="0xFFFC" value="0" />
     <attribute side="server" code="0x0000" define="MEDIA_PLAYBACK_STATE"                     type="PlaybackStateEnum" min="0x00" max="0x03" default="0x00" writable="false"                    optional="false">CurrentState</attribute>
-    <attribute side="server" code="0x0001" define="MEDIA_PLAYBACK_START_TIME"                type="EPOCH_US"          min="0x00"            default="0x00" writable="false" isNullable="true"  optional="true">StartTime</attribute>
-    <attribute side="server" code="0x0002" define="MEDIA_PLAYBACK_DURATION"                  type="INT64U"            min="0x00"            default="0"    writable="false" isNullable="true"  optional="true">Duration</attribute>
+    <attribute side="server" code="0x0001" define="MEDIA_PLAYBACK_START_TIME"                type="epoch_us"          min="0x00"            default="0x00" writable="false" isNullable="true"  optional="true">StartTime</attribute>
+    <attribute side="server" code="0x0002" define="MEDIA_PLAYBACK_DURATION"                  type="int64u"            min="0x00"            default="0"    writable="false" isNullable="true"  optional="true">Duration</attribute>
     <attribute side="server" code="0x0003" define="MEDIA_PLAYBACK_PLAYBACK_POSITION"         type="PlaybackPositionStruct"                                 writable="false" isNullable="true"  optional="true">SampledPosition</attribute>
     <attribute side="server" code="0x0004" define="MEDIA_PLAYBACK_PLAYBACK_SPEED"            type="single"            min="0x00"            default="0"    writable="false"                    optional="true">PlaybackSpeed</attribute>
-    <attribute side="server" code="0x0005" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_END"   type="INT64U"            min="0x00"                           writable="false" isNullable="true"  optional="true">SeekRangeEnd</attribute>
-    <attribute side="server" code="0x0006" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_START" type="INT64U"            min="0x00"                           writable="false" isNullable="true"  optional="true">SeekRangeStart</attribute>
+    <attribute side="server" code="0x0005" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_END"   type="int64u"            min="0x00"                           writable="false" isNullable="true"  optional="true">SeekRangeEnd</attribute>
+    <attribute side="server" code="0x0006" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_START" type="int64u"            min="0x00"                           writable="false" isNullable="true"  optional="true">SeekRangeStart</attribute>
 
 
     <command source="client" code="0x00" name="Play" response="PlaybackResponse" optional="false">
@@ -69,23 +69,23 @@ limitations under the License.
 
     <command source="client" code="0x08" name="SkipForward" response="PlaybackResponse" optional="true">
       <description>Upon receipt, this SHALL Skip forward in the media by the given number of seconds, using the data as follows:</description>
-      <arg name="DeltaPositionMilliseconds" type="INT64U"/>
+      <arg name="DeltaPositionMilliseconds" type="int64u"/>
     </command>
 
     <command source="client" code="0x09" name="SkipBackward" response="PlaybackResponse" optional="true">
       <description>Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows:</description>
-      <arg name="DeltaPositionMilliseconds" type="INT64U"/>
+      <arg name="DeltaPositionMilliseconds" type="int64u"/>
     </command>
 
     <command source="client" code="0x0B" name="Seek" response="PlaybackResponse" optional="true">
       <description>Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows:</description>
-      <arg name="position" type="INT64U"/>
+      <arg name="position" type="int64u"/>
     </command>
 
     <command source="server" code="0x0A" name="PlaybackResponse" optional="false">
       <description>This command SHALL be generated in response to various Playback Request commands.</description>
       <arg name="Status" type="MediaPlaybackStatusEnum"/>
-      <arg name="Data"   type="CHAR_STRING" optional="true"/>
+      <arg name="Data"   type="char_string" optional="true"/>
     </command>
 
   </cluster>
@@ -93,10 +93,10 @@ limitations under the License.
   <struct name="PlaybackPositionStruct">
     <cluster code="0x0506"/>
     <item name="UpdatedAt" type="epoch_us"/>
-    <item name="Position"  type="INT64U" isNullable="true"/>
+    <item name="Position"  type="int64u" isNullable="true"/>
   </struct>
 
-  <enum name="PlaybackStateEnum" type="ENUM8">
+  <enum name="PlaybackStateEnum" type="enum8">
     <cluster code="0x0506"/>
     <item name="Playing"    value="0x00"/>
     <item name="Paused"     value="0x01"/>
@@ -104,7 +104,7 @@ limitations under the License.
     <item name="Buffering"  value="0x03"/>
   </enum>
 
-  <enum name="MediaPlaybackStatusEnum" type="ENUM8">
+  <enum name="MediaPlaybackStatusEnum" type="enum8">
     <cluster code="0x0506"/>
     <item name="Success"                value="0x00"/>
     <item name="InvalidStateForCommand" value="0x01"/>
@@ -114,7 +114,7 @@ limitations under the License.
     <item name="SeekOutOfRange"         value="0x05"/>
   </enum>
 
-  <bitmap name="Feature" type="BITMAP32">
+  <bitmap name="Feature" type="bitmap32">
     <cluster code="0x0506"/>
     <field name="AdvancedSeek" mask="0x1"/>
     <field name="VariableSpeed" mask="0x2"/>

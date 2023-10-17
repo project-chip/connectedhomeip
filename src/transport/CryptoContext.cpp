@@ -69,9 +69,7 @@ CHIP_ERROR CryptoContext::InitFromSecret(SessionKeystore & keystore, const ByteS
                                          SessionInfoType infoType, SessionRole role)
 {
     VerifyOrReturnError(mKeyAvailable == false, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(secret.data() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(secret.size() > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError((salt.size() == 0) || (salt.data() != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
 
     ByteSpan info = (infoType == SessionInfoType::kSessionResumption) ? ByteSpan(RSEKeysInfo) : ByteSpan(SEKeysInfo);
 
@@ -88,7 +86,7 @@ CHIP_ERROR CryptoContext::InitFromSecret(SessionKeystore & keystore, const ByteS
     constexpr uint8_t kTestSharedSecret[CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH] = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;
     static_assert(sizeof(CHIP_CONFIG_TEST_SHARED_SECRET_VALUE) == CHIP_CONFIG_TEST_SHARED_SECRET_LENGTH,
                   "CHIP_CONFIG_TEST_SHARED_SECRET_VALUE must be 32 bytes");
-    const ByteSpan & testSalt = ByteSpan(nullptr, 0);
+    const ByteSpan & testSalt = ByteSpan();
     (void) info;
 
 #warning                                                                                                                           \

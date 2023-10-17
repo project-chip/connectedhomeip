@@ -295,16 +295,14 @@ class TypeLookupContext:
     @property
     def all_enums(self):
         """
-        All enumerations, ordered by lookup priority.
+        All enumerations defined within this lookup context.
 
-        If an enum A is defined both in the cluster and globally, this WILL
-        return both instances, however it will return the cluster version first.
+        enums are only defined at cluster level. If lookup context does not
+        include a cluster, the enum list will be empty.
         """
         if self.cluster:
             for e in self.cluster.enums:
                 yield e
-        for e in self.idl.enums:
-            yield e
 
     @property
     def all_bitmaps(self):
@@ -312,7 +310,7 @@ class TypeLookupContext:
         All bitmaps defined within this lookup context.
 
         bitmaps are only defined at cluster level. If lookup context does not
-        include a cluster, the bitmal list will be empty.
+        include a cluster, the bitmap list will be empty.
         """
         if self.cluster:
             for b in self.cluster.bitmaps:
@@ -320,16 +318,14 @@ class TypeLookupContext:
 
     @property
     def all_structs(self):
-        """All structs, ordered by lookup prioroty.
+        """All structs defined within this lookup context.
 
-        If a struct A is defined both in the cluster and globally, this WILL
-        return both instances, however it will return the cluster version first.
+        structs are only defined at cluster level. If lookup context does not
+        include a cluster, the struct list will be empty.
         """
         if self.cluster:
             for e in self.cluster.structs:
                 yield e
-        for e in self.idl.structs:
-            yield e
 
     def is_enum_type(self, name: str):
         """

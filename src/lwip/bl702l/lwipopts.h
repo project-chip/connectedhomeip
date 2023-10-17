@@ -45,18 +45,12 @@
 #define TCP_QUEUE_OOSEQ 0
 #define ARP_QUEUEING (0)
 
+#define LWIP_PBUF_CALLOUTS 0
 #define LWIP_SOCKET 0
 
 #define LWIP_RAW 1
-#define MEMP_NUM_RAW_PCB 5
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-#define LWIP_TCP 1
-#else
-#define LWIP_TCP 0
-#define MEMP_NUM_TCP_PCB 0
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+#define MEMP_NUM_RAW_PCB (5)
 
-// TODO: verify count
 #define MEMP_NUM_UDP_PCB (7)
 
 #define LWIP_HAVE_LOOPIF (0)

@@ -50,6 +50,7 @@
 #ifdef HAVE_SYS_SOCKIO_H
 #include <sys/sockio.h>
 #endif /* HAVE_SYS_SOCKIO_H */
+#include "InetInterfaceImpl.h"
 #include <ifaddrs.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
@@ -216,7 +217,7 @@ bool InterfaceIterator::Next()
 #if defined(NETIF_FOREACH)
     NETIF_FOREACH(mCurNetif)
 #else
-    for (mCurNetif = netif_list; mCurNetif != NULL; mCurNetif = mCurNetif->next)
+    for (mCurNetif = netif_list; mCurNetif != nullptr; mCurNetif = mCurNetif->next)
 #endif
     {
         if (mCurNetif == prevNetif)
@@ -229,7 +230,7 @@ bool InterfaceIterator::Next()
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
 
-    return mCurNetif != NULL;
+    return mCurNetif != nullptr;
 }
 
 CHIP_ERROR InterfaceIterator::GetInterfaceName(char * nameBuf, size_t nameBufSize)
@@ -322,13 +323,11 @@ CHIP_ERROR InterfaceAddressIterator::GetAddress(IPAddress & outIPAddress)
         return CHIP_NO_ERROR;
     }
 #if INET_CONFIG_ENABLE_IPV4 && LWIP_IPV4
-    else
-    {
-        outIPAddress = IPAddress(*netif_ip4_addr(curIntf));
-        return CHIP_NO_ERROR;
-    }
-#endif // INET_CONFIG_ENABLE_IPV4 && LWIP_IPV4
+    outIPAddress = IPAddress(*netif_ip4_addr(curIntf));
+    return CHIP_NO_ERROR;
+#else
     return CHIP_ERROR_INTERNAL;
+#endif // INET_CONFIG_ENABLE_IPV4 && LWIP_IPV4
 }
 
 uint8_t InterfaceAddressIterator::GetPrefixLength()
@@ -340,11 +339,8 @@ uint8_t InterfaceAddressIterator::GetPrefixLength()
             return 64;
         }
 #if INET_CONFIG_ENABLE_IPV4 && LWIP_IPV4
-        else
-        {
-            struct netif * curIntf = mIntfIter.GetInterfaceId().GetPlatformInterface();
-            return NetmaskToPrefixLength((const uint8_t *) netif_ip4_netmask(curIntf), 4);
-        }
+        struct netif * curIntf = mIntfIter.GetInterfaceId().GetPlatformInterface();
+        return NetmaskToPrefixLength((const uint8_t *) netif_ip4_netmask(curIntf), 4);
 #endif // INET_CONFIG_ENABLE_IPV4 && LWIP_IPV4
     }
     return 0;
@@ -519,7 +515,7 @@ InterfaceIterator::~InterfaceIterator()
 {
     if (mIntfArray != nullptr)
     {
-        if_freenameindex(mIntfArray);
+        if_freenameindexImpl(mIntfArray);
         mIntfArray = nullptr;
     }
 }
@@ -533,7 +529,7 @@ bool InterfaceIterator::Next()
 {
     if (mIntfArray == nullptr)
     {
-        mIntfArray = if_nameindex();
+        mIntfArray = if_nameindexImpl();
     }
     else if (mIntfArray[mCurIntf].if_index != 0)
     {
@@ -591,7 +587,7 @@ short InterfaceIterator::GetFlags()
             mIntfFlags       = intfData.ifr_flags;
             mIntfFlagsCached = true;
         }
-#if __MBED__
+#ifdef __MBED__
         CloseIOCTLSocket();
 #endif
     }
@@ -675,7 +671,7 @@ uint8_t InterfaceAddressIterator::GetPrefixLength()
     {
         if (mCurAddr->ifa_addr->sa_family == AF_INET6)
         {
-#if !__MBED__
+#ifndef __MBED__
             struct sockaddr_in6 & netmask = *reinterpret_cast<struct sockaddr_in6 *>(mCurAddr->ifa_netmask);
             return NetmaskToPrefixLength(netmask.sin6_addr.s6_addr, 16);
 #else  // __MBED__
