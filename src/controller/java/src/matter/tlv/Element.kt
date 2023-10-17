@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-package chip.tlv
+package matter.tlv
 
 /**
  * Represents a single TLV element.

@@ -17,10 +17,10 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class UserLabelClusterLabelStruct(val label: String, val value: String) {
   override fun toString(): String = buildString {
