@@ -59,6 +59,23 @@ struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override;
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override;
     void Clear() override;
+    /**
+     * @brief Set the Key object
+     *        This method will create a new keyHandle. The key handle might contain either
+     *        the raw key or a keyID depending on which Crypto implementation is used.
+     *        In any case, to prevent key leakage, one should either call the DeleteKey method
+     *        or save the entry within the ICDMonitoring Table before this object goes out of scope.
+     *
+     *        Calling SetKey() twice on the same object will result in the Key being deleted from
+     *        the keyStore even if the entry was previously saved in the table. One should use a new
+     *        object or manually clear the content of the key handle prior to calling SetKey() again.
+     *
+     * @param keyData A byte span containing the raw key
+     * @return CHIP_ERROR CHIP_NO_ERROR     success
+     *         CHIP_ERROR_INVALID_ARGUMENT  wrong size of the raw key
+     *         CHIP_ERROR_INTERNAL          No KeyStore for the entry or Crypto API related failure
+     *         CHIP_ERROR_XXX               Crypto API related failure
+     */
     CHIP_ERROR SetKey(ByteSpan keyData);
     CHIP_ERROR DeleteKey(void);
 

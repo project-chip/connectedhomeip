@@ -72,7 +72,7 @@ CHIP_ERROR ICDMonitoringEntry::Deserialize(TLV::TLVReader & reader)
             case to_underlying(Fields::kKey): {
                 ByteSpan buf(key.AsMutable<Crypto::Aes128KeyByteArray>());
                 ReturnErrorOnFailure(reader.Get(buf));
-                ReturnErrorOnFailure(this->SetKey(buf));
+                memcpy(key.AsMutable<Crypto::Aes128KeyByteArray>(), buf.data(), sizeof(Crypto::Aes128KeyByteArray));
             }
             break;
             default:

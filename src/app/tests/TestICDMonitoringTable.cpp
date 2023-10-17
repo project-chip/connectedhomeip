@@ -93,24 +93,27 @@ void TestSaveAndLoadRegistrationValue(nlTestSuite * aSuite, void * aContext)
     CHIP_ERROR err;
 
     // Insert first entry
-    entry.checkInNodeID    = kClientNodeId11;
-    entry.monitoredSubject = kClientNodeId12;
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer1a)));
-    err = saving.Set(0, entry);
+    ICDMonitoringEntry entry1(&keystore);
+    entry1.checkInNodeID    = kClientNodeId11;
+    entry1.monitoredSubject = kClientNodeId12;
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry1.SetKey(ByteSpan(kKeyBuffer1a)));
+    err = saving.Set(0, entry1);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
 
     // Insert second entry
-    entry.checkInNodeID    = kClientNodeId12;
-    entry.monitoredSubject = kClientNodeId11;
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer2a)));
-    err = saving.Set(1, entry);
+    ICDMonitoringEntry entry2(&keystore);
+    entry2.checkInNodeID    = kClientNodeId12;
+    entry2.monitoredSubject = kClientNodeId11;
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry2.SetKey(ByteSpan(kKeyBuffer2a)));
+    err = saving.Set(1, entry2);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
 
     // Insert one too many
-    entry.checkInNodeID    = kClientNodeId13;
-    entry.monitoredSubject = kClientNodeId13;
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer3a)));
-    err = saving.Set(2, entry);
+    ICDMonitoringEntry entry3(&keystore);
+    entry3.checkInNodeID    = kClientNodeId13;
+    entry3.monitoredSubject = kClientNodeId13;
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry3.SetKey(ByteSpan(kKeyBuffer3a)));
+    err = saving.Set(2, entry3);
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_INVALID_ARGUMENT == err);
 
     // Retrieve first entry
@@ -134,28 +137,30 @@ void TestSaveAndLoadRegistrationValue(nlTestSuite * aSuite, void * aContext)
     NL_TEST_ASSERT(aSuite, 2 == loading.Limit());
     NL_TEST_ASSERT(aSuite, CHIP_ERROR_NOT_FOUND == err);
 
-    // Overwrite first entry
-    entry.checkInNodeID    = kClientNodeId13;
-    entry.monitoredSubject = kClientNodeId11;
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry.SetKey(ByteSpan(kKeyBuffer1b)));
-    err = saving.Set(0, entry);
+    // Remove first entry
+    saving.Remove(0);
+    ICDMonitoringEntry entry4(&keystore);
+    entry4.checkInNodeID    = kClientNodeId13;
+    entry4.monitoredSubject = kClientNodeId11;
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == entry4.SetKey(ByteSpan(kKeyBuffer1b)));
+    err = saving.Set(1, entry4);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
 
-    // Retrieve first entry (modified)
+    // Retrieve first entry (not modified but shifted)
     err = loading.Get(0, entry);
-    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
-    NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
-    NL_TEST_ASSERT(aSuite, kClientNodeId13 == entry.checkInNodeID);
-    NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.monitoredSubject);
-    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1b)));
-
-    // Retrieve second entry (not modified)
-    err = loading.Get(1, entry);
     NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
     NL_TEST_ASSERT(aSuite, kClientNodeId12 == entry.checkInNodeID);
     NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.monitoredSubject);
     NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
+
+    // Retrieve second entry
+    err = loading.Get(1, entry);
+    NL_TEST_ASSERT(aSuite, CHIP_NO_ERROR == err);
+    NL_TEST_ASSERT(aSuite, kTestFabricIndex1 == entry.fabricIndex);
+    NL_TEST_ASSERT(aSuite, kClientNodeId13 == entry.checkInNodeID);
+    NL_TEST_ASSERT(aSuite, kClientNodeId11 == entry.monitoredSubject);
+    NL_TEST_ASSERT(aSuite, entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1b)));
 }
 
 void TestSaveAllInvalidRegistrationValues(nlTestSuite * aSuite, void * aContext)
