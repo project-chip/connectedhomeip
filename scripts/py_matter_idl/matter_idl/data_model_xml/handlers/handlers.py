@@ -136,6 +136,12 @@ class EventHandler(BaseHandler):
             #   add constraint handling
             self._event.fields.append(AttributesToField(attrs))
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "mandatoryConform":
+            # assume handled (we do not record conformance in IDL)
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "access":
+            # TODO: access handling here ...
+            return BaseHandler(self.context)
         else:
             return BaseHandler(self.context)
 
