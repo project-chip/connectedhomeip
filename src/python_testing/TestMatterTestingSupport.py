@@ -581,6 +581,7 @@ class TestMatterTestingSupport(MatterBaseTest):
         for ep in expected_problems:
             endpoints[ep][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [
                 Clusters.Descriptor.Structs.SemanticTagStruct(namespaceID=ep)]
+            endpoints[ep][Clusters.Descriptor][Clusters.Descriptor.Attributes.FeatureMap] = 1
         problems = find_tag_list_problems(roots=[0], device_types={0: device_type_list}, endpoint_dict=endpoints)
         asserts.assert_equal(len(problems.keys()), 0, 'Unexpected problems found in root endpoint')
 
