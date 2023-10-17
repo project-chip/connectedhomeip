@@ -178,6 +178,17 @@ public class TvCastingApp {
     }
   }
 
+  void resetDiscoveryState() {
+    synchronized (discoveryLock) {
+      Log.d(TAG, "TvCastingApp resetting discovery state");
+      this.discoveryStarted = false;
+      this.nsdDiscoveryListener = null;
+      if (multicastLock != null && multicastLock.isHeld()) {
+        multicastLock.release();
+      }
+    }
+  }
+
   public native boolean openBasicCommissioningWindow(
       int duration,
       CommissioningCallbacks commissioningCallbacks,
