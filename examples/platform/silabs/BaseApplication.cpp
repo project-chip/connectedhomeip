@@ -114,8 +114,6 @@ app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
 #endif /* SL_WIFI */
 
-bool sIsProvisioned = false;
-
 #if !(defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER)
 bool sIsEnabled          = false;
 bool sIsAttached         = false;
@@ -148,6 +146,7 @@ Identify gIdentify = {
 
 #endif // EMBER_AF_PLUGIN_IDENTIFY_SERVER
 } // namespace
+bool BaseApplication::sIsProvisioned = false;
 
 #ifdef DIC_ENABLE
 namespace {
@@ -240,11 +239,6 @@ CHIP_ERROR BaseApplication::Init()
     SILABS_LOG("Current Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
     SILABS_LOG("Current Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
 
-#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
-    LEDWidget::InitGpio();
-    sStatusLED.Init(SYSTEM_STATE_LED);
-#endif // ENABLE_WSTK_LEDS
-
 #ifdef DIC_ENABLE
     chip::DeviceLayer::PlatformMgr().AddEventHandler(AppSpecificConnectivityEventCallback, reinterpret_cast<intptr_t>(nullptr));
 #endif // DIC_ENABLE
@@ -252,6 +246,10 @@ CHIP_ERROR BaseApplication::Init()
     ConfigurationMgr().LogDeviceConfig();
 
     OutputQrCode(true /*refreshLCD at init*/);
+#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
+    LEDWidget::InitGpio();
+    sStatusLED.Init(SYSTEM_STATE_LED);
+#endif // ENABLE_WSTK_LEDS
 
 #ifdef PERFORMANCE_TEST_ENABLED
     RegisterPerfTestCommands();
@@ -259,10 +257,10 @@ CHIP_ERROR BaseApplication::Init()
 
     PlatformMgr().AddEventHandler(OnPlatformEvent, 0);
 #ifdef SL_WIFI
-    sIsProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
+    BaseApplication::sIsProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
 #endif /* SL_WIFI */
 #if CHIP_ENABLE_OPENTHREAD
-    sIsProvisioned = ConnectivityMgr().IsThreadProvisioned();
+    BaseApplication::sIsProvisioned = ConnectivityMgr().IsThreadProvisioned();
 #endif
 
     return err;
@@ -375,7 +373,7 @@ bool BaseApplication::ActivateStatusLedPatterns()
     if (!isPatternSet)
     {
         // Apply different status feedbacks
-        if (sIsProvisioned && sIsEnabled)
+        if (BaseApplication::sIsProvisioned && sIsEnabled)
         {
             if (sIsAttached)
             {
@@ -413,9 +411,9 @@ void BaseApplication::LightEventHandler()
     if (PlatformMgr().TryLockChipStack())
     {
 #ifdef SL_WIFI
-        sIsProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
-        sIsEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
-        sIsAttached    = ConnectivityMgr().IsWiFiStationConnected();
+        BaseApplication::sIsProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
+        sIsEnabled                      = ConnectivityMgr().IsWiFiStationEnabled();
+        sIsAttached                     = ConnectivityMgr().IsWiFiStationConnected();
 #endif /* SL_WIFI */
 #if CHIP_ENABLE_OPENTHREAD
         sIsEnabled  = ConnectivityMgr().IsThreadEnabled();
@@ -491,7 +489,7 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
 #ifdef SL_WIFI
             if (!ConnectivityMgr().IsWiFiStationProvisioned())
 #else
-            if (!sIsProvisioned)
+            if (!BaseApplication::sIsProvisioned)
 #endif /* !SL_WIFI */
             {
                 // Open Basic CommissioningWindow. Will start BLE advertisements
@@ -722,7 +720,7 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
 {
     if (event->Type == DeviceEventType::kServiceProvisioningChange)
     {
-        sIsProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
+        BaseApplication::sIsProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
     }
 }
 
@@ -751,4 +749,9 @@ void BaseApplication::OutputQrCode(bool refreshLCD)
     {
         SILABS_LOG("Getting QR code failed!");
     }
+}
+
+bool BaseApplication::getWifiProvisionStatus()
+{
+    return BaseApplication::sIsProvisioned;
 }
