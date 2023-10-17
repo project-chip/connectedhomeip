@@ -19,13 +19,31 @@ changelog:
     - title: Security Fixes
       labels:
         - security
+    - title: Core Changes
+      labels:
+        - core
+    - title: Controller Changes
+      labels:
+        - controller
+    - title: INet Layer Changes
+      labels:
+        - inet
+    - title: Core Library Changes
+      labels:
+        - inet
+    - title: System Level Changes
+      labels:
+        - system
     - title: Bug Fixes
       labels:
         - bug
-    - title: Spec Alignment Fixes
+    - title: Bluetooth Related Changes
+      labels:
+        - bluetooth
+    - title: Spec Alignment Changes
       labels:
         - spec
-    - title: Platform Fixes
+    - title: Platform Changes
       labels:
         - platform
         - darwin
