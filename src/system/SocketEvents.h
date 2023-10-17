@@ -34,7 +34,7 @@ using SocketEvents = BitFlags<SocketEventFlags>;
 using SocketWatchToken    = intptr_t;
 using SocketWatchCallback = void (*)(SocketEvents events, intptr_t data);
 
-constexpr int kInvalidFd = -1;
+inline constexpr int kInvalidFd = -1;
 
 } // namespace System
 } // namespace chip

@@ -35,13 +35,13 @@ class CommandManager {
     val command: Command?
     if (args.size < 1) {
       logger.log(Level.INFO, "Missing cluster name")
-      showClusters()
+      showHelpInfo()
       return
     }
     val commands = clusters[args[0]]
     if (commands == null) {
       logger.log(Level.INFO, "Unknown cluster: " + args[0])
-      showClusters()
+      showHelpInfo()
       return
     }
     if (args.size < 2) {
@@ -85,7 +85,7 @@ class CommandManager {
     // need skip over binary and command name and only get arguments
     val temp = Arrays.copyOfRange(args, 2, args.size)
     try {
-      command.initArguments(temp)
+      command.setArgumentValues(temp)
     } catch (e: IllegalArgumentException) {
       logger.log(Level.INFO, "Arguments init failed with exception: " + e.message)
       showCommand(args[0], command)
@@ -108,7 +108,7 @@ class CommandManager {
 
   private fun getCommand(commands: List<Command>, commandName: String): Command? {
     for (command in commands) {
-      if (commandName == command.getName()) {
+      if (commandName == command.name) {
         return command
       }
     }
@@ -121,14 +121,14 @@ class CommandManager {
     attributeName: String
   ): Command? {
     for (command in commands) {
-      if (commandName == command.getName() && attributeName == command.getAttribute()) {
+      if (commandName == command.name && attributeName == command.getAttribute()) {
         return command
       }
     }
     return null
   }
 
-  private fun showClusters() {
+  private fun showHelpInfo() {
     logger.log(Level.INFO, "Usage:")
     logger.log(Level.INFO, "  java-matter-controller cluster_name command_name [param1 param2 ...]")
     logger.log(Level.INFO, "\n")
@@ -176,7 +176,7 @@ class CommandManager {
     var subscribeEventCommand = false
     for (command in commands) {
       var shouldPrint = true
-      val cmdName = command.getName()
+      val cmdName = command.name
       if (isGlobalCommand(cmdName)) {
         if (cmdName == "read" && !readCommand) {
           readCommand = true
@@ -227,7 +227,7 @@ class CommandManager {
       "  +-------------------------------------------------------------------------------------+"
     )
     for (command in commands) {
-      if (commandName == command.getName()) {
+      if (commandName == command.name) {
         System.out.printf("  | * %-82s|\n", command.getAttribute())
       }
     }
@@ -258,7 +258,7 @@ class CommandManager {
       "  +-------------------------------------------------------------------------------------+"
     )
     for (command in commands) {
-      if (commandName == command.getName()) {
+      if (commandName == command.name) {
         System.out.printf("  | * %-82s|\n", command.getAttribute())
       }
     }
@@ -270,7 +270,7 @@ class CommandManager {
 
   private fun showCommand(clusterName: String, command: Command) {
     logger.log(Level.INFO, "Usage:")
-    var arguments: String? = command.getName()
+    var arguments: String? = command.name
     var description = ""
     val argumentsCount = command.getArgumentsCount()
     for (i in 0 until argumentsCount) {
@@ -295,7 +295,7 @@ class CommandManager {
       }
     }
     System.out.format("  java-matter-controller %s %s\n", clusterName, arguments)
-    val helpText = command.getHelpText()
+    val helpText = command.helpText
     if (helpText != null) {
       System.out.format("\n%s\n", helpText)
     }

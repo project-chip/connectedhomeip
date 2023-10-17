@@ -5,8 +5,16 @@ from typing import List, Optional, Set, Union
 from lark.tree import Meta
 
 
+class ApiMaturity(enum.Enum):
+    STABLE = enum.auto()  # default
+    PROVISIONAL = enum.auto()
+    INTERNAL = enum.auto()
+    DEPRECATED = enum.auto()
+
 # Information about parsing location for specific items
 # Helpful when referencing data items in logs when processing
+
+
 @dataclass
 class ParseMetaData:
     line: Optional[int]
@@ -114,6 +122,7 @@ class Field:
     name: str
     is_list: bool = False
     qualities: FieldQuality = FieldQuality.NONE
+    api_maturity: ApiMaturity = ApiMaturity.STABLE
 
     @property
     def is_optional(self):
@@ -131,6 +140,7 @@ class Attribute:
     readacl: AccessPrivilege = AccessPrivilege.VIEW
     writeacl: AccessPrivilege = AccessPrivilege.OPERATE
     default: Optional[Union[str, int]] = None
+    api_maturity: ApiMaturity = ApiMaturity.STABLE
 
     @property
     def is_readable(self):
@@ -156,6 +166,7 @@ class Struct:
     tag: Optional[StructTag] = None
     code: Optional[int] = None  # for responses only
     qualities: StructQuality = StructQuality.NONE
+    api_maturity: ApiMaturity = ApiMaturity.STABLE
 
 
 @dataclass
@@ -166,6 +177,8 @@ class Event:
     fields: List[Field]
     readacl: AccessPrivilege = AccessPrivilege.VIEW
     qualities: EventQuality = EventQuality.NONE
+    description: Optional[str] = None
+    api_maturity: ApiMaturity = ApiMaturity.STABLE
 
     @property
     def is_fabric_sensitive(self):
@@ -176,6 +189,7 @@ class Event:
 class ConstantEntry:
     name: str
     code: int
+    api_maturity: ApiMaturity = ApiMaturity.STABLE
 
 
 @dataclass
@@ -183,6 +197,7 @@ class Enum:
     name: str
     base_type: str
     entries: List[ConstantEntry]
+    api_maturity: ApiMaturity = ApiMaturity.STABLE
 
 
 @dataclass
@@ -190,6 +205,7 @@ class Bitmap:
     name: str
     base_type: str
     entries: List[ConstantEntry]
+    api_maturity: ApiMaturity = ApiMaturity.STABLE
 
 
 @dataclass
@@ -201,6 +217,7 @@ class Command:
     qualities: CommandQuality = CommandQuality.NONE
     invokeacl: AccessPrivilege = AccessPrivilege.OPERATE
     description: Optional[str] = None
+    api_maturity: ApiMaturity = ApiMaturity.STABLE
 
     # Parsing meta data missing only when skip meta data is requested
     parse_meta: Optional[ParseMetaData] = field(default=None)
@@ -222,6 +239,7 @@ class Cluster:
     structs: List[Struct] = field(default_factory=list)
     commands: List[Command] = field(default_factory=list)
     description: Optional[str] = None
+    api_maturity: ApiMaturity = ApiMaturity.STABLE
 
     # Parsing meta data missing only when skip meta data is requested
     parse_meta: Optional[ParseMetaData] = field(default=None)
@@ -238,8 +256,17 @@ class AttributeInstantiation:
 
 
 @dataclass
+class CommandInstantiation:
+    name: str
+
+    # Parsing meta data missing only when skip meta data is requested
+    parse_meta: Optional[ParseMetaData] = field(default=None)
+
+
+@dataclass
 class ServerClusterInstantiation:
     name: str
+    commands: List[CommandInstantiation] = field(default_factory=list)
     attributes: List[AttributeInstantiation] = field(default_factory=list)
     events_emitted: Set[str] = field(default_factory=set)
 
@@ -265,9 +292,6 @@ class Endpoint:
 
 @dataclass
 class Idl:
-    # Enums and structs represent globally used items
-    enums: List[Enum] = field(default_factory=list)
-    structs: List[Struct] = field(default_factory=list)
     clusters: List[Cluster] = field(default_factory=list)
     endpoints: List[Endpoint] = field(default_factory=list)
 

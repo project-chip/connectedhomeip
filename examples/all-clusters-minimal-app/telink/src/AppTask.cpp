@@ -35,12 +35,5 @@ CHIP_ERROR AppTask::Init()
         return err;
     }
 
-    err = ConnectivityMgr().SetBLEDeviceName("TelinkMinApp");
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("SetBLEDeviceName fail");
-        return err;
-    }
-
     return CHIP_NO_ERROR;
 }

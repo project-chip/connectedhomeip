@@ -26,8 +26,8 @@
 
 #include <cy_lwip.h>
 #include <cy_wcm.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Infineon/PSOC6/P6Utils.h>
 
@@ -437,7 +437,7 @@ CHIP_ERROR P6Utils::p6_wifi_connect(void)
     return err;
 }
 
-#define INITIALISER_IPV4_ADDRESS1(addr_var, addr_val) addr_var = { CY_WCM_IP_VER_V4, { .v4 = (uint32_t)(addr_val) } }
+#define INITIALISER_IPV4_ADDRESS1(addr_var, addr_val) addr_var = { CY_WCM_IP_VER_V4, { .v4 = (uint32_t) (addr_val) } }
 #define MAKE_IPV4_ADDRESS1(a, b, c, d) ((((uint32_t) d) << 24) | (((uint32_t) c) << 16) | (((uint32_t) b) << 8) | ((uint32_t) a))
 static const cy_wcm_ip_setting_t ap_mode_ip_settings2 = {
     INITIALISER_IPV4_ADDRESS1(.ip_address, MAKE_IPV4_ADDRESS1(192, 168, 0, 2)),
@@ -861,7 +861,7 @@ uint32_t get_heap_total()
 
     uint8_t * heap_base  = (uint8_t *) &__HeapBase;
     uint8_t * heap_limit = (uint8_t *) &__HeapLimit;
-    return (uint32_t)(heap_limit - heap_base);
+    return (uint32_t) (heap_limit - heap_base);
 }
 
 /* Populate Heap info based on heap total size and Current Heap usage */

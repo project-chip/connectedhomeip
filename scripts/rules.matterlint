@@ -91,7 +91,7 @@ load "../src/app/zap-templates/zcl/data-model/draft/input-output-value-clusters.
 load "../src/app/zap-templates/zcl/data-model/draft/onoff-switch-configuration-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/air-quality-cluster.xml";
 load "../src/app/zap-templates/zcl/data-model/chip/resource-monitoring-cluster.xml";
-
+load "../src/app/zap-templates/zcl/data-model/chip/sample-mei-cluster.xml";
 
 all endpoints {
     // These attributes follow a different code path and do not have to be

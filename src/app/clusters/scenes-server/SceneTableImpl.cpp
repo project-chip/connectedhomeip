@@ -767,7 +767,9 @@ CHIP_ERROR DefaultSceneTableImpl::DeleteAllScenesInGroup(FabricIndex fabric_inde
     FabricSceneData fabric(mEndpointId, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
     SceneTableData scene(mEndpointId, fabric_index);
 
-    ReturnErrorOnFailure(fabric.Load(mStorage));
+    CHIP_ERROR err = fabric.Load(mStorage);
+    VerifyOrReturnValue(CHIP_ERROR_NOT_FOUND != err, CHIP_NO_ERROR);
+    ReturnErrorOnFailure(err);
 
     for (uint16_t i = 0; i < mMaxScenesPerFabric; i++)
     {

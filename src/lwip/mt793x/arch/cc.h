@@ -48,7 +48,7 @@
 #define LWIP_PLATFORM_BYTESWAP 0
 
 /** @todo fix some warnings: don't use #pragma if compiling with cygwin gcc */
-//#ifndef __GNUC__
+// #ifndef __GNUC__
 #if (!defined(__ICCARM__)) && (!defined(__GNUC__)) && (!defined(__CC_ARM))
 #include <limits.h>
 #pragma warning(disable : 4244) /* disable conversion warning (implicit integer promotion!) */
@@ -57,7 +57,7 @@
 #pragma warning(disable : 4103) /* structure packing changed by including file */
 #endif
 
-//#define LWIP_PROVIDE_ERRNO
+// #define LWIP_PROVIDE_ERRNO
 
 #if (!defined(__CC_ARM)) && (!defined(__ICCARM__))
 #define LWIP_TIMEVAL_PRIVATE 0
@@ -91,7 +91,7 @@ typedef u32_t sys_prot_t;
 #define PACK_STRUCT_STRUCT __attribute__((packed))
 #endif
 
-//#define LWIP_DEBUG_USE_PRINTF
+// #define LWIP_DEBUG_USE_PRINTF
 
 #ifdef LWIP_DEBUG_USE_PRINTF
 /* Plaform specific diagnostic output */
@@ -101,7 +101,7 @@ typedef u32_t sys_prot_t;
         printf x;                                                                                                                  \
     } while (0)
 #else
-//#define LWIP_PLATFORM_DIAG(x)   do { LWIP_LOGI x; } while(0)
+// #define LWIP_PLATFORM_DIAG(x)   do { LWIP_LOGI x; } while(0)
 void filogic_log_print(const char * fmt, ...);
 #define LWIP_PLATFORM_DIAG(x)                                                                                                      \
     do                                                                                                                             \
@@ -163,7 +163,7 @@ void filogic_log_print(const char * fmt, ...);
 #endif
 
 /* C runtime functions redefined */
-//#define snprintf _snprintf //2015-07-22 Cheng Liu @132663
+// #define snprintf _snprintf //2015-07-22 Cheng Liu @132663
 
 u32_t dns_lookup_external_hosts_file(const char * name);
 

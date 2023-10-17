@@ -67,6 +67,6 @@ struct PrivateHeapBlockHeader
 
 } // namespace internal
 
-constexpr size_t kPrivateHeapAllocationAlignment = std::alignment_of<max_align_t>::value;
+inline constexpr size_t kPrivateHeapAllocationAlignment = std::alignment_of<max_align_t>::value;
 
 #endif // ifdef __cplusplus

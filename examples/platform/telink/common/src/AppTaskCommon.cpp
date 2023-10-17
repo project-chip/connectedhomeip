@@ -31,12 +31,7 @@
 #include <app/util/attribute-storage.h>
 
 #if CONFIG_CHIP_OTA_REQUESTOR
-#include "OTAUtil.h"
-#endif
-
-#ifdef CONFIG_CHIP_ICD_SUBSCRIPTION_HANDLING
-#include "ICDUtil.h"
-#include <app/InteractionModelEngine.h>
+#include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #endif
 
 #include <zephyr/fs/nvs.h>
@@ -53,7 +48,9 @@ constexpr int kAppEventQueueSize       = 10;
 
 #if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
 const struct gpio_dt_spec sFactoryResetButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_1), gpios);
-const struct gpio_dt_spec sBleStartButtonDt     = GPIO_DT_SPEC_GET(DT_NODELABEL(key_2), gpios);
+#if APP_USE_BLE_START_BUTTON
+const struct gpio_dt_spec sBleStartButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_2), gpios);
+#endif
 #if APP_USE_THREAD_START_BUTTON
 const struct gpio_dt_spec sThreadStartButtonDt = GPIO_DT_SPEC_GET(DT_NODELABEL(key_3), gpios);
 #endif
@@ -90,7 +87,9 @@ LEDWidget sStatusLED;
 #endif
 
 Button sFactoryResetButton;
+#if APP_USE_BLE_START_BUTTON
 Button sBleAdvStartButton;
+#endif
 #if APP_USE_EXAMPLE_START_BUTTON
 Button sExampleActionButton;
 #endif
@@ -202,8 +201,8 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
 };
 
 #if CONFIG_CHIP_LIB_SHELL
-#include <sys.h>
 #include <zephyr/shell/shell.h>
+#include <zephyr/sys/reboot.h>
 
 static int cmd_telink_reboot(const struct shell * shell, size_t argc, char ** argv)
 {
@@ -211,7 +210,7 @@ static int cmd_telink_reboot(const struct shell * shell, size_t argc, char ** ar
     ARG_UNUSED(argv);
 
     shell_print(shell, "Performing board reboot...");
-    sys_reboot();
+    sys_reboot(0);
 
     return 0;
 }
@@ -308,10 +307,6 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 #endif
 
-#if CONFIG_CHIP_OTA_REQUESTOR
-    InitBasicOTARequestor();
-#endif
-
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
@@ -320,10 +315,6 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // Set up a valid Network Commissioning cluster on endpoint 0 is done in
     // src/platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
-#endif
-
-#ifdef CONFIG_CHIP_ICD_SUBSCRIPTION_HANDLING
-    chip::app::InteractionModelEngine::GetInstance()->RegisterReadHandlerAppCallback(&GetICDUtil());
 #endif
 
     // We need to disable OpenThread to prevent writing to the NVS storage when factory reset occurs
@@ -366,12 +357,16 @@ void AppTaskCommon::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
     case kButtonId_FactoryReset:
         FactoryResetButtonEventHandler();
         break;
+#if APP_USE_THREAD_START_BUTTON
     case kButtonId_StartThread:
         StartThreadButtonEventHandler();
         break;
+#endif
+#if APP_USE_BLE_START_BUTTON
     case kButtonId_StartBleAdv:
         StartBleAdvButtonEventHandler();
         break;
+#endif
     }
 }
 #endif
@@ -380,7 +375,9 @@ void AppTaskCommon::InitButtons(void)
 {
 #if CONFIG_CHIP_BUTTON_MANAGER_IRQ_MODE
     sFactoryResetButton.Configure(&sFactoryResetButtonDt, FactoryResetButtonEventHandler);
+#if APP_USE_BLE_START_BUTTON
     sBleAdvStartButton.Configure(&sBleStartButtonDt, StartBleAdvButtonEventHandler);
+#endif
 #if APP_USE_EXAMPLE_START_BUTTON
     if (ExampleActionEventHandler)
     {
@@ -392,7 +389,9 @@ void AppTaskCommon::InitButtons(void)
 #endif
 #else
     sFactoryResetButton.Configure(&sButtonRow1Dt, &sButtonCol1Dt, FactoryResetButtonEventHandler);
+#if APP_USE_BLE_START_BUTTON
     sBleAdvStartButton.Configure(&sButtonRow2Dt, &sButtonCol2Dt, StartBleAdvButtonEventHandler);
+#endif
 #if APP_USE_EXAMPLE_START_BUTTON
     if (ExampleActionEventHandler)
     {
@@ -405,7 +404,9 @@ void AppTaskCommon::InitButtons(void)
 #endif
 
     ButtonManagerInst().AddButton(sFactoryResetButton);
+#if APP_USE_BLE_START_BUTTON
     ButtonManagerInst().AddButton(sBleAdvStartButton);
+#endif
 #if APP_USE_THREAD_START_BUTTON
     ButtonManagerInst().AddButton(sThreadStartButton);
 #endif
@@ -520,6 +521,7 @@ void AppTaskCommon::IdentifyEffectHandler(Clusters::Identify::EffectIdentifierEn
 }
 #endif
 
+#if APP_USE_BLE_START_BUTTON
 void AppTaskCommon::StartBleAdvButtonEventHandler(void)
 {
     AppEvent event;
@@ -552,6 +554,7 @@ void AppTaskCommon::StartBleAdvHandler(AppEvent * aEvent)
         LOG_ERR("OpenBasicCommissioningWindow fail");
     }
 }
+#endif
 
 void AppTaskCommon::FactoryResetButtonEventHandler(void)
 {
@@ -674,11 +677,16 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
         UpdateStatusLED();
 #endif
         break;
-    case DeviceEventType::kThreadConnectivityChange:
+    case DeviceEventType::kDnssdInitialized:
 #if CONFIG_CHIP_OTA_REQUESTOR
-        if (event->ThreadConnectivityChange.Result == kConnectivity_Established)
+        InitBasicOTARequestor();
+        if (GetRequestorInstance()->GetCurrentUpdateState() == Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kIdle)
         {
-            InitBasicOTARequestor();
+#endif
+#ifdef CONFIG_BOOTLOADER_MCUBOOT
+            OtaConfirmNewImage();
+#endif /* CONFIG_BOOTLOADER_MCUBOOT */
+#if CONFIG_CHIP_OTA_REQUESTOR
         }
 #endif
         break;

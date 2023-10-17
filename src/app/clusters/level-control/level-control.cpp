@@ -171,9 +171,16 @@ public:
         uint8_t maxLevel;
         VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == Attributes::MaxLevel::Get(endpoint, &maxLevel), CHIP_ERROR_READ_FAILED);
 
-        pairs[0].attributeID    = Attributes::CurrentLevel::Id;
-        pairs[0].attributeValue = (!level.IsNull()) ? level.Value() : maxLevel + 1;
-        size_t attributeCount   = 1;
+        pairs[0].attributeID = Attributes::CurrentLevel::Id;
+        if (!level.IsNull())
+        {
+            pairs[0].attributeValue = level.Value();
+        }
+        else
+        {
+            chip::app::NumericAttributeTraits<uint32_t>::SetNull(pairs[0].attributeValue);
+        }
+        size_t attributeCount = 1;
         if (LevelControlHasFeature(endpoint, LevelControl::Feature::kFrequency))
         {
             uint16_t frequency;
@@ -238,9 +245,9 @@ public:
         CommandId command = LevelControlHasFeature(endpoint, LevelControl::Feature::kOnOff) ? Commands::MoveToLevelWithOnOff::Id
                                                                                             : Commands::MoveToLevel::Id;
 
-        status = moveToLevelHandler(
-            endpoint, command, level, app::DataModel::MakeNullable<uint16_t>(static_cast<uint16_t>(timeMs / 100)),
-            chip::Optional<BitMask<LevelControlOptions>>(), chip::Optional<BitMask<LevelControlOptions>>(), INVALID_STORED_LEVEL);
+        status = moveToLevelHandler(endpoint, command, level, app::DataModel::MakeNullable(static_cast<uint16_t>(timeMs / 100)),
+                                    chip::Optional<BitMask<LevelControlOptions>>(), chip::Optional<BitMask<LevelControlOptions>>(),
+                                    INVALID_STORED_LEVEL);
 
         if (status != Status::Success)
         {
@@ -411,14 +418,6 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     }
 
     updateCoupledColorTemp(endpoint);
-
-#ifdef EMBER_AF_PLUGIN_SCENES
-    // The level has changed, so the scene is no longer valid.
-    if (emberAfContainsServer(endpoint, Scenes::Id))
-    {
-        Scenes::ScenesServer::Instance().MakeSceneInvalid(endpoint);
-    }
-#endif // EMBER_AF_PLUGIN_SCENES
 
     // Are we at the requested level?
     if (currentLevel.Value() == state->moveToLevel)
@@ -910,6 +909,14 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
     state->storedLevel = storedLevel;
 
     state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
+
+#ifdef EMBER_AF_PLUGIN_SCENES
+    // The level has changed, the scene is no longer valid.
+    if (emberAfContainsServer(endpoint, Scenes::Id))
+    {
+        Scenes::ScenesServer::Instance().MakeSceneInvalid(endpoint);
+    }
+#endif // EMBER_AF_PLUGIN_SCENES
 
     // The setup was successful, so mark the new state as active and return.
     scheduleTimerCallbackMs(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));

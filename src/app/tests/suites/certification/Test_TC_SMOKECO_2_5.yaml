@@ -152,7 +152,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read interconnect-smoke-alarm 1 1
+          ./chip-tool smokecoalarm read interconnect-smoke-alarm 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0008 DataVersion: 1795725838
           [TOO]   InterconnectSmokeAlarm: 1
@@ -204,7 +204,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read interconnect-smoke-alarm 1 1
+          ./chip-tool smokecoalarm read interconnect-smoke-alarm 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0008 DataVersion: 1795725838
           [TOO]   InterconnectSmokeAlarm: 0
@@ -275,7 +275,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read interconnect-coalarm 1 1
+          ./chip-tool smokecoalarm read interconnect-coalarm 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0009 DataVersion: 1795725838
           [TOO]   InterconnectCOAlarm: 1
@@ -327,7 +327,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read interconnect-coalarm 1 1
+          ./chip-tool smokecoalarm read interconnect-coalarm 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0009 DataVersion: 1795725838
           [TOO]   InterconnectCOAlarm: 0
@@ -390,7 +390,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read contamination-state 1 1
+          ./chip-tool smokecoalarm read contamination-state 1 1
 
           Verify that the value of ContaminationState is 2 or 3
 
@@ -427,7 +427,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read contamination-state 1 1
+          ./chip-tool smokecoalarm read contamination-state 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_000A DataVersion: 1795725838
           [TOO]   ContaminationState: 0
@@ -462,7 +462,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read contamination-state 1 1
+          ./chip-tool smokecoalarm read contamination-state 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_000A DataVersion: 1795725838
           [TOO]   ContaminationState: 1
@@ -497,7 +497,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read contamination-state 1 1
+          ./chip-tool smokecoalarm read contamination-state 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_000A DataVersion: 1795725838
           [TOO]   ContaminationState: 0
@@ -544,7 +544,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read smoke-sensitivity-level 1 1
+          ./chip-tool smokecoalarm read smoke-sensitivity-level 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_000B DataVersion: 1795725838
           [TOO]   SmokeSensitivityLevel: 0
@@ -579,7 +579,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read smoke-sensitivity-level 1 1
+          ./chip-tool smokecoalarm read smoke-sensitivity-level 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_000B DataVersion: 1795725838
           [TOO]   SmokeSensitivityLevel: 1
@@ -614,7 +614,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read smoke-sensitivity-level 1 1
+          ./chip-tool smokecoalarm read smoke-sensitivity-level 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_000B DataVersion: 1795725838
           [TOO]   SmokeSensitivityLevel: 2
@@ -649,7 +649,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read smoke-sensitivity-level 1 1
+          ./chip-tool smokecoalarm read smoke-sensitivity-level 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_000B DataVersion: 1795725838
           [TOO]   SmokeSensitivityLevel: 1
@@ -716,7 +716,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read smoke-state 1 1
+          ./chip-tool smokecoalarm read smoke-state 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0001 DataVersion: 1795725838
           [TOO]   SmokeState: 1
@@ -757,7 +757,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read device-muted 1 1
+          ./chip-tool smokecoalarm read device-muted 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0004 DataVersion: 1795725838
           [TOO]   DeviceMuted: 1
@@ -800,7 +800,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read device-muted 1 1
+          ./chip-tool smokecoalarm read device-muted 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0004 DataVersion: 1795725838
           [TOO]   DeviceMuted: 0
@@ -851,7 +851,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read smoke-state 1 1
+          ./chip-tool smokecoalarm read smoke-state 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0001 DataVersion: 1795725838
           [TOO]   SmokeState: 2
@@ -928,7 +928,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read smoke-state 1 1
+          ./chip-tool smokecoalarm read smoke-state 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0001 DataVersion: 1795725838
           [TOO]   SmokeState: 0
@@ -984,7 +984,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read costate 1 1
+          ./chip-tool smokecoalarm read costate 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0002 DataVersion: 1795725838
           [TOO]   COState: 1
@@ -1025,7 +1025,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read device-muted 1 1
+          ./chip-tool smokecoalarm read device-muted 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0004 DataVersion: 1795725838
           [TOO]   DeviceMuted: 1
@@ -1068,7 +1068,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read device-muted 1 1
+          ./chip-tool smokecoalarm read device-muted 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0004 DataVersion: 1795725838
           [TOO]   DeviceMuted: 0
@@ -1119,7 +1119,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read costate 1 1
+          ./chip-tool smokecoalarm read costate 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0002 DataVersion: 1795725838
           [TOO]   COState: 2
@@ -1196,7 +1196,7 @@ tests:
       cluster: "LogCommands"
       command: "UserPrompt"
       verification: |
-          ./chip-tool.py smokecoalarm read costate 1 1
+          ./chip-tool smokecoalarm read costate 1 1
 
           [TOO] Endpoint: 1 Cluster: 0x0000_005C Attribute 0x0000_0002 DataVersion: 1795725838
           [TOO]   COState: 0

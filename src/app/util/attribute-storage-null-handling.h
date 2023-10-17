@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/TLV.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/BitMask.h>
@@ -30,13 +31,13 @@ namespace app {
 
 template <typename T,
           bool IsBigEndian =
-// BIGENDIAN_CPU to match how the attribute store works, because that's
+// CHIP_CONFIG_BIG_ENDIAN_TARGET to match how the attribute store works, because that's
 // what where our data buffer is eventually ending up or coming from.
-#if BIGENDIAN_CPU
+#if CHIP_CONFIG_BIG_ENDIAN_TARGET
               true
-#else  // BIGENDIAN_CPU
+#else  // CHIP_CONFIG_BIG_ENDIAN_TARGET
               false
-#endif // BIGENDIAN_CPU
+#endif // CHIP_CONFIG_BIG_ENDIAN_TARGET
           >
 struct NumericAttributeTraits
 {

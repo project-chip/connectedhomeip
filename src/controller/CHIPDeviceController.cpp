@@ -51,12 +51,12 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/Base64.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
@@ -2764,6 +2764,15 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kFindOperational: {
         // If there is an error, CommissioningStageComplete will be called from OnDeviceConnectionFailureFn.
         auto scopedPeerId = GetPeerScopedId(proxy->GetDeviceId());
+
+        // If we ever had a commissioned device with this node ID before, we may
+        // have stale sessions to it.  Make sure we don't re-use any of those,
+        // because clearly they are not related to this new device we are
+        // commissioning.  We only care about sessions we might reuse, so just
+        // clearing the ones associated with our fabric index is good enough and
+        // we don't need to worry about ExpireAllSessionsOnLogicalFabric.
+        mSystemState->SessionMgr()->ExpireAllSessions(scopedPeerId);
+
         mSystemState->CASESessionMgr()->FindOrEstablishSession(scopedPeerId, &mOnDeviceConnectedCallback,
                                                                &mOnDeviceConnectionFailureCallback
 #if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES

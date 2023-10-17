@@ -37,6 +37,7 @@
 #endif // DISPLAY_ENABLED
 
 #include "SilabsDeviceDataProvider.h"
+#include <app/icd/ICDNotifier.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -64,6 +65,10 @@
 #include "dic.h"
 #include "dic_control.h"
 #endif // DIC_ENABLE
+
+#ifdef PERFORMANCE_TEST_ENABLED
+#include <performance_test_commands.h>
+#endif // PERFORMANCE_TEST_ENABLED
 
 /**********************************************************
  * Defines and Constants
@@ -109,8 +114,6 @@ app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
 #endif /* SL_WIFI */
 
-bool sIsProvisioned = false;
-
 #if !(defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && CHIP_CONFIG_ENABLE_ICD_SERVER)
 bool sIsEnabled          = false;
 bool sIsAttached         = false;
@@ -143,6 +146,7 @@ Identify gIdentify = {
 
 #endif // EMBER_AF_PLUGIN_IDENTIFY_SERVER
 } // namespace
+bool BaseApplication::sIsProvisioned = false;
 
 #ifdef DIC_ENABLE
 namespace {
@@ -248,12 +252,16 @@ CHIP_ERROR BaseApplication::Init()
 
     OutputQrCode(true /*refreshLCD at init*/);
 
+#ifdef PERFORMANCE_TEST_ENABLED
+    RegisterPerfTestCommands();
+#endif // PERFORMANCE_TEST_ENABLED
+
     PlatformMgr().AddEventHandler(OnPlatformEvent, 0);
 #ifdef SL_WIFI
-    sIsProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
+    BaseApplication::sIsProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
 #endif /* SL_WIFI */
 #if CHIP_ENABLE_OPENTHREAD
-    sIsProvisioned = ConnectivityMgr().IsThreadProvisioned();
+    BaseApplication::sIsProvisioned = ConnectivityMgr().IsThreadProvisioned();
 #endif
 
     return err;
@@ -366,7 +374,7 @@ bool BaseApplication::ActivateStatusLedPatterns()
     if (!isPatternSet)
     {
         // Apply different status feedbacks
-        if (sIsProvisioned && sIsEnabled)
+        if (BaseApplication::sIsProvisioned && sIsEnabled)
         {
             if (sIsAttached)
             {
@@ -392,6 +400,7 @@ bool BaseApplication::ActivateStatusLedPatterns()
     return isPatternSet;
 }
 
+// TODO Move State Monitoring elsewhere
 void BaseApplication::LightEventHandler()
 {
     // Collect connectivity and configuration state from the CHIP stack. Because
@@ -403,17 +412,26 @@ void BaseApplication::LightEventHandler()
     if (PlatformMgr().TryLockChipStack())
     {
 #ifdef SL_WIFI
-        sIsProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
-        sIsEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
-        sIsAttached    = ConnectivityMgr().IsWiFiStationConnected();
+        BaseApplication::sIsProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
+        sIsEnabled                      = ConnectivityMgr().IsWiFiStationEnabled();
+        sIsAttached                     = ConnectivityMgr().IsWiFiStationConnected();
 #endif /* SL_WIFI */
 #if CHIP_ENABLE_OPENTHREAD
         sIsEnabled  = ConnectivityMgr().IsThreadEnabled();
         sIsAttached = ConnectivityMgr().IsThreadAttached();
 #endif /* CHIP_ENABLE_OPENTHREAD */
         sHaveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
+
+#ifdef DISPLAY_ENABLED
+        SilabsLCD::DisplayStatus_t status;
+        status.connected   = sIsEnabled && sIsAttached;
+        status.advertising = chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen();
+        status.nbFabric    = chip::Server::GetInstance().GetFabricTable().FabricCount();
+        slLCD.SetStatus(status);
+#endif
         PlatformMgr().UnlockChipStack();
     }
+
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 #if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
@@ -465,15 +483,14 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             mFunction = kFunction_NoneSelected;
 
             OutputQrCode(false);
-#ifdef QR_CODE_ENABLED
-            // TOGGLE QRCode/LCD demo UI
-            slLCD.ToggleQRCode();
+#ifdef DISPLAY_ENABLED
+            slLCD.CycleScreens();
 #endif
 
 #ifdef SL_WIFI
             if (!ConnectivityMgr().IsWiFiStationProvisioned())
 #else
-            if (!sIsProvisioned)
+            if (!BaseApplication::sIsProvisioned)
 #endif /* !SL_WIFI */
             {
                 // Open Basic CommissioningWindow. Will start BLE advertisements
@@ -488,13 +505,12 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             else
             {
                 SILABS_LOG("Network is already provisioned, Ble advertissement not enabled");
-                DeviceLayer::ChipDeviceEvent event;
-                event.Type     = DeviceLayer::DeviceEventType::kAppWakeUpEvent;
-                CHIP_ERROR err = DeviceLayer::PlatformMgr().PostEvent(&event);
-                if (err != CHIP_NO_ERROR)
-                {
-                    ChipLogError(AppServer, "Failed to post App wake up Event event %" CHIP_ERROR_FORMAT, err.Format());
-                }
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+                // Temporarily claim network activity, until we implement a "user trigger" reason for ICD wakeups.
+                PlatformMgr().LockChipStack();
+                ICDNotifier::GetInstance().BroadcastNetworkActivityNotification();
+                PlatformMgr().UnlockChipStack();
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
             }
         }
         else if (mFunctionTimerActive && mFunction == kFunction_FactoryReset)
@@ -705,7 +721,7 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
 {
     if (event->Type == DeviceEventType::kServiceProvisioningChange)
     {
-        sIsProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
+        BaseApplication::sIsProvisioned = event->ServiceProvisioningChange.IsServiceProvisioned;
     }
 }
 
@@ -724,7 +740,7 @@ void BaseApplication::OutputQrCode(bool refreshLCD)
         if (refreshLCD)
         {
             slLCD.SetQRCode((uint8_t *) setupPayload.data(), setupPayload.size());
-            slLCD.ShowQRCode(true, true);
+            slLCD.ShowQRCode(true);
         }
 #endif // QR_CODE_ENABLED
 
@@ -734,4 +750,9 @@ void BaseApplication::OutputQrCode(bool refreshLCD)
     {
         SILABS_LOG("Getting QR code failed!");
     }
+}
+
+bool BaseApplication::getWifiProvisionStatus()
+{
+    return BaseApplication::sIsProvisioned;
 }

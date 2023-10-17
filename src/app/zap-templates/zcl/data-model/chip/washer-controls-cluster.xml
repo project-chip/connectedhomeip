@@ -17,13 +17,13 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <bitmap name="Feature" type="BITMAP32">
+  <bitmap name="Feature" type="bitmap32">
     <cluster code="0x0053"/>
     <field mask="0x01" name="Spin"/>
     <field mask="0x02" name="Rinse"/>
   </bitmap>
 
-  <enum name="NumberOfRinsesEnum" type="ENUM8">
+  <enum name="NumberOfRinsesEnum" type="enum8">
     <cluster code="0x0053"/>
     <item name="None" value="0x0"/>
     <item name="Normal" value="0x1"/>
@@ -42,8 +42,8 @@ limitations under the License.
 
     <globalAttribute side="server" code="0xFFFD" value="1" />
 
-    <attribute side="server" code="0x0000" define="SPIN_SPEEDS"               type="ARRAY" entryType="CHAR_STRING"                                writable="false" isNullable="false" optional="true">SpinSpeeds</attribute>
-    <attribute side="server" code="0x0001" define="SPIN_SPEED_CURRENT"        type="INT8U"                                min="0x00" max="0x1F"   writable="true"  isNullable="true"  optional="true">SpinSpeedCurrent</attribute>
+    <attribute side="server" code="0x0000" define="SPIN_SPEEDS"               type="ARRAY" entryType="char_string"                                writable="false" isNullable="false" optional="true">SpinSpeeds</attribute>
+    <attribute side="server" code="0x0001" define="SPIN_SPEED_CURRENT"        type="int8u"                                min="0x00" max="0x1F"   writable="true"  isNullable="true"  optional="true">SpinSpeedCurrent</attribute>
     <attribute side="server" code="0x0002" define="NUMBER_OF_RINSES"          type="NumberOfRinsesEnum"                                           writable="true"  isNullable="false"  optional="true">NumberOfRinses</attribute>
     <attribute side="server" code="0x0003" define="SUPPORTED_RINSES"          type="ARRAY" entryType="NumberOfRinsesEnum"                      writable="false"  isNullable="false"  optional="true">SupportedRinses</attribute>
   </cluster>

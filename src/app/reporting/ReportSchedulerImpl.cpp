@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/ReportSchedulerImpl.h>
 

@@ -3660,7 +3660,7 @@ PICS:
       id: GRPKEY.S.C01.Rsp
 
     - label: "Does the device implement the KeySetReadResponse command}?"
-      id: GRPKEY.S.C02.Rsp
+      id: GRPKEY.S.C02.Tx
 
     - label: "Does the device implement the KeySetRemove command}?"
       id: GRPKEY.S.C03.Rsp
@@ -3670,7 +3670,7 @@ PICS:
 
     - label:
           "Does the device implement the KeySetReadAllIndicesResponse command}?"
-      id: GRPKEY.S.C05.Rsp
+      id: GRPKEY.S.C05.Tx
 
     #
     # client / attributes
@@ -7074,10 +7074,10 @@ PICS:
       id: LTIME.S.A0002
 
     - label: "Does the DUT (Server) support 12 Hr Hour Format ?"
-      id: LTIME.S.A0000.12HR
+      id: LTIME.S.M.12HR
 
     - label: "Does the DUT (Server) support 24 Hr Hour Format ?"
-      id: LTIME.S.A0000.24HR
+      id: LTIME.S.M.24HR
 
     #
     # client / attributes
@@ -7156,51 +7156,13 @@ PICS:
     # server / manually
     #
     - label: "Does the device support the TemperatureUnit Fahrenheit ?"
-      id: LUNIT.TempUnit.Fahrenheit
+      id: LUNIT.S.M.Fahrenheit
 
     - label: "Does the device support the TemperatureUnit Celsius ?"
-      id: LUNIT.TempUnit.Celsius
+      id: LUNIT.S.M.Celsius
 
     - label: "Does the device support the TemperatureUnit Kelvin ?"
-      id: LUNIT.TempUnit.Kelvin
-
-    #
-    # client / attributes
-    #
-    - label:
-          "Does the DUT(client) have access privileges for the TemperatureUnit
-          attribute implemented on the server ?"
-      id: LUNIT.C.A0000
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFF8)
-          GeneratedCommandList attribute implemented on the server ?"
-      id: LUNIT.C.Afff8
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFF9)
-          AcceptedCommandList attribute implemented on the server ?"
-      id: LUNIT.C.Afff9
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFFA)
-          EventList attribute implemented on the server ?"
-      id: LUNIT.C.Afffa
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFFB)
-          AttributeList attribute implemented on the server ?"
-      id: LUNIT.C.Afffb
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFFC)
-          FeatureMap attribute implemented on the server ?"
-      id: LUNIT.C.Afffc
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFFD)
-          ClusterRevision attribute implemented on the server ?"
-      id: LUNIT.C.Afffd
+      id: LUNIT.S.M.Kelvin
 
     # User Label Cluster Test Plan
     - label: "Does the device implement the User Label cluster as a server?"
@@ -7343,87 +7305,13 @@ PICS:
       id: DGWIFI.S.F01
 
     #
-    # client / attributes
-    #
-    - label:
-          "Does the DUT(client) have access privileges for the BSSID attribute
-          implemented on the server?"
-      id: DGWIFI.C.A0000
-
-    - label:
-          "Does the DUT(client) have access privileges for the SecurityType
-          attribute implemented on the server?"
-      id: DGWIFI.C.A0001
-
-    - label:
-          "Does the DUT(client) have access privileges for the WiFiVersion
-          attribute implemented on the server?"
-      id: DGWIFI.C.A0002
-
-    - label:
-          "Does the DUT(client) have access privileges for the ChannelNumber
-          attribute implemented on the server?"
-      id: DGWIFI.C.A0003
-
-    - label:
-          "Does the DUT(client) have access privileges for the RSSI attribute
-          implemented on the server?"
-      id: DGWIFI.C.A0004
-
-    - label:
-          "Does the DUT(client) have access privileges for the BeaconLostCount
-          attribute implemented on the server?"
-      id: DGWIFI.C.A0005
-
-    - label:
-          "Does the DUT(client) have access privileges for the BeaconRxCount
-          attribute implemented on the server?"
-      id: DGWIFI.C.A0006
-
-    - label:
-          "Does the DUT(client) have access privileges for the
-          PacketMulticastRxCount attribute implemented on the server?"
-      id: DGWIFI.C.A0007
-
-    - label:
-          "Does the DUT(client) have access privileges for the
-          PacketMulticastTxCount attribute implemented on the server?"
-      id: DGWIFI.C.A0008
-
-    - label:
-          "Does the DUT(client) have access privileges for the
-          PacketUnicastRxCount attribute implemented on the server?"
-      id: DGWIFI.C.A0009
-
-    - label:
-          "Does the DUT(client) have access privileges for the
-          PacketUnicastTxCount attribute implemented on the server?"
-      id: DGWIFI.C.A000a
-
-    - label:
-          "Does the DUT(client) have access privileges for the CurrentMaxRate
-          attribute implemented on the server?"
-      id: DGWIFI.C.A000b
-
-    - label:
-          "Does the DUT(client) have access privileges for the OverrunCount
-          attribute implemented on the server?"
-      id: DGWIFI.C.A000c
-
-    #
     # client / commandsGenerated
     #
     - label:
           "Reset the following attributes to 0; BeaconLostCount, BeaconRxCount,
           PacketMulticastRxCount, PacketMulticastTxCount, PacketUnicastRxCount,
           PacketUnicastTxCount"
-      id: DGWIFI.C.C00.Tx
-
-    #
-    # client / manually
-    #
-    - label: ""
-      id: DGWIFI.C.A
+      id: DGWIFI.S.C00.Tx
 
     # Window Covering Cluster Test Plan
     - label:
@@ -8902,15 +8790,6 @@ PICS:
       id: SMOKECO.S.A0009
 
     - label: "Does the device implement the ContaminationState attribute?"
-      id: SMOKECO.S.A0010
-
-    - label: "Does the device implement the SensitivityLevel attribute?"
-      id: SMOKECO.S.A0011
-
-    - label: "Does the device implement the ExpiryDate attribute?"
-      id: SMOKECO.S.A0012
-
-    - label: "Does the device implement the ContaminationState attribute?"
       id: SMOKECO.S.A000a
 
     - label: "Does the device implement the SensitivityLevel attribute?"
@@ -8953,7 +8832,7 @@ PICS:
       id: SMOKECO.S.E09
 
     - label: "Does the device implement the AllClear event?"
-      id: SMOKECO.S.E10
+      id: SMOKECO.S.E0a
 
     #
     # server / manually

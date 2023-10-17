@@ -212,6 +212,7 @@ class TestXmlParser(unittest.TestCase):
                                                events=[Event(priority=EventPriority.INFO,
                                                              name='FabricEvent',
                                                              code=0x1234,
+                                                             description="This is a test event",
                                                              fields=[Field(data_type=DataType(name='node_id'),
                                                                            code=1,
                                                                            name='AdminNodeID',
@@ -243,11 +244,6 @@ class TestXmlParser(unittest.TestCase):
               <cluster><name>Test1</name><code>10</code></cluster>
               <cluster><name>Test2</name><code>20</code></cluster>
 
-              <enum name="GlobalEnum" type="ENUM8">
-                <item value="0" name="First" />
-                <item value="1" name="Second" />
-              </enum>
-
               <enum name="OneCluster" type="ENUM8">
                 <cluster code="10" />
                 <item value="3" name="Three" />
@@ -261,14 +257,6 @@ class TestXmlParser(unittest.TestCase):
               </enum>
             </configurator>
         ''')
-        e1 = Enum(
-            name='GlobalEnum',
-            base_type="ENUM8",
-            entries=[
-                ConstantEntry(name="First", code=0),
-                ConstantEntry(name="Second", code=1),
-            ]
-        )
         e2 = Enum(
             name='OneCluster',
             base_type="ENUM8",
@@ -290,7 +278,6 @@ class TestXmlParser(unittest.TestCase):
                                      name='Test1', code=10, enums=[e2, e3]),
                              Cluster(side=ClusterSide.CLIENT,
                                      name='Test2', code=20, enums=[e3])],
-                             enums=[e1],
                              ))
 
     def testStruct(self):

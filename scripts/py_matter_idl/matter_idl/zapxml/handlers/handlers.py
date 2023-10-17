@@ -110,7 +110,7 @@ class EventHandler(BaseHandler):
             self._event.readacl = AttrsToAccessPrivilege(attrs)
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name.lower() == 'description':
-            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+            return DescriptionHandler(self.context, self._event)
         else:
             return BaseHandler(self.context)
 
@@ -225,19 +225,20 @@ class StructHandler(BaseHandler, IdlPostProcessor):
         # We have two choices of adding a struct:
         #   - inside a cluster if a code exists
         #   - inside top level if no codes were associated
-        if self._cluster_codes:
-            for code in self._cluster_codes:
-                found = False
-                for c in idl.clusters:
-                    if c.code == code:
-                        c.structs.append(self._struct)
-                        found = True
+        if not self._cluster_codes:
+            LOGGER.error('Struct %s has no cluster codes' % self._struct.name)
+            return
 
-                if not found:
-                    LOGGER.error('Enum %s could not find cluster (code %d/0x%X)' %
-                                 (self._struct.name, code, code))
-        else:
-            idl.structs.append(self._struct)
+        for code in self._cluster_codes:
+            found = False
+            for c in idl.clusters:
+                if c.code == code:
+                    c.structs.append(self._struct)
+                    found = True
+
+            if not found:
+                LOGGER.error('Struct %s could not find cluster (code %d/0x%X)' %
+                             (self._struct.name, code, code))
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
@@ -269,22 +270,19 @@ class EnumHandler(BaseHandler, IdlPostProcessor):
             return BaseHandler(self.context)
 
     def FinalizeProcessing(self, idl: Idl):
-        # We have two choices of adding an enum:
-        #   - inside a cluster if a code exists
-        #   - inside top level if a code does not exist
-
         if not self._cluster_codes:
-            idl.enums.append(self._enum)
-        else:
-            found = set()
-            for c in idl.clusters:
-                if c.code in self._cluster_codes:
-                    c.enums.append(self._enum)
-                    found.add(c.code)
+            LOGGER.error("Found enum without a cluster code: %s" %
+                         (self._enum.name))
+            return
+        found = set()
+        for c in idl.clusters:
+            if c.code in self._cluster_codes:
+                c.enums.append(self._enum)
+                found.add(c.code)
 
-            if found != self._cluster_codes:
-                LOGGER.error('Enum %s could not find its clusters (codes: %r)' %
-                             (self._enum.name, self._cluster_codes - found))
+        if found != self._cluster_codes:
+            LOGGER.error('Enum %s could not find its clusters (codes: %r)' %
+                         (self._enum.name, self._cluster_codes - found))
 
     def EndProcessing(self):
         self.context.AddIdlPostProcessor(self)
@@ -347,7 +345,7 @@ class DescriptionHandler(BaseHandler):
     """
 
     def __init__(self, context: Context, target: Any):
-        super().__init__(context)
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self.target = target
 
     def HandleContent(self, content):

@@ -76,6 +76,7 @@ static bool KeyExists(FabricIndex fabricIndex, GroupId groupId)
 static Status GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId, const CharSpan & groupName)
 {
     VerifyOrReturnError(IsValidGroupId(groupId), Status::ConstraintError);
+    VerifyOrReturnError(groupName.size() <= GroupDataProvider::GroupInfo::kGroupNameMax, Status::ConstraintError);
 
     GroupDataProvider * provider = GetGroupDataProvider();
     VerifyOrReturnError(nullptr != provider, Status::NotFound);

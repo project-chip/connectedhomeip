@@ -38,7 +38,7 @@ class PairOnNetworkLongCommand(
     currentCommissioner()
       .pairDeviceWithAddress(
         getNodeId(),
-        getRemoteAddr().getHostAddress(),
+        getRemoteAddr().address.hostAddress,
         MATTER_PORT,
         getDiscriminator(),
         getSetupPINCode(),

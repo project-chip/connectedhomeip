@@ -23,9 +23,12 @@
 
 #pragma once
 
+#include <string>
+
 #include <ble/BleLayer.h>
 #include <platform/internal/BLEManager.h>
 
+#include "bluez/BluezEndpoint.h"
 #include "bluez/ChipDeviceScanner.h"
 #include "bluez/Types.h"
 

@@ -185,7 +185,6 @@ int32_t rsi_ble_app_get_event(void)
  */
 void rsi_ble_app_set_event(uint32_t event_num)
 {
-    SILABS_LOG("%s: starting", __func__);
     event_msg.ble_app_event_map |= BIT(event_num);
     osSemaphoreRelease(sl_ble_event_sem);
     return;
@@ -209,7 +208,6 @@ void rsi_gatt_add_attribute_to_list(rsi_ble_t * p_val, uint16_t handle, uint16_t
 {
     if ((p_val->DATA_ix + data_len) >= BLE_ATT_REC_SIZE)
     { //! Check for max data length for the characteristic value
-        SILABS_LOG("\r\n no data memory for att rec values \r\n");
         return;
     }
 
@@ -351,10 +349,10 @@ void rsi_ble_add_char_val_att(void * serv_handler, uint16_t handle, uuid_t att_t
 
 uint32_t rsi_ble_add_matter_service(void)
 {
-    uuid_t custom_service    = { RSI_BLE_MATTER_CUSTOM_SERVICE_UUID };
-    custom_service.size      = RSI_BLE_MATTER_CUSTOM_SERVICE_SIZE;
-    custom_service.val.val16 = RSI_BLE_MATTER_CUSTOM_SERVICE_VALUE_16;
-    uint8_t data[230]        = { RSI_BLE_MATTER_CUSTOM_SERVICE_DATA };
+    uuid_t custom_service                                   = { RSI_BLE_MATTER_CUSTOM_SERVICE_UUID };
+    custom_service.size                                     = RSI_BLE_MATTER_CUSTOM_SERVICE_SIZE;
+    custom_service.val.val16                                = RSI_BLE_MATTER_CUSTOM_SERVICE_VALUE_16;
+    uint8_t data[RSI_BLE_MATTER_CUSTOM_SERVICE_DATA_LENGTH] = { RSI_BLE_MATTER_CUSTOM_SERVICE_DATA };
 
     static const uuid_t custom_characteristic_RX = { .size             = RSI_BLE_CUSTOM_CHARACTERISTIC_RX_SIZE,
                                                      .reserved         = { RSI_BLE_CUSTOM_CHARACTERISTIC_RX_RESERVED },

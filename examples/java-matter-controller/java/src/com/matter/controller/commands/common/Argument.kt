@@ -171,7 +171,7 @@ class Argument {
         isValidArgument =
           try {
             val ipAddress = this.value as IPAddress
-            ipAddress.setAddress(InetAddress.getByName(value))
+            ipAddress.address = InetAddress.getByName(value)
             true
           } catch (e: UnknownHostException) {
             false

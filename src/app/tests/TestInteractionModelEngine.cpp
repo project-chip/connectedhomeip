@@ -28,10 +28,10 @@
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/UnitTestContext.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <messaging/ExchangeContext.h>
@@ -72,7 +72,7 @@ void TestInteractionModelEngine::TestAttributePathParamsPushRelease(nlTestSuite 
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
     err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(),
-                                                      app::reporting::GetDefaultReportScheduler());
+                                                                    app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ObjectList<AttributePathParams> * attributePathParamsList = nullptr;
     AttributePathParams attributePathParams1;
@@ -110,7 +110,7 @@ void TestInteractionModelEngine::TestRemoveDuplicateConcreteAttribute(nlTestSuit
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
     err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(),
-                                                      app::reporting::GetDefaultReportScheduler());
+                                                                    app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ObjectList<AttributePathParams> * attributePathParamsList = nullptr;
     AttributePathParams attributePathParams1;
@@ -235,7 +235,7 @@ void TestInteractionModelEngine::TestSubscriptionResumptionTimer(nlTestSuite * a
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
     err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(),
-                                                      app::reporting::GetDefaultReportScheduler());
+                                                                    app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     uint32_t timeTillNextResubscriptionMs;

@@ -999,14 +999,14 @@ exit:
 
 CHIP_ERROR BLEManagerImpl::ConfigureScanResponseData(ByteSpan data)
 {
-    if (!IsSpanUsable(data) || data.size() > MAX_SCAN_RSP_DATA_LEN)
+    if (data.empty() || data.size() > MAX_SCAN_RSP_DATA_LEN)
     {
         ChipLogError(DeviceLayer, "scan response data is invalid");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     memcpy(scanResponseBuffer, data.data(), data.size());
     ByteSpan scanResponseSpan(scanResponseBuffer);
-    mScanResponse = chip::Optional(scanResponseSpan);
+    mScanResponse = chip::Optional<ByteSpan>(scanResponseSpan);
     return CHIP_NO_ERROR;
 }
 

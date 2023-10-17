@@ -1,9 +1,14 @@
+#include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
 
+#include <FreeRTOS.h>
+#include <aos/yloop.h>
 #include <bl60x_wifi_driver/wifi_mgmr.h>
 #include <bl60x_wifi_driver/wifi_mgmr_api.h>
 #include <bl60x_wifi_driver/wifi_mgmr_profile.h>
+#include <task.h>
+
 #include <supplicant_api.h>
 
 #include <wpa_supplicant/src/utils/common.h>
@@ -12,13 +17,16 @@
 #include <wpa_supplicant/src/common/wpa_common.h>
 #include <wpa_supplicant/src/rsn_supp/wpa_i.h>
 
+#include <wifi_mgmr_portable.h>
+
 extern struct wpa_sm gWpaSm;
+static netif_ext_callback_t netifExtCallback;
 
 int wifi_mgmr_get_bssid(uint8_t * bssid)
 {
     int i;
 
-    for (i = 0; i < 8; i++)
+    for (i = 0; i < sizeof(wifiMgmr.wifi_mgmr_stat_info.bssid); i++)
     {
         bssid[i] = wifiMgmr.wifi_mgmr_stat_info.bssid[i];
     }
@@ -148,4 +156,24 @@ bool wifi_mgmr_security_type_is_wpa3(void)
 struct netif * deviceInterface_getNetif(void)
 {
     return wifi_mgmr_sta_netif_get();
+}
+
+static void wifi_event_handler_raw(input_event_t * event, void * private_data)
+{
+    wifi_event_handler(event->code);
+}
+
+void wifi_start_firmware_task(void)
+{
+#define WIFI_STACK_SIZE 1552
+    static StackType_t wifi_fw_stack[WIFI_STACK_SIZE];
+    static StaticTask_t wifi_fw_task;
+
+    aos_register_event_filter(EV_WIFI, wifi_event_handler_raw, NULL);
+    netif_add_ext_callback(&netifExtCallback, network_netif_ext_callback);
+
+    bl_pm_init();
+    xTaskCreateStatic(wifi_main, (char *) "fw", WIFI_STACK_SIZE, NULL, 30, wifi_fw_stack, &wifi_fw_task);
+
+    aos_post_event(EV_WIFI, CODE_WIFI_ON_INIT_DONE, 0);
 }

@@ -18,7 +18,7 @@ limitations under the License.
 <configurator>
     <domain name="CHIP" />
 
-    <bitmap name="Feature" type="BITMAP32">
+    <bitmap name="Feature" type="bitmap32">
         <cluster code="0x0046"/>
         <field name="CheckInProtocolSupport" mask="0x1"/>
     </bitmap>
@@ -26,8 +26,8 @@ limitations under the License.
     <struct name = "MonitoringRegistrationStruct" isFabricScoped="true">
         <cluster code="0x0046"/>
         <item fieldId="1" name="CheckInNodeID" type="node_id" isFabricSensitive="true"/>
-        <item fieldId="2" name="MonitoredSubject" type="INT64U" isFabricSensitive="true"/>
-        <item fieldId="3" name="Key" type="OCTET_STRING" length="16" isFabricSensitive="true"/>
+        <item fieldId="2" name="MonitoredSubject" type="int64u" isFabricSensitive="true"/>
+        <!-- RESERVED = 0x03 -->
     </struct>
 
     <cluster>
@@ -42,37 +42,37 @@ limitations under the License.
         <!-- Current cluster version -->
         <globalAttribute side="either" code="0xFFFD" value="1"/>
 
-        <attribute side="server" code="0x00" define="IDLE_MODE_INTERVAL" type="INT32U" min="1" max="64800" default="1" writable="false" optional="false" isNullable="false">IdleModeInterval</attribute>
-        <attribute side="server" code="0x01" define="ACTIVE_MODE_INTERVAL" type="INT32U" min="300" default="300" writable="false" optional="false" isNullable="false">ActiveModeInterval</attribute>
-        <attribute side="server" code="0x02" define="ACTIVE_MODE_THRESHOLD" type="INT16U" min="300" default="300" writable="false" optional="false" isNullable="false">ActiveModeThreshold</attribute>
+        <attribute side="server" code="0x00" define="IDLE_MODE_INTERVAL" type="int32u" min="1" max="64800" default="1" writable="false" optional="false" isNullable="false">IdleModeInterval</attribute>
+        <attribute side="server" code="0x01" define="ACTIVE_MODE_INTERVAL" type="int32u" default="300" writable="false" optional="false" isNullable="false">ActiveModeInterval</attribute>
+        <attribute side="server" code="0x02" define="ACTIVE_MODE_THRESHOLD" type="int16u" default="300" writable="false" optional="false" isNullable="false">ActiveModeThreshold</attribute>
         <attribute side="server" code="0x03" define="REGISTERED_CLIENTS" type="ARRAY" entryType="MonitoringRegistrationStruct" writable="false" optional="true" isNullable="false">
             <description>RegisteredClients</description>
             <access op="read" privilege="administer"/>
         </attribute>
-        <attribute side="server" code="0x04" define="ICD_COUNTER" type="INT32U" writable="false" default="0" optional="true" isNullable="false">
+        <attribute side="server" code="0x04" define="ICD_COUNTER" type="int32u" writable="false" default="0" optional="true" isNullable="false">
             <description>ICDCounter</description>
             <access op="read" privilege="administer"/>
         </attribute>
-        <attribute side="server" code="0x05" define="CLIENTS_SUPPORTED_PER_FABRIC" type="INT16U" min="1" default="1" writable="false" optional="true" isNullable="false">ClientsSupportedPerFabric</attribute>
+        <attribute side="server" code="0x05" define="CLIENTS_SUPPORTED_PER_FABRIC" type="int16u" min="1" default="1" writable="false" optional="true" isNullable="false">ClientsSupportedPerFabric</attribute>
 
         <command source="client" code="0x00" name="RegisterClient" response="RegisterClientResponse" isFabricScoped="true" optional="true">
             <description> Register a client to the end device </description>
             <arg name="CheckInNodeID" type="node_id" optional="false"/>
-            <arg name="MonitoredSubject" type="INT64U" optional="false"/>
-            <arg name="Key" type="OCTET_STRING" length="16" optional="false"/>
-            <arg name="VerificationKey" type="OCTET_STRING" length="16" optional="true"/>
+            <arg name="MonitoredSubject" type="int64u" optional="false"/>
+            <arg name="Key" type="octet_string" length="16" optional="false"/>
+            <arg name="VerificationKey" type="octet_string" length="16" optional="true"/>
             <access op="invoke" privilege="manage"/>
         </command>
 
         <command source="server" code="0x01" name="RegisterClientResponse" optional="false" disableDefaultResponse="true">
             <description> RegisterClient response command </description>
-            <arg name="ICDCounter" type="INT32U" isNullable="false"/>
+            <arg name="ICDCounter" type="int32u" isNullable="false"/>
         </command>
 
         <command source="client" code="0x02" name="UnregisterClient" isFabricScoped="true" optional="true">
             <description> Unregister a client from an end device </description>
             <arg name="CheckInNodeID" type="node_id"/>
-            <arg name="VerificationKey" type="OCTET_STRING" length="16" optional="true"/>
+            <arg name="VerificationKey" type="octet_string" length="16" optional="true"/>
             <access op="invoke" privilege="manage"/>
         </command>
 

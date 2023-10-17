@@ -23,10 +23,10 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
 #include <lib/core/TLVUtilities.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/TestGroupData.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/UnitTestContext.h>

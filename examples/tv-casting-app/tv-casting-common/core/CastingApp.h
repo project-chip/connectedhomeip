@@ -30,9 +30,9 @@ namespace core {
  */
 enum CastingAppState
 {
-    UNINITIALIZED, // Before Initialize() success
-    NOT_RUNNING,   // After Initialize() success before Start()ing, OR After stop() success
-    RUNNING,       // After Start() success
+    CASTING_APP_UNINITIALIZED, // Before Initialize() success
+    CASTING_APP_NOT_RUNNING,   // After Initialize() success before Start()ing, OR After stop() success
+    CASTING_APP_RUNNING,       // After Start() success
 };
 
 /**
@@ -71,7 +71,7 @@ private:
     CastingApp();
     static CastingApp * _castingApp;
 
-    CastingApp(CastingApp & other) = delete;
+    CastingApp(CastingApp & other)     = delete;
     void operator=(const CastingApp &) = delete;
 
     /**
@@ -83,7 +83,7 @@ private:
 
     const matter::casting::support::AppParameters * mAppParameters;
 
-    CastingAppState mState = UNINITIALIZED;
+    CastingAppState mState = CASTING_APP_UNINITIALIZED;
 };
 
 }; // namespace core

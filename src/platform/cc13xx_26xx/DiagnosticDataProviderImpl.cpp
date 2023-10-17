@@ -219,8 +219,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveHardwareFaults(GeneralFaults<kMa
 CHIP_ERROR DiagnosticDataProviderImpl::GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults)
 {
 #if CHIP_CONFIG_TEST
-    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_ENUM_THREAD_FAULT));
-    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_ENUM_BLE_FAULT));
+    ReturnErrorOnFailure(radioFaults.add(to_underlying(RadioFaultEnum::kThreadFault)));
+    ReturnErrorOnFailure(radioFaults.add(to_underlying(RadioFaultEnum::kBLEFault)));
 #endif
 
     return CHIP_NO_ERROR;
@@ -248,7 +248,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     ifp->isOperational             = true;
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
-    ifp->type = EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD;
+    ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kThread;
 
     otExtAddress extAddr;
     ThreadStackMgrImpl().GetExtAddress(extAddr);
