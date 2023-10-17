@@ -1,0 +1,6 @@
+---
+  commander_info:
+    commanderBranch: 'master'
+    browserUrl: 'https://stash.silabs.com/projects/TOOLCHAIN_INTERNAL/repos/simplicity_commander_linux_x64'
+    gitUrl: 'ssh://git@stash.silabs.com/toolchain_internal/simplicity_commander_linux_x64.git'
+    commanderTag: 'simplicity_commander_linux_x64_rel_1_16_0'
