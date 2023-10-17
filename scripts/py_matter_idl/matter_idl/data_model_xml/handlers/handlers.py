@@ -84,6 +84,44 @@ class BitmapHandler(BaseHandler):
         else:
             return BaseHandler(self.context)
 
+class StructHandler(BaseHandler):
+    def __init__(self, context: Context, cluster: Cluster, attrs):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._cluster = cluster
+
+        self._struct = Struct(name=NormalizeName(attrs["name"]), fields=[])
+
+    def EndProcessing(self):
+        self._cluster.structs.append(self._struct)
+
+    def GetNextProcessor(self, name: str, attrs):
+        if name == "section":
+            # Documentation data, skipped
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "field":
+            assert ("name" in attrs)
+            assert ("id" in attrs)
+            assert ("type" in attrs)
+
+            # TODO:
+            #   - is_list would be useful here
+            #   - qualities (NULLABLE, OPTIONAL, FABRIC_SENSITIVE)
+            #   - data type: min/max length and min/max value
+            self._struct.fields.append(Field(
+                name=NormalizeName(attrs["name"]),
+                code=ParseInt(attrs["id"]),
+                data_type=DataType(name=attrs["type"])
+            ))
+
+
+            # Assume fully handled.
+            #
+            # TODO: "access" is unclear here. mandatoryConform and section is probably
+            #       not needed in general
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        else:
+            return BaseHandler(self.context)
+
 
 class EnumHandler(BaseHandler):
     def __init__(self, context: Context, cluster: Cluster, attrs):
@@ -134,8 +172,7 @@ class DataTypesHandler(BaseHandler):
         elif name == "bitmap":
             return BitmapHandler(self.context, self._cluster, attrs)
         elif name == "struct":
-            # FIXME
-            return BaseHandler(self.context)
+            return StructHandler(self.context, self._cluster, attrs)
         else:
             return BaseHandler(self.context)
 
