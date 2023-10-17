@@ -18,16 +18,16 @@
 
 CURRENT_SPEC_VERSION=$(cat SPECIFICATION_VERSION)
 
-CURRENT_RELEASE=$(gh release list --exclude-pre-releases | grep -Fi $CURRENT_SPEC_VERSION | awk '{print $1}' | head -n1)
+CURRENT_RELEASE=$(gh release list --exclude-pre-releases | grep -Fi "$CURRENT_SPEC_VERSION" | awk '{print $1}' | head -n1)
 
 if [ -z "$CURRENT_RELEASE" ]; then
     SDK_RELEASE_REVISIONS=0
     echo "No revision found for current release"
 else
-    SDK_RELEASE_REVISIONS="$(echo $CURRENT_RELEASE | cut -d'.' -f4)"
+    SDK_RELEASE_REVISIONS="$(echo "$CURRENT_RELEASE" | cut -d'.' -f4)"
 fi
 
-if [ $SDK_RELEASE_REVISIONS != 0 ]; then
+if [ "$SDK_RELEASE_REVISIONS" != 0 ]; then
     SDK_RELEASE_REVISIONS=$(($SDK_RELEASE_REVISIONS + 1))
 fi
 
@@ -37,4 +37,4 @@ echo "Current release: $CURRENT_RELEASE"
 echo "SDK release revisions: $SDK_RELEASE_REVISIONS"
 echo "New release: $NEW_RELEASE_TAG"
 
-gh release create "$NEW_RELEASE_TAG" $@
+gh release create "$NEW_RELEASE_TAG" "$@"
