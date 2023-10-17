@@ -28,6 +28,7 @@ def ParseInt(value: str, data_type: Optional[DataType] = None) -> int:
         parsed = int(value[2:], 16)
         if data_type and IsSignedDataType(data_type):
             bits = GetDataTypeSizeInBits(data_type)
+            assert(bits) # size MUST be known
             if parsed & (1 << (bits - 1)):
                 parsed -= 1 << bits
         return parsed
