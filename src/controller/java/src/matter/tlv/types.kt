@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-package chip.tlv
+package matter.tlv
 
 import kotlin.experimental.and
 import kotlin.experimental.or

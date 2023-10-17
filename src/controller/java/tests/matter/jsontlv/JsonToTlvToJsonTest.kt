@@ -16,12 +16,12 @@
  *    limitations under the License.
  */
 
-package chip.jsontlv
+package matter.jsontlv
 
-import chip.tlv.*
 import com.google.common.truth.Truth.assertThat
 import com.google.gson.JsonParser
 import kotlin.test.assertFailsWith
+import matter.tlv.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4

@@ -173,27 +173,32 @@ dt_nodelabel(dts_partition_path NODELABEL "boot_partition")
 dt_reg_size(mcuboot_size PATH ${dts_partition_path})
 math(EXPR boot_blocks "${mcuboot_size} / ${BLOCK_SIZE}" OUTPUT_FORMAT DECIMAL)
 
-if (CONFIG_CHIP_OTA_IMAGE_BUILD)
+if (CONFIG_BOOTLOADER_MCUBOOT)
     add_custom_target(build_mcuboot ALL
         COMMAND
         west build -b ${BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
             -- -DOVERLAY_CONFIG=${GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE} -DDTC_OVERLAY_FILE="${GLOBAL_DTC_OVERLAY_FILE};${USB_BOOT_DTC_OVERLAY_FILE}"
+        COMMAND
+        cp ${PROJECT_BINARY_DIR}/../modules/chip-module/build_mcuboot/zephyr/zephyr.bin ${PROJECT_BINARY_DIR}/zephyr.mcuboot.bin
     )
 
     add_custom_target(merge_mcuboot ALL
         COMMAND
-        dd if=${PROJECT_BINARY_DIR}/../modules/chip-module/build_mcuboot/zephyr/zephyr.bin of=${PROJECT_BINARY_DIR}/zephyr.bin
+        dd if=${PROJECT_BINARY_DIR}/zephyr.mcuboot.bin of=${PROJECT_BINARY_DIR}/zephyr.bin
         COMMAND
         dd if=${PROJECT_BINARY_DIR}/zephyr.signed.bin of=${PROJECT_BINARY_DIR}/zephyr.bin bs=${BLOCK_SIZE} seek=${boot_blocks}
     )
 
+    add_dependencies(merge_mcuboot ${ZEPHYR_FINAL_EXECUTABLE})
+
+if (CONFIG_CHIP_OTA_IMAGE_BUILD)
     chip_ota_image(chip-ota-image
         INPUT_FILES ${PROJECT_BINARY_DIR}/zephyr.signed.bin
         OUTPUT_FILE ${PROJECT_BINARY_DIR}/zephyr-ota.bin
     )
 
-    add_dependencies(merge_mcuboot ${ZEPHYR_FINAL_EXECUTABLE})
     add_dependencies(chip-ota-image ${ZEPHYR_FINAL_EXECUTABLE})
+endif()
 endif()
 
 # get code-partition factory_partition address

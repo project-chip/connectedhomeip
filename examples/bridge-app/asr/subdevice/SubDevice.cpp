@@ -21,7 +21,7 @@
 extern "C" {
 #endif
 #include <stdio.h>
-#if CONFIG_ENABLE_ASR_APP_MESH
+#ifdef CONFIG_ENABLE_ASR_APP_MESH
 #include "app.h"
 #include "sonata_gap_api.h"
 #include "sonata_gatt_api.h"
@@ -65,7 +65,7 @@ void SubDevice::SetOnOff(bool aOn)
         changed = (mState != kState_On);
         mState  = kState_On;
         ChipLogProgress(DeviceLayer, "SubDevice[%s]: ON", mName);
-#if CONFIG_ENABLE_ASR_APP_MESH
+#ifdef CONFIG_ENABLE_ASR_APP_MESH
         if (strcmp(mName, "Light 1") == 0)
         {
             app_mesh_control_fan(1);
@@ -81,7 +81,7 @@ void SubDevice::SetOnOff(bool aOn)
         changed = (mState != kState_Off);
         mState  = kState_Off;
         ChipLogProgress(DeviceLayer, "SubDevice[%s]: OFF", mName);
-#if CONFIG_ENABLE_ASR_APP_MESH
+#ifdef CONFIG_ENABLE_ASR_APP_MESH
         if (strcmp(mName, "Light 1") == 0)
         {
             app_mesh_control_fan(0);
