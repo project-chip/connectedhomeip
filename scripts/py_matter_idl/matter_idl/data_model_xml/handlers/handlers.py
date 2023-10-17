@@ -72,8 +72,18 @@ class ClusterHandler(BaseHandler):
             parse_meta=context.GetCurrentLocationMeta()
         )
 
-        # TODO: add global attributes by default as they are not in XMLs?
-        # NOTE: feature map should be populated separatly
+        # Global things MUST be available everywhere
+        to_add = [
+            # type, code, name, is_list
+            ('attrib_id', 65531, 'attributeList', True),
+            ('event_id', 65530, 'eventList', True),
+            ('command_id', 65529, 'acceptedCommandList', True),
+            ('command_id', 65528, 'generatedCommandList', True),
+            ('bitmap32', 65532, 'featureMap', False),
+            ('int16u', 65533, 'clusterRevision', False),
+        ]
+        for data_type, code, name, is_list in to_add:
+            self._cluster.attributes.append(Attribute(definition=Field(data_type=DataType(name=data_type), code=code, name=name, is_list=is_list)))
 
     def EndProcessing(self):
         self._idl.clusters.append(self._cluster)
@@ -90,6 +100,9 @@ class ClusterHandler(BaseHandler):
         if name == "revisionHistory":
             # Revision history COULD be used to find the latest revision of a cluster
             # however current IDL files do NOT have a revision info field
+            #
+            # NOTE: we COULD set this as a `default` for attribute clusterRevision, however this will likely
+            #       not match with what matter IDL would parse into.
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "section":
             # Documentation data, skipped
