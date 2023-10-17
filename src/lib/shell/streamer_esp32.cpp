@@ -56,7 +56,7 @@ int streamer_esp32_init(streamer_t * streamer)
     fsync(fileno(stdout));
     setvbuf(stdin, NULL, _IONBF, 0);
 #if CONFIG_ESP_CONSOLE_UART_DEFAULT || CONFIG_ESP_CONSOLE_UART_CUSTOM
-    esp_vfs_dev_uart_port_set_rx_line_endings((uart_port_t)CONFIG_ESP_CONSOLE_UART_NUM, ESP_LINE_ENDINGS_CR);
+    esp_vfs_dev_uart_port_set_rx_line_endings((uart_port_t) CONFIG_ESP_CONSOLE_UART_NUM, ESP_LINE_ENDINGS_CR);
     esp_vfs_dev_uart_port_set_tx_line_endings((uart_port_t) CONFIG_ESP_CONSOLE_UART_NUM, ESP_LINE_ENDINGS_CRLF);
     if (!uart_is_driver_installed((uart_port_t) CONFIG_ESP_CONSOLE_UART_NUM))
     {
