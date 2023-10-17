@@ -66,9 +66,11 @@ struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
      *        In any case, to prevent key leakage, one should either call the DeleteKey method
      *        or save the entry within the ICDMonitoring Table before this object goes out of scope.
      *
-     *        Calling SetKey() twice on the same object will result in the Key being deleted from
-     *        the keyStore even if the entry was previously saved in the table. One should use a new
-     *        object or manually clear the content of the key handle prior to calling SetKey() again.
+     *        In some implementation Calling SetKey() twice on the same ICDMonitoringEntry will result
+     *        in the first Key being deleted from the keyStore to prevent key leakage and this even if
+     *        the entry was previously saved in the table since the key storage is decoupled from the
+     *        ICDMonitoringTableStorage. One should use a new object or manually clear the content of
+     *        the key handle prior to calling SetKey() again.
      *
      * @param keyData A byte span containing the raw key
      * @return CHIP_ERROR CHIP_NO_ERROR     success

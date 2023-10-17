@@ -72,6 +72,10 @@ CHIP_ERROR ICDMonitoringEntry::Deserialize(TLV::TLVReader & reader)
             case to_underlying(Fields::kKey): {
                 ByteSpan buf(key.AsMutable<Crypto::Aes128KeyByteArray>());
                 ReturnErrorOnFailure(reader.Get(buf));
+                // Since we are storing either the raw key or a key ID, we must
+                // simply copy the data as is in the keyHandle.
+                // Calling SetKey here would create another key in storage and will cause
+                // key leakage in some implementation.
                 memcpy(key.AsMutable<Crypto::Aes128KeyByteArray>(), buf.data(), sizeof(Crypto::Aes128KeyByteArray));
             }
             break;
