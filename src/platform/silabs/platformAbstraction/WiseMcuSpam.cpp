@@ -66,6 +66,7 @@ CHIP_ERROR SilabsPlatform::Init(void)
 void SilabsPlatform::InitLed(void)
 {
     // TODO
+    RSI_Board_Init();
     SilabsPlatformAbstractionBase::InitLed();
 }
 
