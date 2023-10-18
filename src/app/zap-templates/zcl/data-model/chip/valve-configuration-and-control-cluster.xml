@@ -62,20 +62,16 @@ limitations under the License.
     </attribute>
     <attribute side="server" code="0x0006" define="CURRENT_LEVEL" type="percent" isNullable="true" min="0" max="100" writable="false" optional="true">CurrentLevel</attribute>
     <attribute side="server" code="0x0007" define="TARGET_LEVEL" type="percent" isNullable="true" min="0" max="100" writable="false" optional="true">TargetLevel</attribute>
-    <attribute side="server" code="0x0008" define="START_UP_LEVEL" type="percent" isNullable="false" min="1" max="100" writable="true" optional="true">
-      <description>StartUpLevel</description>
-      <access op="read" privilege="view"/>
-      <access op="write" privilege="manage"/>
-    </attribute>
-    <attribute side="server" code="0x0009" define="OPEN_LEVEL" type="percent" isNullable="false" min="1" max="100" writable="true" default="100" optional="true">
+    <attribute side="server" code="0x0008" define="OPEN_LEVEL" type="percent" isNullable="true" min="1" max="100" writable="true" default="100" optional="true">
       <description>OpenLevel</description>
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
     </attribute>
-    <attribute side="server" code="0x000A" define="VALVE_FAULT" type="ValveFaultBitmap" isNullable="false" writable="false" optional="true">ValveFault</attribute>
+    <attribute side="server" code="0x0009" define="VALVE_FAULT" type="ValveFaultBitmap" isNullable="false" writable="false" optional="true">ValveFault</attribute>
 
     <command source="client" code="0x00" name="Open" optional="false">
       <description>This command is used to set the valve to its fully open position.</description>
+      <arg name="OpenDuration" type="elapsed_s" optional="true"/>
     </command>
 
     <command source="client" code="0x01" name="Close" optional="false">
@@ -85,6 +81,7 @@ limitations under the License.
     <command source="client" code="0x02" name="SetLevel" optional="true">
       <description>This command is used to set the valve to a specific level.</description>
       <arg name="Level" type="percent"/>
+      <arg name="OpenDuration" type="elapsed_s" optional="true"/>
     </command>
 
     <event side="server" code="0x00" priority="info" name="ValveStateChanged" optional="true">
