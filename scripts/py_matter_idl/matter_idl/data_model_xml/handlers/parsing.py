@@ -85,10 +85,31 @@ def AttributesToBitFieldConstantEntry(attrs) -> ConstantEntry:
     return ConstantEntry(name="k" + NormalizeName(attrs["name"]), code=1 << ParseInt(attrs["bit"]))
 
 
+def AttributesToAttribute(attrs) -> Attribute:
+    assert "name" in attrs
+    assert "id" in attrs
+
+    if "type" in attrs:
+        attr_type = attrs["type"]
+    else:
+        # TODO: we should NOT have this, however we are now lenient
+        # to bad input data
+        LOGGER.error(f"Attribute {attrs['name']} has no type")
+        attr_type = "sint32"
+
+    return Attribute(
+        definition=Field(
+            code=ParseInt(attrs["id"]),
+            name=NormalizeName(attrs["name"]),
+            data_type=DataType(name=attr_type),
+        )
+    )
+
+
 def AttributesToEvent(attrs) -> Event:
-    assert ("name" in attrs)
-    assert ("id" in attrs)
-    assert ("priority" in attrs)
+    assert "name" in attrs
+    assert "id" in attrs
+    assert "priority" in attrs
 
     if attrs["priority"] == "critical":
         priority = EventPriority.CRITICAL

@@ -21,7 +21,7 @@ from matter_idl.matter_idl_types import (Attribute, Bitmap, Cluster, ClusterSide
 
 from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
-from .parsing import AttributesToBitFieldConstantEntry, AttributesToEvent, AttributesToField, NormalizeName, ParseInt, StringToAccessPrivilege
+from .parsing import AttributesToBitFieldConstantEntry, AttributesToEvent, AttributesToField, NormalizeName, ParseInt, StringToAccessPrivilege, AttributesToAttribute
 
 LOGGER = logging.getLogger('data-model-xml-parser')
 
@@ -197,6 +197,42 @@ class EventsHandler(BaseHandler):
             return BaseHandler(self.context)
 
 
+class AttributeHandler(BaseHandler):
+    def __init__(self, context: Context, cluster: Cluster, attrs):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._cluster = cluster
+        self._attribute = AttributesToAttribute(attrs)
+
+    def EndProcessing(self):
+        self._cluster.attributes.append(self._attribute)
+
+    def GetNextProcessor(self, name: str, attrs):
+        # TODO:
+        #   - access
+        #   - quality
+        #   - constraint
+        if name == "enum":
+            LOGGER.warning(f"Anonymous enumeration not supported when handling attribute {self._cluster.name}::{self._attribute.definition.name}")
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "bitmap":
+            LOGGER.warning(f"Anonymous bitmap not supported when handling attribute {self._cluster.name}::{self._attribute.definition.name}")
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        else:
+            return BaseHandler(self.context)
+
+
+class AttributesHandler(BaseHandler):
+    def __init__(self, context: Context, cluster: Cluster):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._cluster = cluster
+
+    def GetNextProcessor(self, name: str, attrs):
+        if name == "attribute":
+            return AttributeHandler(self.context, self._cluster, attrs)
+        else:
+            return BaseHandler(self.context)
+
+
 class DataTypesHandler(BaseHandler):
     def __init__(self, context: Context, cluster: Cluster):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
@@ -284,5 +320,7 @@ class ClusterHandler(BaseHandler):
             return DataTypesHandler(self.context, self._cluster)
         elif name == "events":
             return EventsHandler(self.context, self._cluster)
+        elif name == "attributes":
+            return AttributesHandler(self.context, self._cluster)
         else:
             return BaseHandler(self.context)
