@@ -20,7 +20,7 @@ from matter_idl.matter_idl_types import (Attribute, AttributeQuality, Bitmap, Cl
                                          Idl, Struct, StructQuality, StructTag)
 
 from .base import BaseHandler, HandledDepth
-from .context import Context, IdlPostProcessor
+from .context import Context
 from .parsing import (ApplyConstraint, AttributesToAttribute, AttributesToBitFieldConstantEntry, AttributesToEvent,
                       AttributesToField, NormalizeName, ParseInt, StringToAccessPrivilege)
 
