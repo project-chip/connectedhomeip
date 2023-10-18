@@ -43,7 +43,7 @@ def ParseInt(value: str, data_type: Optional[DataType] = None) -> int:
 
 def ParseOptionalInt(value: str) -> Optional[int]:
     """Parses numbers as long as they are in an expected format of numbers.
- 
+
        "1" parses to 1
        "0x12" parses to 18
        "Min" parses to None
@@ -164,11 +164,11 @@ def ApplyConstraint(attrs, field: Field):
     constraint_type = attrs["type"]
 
     if constraint_type == "allowed":
-        pass #  unsure what to do allowed
+        pass  # unsure what to do allowed
     elif constraint_type == "desc":
-        pass #  free-form description
+        pass  # free-form description
     elif type in {"countBetween", "maxCount"}:
-        pass # cannot implement count
+        pass  # cannot implement count
     elif constraint_type == "min":
         field.data_type.min_value = ParseOptionalInt(attrs["value"])
     elif constraint_type == "max":
@@ -188,4 +188,4 @@ def ApplyConstraint(attrs, field: Field):
         field.data_type.min_length = ParseOptionalInt(attrs["from"])
         field.data_type.max_length = ParseOptionalInt(attrs["to"])
     else:
-       logging.error("UNKNOWN constraint type {type}")
+        logging.error("UNKNOWN constraint type {type}")

@@ -15,14 +15,14 @@
 import logging
 from typing import Any, Optional
 
-from matter_idl.matter_idl_types import (Attribute, Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType,
-                                         Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, Struct, StructQuality,
-                                         StructTag, AttributeQuality)
+from matter_idl.matter_idl_types import (Attribute, AttributeQuality, Bitmap, Cluster, ClusterSide, Command, CommandQuality,
+                                         ConstantEntry, DataType, Enum, Event, EventPriority, EventQuality, Field, FieldQuality,
+                                         Idl, Struct, StructQuality, StructTag)
 
 from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
-from .parsing import (AttributesToAttribute, AttributesToBitFieldConstantEntry, AttributesToEvent, AttributesToField, NormalizeName,
-                      ParseInt, StringToAccessPrivilege, ApplyConstraint)
+from .parsing import (ApplyConstraint, AttributesToAttribute, AttributesToBitFieldConstantEntry, AttributesToEvent,
+                      AttributesToField, NormalizeName, ParseInt, StringToAccessPrivilege)
 
 LOGGER = logging.getLogger('data-model-xml-parser')
 
@@ -228,10 +228,12 @@ class AttributeHandler(BaseHandler):
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "access":
             if "readPrivilege" in attrs:
-                self._attribute.readacl = StringToAccessPrivilege(attrs["readPrivilege"])
+                self._attribute.readacl = StringToAccessPrivilege(
+                    attrs["readPrivilege"])
 
             if "writePrivilege" in attrs:
-                self._attribute.writeacl = StringToAccessPrivilege(attrs["writePrivilege"])
+                self._attribute.writeacl = StringToAccessPrivilege(
+                    attrs["writePrivilege"])
 
             if "read" in attrs and attrs["read"] != "false":
                 self._attribute.qualities = self._attribute.qualities | AttributeQuality.READABLE
