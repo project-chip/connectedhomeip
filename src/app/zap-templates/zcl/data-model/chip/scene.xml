@@ -33,7 +33,7 @@ limitations under the License.
   </struct>
 
   <domain name="CHIP"/>
-    <cluster>
+  <cluster apiMaturity="provisional">
     <name>Scenes</name>
     <domain>General</domain>
     <description>Attributes and commands for scene configuration and manipulation.</description>

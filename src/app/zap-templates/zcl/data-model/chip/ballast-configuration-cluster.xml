@@ -28,7 +28,7 @@ limitations under the License.
     <field name="LampBurnHours" mask="0x01"/>
   </bitmap>
 
-  <cluster>
+  <cluster apiMaturity="provisional">
     <name>Ballast Configuration</name>
     <domain>Lighting</domain>
     <description>Attributes and commands for configuring a lighting ballast.</description>

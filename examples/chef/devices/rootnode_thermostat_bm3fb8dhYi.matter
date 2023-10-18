@@ -1261,7 +1261,7 @@ server cluster Thermostat = 513 {
 }
 
 /** An interface for controlling a fan in a heating/cooling system. */
-client cluster FanControl = 514 {
+provisional client cluster FanControl = 514 {
   enum AirflowDirectionEnum : enum8 {
     kForward = 0;
     kReverse = 1;

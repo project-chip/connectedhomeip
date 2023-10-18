@@ -1088,7 +1088,7 @@ server cluster Thermostat = 513 {
 }
 
 /** An interface for controlling a fan in a heating/cooling system. */
-server cluster FanControl = 514 {
+provisional server cluster FanControl = 514 {
   enum AirflowDirectionEnum : enum8 {
     kForward = 0;
     kReverse = 1;
@@ -2351,7 +2351,7 @@ endpoint 5 {
     callback attribute eventList;
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
-    ram      attribute clusterRevision default = 5;
+    ram      attribute clusterRevision default = 6;
 
     handle command SetpointRaiseLower;
   }
