@@ -1112,6 +1112,11 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     serverSideProcessingTimeout = [serverSideProcessingTimeout copy];
     timeout = [timeout copy];
 
+    NSDate * cutoffTime;
+    if (timeout) {
+        cutoffTime = [NSDate dateWithTimeIntervalSinceNow:(timeout.doubleValue / 1000)];
+    }
+
     uint64_t expectedValueID = 0;
     NSMutableArray<MTRAttributePath *> * attributePaths = nil;
     if (expectedValues) {
@@ -1130,26 +1135,51 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         *stop = YES;
     }];
     [workItem setReadyHandler:^(MTRDevice * device, NSInteger retryCount, MTRAsyncWorkCompletionBlock workCompletion) {
+        auto workDone = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            dispatch_async(queue, ^{
+                completion(values, error);
+            });
+            if (error && expectedValues) {
+                [self removeExpectedValuesForAttributePaths:attributePaths expectedValueID:expectedValueID];
+            }
+            workCompletion(MTRAsyncWorkComplete);
+        };
+
+        NSNumber * timedInvokeTimeout = nil;
+        if (timeout) {
+            auto * now = [NSDate now];
+            if ([now compare:cutoffTime] == NSOrderedDescending) {
+                // Our timed invoke timeout has expired already.  Command
+                // was queued for too long.  Do not send it out.
+                workDone(nil, [MTRError errorForIMStatusCode:Status::Timeout]);
+                return;
+            }
+
+            // Recompute the actual timeout left, accounting for time spent
+            // in our queuing and retries.
+            timedInvokeTimeout = @([cutoffTime timeIntervalSinceDate:now] * 1000);
+        }
         MTRBaseDevice * baseDevice = [self newBaseDevice];
         [baseDevice
             _invokeCommandWithEndpointID:endpointID
                                clusterID:clusterID
                                commandID:commandID
                            commandFields:commandFields
-                      timedInvokeTimeout:timeout
+                      timedInvokeTimeout:timedInvokeTimeout
              serverSideProcessingTimeout:serverSideProcessingTimeout
                                    queue:self.queue
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                   // Log the data at the INFO level (not usually persisted permanently),
                                   // but make sure we log the work completion at the DEFAULT level.
                                   MTR_LOG_INFO("Invoke work item [%llu] received command response: %@ error: %@", workItemID, values, error);
-                                  dispatch_async(queue, ^{
-                                      completion(values, error);
-                                  });
-                                  if (error && expectedValues) {
-                                      [self removeExpectedValuesForAttributePaths:attributePaths expectedValueID:expectedValueID];
+                                  // TODO: This 5-retry cap is very arbitrary.
+                                  // TODO: Should there be some sort of backoff here?
+                                  if (error != nil && error.domain == MTRInteractionErrorDomain && error.code == MTRInteractionErrorCodeBusy && retryCount < 5) {
+                                      workCompletion(MTRAsyncWorkNeedsRetry);
+                                      return;
                                   }
-                                  workCompletion(MTRAsyncWorkComplete);
+
+                                  workDone(values, error);
                               }];
     }];
     [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"invoke %@ %@ %@", endpointID, clusterID, commandID];
