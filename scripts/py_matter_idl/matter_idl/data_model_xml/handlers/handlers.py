@@ -107,7 +107,8 @@ class FieldHandler(BaseHandler):
             # Lists have "type=list" and then the type is inside entry
 
             if self._field.data_type.name != "list":
-               LOGGER.warning(f"Entry type provided for non-list element {self._field.name}")
+                LOGGER.warning(
+                    f"Entry type provided for non-list element {self._field.name}")
 
             assert "type" in attrs
 
@@ -361,9 +362,11 @@ class CommandHandler(BaseHandler):
             # <access invokePrivilege="admin" timed="true"/>
             if "invokePrivilege" in attrs:
                 if self._command:
-                    self._command.invokeacl = StringToAccessPrivilege(attrs["invokePrivilege"])
+                    self._command.invokeacl = StringToAccessPrivilege(
+                        attrs["invokePrivilege"])
                 else:
-                    LOGGER.warn(f"Ignoring invoke privilege for {self._struct.name}")
+                    LOGGER.warn(
+                        f"Ignoring invoke privilege for {self._struct.name}")
 
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name == "field":
