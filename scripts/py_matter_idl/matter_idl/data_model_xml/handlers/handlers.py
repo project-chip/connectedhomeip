@@ -85,7 +85,8 @@ class FieldHandler(BaseHandler):
     def GetNextProcessor(self, name: str, attrs):
         # TODO: switch
         if name == "constraint":
-            ApplyConstraint(attrs, field)
+            ApplyConstraint(attrs, self._field)
+            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name in {"mandatoryConform", "optionalConform"}:
             # Nothing to tag conformance
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
