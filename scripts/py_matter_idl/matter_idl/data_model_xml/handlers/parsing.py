@@ -78,13 +78,19 @@ def NormalizeName(name: str) -> str:
     return name
 
 
+def FieldName(name: str) -> str:
+    """Normalized name with the first letter lowercase. """
+    name = NormalizeName(name)
+    return name[0].lower() + name[1:]
+
+
 def AttributesToField(attrs) -> Field:
-    assert ("name" in attrs)
-    assert ("id" in attrs)
-    assert ("type" in attrs)
+    assert "name" in attrs
+    assert "id" in attrs
+    assert "type" in attrs
 
     return Field(
-        name=NormalizeName(attrs["name"]),
+        name=FieldName(attrs["name"]),
         code=ParseInt(attrs["id"]),
         data_type=DataType(name=attrs["type"])
     )

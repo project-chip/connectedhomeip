@@ -82,7 +82,6 @@ class FieldHandler(BaseHandler):
         self._field = field
 
     def GetNextProcessor(self, name: str, attrs):
-        # TODO: switch
         if name == "constraint":
             ApplyConstraint(attrs, self._field)
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
@@ -92,6 +91,10 @@ class FieldHandler(BaseHandler):
         elif name == "access":
             # per-field access is not something we model
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+        elif name == "quality":
+            if "nullable" in attrs and attrs["nullable"] != "false":
+                self._field.qualities = self._field.qualities | FieldQuality.NULLABLE
+            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name == "enum":
             LOGGER.warning(
                 f"Anonymous enumeration not supported when handling field {self._field.name}")
@@ -100,6 +103,18 @@ class FieldHandler(BaseHandler):
             LOGGER.warning(
                 f"Anonymous bitmap not supported when handling field {self._field.name}")
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "entry":
+            # Lists have "type=list" and then the type is inside entry
+
+            if self._field.data_type.name != "list":
+               LOGGER.warning(f"Entry type provided for non-list element {self._field.name}")
+
+            assert "type" in attrs
+
+            self._field.is_list = True
+            self._field.data_type.name = attrs["type"]
+
+            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         else:
             return BaseHandler(self.context)
 
@@ -342,6 +357,15 @@ class CommandHandler(BaseHandler):
             # Nothing to tag conformance
             # TODO: what is disallowConform? Should it affect codegen?
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "access":
+            # <access invokePrivilege="admin" timed="true"/>
+            if "invokePrivilege" in attrs:
+                if self._command:
+                    self._command.invokeacl = StringToAccessPrivilege(attrs["invokePrivilege"])
+                else:
+                    LOGGER.warn(f"Ignoring invoke privilege for {self._struct.name}")
+
+            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name == "field":
             field = AttributesToField(attrs)
             self._struct.fields.append(field)
