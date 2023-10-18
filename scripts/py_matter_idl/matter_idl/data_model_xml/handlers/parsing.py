@@ -199,7 +199,7 @@ def ApplyConstraint(attrs, field: Field):
         pass  # unsure what to do allowed
     elif constraint_type == "desc":
         pass  # free-form description
-    elif type in {"countBetween", "maxCount"}:
+    elif constraint_type in {"countBetween", "maxCount"}:
         pass  # cannot implement count
     elif constraint_type == "min":
         field.data_type.min_value = ParseOptionalInt(attrs["value"])
@@ -220,4 +220,4 @@ def ApplyConstraint(attrs, field: Field):
         field.data_type.min_length = ParseOptionalInt(attrs["from"])
         field.data_type.max_length = ParseOptionalInt(attrs["to"])
     else:
-        logging.error("UNKNOWN constraint type {type}")
+        logging.error(f"UNKNOWN constraint type {constraint_type}")
