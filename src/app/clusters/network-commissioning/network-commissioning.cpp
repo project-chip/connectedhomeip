@@ -117,11 +117,22 @@ void Instance::InvokeCommand(HandlerContext & ctxt)
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleRemoveNetwork(ctx, req); });
         return;
 
-    case Commands::ConnectNetwork::Id:
+    case Commands::ConnectNetwork::Id: {
         VerifyOrReturn(mFeatureFlags.Has(Feature::kWiFiNetworkInterface) || mFeatureFlags.Has(Feature::kThreadNetworkInterface));
+#if CONFIG_NETWORK_LAYER_BLE
+        // If commissionee does not support Concurrent Connections, request the BLE to be stopped.
+        // Start the ConnectNetwork, but this will not complete until the BLE is off.
+        bool supportsConcurrentConnection = CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION;
+        if (!supportsConcurrentConnection)
+        {
+            ChipLogProgress(NetworkProvisioning, "Commands::ConnectNetwork::Id PostCloseAllBLEConnectionsToOperationalNetworkEvent");    
+            DeviceLayer::DeviceControlServer::DeviceControlSvr().PostCloseAllBLEConnectionsToOperationalNetworkEvent();
+        }
+#endif
         HandleCommand<Commands::ConnectNetwork::DecodableType>(
             ctxt, [this](HandlerContext & ctx, const auto & req) { HandleConnectNetwork(ctx, req); });
         return;
+    }
 
     case Commands::ReorderNetwork::Id:
         VerifyOrReturn(mFeatureFlags.Has(Feature::kWiFiNetworkInterface) || mFeatureFlags.Has(Feature::kThreadNetworkInterface));
@@ -445,7 +456,22 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
     memcpy(mConnectingNetworkID, req.networkID.data(), mConnectingNetworkIDLen);
     mAsyncCommandHandle         = CommandHandler::Handle(&ctx.mCommandHandler);
     mCurrentOperationBreadcrumb = req.breadcrumb;
-    mpWirelessDriver->ConnectNetwork(req.networkID, this);
+    
+    // In Non-concurrent mode postpone the final execution of ConnectNetwork until the operational
+    // network has been fully brought up and kWiFiDeviceAvailable is delivered.
+    // mConnectingNetworkIDLen and mConnectingNetworkID contains the received SSID
+    bool supportsConcurrentConnection = CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION;
+    if (supportsConcurrentConnection)
+    {
+         mpWirelessDriver->ConnectNetwork(req.networkID, this);
+    }
+}
+
+void Instance::HandleNonConcurrentConnectNetwork(void)
+{
+    ByteSpan nonConcurrentNetworkID = ByteSpan(mConnectingNetworkID, mConnectingNetworkIDLen);
+    ChipLogProgress(NetworkProvisioning, "HandleNonConcurrentConnectNetwork() SSID=%s", mConnectingNetworkID);
+    mpWirelessDriver->ConnectNetwork(nonConcurrentNetworkID, this);
 }
 
 void Instance::HandleReorderNetwork(HandlerContext & ctx, const Commands::ReorderNetwork::DecodableType & req)
@@ -499,7 +525,19 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
     memcpy(mLastNetworkID, mConnectingNetworkID, mLastNetworkIDLen);
     mLastNetworkingStatusValue.SetNonNull(commissioningError);
 
-    commandHandle->AddResponse(mPath, response);
+#if CONFIG_NETWORK_LAYER_BLE
+    bool supportsConcurrentConnection = CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION;
+    if (!supportsConcurrentConnection)
+    {
+        ChipLogProgress(NetworkProvisioning, "Instance::OnResult Non-Concurrent Mode, ConnectNetworkResponse will NOT be sent");    
+        // Do not send the ConnectNetworkResponse if in non-concurrent mode
+    }
+    else
+#endif
+    {
+        commandHandle->AddResponse(mPath, response);
+    }
+
     if (commissioningError == NetworkCommissioningStatusEnum::kSuccess)
     {
         CommitSavedBreadcrumb();
@@ -695,6 +733,10 @@ void Instance::OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event
     else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
     {
         this_->OnFailSafeTimerExpired();
+    }
+    else if (event->Type == DeviceLayer::DeviceEventType::kWiFiDeviceAvailable)
+    {
+       this_->HandleNonConcurrentConnectNetwork();
     }
 }
 

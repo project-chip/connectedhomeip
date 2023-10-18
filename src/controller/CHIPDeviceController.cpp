@@ -1614,6 +1614,11 @@ void OnBasicFailure(void * context, CHIP_ERROR error)
     commissioner->CommissioningStageComplete(error);
 }
 
+void NonConcurrentTimeout(void * context, CHIP_ERROR error)
+{
+    ChipLogProgress(Controller, "Non-Concurrent Mode: Expected NetworkResponse Timeout, do nothing");
+}
+
 void DeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus)
 {
     commissioningCompletionStatus = completionStatus;
@@ -2114,6 +2119,14 @@ void DeviceCommissioner::ParseCommissioningInfo2()
     ReadCommissioningInfo2 info;
     CHIP_ERROR return_err = CHIP_NO_ERROR;
 
+    using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
+    CHIP_ERROR err = mAttributeCache->Get<SupportsConcurrentConnection::TypeInfo>(kRootEndpointId, info.supportsConcurrentConnection);
+    if (err != CHIP_NO_ERROR)
+    {
+        // May not be present so don't return the error code, non fatal, default concurrent
+        ChipLogError(Controller, "Failed to read SupportsConcurrentConnection: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+ 
     return_err = ParseFabrics(info);
 
     if (return_err == CHIP_NO_ERROR)
@@ -2247,6 +2260,14 @@ void DeviceCommissioner::OnArmFailSafe(void * context,
 
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     commissioner->CommissioningStageComplete(err, report);
+}
+
+void DeviceCommissioner::NonConcurrentNetworkResponse(
+    void * context, const NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data)
+{
+    // In Non Concurrent mode the commissioing network should have been shutdown and not send the
+    // ConnectNetworkResponse. In case it does send it this handles the message
+    ChipLogProgress(Controller, "NonConcurrent Mode : Received Unexpected ConnectNetwork response, ignoring. Status=%u", to_underlying(data.networkingStatus));
 }
 
 void DeviceCommissioner::OnSetRegulatoryConfigResponse(
@@ -2443,6 +2464,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kReadCommissioningInfo: {
         ChipLogProgress(Controller, "Sending read request for commissioning information");
         // NOTE: this array cannot have more than 9 entries, since the spec mandates that server only needs to support 9
+        // See R1.1, 2.11.2 Interaction Model Limits
         app::AttributePathParams readPaths[9];
         // Read all the feature maps for all the networking clusters on any endpoint to determine what is supported
         readPaths[0] = app::AttributePathParams(app::Clusters::NetworkCommissioning::Id,
@@ -2474,7 +2496,14 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kReadCommissioningInfo2: {
         size_t numberOfAttributes = 0;
         // This is done in a separate step since we've already used up all the available read paths in the previous read step
-        app::AttributePathParams readPaths[9];
+        // NOTE: this array cannot have more than 9 entries, since the spec mandates that server only needs to support 9
+        // See R1.1, 2.11.2 Interaction Model Limits
+        app::AttributePathParams readPaths[4];
+
+        // Mandatory attribute
+        readPaths[0] = app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
+                                                app::Clusters::GeneralCommissioning::Attributes::SupportsConcurrentConnection::Id);
+        numberOfAttributes++;
 
         // Read the current fabrics
         if (params.GetCheckForMatchingFabric())
@@ -2921,7 +2950,27 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         NetworkCommissioning::Commands::ConnectNetwork::Type request;
         request.networkID = params.GetWiFiCredentials().Value().ssid;
         request.breadcrumb.Emplace(breadcrumb);
-        CHIP_ERROR err = SendCommand(proxy, request, OnConnectNetworkResponse, OnBasicFailure, endpoint, timeout);
+
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        GeneralCommissioning::Attributes::SupportsConcurrentConnection::TypeInfo::Type supportsConcurrentConnection;
+        supportsConcurrentConnection = params.GetSupportsConcurrentConnection().Value();
+        ChipLogProgress(Controller,"SendCommand kWiFiNetworkEnable, supportsConcurrentConnection=%d", supportsConcurrentConnection);
+        if (supportsConcurrentConnection) 
+        {
+           err = SendCommand(proxy, request, OnConnectNetworkResponse, OnBasicFailure, endpoint, timeout);
+        }
+        else
+        {
+            // Concurrent Connections not allowed. Send the ConnectNetwork command but do not wait for the
+            // ConnectNetworkResponse on the Commissioing network as it will not be present. Stop the timeout
+            // and run what would have been in the onConnectNetworkResponse callback. 
+            SendCommand(proxy, request, NonConcurrentNetworkResponse, NonConcurrentTimeout, endpoint, NullOptional);
+            // As there will be no ConnectNetworkResponse, it is an implicit kSuccess so a default report is fine
+            CommissioningDelegate::CommissioningReport report;
+            DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(this);
+            commissioner->CommissioningStageComplete(CHIP_NO_ERROR, report);
+        }
+
         if (err != CHIP_NO_ERROR)
         {
             // We won't get any async callbacks here, so just complete our stage.
