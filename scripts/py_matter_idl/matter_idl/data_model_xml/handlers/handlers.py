@@ -22,7 +22,7 @@ from matter_idl.matter_idl_types import (Attribute, Bitmap, Cluster, ClusterSide
 from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
 from .parsing import (AttributesToAttribute, AttributesToBitFieldConstantEntry, AttributesToEvent, AttributesToField, NormalizeName,
-                      ParseInt, StringToAccessPrivilege)
+                      ParseInt, StringToAccessPrivilege, ApplyConstraint)
 
 LOGGER = logging.getLogger('data-model-xml-parser')
 
@@ -254,9 +254,8 @@ class AttributeHandler(BaseHandler):
             self._deprecated = True
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "constraint":
-            # FIXME: implement and handle. Same as structs and
-            #        event fields. Constraints go into field definitions
-            return BaseHandler(self.context)
+            ApplyConstraint(attrs, self._attribute.definition)
+            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         else:
             return BaseHandler(self.context)
 

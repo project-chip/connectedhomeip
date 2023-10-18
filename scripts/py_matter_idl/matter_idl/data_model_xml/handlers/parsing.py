@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import logging
+import re
 from typing import Optional
 
 from matter_idl.generators.types import GetDataTypeSizeInBits, IsSignedDataType
@@ -38,6 +39,19 @@ def ParseInt(value: str, data_type: Optional[DataType] = None) -> int:
         return parsed
     else:
         return int(value)
+
+
+def ParseOptionalInt(value: str) -> Optional[int]:
+    """Parses numbers as long as they are in an expected format of numbers.
+ 
+       "1" parses to 1
+       "0x12" parses to 18
+       "Min" parses to None
+    """
+    if re.match("^-?((0x[0-9a-fA-F]*)|([0-9]*))$", value):
+        return ParseInt(value)
+
+    return None
 
 
 def NormalizeName(name: str) -> str:
@@ -142,3 +156,36 @@ def StringToAccessPrivilege(value: str) -> AccessPrivilege:
         return AccessPrivilege.ADMINISTER
     else:
         raise Exception("UNKNOWN privilege level: %r" % value)
+
+
+def ApplyConstraint(attrs, field: Field):
+    assert "type" in attrs
+
+    constraint_type = attrs["type"]
+
+    if constraint_type == "allowed":
+        pass #  unsure what to do allowed
+    elif constraint_type == "desc":
+        pass #  free-form description
+    elif type in {"countBetween", "maxCount"}:
+        pass # cannot implement count
+    elif constraint_type == "min":
+        field.data_type.min_value = ParseOptionalInt(attrs["value"])
+    elif constraint_type == "max":
+        field.data_type.max_value = ParseOptionalInt(attrs["value"])
+    elif constraint_type == "between":
+        # TODO: examples existing in the parsed data which are NOT
+        #       handled:
+        #         - from="-2.5°C" to="2.5°C"
+        #         - from="0%" to="100%"
+        field.data_type.min_value = ParseOptionalInt(attrs["from"])
+        field.data_type.max_value = ParseOptionalInt(attrs["to"])
+    elif constraint_type == "maxLength":
+        field.data_type.max_length = ParseOptionalInt(attrs["value"])
+    elif constraint_type == "minLength":
+        field.data_type.min_length = ParseOptionalInt(attrs["value"])
+    elif constraint_type == "lengthBetween":
+        field.data_type.min_length = ParseOptionalInt(attrs["from"])
+        field.data_type.max_length = ParseOptionalInt(attrs["to"])
+    else:
+       logging.error("UNKNOWN constraint type {type}")
