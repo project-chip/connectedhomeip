@@ -21,6 +21,7 @@ from typing import List, Optional, Union
 from matter_idl.data_model_xml.handlers import Context, DataModelXmlHandler
 from matter_idl.matter_idl_types import Idl
 
+
 class ParseHandler(xml.sax.handler.ContentHandler):
     """A parser for data model XML data definitions.
 
@@ -120,8 +121,8 @@ def ParseXmls(sources: List[ParseSource], include_meta_data=True) -> Idl:
         try:
             parser.parse(source.source)
         except AssertionError as e:
-            logging.error("AssertionError %s at %r", e, handler._context.GetCurrentLocationMeta())
+            logging.error("AssertionError %s at %r", e,
+                          handler._context.GetCurrentLocationMeta())
             raise
-
 
     return handler.Finish()

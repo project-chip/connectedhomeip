@@ -21,7 +21,8 @@ from matter_idl.matter_idl_types import (Attribute, Bitmap, Cluster, ClusterSide
 
 from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
-from .parsing import AttributesToBitFieldConstantEntry, AttributesToEvent, AttributesToField, NormalizeName, ParseInt, StringToAccessPrivilege, AttributesToAttribute
+from .parsing import (AttributesToAttribute, AttributesToBitFieldConstantEntry, AttributesToEvent, AttributesToField, NormalizeName,
+                      ParseInt, StringToAccessPrivilege)
 
 LOGGER = logging.getLogger('data-model-xml-parser')
 
@@ -141,7 +142,8 @@ class EventHandler(BaseHandler):
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "access":
             if "readPrivilege" in attrs:
-                self._event.readacl = StringToAccessPrivilege(attrs["readPrivilege"])
+                self._event.readacl = StringToAccessPrivilege(
+                    attrs["readPrivilege"])
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         else:
             return BaseHandler(self.context)
@@ -212,10 +214,12 @@ class AttributeHandler(BaseHandler):
         #   - quality
         #   - constraint
         if name == "enum":
-            LOGGER.warning(f"Anonymous enumeration not supported when handling attribute {self._cluster.name}::{self._attribute.definition.name}")
+            LOGGER.warning(
+                f"Anonymous enumeration not supported when handling attribute {self._cluster.name}::{self._attribute.definition.name}")
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "bitmap":
-            LOGGER.warning(f"Anonymous bitmap not supported when handling attribute {self._cluster.name}::{self._attribute.definition.name}")
+            LOGGER.warning(
+                f"Anonymous bitmap not supported when handling attribute {self._cluster.name}::{self._attribute.definition.name}")
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
             return BaseHandler(self.context)
