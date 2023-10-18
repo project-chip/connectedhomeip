@@ -26,7 +26,7 @@ from mobly import asserts
 # We don't have a good pipe between the c++ enums in CommissioningDelegate and python
 # so this is hardcoded.
 # I realize this is dodgy, not sure how to cross the enum from c++ to python cleanly
-kCheckForMatchingFabric = 3
+kReadAdditionalAttributes = 3
 kConfigureUTCTime = 6
 kConfigureTimeZone = 7
 kConfigureDSTOffset = 8
@@ -218,7 +218,7 @@ class TestCommissioningTimeSync(MatterBaseTest):
         self.commissioner.SetCheckMatchingFabric(True)
         await self.commission_and_base_checks()
         asserts.assert_true(self.commissioner.CheckStageSuccessful(
-            kCheckForMatchingFabric), "Did not run check for matching fabric stage")
+            kReadAdditionalAttributes), "Did not run check for matching fabric stage")
         asserts.assert_equal(self.commissioner.GetFabricCheckResult(), 0, "Fabric check result did not get set by pairing delegate")
 
         # Let's try it again with no check
@@ -227,7 +227,7 @@ class TestCommissioningTimeSync(MatterBaseTest):
         self.commissioner.SetCheckMatchingFabric(False)
         await self.commission_and_base_checks()
         asserts.assert_false(self.commissioner.CheckStageSuccessful(
-            kCheckForMatchingFabric), "Incorrectly ran check for matching fabric stage")
+            kReadAdditionalAttributes), "Incorrectly ran check for matching fabric stage")
         asserts.assert_equal(self.commissioner.GetFabricCheckResult(), -1, "Fabric check result incorrectly set")
 
 

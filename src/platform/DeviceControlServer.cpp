@@ -73,5 +73,19 @@ CHIP_ERROR DeviceControlServer::PostConnectedToOperationalNetworkEvent(ByteSpan 
     return PlatformMgr().PostEvent(&event);
 }
 
+CHIP_ERROR DeviceControlServer::PostCloseAllBLEConnectionsToOperationalNetworkEvent(void)
+{
+    ChipDeviceEvent event;
+    event.Type = DeviceEventType::kCloseAllBleConnections;
+    return PlatformMgr().PostEvent(&event);
+}
+
+CHIP_ERROR DeviceControlServer::PostWiFiDeviceAvailableNetworkEvent(void)
+{
+    ChipDeviceEvent event;
+    event.Type = DeviceEventType::kWiFiDeviceAvailable;
+    return PlatformMgr().PostEvent(&event);
+}
+
 } // namespace DeviceLayer
 } // namespace chip

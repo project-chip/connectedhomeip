@@ -245,8 +245,8 @@ using chip::Shell::Engine;
  * still hasn't been initialized, the device configuration is reset, and device
  * needs to be paired again.
  */
-static constexpr useconds_t kWiFiStartCheckTimeUsec = 100 * 1000; // 100 ms
-static constexpr uint8_t kWiFiStartCheckAttempts    = 5;
+static constexpr useconds_t kWiFiStartCheckTimeUsec = WIFI_START_CHECK_TIME_USEC;
+static constexpr uint8_t kWiFiStartCheckAttempts    = WIFI_START_CHECK_ATTEMPTS;
 #endif
 
 namespace {
@@ -465,10 +465,15 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     if (LinuxDeviceOptions::GetInstance().mWiFi)
     {
-        DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
-        if (!EnsureWiFiIsStarted())
+        bool supportsConcurrentConnection = CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION;
+        if (supportsConcurrentConnection)
         {
-            ChipLogError(NotSpecified, "Wi-Fi Management taking too long to start - device configuration will be reset.");
+            // Start WiFi management in Concurrent mode
+            DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
+            if (!EnsureWiFiIsStarted())
+            {
+                ChipLogError(NotSpecified, "Wi-Fi Management taking too long to start - device configuration will be reset.");
+            }
         }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA

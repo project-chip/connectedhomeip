@@ -242,12 +242,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             // Per the spec, we restart from after adding the NOC.
             return GetNextCommissioningStage(CommissioningStage::kSendNOC, lastErr);
         }
-        if (mParams.GetCheckForMatchingFabric())
-        {
-            return CommissioningStage::kCheckForMatchingFabric;
-        }
-        return CommissioningStage::kArmFailsafe;
-    case CommissioningStage::kCheckForMatchingFabric:
+        return CommissioningStage::kReadAdditionalAttributes;
+    case CommissioningStage::kReadAdditionalAttributes:
         return CommissioningStage::kArmFailsafe;
     case CommissioningStage::kArmFailsafe:
         return CommissioningStage::kConfigRegulatory;
@@ -635,7 +631,9 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             // Don't send DST unless the device says it needs it
             mNeedsDST = false;
             break;
-        case CommissioningStage::kCheckForMatchingFabric: {
+        case CommissioningStage::kReadAdditionalAttributes: {
+            mParams.SetSupportsConcurrentConnection(mDeviceCommissioningInfo.general.supportsConcurrentConnection);
+
             chip::NodeId nodeId = report.Get<MatchingFabricInfo>().nodeId;
             if (nodeId != kUndefinedNodeId)
             {

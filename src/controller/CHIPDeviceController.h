@@ -87,6 +87,7 @@ inline constexpr uint16_t kNumMaxActiveDevices = CHIP_CONFIG_CONTROLLER_MAX_ACTI
 // Raw functions for cluster callbacks
 void OnBasicFailure(void * context, CHIP_ERROR err);
 void OnBasicSuccess(void * context, const chip::app::DataModel::NullObjectType &);
+void NonConcurrentTimeout(void * context, CHIP_ERROR error);
 
 struct ControllerInitParams
 {
@@ -858,6 +859,8 @@ private:
     OnNetworkConfigResponse(void * context,
                             const app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data);
     static void OnConnectNetworkResponse(
+        void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data);
+    static void NonConcurrentNetworkResponse(
         void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data);
     static void OnCommissioningCompleteResponse(
         void * context,

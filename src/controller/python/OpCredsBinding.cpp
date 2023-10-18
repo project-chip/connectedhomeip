@@ -311,7 +311,7 @@ private:
     {
         switch (stage)
         {
-        case chip::Controller::CommissioningStage::kCheckForMatchingFabric:
+        case chip::Controller::CommissioningStage::kReadAdditionalAttributes:
             return mParams.GetCheckForMatchingFabric();
         case chip::Controller::CommissioningStage::kWiFiNetworkEnable:
         case chip::Controller::CommissioningStage::kFailsafeBeforeWiFiEnable:

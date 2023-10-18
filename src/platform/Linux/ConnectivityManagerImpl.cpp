@@ -26,6 +26,7 @@
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #include <platform/Linux/WirelessDefs.h>
 #include <platform/internal/BLEManager.h>
+#include <platform/DeviceControlServer.h>
 
 #include <cstdlib>
 #include <new>
@@ -487,7 +488,20 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
                         DeviceLayer::SystemLayer().ScheduleLambda([]() {
                             if (mpConnectCallback != nullptr)
                             {
-                                mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
+#if CONFIG_NETWORK_LAYER_BLE
+                                bool supportsConcurrentConnection = CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION;
+                                if (!supportsConcurrentConnection)
+                                {
+                                    // Non-concurrent mode therefore DO NOT send WiFiNetworkEnableResponse as per
+                                    // Matter Specification, 
+                                    ChipLogProgress(DeviceLayer, "Non Conurrent Connection: WiFiNetworkEnableResponse NOT SENT");
+
+                                }
+                                else
+#endif                                
+                                {
+                                    mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
+                                }
                                 mpConnectCallback = nullptr;
                             }
                             ConnectivityMgrImpl().PostNetworkConnect();
@@ -781,6 +795,23 @@ bool ConnectivityManagerImpl::IsWiFiManagementStarted()
     bool ret = mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED;
 
     return ret;
+}
+
+void ConnectivityManagerImpl::StartNonConcurrentWiFiManagement()
+{
+    StartWiFiManagement();
+
+    for (int cnt = 0; cnt < WIFI_START_CHECK_ATTEMPTS; cnt++)
+    {
+        if (IsWiFiManagementStarted())
+        {
+            DeviceControlServer::DeviceControlSvr().PostWiFiDeviceAvailableNetworkEvent();
+            ChipLogProgress(DeviceLayer, "Non-concurrent mode Wi-Fi Management Started.");
+            return;
+        }
+        usleep(WIFI_START_CHECK_TIME_USEC);
+    }
+    ChipLogError(Ble, "Non-concurrent mode Wi-Fi Management taking too long to start.");
 }
 
 void ConnectivityManagerImpl::DriveAPState()

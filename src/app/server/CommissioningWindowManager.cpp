@@ -64,7 +64,12 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         mServer->GetSecureSessionManager().ExpireAllPASESessions();
         // That should have cleared out mPASESession.
 #if CONFIG_NETWORK_LAYER_BLE
-        mServer->GetBleLayerObject()->CloseAllBleConnections();
+        // If in NonConcurrentConnection, this will already have been completed
+        bool supportsConcurrentConnection = CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION;
+        if (supportsConcurrentConnection)
+        {
+            mServer->GetBleLayerObject()->CloseAllBleConnections();
+        }
 #endif
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)
@@ -81,6 +86,13 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         app::DnssdServer::Instance().AdvertiseOperational();
         ChipLogProgress(AppServer, "Operational advertising enabled");
     }
+#if CONFIG_NETWORK_LAYER_BLE
+    else if (event->Type == DeviceLayer::DeviceEventType::kCloseAllBleConnections)
+    {
+        ChipLogProgress(AppServer, "CommissioningWindowManager::OnPlatformEvent::kCloseAllBleConnections");
+        mServer->GetBleLayerObject()->CloseAllBleConnections();
+    }
+#endif    
 }
 
 void CommissioningWindowManager::Shutdown()

@@ -31,6 +31,7 @@
  * Note: Use public include for BLEManager which includes our local
  *       platform/<PLATFORM>/BLEManagerImpl.h after defining interface class. */
 #include "platform/internal/BLEManager.h"
+#include <platform/DeviceControlServer.h>
 
 #include <cassert>
 #include <type_traits>
@@ -663,6 +664,12 @@ void BLEManagerImpl::DriveBLEState(intptr_t arg)
 void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     ChipLogProgress(Ble, "Got notification regarding chip connection closure");
+    // In Non-Concurrent mode start the Wi-Fi, as BLE has been stopped
+    bool supportsConcurrentConnection = CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION;
+    if (!supportsConcurrentConnection)
+    {
+        DeviceLayer::ConnectivityMgrImpl().StartNonConcurrentWiFiManagement();
+    } 
 }
 
 void BLEManagerImpl::InitiateScan(BleScanState scanType)
