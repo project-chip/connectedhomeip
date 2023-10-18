@@ -1404,24 +1404,10 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @brief The minimum number of scenes to support according to spec
- */
-#ifndef CHIP_CONFIG_MAX_SCENES_PER_ENDPOINT
-#define CHIP_CONFIG_MAX_SCENES_PER_ENDPOINT 16
-#endif
-
-/**
  * @brief Maximum length of Scene names
  */
 #ifndef CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH
 #define CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH 16
-#endif
-
-/**
- * @brief The maximum number of scenes allowed on a single fabric
- */
-#ifndef CHIP_CONFIG_SCENES_MAX_PER_FABRIC
-#define CHIP_CONFIG_SCENES_MAX_PER_FABRIC (CHIP_CONFIG_MAX_SCENES_PER_ENDPOINT / 2)
 #endif
 
 /**
