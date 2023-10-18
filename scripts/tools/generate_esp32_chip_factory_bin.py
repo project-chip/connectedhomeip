@@ -27,6 +27,7 @@ from types import SimpleNamespace
 import cryptography.x509
 from bitarray import bitarray
 from bitarray.util import ba2int
+from esp_secure_cert.tlv_format import *
 
 CHIP_TOPDIR = os.path.dirname(os.path.realpath(__file__))[:-len(os.path.join('scripts', 'tools'))]
 sys.path.insert(0, os.path.join(CHIP_TOPDIR, 'scripts', 'tools', 'spake2p'))
@@ -162,6 +163,11 @@ FACTORY_DATA = {
 
     # Other device info provider keys are dynamically generated
     # in the respective functions.
+}
+
+OUT_DIR = {
+    'top': None,
+    'chip': None,
 }
 
 
@@ -315,17 +321,40 @@ def populate_factory_data(args, spake2p_params):
         FACTORY_DATA['iteration-count']['value'] = spake2p_params['Iteration Count']
         FACTORY_DATA['salt']['value'] = spake2p_params['Salt']
         FACTORY_DATA['verifier']['value'] = spake2p_params['Verifier']
+    if not args.dac_in_secure_cert:
+        if args.dac_cert:
+            FACTORY_DATA['dac-cert']['value'] = os.path.abspath(args.dac_cert)
+        if args.pai_cert:
+            FACTORY_DATA['pai-cert']['value'] = os.path.abspath(args.pai_cert)
+        if args.dac_key:
+            FACTORY_DATA['dac-key']['value'] = os.path.abspath('dac_raw_privkey.bin')
+            FACTORY_DATA['dac-pub-key']['value'] = os.path.abspath('dac_raw_pubkey.bin')
+    else:
+        file_name = "esp_secure_cert_partititon.bin"
+        secure_cert_partition_file_path = os.path.join(OUT_DIR['top'], file_name)
+        if args.ds_peripheral:
+            if args.target != "esp32h2":
+                logging.error("DS peripheral is only supported for esp32h2 target")
+                exit(1)
+            if args.efuse_key_id == -1:
+                logging.error("--efuse-key-id <value> is required when -ds or --ds-peripheral option is used")
+                exit(1)
+            priv_key = tlv_priv_key_t(key_type=tlv_priv_key_type_t.ESP_SECURE_CERT_ECDSA_PERIPHERAL_KEY,
+                                      key_path=args.dac_key, key_pass=None)
+            priv_key.priv_key_len = 256
+            priv_key.efuse_key_id = args.efuse_key_id
+            generate_partition_ds(priv_key=priv_key, device_cert=args.dac_cert,
+                                  ca_cert=args.pai_cert, idf_target=args.target,
+                                  op_file=secure_cert_partition_file_path)
+        else:
+            priv_key = tlv_priv_key_t(key_type=tlv_priv_key_type_t.ESP_SECURE_CERT_DEFAULT_FORMAT_KEY,
+                                      key_path=args.dac_key, key_pass=None)
+            generate_partition_no_ds(priv_key=priv_key, device_cert=args.dac_cert,
+                                     ca_cert=args.pai_cert, idf_target=args.target,
+                                     op_file=secure_cert_partition_file_path)
 
-    if args.dac_cert:
-        FACTORY_DATA['dac-cert']['value'] = os.path.abspath(args.dac_cert)
-    if args.pai_cert:
-        FACTORY_DATA['pai-cert']['value'] = os.path.abspath(args.pai_cert)
     if args.cd:
         FACTORY_DATA['cert-dclrn']['value'] = os.path.abspath(args.cd)
-    if args.dac_key:
-        FACTORY_DATA['dac-key']['value'] = os.path.abspath('dac_raw_privkey.bin')
-        FACTORY_DATA['dac-pub-key']['value'] = os.path.abspath('dac_raw_pubkey.bin')
-
     if args.serial_num:
         FACTORY_DATA['serial-num']['value'] = args.serial_num
     if args.rd_id_uid:
@@ -488,7 +517,7 @@ def generate_nvs_csv(out_csv_filename):
 
 def generate_nvs_bin(encrypt, size, csv_filename, bin_filename):
     nvs_args = SimpleNamespace(version=2,
-                               outdir=os.getcwd(),
+                               outdir=OUT_DIR['top'],
                                input=csv_filename,
                                output=bin_filename,
                                size=hex(size))
@@ -517,7 +546,8 @@ def clean_up():
         os.remove(FACTORY_DATA['dac-key']['value'])
 
 
-def main():
+def get_args():
+
     def any_base_int(s): return int(s, 0)
 
     parser = argparse.ArgumentParser(description='Chip Factory NVS binary generator tool')
@@ -533,6 +563,14 @@ def main():
     parser.add_argument('--dac-key', help='The path to the DAC private key in der format')
     parser.add_argument('--pai-cert', help='The path to the PAI certificate in der format')
     parser.add_argument('--cd', help='The path to the certificate declaration der format')
+
+    # Options for esp_secure_cert_partition
+    parser.add_argument('--dac-in-secure-cert', action="store_true", required=False,
+                        help='Store DAC in secure cert partition. By default, DAC is stored in nvs factory partition.')
+    parser.add_argument('-ds', '--ds-peripheral', action="store_true",
+                        help='Use DS Peripheral in generating secure cert partition.')
+    parser.add_argument('--efuse-key-id', type=int, choices=range(0, 6), default=-1,
+                        help='Provide the efuse key_id which contains/will contain HMAC_KEY, default is 1')
 
     # These will be used by DeviceInstanceInfoProvider
     parser.add_argument('--vendor-id', type=any_base_int, help='Vendor id')
@@ -559,13 +597,18 @@ def main():
 
     parser.add_argument('-s', '--size', type=any_base_int, default=0x6000,
                         help='The size of the partition.bin, default: 0x6000')
+    parser.add_argument('--target', default='esp32',
+                        help='The platform type of device. eg: one of esp32, esp32c3, etc.')
     parser.add_argument('-e', '--encrypt', action='store_true',
                         help='Encrypt the factory parititon NVS binary')
     parser.add_argument('--no-bin', action='store_false', dest='generate_bin',
                         help='Do not generate the factory partition binary')
     parser.set_defaults(generate_bin=True)
 
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+def set_up_factory_data(args):
     validate_args(args)
 
     if args.passcode is not None:
@@ -575,16 +618,30 @@ def main():
 
     populate_factory_data(args, spake2p_params)
 
-    if args.dac_key:
+    if args.dac_key and not args.dac_in_secure_cert:
         gen_raw_ec_keypair_from_der(args.dac_key, FACTORY_DATA['dac-pub-key']['value'], FACTORY_DATA['dac-key']['value'])
+    if args.dac_key:
+        gen_raw_ec_keypair_from_der(args.dac_key, os.path.abspath('dac_raw_pubkey.bin'), os.path.abspath('dac_raw_privkey.bin'))
 
+
+def generate_factory_partiton_binary(args):
     generate_nvs_csv(FACTORY_PARTITION_CSV)
-
     if args.generate_bin:
         generate_nvs_bin(args.encrypt, args.size, FACTORY_PARTITION_CSV, FACTORY_PARTITION_BIN)
         print_flashing_help(args.encrypt, FACTORY_PARTITION_BIN)
-
     clean_up()
+
+
+def set_up_out_dirs(args):
+    OUT_DIR['top'] = os.sep.join(['out', 'bin'])
+    os.makedirs(OUT_DIR['top'], exist_ok=True)
+
+
+def main():
+    args = get_args()
+    set_up_out_dirs(args)
+    set_up_factory_data(args)
+    generate_factory_partiton_binary(args)
 
 
 if __name__ == "__main__":
