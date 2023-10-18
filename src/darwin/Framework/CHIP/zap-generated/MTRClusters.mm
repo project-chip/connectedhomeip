@@ -22,6 +22,7 @@
 #import "MTRCluster_Internal.h"
 #import "MTRClusters_Internal.h"
 #import "MTRCommandPayloadsObjc.h"
+#import "MTRDefines_Internal.h"
 #import "MTRDevice_Internal.h"
 #import "MTRLogging_Internal.h"
 #import "MTRStructsObjc.h"
@@ -5856,7 +5857,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMs == nil) {
-        timedInvokeTimeoutMs = @(10000);
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
     }
 
     using RequestType = AdministratorCommissioning::Commands::OpenCommissioningWindow::Type;
@@ -5886,7 +5887,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMs == nil) {
-        timedInvokeTimeoutMs = @(10000);
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
     }
 
     using RequestType = AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type;
@@ -5920,7 +5921,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMs == nil) {
-        timedInvokeTimeoutMs = @(10000);
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
     }
 
     using RequestType = AdministratorCommissioning::Commands::RevokeCommissioning::Type;
@@ -8903,7 +8904,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMs == nil) {
-        timedInvokeTimeoutMs = @(10000);
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
     }
 
     using RequestType = DoorLock::Commands::LockDoor::Type;
@@ -8933,7 +8934,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMs == nil) {
-        timedInvokeTimeoutMs = @(10000);
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
     }
 
     using RequestType = DoorLock::Commands::UnlockDoor::Type;
@@ -8963,7 +8964,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMs == nil) {
-        timedInvokeTimeoutMs = @(10000);
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
     }
 
     using RequestType = DoorLock::Commands::UnlockWithTimeout::Type;
@@ -9236,7 +9237,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMs == nil) {
-        timedInvokeTimeoutMs = @(10000);
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
     }
 
     using RequestType = DoorLock::Commands::SetUser::Type;
@@ -9293,7 +9294,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMs == nil) {
-        timedInvokeTimeoutMs = @(10000);
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
     }
 
     using RequestType = DoorLock::Commands::ClearUser::Type;
@@ -9323,7 +9324,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMs == nil) {
-        timedInvokeTimeoutMs = @(10000);
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
     }
 
     using RequestType = DoorLock::Commands::SetCredential::Type;
@@ -9380,7 +9381,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMs == nil) {
-        timedInvokeTimeoutMs = @(10000);
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
     }
 
     using RequestType = DoorLock::Commands::ClearCredential::Type;
@@ -9410,7 +9411,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMs == nil) {
-        timedInvokeTimeoutMs = @(10000);
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
     }
 
     using RequestType = DoorLock::Commands::UnboltDoor::Type;
@@ -16713,7 +16714,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMs == nil) {
-        timedInvokeTimeoutMs = @(10000);
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
     }
 
     using RequestType = AccountLogin::Commands::GetSetupPIN::Type;
@@ -16743,7 +16744,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMs == nil) {
-        timedInvokeTimeoutMs = @(10000);
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
     }
 
     using RequestType = AccountLogin::Commands::Login::Type;
@@ -16777,7 +16778,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMs == nil) {
-        timedInvokeTimeoutMs = @(10000);
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
     }
 
     using RequestType = AccountLogin::Commands::Logout::Type;
@@ -18245,7 +18246,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
     if (timedInvokeTimeoutMs == nil) {
-        timedInvokeTimeoutMs = @(10000);
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
     }
 
     using RequestType = UnitTesting::Commands::TimedInvokeRequest::Type;
@@ -19060,7 +19061,7 @@ using chip::System::Clock::Timeout;
 {
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
     if (!timedWriteTimeout) {
-        timedWriteTimeout = @(10000);
+        timedWriteTimeout = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
     }
 
     [self.device writeAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(MTRAttributeIDTypeClusterUnitTestingAttributeTimedWriteBooleanID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
