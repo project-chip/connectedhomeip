@@ -72,7 +72,7 @@ API_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 
 /**
  * The vendor ID value from the device's Basic Information cluster that was used
- * for device attestation.  If attestation succeeds, this must match the vendor
+ * for device attestation.  For attestation to succeed, this must match the vendor
  * ID from the certification declaration.
  */
 @property (nonatomic, readonly) NSNumber * basicInformationVendorID MTR_NEWLY_AVAILABLE;
