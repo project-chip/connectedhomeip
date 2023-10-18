@@ -14,8 +14,10 @@
 
 #if (CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME && (CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS))
 #define CHIP_DEVICE_USES_SYS_TIME 1
+#define CHIP_DEVICE_USES_TIME_H 0
 #else // ! CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME etal
 #define CHIP_DEVICE_USES_TIME_H 1
+#define CHIP_DEVICE_USES_SYS_TIME 0
 #endif // CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME etal
 
 
@@ -40,7 +42,7 @@ namespace timing {
 
 class DurationTimer
 {
-#ifdef CHIP_DEVICE_USES_SYS_TIME
+#if CHIP_DEVICE_USES_SYS_TIME
 /**
  * SystemClock/clock-gettime supported therefore timeval struct.
  * */
@@ -53,7 +55,7 @@ protected:
     string label;
 #endif
 
-#ifdef CHIP_DEVICE_USES_TIME_H
+#if CHIP_DEVICE_USES_TIME_H
 /**
  * clock-SystemClock/clock-gettime not supported therefore use timespec struct
  * */
