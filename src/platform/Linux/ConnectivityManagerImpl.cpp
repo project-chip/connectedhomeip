@@ -21,7 +21,6 @@
 #include <platform/CommissionableDataProvider.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/ConnectivityUtils.h>
 #include <platform/Linux/DiagnosticDataProviderImpl.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
