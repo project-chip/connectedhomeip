@@ -112,6 +112,7 @@ public:
 
     void SetDelegate(DiscoveryDelegate * clientDelegate)
     {
+        ChipLogProgress(Discovery, "CastingPlayerDiscovery::SetDelegate() called");
         if (clientDelegate == nullptr)
         {
             mState = DISCOVERY_NOT_READY;
