@@ -245,8 +245,8 @@ using chip::Shell::Engine;
  * still hasn't been initialized, the device configuration is reset, and device
  * needs to be paired again.
  */
-static constexpr useconds_t kWiFiStartCheckTimeUsec = 100 * 1000; // 100 ms
-static constexpr uint8_t kWiFiStartCheckAttempts    = 5;
+static constexpr useconds_t kWiFiStartCheckTimeUsec = WIFI_START_CHECK_TIME_USEC;
+static constexpr uint8_t kWiFiStartCheckAttempts    = WIFI_START_CHECK_ATTEMPTS;
 #endif
 
 namespace {
@@ -263,6 +263,26 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
     if (event->Type == DeviceLayer::DeviceEventType::kCHIPoBLEConnectionEstablished)
     {
         ChipLogProgress(DeviceLayer, "Receive kCHIPoBLEConnectionEstablished");
+    }
+    else if ((event->Type == chip::DeviceLayer::DeviceEventType::kInternetConnectivityChange))
+    {
+        /* Network may not have been ready when mDNS attempted to broadcast an
+         * update, so restart the server here so it does it again,
+         * See https://github.com/project-chip/connectedhomeip/issues/27505
+         */
+        ChipLogProgress(DeviceLayer, "%s: DeviceEventType::kInternetConnectivityChange",
+            __func__);
+        chip::DeviceLayer::ChipDeviceEvent dns_restart_event;
+        dns_restart_event.Type = chip::DeviceLayer::DeviceEventType::kDnssdRestartNeeded;
+        CHIP_ERROR error = PlatformMgr().PostEvent(&dns_restart_event);
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to post kDnssdRestartNeeded: %" CHIP_ERROR_FORMAT, error.Format());
+        }
+        else
+        {
+            ChipLogProgress(DeviceLayer, "%s: posted kDnssdRestartNeeded", __func__);
+        }
     }
 }
 
@@ -465,10 +485,15 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     if (LinuxDeviceOptions::GetInstance().mWiFi)
     {
-        DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
-        if (!EnsureWiFiIsStarted())
+        bool supportsConcurrentConnection = CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION;
+        if (supportsConcurrentConnection)
         {
-            ChipLogError(NotSpecified, "Wi-Fi Management taking too long to start - device configuration will be reset.");
+            // Start WiFi management in Concurrent mode
+            DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
+            if (!EnsureWiFiIsStarted())
+            {
+                ChipLogError(NotSpecified, "Wi-Fi Management taking too long to start - device configuration will be reset.");
+            }
         }
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
