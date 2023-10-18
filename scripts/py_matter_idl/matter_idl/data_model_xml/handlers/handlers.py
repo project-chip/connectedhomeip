@@ -165,8 +165,13 @@ class EnumHandler(BaseHandler):
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "item":
-            assert ("name" in attrs)
-            assert ("value" in attrs)
+            for key in ["name", "value"]:
+                if key not in attrs:
+                    logging.error("Enumeration %s entry is missing a '%s' entry (at %r)",
+                                  self._enum.name, key, self.context.GetCurrentLocationMeta())
+                    # bad entry, nothing I can do about it.
+                    return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+
             self._enum.entries.append(
                 ConstantEntry(
                     name="k" + NormalizeName(attrs["name"]), code=ParseInt(attrs["value"]))
