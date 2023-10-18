@@ -76,7 +76,7 @@ struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
      * @param keyData A byte span containing the raw key
      * @return CHIP_ERROR CHIP_NO_ERROR     success
      *         CHIP_ERROR_INVALID_ARGUMENT  wrong size of the raw key
-     *         CHIP_ERROR_INTERNAL          No KeyStore for the entry or Crypto API related failure
+     *         CHIP_ERROR_INTERNAL          No KeyStore for the entry or Key Handle already present
      *         CHIP_ERROR_XXX               Crypto API related failure
      */
     CHIP_ERROR SetKey(ByteSpan keyData);
@@ -103,6 +103,7 @@ struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
     chip::NodeId checkInNodeID                    = kUndefinedNodeId;
     uint64_t monitoredSubject                     = static_cast<uint64_t>(0);
     Crypto::Aes128KeyHandle key                   = Crypto::Aes128KeyHandle();
+    bool isKeySet                                 = false;
     uint16_t index                                = 0;
     Crypto::SymmetricKeystore * symmetricKeystore = nullptr;
 };
