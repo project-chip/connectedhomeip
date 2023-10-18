@@ -1273,6 +1273,8 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(struct ble_gap_event * gapEvent)
     peer_delete(gapEvent->disconnect.conn.conn_handle);
 #endif
 
+    // There can be a case where the BLE central disconnects without unsubscribing from the BLE characteristic.
+    // In such situations, it is necessary to clear the subscription and post a connection error event.
     if (UnsetSubscribed(gapEvent->disconnect.conn.conn_handle))
     {
         CHIP_ERROR disconReason;
