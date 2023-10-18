@@ -77,11 +77,29 @@ class BitmapHandler(BaseHandler):
             return BaseHandler(self.context)
 
 
+class FieldHandler(BaseHandler):
+    def __init__(self, context: Context, field: Field):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._field = field
+
+    def GetNextProcessor(self, name: str, attrs):
+        # TODO: switch
+        if name == "constraint":
+            ApplyConstraint(attrs, field)
+        elif name in {"mandatoryConform", "optionalConform"}:
+            # Nothing to tag conformance
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "access":
+            # per-field access is not something we model
+            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+        else:
+            return BaseHandler(self.context)
+
+
 class StructHandler(BaseHandler):
     def __init__(self, context: Context, cluster: Cluster, attrs):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._cluster = cluster
-
         self._struct = Struct(name=NormalizeName(attrs["name"]), fields=[])
 
     def EndProcessing(self):
@@ -92,28 +110,9 @@ class StructHandler(BaseHandler):
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "field":
-
-            # TODO:
-            #   - is_list would be useful here
-            #   - qualities (NULLABLE, OPTIONAL, FABRIC_SENSITIVE)
-            #   - data type: min/max length and min/max value
-            self._struct.fields.append(AttributesToField(attrs))
-
-            # TODO: min/max is via:
-            #    <constraint type="lengthBetween" from="16" to="100"/>
-            #    <constraint type="between" from="MinScaledValue+1" to="32767"/>
-            #    <constraint type="between" from="0" to="2048"/>
-            #    <constraint type="maxLength" value="16"/>
-            #    <constraint type="minLength" value="11"/>
-            # Test via:
-            #    Switch.xml
-            #    AccountLogin.xml
-
-            # Assume fully handled.
-            #
-            # TODO: "access" is unclear here. mandatoryConform and section is probably
-            #       not needed in general
-            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+            field = AttributesToField(attrs)
+            self._struct.fields.append(field)
+            return FieldHandler(self.context, field)
         else:
             return BaseHandler(self.context)
 
@@ -334,8 +333,6 @@ class ClusterHandler(BaseHandler):
 
     def GetNextProcessor(self, name: str, attrs):
         # TODO:
-        #   - dataTypes (enum, bitmap, list???, struct)
-        #   - attributes
         #   - commands
         if name == "revisionHistory":
             # Revision history COULD be used to find the latest revision of a cluster
