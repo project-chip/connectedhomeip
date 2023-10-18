@@ -117,7 +117,7 @@ server cluster Groups = 4 {
 }
 
 /** Attributes and commands for scene configuration and manipulation. */
-server cluster Scenes = 5 {
+provisional server cluster Scenes = 5 {
   bitmap Feature : BITMAP32 {
     kSceneNames = 0x1;
     kExplicit = 0x2;
@@ -2819,7 +2819,7 @@ server cluster Thermostat = 513 {
 }
 
 /** An interface for controlling a fan in a heating/cooling system. */
-server cluster FanControl = 514 {
+provisional server cluster FanControl = 514 {
   enum AirflowDirectionEnum : ENUM8 {
     kForward = 0;
     kReverse = 1;
@@ -2978,7 +2978,7 @@ server cluster ColorControl = 768 {
 }
 
 /** Attributes and commands for configuring a lighting ballast. */
-server cluster BallastConfiguration = 769 {
+provisional server cluster BallastConfiguration = 769 {
   bitmap BallastStatusBitmap : BITMAP8 {
     kBallastNonOperational = 0x1;
     kLampFailure = 0x2;
@@ -3654,7 +3654,7 @@ server cluster AccountLogin = 1294 {
 }
 
 /** The Test Cluster is meant to validate the generated code */
-server cluster UnitTesting = 4294048773 {
+internal server cluster UnitTesting = 4294048773 {
   enum SimpleEnum : ENUM8 {
     kUnspecified = 0;
     kValueA = 1;

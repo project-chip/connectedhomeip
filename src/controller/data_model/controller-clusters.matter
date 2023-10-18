@@ -125,7 +125,7 @@ client cluster Groups = 4 {
 }
 
 /** Attributes and commands for scene configuration and manipulation. */
-client cluster Scenes = 5 {
+provisional client cluster Scenes = 5 {
   bitmap Feature : BITMAP32 {
     kSceneNames = 0x1;
     kExplicit = 0x2;
@@ -526,7 +526,7 @@ client cluster BinaryInputBasic = 15 {
 }
 
 /** Cluster to control pulse width modulation */
-client cluster PulseWidthModulation = 28 {
+provisional client cluster PulseWidthModulation = 28 {
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -4630,7 +4630,7 @@ client cluster Thermostat = 513 {
 }
 
 /** An interface for controlling a fan in a heating/cooling system. */
-client cluster FanControl = 514 {
+provisional client cluster FanControl = 514 {
   enum AirflowDirectionEnum : ENUM8 {
     kForward = 0;
     kReverse = 1;
@@ -5041,7 +5041,7 @@ client cluster ColorControl = 768 {
 }
 
 /** Attributes and commands for configuring a lighting ballast. */
-client cluster BallastConfiguration = 769 {
+provisional client cluster BallastConfiguration = 769 {
   bitmap BallastStatusBitmap : BITMAP8 {
     kBallastNonOperational = 0x1;
     kLampFailure = 0x2;
@@ -6572,7 +6572,7 @@ client cluster ElectricalMeasurement = 2820 {
 }
 
 /** The Test Cluster is meant to validate the generated code */
-client cluster UnitTesting = 4294048773 {
+internal client cluster UnitTesting = 4294048773 {
   enum SimpleEnum : ENUM8 {
     kUnspecified = 0;
     kValueA = 1;
@@ -7018,7 +7018,7 @@ client cluster UnitTesting = 4294048773 {
 }
 
 /** The Fault Injection Cluster provide a means for a test harness to configure faults(for example triggering a fault in the system). */
-client cluster FaultInjection = 4294048774 {
+internal client cluster FaultInjection = 4294048774 {
   enum FaultType : ENUM8 {
     kUnspecified = 0;
     kSystemFault = 1;
