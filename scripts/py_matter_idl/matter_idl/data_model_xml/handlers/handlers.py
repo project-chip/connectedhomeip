@@ -22,7 +22,7 @@ from matter_idl.matter_idl_types import (Attribute, AttributeQuality, Bitmap, Cl
 from .base import BaseHandler, HandledDepth
 from .context import Context
 from .parsing import (ApplyConstraint, AttributesToAttribute, AttributesToBitFieldConstantEntry, AttributesToEvent,
-                      AttributesToField, NormalizeName, ParseInt, StringToAccessPrivilege)
+                      AttributesToField, NormalizeName, ParseInt, StringToAccessPrivilege, AttributesToCommand)
 
 LOGGER = logging.getLogger('data-model-xml-parser')
 
@@ -44,7 +44,6 @@ class FeaturesHandler(BaseHandler):
         elif name == "feature":
             self._bitmap.entries.append(
                 AttributesToBitFieldConstantEntry(attrs))
-
             # assume everything handled. Sub-item is only section
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
@@ -93,6 +92,14 @@ class FieldHandler(BaseHandler):
         elif name == "access":
             # per-field access is not something we model
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+        elif name == "enum":
+            LOGGER.warning(
+                f"Anonymous enumeration not supported when handling field {self._field.name}")
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "bitmap":
+            LOGGER.warning(
+                f"Anonymous bitmap not supported when handling field {self._field.name}")
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
             return BaseHandler(self.context)
 
@@ -212,10 +219,6 @@ class AttributeHandler(BaseHandler):
         self._cluster.attributes.append(self._attribute)
 
     def GetNextProcessor(self, name: str, attrs):
-        # TODO:
-        #   - access
-        #   - quality
-        #   - constraint
         if name == "enum":
             LOGGER.warning(
                 f"Anonymous enumeration not supported when handling attribute {self._cluster.name}::{self._attribute.definition.name}")
@@ -271,6 +274,94 @@ class AttributesHandler(BaseHandler):
         else:
             return BaseHandler(self.context)
 
+class CommandHandler(BaseHandler):
+    def __init__(self, context: Context, cluster: Cluster, attrs):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._cluster = cluster
+
+        # Command information layout:
+        #   "response":
+        #       - is mandatory for "requests" and contains
+        #         'Y' for default response and something else
+        #         for non-default responses
+        #   "direction":
+        #       - sometimes missing (seems to just be request to client)
+        #       - "commandToClient"
+        #       - "responseFromServer"
+        #
+
+        # Heuristic logic of direction:
+        #   - if we have a response, this must be a request
+        #   - if direction is "commandToClient" it should be a request
+        #   - if direction is "responseFromServer" it should be a response
+        # otherwise guess
+
+        if "response" in attrs:
+            is_command = True
+        elif ("direction" in attrs) and attrs["direction"] == "commandToClient":
+            is_command = True
+        elif ("direction" in attrs) and attrs["direction"] == "responseFromServer":
+            is_command = False # response
+        else:
+            LOGGER.warn("Could not clearly determine command direction: %s" %
+                        [item for item in attrs.items()])
+            # Do a best-guess. However we should NOT need to guess once
+            # we have a good data set
+            is_command = not attrs["name"].endswith("Response")
+
+
+        if is_command:
+            self._command = AttributesToCommand(attrs)
+            self._struct = Struct(name=NormalizeName(attrs["name"] + "Request"),
+                                  fields = [],
+                                  tag = StructTag.REQUEST,
+                                  )
+        else:
+            self._command = None
+            self._struct = Struct(
+                name=NormalizeName(attrs["name"]),
+                fields = [],
+                code = ParseInt(attrs["id"]),
+                tag = StructTag.RESPONSE,
+            )
+
+    def EndProcessing(self):
+        if self._struct and self._struct.fields:
+           # A valid structure exists ...
+           self._cluster.structs.append(self._struct)
+
+           if self._command:
+               # Input structure is well defined, set it
+               self._command.input_param = self._struct.name
+
+        if self._command:
+           self._cluster.commands.append(self._command)
+
+    def GetNextProcessor(self, name: str, attrs):
+        if name in {"mandatoryConform", "optionalConform", "disallowConform"}:
+            # Nothing to tag conformance
+            # TODO: what is disallowConform? Should it affect codegen?
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "field":
+            field = AttributesToField(attrs)
+            self._struct.fields.append(field)
+            return FieldHandler(self.context, field)
+        else:
+            return BaseHandler(self.context)
+
+class CommandsHandler(BaseHandler):
+    def __init__(self, context: Context, cluster: Cluster):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._cluster = cluster
+
+    def GetNextProcessor(self, name: str, attrs):
+        if name == "command":
+            return CommandHandler(self.context, self._cluster, attrs)
+        elif name in {"mandatoryConform", "optionalConform"}:
+            # Nothing to tag conformance
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        else:
+            return BaseHandler(self.context)
 
 class DataTypesHandler(BaseHandler):
     def __init__(self, context: Context, cluster: Cluster):
@@ -331,8 +422,6 @@ class ClusterHandler(BaseHandler):
         self._idl.clusters.append(self._cluster)
 
     def GetNextProcessor(self, name: str, attrs):
-        # TODO:
-        #   - commands
         if name == "revisionHistory":
             # Revision history COULD be used to find the latest revision of a cluster
             # however current IDL files do NOT have a revision info field
@@ -359,5 +448,7 @@ class ClusterHandler(BaseHandler):
             return EventsHandler(self.context, self._cluster)
         elif name == "attributes":
             return AttributesHandler(self.context, self._cluster)
+        elif name == "commands":
+            return CommandsHandler(self.context, self._cluster)
         else:
             return BaseHandler(self.context)

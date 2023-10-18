@@ -17,7 +17,7 @@ import re
 from typing import Optional
 
 from matter_idl.generators.types import GetDataTypeSizeInBits, IsSignedDataType
-from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, ConstantEntry, DataType, Event,
+from matter_idl.matter_idl_types import (Command, AccessPrivilege, Attribute, AttributeQuality, ConstantEntry, DataType, Event,
                                          EventPriority, Field, FieldQuality)
 
 LOGGER = logging.getLogger('data-model-xml-data-parsing')
@@ -156,6 +156,33 @@ def StringToAccessPrivilege(value: str) -> AccessPrivilege:
         return AccessPrivilege.ADMINISTER
     else:
         raise Exception("UNKNOWN privilege level: %r" % value)
+
+
+def AttributesToCommand(attrs) -> Command:
+    assert "id" in attrs
+    assert "name" in attrs
+
+    if "response" not in attrs:
+        LOGGER.warn(f"Command {attrs['name']} has no response set.")
+        # Matter IDL has no concept of "no response sent"
+        # Example is DoorLock::"Operating Event Notification"
+        #
+        # However that is not in the impl in general
+        # it is unclear what to do here (and what "NOT" is as conformance)
+
+        output_param = "DefaultSuccess"
+    else:
+        output_param = NormalizeName(attrs["response"])
+        if output_param == "Y":
+            output_param = "DefaultSuccess" # IDL name for no specific struct
+
+    return Command(
+        name=NormalizeName(attrs["name"]),
+        code=ParseInt(attrs["id"]),
+        input_param=None, # not specified YET
+        output_param=output_param
+    )
+
 
 
 def ApplyConstraint(attrs, field: Field):
