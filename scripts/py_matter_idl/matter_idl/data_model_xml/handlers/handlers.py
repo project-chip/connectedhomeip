@@ -21,8 +21,8 @@ from matter_idl.matter_idl_types import (Attribute, AttributeQuality, Bitmap, Cl
 
 from .base import BaseHandler, HandledDepth
 from .context import Context
-from .parsing import (ApplyConstraint, AttributesToAttribute, AttributesToBitFieldConstantEntry, AttributesToEvent,
-                      AttributesToField, NormalizeName, ParseInt, StringToAccessPrivilege, AttributesToCommand)
+from .parsing import (ApplyConstraint, AttributesToAttribute, AttributesToBitFieldConstantEntry, AttributesToCommand,
+                      AttributesToEvent, AttributesToField, NormalizeName, ParseInt, StringToAccessPrivilege)
 
 LOGGER = logging.getLogger('data-model-xml-parser')
 
@@ -274,6 +274,7 @@ class AttributesHandler(BaseHandler):
         else:
             return BaseHandler(self.context)
 
+
 class CommandHandler(BaseHandler):
     def __init__(self, context: Context, cluster: Cluster, attrs):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
@@ -301,7 +302,7 @@ class CommandHandler(BaseHandler):
         elif ("direction" in attrs) and attrs["direction"] == "commandToClient":
             is_command = True
         elif ("direction" in attrs) and attrs["direction"] == "responseFromServer":
-            is_command = False # response
+            is_command = False  # response
         else:
             LOGGER.warn("Could not clearly determine command direction: %s" %
                         [item for item in attrs.items()])
@@ -309,33 +310,32 @@ class CommandHandler(BaseHandler):
             # we have a good data set
             is_command = not attrs["name"].endswith("Response")
 
-
         if is_command:
             self._command = AttributesToCommand(attrs)
             self._struct = Struct(name=NormalizeName(attrs["name"] + "Request"),
-                                  fields = [],
-                                  tag = StructTag.REQUEST,
+                                  fields=[],
+                                  tag=StructTag.REQUEST,
                                   )
         else:
             self._command = None
             self._struct = Struct(
                 name=NormalizeName(attrs["name"]),
-                fields = [],
-                code = ParseInt(attrs["id"]),
-                tag = StructTag.RESPONSE,
+                fields=[],
+                code=ParseInt(attrs["id"]),
+                tag=StructTag.RESPONSE,
             )
 
     def EndProcessing(self):
         if self._struct and self._struct.fields:
-           # A valid structure exists ...
-           self._cluster.structs.append(self._struct)
+            # A valid structure exists ...
+            self._cluster.structs.append(self._struct)
 
-           if self._command:
-               # Input structure is well defined, set it
-               self._command.input_param = self._struct.name
+            if self._command:
+                # Input structure is well defined, set it
+                self._command.input_param = self._struct.name
 
         if self._command:
-           self._cluster.commands.append(self._command)
+            self._cluster.commands.append(self._command)
 
     def GetNextProcessor(self, name: str, attrs):
         if name in {"mandatoryConform", "optionalConform", "disallowConform"}:
@@ -348,6 +348,7 @@ class CommandHandler(BaseHandler):
             return FieldHandler(self.context, field)
         else:
             return BaseHandler(self.context)
+
 
 class CommandsHandler(BaseHandler):
     def __init__(self, context: Context, cluster: Cluster):
@@ -362,6 +363,7 @@ class CommandsHandler(BaseHandler):
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         else:
             return BaseHandler(self.context)
+
 
 class DataTypesHandler(BaseHandler):
     def __init__(self, context: Context, cluster: Cluster):

@@ -17,7 +17,7 @@ import re
 from typing import Optional
 
 from matter_idl.generators.types import GetDataTypeSizeInBits, IsSignedDataType
-from matter_idl.matter_idl_types import (Command, AccessPrivilege, Attribute, AttributeQuality, ConstantEntry, DataType, Event,
+from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Command, ConstantEntry, DataType, Event,
                                          EventPriority, Field, FieldQuality)
 
 LOGGER = logging.getLogger('data-model-xml-data-parsing')
@@ -174,15 +174,14 @@ def AttributesToCommand(attrs) -> Command:
     else:
         output_param = NormalizeName(attrs["response"])
         if output_param == "Y":
-            output_param = "DefaultSuccess" # IDL name for no specific struct
+            output_param = "DefaultSuccess"  # IDL name for no specific struct
 
     return Command(
         name=NormalizeName(attrs["name"]),
         code=ParseInt(attrs["id"]),
-        input_param=None, # not specified YET
+        input_param=None,  # not specified YET
         output_param=output_param
     )
-
 
 
 def ApplyConstraint(attrs, field: Field):
