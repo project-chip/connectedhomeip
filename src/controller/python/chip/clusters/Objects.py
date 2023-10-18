@@ -14664,6 +14664,8 @@ class IcdManagement(Cluster):
     class Bitmaps:
         class Feature(IntFlag):
             kCheckInProtocolSupport = 0x1
+            kUserActiveModeTrigger = 0x2
+            kLongIdleTimeSupport = 0x4
 
     class Structs:
         @dataclass

@@ -1553,6 +1553,8 @@ server cluster UserLabel = 65 {
 server cluster IcdManagement = 70 {
   bitmap Feature : bitmap32 {
     kCheckInProtocolSupport = 0x1;
+    kUserActiveModeTrigger = 0x2;
+    kLongIdleTimeSupport = 0x4;
   }
 
   fabric_scoped struct MonitoringRegistrationStruct {
