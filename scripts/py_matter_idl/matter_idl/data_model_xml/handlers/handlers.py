@@ -131,11 +131,9 @@ class EventHandler(BaseHandler):
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "field":
-            # TODO: same processing as structs:
-            #   optional/nullable
-            #   add constraint handling
-            self._event.fields.append(AttributesToField(attrs))
-            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+            field = AttributesToField(attrs)
+            self._event.fields.append(field)
+            return FieldHandler(self.context, field)
         elif name == "mandatoryConform":
             # assume handled (we do not record conformance in IDL)
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
