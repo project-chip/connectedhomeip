@@ -663,35 +663,32 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             mNeedsDST = false;
             break;
         case CommissioningStage::kReadCommissioningInfo2: {
-            bool shouldReadCommissioningInfo2 =
-                mParams.GetCheckForMatchingFabric() || (mParams.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore);
-            if (shouldReadCommissioningInfo2)
+
+            if (!report.Is<ReadCommissioningInfo2>())
             {
-                if (!report.Is<ReadCommissioningInfo2>())
+                ChipLogError(
+                    Controller,
+                    "[BUG] Should read commissioning info (part 2), but report is not ReadCommissioningInfo2. THIS IS A BUG.");
+            }
+
+            ReadCommissioningInfo2 mDeviceCommissioningInfo2 = report.Get<ReadCommissioningInfo2>();
+            mParams.SetSupportsConcurrentConnection(mDeviceCommissioningInfo2.supportsConcurrentConnection);
+
+            if (mParams.GetCheckForMatchingFabric())
+            {
+                chip::NodeId nodeId = mDeviceCommissioningInfo2.nodeId;
+                if (nodeId != kUndefinedNodeId)
                 {
-                    ChipLogError(
-                        Controller,
-                        "[BUG] Should read commissioning info (part 2), but report is not ReadCommissioningInfo2. THIS IS A BUG.");
+                    mParams.SetRemoteNodeId(nodeId);
                 }
+            }
 
-                ReadCommissioningInfo2 commissioningInfo = report.Get<ReadCommissioningInfo2>();
-
-                if (mParams.GetCheckForMatchingFabric())
+            if (mParams.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
+            {
+                if (mDeviceCommissioningInfo2.isIcd)
                 {
-                    chip::NodeId nodeId = commissioningInfo.nodeId;
-                    if (nodeId != kUndefinedNodeId)
-                    {
-                        mParams.SetRemoteNodeId(nodeId);
-                    }
-                }
-
-                if (mParams.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
-                {
-                    if (commissioningInfo.isIcd)
-                    {
-                        mNeedIcdRegistraion = true;
-                        ChipLogDetail(Controller, "AutoCommissioner: Device is ICD");
-                    }
+                    mNeedIcdRegistraion = true;
+                    ChipLogDetail(Controller, "AutoCommissioner: Device is ICD");
                 }
             }
             break;
