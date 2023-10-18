@@ -120,7 +120,7 @@ def AttributesToAttribute(attrs) -> Attribute:
     return Attribute(
         definition=Field(
             code=ParseInt(attrs["id"]),
-            name=NormalizeName(attrs["name"]),
+            name=FieldName(attrs["name"]),
             data_type=DataType(name=attr_type),
         )
     )
