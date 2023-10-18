@@ -490,7 +490,7 @@ API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
  * verified and the verification result.  The verification will be done in the
  * same way as for devices being commissioned.  In particular, which things are
  * verified will depend on whether the controller has an
- * MTROperationalCertificateIssuer, if it does on what its
+ * MTROperationalCertificateIssuer, and if it does on what its
  * shouldSkipAttestationCertificateValidation property is set to.
  *
  * If getting the attestation information fails, so that attestation could not
