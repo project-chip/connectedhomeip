@@ -17,7 +17,7 @@ from typing import Any, Optional
 
 from matter_idl.matter_idl_types import (Attribute, Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType,
                                          Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, Struct, StructQuality,
-                                         StructTag)
+                                         StructTag, AttributeQuality)
 
 from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
@@ -204,8 +204,13 @@ class AttributeHandler(BaseHandler):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._cluster = cluster
         self._attribute = AttributesToAttribute(attrs)
+        self._deprecated = False
 
     def EndProcessing(self):
+        if self._deprecated:
+            # Deprecation skips processing
+            return
+
         self._cluster.attributes.append(self._attribute)
 
     def GetNextProcessor(self, name: str, attrs):
@@ -221,6 +226,37 @@ class AttributeHandler(BaseHandler):
             LOGGER.warning(
                 f"Anonymous bitmap not supported when handling attribute {self._cluster.name}::{self._attribute.definition.name}")
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "access":
+            if "readPrivilege" in attrs:
+                self._attribute.readacl = StringToAccessPrivilege(attrs["readPrivilege"])
+
+            if "writePrivilege" in attrs:
+                self._attribute.writeacl = StringToAccessPrivilege(attrs["writePrivilege"])
+
+            if "read" in attrs and attrs["read"] != "false":
+                self._attribute.qualities = self._attribute.qualities | AttributeQuality.READABLE
+
+            if "write" in attrs and attrs["write"] != "false":
+                self._attribute.qualities = self._attribute.qualities | AttributeQuality.WRITABLE
+
+            if "timed" in attrs and attrs["timed"] != "false":
+                self._attribute.qualities = self._attribute.qualities | AttributeQuality.TIMED_WRITE
+            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+        elif name == "quality":
+            # Out of the many interesting bits, only "nullable" seems relevant for codegen
+            if "nullable" in attrs and attrs["nullable"] != "false":
+                self._attribute.definition.qualities = self._attribute.definition.qualities | FieldQuality.NULLABLE
+
+            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
+        elif name in {"mandatoryConform", "optionalConform"}:
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "deprecateConform":
+            self._deprecated = True
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "constraint":
+            # FIXME: implement and handle. Same as structs and
+            #        event fields. Constraints go into field definitions
+            return BaseHandler(self.context)
         else:
             return BaseHandler(self.context)
 
