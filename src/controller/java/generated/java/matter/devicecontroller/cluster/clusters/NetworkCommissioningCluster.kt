@@ -17,22 +17,31 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import matter.controller.MatterController
+import java.time.Duration
+import java.util.logging.Level
+import java.util.logging.Logger
+import matter.controller.*
+import matter.controller.model.AttributePath
+import matter.controller.model.CommandPath
 import matter.devicecontroller.cluster.structs.*
+import matter.tlv.AnonymousTag
+import matter.tlv.ContextSpecificTag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class NetworkCommissioningCluster(
   private val controller: MatterController,
   private val endpointId: UShort
 ) {
   class ScanNetworksResponse(
-    val networkingStatus: UInt,
+    val networkingStatus: UByte,
     val debugText: String?,
     val wiFiScanResults: List<NetworkCommissioningClusterWiFiInterfaceScanResultStruct>?,
     val threadScanResults: List<NetworkCommissioningClusterThreadInterfaceScanResultStruct>?
   )
 
   class NetworkConfigResponse(
-    val networkingStatus: UInt,
+    val networkingStatus: UByte,
     val debugText: String?,
     val networkIndex: UByte?,
     val clientIdentity: ByteArray?,
@@ -40,7 +49,7 @@ class NetworkCommissioningCluster(
   )
 
   class ConnectNetworkResponse(
-    val networkingStatus: UInt,
+    val networkingStatus: UByte,
     val debugText: String?,
     val errorValue: Int?
   )
@@ -49,13 +58,13 @@ class NetworkCommissioningCluster(
 
   class NetworksAttribute(val value: List<NetworkCommissioningClusterNetworkInfoStruct>)
 
-  class LastNetworkingStatusAttribute(val value: UInt?)
+  class LastNetworkingStatusAttribute(val value: UByte?)
 
   class LastNetworkIDAttribute(val value: ByteArray?)
 
   class LastConnectErrorValueAttribute(val value: Int?)
 
-  class SupportedWiFiBandsAttribute(val value: List<UInt>?)
+  class SupportedWiFiBandsAttribute(val value: List<UByte>?)
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
@@ -70,13 +79,88 @@ class NetworkCommissioningCluster(
     breadcrumb: ULong?,
     timedInvokeTimeoutMs: Int? = null
   ): ScanNetworksResponse {
-    val commandId = 0L
+    val commandId: UInt = 0u
+    val timeoutMs: Duration =
+      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
-    }
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_SSID_REQ: Int = 0
+    ssid?.let { tlvWriter.put(ContextSpecificTag(TAG_SSID_REQ), ssid) }
+
+    val TAG_BREADCRUMB_REQ: Int = 1
+    breadcrumb?.let { tlvWriter.put(ContextSpecificTag(TAG_BREADCRUMB_REQ), breadcrumb) }
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timeoutMs
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_NETWORKING_STATUS: Int = 0
+    val networkingStatus_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_NETWORKING_STATUS))
+
+    val TAG_DEBUG_TEXT: Int = 1
+    val debugText_decoded =
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEBUG_TEXT))) {
+        tlvReader.getString(ContextSpecificTag(TAG_DEBUG_TEXT))
+      } else {
+        null
+      }
+
+    val TAG_WI_FI_SCAN_RESULTS: Int = 2
+    val wiFiScanResults_decoded =
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_WI_FI_SCAN_RESULTS))) {
+        buildList<NetworkCommissioningClusterWiFiInterfaceScanResultStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_WI_FI_SCAN_RESULTS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(
+              NetworkCommissioningClusterWiFiInterfaceScanResultStruct.fromTlv(
+                AnonymousTag,
+                tlvReader
+              )
+            )
+          }
+          tlvReader.exitContainer()
+        }
+      } else {
+        null
+      }
+
+    val TAG_THREAD_SCAN_RESULTS: Int = 3
+    val threadScanResults_decoded =
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_THREAD_SCAN_RESULTS))) {
+        buildList<NetworkCommissioningClusterThreadInterfaceScanResultStruct> {
+          tlvReader.enterArray(ContextSpecificTag(TAG_THREAD_SCAN_RESULTS))
+          while (!tlvReader.isEndOfContainer()) {
+            add(
+              NetworkCommissioningClusterThreadInterfaceScanResultStruct.fromTlv(
+                AnonymousTag,
+                tlvReader
+              )
+            )
+          }
+          tlvReader.exitContainer()
+        }
+      } else {
+        null
+      }
+    tlvReader.exitContainer()
+
+    return ScanNetworksResponse(
+      networkingStatus_decoded,
+      debugText_decoded,
+      wiFiScanResults_decoded,
+      threadScanResults_decoded
+    )
   }
 
   suspend fun addOrUpdateWiFiNetwork(
@@ -88,13 +172,93 @@ class NetworkCommissioningCluster(
     possessionNonce: ByteArray?,
     timedInvokeTimeoutMs: Int? = null
   ): NetworkConfigResponse {
-    val commandId = 2L
+    val commandId: UInt = 2u
+    val timeoutMs: Duration =
+      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_SSID_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_SSID_REQ), ssid)
+
+    val TAG_CREDENTIALS_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_CREDENTIALS_REQ), credentials)
+
+    val TAG_BREADCRUMB_REQ: Int = 2
+    breadcrumb?.let { tlvWriter.put(ContextSpecificTag(TAG_BREADCRUMB_REQ), breadcrumb) }
+
+    val TAG_NETWORK_IDENTITY_REQ: Int = 3
+    networkIdentity?.let {
+      tlvWriter.put(ContextSpecificTag(TAG_NETWORK_IDENTITY_REQ), networkIdentity)
     }
+
+    val TAG_CLIENT_IDENTIFIER_REQ: Int = 4
+    clientIdentifier?.let {
+      tlvWriter.put(ContextSpecificTag(TAG_CLIENT_IDENTIFIER_REQ), clientIdentifier)
+    }
+
+    val TAG_POSSESSION_NONCE_REQ: Int = 5
+    possessionNonce?.let {
+      tlvWriter.put(ContextSpecificTag(TAG_POSSESSION_NONCE_REQ), possessionNonce)
+    }
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timeoutMs
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_NETWORKING_STATUS: Int = 0
+    val networkingStatus_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_NETWORKING_STATUS))
+
+    val TAG_DEBUG_TEXT: Int = 1
+    val debugText_decoded =
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEBUG_TEXT))) {
+        tlvReader.getString(ContextSpecificTag(TAG_DEBUG_TEXT))
+      } else {
+        null
+      }
+
+    val TAG_NETWORK_INDEX: Int = 2
+    val networkIndex_decoded =
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NETWORK_INDEX))) {
+        tlvReader.getUByte(ContextSpecificTag(TAG_NETWORK_INDEX))
+      } else {
+        null
+      }
+
+    val TAG_CLIENT_IDENTITY: Int = 3
+    val clientIdentity_decoded =
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLIENT_IDENTITY))) {
+        tlvReader.getByteArray(ContextSpecificTag(TAG_CLIENT_IDENTITY))
+      } else {
+        null
+      }
+
+    val TAG_POSSESSION_SIGNATURE: Int = 4
+    val possessionSignature_decoded =
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_POSSESSION_SIGNATURE))) {
+        tlvReader.getByteArray(ContextSpecificTag(TAG_POSSESSION_SIGNATURE))
+      } else {
+        null
+      }
+    tlvReader.exitContainer()
+
+    return NetworkConfigResponse(
+      networkingStatus_decoded,
+      debugText_decoded,
+      networkIndex_decoded,
+      clientIdentity_decoded,
+      possessionSignature_decoded
+    )
   }
 
   suspend fun addOrUpdateThreadNetwork(
@@ -102,13 +266,75 @@ class NetworkCommissioningCluster(
     breadcrumb: ULong?,
     timedInvokeTimeoutMs: Int? = null
   ): NetworkConfigResponse {
-    val commandId = 3L
+    val commandId: UInt = 3u
+    val timeoutMs: Duration =
+      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
-    }
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_OPERATIONAL_DATASET_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_OPERATIONAL_DATASET_REQ), operationalDataset)
+
+    val TAG_BREADCRUMB_REQ: Int = 1
+    breadcrumb?.let { tlvWriter.put(ContextSpecificTag(TAG_BREADCRUMB_REQ), breadcrumb) }
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timeoutMs
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_NETWORKING_STATUS: Int = 0
+    val networkingStatus_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_NETWORKING_STATUS))
+
+    val TAG_DEBUG_TEXT: Int = 1
+    val debugText_decoded =
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEBUG_TEXT))) {
+        tlvReader.getString(ContextSpecificTag(TAG_DEBUG_TEXT))
+      } else {
+        null
+      }
+
+    val TAG_NETWORK_INDEX: Int = 2
+    val networkIndex_decoded =
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NETWORK_INDEX))) {
+        tlvReader.getUByte(ContextSpecificTag(TAG_NETWORK_INDEX))
+      } else {
+        null
+      }
+
+    val TAG_CLIENT_IDENTITY: Int = 3
+    val clientIdentity_decoded =
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLIENT_IDENTITY))) {
+        tlvReader.getByteArray(ContextSpecificTag(TAG_CLIENT_IDENTITY))
+      } else {
+        null
+      }
+
+    val TAG_POSSESSION_SIGNATURE: Int = 4
+    val possessionSignature_decoded =
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_POSSESSION_SIGNATURE))) {
+        tlvReader.getByteArray(ContextSpecificTag(TAG_POSSESSION_SIGNATURE))
+      } else {
+        null
+      }
+    tlvReader.exitContainer()
+
+    return NetworkConfigResponse(
+      networkingStatus_decoded,
+      debugText_decoded,
+      networkIndex_decoded,
+      clientIdentity_decoded,
+      possessionSignature_decoded
+    )
   }
 
   suspend fun removeNetwork(
@@ -116,13 +342,75 @@ class NetworkCommissioningCluster(
     breadcrumb: ULong?,
     timedInvokeTimeoutMs: Int? = null
   ): NetworkConfigResponse {
-    val commandId = 4L
+    val commandId: UInt = 4u
+    val timeoutMs: Duration =
+      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
-    }
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_NETWORK_I_D_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_NETWORK_I_D_REQ), networkID)
+
+    val TAG_BREADCRUMB_REQ: Int = 1
+    breadcrumb?.let { tlvWriter.put(ContextSpecificTag(TAG_BREADCRUMB_REQ), breadcrumb) }
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timeoutMs
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_NETWORKING_STATUS: Int = 0
+    val networkingStatus_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_NETWORKING_STATUS))
+
+    val TAG_DEBUG_TEXT: Int = 1
+    val debugText_decoded =
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEBUG_TEXT))) {
+        tlvReader.getString(ContextSpecificTag(TAG_DEBUG_TEXT))
+      } else {
+        null
+      }
+
+    val TAG_NETWORK_INDEX: Int = 2
+    val networkIndex_decoded =
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NETWORK_INDEX))) {
+        tlvReader.getUByte(ContextSpecificTag(TAG_NETWORK_INDEX))
+      } else {
+        null
+      }
+
+    val TAG_CLIENT_IDENTITY: Int = 3
+    val clientIdentity_decoded =
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLIENT_IDENTITY))) {
+        tlvReader.getByteArray(ContextSpecificTag(TAG_CLIENT_IDENTITY))
+      } else {
+        null
+      }
+
+    val TAG_POSSESSION_SIGNATURE: Int = 4
+    val possessionSignature_decoded =
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_POSSESSION_SIGNATURE))) {
+        tlvReader.getByteArray(ContextSpecificTag(TAG_POSSESSION_SIGNATURE))
+      } else {
+        null
+      }
+    tlvReader.exitContainer()
+
+    return NetworkConfigResponse(
+      networkingStatus_decoded,
+      debugText_decoded,
+      networkIndex_decoded,
+      clientIdentity_decoded,
+      possessionSignature_decoded
+    )
   }
 
   suspend fun connectNetwork(
@@ -130,13 +418,58 @@ class NetworkCommissioningCluster(
     breadcrumb: ULong?,
     timedInvokeTimeoutMs: Int? = null
   ): ConnectNetworkResponse {
-    val commandId = 6L
+    val commandId: UInt = 6u
+    val timeoutMs: Duration =
+      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
-    }
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_NETWORK_I_D_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_NETWORK_I_D_REQ), networkID)
+
+    val TAG_BREADCRUMB_REQ: Int = 1
+    breadcrumb?.let { tlvWriter.put(ContextSpecificTag(TAG_BREADCRUMB_REQ), breadcrumb) }
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timeoutMs
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_NETWORKING_STATUS: Int = 0
+    val networkingStatus_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_NETWORKING_STATUS))
+
+    val TAG_DEBUG_TEXT: Int = 1
+    val debugText_decoded =
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEBUG_TEXT))) {
+        tlvReader.getString(ContextSpecificTag(TAG_DEBUG_TEXT))
+      } else {
+        null
+      }
+
+    val TAG_ERROR_VALUE: Int = 2
+    val errorValue_decoded =
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_ERROR_VALUE))) {
+        if (!tlvReader.isNull()) {
+          tlvReader.getInt(ContextSpecificTag(TAG_ERROR_VALUE))
+        } else {
+          tlvReader.getNull(ContextSpecificTag(TAG_ERROR_VALUE))
+          null
+        }
+      } else {
+        null
+      }
+    tlvReader.exitContainer()
+
+    return ConnectNetworkResponse(networkingStatus_decoded, debugText_decoded, errorValue_decoded)
   }
 
   suspend fun reorderNetwork(
@@ -145,13 +478,78 @@ class NetworkCommissioningCluster(
     breadcrumb: ULong?,
     timedInvokeTimeoutMs: Int? = null
   ): NetworkConfigResponse {
-    val commandId = 8L
+    val commandId: UInt = 8u
+    val timeoutMs: Duration =
+      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
-    }
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_NETWORK_I_D_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_NETWORK_I_D_REQ), networkID)
+
+    val TAG_NETWORK_INDEX_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_NETWORK_INDEX_REQ), networkIndex)
+
+    val TAG_BREADCRUMB_REQ: Int = 2
+    breadcrumb?.let { tlvWriter.put(ContextSpecificTag(TAG_BREADCRUMB_REQ), breadcrumb) }
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timeoutMs
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_NETWORKING_STATUS: Int = 0
+    val networkingStatus_decoded = tlvReader.getUByte(ContextSpecificTag(TAG_NETWORKING_STATUS))
+
+    val TAG_DEBUG_TEXT: Int = 1
+    val debugText_decoded =
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_DEBUG_TEXT))) {
+        tlvReader.getString(ContextSpecificTag(TAG_DEBUG_TEXT))
+      } else {
+        null
+      }
+
+    val TAG_NETWORK_INDEX: Int = 2
+    val networkIndex_decoded =
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_NETWORK_INDEX))) {
+        tlvReader.getUByte(ContextSpecificTag(TAG_NETWORK_INDEX))
+      } else {
+        null
+      }
+
+    val TAG_CLIENT_IDENTITY: Int = 3
+    val clientIdentity_decoded =
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLIENT_IDENTITY))) {
+        tlvReader.getByteArray(ContextSpecificTag(TAG_CLIENT_IDENTITY))
+      } else {
+        null
+      }
+
+    val TAG_POSSESSION_SIGNATURE: Int = 4
+    val possessionSignature_decoded =
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_POSSESSION_SIGNATURE))) {
+        tlvReader.getByteArray(ContextSpecificTag(TAG_POSSESSION_SIGNATURE))
+      } else {
+        null
+      }
+    tlvReader.exitContainer()
+
+    return NetworkConfigResponse(
+      networkingStatus_decoded,
+      debugText_decoded,
+      networkIndex_decoded,
+      clientIdentity_decoded,
+      possessionSignature_decoded
+    )
   }
 
   suspend fun queryIdentity(
@@ -159,184 +557,776 @@ class NetworkCommissioningCluster(
     possessionNonce: ByteArray?,
     timedInvokeTimeoutMs: Int? = null
   ): QueryIdentityResponse {
-    val commandId = 9L
+    val commandId: UInt = 9u
+    val timeoutMs: Duration =
+      timedInvokeTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
 
-    if (timedInvokeTimeoutMs != null) {
-      // Do the action with timedInvokeTimeoutMs
-    } else {
-      // Do the action without timedInvokeTimeoutMs
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_KEY_IDENTIFIER_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_KEY_IDENTIFIER_REQ), keyIdentifier)
+
+    val TAG_POSSESSION_NONCE_REQ: Int = 1
+    possessionNonce?.let {
+      tlvWriter.put(ContextSpecificTag(TAG_POSSESSION_NONCE_REQ), possessionNonce)
     }
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timeoutMs
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.INFO, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_IDENTITY: Int = 0
+    val identity_decoded = tlvReader.getByteArray(ContextSpecificTag(TAG_IDENTITY))
+
+    val TAG_POSSESSION_SIGNATURE: Int = 1
+    val possessionSignature_decoded =
+      if (tlvReader.isNextTag(ContextSpecificTag(TAG_POSSESSION_SIGNATURE))) {
+        tlvReader.getByteArray(ContextSpecificTag(TAG_POSSESSION_SIGNATURE))
+      } else {
+        null
+      }
+    tlvReader.exitContainer()
+
+    return QueryIdentityResponse(identity_decoded, possessionSignature_decoded)
   }
 
   suspend fun readMaxNetworksAttribute(): UByte {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID_MAXNETWORKS: UInt = 0u
 
-  suspend fun subscribeMaxNetworksAttribute(minInterval: Int, maxInterval: Int): UByte {
-    // Implementation needs to be added here
-  }
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_MAXNETWORKS
+      )
 
-  suspend fun readNetworksAttribute(): NetworksAttribute {
-    // Implementation needs to be added here
-  }
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
-  suspend fun subscribeNetworksAttribute(minInterval: Int, maxInterval: Int): NetworksAttribute {
-    // Implementation needs to be added here
-  }
+    val response = controller.read(readRequest)
 
-  suspend fun readScanMaxTimeSecondsAttribute(): UByte {
-    // Implementation needs to be added here
-  }
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
 
-  suspend fun subscribeScanMaxTimeSecondsAttribute(minInterval: Int, maxInterval: Int): UByte {
-    // Implementation needs to be added here
-  }
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_MAXNETWORKS
+        }
 
-  suspend fun readConnectMaxTimeSecondsAttribute(): UByte {
-    // Implementation needs to be added here
-  }
+      requireNotNull(attributeData) { "Maxnetworks attribute not found in response" }
 
-  suspend fun subscribeConnectMaxTimeSecondsAttribute(minInterval: Int, maxInterval: Int): UByte {
-    // Implementation needs to be added here
-  }
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
-  suspend fun readInterfaceEnabledAttribute(): Boolean {
-    // Implementation needs to be added here
-  }
-
-  suspend fun writeInterfaceEnabledAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
-    if (timedWriteTimeoutMs != null) {
-      // Do the action with timedWriteTimeoutMs
+      return decodedValue
     } else {
-      // Do the action without timedWriteTimeoutMs
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
     }
   }
 
-  suspend fun subscribeInterfaceEnabledAttribute(minInterval: Int, maxInterval: Int): Boolean {
-    // Implementation needs to be added here
+  suspend fun readNetworksAttribute(): NetworksAttribute {
+    val ATTRIBUTE_ID_NETWORKS: UInt = 1u
+
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_NETWORKS
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_NETWORKS
+        }
+
+      requireNotNull(attributeData) { "Networks attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: List<NetworkCommissioningClusterNetworkInfoStruct> =
+        buildList<NetworkCommissioningClusterNetworkInfoStruct> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(NetworkCommissioningClusterNetworkInfoStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+
+      return NetworksAttribute(decodedValue)
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+  }
+
+  suspend fun readScanMaxTimeSecondsAttribute(): UByte? {
+    val ATTRIBUTE_ID_SCANMAXTIMESECONDS: UInt = 2u
+
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_SCANMAXTIMESECONDS
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_SCANMAXTIMESECONDS
+        }
+
+      requireNotNull(attributeData) { "Scanmaxtimeseconds attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: UByte? =
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getUByte(AnonymousTag)
+        } else {
+          null
+        }
+
+      return decodedValue
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+  }
+
+  suspend fun readConnectMaxTimeSecondsAttribute(): UByte? {
+    val ATTRIBUTE_ID_CONNECTMAXTIMESECONDS: UInt = 3u
+
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_CONNECTMAXTIMESECONDS
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_CONNECTMAXTIMESECONDS
+        }
+
+      requireNotNull(attributeData) { "Connectmaxtimeseconds attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: UByte? =
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getUByte(AnonymousTag)
+        } else {
+          null
+        }
+
+      return decodedValue
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+  }
+
+  suspend fun readInterfaceEnabledAttribute(): Boolean {
+    val ATTRIBUTE_ID_INTERFACEENABLED: UInt = 4u
+
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_INTERFACEENABLED
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_INTERFACEENABLED
+        }
+
+      requireNotNull(attributeData) { "Interfaceenabled attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
+
+      return decodedValue
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+  }
+
+  suspend fun writeInterfaceEnabledAttribute(value: Boolean, timedWriteTimeoutMs: Int? = null) {
+    val ATTRIBUTE_ID_INTERFACEENABLED: UInt = 4u
+    val timeoutMs: Duration =
+      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(
+                  endpointId,
+                  clusterId = CLUSTER_ID,
+                  attributeId = ATTRIBUTE_ID_INTERFACEENABLED
+                ),
+              tlvPayload = tlvWriter.getEncoded()
+            )
+          ),
+        timedRequest = timeoutMs
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.INFO, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
   }
 
   suspend fun readLastNetworkingStatusAttribute(): LastNetworkingStatusAttribute {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID_LASTNETWORKINGSTATUS: UInt = 5u
 
-  suspend fun subscribeLastNetworkingStatusAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): LastNetworkingStatusAttribute {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_LASTNETWORKINGSTATUS
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_LASTNETWORKINGSTATUS
+        }
+
+      requireNotNull(attributeData) { "Lastnetworkingstatus attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: UByte? =
+        if (!tlvReader.isNull()) {
+          tlvReader.getUByte(AnonymousTag)
+        } else {
+          tlvReader.getNull(AnonymousTag)
+          null
+        }
+
+      return LastNetworkingStatusAttribute(decodedValue)
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun readLastNetworkIDAttribute(): LastNetworkIDAttribute {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID_LASTNETWORKID: UInt = 6u
 
-  suspend fun subscribeLastNetworkIDAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): LastNetworkIDAttribute {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_LASTNETWORKID
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_LASTNETWORKID
+        }
+
+      requireNotNull(attributeData) { "Lastnetworkid attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: ByteArray? =
+        if (!tlvReader.isNull()) {
+          tlvReader.getByteArray(AnonymousTag)
+        } else {
+          tlvReader.getNull(AnonymousTag)
+          null
+        }
+
+      return LastNetworkIDAttribute(decodedValue)
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun readLastConnectErrorValueAttribute(): LastConnectErrorValueAttribute {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID_LASTCONNECTERRORVALUE: UInt = 7u
 
-  suspend fun subscribeLastConnectErrorValueAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): LastConnectErrorValueAttribute {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_LASTCONNECTERRORVALUE
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_LASTCONNECTERRORVALUE
+        }
+
+      requireNotNull(attributeData) { "Lastconnecterrorvalue attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: Int? =
+        if (!tlvReader.isNull()) {
+          tlvReader.getInt(AnonymousTag)
+        } else {
+          tlvReader.getNull(AnonymousTag)
+          null
+        }
+
+      return LastConnectErrorValueAttribute(decodedValue)
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun readSupportedWiFiBandsAttribute(): SupportedWiFiBandsAttribute {
-    // Implementation needs to be added here
+    val ATTRIBUTE_ID_SUPPORTEDWIFIBANDS: UInt = 8u
+
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_SUPPORTEDWIFIBANDS
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_SUPPORTEDWIFIBANDS
+        }
+
+      requireNotNull(attributeData) { "Supportedwifibands attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: List<UByte>? =
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          buildList<UByte> {
+            tlvReader.enterArray(AnonymousTag)
+            while (!tlvReader.isEndOfContainer()) {
+              add(tlvReader.getUByte(AnonymousTag))
+            }
+            tlvReader.exitContainer()
+          }
+        } else {
+          null
+        }
+
+      return SupportedWiFiBandsAttribute(decodedValue)
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
-  suspend fun subscribeSupportedWiFiBandsAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): SupportedWiFiBandsAttribute {
-    // Implementation needs to be added here
+  suspend fun readSupportedThreadFeaturesAttribute(): UShort? {
+    val ATTRIBUTE_ID_SUPPORTEDTHREADFEATURES: UInt = 9u
+
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_SUPPORTEDTHREADFEATURES
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_SUPPORTEDTHREADFEATURES
+        }
+
+      requireNotNull(attributeData) { "Supportedthreadfeatures attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: UShort? =
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getUShort(AnonymousTag)
+        } else {
+          null
+        }
+
+      return decodedValue
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
-  suspend fun readSupportedThreadFeaturesAttribute(): UShort {
-    // Implementation needs to be added here
-  }
+  suspend fun readThreadVersionAttribute(): UShort? {
+    val ATTRIBUTE_ID_THREADVERSION: UInt = 10u
 
-  suspend fun subscribeSupportedThreadFeaturesAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
-    // Implementation needs to be added here
-  }
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_THREADVERSION
+      )
 
-  suspend fun readThreadVersionAttribute(): UShort {
-    // Implementation needs to be added here
-  }
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
 
-  suspend fun subscribeThreadVersionAttribute(minInterval: Int, maxInterval: Int): UShort {
-    // Implementation needs to be added here
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_THREADVERSION
+        }
+
+      requireNotNull(attributeData) { "Threadversion attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: UShort? =
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getUShort(AnonymousTag)
+        } else {
+          null
+        }
+
+      return decodedValue
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID_GENERATEDCOMMANDLIST: UInt = 65528u
 
-  suspend fun subscribeGeneratedCommandListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): GeneratedCommandListAttribute {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_GENERATEDCOMMANDLIST
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_GENERATEDCOMMANDLIST
+        }
+
+      requireNotNull(attributeData) { "Generatedcommandlist attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: List<UInt> =
+        buildList<UInt> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getUInt(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+
+      return GeneratedCommandListAttribute(decodedValue)
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID_ACCEPTEDCOMMANDLIST: UInt = 65529u
 
-  suspend fun subscribeAcceptedCommandListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): AcceptedCommandListAttribute {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_ACCEPTEDCOMMANDLIST
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_ACCEPTEDCOMMANDLIST
+        }
+
+      requireNotNull(attributeData) { "Acceptedcommandlist attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: List<UInt> =
+        buildList<UInt> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getUInt(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+
+      return AcceptedCommandListAttribute(decodedValue)
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun readEventListAttribute(): EventListAttribute {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID_EVENTLIST: UInt = 65530u
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_EVENTLIST
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_EVENTLIST
+        }
+
+      requireNotNull(attributeData) { "Eventlist attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: List<UInt> =
+        buildList<UInt> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getUInt(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+
+      return EventListAttribute(decodedValue)
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun readAttributeListAttribute(): AttributeListAttribute {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID_ATTRIBUTELIST: UInt = 65531u
 
-  suspend fun subscribeAttributeListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): AttributeListAttribute {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_ATTRIBUTELIST
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_ATTRIBUTELIST
+        }
+
+      requireNotNull(attributeData) { "Attributelist attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: List<UInt> =
+        buildList<UInt> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getUInt(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+
+      return AttributeListAttribute(decodedValue)
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun readFeatureMapAttribute(): UInt {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID_FEATUREMAP: UInt = 65532u
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_FEATUREMAP
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_FEATUREMAP
+        }
+
+      requireNotNull(attributeData) { "Featuremap attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
+
+      return decodedValue
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun readClusterRevisionAttribute(): UShort {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID_CLUSTERREVISION: UInt = 65533u
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_CLUSTERREVISION
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_CLUSTERREVISION
+        }
+
+      requireNotNull(attributeData) { "Clusterrevision attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
+
+      return decodedValue
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   companion object {
+    private val logger = Logger.getLogger(NetworkCommissioningCluster::class.java.name)
     const val CLUSTER_ID: UInt = 49u
   }
 }

@@ -17,8 +17,15 @@
 
 package matter.devicecontroller.cluster.clusters
 
-import matter.controller.MatterController
+import java.time.Duration
+import java.util.logging.Level
+import java.util.logging.Logger
+import matter.controller.*
+import matter.controller.model.AttributePath
 import matter.devicecontroller.cluster.structs.*
+import matter.tlv.AnonymousTag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class OccupancySensingCluster(
   private val controller: MatterController,
@@ -33,288 +40,1169 @@ class OccupancySensingCluster(
   class AttributeListAttribute(val value: List<UInt>)
 
   suspend fun readOccupancyAttribute(): UByte {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID_OCCUPANCY: UInt = 0u
 
-  suspend fun subscribeOccupancyAttribute(minInterval: Int, maxInterval: Int): UByte {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_OCCUPANCY
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_OCCUPANCY
+        }
+
+      requireNotNull(attributeData) { "Occupancy attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+
+      return decodedValue
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun readOccupancySensorTypeAttribute(): UByte {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID_OCCUPANCYSENSORTYPE: UInt = 1u
 
-  suspend fun subscribeOccupancySensorTypeAttribute(minInterval: Int, maxInterval: Int): UByte {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_OCCUPANCYSENSORTYPE
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_OCCUPANCYSENSORTYPE
+        }
+
+      requireNotNull(attributeData) { "Occupancysensortype attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+
+      return decodedValue
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun readOccupancySensorTypeBitmapAttribute(): UByte {
-    // Implementation needs to be added here
+    val ATTRIBUTE_ID_OCCUPANCYSENSORTYPEBITMAP: UInt = 2u
+
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_OCCUPANCYSENSORTYPEBITMAP
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_OCCUPANCYSENSORTYPEBITMAP
+        }
+
+      requireNotNull(attributeData) { "Occupancysensortypebitmap attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
+
+      return decodedValue
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
-  suspend fun subscribeOccupancySensorTypeBitmapAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
-    // Implementation needs to be added here
-  }
+  suspend fun readPIROccupiedToUnoccupiedDelayAttribute(): UShort? {
+    val ATTRIBUTE_ID_PIROCCUPIEDTOUNOCCUPIEDDELAY: UInt = 16u
 
-  suspend fun readPIROccupiedToUnoccupiedDelayAttribute(): UShort {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_PIROCCUPIEDTOUNOCCUPIEDDELAY
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_PIROCCUPIEDTOUNOCCUPIEDDELAY
+        }
+
+      requireNotNull(attributeData) {
+        "Piroccupiedtounoccupieddelay attribute not found in response"
+      }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: UShort? =
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getUShort(AnonymousTag)
+        } else {
+          null
+        }
+
+      return decodedValue
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun writePIROccupiedToUnoccupiedDelayAttribute(
     value: UShort,
     timedWriteTimeoutMs: Int? = null
   ) {
-    if (timedWriteTimeoutMs != null) {
-      // Do the action with timedWriteTimeoutMs
-    } else {
-      // Do the action without timedWriteTimeoutMs
+    val ATTRIBUTE_ID_PIROCCUPIEDTOUNOCCUPIEDDELAY: UInt = 16u
+    val timeoutMs: Duration =
+      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(
+                  endpointId,
+                  clusterId = CLUSTER_ID,
+                  attributeId = ATTRIBUTE_ID_PIROCCUPIEDTOUNOCCUPIEDDELAY
+                ),
+              tlvPayload = tlvWriter.getEncoded()
+            )
+          ),
+        timedRequest = timeoutMs
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.INFO, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
     }
   }
 
-  suspend fun subscribePIROccupiedToUnoccupiedDelayAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
-    // Implementation needs to be added here
-  }
+  suspend fun readPIRUnoccupiedToOccupiedDelayAttribute(): UShort? {
+    val ATTRIBUTE_ID_PIRUNOCCUPIEDTOOCCUPIEDDELAY: UInt = 17u
 
-  suspend fun readPIRUnoccupiedToOccupiedDelayAttribute(): UShort {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_PIRUNOCCUPIEDTOOCCUPIEDDELAY
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_PIRUNOCCUPIEDTOOCCUPIEDDELAY
+        }
+
+      requireNotNull(attributeData) {
+        "Pirunoccupiedtooccupieddelay attribute not found in response"
+      }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: UShort? =
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getUShort(AnonymousTag)
+        } else {
+          null
+        }
+
+      return decodedValue
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun writePIRUnoccupiedToOccupiedDelayAttribute(
     value: UShort,
     timedWriteTimeoutMs: Int? = null
   ) {
-    if (timedWriteTimeoutMs != null) {
-      // Do the action with timedWriteTimeoutMs
-    } else {
-      // Do the action without timedWriteTimeoutMs
+    val ATTRIBUTE_ID_PIRUNOCCUPIEDTOOCCUPIEDDELAY: UInt = 17u
+    val timeoutMs: Duration =
+      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(
+                  endpointId,
+                  clusterId = CLUSTER_ID,
+                  attributeId = ATTRIBUTE_ID_PIRUNOCCUPIEDTOOCCUPIEDDELAY
+                ),
+              tlvPayload = tlvWriter.getEncoded()
+            )
+          ),
+        timedRequest = timeoutMs
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.INFO, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
     }
   }
 
-  suspend fun subscribePIRUnoccupiedToOccupiedDelayAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
-    // Implementation needs to be added here
-  }
+  suspend fun readPIRUnoccupiedToOccupiedThresholdAttribute(): UByte? {
+    val ATTRIBUTE_ID_PIRUNOCCUPIEDTOOCCUPIEDTHRESHOLD: UInt = 18u
 
-  suspend fun readPIRUnoccupiedToOccupiedThresholdAttribute(): UByte {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_PIRUNOCCUPIEDTOOCCUPIEDTHRESHOLD
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_PIRUNOCCUPIEDTOOCCUPIEDTHRESHOLD
+        }
+
+      requireNotNull(attributeData) {
+        "Pirunoccupiedtooccupiedthreshold attribute not found in response"
+      }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: UByte? =
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getUByte(AnonymousTag)
+        } else {
+          null
+        }
+
+      return decodedValue
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun writePIRUnoccupiedToOccupiedThresholdAttribute(
     value: UByte,
     timedWriteTimeoutMs: Int? = null
   ) {
-    if (timedWriteTimeoutMs != null) {
-      // Do the action with timedWriteTimeoutMs
-    } else {
-      // Do the action without timedWriteTimeoutMs
+    val ATTRIBUTE_ID_PIRUNOCCUPIEDTOOCCUPIEDTHRESHOLD: UInt = 18u
+    val timeoutMs: Duration =
+      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(
+                  endpointId,
+                  clusterId = CLUSTER_ID,
+                  attributeId = ATTRIBUTE_ID_PIRUNOCCUPIEDTOOCCUPIEDTHRESHOLD
+                ),
+              tlvPayload = tlvWriter.getEncoded()
+            )
+          ),
+        timedRequest = timeoutMs
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.INFO, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
     }
   }
 
-  suspend fun subscribePIRUnoccupiedToOccupiedThresholdAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
-    // Implementation needs to be added here
-  }
+  suspend fun readUltrasonicOccupiedToUnoccupiedDelayAttribute(): UShort? {
+    val ATTRIBUTE_ID_ULTRASONICOCCUPIEDTOUNOCCUPIEDDELAY: UInt = 32u
 
-  suspend fun readUltrasonicOccupiedToUnoccupiedDelayAttribute(): UShort {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_ULTRASONICOCCUPIEDTOUNOCCUPIEDDELAY
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_ULTRASONICOCCUPIEDTOUNOCCUPIEDDELAY
+        }
+
+      requireNotNull(attributeData) {
+        "Ultrasonicoccupiedtounoccupieddelay attribute not found in response"
+      }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: UShort? =
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getUShort(AnonymousTag)
+        } else {
+          null
+        }
+
+      return decodedValue
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun writeUltrasonicOccupiedToUnoccupiedDelayAttribute(
     value: UShort,
     timedWriteTimeoutMs: Int? = null
   ) {
-    if (timedWriteTimeoutMs != null) {
-      // Do the action with timedWriteTimeoutMs
-    } else {
-      // Do the action without timedWriteTimeoutMs
+    val ATTRIBUTE_ID_ULTRASONICOCCUPIEDTOUNOCCUPIEDDELAY: UInt = 32u
+    val timeoutMs: Duration =
+      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(
+                  endpointId,
+                  clusterId = CLUSTER_ID,
+                  attributeId = ATTRIBUTE_ID_ULTRASONICOCCUPIEDTOUNOCCUPIEDDELAY
+                ),
+              tlvPayload = tlvWriter.getEncoded()
+            )
+          ),
+        timedRequest = timeoutMs
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.INFO, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
     }
   }
 
-  suspend fun subscribeUltrasonicOccupiedToUnoccupiedDelayAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
-    // Implementation needs to be added here
-  }
+  suspend fun readUltrasonicUnoccupiedToOccupiedDelayAttribute(): UShort? {
+    val ATTRIBUTE_ID_ULTRASONICUNOCCUPIEDTOOCCUPIEDDELAY: UInt = 33u
 
-  suspend fun readUltrasonicUnoccupiedToOccupiedDelayAttribute(): UShort {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_ULTRASONICUNOCCUPIEDTOOCCUPIEDDELAY
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_ULTRASONICUNOCCUPIEDTOOCCUPIEDDELAY
+        }
+
+      requireNotNull(attributeData) {
+        "Ultrasonicunoccupiedtooccupieddelay attribute not found in response"
+      }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: UShort? =
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getUShort(AnonymousTag)
+        } else {
+          null
+        }
+
+      return decodedValue
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun writeUltrasonicUnoccupiedToOccupiedDelayAttribute(
     value: UShort,
     timedWriteTimeoutMs: Int? = null
   ) {
-    if (timedWriteTimeoutMs != null) {
-      // Do the action with timedWriteTimeoutMs
-    } else {
-      // Do the action without timedWriteTimeoutMs
+    val ATTRIBUTE_ID_ULTRASONICUNOCCUPIEDTOOCCUPIEDDELAY: UInt = 33u
+    val timeoutMs: Duration =
+      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(
+                  endpointId,
+                  clusterId = CLUSTER_ID,
+                  attributeId = ATTRIBUTE_ID_ULTRASONICUNOCCUPIEDTOOCCUPIEDDELAY
+                ),
+              tlvPayload = tlvWriter.getEncoded()
+            )
+          ),
+        timedRequest = timeoutMs
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.INFO, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
     }
   }
 
-  suspend fun subscribeUltrasonicUnoccupiedToOccupiedDelayAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
-    // Implementation needs to be added here
-  }
+  suspend fun readUltrasonicUnoccupiedToOccupiedThresholdAttribute(): UByte? {
+    val ATTRIBUTE_ID_ULTRASONICUNOCCUPIEDTOOCCUPIEDTHRESHOLD: UInt = 34u
 
-  suspend fun readUltrasonicUnoccupiedToOccupiedThresholdAttribute(): UByte {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_ULTRASONICUNOCCUPIEDTOOCCUPIEDTHRESHOLD
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_ULTRASONICUNOCCUPIEDTOOCCUPIEDTHRESHOLD
+        }
+
+      requireNotNull(attributeData) {
+        "Ultrasonicunoccupiedtooccupiedthreshold attribute not found in response"
+      }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: UByte? =
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getUByte(AnonymousTag)
+        } else {
+          null
+        }
+
+      return decodedValue
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun writeUltrasonicUnoccupiedToOccupiedThresholdAttribute(
     value: UByte,
     timedWriteTimeoutMs: Int? = null
   ) {
-    if (timedWriteTimeoutMs != null) {
-      // Do the action with timedWriteTimeoutMs
-    } else {
-      // Do the action without timedWriteTimeoutMs
+    val ATTRIBUTE_ID_ULTRASONICUNOCCUPIEDTOOCCUPIEDTHRESHOLD: UInt = 34u
+    val timeoutMs: Duration =
+      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(
+                  endpointId,
+                  clusterId = CLUSTER_ID,
+                  attributeId = ATTRIBUTE_ID_ULTRASONICUNOCCUPIEDTOOCCUPIEDTHRESHOLD
+                ),
+              tlvPayload = tlvWriter.getEncoded()
+            )
+          ),
+        timedRequest = timeoutMs
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.INFO, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
     }
   }
 
-  suspend fun subscribeUltrasonicUnoccupiedToOccupiedThresholdAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
-    // Implementation needs to be added here
-  }
+  suspend fun readPhysicalContactOccupiedToUnoccupiedDelayAttribute(): UShort? {
+    val ATTRIBUTE_ID_PHYSICALCONTACTOCCUPIEDTOUNOCCUPIEDDELAY: UInt = 48u
 
-  suspend fun readPhysicalContactOccupiedToUnoccupiedDelayAttribute(): UShort {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_PHYSICALCONTACTOCCUPIEDTOUNOCCUPIEDDELAY
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_PHYSICALCONTACTOCCUPIEDTOUNOCCUPIEDDELAY
+        }
+
+      requireNotNull(attributeData) {
+        "Physicalcontactoccupiedtounoccupieddelay attribute not found in response"
+      }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: UShort? =
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getUShort(AnonymousTag)
+        } else {
+          null
+        }
+
+      return decodedValue
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun writePhysicalContactOccupiedToUnoccupiedDelayAttribute(
     value: UShort,
     timedWriteTimeoutMs: Int? = null
   ) {
-    if (timedWriteTimeoutMs != null) {
-      // Do the action with timedWriteTimeoutMs
-    } else {
-      // Do the action without timedWriteTimeoutMs
+    val ATTRIBUTE_ID_PHYSICALCONTACTOCCUPIEDTOUNOCCUPIEDDELAY: UInt = 48u
+    val timeoutMs: Duration =
+      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(
+                  endpointId,
+                  clusterId = CLUSTER_ID,
+                  attributeId = ATTRIBUTE_ID_PHYSICALCONTACTOCCUPIEDTOUNOCCUPIEDDELAY
+                ),
+              tlvPayload = tlvWriter.getEncoded()
+            )
+          ),
+        timedRequest = timeoutMs
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.INFO, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
     }
   }
 
-  suspend fun subscribePhysicalContactOccupiedToUnoccupiedDelayAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
-    // Implementation needs to be added here
-  }
+  suspend fun readPhysicalContactUnoccupiedToOccupiedDelayAttribute(): UShort? {
+    val ATTRIBUTE_ID_PHYSICALCONTACTUNOCCUPIEDTOOCCUPIEDDELAY: UInt = 49u
 
-  suspend fun readPhysicalContactUnoccupiedToOccupiedDelayAttribute(): UShort {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_PHYSICALCONTACTUNOCCUPIEDTOOCCUPIEDDELAY
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_PHYSICALCONTACTUNOCCUPIEDTOOCCUPIEDDELAY
+        }
+
+      requireNotNull(attributeData) {
+        "Physicalcontactunoccupiedtooccupieddelay attribute not found in response"
+      }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: UShort? =
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getUShort(AnonymousTag)
+        } else {
+          null
+        }
+
+      return decodedValue
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun writePhysicalContactUnoccupiedToOccupiedDelayAttribute(
     value: UShort,
     timedWriteTimeoutMs: Int? = null
   ) {
-    if (timedWriteTimeoutMs != null) {
-      // Do the action with timedWriteTimeoutMs
-    } else {
-      // Do the action without timedWriteTimeoutMs
+    val ATTRIBUTE_ID_PHYSICALCONTACTUNOCCUPIEDTOOCCUPIEDDELAY: UInt = 49u
+    val timeoutMs: Duration =
+      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(
+                  endpointId,
+                  clusterId = CLUSTER_ID,
+                  attributeId = ATTRIBUTE_ID_PHYSICALCONTACTUNOCCUPIEDTOOCCUPIEDDELAY
+                ),
+              tlvPayload = tlvWriter.getEncoded()
+            )
+          ),
+        timedRequest = timeoutMs
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.INFO, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
     }
   }
 
-  suspend fun subscribePhysicalContactUnoccupiedToOccupiedDelayAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UShort {
-    // Implementation needs to be added here
-  }
+  suspend fun readPhysicalContactUnoccupiedToOccupiedThresholdAttribute(): UByte? {
+    val ATTRIBUTE_ID_PHYSICALCONTACTUNOCCUPIEDTOOCCUPIEDTHRESHOLD: UInt = 50u
 
-  suspend fun readPhysicalContactUnoccupiedToOccupiedThresholdAttribute(): UByte {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_PHYSICALCONTACTUNOCCUPIEDTOOCCUPIEDTHRESHOLD
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_PHYSICALCONTACTUNOCCUPIEDTOOCCUPIEDTHRESHOLD
+        }
+
+      requireNotNull(attributeData) {
+        "Physicalcontactunoccupiedtooccupiedthreshold attribute not found in response"
+      }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: UByte? =
+        if (tlvReader.isNextTag(AnonymousTag)) {
+          tlvReader.getUByte(AnonymousTag)
+        } else {
+          null
+        }
+
+      return decodedValue
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun writePhysicalContactUnoccupiedToOccupiedThresholdAttribute(
     value: UByte,
     timedWriteTimeoutMs: Int? = null
   ) {
-    if (timedWriteTimeoutMs != null) {
-      // Do the action with timedWriteTimeoutMs
-    } else {
-      // Do the action without timedWriteTimeoutMs
+    val ATTRIBUTE_ID_PHYSICALCONTACTUNOCCUPIEDTOOCCUPIEDTHRESHOLD: UInt = 50u
+    val timeoutMs: Duration =
+      timedWriteTimeoutMs?.let { Duration.ofMillis(it.toLong()) } ?: Duration.ZERO
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(
+                  endpointId,
+                  clusterId = CLUSTER_ID,
+                  attributeId = ATTRIBUTE_ID_PHYSICALCONTACTUNOCCUPIEDTOOCCUPIEDTHRESHOLD
+                ),
+              tlvPayload = tlvWriter.getEncoded()
+            )
+          ),
+        timedRequest = timeoutMs
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.INFO, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
     }
   }
 
-  suspend fun subscribePhysicalContactUnoccupiedToOccupiedThresholdAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): UByte {
-    // Implementation needs to be added here
-  }
-
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID_GENERATEDCOMMANDLIST: UInt = 65528u
 
-  suspend fun subscribeGeneratedCommandListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): GeneratedCommandListAttribute {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_GENERATEDCOMMANDLIST
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_GENERATEDCOMMANDLIST
+        }
+
+      requireNotNull(attributeData) { "Generatedcommandlist attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: List<UInt> =
+        buildList<UInt> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getUInt(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+
+      return GeneratedCommandListAttribute(decodedValue)
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID_ACCEPTEDCOMMANDLIST: UInt = 65529u
 
-  suspend fun subscribeAcceptedCommandListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): AcceptedCommandListAttribute {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_ACCEPTEDCOMMANDLIST
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_ACCEPTEDCOMMANDLIST
+        }
+
+      requireNotNull(attributeData) { "Acceptedcommandlist attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: List<UInt> =
+        buildList<UInt> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getUInt(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+
+      return AcceptedCommandListAttribute(decodedValue)
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun readEventListAttribute(): EventListAttribute {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID_EVENTLIST: UInt = 65530u
 
-  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_EVENTLIST
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_EVENTLIST
+        }
+
+      requireNotNull(attributeData) { "Eventlist attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: List<UInt> =
+        buildList<UInt> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getUInt(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+
+      return EventListAttribute(decodedValue)
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun readAttributeListAttribute(): AttributeListAttribute {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID_ATTRIBUTELIST: UInt = 65531u
 
-  suspend fun subscribeAttributeListAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): AttributeListAttribute {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_ATTRIBUTELIST
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_ATTRIBUTELIST
+        }
+
+      requireNotNull(attributeData) { "Attributelist attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: List<UInt> =
+        buildList<UInt> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getUInt(AnonymousTag))
+          }
+          tlvReader.exitContainer()
+        }
+
+      return AttributeListAttribute(decodedValue)
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun readFeatureMapAttribute(): UInt {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID_FEATUREMAP: UInt = 65532u
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_FEATUREMAP
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_FEATUREMAP
+        }
+
+      requireNotNull(attributeData) { "Featuremap attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: UInt = tlvReader.getUInt(AnonymousTag)
+
+      return decodedValue
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   suspend fun readClusterRevisionAttribute(): UShort {
-    // Implementation needs to be added here
-  }
+    val ATTRIBUTE_ID_CLUSTERREVISION: UInt = 65533u
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
-    // Implementation needs to be added here
+    val attributePath =
+      AttributePath(
+        endpointId = endpointId,
+        clusterId = CLUSTER_ID,
+        attributeId = ATTRIBUTE_ID_CLUSTERREVISION
+      )
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isNotEmpty()) {
+      logger.log(Level.INFO, "Read command succeeded")
+
+      val attributeData =
+        response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+          it.path.attributeId == ATTRIBUTE_ID_CLUSTERREVISION
+        }
+
+      requireNotNull(attributeData) { "Clusterrevision attribute not found in response" }
+
+      // Decode the TLV data into the appropriate type
+      val tlvReader = TlvReader(attributeData.data)
+      val decodedValue: UShort = tlvReader.getUShort(AnonymousTag)
+
+      return decodedValue
+    } else {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
   }
 
   companion object {
+    private val logger = Logger.getLogger(OccupancySensingCluster::class.java.name)
     const val CLUSTER_ID: UInt = 1030u
   }
 }

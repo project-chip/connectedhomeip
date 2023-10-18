@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class EnergyEvseClusterEVNotDetectedEvent(
   val sessionID: UInt,
-  val state: UInt,
+  val state: UByte,
   val sessionDuration: UInt,
   val sessionEnergyCharged: Long,
   val sessionEnergyDischarged: Optional<Long>
@@ -65,7 +65,7 @@ class EnergyEvseClusterEVNotDetectedEvent(
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): EnergyEvseClusterEVNotDetectedEvent {
       tlvReader.enterStructure(tlvTag)
       val sessionID = tlvReader.getUInt(ContextSpecificTag(TAG_SESSION_I_D))
-      val state = tlvReader.getUInt(ContextSpecificTag(TAG_STATE))
+      val state = tlvReader.getUByte(ContextSpecificTag(TAG_STATE))
       val sessionDuration = tlvReader.getUInt(ContextSpecificTag(TAG_SESSION_DURATION))
       val sessionEnergyCharged = tlvReader.getLong(ContextSpecificTag(TAG_SESSION_ENERGY_CHARGED))
       val sessionEnergyDischarged =

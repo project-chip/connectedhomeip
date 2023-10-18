@@ -22,7 +22,7 @@ import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class DemandResponseLoadControlClusterHeatingSourceControlStruct(val heatingSource: UInt) {
+class DemandResponseLoadControlClusterHeatingSourceControlStruct(val heatingSource: UByte) {
   override fun toString(): String = buildString {
     append("DemandResponseLoadControlClusterHeatingSourceControlStruct {\n")
     append("\theatingSource : $heatingSource\n")
@@ -45,7 +45,7 @@ class DemandResponseLoadControlClusterHeatingSourceControlStruct(val heatingSour
       tlvReader: TlvReader
     ): DemandResponseLoadControlClusterHeatingSourceControlStruct {
       tlvReader.enterStructure(tlvTag)
-      val heatingSource = tlvReader.getUInt(ContextSpecificTag(TAG_HEATING_SOURCE))
+      val heatingSource = tlvReader.getUByte(ContextSpecificTag(TAG_HEATING_SOURCE))
 
       tlvReader.exitContainer()
 

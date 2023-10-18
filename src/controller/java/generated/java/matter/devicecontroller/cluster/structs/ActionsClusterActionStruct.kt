@@ -25,10 +25,10 @@ import matter.tlv.TlvWriter
 class ActionsClusterActionStruct(
   val actionID: UShort,
   val name: String,
-  val type: UInt,
+  val type: UByte,
   val endpointListID: UShort,
-  val supportedCommands: UInt,
-  val state: UInt
+  val supportedCommands: UShort,
+  val state: UByte
 ) {
   override fun toString(): String = buildString {
     append("ActionsClusterActionStruct {\n")
@@ -66,10 +66,10 @@ class ActionsClusterActionStruct(
       tlvReader.enterStructure(tlvTag)
       val actionID = tlvReader.getUShort(ContextSpecificTag(TAG_ACTION_I_D))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
-      val type = tlvReader.getUInt(ContextSpecificTag(TAG_TYPE))
+      val type = tlvReader.getUByte(ContextSpecificTag(TAG_TYPE))
       val endpointListID = tlvReader.getUShort(ContextSpecificTag(TAG_ENDPOINT_LIST_I_D))
-      val supportedCommands = tlvReader.getUInt(ContextSpecificTag(TAG_SUPPORTED_COMMANDS))
-      val state = tlvReader.getUInt(ContextSpecificTag(TAG_STATE))
+      val supportedCommands = tlvReader.getUShort(ContextSpecificTag(TAG_SUPPORTED_COMMANDS))
+      val state = tlvReader.getUByte(ContextSpecificTag(TAG_STATE))
 
       tlvReader.exitContainer()
 
