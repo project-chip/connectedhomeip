@@ -62,7 +62,8 @@ void AirPurifierManager::Init()
         }
     }
 
-    // Set up some sane initial values
+    // Set up some sane initial values for temperature and humidity - note these are fixed values for testing purposes only
+    // TODO: Make these values settable via linux pipe
     mTemperatureSensorManager.OnTemperatureChangeHandler(2000);
     mHumiditySensorManager.OnHumidityChangeHandler(5000);
 }
@@ -221,6 +222,24 @@ void AirPurifierManager::SpeedSettingWriteCallback(uint8_t aNewSpeedSetting)
             ChipLogError(NotSpecified, "AirPurifierManager::SpeedSettingWriteCallback: failed to set SpeedCurrent attribute: %d",
                          status);
         }
+
+        // Determine if the speed change should also change the fan mode
+        if (speedCurrent == 0)
+        {
+            FanControl::Attributes::FanMode::Set(mEndpointId, FanControl::FanModeEnum::kOff);
+        }
+        else if (speedCurrent <= FAN_MODE_LOW_UPPER_BOUND)
+        {
+            FanControl::Attributes::FanMode::Set(mEndpointId, FanControl::FanModeEnum::kLow);
+        }
+        else if (speedCurrent <= FAN_MODE_MEDIUM_UPPER_BOUND)
+        {
+            FanControl::Attributes::FanMode::Set(mEndpointId, FanControl::FanModeEnum::kMedium);
+        }
+        else if (speedCurrent <= FAN_MODE_HIGH_UPPER_BOUND)
+        {
+            FanControl::Attributes::FanMode::Set(mEndpointId, FanControl::FanModeEnum::kHigh);
+        }
     }
 }
 
@@ -230,43 +249,35 @@ void AirPurifierManager::FanModeWriteCallback(FanControl::FanModeEnum aNewFanMod
     switch (aNewFanMode)
     {
     case FanControl::FanModeEnum::kOff: {
-        DataModel::Nullable<chip::Percent> percentSetting(0);
-        EmberAfStatus status = FanControl::Attributes::PercentSetting::Set(mEndpointId, percentSetting);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (speedCurrent != 0)
         {
-            ChipLogError(NotSpecified, "AirPurifierManager::FanModeWriteCallback: failed to set PercentSetting attribute: %d",
-                         status);
+            DataModel::Nullable<uint8_t> speedSetting(0);
+            SetSpeedSetting(speedSetting);
         }
         break;
     }
     case FanControl::FanModeEnum::kLow: {
-        DataModel::Nullable<chip::Percent> percentSetting(30);
-        EmberAfStatus status = FanControl::Attributes::PercentSetting::Set(mEndpointId, percentSetting);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (speedCurrent < FAN_MODE_LOW_LOWER_BOUND || speedCurrent > FAN_MODE_LOW_UPPER_BOUND)
         {
-            ChipLogError(NotSpecified, "AirPurifierManager::FanModeWriteCallback: failed to set PercentSetting attribute: %d",
-                         status);
+            DataModel::Nullable<uint8_t> speedSetting(FAN_MODE_LOW_LOWER_BOUND);
+            SetSpeedSetting(speedSetting);
         }
         break;
     }
     case FanControl::FanModeEnum::kMedium: {
-        DataModel::Nullable<chip::Percent> percentSetting(60);
-        EmberAfStatus status = FanControl::Attributes::PercentSetting::Set(mEndpointId, percentSetting);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (speedCurrent < FAN_MODE_MEDIUM_LOWER_BOUND || speedCurrent > FAN_MODE_MEDIUM_UPPER_BOUND)
         {
-            ChipLogError(NotSpecified, "AirPurifierManager::FanModeWriteCallback: failed to set PercentSetting attribute: %d",
-                         status);
+            DataModel::Nullable<uint8_t> speedSetting(FAN_MODE_MEDIUM_LOWER_BOUND);
+            SetSpeedSetting(speedSetting);
         }
         break;
     }
     case FanControl::FanModeEnum::kOn:
     case FanControl::FanModeEnum::kHigh: {
-        DataModel::Nullable<chip::Percent> percentSetting(100);
-        EmberAfStatus status = FanControl::Attributes::PercentSetting::Set(mEndpointId, percentSetting);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        if (speedCurrent < FAN_MODE_HIGH_LOWER_BOUND || speedCurrent > FAN_MODE_HIGH_UPPER_BOUND)
         {
-            ChipLogError(NotSpecified, "AirPurifierManager::FanModeWriteCallback: failed to set PercentSetting attribute: %d",
-                         status);
+            DataModel::Nullable<uint8_t> speedSetting(FAN_MODE_HIGH_LOWER_BOUND);
+            SetSpeedSetting(speedSetting);
         }
         break;
     }
@@ -279,5 +290,23 @@ void AirPurifierManager::FanModeWriteCallback(FanControl::FanModeEnum aNewFanMod
         ChipLogProgress(NotSpecified, "AirPurifierManager::FanModeWriteCallback: Unknown");
         break;
     }
+    }
+}
+
+void AirPurifierManager::SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedSetting)
+{
+    if (aNewSpeedSetting.IsNull())
+    {
+        ChipLogError(NotSpecified, "AirPurifierManager::SetSpeedSetting: invalid value");
+        return;
+    }
+
+    if (aNewSpeedSetting.Value() != speedCurrent)
+    {
+        EmberAfStatus status = FanControl::Attributes::SpeedSetting::Set(mEndpointId, aNewSpeedSetting);
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            ChipLogError(NotSpecified, "AirPurifierManager::SetSpeedSetting: failed to set SpeedSetting attribute: %d", status);
+        }
     }
 }

@@ -83,8 +83,6 @@ private:
         totalVolatileOrganicCompoundsConcentrationMeasurementInstance;
     ConcentrationMeasurement::Instance<true, true, true, true, true, true> ozoneConcentrationMeasurementInstance;
     ConcentrationMeasurement::Instance<true, true, true, true, true, true> formaldehydeConcentrationMeasurementInstance;
-
-    // TODO: Add public OnChange handlers for the AQ and Concentrations - maybe not required?
 };
 
 } // namespace Clusters

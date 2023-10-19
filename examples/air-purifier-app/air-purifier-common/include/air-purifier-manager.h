@@ -113,6 +113,14 @@ private:
     TemperatureSensorManager mTemperatureSensorManager;
     RelativeHumiditySensorManager mHumiditySensorManager;
 
+    // Fan Mode Limits
+    static constexpr int FAN_MODE_LOW_LOWER_BOUND    = 1;
+    static constexpr int FAN_MODE_LOW_UPPER_BOUND    = 3;
+    static constexpr int FAN_MODE_MEDIUM_LOWER_BOUND = 4;
+    static constexpr int FAN_MODE_MEDIUM_UPPER_BOUND = 7;
+    static constexpr int FAN_MODE_HIGH_LOWER_BOUND   = 8;
+    static constexpr int FAN_MODE_HIGH_UPPER_BOUND   = 10;
+
     /**
      * @brief Construct a new Air Purifier Manager object - this class acts as a singleton device manager for the air purifier
      * @param[in] aEndpointId    Endpoint that the air purifier is on
@@ -141,9 +149,12 @@ private:
      * @param[in] value          Pointer to the new value
      */
     void HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
+
     void PercentSettingWriteCallback(uint8_t aNewPercentSetting);
     void SpeedSettingWriteCallback(uint8_t aNewSpeedSetting);
     void FanModeWriteCallback(FanControl::FanModeEnum aNewFanMode);
+
+    void SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedSetting);
 };
 
 } // namespace Clusters
