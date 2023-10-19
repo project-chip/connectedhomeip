@@ -27,6 +27,7 @@
 #define AIR_QUALITY_SENSOR_ENDPOINT 2
 #define TEMPERATURE_SENSOR_ENDPOINT 3
 #define RELATIVE_HUMIDITY_SENSOR_ENDPOINT 4
+// TODO: Add support for the thermostat endpoint in future PR.
 
 using namespace chip;
 using namespace chip::app;
