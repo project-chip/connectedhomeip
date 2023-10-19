@@ -16,9 +16,9 @@ import os
 from typing import List
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.matter_idl_types import Cluster, ClusterSide, Idl, StructTag, FieldQuality, StructQuality, EventPriority, EventQuality, Event, AccessPrivilege
+from matter_idl.matter_idl_types import Cluster, ClusterSide, Idl, StructTag, FieldQuality, StructQuality, EventPriority, EventQuality, Event, AccessPrivilege, Struct, AttributeQuality
 
-def human_text_string(value: ClusterSide|StructTag|StructQuality|EventPriority|EventQuality|AccessPrivilege) -> str:
+def human_text_string(value: ClusterSide|StructTag|StructQuality|EventPriority|EventQuality|AccessPrivilege|AttributeQuality) -> str:
     if type(value) is ClusterSide:
         if value == ClusterSide.CLIENT:
             return "client"
@@ -64,6 +64,15 @@ def human_text_string(value: ClusterSide|StructTag|StructQuality|EventPriority|E
             return "manage"
         if value == AccessPrivilege.ADMINISTER:
             return "administer"
+    elif type(value) is AttributeQuality:
+        result = ""
+        if AttributeQuality.TIMED_WRITE in value:
+            result += "timedwrite "
+        if AttributeQuality.WRITABLE not in value:
+            result += "readonly "
+        if AttributeQuality.NOSUBSCRIBE in value:
+            result += "nosubscribe "
+        return result
 
     # wrong value in general
     return "Unknown/unsupported: %r" % value
@@ -81,6 +90,9 @@ def event_access_string(e: Event) -> str:
        return ""
    return f"access({result}) "
 
+def is_untagged_struct(s: Struct):
+    return s.tag is None
+
 
 class IdlGenerator(CodeGenerator):
     """
@@ -92,6 +104,8 @@ class IdlGenerator(CodeGenerator):
 
         self.jinja_env.filters['idltxt'] = human_text_string
         self.jinja_env.filters['event_access'] = event_access_string
+
+        self.jinja_env.tests['is_untagged_struct'] = is_untagged_struct
 
     def internal_render_all(self):
         """

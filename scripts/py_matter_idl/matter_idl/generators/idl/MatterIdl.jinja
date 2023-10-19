@@ -1,9 +1,34 @@
-{% macro render_field(field) -%}
+{% macro render_field(field) -%}{#
+ Macro for the output of a single field entry such as:
+
+ int16u identifyTime = 0;
+ optional int16u transitionTime = 3;
+ optional nullable int16u transitionTime = 2;
+ optional ExtensionFieldSet extensionFieldSets[] = 5;
+#}
+
 {%- if field.qualities %}{{field.qualities | idltxt}} {% endif -%}
 {{field.data_type.name}} {{field.name}}
 {%- if field.is_list %}[]{% endif -%}
 {##} = {{field.code}};
-{%- endmacro %}
+{%- endmacro -%}
+
+{% macro render_struct(s) -%}{#
+ Macro for the output of a complete struct
+#}
+  {%- if s.tag %}{{s.tag | idltxt}} {% endif -%}
+  {% if s.qualities %}{{s.qualities | idltxt}} {% endif -%}
+  struct {{s.name}} {##}
+  {%- if s.code %}= {{s.code}} {% endif -%}
+  {
+    {%- for field in s.fields %}
+    {{render_field(field)}}
+    {%- endfor %}
+  }
+
+{%- endmacro -%}
+
+
 // This IDL was auto-generated from a parsed data structure
 
 {%  for cluster in idl.clusters -%}
@@ -24,18 +49,10 @@
     {%- endfor %}
   }
   {%- endfor %}
-  {%- for s in cluster.structs %}
+  {% for s in cluster.structs | rejectattr("tag") -%}
+  {{render_struct(s)}}
 
-  {% if s.tag %}{{s.tag | idltxt}} {% endif -%}
-  {% if s.qualities %}{{s.qualities | idltxt}} {% endif -%}
-  struct {{s.name}} {##}
-  {%- if s.code %}= {{s.code}} {% endif -%}
-  {
-    {%- for field in s.fields %}
-    {{render_field(field)}}
-    {%- endfor %}
-  }
-  {%- endfor %}
+  {% endfor %}
   {%- for e in cluster.events %}
 
   {% if e.qualities %}{{e.qualities | idltxt}} {% endif -%}
@@ -45,11 +62,18 @@
     {%- endfor %}
   }
   {%- endfor %}
+  {%- for a in cluster.attributes -%}
+    {{a.qualities | idltxt}}attribute {{render_field(a.definition)}}
+  {%- if loop.last %}
 
+  {% endif %}
+  {% endfor %}
+  {%- for s in cluster.structs | selectattr("tag") -%}
+  {{render_struct(s)}}
+
+  {% endfor %}
 
   // FIXME:
-  //  - events
-  //  - attributes
   //  - commands
 }
 
