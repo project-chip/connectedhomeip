@@ -18,20 +18,20 @@ limitations under the License.
   <domain name="CHIP"/>
 
   <bitmap name="Feature" type="bitmap32">
-    <cluster code="0xXXXX"/>
+    <cluster code="0x0081"/>
     <field name="TimeSync" mask="0x1"/>
     <field name="Level" mask="0x2"/>
   </bitmap>
 
   <bitmap name="ValveFaultBitmap" type="bitmap16">
-    <cluster code="0xXXXX"/>
+    <cluster code="0x0081"/>
     <field name="GeneralFault" mask="0x1"/>
     <field name="Blocked" mask="0x2"/>
     <field name="Leak" mask="0x4"/>
   </bitmap>
 
   <enum name="ValveStateEnum" type="enum8">
-    <cluster code="0xXXXX"/>
+    <cluster code="0x0081"/>
     <item name="Open" value="0x0"/>
     <item name="Closed" value="0x1"/>
   </enum>
@@ -39,7 +39,7 @@ limitations under the License.
   <cluster>
     <name>Valve Configuration and Control</name>
     <domain>HVAC</domain>
-    <code>0xXXXX</code>
+    <code>0x0081</code>
     <define>VALVE_CONFIGURATION_AND_CONTROL_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
