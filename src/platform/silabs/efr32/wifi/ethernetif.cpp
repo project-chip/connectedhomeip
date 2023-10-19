@@ -359,7 +359,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
 #endif
     struct pbuf * q;
     uint16_t framelength = 0;
-    uint16_t datalength = 0;
+    uint16_t datalength  = 0;
 #ifdef WIFI_DEBUG_ENABLED
     SILABS_LOG("LWIP : low_level_output");
 #endif
@@ -391,7 +391,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
                                               SL_WIFI_ALLOCATE_COMMAND_BUFFER_WAIT_TIME_MS);
     VERIFY_STATUS_AND_RETURN(status);
     if (packet == NULL)
-#else // RS9116
+#else  // RS9116
     packet = wfx_rsi_alloc_pkt();
     if (!packet)
 #endif // SIWX_917
@@ -434,7 +434,7 @@ static err_t low_level_output(struct netif * netif, struct pbuf * p)
     packet->command = RSI_SEND_RAW_DATA;
     if (sl_si91x_driver_send_data_packet(SI91X_WLAN_CMD_QUEUE, buffer, 1000))
 #else
-     /* forward the generated packet to RSI to
+    /* forward the generated packet to RSI to
      * send the data over wifi network
      */
     if (wfx_rsi_send_data(packet, datalength))
