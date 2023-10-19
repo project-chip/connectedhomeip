@@ -69,7 +69,8 @@ transition to mode 2", set the `RvcRunMode` to 0.
 
 #### TC 3.2
 
-This is not applicable because this RVC device does not support the `StartUpMode` attribute.
+This is not applicable because this RVC device does not support the
+`StartUpMode` attribute.
 
 ### RVC Run Mode cluster
 
