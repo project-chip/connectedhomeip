@@ -155,6 +155,25 @@ static void CheckOtaEntry()
         K32W_LOG("Unable to access OTA entries structure");
     }
 }
+
+static void LogSsblVersion()
+{
+    typedef psector_page_state_t (*psector_Init_t)(psector_partition_id_t part_index, psector_page_data_t *page);
+    psector_Init_t psector_Init = (psector_Init_t)((void*)((0x03004e94) | 1));
+    extern uint32_t __MATTER_SSBL_VERSION_START[];
+
+    psector_page_data_t psect;
+    psector_page_state_t psect_state = psector_Init(PSECTOR_PAGE0_PART, &psect);
+
+    if (psect_state < PAGE_STATE_DEGRADED)
+    {
+        K32W_LOG("Something wrong with PSECT. SSBL version not retrieved.");
+        return;
+    }
+
+    uint32_t ssblVersionOffset = psect.page0_v3.SelectedImageAddress + (uint32_t)__MATTER_SSBL_VERSION_START;
+    K32W_LOG("Current SSBL Version: %ld. Found at address 0x%lx", *((uint32_t*) ssblVersionOffset), ssblVersionOffset);
+}
 #endif
 
 CHIP_ERROR AppTask::Init()
@@ -240,6 +259,9 @@ CHIP_ERROR AppTask::Init()
 
     K32W_LOG("Current Software Version: %s, %" PRIu32, currentSoftwareVer, currentVersion);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    LogSsblVersion();
+#endif
     return err;
 }
 
