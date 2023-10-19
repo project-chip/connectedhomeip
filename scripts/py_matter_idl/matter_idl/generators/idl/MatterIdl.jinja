@@ -83,12 +83,16 @@
   {% if loop.first %}
 
   {% endif %}
-
   {{render_struct(s)}}
+  {%- if not loop.last %}
+
+
+  {% endif %}
   {% endfor %}
 
   {%- for c in cluster.commands %}
   {% if loop.first %}
+
 
   {% endif %}
   {{c.qualities | idltxt}}command {{c | command_access}}{{c.name}}({{c.input_param}}): {{c.output_param}} = {{c.code}};
