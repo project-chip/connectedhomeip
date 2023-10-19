@@ -128,7 +128,7 @@ develop `XT-ZB6-DevKit` and `BL706DK` bl706 board, and `BL704LDK` BL704L board .
 -   `-thread`, to specify that connectivity Thread is enabled for Matter
     application.
 -   `-mot`, to specify to use openthread stack under `third_party/openthread/repo`
-    - Without `-mot` specified, Matter Thread will use openthread stack under Bouffalo Lab SDK
+    - Without `-mot` specified, Matter Thread will use openthread stack under `Bouffalo Lab` SDK
 -   `-fp`, to specify to enable frame pointer feature to print call stack when
     hit an exception for debug purpose.
 
