@@ -64,7 +64,7 @@ LockGuard::~LockGuard()
     }
 }
 
-int initHeap()
+int InitSysHeapMalloc()
 {
     sys_heap_init(&sHeap, sHeapMemory, sizeof(sHeapMemory));
     return 0;
@@ -74,7 +74,7 @@ int initHeap()
 
 // Initialize the heap in the POST_KERNEL phase to make sure that it is ready even before
 // C++ static constructors are called (which happens prior to the APPLICATION initialization phase).
-SYS_INIT(initHeap, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);
+SYS_INIT(InitSysHeapMalloc, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT);
 
 namespace chip {
 namespace DeviceLayer {
