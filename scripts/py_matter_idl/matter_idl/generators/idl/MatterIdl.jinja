@@ -49,7 +49,7 @@
 
   bitmap {{bitmap.name}} : {{ bitmap.base_type}} {
     {% for entry in bitmap.entries %}
-    {{entry.name}} = {{entry.code}};
+    {{entry.name}} = 0x{{"%X" | format(entry.code)}};
     {% endfor %}
   }
   {% endfor %}
@@ -78,7 +78,7 @@
   {% endfor %}
 
   {%- for a in cluster.attributes %}
-  {%- if loop.first %}
+  {% if loop.first %}
 
   {% endif %}
   {{a.qualities | idltxt}}attribute {{a | attribute_access}}{{render_field(a.definition)}}
