@@ -136,7 +136,7 @@ limitations under the License.
         <field mask="0x4000000000000000" name="MaskVal4" />
     </bitmap>
     
-  <cluster>
+  <cluster apiMaturity="internal">
     <domain>CHIP</domain>
     <name>Unit Testing</name>
     <code>0xFFF1FC05</code>

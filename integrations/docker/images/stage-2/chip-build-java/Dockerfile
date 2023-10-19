@@ -2,6 +2,14 @@ ARG VERSION=1
 FROM ghcr.io/project-chip/chip-build:${VERSION}
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
+# Ensure some java is installed
+RUN set -x \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
+    openjdk-8-jdk \
+    && rm -rf /var/lib/apt/lists/ \
+    && : # last line
+
 # Download and install kotlin compiler
 RUN set -x \
     && cd /usr/lib \

@@ -22,11 +22,11 @@ import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCal
 import chip.devicecontroller.WriteAttributesCallback
 import chip.devicecontroller.model.AttributeWriteRequest
 import chip.devicecontroller.model.ChipAttributePath
-import chip.tlv.AnonymousTag
-import chip.tlv.TlvWriter
 import com.matter.controller.commands.common.CredentialsIssuer
 import java.util.logging.Level
 import java.util.logging.Logger
+import matter.tlv.AnonymousTag
+import matter.tlv.TlvWriter
 
 class PairOnNetworkLongImWriteCommand(
   controller: ChipDeviceController,

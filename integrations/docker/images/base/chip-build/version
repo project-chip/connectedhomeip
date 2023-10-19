@@ -1,1 +1,1 @@
-20 : [Chip-build] Decrease some image sizes
+21 : [chip-build-java] Ensure java is actually available in the docker image

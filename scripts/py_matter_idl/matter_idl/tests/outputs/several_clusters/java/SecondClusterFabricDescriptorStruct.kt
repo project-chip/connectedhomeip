@@ -17,12 +17,12 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.AnonymousTag
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvParsingException
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.AnonymousTag
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvParsingException
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 import java.util.Optional
 

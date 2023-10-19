@@ -21,14 +21,15 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <platform/telink/OTAImageProcessorImpl.h>
-#endif
-
-#if CONFIG_BOOTLOADER_MCUBOOT
-#include <zephyr/dfu/mcuboot.h>
-#endif
 
 using namespace chip;
 using namespace chip::DeviceLayer;
+#endif
+
+#include <zephyr/dfu/mcuboot.h>
+#include <zephyr/logging/log.h>
+
+LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 #ifdef CONFIG_CHIP_OTA_REQUESTOR
 
@@ -59,14 +60,14 @@ void OtaConfirmNewImage()
 {
     if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
     {
-        CHIP_ERROR err = System::MapErrorZephyr(boot_write_img_confirmed());
-        if (CHIP_NO_ERROR == err)
+        int img_confirmation = boot_write_img_confirmed();
+        if (img_confirmation)
         {
-            ChipLogProgress(SoftwareUpdate, "New firmware image confirmed");
+            LOG_ERR("Image not confirmed %d. Will be reverted!", img_confirmation);
         }
         else
         {
-            ChipLogError(SoftwareUpdate, "Failed to confirm firmware image, it will be reverted on the next boot");
+            LOG_INF("Image confirmed");
         }
     }
 }
