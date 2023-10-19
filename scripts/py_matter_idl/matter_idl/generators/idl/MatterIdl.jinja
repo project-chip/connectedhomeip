@@ -33,7 +33,6 @@
 // This IDL was auto-generated from a parsed data structure
 
 {%  for cluster in idl.clusters %}
-
 {% if cluster.description %}/** {{cluster.description}} */
 {% endif %}
 {{cluster.side | idltxt}} cluster {{cluster.name}} = {{cluster.code}} {
@@ -93,6 +92,9 @@
   {% if loop.first %}
 
 
+  {% endif %}
+  {% if c.description %}
+  /** {{c.description}} */
   {% endif %}
   {{c.qualities | idltxt}}command {{c | command_access}}{{c.name}}({{c.input_param}}): {{c.output_param}} = {{c.code}};
   {% endfor %}
