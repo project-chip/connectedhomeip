@@ -22,22 +22,23 @@ Instruments CC32XX family of Wireless MCUs.
 
 ## Introduction
 
-The CC32XX air purifier example application provides a working demonstration of a
-connected air purifier device. This uses the open-source CHIP implementation and
-the Texas Instruments SimpleLink™ Wi-Fi® CC32xx software development kit.
+The CC32XX air purifier example application provides a working demonstration of
+a connected air purifier device. This uses the open-source CHIP implementation
+and the Texas Instruments SimpleLink™ Wi-Fi® CC32xx software development kit.
 
 By default this example targets the [CC3235SF_LAUNCHXL][cc3235sf_launchxl]
 LaunchPad, but the example application is enabled to build on the whole `CC32XX`
 family of MCUs.
 
-The air purifier example is intended to serve both as a means to explore the workings of
-CHIP, as well as a template for creating real products based on the Texas
-Instruments devices.
+The air purifier example is intended to serve both as a means to explore the
+workings of CHIP, as well as a template for creating real products based on the
+Texas Instruments devices.
 
 ## Device UI
 
-The left button (`BTN-1`) is used to enable provisioning (provisioning is enabled as "oneshot" by default).
-The right button (`BTN-2`) long press is used to reset the device.
+The left button (`BTN-1`) is used to enable provisioning (provisioning is
+enabled as "oneshot" by default). The right button (`BTN-2`) long press is used
+to reset the device.
 
 ## Building
 
