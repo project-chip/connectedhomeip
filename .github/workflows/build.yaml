@@ -332,6 +332,39 @@ jobs:
                   pip3 install -r src/setup_payload/python/requirements.txt
                   python3 src/setup_payload/tests/run_python_setup_payload_gen_test.py out/chip-tool
 
+    build_linux_python_lighting_device:
+        name: Build on Linux (python lighting-app)
+
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+
+        container:
+            image: ghcr.io/project-chip/chip-build:21
+            volumes:
+                - "/tmp/log_output:/tmp/test_logs"
+            options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
+                net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+
+        steps:
+            - name: Dump GitHub context
+              env:
+                  GITHUB_CONTEXT: ${{ toJSON(github) }}
+              run: echo "$GITHUB_CONTEXT"
+            - name: Dump Concurrency context
+              env:
+                  CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+              run: echo "$CONCURRENCY_CONTEXT"
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: linux
+
+            - name: Setup Build
+              run: |
+                  scripts/build_python_device.sh --chip_detail_logging true
+
     build_darwin:
         name: Build on Darwin (clang, python_lib, simulated)
         runs-on: macos-latest
