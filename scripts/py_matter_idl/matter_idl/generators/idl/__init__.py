@@ -155,6 +155,9 @@ def render_default(value: str | int | bool) -> str:
     Generally quotes strings and handles bools
     """
     if type(value) is str:
+        # TODO: technically this should support escaping for quotes
+        #       however currently we never needed this. Escaping can be
+        #       added once we use this info
         return f'"{value}"'
     elif type(value) is bool:
         if value:
