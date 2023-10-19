@@ -22,7 +22,7 @@ from matter_idl.matter_idl_types import (Attribute, AttributeQuality, Bitmap, Cl
 from .base import BaseHandler, HandledDepth
 from .context import Context
 from .parsing import (ApplyConstraint, AttributesToAttribute, AttributesToBitFieldConstantEntry, AttributesToCommand,
-                      AttributesToEvent, AttributesToField, NormalizeName, ParseInt, StringToAccessPrivilege)
+                      AttributesToEvent, AttributesToField, NormalizeDataType, NormalizeName, ParseInt, StringToAccessPrivilege)
 
 LOGGER = logging.getLogger('data-model-xml-parser')
 
@@ -113,7 +113,7 @@ class FieldHandler(BaseHandler):
             assert "type" in attrs
 
             self._field.is_list = True
-            self._field.data_type.name = attrs["type"]
+            self._field.data_type.name = NormalizeDataType(attrs["type"])
 
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         else:
@@ -433,6 +433,7 @@ class ClusterHandler(BaseHandler):
             parse_meta=context.GetCurrentLocationMeta()
         )
 
+    def EndProcessing(self):
         # Global things MUST be available everywhere
         to_add = [
             # type, code, name, is_list
@@ -443,11 +444,10 @@ class ClusterHandler(BaseHandler):
             ('bitmap32', 65532, 'featureMap', False),
             ('int16u', 65533, 'clusterRevision', False),
         ]
+
         for data_type, code, name, is_list in to_add:
             self._cluster.attributes.append(Attribute(definition=Field(
                 data_type=DataType(name=data_type), code=code, name=name, is_list=is_list)))
-
-    def EndProcessing(self):
         self._idl.clusters.append(self._cluster)
 
     def GetNextProcessor(self, name: str, attrs):

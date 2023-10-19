@@ -54,6 +54,31 @@ def ParseOptionalInt(value: str) -> Optional[int]:
     return None
 
 
+_TYPE_REMAP = {
+    # unsigned
+    "uint8": "int8u",
+    "uint16": "int16u",
+    "uint24": "int24u",
+    "uint32": "int32u",
+    "uint48": "int48u",
+    "uint52": "int52u",
+    "uint64": "int54u",
+    # signed
+    "sint8": "int8s",
+    "sint16": "int16s",
+    "sint24": "int24s",
+    "sint32": "int32s",
+    "sint48": "int48s",
+    "sint52": "int52s",
+    "sint64": "int54s",
+}
+
+
+def NormalizeDataType(t: str) -> str:
+    """Convert data model xml types into matter idl types."""
+    return _TYPE_REMAP.get(t, t.replace("-", "_"))
+
+
 def NormalizeName(name: str) -> str:
     """Convert a free form name from the spec into a programming language
        name that is appropriate for matter IDL.
@@ -92,7 +117,7 @@ def AttributesToField(attrs) -> Field:
     return Field(
         name=FieldName(attrs["name"]),
         code=ParseInt(attrs["id"]),
-        data_type=DataType(name=attrs["type"])
+        data_type=DataType(name=NormalizeDataType(attrs["type"]))
     )
 
 
