@@ -196,6 +196,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)unitTestReportEndForDevice:(MTRDevice *)device;
 - (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device;
 - (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device;
+- (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device;
 @end
 #endif
 
@@ -233,8 +234,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #pragma mark Subscription and delegate handling
 
 // subscription intervals are in seconds
-#define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN (2)
-#define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX (60)
+#define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN (1 * 60) // 1 minute (for now)
+#define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX (60 * 60) // 60 minutes
 
 - (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue
 {
@@ -590,6 +591,17 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // assume lock is held
 - (void)_setupSubscription
 {
+#ifdef DEBUG
+    id delegate = _weakDelegate.strongObject;
+    Optional<System::Clock::Seconds32> maxIntervalOverride;
+    if (delegate) {
+        if ([delegate respondsToSelector:@selector(unitTestMaxIntervalOverrideForSubscription:)]) {
+            NSNumber * delegateMin = [delegate unitTestMaxIntervalOverrideForSubscription:self];
+            maxIntervalOverride.Emplace(delegateMin.unsignedIntValue);
+        }
+    }
+#endif
+
     os_unfair_lock_assert_owner(&self->_lock);
 
     // for now just subscribe once
@@ -623,12 +635,21 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                    // Select a max interval based on the device's claimed idle sleep interval.
                    auto idleSleepInterval = std::chrono::duration_cast<System::Clock::Seconds32>(
                        session.Value()->GetRemoteMRPConfig().mIdleRetransTimeout);
-                   if (idleSleepInterval.count() < MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN) {
-                       idleSleepInterval = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN);
+
+                   auto maxIntervalCeilingMin = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN);
+                   if (idleSleepInterval < maxIntervalCeilingMin) {
+                       idleSleepInterval = maxIntervalCeilingMin;
                    }
-                   if (idleSleepInterval.count() > MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX) {
-                       idleSleepInterval = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX);
+
+                   auto maxIntervalCeilingMax = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX);
+                   if (idleSleepInterval > maxIntervalCeilingMax) {
+                       idleSleepInterval = maxIntervalCeilingMax;
                    }
+#ifdef DEBUG
+                   if (maxIntervalOverride.HasValue()) {
+                       idleSleepInterval = maxIntervalOverride.Value();
+                   }
+#endif
                    readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>(idleSleepInterval.count());
 
                    readParams.mpAttributePathParamsList = attributePath.get();

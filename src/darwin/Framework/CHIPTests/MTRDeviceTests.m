@@ -160,6 +160,12 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
     }
 }
 
+- (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device
+{
+    // Make sure our subscriptions time out in finite time.
+    return @(2); // seconds
+}
+
 @end
 
 @interface MTRDeviceTests : XCTestCase
