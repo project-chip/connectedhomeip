@@ -74,7 +74,9 @@
     {{render_field(field)}}
     {% endfor %}
   }
+  {% if not loop.last %}
 
+  {% endif %}
   {% endfor %}
 
   {%- for a in cluster.attributes %}
@@ -85,19 +87,12 @@
   {% endfor %}
 
   {%- for s in cluster.structs | selectattr("tag") %}
-  {% if loop.first %}
 
-  {% endif %}
   {{render_struct(s)}}
-  {%- if not loop.last %}
-
-
-  {% endif %}
   {% endfor %}
 
   {%- for c in cluster.commands %}
   {% if loop.first %}
-
 
   {% endif %}
   {% if c.description %}
