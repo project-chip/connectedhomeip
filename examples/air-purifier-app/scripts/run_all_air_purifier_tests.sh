@@ -20,54 +20,54 @@ cd ../../../
 
 # air quality
 "$CHIPTOOL_CMD" Test_TC_AIRQUAL_1_1 "$COMMON_ARGS" --endpoint "$AIRQUAL_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_AIRQUAL_2_1 "$COMMON_ARGS" --endpoint "$AIRQUAL_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_AIRQUAL_2_1 "$COMMON_ARGS" --endpoint "$AIRQUAL_ENDPOINT" &&
 
-    # relative humidity
-    "$CHIPTOOL_CMD" Test_TC_RH_1_1 "$COMMON_ARGS" --endpoint "$RH_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_RH_2_1 "$COMMON_ARGS" --endpoint "$RH_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_RH_2_2 "$COMMON_ARGS" --endpoint "$RH_ENDPOINT" &&
+# relative humidity
+"$CHIPTOOL_CMD" Test_TC_RH_1_1 "$COMMON_ARGS" --endpoint "$RH_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_RH_2_1 "$COMMON_ARGS" --endpoint "$RH_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_RH_2_2 "$COMMON_ARGS" --endpoint "$RH_ENDPOINT" &&
 
-    # temperature measurement
-    "$CHIPTOOL_CMD" Test_TC_TMP_1_1 "$COMMON_ARGS" --endpoint "$TEMP_MEAS_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_TMP_2_1 "$COMMON_ARGS" --endpoint "$TEMP_MEAS_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_TMP_2_2 "$COMMON_ARGS" --endpoint "$TEMP_MEAS_ENDPOINT" &&
+# temperature measurement
+"$CHIPTOOL_CMD" Test_TC_TMP_1_1 "$COMMON_ARGS" --endpoint "$TEMP_MEAS_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_TMP_2_1 "$COMMON_ARGS" --endpoint "$TEMP_MEAS_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_TMP_2_2 "$COMMON_ARGS" --endpoint "$TEMP_MEAS_ENDPOINT" &&
 
-    # fan control
-    "$CHIPTOOL_CMD" Test_TC_FAN_1_1 "$COMMON_ARGS" --endpoint "$FAN_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_FAN_2_1 "$COMMON_ARGS" --endpoint "$FAN_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_FAN_2_2 "$COMMON_ARGS" --endpoint "$FAN_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_FAN_2_3 "$COMMON_ARGS" --endpoint "$FAN_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_FAN_2_4 "$COMMON_ARGS" --endpoint "$FAN_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_FAN_2_5 "$COMMON_ARGS" --endpoint "$FAN_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_FAN_3_1 "$COMMON_ARGS" --endpoint "$FAN_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_FAN_3_2 "$COMMON_ARGS" --endpoint "$FAN_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_FAN_3_6 "$COMMON_ARGS" --endpoint "$FAN_ENDPOINT" &&
+# fan control
+"$CHIPTOOL_CMD" Test_TC_FAN_1_1 "$COMMON_ARGS" --endpoint "$FAN_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_FAN_2_1 "$COMMON_ARGS" --endpoint "$FAN_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_FAN_2_2 "$COMMON_ARGS" --endpoint "$FAN_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_FAN_2_3 "$COMMON_ARGS" --endpoint "$FAN_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_FAN_2_4 "$COMMON_ARGS" --endpoint "$FAN_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_FAN_2_5 "$COMMON_ARGS" --endpoint "$FAN_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_FAN_3_1 "$COMMON_ARGS" --endpoint "$FAN_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_FAN_3_2 "$COMMON_ARGS" --endpoint "$FAN_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_FAN_3_6 "$COMMON_ARGS" --endpoint "$FAN_ENDPOINT" &&
 
-    # resource monitoring
-    "$CHIPTOOL_CMD" Test_TC_HEPAFREMON_1_1 "$COMMON_ARGS" --endpoint "$REMON_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_HEPAFREMON_2_1 "$COMMON_ARGS" --endpoint "$REMON_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_ACFREMON_1_1 "$COMMON_ARGS" --endpoint "$REMON_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_ACFREMON_2_1 "$COMMON_ARGS" --endpoint "$REMON_ENDPOINT" &&
+# resource monitoring
+"$CHIPTOOL_CMD" Test_TC_HEPAFREMON_1_1 "$COMMON_ARGS" --endpoint "$REMON_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_HEPAFREMON_2_1 "$COMMON_ARGS" --endpoint "$REMON_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_ACFREMON_1_1 "$COMMON_ARGS" --endpoint "$REMON_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_ACFREMON_2_1 "$COMMON_ARGS" --endpoint "$REMON_ENDPOINT" &&
 
-    # concentration measurement
-    "$CHIPTOOL_CMD" Test_TC_CDOCONC_1_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_CDOCONC_2_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_CMOCONC_1_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_CMOCONC_2_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_NDOCONC_1_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_NDOCONC_2_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_OZCONC_1_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_OZCONC_2_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_PMICONC_1_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_PMICONC_2_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_FLDCONC_1_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_FLDCONC_2_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_PMHCONC_1_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_PMHCONC_2_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_PMKCONC_1_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_PMKCONC_2_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_TVOCCONC_1_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_TVOCCONC_2_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_RNCONC_1_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
-    "$CHIPTOOL_CMD" Test_TC_RNCONC_2_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
-    echo All tests complete
+# concentration measurement
+"$CHIPTOOL_CMD" Test_TC_CDOCONC_1_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_CDOCONC_2_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_CMOCONC_1_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_CMOCONC_2_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_NDOCONC_1_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_NDOCONC_2_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_OZCONC_1_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_OZCONC_2_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_PMICONC_1_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_PMICONC_2_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_FLDCONC_1_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_FLDCONC_2_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_PMHCONC_1_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_PMHCONC_2_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_PMKCONC_1_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_PMKCONC_2_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_TVOCCONC_1_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_TVOCCONC_2_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_RNCONC_1_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
+"$CHIPTOOL_CMD" Test_TC_RNCONC_2_1 "$COMMON_ARGS" --endpoint "$CONC_ENDPOINT" &&
+echo All tests complete
