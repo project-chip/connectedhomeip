@@ -114,7 +114,7 @@ limitations under the License.
     <define>THERMOSTAT_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="5"/>
+    <globalAttribute side="either" code="0xFFFD" value="6"/>
     <attribute side="server" code="0x0000" define="LOCAL_TEMPERATURE" type="int16s" min="0x954D" max="0x7FFF" writable="false" reportable="true" optional="false" isNullable="true">LocalTemperature</attribute>
     <attribute side="server" code="0x0001" define="OUTDOOR_TEMPERATURE" type="int16s" min="0x954D" max="0x7FFF" writable="false" optional="true" isNullable="true">OutdoorTemperature</attribute>
     <attribute side="server" code="0x0002" define="THERMOSTAT_OCCUPANCY" type="bitmap8" min="0x00" max="0x01" writable="false" default="0x01" optional="true">Occupancy</attribute>

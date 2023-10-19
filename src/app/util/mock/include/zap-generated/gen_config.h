@@ -18,3 +18,4 @@
 #pragma once
 
 #define EMBER_BINDING_TABLE_SIZE 20
+#define MATTER_SCENES_TABLE_SIZE 24

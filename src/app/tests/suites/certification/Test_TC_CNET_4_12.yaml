@@ -26,19 +26,16 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          1. DUT supports CNET.S.F01(TH)
+          2. DUT has a Network Commissioning cluster on endpoint PIXIT.CNET.ENDPOINT_THREAD with FeatureMap attribute of 2
+          3. TH has can communicate to two valid thread PANs: PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET and PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET
+          4. TH can connect to two valid Wi-Fi access points: PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID and PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID
+          5. XPANID of PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET is saved as th_xpan and the XPANID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET is saved as th_xpan1
+      disabled: true
+
     - label: "Commission TH and DUT on Thread setup"
-      verification: |
-
-      disabled: true
-
-    - label:
-          "The cluster Identifier 49 (0x0031) is present in the ServerList
-          attribute"
-      verification: |
-
-      disabled: true
-
-    - label: "The FeatureMap attribute value is 2"
       verification: |
 
       disabled: true

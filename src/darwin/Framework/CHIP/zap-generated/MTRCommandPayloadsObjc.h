@@ -3362,14 +3362,14 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (nonatomic, copy, nullable) NSNumber * serverSideProcessingTimeout;
 @end
 
-MTR_NEWLY_AVAILABLE
+MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2))
 @interface MTRTimeSynchronizationClusterSetUTCTimeParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSNumber * _Nonnull utcTime MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull utcTime MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2));
 
-@property (nonatomic, copy) NSNumber * _Nonnull granularity MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull granularity MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2));
 
-@property (nonatomic, copy) NSNumber * _Nullable timeSource MTR_NEWLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable timeSource MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *

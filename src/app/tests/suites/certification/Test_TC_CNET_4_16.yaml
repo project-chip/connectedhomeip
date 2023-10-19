@@ -28,11 +28,12 @@ config:
 tests:
     - label: "Preconditions"
       verification: |
-          1. Factory Reset the DUT
-          2. Commission TH and DUT to setup the Thread
-          3. The cluster Identifier 49 (0x0031) is present in the ServerList attribute
-          4. The FeatureMap attribute value is 2
-          5. MaxNetworks attribute value is at least 1 which is saved as MaxNetworksValue for future use
+          1. DUT supports CNET.S.F01(TH)
+          2. DUT has a Network Commissioning cluster on endpoint PIXIT.CNET.ENDPOINT_THREAD with FeatureMap attribute of 2
+          3. DUT is factory reset
+          4. DUT is commissioned on PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
+          5. TH can communicate with the DUT on PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
+          6. DUT MaxNetworks attribute value is at least 1 and is saved as 'MaxNetworksValue' for future use
       disabled: true
 
     - label:
@@ -64,7 +65,7 @@ tests:
 
           Below is an example:
 
-          ./chip-tool networkcommissioning remove-network 2111111122222222 54 0
+          ./chip-tool networkcommissioning remove-network 2111111122222222 54 0 --Breadcrumb 1
 
           Via the TH (chip-tool), Verify the NetworkConfigResponse that contains Networking Status value as 3 (NetworkIDNotFound).
 
@@ -92,7 +93,7 @@ tests:
 
           Below is an example:
 
-          ./chip-tool networkcommissioning connect-network 47524C50726976617465 54 0
+          ./chip-tool networkcommissioning connect-network 47524C50726976617465 54 0 --Breadcrumb 1
 
           Via the TH (chip-tool), Verify the ConnectNetworkResponse that contains Networking Status value as 3 (NetworkIDNotFound).
 

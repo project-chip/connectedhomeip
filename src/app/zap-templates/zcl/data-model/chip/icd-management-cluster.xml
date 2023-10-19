@@ -21,6 +21,8 @@ limitations under the License.
     <bitmap name="Feature" type="bitmap32">
         <cluster code="0x0046"/>
         <field name="CheckInProtocolSupport" mask="0x1"/>
+        <field name="UserActiveModeTrigger" mask="0x2"/>
+        <field name="LongIdleTimeSupport" mask="0x4"/>
     </bitmap>
 
     <struct name = "MonitoringRegistrationStruct" isFabricScoped="true">
