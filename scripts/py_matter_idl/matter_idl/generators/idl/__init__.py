@@ -16,18 +16,70 @@ import os
 from typing import List
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.matter_idl_types import Cluster, ClusterSide, Idl
+from matter_idl.matter_idl_types import Cluster, ClusterSide, Idl, StructTag, FieldQuality, StructQuality, EventPriority, EventQuality, Event, AccessPrivilege
 
-def HumanTextString(value: ClusterSide) -> str:
+def human_text_string(value: ClusterSide|StructTag|StructQuality|EventPriority|EventQuality|AccessPrivilege) -> str:
     if type(value) is ClusterSide:
         if value == ClusterSide.CLIENT:
             return "client"
         if value == ClusterSide.SERVER:
             return "server"
-
+    elif type(value) is StructTag:
+        if value == StructTag.REQUEST:
+            return "request"
+        if value == StructTag.RESPONSE:
+            return "response"
+    elif type(value) is FieldQuality:
+        result = ""
+        if FieldQuality.OPTIONAL in value:
+            result += "optional "
+        if FieldQuality.NULLABLE in value:
+            result += "nullable "
+        if FieldQuality.FABRIC_SENSITIVE in value:
+            result += "fabric_sensitive "
+        return result.strip()
+    elif type(value) is StructQuality:
+        result = ""
+        if value == StructQuality.FABRIC_SCOPED:
+            result += "fabric_scoped "
+        return result.strip()
+    elif type(value) is EventPriority:
+        if value == EventPriority.DEBUG:
+            return "debug"
+        if value == EventPriority.INFO:
+            return "info"
+        if value == EventPriority.CRITICAL:
+            return "critical"
+    elif type(value) is EventQuality:
+        result = ""
+        if EventQuality.FABRIC_SENSITIVE in value:
+            result += "fabric_sensitive "
+        return result.strip()
+    elif type(value) is AccessPrivilege:
+        if value == AccessPrivilege.VIEW:
+            return "view"
+        if value == AccessPrivilege.OPERATE:
+            return "operate"
+        if value == AccessPrivilege.MANAGE:
+            return "manage"
+        if value == AccessPrivilege.ADMINISTER:
+            return "administer"
 
     # wrong value in general
     return "Unknown/unsupported: %r" % value
+
+
+def event_access_string(e: Event) -> str:
+   """Generates the access string required for an event. If string is non-empty it will
+      include a trailing space
+   """
+   result = ""
+   if e.readacl != AccessPrivilege.VIEW:
+       result += "read: " + human_text_string(e.readacl)
+
+   if not result:
+       return ""
+   return f"access({result}) "
 
 
 class IdlGenerator(CodeGenerator):
@@ -38,7 +90,8 @@ class IdlGenerator(CodeGenerator):
     def __init__(self, storage: GeneratorStorage, idl: Idl, **kargs):
         super().__init__(storage, idl, fs_loader_searchpath=os.path.dirname(__file__))
 
-        self.jinja_env.filters['idltxt'] = HumanTextString 
+        self.jinja_env.filters['idltxt'] = human_text_string
+        self.jinja_env.filters['event_access'] = event_access_string
 
     def internal_render_all(self):
         """
