@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import os
-from typing import List
+from typing import List, Union
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
 from matter_idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeQuality, AttributeStorage, Cluster,
@@ -21,7 +21,7 @@ from matter_idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute
                                          Idl, Struct, StructQuality, StructTag)
 
 
-def human_text_string(value: ClusterSide | StructTag | StructQuality | EventPriority | EventQuality | AccessPrivilege | AttributeQuality | CommandQuality | ApiMaturity | AttributeStorage) -> str:
+def human_text_string(value: Union[ClusterSide, StructTag, StructQuality, EventPriority, EventQuality, AccessPrivilege, AttributeQuality, CommandQuality, ApiMaturity, AttributeStorage]) -> str:
     if type(value) is ClusterSide:
         if value == ClusterSide.CLIENT:
             return "client"
@@ -148,7 +148,7 @@ def attribute_access_string(a: Attribute) -> str:
     return f"access({', '.join(result)}) "
 
 
-def render_default(value: str | int | bool) -> str:
+def render_default(value: Union[str, int, bool]) -> str:
     """
     Renders a idl-style default.
 
