@@ -2033,7 +2033,7 @@ limitations under the License.
         </clusters>
     </deviceType>
     <deviceType>
-        <name>MA-boolean-sensor</name>
+        <name>MA-boolean-sesnsor</name>
         <domain>CHIP</domain>
         <typeName>Matter Boolean Sensor</typeName>
         <profileId editable="false">0x0103</profileId>
@@ -2059,7 +2059,6 @@ limitations under the License.
         <clusters lockOthers="true">
             <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Valve Configuration and Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -2074,7 +2073,7 @@ limitations under the License.
         <clusters lockOthers="true">
             <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Boolean State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Boolean Sensor Configuration" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Boolean State Configuration" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>TAG_LIST</requireAttribute>
             </include>
