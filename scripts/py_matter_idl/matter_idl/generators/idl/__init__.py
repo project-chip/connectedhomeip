@@ -18,10 +18,10 @@ from typing import List
 from matter_idl.generators import CodeGenerator, GeneratorStorage
 from matter_idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeQuality, Cluster, ClusterSide, Command,
                                          CommandQuality, Event, EventPriority, EventQuality, FieldQuality, Idl, Struct,
-                                         StructQuality, StructTag)
+                                         StructQuality, StructTag, AttributeStorage)
 
 
-def human_text_string(value: ClusterSide | StructTag | StructQuality | EventPriority | EventQuality | AccessPrivilege | AttributeQuality | CommandQuality | ApiMaturity) -> str:
+def human_text_string(value: ClusterSide | StructTag | StructQuality | EventPriority | EventQuality | AccessPrivilege | AttributeQuality | CommandQuality | ApiMaturity | AttributeStorage) -> str:
     if type(value) is ClusterSide:
         if value == ClusterSide.CLIENT:
             return "client"
@@ -92,6 +92,13 @@ def human_text_string(value: ClusterSide | StructTag | StructQuality | EventPrio
             return "internal "
         if value == ApiMaturity.DEPRECATED:
             return "deprecated "
+    elif type(value) is AttributeStorage:
+        if value == AttributeStorage.RAM:
+            return "ram"
+        if value == AttributeStorage.PERSIST:
+            return "persist"
+        if value == AttributeStorage.CALLBACK:
+            return "callback"
 
     # wrong value in general
     return "Unknown/unsupported: %r" % value
@@ -141,6 +148,22 @@ def attribute_access_string(a: Attribute) -> str:
     return f"access({', '.join(result)}) "
 
 
+def render_default(value: str|int|bool) -> str:
+    """
+    Renders a idl-style default.
+
+    Generally quotes strings and handles bools
+    """
+    if type(value) is str:
+        return f'"{value}"'
+    elif type(value) is bool:
+        if value:
+            return "true"
+        else:
+            return "false"
+    return str(value)
+
+
 class IdlGenerator(CodeGenerator):
     """
     Generation .matter idl files for a given IDL
@@ -153,6 +176,7 @@ class IdlGenerator(CodeGenerator):
         self.jinja_env.filters['event_access'] = event_access_string
         self.jinja_env.filters['command_access'] = command_access_string
         self.jinja_env.filters['attribute_access'] = attribute_access_string
+        self.jinja_env.filters['render_default'] = render_default
 
         # Easier whitespace management
         self.jinja_env.trim_blocks = True

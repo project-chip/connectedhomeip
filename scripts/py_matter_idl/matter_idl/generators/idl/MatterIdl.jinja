@@ -107,10 +107,44 @@
 {% endfor %}
 
 {%- if idl.endpoints %}
-{% for endpoint in idl.endpoints %}
-
+{%- for endpoint in idl.endpoints %}
 endpoint {{endpoint.number}} {
-  // FIXME: report endpoint
+  {% for t in endpoint.device_types %}
+  device type {{t.name}} = {{t.code}}, version {{t.version}};
+  {% endfor%}
+
+  {%-for b in endpoint.client_bindings %}
+  {% if loop.first %}
+
+  {% endif %}
+  binding cluster {{b}};
+  {% endfor %}
+
+  {%-for c in endpoint.server_clusters %}
+
+  server cluster {{c.name}} {
+    {% for e in c.events_emitted %}
+    emits event {{e}};
+    {% if loop.last %}
+
+    {% endif %}
+    {% endfor %}
+    {% for a in c.attributes %}
+    {{"%-8s" | format(a.storage|idltxt) }} attribute {{a.name}}
+    {%- if a.default is not none %} default = {{a.default}} {%- endif %};
+    {% endfor %}
+    {% for cmd in c.commands %}
+    {% if loop.first %}
+
+    {% endif %}
+    handle command {{cmd.name}};
+    {% endfor %}
+  }
+  {% endfor %}
+
 }
+{% if not loop.last %}
+
+{% endif %}
 {%  endfor %}
 {%  endif %}
