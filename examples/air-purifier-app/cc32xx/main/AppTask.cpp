@@ -48,8 +48,8 @@
 
 #include <CC32XXConfig.h>
 /* syscfg */
-#include <ti_drivers_config.h>
 #include <third_party/ti_simplelink_sdk/repo_cc32xx/source/ti/drivers/net/wifi/fs.h>
+#include <ti_drivers_config.h>
 
 extern "C" {
 extern int WiFi_init();
@@ -174,14 +174,13 @@ int AppTask::Init()
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif
 
-    //init air purifier stuff
+    // init air purifier stuff
     SetParentEndpointForEndpoint(AIR_QUALITY_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
     SetParentEndpointForEndpoint(TEMPERATURE_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
     SetParentEndpointForEndpoint(RELATIVE_HUMIDITY_SENSOR_ENDPOINT, AIR_PURIFIER_ENDPOINT);
 
     AirPurifierManager::InitInstance(EndpointId(AIR_PURIFIER_ENDPOINT), EndpointId(AIR_QUALITY_SENSOR_ENDPOINT),
                                      EndpointId(TEMPERATURE_SENSOR_ENDPOINT), EndpointId(RELATIVE_HUMIDITY_SENSOR_ENDPOINT));
-
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -258,14 +257,14 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         {
             PLAT_LOG("DispatchEvent: kEventType_ButtonRight: kAppEventButtonType_Clicked");
         }
-        if ( AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
+        if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
         {
             // delete the kvs.cfg file and reset the matter part of the device
             PLAT_LOG("DispatchEvent: kEventType_ButtonRight: LONG clicked - clearing KVS");
 
-            uint32_t token = KVS_TOKEN;
+            uint32_t token                 = KVS_TOKEN;
             const unsigned char listName[] = "/sys/matter/kvs.cfg";
-            sl_FsDel(listName,token);
+            sl_FsDel(listName, token);
         }
         break;
     case AppEvent::kEventType_AppEvent:

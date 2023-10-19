@@ -42,7 +42,6 @@ private:
 
     int Init();
 
-
     void DispatchEvent(AppEvent * event);
 
     static void ButtonRightEventHandler(Button_Handle handle, Button_EventMask events);

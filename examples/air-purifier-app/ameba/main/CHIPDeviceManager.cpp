@@ -25,6 +25,7 @@
 #include <stdlib.h>
 
 #include "CHIPDeviceManager.h"
+#include <air-purifier-manager.h>
 #include <app/util/basic-types.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -32,7 +33,6 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
-#include <air-purifier-manager.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
