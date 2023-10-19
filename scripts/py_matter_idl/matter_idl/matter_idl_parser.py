@@ -48,8 +48,8 @@ class PrefixCppDocComment:
 
         # Allow to skip api maturity flags
         for maturity in ["provisional", "internal", "stable", "deprecated"]:
-          if content[actual_pos:].startswith(maturity):
-              actual_pos += len(maturity)
+            if content[actual_pos:].startswith(maturity):
+                actual_pos += len(maturity)
 
         while content[actual_pos] in ' \t\n\r':
             actual_pos += 1

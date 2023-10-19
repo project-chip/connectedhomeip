@@ -16,8 +16,9 @@ import os
 from typing import List
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.matter_idl_types import (AccessPrivilege, AttributeQuality, Cluster, ClusterSide, Command, CommandQuality, Event,
-                                         EventPriority, EventQuality, FieldQuality, Idl, Struct, StructQuality, StructTag, Attribute, ApiMaturity)
+from matter_idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeQuality, Cluster, ClusterSide, Command,
+                                         CommandQuality, Event, EventPriority, EventQuality, FieldQuality, Idl, Struct,
+                                         StructQuality, StructTag)
 
 
 def human_text_string(value: ClusterSide | StructTag | StructQuality | EventPriority | EventQuality | AccessPrivilege | AttributeQuality | CommandQuality | ApiMaturity) -> str:
@@ -120,6 +121,7 @@ def command_access_string(c: Command) -> str:
     if not result:
         return ""
     return f"access({result}) "
+
 
 def attribute_access_string(a: Attribute) -> str:
     """Generates the access string required for a struct. If string is non-empty it will
