@@ -318,5 +318,5 @@ rvc-app/README
 :glob:
 :maxdepth: 1
 
-air-purifier-app/**/README.md
+air-purifier-app/**/README
 ```
