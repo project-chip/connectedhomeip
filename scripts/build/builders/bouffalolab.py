@@ -91,7 +91,8 @@ class BouffalolabBuilder(GnBuilder):
                  enable_wifi: bool = False,
                  enable_thread: bool = False,
                  enable_frame_ptr: bool = False,
-                 enable_heap_monitoring: bool = False
+                 enable_heap_monitoring: bool = False,
+                 use_matter_openthread: bool = False
                  ):
 
         if 'BL602' == module_type:
@@ -157,6 +158,8 @@ class BouffalolabBuilder(GnBuilder):
         self.argsOpt.append(f'chip_enable_ethernet={str(enable_ethernet).lower()}')
         self.argsOpt.append(f'chip_enable_wifi={str(enable_wifi).lower()}')
         self.argsOpt.append(f'chip_enable_openthread={str(enable_thread).lower()}')
+        if not use_matter_openthread:
+            self.argsOpt.append('openthread_root="//third_party/connectedhomeip/third_party/bouffalolab/repo/components/network/thread/openthread"')
 
         # for enable_ethernet, do not need ble for commissioning
         self.argsOpt.append(f'chip_config_network_layer_ble={str(enable_wifi or enable_thread).lower()}')
