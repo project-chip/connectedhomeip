@@ -17,18 +17,18 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class UnitTestingClusterSimpleStruct(
-  val a: Int,
+  val a: UInt,
   val b: Boolean,
-  val c: Int,
+  val c: UInt,
   val d: ByteArray,
   val e: String,
-  val f: Int,
+  val f: UInt,
   val g: Float,
   val h: Double
 ) {
@@ -45,9 +45,9 @@ class UnitTestingClusterSimpleStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_A), a)
       put(ContextSpecificTag(TAG_B), b)
       put(ContextSpecificTag(TAG_C), c)
@@ -70,14 +70,14 @@ class UnitTestingClusterSimpleStruct(
     private const val TAG_G = 6
     private const val TAG_H = 7
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): UnitTestingClusterSimpleStruct {
-      tlvReader.enterStructure(tag)
-      val a = tlvReader.getInt(ContextSpecificTag(TAG_A))
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): UnitTestingClusterSimpleStruct {
+      tlvReader.enterStructure(tlvTag)
+      val a = tlvReader.getUInt(ContextSpecificTag(TAG_A))
       val b = tlvReader.getBoolean(ContextSpecificTag(TAG_B))
-      val c = tlvReader.getInt(ContextSpecificTag(TAG_C))
+      val c = tlvReader.getUInt(ContextSpecificTag(TAG_C))
       val d = tlvReader.getByteArray(ContextSpecificTag(TAG_D))
       val e = tlvReader.getString(ContextSpecificTag(TAG_E))
-      val f = tlvReader.getInt(ContextSpecificTag(TAG_F))
+      val f = tlvReader.getUInt(ContextSpecificTag(TAG_F))
       val g = tlvReader.getFloat(ContextSpecificTag(TAG_G))
       val h = tlvReader.getDouble(ContextSpecificTag(TAG_H))
 

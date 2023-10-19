@@ -36,10 +36,6 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
-import chip.onboardingpayload.OnboardingPayload
-import chip.onboardingpayload.OnboardingPayloadException
-import chip.onboardingpayload.OnboardingPayloadParser
-import chip.onboardingpayload.UnrecognizedQrCodeException
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.SelectActionFragment
 import com.google.chip.chiptool.databinding.BarcodeFragmentBinding
@@ -52,6 +48,8 @@ import java.util.concurrent.Executors
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import matter.onboardingpayload.OnboardingPayloadParser
+import matter.onboardingpayload.UnrecognizedQrCodeException
 
 /** Launches the camera to scan for QR code. */
 class BarcodeFragment : Fragment() {
@@ -139,9 +137,9 @@ class BarcodeFragment : Fragment() {
 
     // workaround: can not use gms to scan the code in China, added a EditText to debug
     binding.manualCodeBtn.setOnClickListener {
-      val qrCode = binding.manualCodeEditText.text.toString()
-      Log.d(TAG, "Submit Code:$qrCode")
-      handleInputQrCode(qrCode)
+      val code = binding.manualCodeEditText.text.toString()
+      Log.d(TAG, "Submit Code:$code")
+      handleInputCode(code)
     }
   }
 
@@ -178,39 +176,39 @@ class BarcodeFragment : Fragment() {
     }
   }
 
-  private fun handleInputQrCode(qrCode: String) {
-    lateinit var payload: OnboardingPayload
+  private fun handleInputCode(code: String) {
     try {
-      payload = OnboardingPayloadParser().parseQrCode(qrCode)
-    } catch (ex: OnboardingPayloadException) {
-      try {
-        payload = OnboardingPayloadParser().parseManualPairingCode(qrCode)
-      } catch (ex: Exception) {
-        Log.e(TAG, "Unrecognized Manual Pairing Code", ex)
-        Toast.makeText(requireContext(), "Unrecognized Manual Pairing Code", Toast.LENGTH_SHORT)
-          .show()
-      }
+      val payload =
+        if (code.startsWith("MT:")) {
+          OnboardingPayloadParser().parseQrCode(code)
+        } else {
+          OnboardingPayloadParser().parseManualPairingCode(code)
+        }
+
+      FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
+        ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
     } catch (ex: UnrecognizedQrCodeException) {
-      Log.e(TAG, "Unrecognized QR Code", ex)
+      Log.e(TAG, "Unrecognized Code", ex)
       Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
+    } catch (ex: Exception) {
+      Log.e(TAG, "Exception, $ex")
+      Toast.makeText(requireContext(), "Occur Exception, $ex", Toast.LENGTH_SHORT).show()
     }
-    FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
-      ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
   }
 
   private fun handleScannedQrCode(barcode: Barcode) {
     Handler(Looper.getMainLooper()).post {
-      lateinit var payload: OnboardingPayload
       try {
-        payload =
+        val payload =
           barcode.displayValue?.let { OnboardingPayloadParser().parseQrCode(it) } ?: return@post
+
+        FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
+          ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
       } catch (ex: UnrecognizedQrCodeException) {
         Log.e(TAG, "Unrecognized QR Code", ex)
         Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
         return@post
       }
-      FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
-        ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload))
     }
   }
 

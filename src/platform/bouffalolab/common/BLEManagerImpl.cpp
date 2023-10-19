@@ -16,6 +16,7 @@
  */
 
 #define __ZEPHYR__ 1
+#define CONFIG_EVENTFD 0
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -29,7 +30,7 @@
 #endif
 
 extern "C" {
-#ifdef BL702L
+#if CHIP_DEVICE_LAYER_TARGET_BL702L
 #include <btble_lib_api.h>
 #else
 #include <ble_lib_api.h>
@@ -124,7 +125,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     memset(mSubscribedConns, 0, sizeof(mSubscribedConns));
 
     ReturnErrorOnFailure(InitRandomStaticAddress());
-#ifdef BL702L
+#if CHIP_DEVICE_LAYER_TARGET_BL702L
     btble_controller_init(configMAX_PRIORITIES - 1);
 #else
     ble_controller_init(configMAX_PRIORITIES - 1);
@@ -275,7 +276,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 
     if (!isAdvertisingRerun)
     {
-#if CONFIG_BT_PRIVACY
+#ifdef CONFIG_BT_PRIVACY
         static_assert(CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS <= CONFIG_BT_RPA_TIMEOUT,
                       "BLE advertising timeout is too long relative to RPA timeout");
         // Generate new private BLE address

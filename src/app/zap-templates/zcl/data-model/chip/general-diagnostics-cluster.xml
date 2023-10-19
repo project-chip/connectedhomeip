@@ -16,7 +16,7 @@ limitations under the License.
 -->
 <configurator>
   <domain name="CHIP"/>
-  <enum name="HardwareFaultEnum" type="ENUM8">
+  <enum name="HardwareFaultEnum" type="enum8">
     <cluster code="0x0033"/>
     <item name="Unspecified" value="0x00"/>
     <item name="Radio" value="0x01"/>
@@ -30,7 +30,7 @@ limitations under the License.
     <item name="NonVolatileMemoryError" value="0x09"/>
     <item name="TamperDetected" value="0x0A"/>
   </enum>
-  <enum name="RadioFaultEnum" type="ENUM8">
+  <enum name="RadioFaultEnum" type="enum8">
     <cluster code="0x0033"/>
     <item name="Unspecified" value="0x00"/>
     <item name="WiFiFault" value="0x01"/>
@@ -40,14 +40,14 @@ limitations under the License.
     <item name="BLEFault" value="0x05"/>
     <item name="EthernetFault" value="0x06"/>    
   </enum>
-  <enum name="NetworkFaultEnum" type="ENUM8">
+  <enum name="NetworkFaultEnum" type="enum8">
     <cluster code="0x0033"/>
     <item name="Unspecified" value="0x00"/>
     <item name="HardwareFailure" value="0x01"/>
     <item name="NetworkJammed" value="0x02"/>
     <item name="ConnectionFailed" value="0x03"/>
   </enum>
-  <enum name="BootReasonEnum" type="ENUM8">
+  <enum name="BootReasonEnum" type="enum8">
     <cluster code="0x0033"/>
     <item name="Unspecified" value="0x00"/>
     <item name="PowerOnReboot" value="0x01"/>
@@ -57,7 +57,7 @@ limitations under the License.
     <item name="SoftwareUpdateCompleted" value="0x05"/>
     <item name="SoftwareReset" value="0x06"/>
   </enum>  
-  <enum name="InterfaceTypeEnum" type="ENUM8">
+  <enum name="InterfaceTypeEnum" type="enum8">
     <cluster code="0x0033"/>
     <item name="Unspecified" value="0x00"/>
     <item name="WiFi" value="0x01"/>
@@ -67,14 +67,14 @@ limitations under the License.
   </enum>
   <struct name="NetworkInterface">
     <cluster code="0x0033"/>
-    <item name="Name" type="CHAR_STRING" length="32"/>
-    <item name="IsOperational" type="BOOLEAN"/>
-    <item name="OffPremiseServicesReachableIPv4" type="BOOLEAN" isNullable="true"/>
-    <item name="OffPremiseServicesReachableIPv6" type="BOOLEAN" isNullable="true"/>
+    <item name="Name" type="char_string" length="32"/>
+    <item name="IsOperational" type="boolean"/>
+    <item name="OffPremiseServicesReachableIPv4" type="boolean" isNullable="true"/>
+    <item name="OffPremiseServicesReachableIPv6" type="boolean" isNullable="true"/>
     <!-- TODO(#14075): HWADR not supported yet -->
-    <item name="HardwareAddress" type="OCTET_STRING" length="8"/>
-    <item name="IPv4Addresses" type="OCTET_STRING" array="true"/>
-    <item name="IPv6Addresses" type="OCTET_STRING" array="true"/>
+    <item name="HardwareAddress" type="octet_string" length="8"/>
+    <item name="IPv4Addresses" type="octet_string" array="true"/>
+    <item name="IPv6Addresses" type="octet_string" array="true"/>
     <item name="Type" type="InterfaceTypeEnum"/>
   </struct>
   <cluster>
@@ -84,19 +84,20 @@ limitations under the License.
     <define>GENERAL_DIAGNOSTICS_CLUSTER</define>
     <description>The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems.</description>
     <attribute side="server" code="0x00" define="NETWORK_INTERFACES" type="ARRAY" entryType="NetworkInterface" length="254" writable="false" optional="false">NetworkInterfaces</attribute>
-    <attribute side="server" code="0x01" define="REBOOT_COUNT" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="false">RebootCount</attribute>
-    <attribute side="server" code="0x02" define="UP_TIME" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">UpTime</attribute>
-    <attribute side="server" code="0x03" define="TOTAL_OPERATIONAL_HOURS" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" default="0x00000000" optional="true">TotalOperationalHours</attribute>
+    <attribute side="server" code="0x01" define="REBOOT_COUNT" type="int16u" writable="false" default="0x0000" optional="false">RebootCount</attribute>
+    <attribute side="server" code="0x02" define="UP_TIME" type="int64u" writable="false" default="0x0000000000000000" optional="true">UpTime</attribute>
+    <attribute side="server" code="0x03" define="TOTAL_OPERATIONAL_HOURS" type="int32u" writable="false" default="0x00000000" optional="true">TotalOperationalHours</attribute>
     <attribute side="server" code="0x04" define="BOOT_REASONS" type="BootReasonEnum" writable="false" optional="true">BootReason</attribute>
     <attribute side="server" code="0x05" define="ACTIVE_HARDWARE_FAULTS" type="ARRAY" entryType="HardwareFaultEnum" writable="false" optional="true">ActiveHardwareFaults</attribute>
     <attribute side="server" code="0x06" define="ACTIVE_RADIO_FAULTS" type="ARRAY" entryType="RadioFaultEnum" writable="false" optional="true">ActiveRadioFaults</attribute>
     <attribute side="server" code="0x07" define="ACTIVE_NETWORK_FAULTS" type="ARRAY" entryType="NetworkFaultEnum" writable="false" optional="true">ActiveNetworkFaults</attribute>
-    <attribute side="server" code="0x08" define="TEST_EVENT_TRIGGERS_ENABLED" type="BOOLEAN" writable="false" optional="false">TestEventTriggersEnabled</attribute>
+    <attribute side="server" code="0x08" define="TEST_EVENT_TRIGGERS_ENABLED" type="boolean" writable="false" optional="false">TestEventTriggersEnabled</attribute>
+    <attribute side="server" code="0x09" define="AVERAGE_WEAR_COUNT" type="int32u" writable="false" default="0x00000000" optional="true">AverageWearCount</attribute>
 
     <command source="client" code="0x00" name="TestEventTrigger" optional="false">
       <description>Provide a means for certification tests to trigger some test-plan-specific events</description>
-      <arg name="EnableKey" type="OCTET_STRING" length="16"/>
-      <arg name="EventTrigger" type="INT64U"/>
+      <arg name="EnableKey" type="octet_string" length="16"/>
+      <arg name="EventTrigger" type="int64u"/>
       <access op="invoke" role="manage"/>
     </command>
 

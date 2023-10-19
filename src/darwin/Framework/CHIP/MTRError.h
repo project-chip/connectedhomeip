@@ -17,6 +17,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import <Matter/MTRDefines.h>
+
 NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXPORT NSErrorDomain const MTRErrorDomain;
 
@@ -63,19 +65,28 @@ typedef NS_ERROR_ENUM(MTRErrorDomain, MTRErrorCode){
      * MTRErrorCodeUnknownSchema means the schema for the given cluster/attribute,
      * cluster/event, or cluster/command combination is not known.
      */
-    MTRErrorCodeUnknownSchema API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 12,
+    MTRErrorCodeUnknownSchema MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 12,
     /**
      * MTRErrorCodeSchemaMismatch means that provided data did not match the
      * expected schema.
      */
-    MTRErrorCodeSchemaMismatch API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 13,
+    MTRErrorCodeSchemaMismatch MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 13,
     /**
      * MTRErrorCodeTLVDecodeFailed means that the TLV being decoded was malformed in
      * some way.  This can include things like lengths running past the end of
      * the buffer, strings that are not actually UTF-8, and various other
      * TLV-level failures.
      */
-    MTRErrorCodeTLVDecodeFailed API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 14,
+    MTRErrorCodeTLVDecodeFailed MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 14,
+
+    /**
+     * MTRErrorCodeDNSSDUnauthorized means that the application is not
+     * authorized to perform DNS_SD lookups.  This typically means missing
+     * entries for "_matter._tcp" (for operational lookup) and "_matterc._udp"
+     * (for commissionable lookup) under the NSBonjourServices key in the
+     * application's Info.plist.
+     */
+    MTRErrorCodeDNSSDUnauthorized MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 15,
 };
 // clang-format on
 

@@ -230,8 +230,8 @@ public:
             bufferLength += (uint16_t) strlen(currentEntry->Key());
 
             // copy value length
-            list[bufferLength]     = (uint8_t)(currentEntry->Len() & 0xFF);
-            list[bufferLength + 1] = (uint8_t)((currentEntry->Len() & 0xFF00) >> 8);
+            list[bufferLength]     = (uint8_t) (currentEntry->Len() & 0xFF);
+            list[bufferLength + 1] = (uint8_t) ((currentEntry->Len() & 0xFF00) >> 8);
             bufferLength           = bufferLength + 2;
 
             // copy value
@@ -267,7 +267,7 @@ public:
             // read in value length
 
             uint16_t valueLen = 0;
-            valueLen          = (uint16_t)(list[currentLength] | list[currentLength + 1] << 8);
+            valueLen          = (uint16_t) (list[currentLength] | list[currentLength + 1] << 8);
             currentLength += 2;
 
             // read in value

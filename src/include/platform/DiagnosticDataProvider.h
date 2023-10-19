@@ -36,12 +36,12 @@ namespace DeviceLayer {
 static constexpr size_t kMaxThreadNameLength = 8;
 
 // 48-bit IEEE MAC Address or a 64-bit IEEE MAC Address (e.g. EUI-64).
-constexpr size_t kMaxHardwareAddrSize = 8;
+inline constexpr size_t kMaxHardwareAddrSize = 8;
 
-constexpr size_t kMaxIPv4AddrSize  = 4;
-constexpr size_t kMaxIPv6AddrSize  = 16;
-constexpr size_t kMaxIPv4AddrCount = 4;
-constexpr size_t kMaxIPv6AddrCount = 8;
+inline constexpr size_t kMaxIPv4AddrSize  = 4;
+inline constexpr size_t kMaxIPv6AddrSize  = 16;
+inline constexpr size_t kMaxIPv4AddrCount = 4;
+inline constexpr size_t kMaxIPv6AddrCount = 8;
 
 using BootReasonType = app::Clusters::GeneralDiagnostics::BootReasonEnum;
 
@@ -103,13 +103,68 @@ public:
     /**
      * General Diagnostics methods.
      */
+
+    /**
+     * @brief Obtain the number of times the node has rebooted.
+     *        The reboot count value will be reset only upon a factory reset of the node.
+     *
+     * @param[out] rebootCount Reference to location where the reboot count integer will be copied.
+     */
     virtual CHIP_ERROR GetRebootCount(uint16_t & rebootCount);
+
+    /**
+     * @brief Obtain the time (in seconds) since the node's last reboot.
+     *        The up time value will be reset upon a node reboot.
+     *
+     * @param[out] upTime Reference to location where the up time integer will be copied.
+     */
     virtual CHIP_ERROR GetUpTime(uint64_t & upTime);
+
+    /**
+     * @brief Obtain the total time (in hours) the node has been operational.
+     *        The total operational hours value will be reset only upon a factory reset of the node.
+     *
+     * @param[out] totalOperationalHours Reference to location where the total operation hours integer will be copied.
+     */
     virtual CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
+
+    /**
+     * @brief Obtain the reason for the node's most recent reboot.
+     *
+     * @param[out] bootReason Reference to location where the boot reason enum value will be copied.
+     */
     virtual CHIP_ERROR GetBootReason(BootReasonType & bootReason);
+
+    /**
+     * @brief Obtain the set of hardware faults currently detected by the node.
+     *
+     * @param[out] hardwareFaults Reference to location of a GeneralFaults instance.
+     *                            The instance can be populated by sequentially calling add method.
+     */
     virtual CHIP_ERROR GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults);
+
+    /**
+     * @brief Obtain the set of radio faults currently detected by the node.
+     *
+     * @param[out] radioFaults Reference to location of a GeneralFaults instance.
+     *                         The instance can be populated by sequentially calling add method.
+     */
     virtual CHIP_ERROR GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults);
+
+    /**
+     * @brief Obtain the set of network faults currently detected by the node.
+     *
+     * @param[out] networkFaults Reference to location of a GeneralFaults instance.
+     *                           The instance can be populated by sequentially calling add method.
+     */
     virtual CHIP_ERROR GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults);
+
+    /**
+     * @brief Obtain the average wear count of the node's persistent storage backend.
+     *
+     * @param[out] averageWearCount Reference to location where the average wear count integer will be copied.
+     */
+    virtual CHIP_ERROR GetAverageWearCount(uint32_t & averageWearCount);
 
     /*
      * Get the linked list of network interfaces of the current plaform. After usage, each caller of GetNetworkInterfaces
@@ -186,8 +241,8 @@ private:
     WiFiDiagnosticsDelegate * mWiFiDiagnosticsDelegate = nullptr;
 
     // No copy, move or assignment.
-    DiagnosticDataProvider(const DiagnosticDataProvider &)  = delete;
-    DiagnosticDataProvider(const DiagnosticDataProvider &&) = delete;
+    DiagnosticDataProvider(const DiagnosticDataProvider &)             = delete;
+    DiagnosticDataProvider(const DiagnosticDataProvider &&)            = delete;
     DiagnosticDataProvider & operator=(const DiagnosticDataProvider &) = delete;
 };
 
@@ -273,6 +328,11 @@ inline CHIP_ERROR DiagnosticDataProvider::GetActiveRadioFaults(GeneralFaults<kMa
 }
 
 inline CHIP_ERROR DiagnosticDataProvider::GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+inline CHIP_ERROR DiagnosticDataProvider::GetAverageWearCount(uint32_t & averageWearCount)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

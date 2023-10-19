@@ -17,26 +17,26 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.AnonymousTag
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
 import java.util.Optional
+import matter.tlv.AnonymousTag
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class UnitTestingClusterNullablesAndOptionalsStruct(
-  val nullableInt: Int?,
-  val optionalInt: Optional<Int>,
-  val nullableOptionalInt: Optional<Int>?,
+  val nullableInt: UInt?,
+  val optionalInt: Optional<UInt>,
+  val nullableOptionalInt: Optional<UInt>?,
   val nullableString: String?,
   val optionalString: Optional<String>,
   val nullableOptionalString: Optional<String>?,
   val nullableStruct: UnitTestingClusterSimpleStruct?,
   val optionalStruct: Optional<UnitTestingClusterSimpleStruct>,
   val nullableOptionalStruct: Optional<UnitTestingClusterSimpleStruct>?,
-  val nullableList: List<Int>?,
-  val optionalList: Optional<List<Int>>,
-  val nullableOptionalList: Optional<List<Int>>?
+  val nullableList: List<UInt>?,
+  val optionalList: Optional<List<UInt>>,
+  val nullableOptionalList: Optional<List<UInt>>?
 ) {
   override fun toString(): String = buildString {
     append("UnitTestingClusterNullablesAndOptionalsStruct {\n")
@@ -55,9 +55,9 @@ class UnitTestingClusterNullablesAndOptionalsStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       if (nullableInt != null) {
         put(ContextSpecificTag(TAG_NULLABLE_INT), nullableInt)
       } else {
@@ -110,30 +110,30 @@ class UnitTestingClusterNullablesAndOptionalsStruct(
         putNull(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_STRUCT))
       }
       if (nullableList != null) {
-        startList(ContextSpecificTag(TAG_NULLABLE_LIST))
+        startArray(ContextSpecificTag(TAG_NULLABLE_LIST))
         for (item in nullableList.iterator()) {
           put(AnonymousTag, item)
         }
-        endList()
+        endArray()
       } else {
         putNull(ContextSpecificTag(TAG_NULLABLE_LIST))
       }
       if (optionalList.isPresent) {
         val optoptionalList = optionalList.get()
-        startList(ContextSpecificTag(TAG_OPTIONAL_LIST))
+        startArray(ContextSpecificTag(TAG_OPTIONAL_LIST))
         for (item in optoptionalList.iterator()) {
           put(AnonymousTag, item)
         }
-        endList()
+        endArray()
       }
       if (nullableOptionalList != null) {
         if (nullableOptionalList.isPresent) {
           val optnullableOptionalList = nullableOptionalList.get()
-          startList(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST))
+          startArray(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST))
           for (item in optnullableOptionalList.iterator()) {
             put(AnonymousTag, item)
           }
-          endList()
+          endArray()
         }
       } else {
         putNull(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST))
@@ -156,25 +156,25 @@ class UnitTestingClusterNullablesAndOptionalsStruct(
     private const val TAG_OPTIONAL_LIST = 10
     private const val TAG_NULLABLE_OPTIONAL_LIST = 11
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): UnitTestingClusterNullablesAndOptionalsStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): UnitTestingClusterNullablesAndOptionalsStruct {
+      tlvReader.enterStructure(tlvTag)
       val nullableInt =
         if (!tlvReader.isNull()) {
-          tlvReader.getInt(ContextSpecificTag(TAG_NULLABLE_INT))
+          tlvReader.getUInt(ContextSpecificTag(TAG_NULLABLE_INT))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_NULLABLE_INT))
           null
         }
       val optionalInt =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_OPTIONAL_INT))) {
-          Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_OPTIONAL_INT)))
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_OPTIONAL_INT)))
         } else {
           Optional.empty()
         }
       val nullableOptionalInt =
         if (!tlvReader.isNull()) {
           if (tlvReader.isNextTag(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT))) {
-            Optional.of(tlvReader.getInt(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT)))
+            Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_INT)))
           } else {
             Optional.empty()
           }
@@ -242,10 +242,10 @@ class UnitTestingClusterNullablesAndOptionalsStruct(
         }
       val nullableList =
         if (!tlvReader.isNull()) {
-          buildList<Int> {
-            tlvReader.enterList(ContextSpecificTag(TAG_NULLABLE_LIST))
+          buildList<UInt> {
+            tlvReader.enterArray(ContextSpecificTag(TAG_NULLABLE_LIST))
             while (!tlvReader.isEndOfContainer()) {
-              add(tlvReader.getInt(AnonymousTag))
+              add(tlvReader.getUInt(AnonymousTag))
             }
             tlvReader.exitContainer()
           }
@@ -256,10 +256,10 @@ class UnitTestingClusterNullablesAndOptionalsStruct(
       val optionalList =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_OPTIONAL_LIST))) {
           Optional.of(
-            buildList<Int> {
-              tlvReader.enterList(ContextSpecificTag(TAG_OPTIONAL_LIST))
+            buildList<UInt> {
+              tlvReader.enterArray(ContextSpecificTag(TAG_OPTIONAL_LIST))
               while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getInt(AnonymousTag))
+                add(tlvReader.getUInt(AnonymousTag))
               }
               tlvReader.exitContainer()
             }
@@ -271,10 +271,10 @@ class UnitTestingClusterNullablesAndOptionalsStruct(
         if (!tlvReader.isNull()) {
           if (tlvReader.isNextTag(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST))) {
             Optional.of(
-              buildList<Int> {
-                tlvReader.enterList(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST))
+              buildList<UInt> {
+                tlvReader.enterArray(ContextSpecificTag(TAG_NULLABLE_OPTIONAL_LIST))
                 while (!tlvReader.isEndOfContainer()) {
-                  add(tlvReader.getInt(AnonymousTag))
+                  add(tlvReader.getUInt(AnonymousTag))
                 }
                 tlvReader.exitContainer()
               }

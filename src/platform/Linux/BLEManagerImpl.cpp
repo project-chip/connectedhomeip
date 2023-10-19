@@ -42,7 +42,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 
-#include "bluez/Helper.h"
+#include "bluez/BluezEndpoint.h"
 
 using namespace ::nl;
 using namespace ::chip::Ble;

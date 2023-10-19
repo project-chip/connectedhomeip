@@ -67,26 +67,26 @@ ble_gatt_att_reg_t matter_csvc_atts[CSVC_IDX_NB] = {
     // ATT_DECL_CHARACTERISTIC (Write)
     [CSVC_IDX_RX_CHAR] = { { { 0X03, 0X28, 0 }, PRD_NA, 0, 0 }, { 0, 0 } },
     [CSVC_IDX_RX_VAL]  = { { { 0x11, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18 },
-                            PWR_NA,
-                            247,
-                            PRI | SONATA_PERM(UUID_LEN, UUID_128) },
-                          { matter_rx_char_write_cb, 0 } },
+                             PWR_NA,
+                             247,
+                             PRI | SONATA_PERM(UUID_LEN, UUID_128) },
+                           { matter_rx_char_write_cb, 0 } },
 
     // ATT_DECL_CHARACTERISTIC (Read,Notify)
     [CSVC_IDX_TX_CHAR] = { { { 0X03, 0X28, 0 }, PRD_NA, 0, 0 }, { 0, 0 } },
     [CSVC_IDX_TX_VAL]  = { { { 0x12, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18 },
-                            PRD_NA | PNTF_NA | PIND_NA,
-                            247,
-                            SONATA_PERM(UUID_LEN, UUID_128) },
-                          { 0, 0 } },
+                             PRD_NA | PNTF_NA | PIND_NA,
+                             247,
+                             SONATA_PERM(UUID_LEN, UUID_128) },
+                           { 0, 0 } },
     [CSVC_IDX_TX_CFG]  = { { { 0X02, 0X29, 0 }, PRD_NA | PWR_NA, 2, PRI }, { matter_tx_CCCD_write_cb, matter_tx_CCCD_read_cb } },
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     [CSVC_IDX_C3_CHAR] = { { { 0X03, 0X28, 0 }, PRD_NA, 0, 0 }, { 0, 0 } },
     [CSVC_IDX_C3_VAL]  = { { { 0x04, 0x8F, 0x21, 0x83, 0x8A, 0x74, 0x7D, 0xB8, 0xF2, 0x45, 0x72, 0x87, 0x38, 0x02, 0x63, 0x64 },
-                            PRD_NA,
-                            512,
-                            PRI | SONATA_PERM(UUID_LEN, UUID_128) },
-                          { 0, matter_c3_char_read_cb } },
+                             PRD_NA,
+                             512,
+                             PRI | SONATA_PERM(UUID_LEN, UUID_128) },
+                           { 0, matter_c3_char_read_cb } },
 #endif
 };
 /*

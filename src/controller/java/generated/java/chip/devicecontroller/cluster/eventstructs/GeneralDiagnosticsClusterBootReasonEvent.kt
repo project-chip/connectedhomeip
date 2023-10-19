@@ -17,21 +17,21 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
-class GeneralDiagnosticsClusterBootReasonEvent(val bootReason: Int) {
+class GeneralDiagnosticsClusterBootReasonEvent(val bootReason: UInt) {
   override fun toString(): String = buildString {
     append("GeneralDiagnosticsClusterBootReasonEvent {\n")
     append("\tbootReason : $bootReason\n")
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_BOOT_REASON), bootReason)
       endStructure()
     }
@@ -40,9 +40,9 @@ class GeneralDiagnosticsClusterBootReasonEvent(val bootReason: Int) {
   companion object {
     private const val TAG_BOOT_REASON = 0
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): GeneralDiagnosticsClusterBootReasonEvent {
-      tlvReader.enterStructure(tag)
-      val bootReason = tlvReader.getInt(ContextSpecificTag(TAG_BOOT_REASON))
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): GeneralDiagnosticsClusterBootReasonEvent {
+      tlvReader.enterStructure(tlvTag)
+      val bootReason = tlvReader.getUInt(ContextSpecificTag(TAG_BOOT_REASON))
 
       tlvReader.exitContainer()
 

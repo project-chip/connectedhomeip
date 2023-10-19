@@ -1790,14 +1790,6 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("Key", indent + 1, value.key);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Key'");
-            return err;
-        }
-    }
-    {
         CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
         if (err != CHIP_NO_ERROR)
         {
@@ -5281,7 +5273,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("OffWaitTime", 1, value);
         }
         case OnOff::Attributes::StartUpOnOff::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffStartUpOnOff> value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::StartUpOnOffEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("StartUpOnOff", 1, value);
         }
@@ -5998,7 +5990,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("UpdatePossible", 1, value);
         }
         case OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id: {
-            chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value;
+            chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("UpdateState", 1, value);
         }
@@ -6638,6 +6630,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("TestEventTriggersEnabled", 1, value);
+        }
+        case GeneralDiagnostics::Attributes::AverageWearCount::Id: {
+            uint32_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AverageWearCount", 1, value);
         }
         case GeneralDiagnostics::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -10349,7 +10346,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("PhysicalMaxLevel", 1, value);
         }
         case BallastConfiguration::Attributes::BallastStatus::Id: {
-            uint8_t value;
+            chip::BitMask<chip::app::Clusters::BallastConfiguration::BallastStatusBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BallastStatus", 1, value);
         }
@@ -10399,7 +10396,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("LampBurnHours", 1, value);
         }
         case BallastConfiguration::Attributes::LampAlarmMode::Id: {
-            uint8_t value;
+            chip::BitMask<chip::app::Clusters::BallastConfiguration::LampAlarmModeBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LampAlarmMode", 1, value);
         }

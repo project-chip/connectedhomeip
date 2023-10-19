@@ -126,7 +126,7 @@ public:
     virtual ~AttestationTrustStore() = default;
 
     // Not copyable
-    AttestationTrustStore(const AttestationTrustStore &) = delete;
+    AttestationTrustStore(const AttestationTrustStore &)             = delete;
     AttestationTrustStore & operator=(const AttestationTrustStore &) = delete;
 
     /**
@@ -164,7 +164,7 @@ public:
     virtual ~WellKnownKeysTrustStore() = default;
 
     // Not copyable
-    WellKnownKeysTrustStore(const WellKnownKeysTrustStore &) = delete;
+    WellKnownKeysTrustStore(const WellKnownKeysTrustStore &)             = delete;
     WellKnownKeysTrustStore & operator=(const WellKnownKeysTrustStore &) = delete;
 
     /**
@@ -266,7 +266,7 @@ public:
     virtual ~DeviceAttestationVerifier() = default;
 
     // Not copyable
-    DeviceAttestationVerifier(const DeviceAttestationVerifier &) = delete;
+    DeviceAttestationVerifier(const DeviceAttestationVerifier &)             = delete;
     DeviceAttestationVerifier & operator=(const DeviceAttestationVerifier &) = delete;
 
     struct AttestationInfo

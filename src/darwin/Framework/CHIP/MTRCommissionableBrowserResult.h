@@ -17,9 +17,11 @@
 
 #import <Foundation/Foundation.h>
 
+#import <Matter/MTRDefines.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
-API_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
+MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0))
 @interface MTRCommissionableBrowserResult : NSObject
 
 /**

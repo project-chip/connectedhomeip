@@ -17,11 +17,11 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
 import java.util.Optional
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class ContentLauncherClusterStyleInformationStruct(
   val imageURL: Optional<String>,
@@ -36,9 +36,9 @@ class ContentLauncherClusterStyleInformationStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       if (imageURL.isPresent) {
         val optimageURL = imageURL.get()
         put(ContextSpecificTag(TAG_IMAGE_U_R_L), optimageURL)
@@ -60,8 +60,8 @@ class ContentLauncherClusterStyleInformationStruct(
     private const val TAG_COLOR = 1
     private const val TAG_SIZE = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ContentLauncherClusterStyleInformationStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ContentLauncherClusterStyleInformationStruct {
+      tlvReader.enterStructure(tlvTag)
       val imageURL =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_IMAGE_U_R_L))) {
           Optional.of(tlvReader.getString(ContextSpecificTag(TAG_IMAGE_U_R_L)))

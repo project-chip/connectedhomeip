@@ -17,17 +17,17 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class NetworkCommissioningClusterWiFiInterfaceScanResultStruct(
-  val security: Int,
+  val security: UInt,
   val ssid: ByteArray,
   val bssid: ByteArray,
-  val channel: Int,
-  val wiFiBand: Int,
+  val channel: UInt,
+  val wiFiBand: UInt,
   val rssi: Int
 ) {
   override fun toString(): String = buildString {
@@ -41,9 +41,9 @@ class NetworkCommissioningClusterWiFiInterfaceScanResultStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_SECURITY), security)
       put(ContextSpecificTag(TAG_SSID), ssid)
       put(ContextSpecificTag(TAG_BSSID), bssid)
@@ -63,15 +63,15 @@ class NetworkCommissioningClusterWiFiInterfaceScanResultStruct(
     private const val TAG_RSSI = 5
 
     fun fromTlv(
-      tag: Tag,
+      tlvTag: Tag,
       tlvReader: TlvReader
     ): NetworkCommissioningClusterWiFiInterfaceScanResultStruct {
-      tlvReader.enterStructure(tag)
-      val security = tlvReader.getInt(ContextSpecificTag(TAG_SECURITY))
+      tlvReader.enterStructure(tlvTag)
+      val security = tlvReader.getUInt(ContextSpecificTag(TAG_SECURITY))
       val ssid = tlvReader.getByteArray(ContextSpecificTag(TAG_SSID))
       val bssid = tlvReader.getByteArray(ContextSpecificTag(TAG_BSSID))
-      val channel = tlvReader.getInt(ContextSpecificTag(TAG_CHANNEL))
-      val wiFiBand = tlvReader.getInt(ContextSpecificTag(TAG_WI_FI_BAND))
+      val channel = tlvReader.getUInt(ContextSpecificTag(TAG_CHANNEL))
+      val wiFiBand = tlvReader.getUInt(ContextSpecificTag(TAG_WI_FI_BAND))
       val rssi = tlvReader.getInt(ContextSpecificTag(TAG_RSSI))
 
       tlvReader.exitContainer()

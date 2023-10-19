@@ -38,7 +38,7 @@ namespace mdns {
 namespace Minimal {
 namespace test {
 
-constexpr QNamePart kIgnoreQNameParts[] = { "IGNORE", "THIS" };
+inline constexpr QNamePart kIgnoreQNameParts[] = { "IGNORE", "THIS" };
 namespace {
 bool StringMatches(const BytesRange & br, const char * str)
 {

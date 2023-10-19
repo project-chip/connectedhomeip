@@ -17,10 +17,10 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class OperationalStateClusterOperationalErrorEvent(
   val errorState: chip.devicecontroller.cluster.structs.OperationalStateClusterErrorStateStruct
@@ -31,9 +31,9 @@ class OperationalStateClusterOperationalErrorEvent(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       errorState.toTlv(ContextSpecificTag(TAG_ERROR_STATE), this)
       endStructure()
     }
@@ -42,8 +42,8 @@ class OperationalStateClusterOperationalErrorEvent(
   companion object {
     private const val TAG_ERROR_STATE = 0
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): OperationalStateClusterOperationalErrorEvent {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): OperationalStateClusterOperationalErrorEvent {
+      tlvReader.enterStructure(tlvTag)
       val errorState =
         chip.devicecontroller.cluster.structs.OperationalStateClusterErrorStateStruct.fromTlv(
           ContextSpecificTag(TAG_ERROR_STATE),

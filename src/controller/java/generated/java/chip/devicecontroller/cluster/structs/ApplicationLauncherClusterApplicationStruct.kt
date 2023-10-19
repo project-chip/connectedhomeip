@@ -17,13 +17,13 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class ApplicationLauncherClusterApplicationStruct(
-  val catalogVendorID: Int,
+  val catalogVendorID: UInt,
   val applicationID: String
 ) {
   override fun toString(): String = buildString {
@@ -33,9 +33,9 @@ class ApplicationLauncherClusterApplicationStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_CATALOG_VENDOR_I_D), catalogVendorID)
       put(ContextSpecificTag(TAG_APPLICATION_I_D), applicationID)
       endStructure()
@@ -46,9 +46,9 @@ class ApplicationLauncherClusterApplicationStruct(
     private const val TAG_CATALOG_VENDOR_I_D = 0
     private const val TAG_APPLICATION_I_D = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ApplicationLauncherClusterApplicationStruct {
-      tlvReader.enterStructure(tag)
-      val catalogVendorID = tlvReader.getInt(ContextSpecificTag(TAG_CATALOG_VENDOR_I_D))
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ApplicationLauncherClusterApplicationStruct {
+      tlvReader.enterStructure(tlvTag)
+      val catalogVendorID = tlvReader.getUInt(ContextSpecificTag(TAG_CATALOG_VENDOR_I_D))
       val applicationID = tlvReader.getString(ContextSpecificTag(TAG_APPLICATION_I_D))
 
       tlvReader.exitContainer()

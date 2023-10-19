@@ -160,7 +160,7 @@ def main(context, dry_run, log_level, target, target_glob, target_skip_glob,
     # Figures out selected test that match the given name(s)
     if runtime == TestRunTime.CHIP_REPL_PYTHON:
         all_tests = [test for test in chiptest.AllReplYamlTests()]
-    elif runtime == TestRunTime.CHIP_TOOL_PYTHON:
+    elif runtime == TestRunTime.CHIP_TOOL_PYTHON and os.path.basename(chip_tool) != "darwin-framework-tool":
         all_tests = [test for test in chiptest.AllChipToolYamlTests()]
     else:
         all_tests = [test for test in chiptest.AllChipToolTests(chip_tool)]
@@ -313,7 +313,10 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         chip_repl_yaml_tester = paths_finder.get('yamltest_with_chip_repl_tester.py')
 
     if chip_tool_with_python is None:
-        chip_tool_with_python = paths_finder.get('chiptool.py')
+        if context.obj.chip_tool and os.path.basename(context.obj.chip_tool) == "darwin-framework-tool":
+            chip_tool_with_python = paths_finder.get('darwinframeworktool.py')
+        else:
+            chip_tool_with_python = paths_finder.get('chiptool.py')
 
     # Command execution requires an array
     paths = chiptest.ApplicationPaths(
@@ -361,15 +364,15 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             try:
                 if context.obj.dry_run:
                     logging.info("Would run test: %s" % test.name)
-                    continue
-
-                logging.info('%-20s - Starting test' % (test.name))
+                else:
+                    logging.info('%-20s - Starting test' % (test.name))
                 test.Run(
                     runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run,
                     test_runtime=context.obj.runtime)
-                test_end = time.monotonic()
-                logging.info('%-30s - Completed in %0.2f seconds' %
-                             (test.name, (test_end - test_start)))
+                if not context.obj.dry_run:
+                    test_end = time.monotonic()
+                    logging.info('%-30s - Completed in %0.2f seconds' %
+                                 (test.name, (test_end - test_start)))
             except Exception:
                 test_end = time.monotonic()
                 logging.exception('%-30s - FAILED in %0.2f seconds' %

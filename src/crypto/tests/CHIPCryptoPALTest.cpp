@@ -57,6 +57,7 @@
 #endif
 
 #include <credentials/CHIPCert.h>
+#include <credentials/attestation_verifier/TestPAAStore.h>
 #include <credentials/tests/CHIPAttCert_test_vectors.h>
 #include <credentials/tests/CHIPCert_test_vectors.h>
 
@@ -166,13 +167,13 @@ const AesCtrTestEntry theAesCtrTestVector[] = {
         .ciphertextLen = 16,
     },
     {
-        .key       = (const uint8_t *) "\x7e\x24\x06\x78\x17\xfa\xe0\xd7\x43\xd6\xce\x1f\x32\x53\x91\x63",
-        .nonce     = (const uint8_t *) "\x00\x6c\xb6\xdb\xc0\x54\x3b\x59\xda\x48\xd9\x0b\x00",
-        .plaintext = (const uint8_t *) "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
-                                       "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
-        .plaintextLen = 32,
-        .ciphertext   = (const uint8_t *) "\x4f\x3d\xf9\x49\x15\x88\x4d\xe0\xdc\x0e\x30\x95\x0d\xe7\xa6\xe9"
-                                        "\x5a\x91\x7e\x1d\x06\x42\x22\xdb\x2f\x6e\xc7\x3d\x99\x4a\xd9\x5f",
+        .key           = (const uint8_t *) "\x7e\x24\x06\x78\x17\xfa\xe0\xd7\x43\xd6\xce\x1f\x32\x53\x91\x63",
+        .nonce         = (const uint8_t *) "\x00\x6c\xb6\xdb\xc0\x54\x3b\x59\xda\x48\xd9\x0b\x00",
+        .plaintext     = (const uint8_t *) "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
+                                           "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
+        .plaintextLen  = 32,
+        .ciphertext    = (const uint8_t *) "\x4f\x3d\xf9\x49\x15\x88\x4d\xe0\xdc\x0e\x30\x95\x0d\xe7\xa6\xe9"
+                                           "\x5a\x91\x7e\x1d\x06\x42\x22\xdb\x2f\x6e\xc7\x3d\x99\x4a\xd9\x5f",
         .ciphertextLen = 32,
     }
 };
@@ -574,14 +575,11 @@ static void TestRawIntegerToDerInvalidCases(nlTestSuite * inSuite, void * inCont
     HeapChecker heapChecker(inSuite);
     // Cover case of invalid buffers
     uint8_t placeholder[10] = { 0 };
-    MutableByteSpan good_out_buffer(placeholder, sizeof(placeholder));
-    ByteSpan good_buffer(placeholder, sizeof(placeholder));
+    MutableByteSpan good_out_buffer(placeholder);
+    ByteSpan good_buffer(placeholder);
 
-    MutableByteSpan bad_out_buffer_nullptr(nullptr, sizeof(placeholder));
-    MutableByteSpan bad_out_buffer_empty(placeholder, 0);
-
-    ByteSpan bad_buffer_nullptr(nullptr, sizeof(placeholder));
-    ByteSpan bad_buffer_empty(placeholder, 0);
+    MutableByteSpan bad_out_buffer_empty;
+    ByteSpan bad_buffer_empty;
 
     struct ErrorCase
     {
@@ -591,9 +589,7 @@ static void TestRawIntegerToDerInvalidCases(nlTestSuite * inSuite, void * inCont
     };
 
     const ErrorCase error_cases[] = {
-        { .input = good_buffer, .output = bad_out_buffer_nullptr, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
         { .input = good_buffer, .output = bad_out_buffer_empty, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
-        { .input = bad_buffer_nullptr, .output = good_out_buffer, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
         { .input = bad_buffer_empty, .output = good_out_buffer, .expected_status = CHIP_ERROR_INVALID_ARGUMENT }
     };
 
@@ -681,7 +677,6 @@ static void TestReadDerLengthInvalidCases(nlTestSuite * inSuite, void * inContex
 {
     uint8_t placeholder[1];
 
-    ByteSpan bad_buffer_nullptr(nullptr, sizeof(placeholder));
     ByteSpan bad_buffer_empty(placeholder, 0);
 
     const uint8_t zero_multi_byte_length[] = { 0x80 };
@@ -716,7 +711,6 @@ static void TestReadDerLengthInvalidCases(nlTestSuite * inSuite, void * inContex
     };
 
     const ErrorCase error_cases[] = {
-        { .input_buf = bad_buffer_nullptr, .expected_status = CHIP_ERROR_BUFFER_TOO_SMALL },
         { .input_buf = bad_buffer_empty, .expected_status = CHIP_ERROR_BUFFER_TOO_SMALL },
         { .input_buf = zero_multi_byte_length_buf, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
         { .input_buf = single_byte_length_zero_buf, .expected_status = CHIP_ERROR_INVALID_ARGUMENT },
@@ -1454,8 +1448,8 @@ void TestCSR_GenDirect(nlTestSuite * inSuite, void * inContext)
 
         // Let's corrupt the CSR buffer and make sure it fails to verify
         size_t length      = csrSpan.size();
-        csrBuf[length - 2] = (uint8_t)(csrBuf[length - 2] + 1);
-        csrBuf[length - 1] = (uint8_t)(csrBuf[length - 1] + 1);
+        csrBuf[length - 2] = (uint8_t) (csrBuf[length - 2] + 1);
+        csrBuf[length - 1] = (uint8_t) (csrBuf[length - 1] + 1);
 
         NL_TEST_ASSERT(inSuite, VerifyCertificateSigningRequest(csrSpan.data(), csrSpan.size(), pubkey) != CHIP_NO_ERROR);
     }
@@ -1485,8 +1479,8 @@ static void TestCSR_GenByKeypair(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, memcmp(pubkey.ConstBytes(), keypair.Pubkey().ConstBytes(), pubkey.Length()) == 0);
 
         // Let's corrupt the CSR buffer and make sure it fails to verify
-        csr[length - 2] = (uint8_t)(csr[length - 2] + 1);
-        csr[length - 1] = (uint8_t)(csr[length - 1] + 1);
+        csr[length - 2] = (uint8_t) (csr[length - 2] + 1);
+        csr[length - 1] = (uint8_t) (csr[length - 1] + 1);
 
         NL_TEST_ASSERT(inSuite, VerifyCertificateSigningRequest(csr, length, pubkey) != CHIP_NO_ERROR);
     }
@@ -2104,7 +2098,7 @@ static void TestX509_CertChainValidation(nlTestSuite * inSuite, void * inContext
         {  sTestCert_PAA_FFF2_ValInPast_Cert,   sTestCert_PAI_FFF2_8006_ValInPast_Cert,    sTestCert_DAC_FFF2_8006_0024_ValInPast_Cert,     CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
         {  sTestCert_PAA_FFF2_ValInFuture_Cert, sTestCert_PAI_FFF2_8006_ValInFuture_Cert,  sTestCert_DAC_FFF2_8006_0025_ValInFuture_Cert,   CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
         // Valid cases without intermediate:
-        {  ByteSpan(sTestCert_Root01_DER, sTestCert_Root01_DER_Len), ByteSpan(), ByteSpan(sTestCert_Node01_02_DER, sTestCert_Node01_02_DER_Len), CHIP_NO_ERROR,          CertificateChainValidationResult::kSuccess             },
+        {  sTestCert_Root01_DER,                ByteSpan(),                                sTestCert_Node01_02_DER,                         CHIP_NO_ERROR,               CertificateChainValidationResult::kSuccess             },
         // Error cases with invalid (empty Span) inputs:
         {  ByteSpan(),                          sTestCert_PAI_FFF1_8000_Cert,              sTestCert_DAC_FFF1_8000_0000_Cert,               CHIP_ERROR_INVALID_ARGUMENT, CertificateChainValidationResult::kRootArgumentInvalid },
         {  sTestCert_PAA_FFF1_Cert,             sTestCert_PAI_FFF1_8000_Cert,              ByteSpan(),                                      CHIP_ERROR_INVALID_ARGUMENT, CertificateChainValidationResult::kLeafArgumentInvalid },
@@ -2622,7 +2616,7 @@ static void TestVIDPID_StringExtraction(nlTestSuite * inSuite, void * inContext)
         { DNAttrType::kCommonName, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute16), strlen(sTestCNAttribute16)), true, true, chip::VendorId::TestVendor1, 0xFE67, CHIP_NO_ERROR },
         // Other input combinations:
         { DNAttrType::kUnspecified, ByteSpan(reinterpret_cast<const uint8_t *>(sTestCNAttribute15), strlen(sTestCNAttribute15)), false, false, chip::VendorId::NotSpecified, 0, CHIP_NO_ERROR },
-        { DNAttrType::kCommonName, ByteSpan(nullptr, 0), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_INVALID_ARGUMENT },
+        { DNAttrType::kCommonName, ByteSpan(), false, false, chip::VendorId::NotSpecified, 0, CHIP_ERROR_INVALID_ARGUMENT },
     };
     // clang-format on
 

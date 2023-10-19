@@ -14,9 +14,8 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
-import("${chip_root}/src/platform/device.gni")
-
 import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/platform/device.gni")
 import("common_flags.gni")
 import("icd/icd.gni")
 
@@ -59,6 +58,8 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_ENABLE_EVENTLIST_ATTRIBUTE=${enable_eventlist_attribute}",
     "CHIP_CONFIG_ENABLE_ICD_SERVER=${chip_enable_icd_server}",
     "CHIP_CONFIG_ENABLE_READ_CLIENT=${chip_enable_read_client}",
+    "ICD_REPORT_ON_ENTER_ACTIVE_MODE=${chip_report_on_active_mode}",
+    "ICD_MAX_NOTIFICATION_SUBSCRIBERS=${icd_max_notification_subscribers}",
   ]
 }
 
@@ -209,6 +210,21 @@ static_library("app") {
     ]
   }
 
+  if (chip_build_controller_dynamic_server) {
+    defines = [
+      "CHIP_CONFIG_SKIP_APP_SPECIFIC_GENERATED_HEADER_INCLUDES=1",
+      "CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=1",
+    ]
+    sources += [
+      "clusters/ota-provider/ota-provider.cpp",
+      "dynamic_server/AccessControl.cpp",
+      "dynamic_server/AccessControl.h",
+      "dynamic_server/DynamicDispatcher.cpp",
+      "util/privilege-storage.cpp",
+      "util/privilege-storage.h",
+    ]
+  }
+
   if (chip_enable_read_client) {
     sources += [
       "BufferedReadCallback.cpp",
@@ -221,7 +237,8 @@ static_library("app") {
   public_deps = [
     ":app_config",
     "${chip_root}/src/access",
-    "${chip_root}/src/app/icd:observer-srcs",
+    "${chip_root}/src/app/icd:notifier",
+    "${chip_root}/src/app/icd:observer",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
@@ -231,7 +248,7 @@ static_library("app") {
   ]
 
   if (chip_enable_icd_server) {
-    public_deps += [ "${chip_root}/src/app/icd:server-srcs" ]
+    public_deps += [ "${chip_root}/src/app/icd:manager" ]
   }
 
   cflags = [ "-Wconversion" ]

@@ -118,8 +118,8 @@ esp_err_t InitDisplay()
     TFT_setRotation(LANDSCAPE);
     TFT_resetclipwin();
 
-    DisplayWidth  = (uint16_t)(1 + tft_dispWin.x2 - tft_dispWin.x1);
-    DisplayHeight = (uint16_t)(1 + tft_dispWin.y2 - tft_dispWin.y1);
+    DisplayWidth  = (uint16_t) (1 + tft_dispWin.x2 - tft_dispWin.x1);
+    DisplayHeight = (uint16_t) (1 + tft_dispWin.y2 - tft_dispWin.y1);
 
     ESP_LOGI(TAG, "Display initialized (height %u, width %u)", DisplayHeight, DisplayWidth);
 

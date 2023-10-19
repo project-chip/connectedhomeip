@@ -18,11 +18,10 @@
 #include "DeviceCallbacks.h"
 
 #include "AppTask.h"
+#include "esp_log.h"
 #include <common/CHIPDeviceManager.h>
 #include <common/Esp32AppServer.h>
 #include <common/Esp32ThreadInit.h>
-
-#include "esp_log.h"
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 #include "spi_flash_mmap.h"
 #else
@@ -61,6 +60,8 @@
 
 #if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
 #include <esp_insights.h>
+#include <tracing/esp32_trace/esp32_tracing.h>
+#include <tracing/registry.h>
 #endif
 
 using namespace ::chip;
@@ -113,6 +114,22 @@ static void InitServer(intptr_t context)
 
     DeviceCallbacksDelegate::Instance().SetAppDelegate(&sAppDeviceCallbacksDelegate);
     Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
+#if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
+    esp_insights_config_t config = {
+        .log_type = ESP_DIAG_LOG_TYPE_ERROR | ESP_DIAG_LOG_TYPE_WARNING | ESP_DIAG_LOG_TYPE_EVENT,
+        .auth_key = insights_auth_key_start,
+    };
+
+    esp_err_t ret = esp_insights_init(&config);
+
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(TAG, "Failed to initialize ESP Insights, err:0x%x", ret);
+    }
+
+    static Tracing::Insights::ESP32Backend backend;
+    Tracing::Register(backend);
+#endif
 }
 
 extern "C" void app_main()
@@ -132,20 +149,6 @@ extern "C" void app_main()
     }
 #if CONFIG_ENABLE_PW_RPC
     chip::rpc::Init();
-#endif
-
-#if CONFIG_ENABLE_ESP_INSIGHTS_TRACE
-    esp_insights_config_t config = {
-        .log_type = ESP_DIAG_LOG_TYPE_ERROR | ESP_DIAG_LOG_TYPE_WARNING | ESP_DIAG_LOG_TYPE_EVENT,
-        .auth_key = insights_auth_key_start,
-    };
-
-    esp_err_t ret = esp_insights_init(&config);
-
-    if (ret != ESP_OK)
-    {
-        ESP_LOGE(TAG, "Failed to initialize ESP Insights, err:0x%x", ret);
-    }
 #endif
 
     ESP_LOGI(TAG, "==================================================");

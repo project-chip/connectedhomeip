@@ -17,12 +17,12 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
-class MediaPlaybackClusterPlaybackPositionStruct(val updatedAt: Long, val position: Long?) {
+class MediaPlaybackClusterPlaybackPositionStruct(val updatedAt: ULong, val position: ULong?) {
   override fun toString(): String = buildString {
     append("MediaPlaybackClusterPlaybackPositionStruct {\n")
     append("\tupdatedAt : $updatedAt\n")
@@ -30,9 +30,9 @@ class MediaPlaybackClusterPlaybackPositionStruct(val updatedAt: Long, val positi
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_UPDATED_AT), updatedAt)
       if (position != null) {
         put(ContextSpecificTag(TAG_POSITION), position)
@@ -47,12 +47,12 @@ class MediaPlaybackClusterPlaybackPositionStruct(val updatedAt: Long, val positi
     private const val TAG_UPDATED_AT = 0
     private const val TAG_POSITION = 1
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): MediaPlaybackClusterPlaybackPositionStruct {
-      tlvReader.enterStructure(tag)
-      val updatedAt = tlvReader.getLong(ContextSpecificTag(TAG_UPDATED_AT))
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): MediaPlaybackClusterPlaybackPositionStruct {
+      tlvReader.enterStructure(tlvTag)
+      val updatedAt = tlvReader.getULong(ContextSpecificTag(TAG_UPDATED_AT))
       val position =
         if (!tlvReader.isNull()) {
-          tlvReader.getLong(ContextSpecificTag(TAG_POSITION))
+          tlvReader.getULong(ContextSpecificTag(TAG_POSITION))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_POSITION))
           null

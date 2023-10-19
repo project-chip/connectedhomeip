@@ -161,7 +161,7 @@ def test_update_ctrl(device, controller, ota_provider, softwareVersion):
     # Announce the OTA provider and start the firmware update process
     err, res = send_zcl_command(devCtrl, "OtaSoftwareUpdateRequestor", "AnnounceOTAProvider", requestorNodeId, OTA_REQUESTOR_CTRL_TEST_ENDPOINT_ID,
                                 dict(providerNodeID=providerNodeId, vendorID=int(setupPayloadProvider.attributes['VendorID']),
-                                     announcementReason=OtaSoftwareUpdateRequestor.Enums.OTAAnnouncementReason.kUrgentUpdateAvailable,
+                                     announcementReason=OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUrgentUpdateAvailable,
                                      metadataForNode=None, endpoint=0))
 
     ret = device.wait_for_output("New version of the software is available")

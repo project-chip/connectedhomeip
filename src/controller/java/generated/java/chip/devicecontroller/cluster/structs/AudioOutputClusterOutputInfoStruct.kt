@@ -17,12 +17,12 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
-class AudioOutputClusterOutputInfoStruct(val index: Int, val outputType: Int, val name: String) {
+class AudioOutputClusterOutputInfoStruct(val index: UInt, val outputType: UInt, val name: String) {
   override fun toString(): String = buildString {
     append("AudioOutputClusterOutputInfoStruct {\n")
     append("\tindex : $index\n")
@@ -31,9 +31,9 @@ class AudioOutputClusterOutputInfoStruct(val index: Int, val outputType: Int, va
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_INDEX), index)
       put(ContextSpecificTag(TAG_OUTPUT_TYPE), outputType)
       put(ContextSpecificTag(TAG_NAME), name)
@@ -46,10 +46,10 @@ class AudioOutputClusterOutputInfoStruct(val index: Int, val outputType: Int, va
     private const val TAG_OUTPUT_TYPE = 1
     private const val TAG_NAME = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): AudioOutputClusterOutputInfoStruct {
-      tlvReader.enterStructure(tag)
-      val index = tlvReader.getInt(ContextSpecificTag(TAG_INDEX))
-      val outputType = tlvReader.getInt(ContextSpecificTag(TAG_OUTPUT_TYPE))
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): AudioOutputClusterOutputInfoStruct {
+      tlvReader.enterStructure(tlvTag)
+      val index = tlvReader.getUInt(ContextSpecificTag(TAG_INDEX))
+      val outputType = tlvReader.getUInt(ContextSpecificTag(TAG_OUTPUT_TYPE))
       val name = tlvReader.getString(ContextSpecificTag(TAG_NAME))
 
       tlvReader.exitContainer()

@@ -17,15 +17,15 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class OtaSoftwareUpdateRequestorClusterDownloadErrorEvent(
-  val softwareVersion: Long,
-  val bytesDownloaded: Long,
-  val progressPercent: Int?,
+  val softwareVersion: ULong,
+  val bytesDownloaded: ULong,
+  val progressPercent: UInt?,
   val platformCode: Long?
 ) {
   override fun toString(): String = buildString {
@@ -37,9 +37,9 @@ class OtaSoftwareUpdateRequestorClusterDownloadErrorEvent(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_SOFTWARE_VERSION), softwareVersion)
       put(ContextSpecificTag(TAG_BYTES_DOWNLOADED), bytesDownloaded)
       if (progressPercent != null) {
@@ -63,15 +63,15 @@ class OtaSoftwareUpdateRequestorClusterDownloadErrorEvent(
     private const val TAG_PLATFORM_CODE = 3
 
     fun fromTlv(
-      tag: Tag,
+      tlvTag: Tag,
       tlvReader: TlvReader
     ): OtaSoftwareUpdateRequestorClusterDownloadErrorEvent {
-      tlvReader.enterStructure(tag)
-      val softwareVersion = tlvReader.getLong(ContextSpecificTag(TAG_SOFTWARE_VERSION))
-      val bytesDownloaded = tlvReader.getLong(ContextSpecificTag(TAG_BYTES_DOWNLOADED))
+      tlvReader.enterStructure(tlvTag)
+      val softwareVersion = tlvReader.getULong(ContextSpecificTag(TAG_SOFTWARE_VERSION))
+      val bytesDownloaded = tlvReader.getULong(ContextSpecificTag(TAG_BYTES_DOWNLOADED))
       val progressPercent =
         if (!tlvReader.isNull()) {
-          tlvReader.getInt(ContextSpecificTag(TAG_PROGRESS_PERCENT))
+          tlvReader.getUInt(ContextSpecificTag(TAG_PROGRESS_PERCENT))
         } else {
           tlvReader.getNull(ContextSpecificTag(TAG_PROGRESS_PERCENT))
           null

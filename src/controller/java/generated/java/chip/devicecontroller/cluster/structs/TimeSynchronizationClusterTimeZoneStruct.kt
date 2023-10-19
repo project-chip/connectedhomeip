@@ -17,15 +17,15 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
 import java.util.Optional
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class TimeSynchronizationClusterTimeZoneStruct(
   val offset: Long,
-  val validAt: Long,
+  val validAt: ULong,
   val name: Optional<String>
 ) {
   override fun toString(): String = buildString {
@@ -36,9 +36,9 @@ class TimeSynchronizationClusterTimeZoneStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_OFFSET), offset)
       put(ContextSpecificTag(TAG_VALID_AT), validAt)
       if (name.isPresent) {
@@ -54,10 +54,10 @@ class TimeSynchronizationClusterTimeZoneStruct(
     private const val TAG_VALID_AT = 1
     private const val TAG_NAME = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): TimeSynchronizationClusterTimeZoneStruct {
-      tlvReader.enterStructure(tag)
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): TimeSynchronizationClusterTimeZoneStruct {
+      tlvReader.enterStructure(tlvTag)
       val offset = tlvReader.getLong(ContextSpecificTag(TAG_OFFSET))
-      val validAt = tlvReader.getLong(ContextSpecificTag(TAG_VALID_AT))
+      val validAt = tlvReader.getULong(ContextSpecificTag(TAG_VALID_AT))
       val name =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_NAME))) {
           Optional.of(tlvReader.getString(ContextSpecificTag(TAG_NAME)))

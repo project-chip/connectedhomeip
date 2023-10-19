@@ -310,8 +310,8 @@ menu "CHIP Device Layer"
             help
                 Enables or Disables ICD server
 
-        config ICD_SLOW_POLL_INTERVAL
-            int "ICD Slow Polling Interval"
+        config ICD_SLOW_POLL_INTERVAL_MS
+            int "ICD Slow Polling Interval(ms)"
             depends on ENABLE_ICD_SERVER
             default 5000
             help
@@ -319,14 +319,46 @@ menu "CHIP Device Layer"
                 messages in Idle Mode. The Slow Polling interval MAY be the same as the Idle Mode
                 Interval.
 
-        config ICD_FAST_POLL_INTERVAL
-            int "ICD Fast Polling Interval"
+        config ICD_FAST_POLL_INTERVAL_MS
+            int "ICD Fast Polling Interval(ms)"
             depends on ENABLE_ICD_SERVER
             default 200
             help
                 Fast Polling defines the fastest frequency at which the device can receive messages
                 in Active Mode. The Fast Polling interval SHALL be smaller than the Active Mode
                 Interval.
+
+        config ICD_IDLE_MODE_INTERVAL_SEC
+            int "ICD Idle Mode Interval(sec)"
+            depends on ENABLE_ICD_SERVER
+            default 2
+            help
+                This value indicates the maximum interval in seconds the server can stay in idle
+                mode.
+
+        config ICD_ACTIVE_MODE_INTERVAL_MS
+            int "ICD Active Mode Interval(ms)"
+            depends on ENABLE_ICD_SERVER
+            default 300
+            help
+                This value indicates the minimum interval in milliseconds the server can stay in
+                active mode.
+
+        config ICD_ACTIVE_MODE_THRESHOLD_MS
+            int "ICD Active Mode Threshold(ms)"
+            depends on ENABLE_ICD_SERVER
+            default 300
+            help
+                This value indicates the minimum amount of time in milliseconds the server typically
+                will stay active after network activity when in active mode.
+
+        config ICD_CLIENTS_SUPPORTED_PER_FABRIC
+            int "ICD Clients Number Supported Per Fabric"
+            depends on ENABLE_ICD_SERVER
+            default 1
+            help
+                This value indicates the maximum number of entries that the ICD server is able to store
+                for each fabric in the RegisteredClients attribute.
 
         config ENABLE_BG_EVENT_PROCESSING
             bool "Enable Background event processing"
@@ -1034,6 +1066,15 @@ menu "CHIP Device Layer"
             default n
             help
                 Enable esp32 as a BLE Commissioner.
+
+    endmenu
+
+    menu "Enable Matter Event List"
+        config ENABLE_MATTER_EVENT_LIST
+            bool "Enable Matter support Event List attribute"
+            default n
+            help
+                Enable Matter support Event List attribute.
 
     endmenu
 

@@ -40,6 +40,7 @@ static_library("mbed") {
   ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
+  deps = [ "${chip_root}/src/platform/logging:headers" ]
 
   if (chip_enable_wifi) {
     sources += [

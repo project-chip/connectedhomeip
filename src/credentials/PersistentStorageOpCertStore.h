@@ -36,7 +36,7 @@ namespace Credentials {
  *        to refactors to use `OperationalCertificateStore` and exists as a baseline example
  *        of how to use the interface.
  */
-class PersistentStorageOpCertStore : public OperationalCertificateStore
+class PersistentStorageOpCertStore final : public OperationalCertificateStore
 {
 public:
     PersistentStorageOpCertStore() {}
@@ -44,7 +44,7 @@ public:
 
     // Non-copyable
     PersistentStorageOpCertStore(PersistentStorageOpCertStore const &) = delete;
-    void operator=(PersistentStorageOpCertStore const &) = delete;
+    void operator=(PersistentStorageOpCertStore const &)               = delete;
 
     /**
      * @brief Initialize the certificate store to map to a given storage delegate.

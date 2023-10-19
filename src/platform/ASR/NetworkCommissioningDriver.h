@@ -33,16 +33,15 @@ namespace DeviceLayer {
 namespace NetworkCommissioning {
 
 namespace {
-constexpr uint8_t kMaxWiFiNetworks                  = 1;
-constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
-constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
-constexpr uint8_t kWiFiMaxNetworks                  = 15;
+inline constexpr uint8_t kMaxWiFiNetworks                  = 1;
+inline constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
+inline constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
 } // namespace
 
 class ASRScanResponseIterator : public Iterator<WiFiScanResponse>
 {
 public:
-    ASRScanResponseIterator(const size_t size, const lega_wlan_scan_result_t * scanResults) :
+    ASRScanResponseIterator(const size_t size, const lega_wlan_scan_ap_record_t * scanResults) :
         mSize(size), mpScanResults(scanResults)
     {}
     size_t Count() override { return mSize; }
@@ -54,14 +53,14 @@ public:
         }
 
         // copy the available information into WiFiScanResponse struct, which will be copied to the result to be sent
-        item.security.SetRaw(mpScanResults->ap_list[mIternum].security);
-        item.ssidLen  = static_cast<uint8_t>(strnlen(reinterpret_cast<const char *>(mpScanResults->ap_list[mIternum].ssid),
-                                                    chip::DeviceLayer::Internal::kMaxWiFiSSIDLength));
-        item.channel  = mpScanResults->ap_list[mIternum].channel;
+        item.security.SetRaw(mpScanResults[mIternum].security);
+        item.ssidLen = static_cast<uint8_t>(
+            strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].ssid), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength));
+        item.channel  = mpScanResults[mIternum].channel;
         item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
-        item.rssi     = mpScanResults->ap_list[mIternum].ap_power;
-        memcpy(item.ssid, mpScanResults->ap_list[mIternum].ssid, item.ssidLen);
-        memcpy(item.bssid, mpScanResults->ap_list[mIternum].bssid, 6);
+        item.rssi     = mpScanResults[mIternum].ap_power;
+        memcpy(item.ssid, mpScanResults[mIternum].ssid, item.ssidLen);
+        memcpy(item.bssid, mpScanResults[mIternum].bssid, 6);
 
         mIternum++;
         return true;
@@ -69,9 +68,9 @@ public:
     void Release() override {}
 
 private:
-    const size_t mSize;                            // no of network scanned
-    const lega_wlan_scan_result_t * mpScanResults; // list of scanned network info of size mSize
-    size_t mIternum = 0;                           // to iterate through mpScanResults of size mSize
+    const size_t mSize;                               // no of network scanned
+    const lega_wlan_scan_ap_record_t * mpScanResults; // list of scanned network info of size mSize
+    size_t mIternum = 0;                              // to iterate through mpScanResults of size mSize
 };
 
 class ASRWiFiDriver final : public WiFiDriver
@@ -124,7 +123,7 @@ public:
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
 
     void OnConnectWiFiNetwork();
-    void OnScanWiFiNetworkDone(lega_wlan_scan_result_t * ScanResult);
+    void OnScanWiFiNetworkDone();
     void OnNetworkStatusChange();
 
     CHIP_ERROR SetLastDisconnectReason(int32_t reason);
@@ -138,7 +137,6 @@ public:
 
 private:
     bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
-    CHIP_ERROR StartScanWiFiNetworks(ByteSpan ssid);
 
     WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;

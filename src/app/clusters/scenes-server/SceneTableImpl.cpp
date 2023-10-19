@@ -767,7 +767,9 @@ CHIP_ERROR DefaultSceneTableImpl::DeleteAllScenesInGroup(FabricIndex fabric_inde
     FabricSceneData fabric(mEndpointId, fabric_index, mMaxScenesPerFabric, mMaxScenesPerEndpoint);
     SceneTableData scene(mEndpointId, fabric_index);
 
-    ReturnErrorOnFailure(fabric.Load(mStorage));
+    CHIP_ERROR err = fabric.Load(mStorage);
+    VerifyOrReturnValue(CHIP_ERROR_NOT_FOUND != err, CHIP_NO_ERROR);
+    ReturnErrorOnFailure(err);
 
     for (uint16_t i = 0; i < mMaxScenesPerFabric; i++)
     {
@@ -926,8 +928,9 @@ void DefaultSceneTableImpl::SetEndpoint(EndpointId endpoint)
 void DefaultSceneTableImpl::SetTableSize(uint16_t endpointSceneTableSize)
 {
     // Verify the endpoint passed size respects the limits of the device configuration
+    VerifyOrDie(kMaxScenesPerEndpoint > 0);
     mMaxScenesPerEndpoint = (kMaxScenesPerEndpoint < endpointSceneTableSize) ? kMaxScenesPerEndpoint : endpointSceneTableSize;
-    mMaxScenesPerFabric   = static_cast<uint16_t>(endpointSceneTableSize / 2);
+    mMaxScenesPerFabric   = static_cast<uint16_t>((mMaxScenesPerEndpoint - 1) / 2);
 }
 
 DefaultSceneTableImpl::SceneEntryIterator * DefaultSceneTableImpl::IterateSceneEntries(FabricIndex fabric)

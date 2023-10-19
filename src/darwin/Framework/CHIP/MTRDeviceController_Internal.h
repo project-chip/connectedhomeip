@@ -31,6 +31,7 @@
 #import "MTRDeviceController.h"
 #import "MTRDeviceControllerDataStore.h"
 
+#import <Matter/MTRDefines.h>
 #import <Matter/MTRDeviceControllerStartupParams.h>
 #if MTR_PER_CONTROLLER_STORAGE_ENABLED
 #import <Matter/MTRDeviceControllerStorageDelegate.h>
@@ -59,7 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * The ID assigned to this controller at creation time.
  */
-@property (readonly, nonatomic) NSUUID * uniqueIdentifier MTR_NEWLY_AVAILABLE;
+@property (readonly, nonatomic) NSUUID * uniqueIdentifier;
 #endif // MTR_PER_CONTROLLER_STORAGE_ENABLED
 
 #pragma mark - MTRDeviceControllerFactory methods

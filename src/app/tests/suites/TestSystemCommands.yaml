@@ -21,6 +21,9 @@ config:
     payload:
         type: char_string
         defaultValue: "MT:-24J0IX4122-.548G00" # This value needs to be generated
+    secondNodeId:
+        type: int64u
+        defaultValue: 0xDEADBEEF
 
 tests:
     - label: "Wait for the commissioned device to be retrieved"
@@ -114,7 +117,7 @@ tests:
       arguments:
           values:
               - name: "nodeId"
-                value: 0xDEADBEEF
+                value: secondNodeId
               - name: "payload"
                 value: payload
 
@@ -125,7 +128,7 @@ tests:
       arguments:
           values:
               - name: "nodeId"
-                value: 0xDEADBEEF
+                value: secondNodeId
 
     - label: "Stop the second accessory"
       command: "Stop"
@@ -146,6 +149,29 @@ tests:
                 value: "/tmp/chip_kvs_lock2"
               - name: "registerKey"
                 value: "chip-lock-app"
+
+    # NOTE: Since we have a new KVS, this is basically a factory reset, so we can commission again.
+    - label: "Commission second accessory with new KVS from alpha"
+      identity: "alpha"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: secondNodeId
+              - name: "payload"
+                value: payload
+
+    - label:
+          "Wait for the second commissioned device with new KVS to be retrieved
+          for alpha"
+      identity: "alpha"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: secondNodeId
 
     - label: "Reboot the default accessory"
       command: "Reboot"
@@ -180,3 +206,25 @@ tests:
           values:
               - name: "registerKey"
                 value: "chip-lock-app"
+
+    - label: "Commission the now-reset second accessory from alpha"
+      identity: "alpha"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: secondNodeId
+              - name: "payload"
+                value: payload
+
+    - label:
+          "Wait for the second commissioned device (after reset) to be retrieved
+          for alpha"
+      identity: "alpha"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+      arguments:
+          values:
+              - name: "nodeId"
+                value: secondNodeId

@@ -85,25 +85,7 @@ tests:
                         EpochStartTime2: "18446744073709551614",
                     }
 
-    - label:
-          "Step 5: TH sends AddGroup Command to DUT on PIXIT.G.ENDPOINT with the
-          the following settings GroupID: 0x0103 GroupName: 'Test Group'"
-      PICS: G.S.C00.Rsp
-      endpoint: Groups.Endpoint
-      cluster: "Groups"
-      command: "AddGroup"
-      arguments:
-          values:
-              - name: GroupID
-                value: 0x0103
-              - name: GroupName
-                value: "Test Group"
-      response:
-          values:
-              - name: "Status"
-                value: 0
-              - name: "GroupID"
-                value: 0x0103
+    # Step 5 does not exist in the test plan.
 
     - label:
           "Step 6: TH reads GroupTable attribute from GroupKeyManagement cluster
@@ -112,15 +94,7 @@ tests:
       command: "readAttribute"
       attribute: "GroupTable"
       response:
-          value:
-              [
-                  {
-                      FabricIndex: 1,
-                      GroupId: 0x0103,
-                      Endpoints: [Groups.Endpoint],
-                      GroupName: "Test Group",
-                  },
-              ]
+          value: []
 
     - label:
           "Step 7a: TH attempts to write to the GroupTable attribute from
@@ -196,7 +170,7 @@ tests:
           saveAs: MaxGroupKeysPerFabricValue
           constraints:
               type: int16u
-              minValue: 0
+              minValue: 1
               maxValue: 65535
 
     - label:
@@ -210,19 +184,3 @@ tests:
           value: MaxGroupKeysPerFabricValue
       response:
           error: UNSUPPORTED_WRITE
-
-    - label:
-          "Step 12: TH cleans up the groups by sending the RemoveAllGroups
-          command to the DUT on PIXIT.G.ENDPOINT"
-      PICS: GRPKEY.S.C04.Rsp
-      cluster: "Groups"
-      endpoint: Groups.Endpoint
-      command: "RemoveAllGroups"
-
-    - label: "TH verifies the group has been removed in the GroupTable"
-      PICS: GRPKEY.S.A0001
-      cluster: "Group Key Management"
-      command: "readAttribute"
-      attribute: "GroupTable"
-      response:
-          value: []

@@ -110,10 +110,10 @@ public:
                       mLocalSessionId);
     }
 
-    SecureSession(SecureSession &&)      = delete;
-    SecureSession(const SecureSession &) = delete;
+    SecureSession(SecureSession &&)                  = delete;
+    SecureSession(const SecureSession &)             = delete;
     SecureSession & operator=(const SecureSession &) = delete;
-    SecureSession & operator=(SecureSession &&) = delete;
+    SecureSession & operator=(SecureSession &&)      = delete;
 
     void Retain() override;
     void Release() override;

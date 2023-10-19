@@ -32,7 +32,7 @@ typedef struct hsm_pake_context_s
     size_t spake_context_len;
     uint8_t spake_objId;
 } hsm_pake_context_t;
-#endif //#if ((ENABLE_SE05X_SPAKE_VERIFIER) || (ENABLE_SE05X_SPAKE_PROVER))
+#endif // #if ((ENABLE_SE05X_SPAKE_VERIFIER) || (ENABLE_SE05X_SPAKE_PROVER))
 
 namespace chip {
 namespace Crypto {
@@ -77,7 +77,7 @@ public:
     hsm_pake_context_t hsm_pake_context;
 };
 
-#endif //#if ((ENABLE_SE05X_SPAKE_VERIFIER) || (ENABLE_SE05X_SPAKE_PROVER))
+#endif // #if ((ENABLE_SE05X_SPAKE_VERIFIER) || (ENABLE_SE05X_SPAKE_PROVER))
 
 } // namespace Crypto
 } // namespace chip

@@ -30,14 +30,14 @@ limitations under the License.
 
     <!-- Attributes -->
     <!-- A simple boolean attribute that flips or flops -->
-    <attribute side="server" code="0x0000" define="FLIP_FLOP" type="BOOLEAN" writable="true" default="false" optional="false">FlipFlop</attribute>
+    <attribute side="server" code="0x0000" define="FLIP_FLOP" type="boolean" writable="true" default="false" optional="false">FlipFlop</attribute>
 
     <!-- Command Responses -->
     <command source="server" code="0x01" name="AddArgumentsResponse" optional="false" disableDefaultResponse="true">
       <description>
         Response for AddArguments that returns the sum.
       </description>
-      <arg name="returnValue" type="INT8U"/>
+      <arg name="returnValue" type="int8u"/>
     </command>
 
     <!-- Commands -->
@@ -45,8 +45,8 @@ limitations under the License.
       <description>
         Command that takes two uint8 arguments and returns their sum.
       </description>
-      <arg name="arg1" type="INT8U"/>
-      <arg name="arg2" type="INT8U"/>
+      <arg name="arg1" type="int8u"/>
+      <arg name="arg2" type="int8u"/>
     </command>
 
     <command source="client" code="0x00" name="Ping" optional="false">

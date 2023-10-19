@@ -18,7 +18,7 @@ name:
 
 PICS:
     - DISHALM.S
-    - PIXIT.DISHALM.WaterLevelAlarmSupported
+    - DISHALM.S.M.WaterLevelAlarmSupported
 
 config:
     nodeId: 0x12344321
@@ -56,6 +56,12 @@ tests:
            [1689842371.478172][2614:2616] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_005D Attribute 0x0000_0001 DataVersion: 3155962179
            [1689842371.478244][2614:2616] CHIP:TOO: Latch: 3
            [1689842371.478410][2614:2616] CHIP:EM: <<< [E:35394i S:46214 M:140335917 (Ack:184279491)] (S) Msg TX to 1:0000000000000001 [C4B0] --- Type 0000:10 (SecureChannel:StandaloneAck)
+      disabled: true
+
+    - label: "Step 1d: Set the value of LatchResponse to 0."
+      PICS: " !DISHALM.S.A0001 "
+      verification: |
+          When the DISHALM.S.A0001(Latch)  feature is not supported or enabled, Set the value of LatchResponse to 0.
       disabled: true
 
     - label:
@@ -162,7 +168,7 @@ tests:
           Alarms set to 1"
       PICS: DISHALM.S.F00 && DISHALM.S.C00.Rsp
       verification: |
-          dishwasheralarm reset  1 1 1
+          dishwasheralarm reset  32 1 1
           Verify the success response on TH(chip-tool)
           [1690974433.649056][3934:3936] CHIP:DMG:         ],
           [1690974433.649084][3934:3936] CHIP:DMG:

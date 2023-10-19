@@ -56,7 +56,7 @@ tests:
       attribute: "CurrentGroup"
       response:
           constraints:
-              type: groupid
+              type: group_id
 
     - label: "Step 5: TH reads from the DUT the (0x0003) SceneValid attribute"
       PICS: S.S.A0003
@@ -64,7 +64,7 @@ tests:
       attribute: "SceneValid"
       response:
           constraints:
-              type: int8u
+              type: boolean
 
     - label: "Step 6: TH reads from the DUT the (0x0004) NameSupport attribute"
       PICS: S.S.A0003 && S.S.F00
@@ -73,7 +73,7 @@ tests:
       response:
           value: 0x80
           constraints:
-              type: int8u
+              type: bitmap8
 
     - label: "Step 6: TH reads from the DUT the (0x0004) NameSupport attribute"
       PICS: S.S.A0004 && (!S.S.F00)
@@ -82,7 +82,7 @@ tests:
       response:
           value: 0x00
           constraints:
-              type: int8u
+              type: bitmap8
 
     - label:
           "Step 7: TH reads from the DUT the (0x0005) LastConfiguredBy attribute"
@@ -91,7 +91,7 @@ tests:
       attribute: "LastConfiguredBy"
       response:
           constraints:
-              type: nodeId
+              type: node_id
 
     - label:
           "Step 8: TH reads from the DUT the (0x0006) SceneTableSize attribute"
@@ -100,7 +100,7 @@ tests:
       attribute: "SceneTableSize"
       response:
           constraints:
-              type: uint16
+              type: int16u
 
     - label:
           "Step 9: TH reads from the DUT the (0x0007) RemainingCapacity

@@ -26,19 +26,15 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          1. DUT supports CNET.S.F01(TH)
+          2. DUT has a Network Commissioning cluster on endpoint PIXIT.CNET.ENDPOINT_THREAD with FeatureMap attribute of 2
+          3. DUT is commissioned on PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
+          4. TH can communicate with the DUT on PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
+      disabled: true
+
     - label: "Commission TH and DUT on Thread setup"
-      verification: |
-
-      disabled: true
-
-    - label:
-          "The cluster Identifier 49 (0x0031) is present in the ServerList
-          attribute"
-      verification: |
-
-      disabled: true
-
-    - label: "The FeatureMap attribute value is 2"
       verification: |
 
       disabled: true
@@ -53,7 +49,7 @@ tests:
 
           Below is an example:
 
-          ./chip-tool networkcommissioning add-or-update-thread-network hex:1011101122222229 51 0
+          ./chip-tool networkcommissioning add-or-update-thread-network hex:1011101122222229 51 0 --Breadcrumb 1
 
           Via the TH (chip-tool), verify the FAILSAFE_REQUIRED response for sending the AddOrUpdateThreadNetwork command.
 
@@ -72,7 +68,7 @@ tests:
 
           Below is an example:
 
-          ./chip-tool networkcommissioning remove-network hex:1011101122222229 51 0
+          ./chip-tool networkcommissioning remove-network hex:1011101122222229 51 0 --Breadcrumb 1
 
           Via the TH (chip-tool), verify the FAILSAFE_REQUIRED response for sending the RemoveNetwork command.
 
@@ -91,7 +87,7 @@ tests:
 
           Below is an example:
 
-          ./chip-tool networkcommissioning connect-network hex:1011101122222229 51 0
+          ./chip-tool networkcommissioning connect-network hex:1011101122222229 51 0 --Breadcrumb 1
 
           Via the TH (chip-tool), verify the FAILSAFE_REQUIRED response for sending the ConnectNetwork command.
 

@@ -17,13 +17,13 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class ThermostatClusterThermostatScheduleTransition(
-  val transitionTime: Int,
+  val transitionTime: UInt,
   val heatSetpoint: Int?,
   val coolSetpoint: Int?
 ) {
@@ -35,9 +35,9 @@ class ThermostatClusterThermostatScheduleTransition(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_TRANSITION_TIME), transitionTime)
       if (heatSetpoint != null) {
         put(ContextSpecificTag(TAG_HEAT_SETPOINT), heatSetpoint)
@@ -58,9 +58,9 @@ class ThermostatClusterThermostatScheduleTransition(
     private const val TAG_HEAT_SETPOINT = 1
     private const val TAG_COOL_SETPOINT = 2
 
-    fun fromTlv(tag: Tag, tlvReader: TlvReader): ThermostatClusterThermostatScheduleTransition {
-      tlvReader.enterStructure(tag)
-      val transitionTime = tlvReader.getInt(ContextSpecificTag(TAG_TRANSITION_TIME))
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ThermostatClusterThermostatScheduleTransition {
+      tlvReader.enterStructure(tlvTag)
+      val transitionTime = tlvReader.getUInt(ContextSpecificTag(TAG_TRANSITION_TIME))
       val heatSetpoint =
         if (!tlvReader.isNull()) {
           tlvReader.getInt(ContextSpecificTag(TAG_HEAT_SETPOINT))

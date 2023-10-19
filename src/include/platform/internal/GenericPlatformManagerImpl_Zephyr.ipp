@@ -122,7 +122,7 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StopEventLoopTask(void
 template <class ImplClass>
 void GenericPlatformManagerImpl_Zephyr<ImplClass>::_Shutdown(void)
 {
-#if CONFIG_REBOOT
+#ifdef CONFIG_REBOOT
     sys_reboot(SYS_REBOOT_WARM);
 #else
     // NB: When this is implemented, |mInitialized| can be removed.

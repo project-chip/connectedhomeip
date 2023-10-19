@@ -17,13 +17,13 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
-import chip.tlv.ContextSpecificTag
-import chip.tlv.Tag
-import chip.tlv.TlvReader
-import chip.tlv.TlvWriter
+import matter.tlv.ContextSpecificTag
+import matter.tlv.Tag
+import matter.tlv.TlvReader
+import matter.tlv.TlvWriter
 
 class HepaFilterMonitoringClusterReplacementProductStruct(
-  val productIdentifierType: Int,
+  val productIdentifierType: UInt,
   val productIdentifierValue: String
 ) {
   override fun toString(): String = buildString {
@@ -33,9 +33,9 @@ class HepaFilterMonitoringClusterReplacementProductStruct(
     append("}\n")
   }
 
-  fun toTlv(tag: Tag, tlvWriter: TlvWriter) {
+  fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
-      startStructure(tag)
+      startStructure(tlvTag)
       put(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_TYPE), productIdentifierType)
       put(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_VALUE), productIdentifierValue)
       endStructure()
@@ -47,11 +47,11 @@ class HepaFilterMonitoringClusterReplacementProductStruct(
     private const val TAG_PRODUCT_IDENTIFIER_VALUE = 1
 
     fun fromTlv(
-      tag: Tag,
+      tlvTag: Tag,
       tlvReader: TlvReader
     ): HepaFilterMonitoringClusterReplacementProductStruct {
-      tlvReader.enterStructure(tag)
-      val productIdentifierType = tlvReader.getInt(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_TYPE))
+      tlvReader.enterStructure(tlvTag)
+      val productIdentifierType = tlvReader.getUInt(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_TYPE))
       val productIdentifierValue =
         tlvReader.getString(ContextSpecificTag(TAG_PRODUCT_IDENTIFIER_VALUE))
 
