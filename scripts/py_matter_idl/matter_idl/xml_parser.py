@@ -16,6 +16,7 @@
 
 import logging
 import os
+from typing import Optional
 
 try:
     from matter_idl.zapxml import ParseSource, ParseXmls

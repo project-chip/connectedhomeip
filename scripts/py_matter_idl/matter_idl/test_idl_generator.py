@@ -17,10 +17,7 @@
 import os
 import sys
 import unittest
-from dataclasses import dataclass, field
-from typing import List
-
-import yaml
+from typing import Optional
 
 try:
     from matter_idl.matter_idl_parser import CreateParser

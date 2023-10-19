@@ -13,12 +13,12 @@
 # limitations under the License.
 
 import os
-from typing import List, Union
+from typing import Union
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeQuality, AttributeStorage, Cluster,
-                                         ClusterSide, Command, CommandQuality, Event, EventPriority, EventQuality, FieldQuality,
-                                         Idl, Struct, StructQuality, StructTag)
+from matter_idl.matter_idl_types import (AccessPrivilege, ApiMaturity, Attribute, AttributeQuality, AttributeStorage, ClusterSide,
+                                         Command, CommandQuality, Event, EventPriority, EventQuality, FieldQuality, Idl,
+                                         StructQuality, StructTag)
 
 
 def human_text_string(value: Union[ClusterSide, StructTag, StructQuality, EventPriority, EventQuality, AccessPrivilege, AttributeQuality, CommandQuality, ApiMaturity, AttributeStorage]) -> str:
