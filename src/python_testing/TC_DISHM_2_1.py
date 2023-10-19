@@ -83,7 +83,7 @@ class TC_DISHM_2_1(MatterBaseTest):
             SUCCESS = 0x00
             UNSUPPORTED_MODE = 0x01
             GENERIC_FAILURE = 0x02
-            INVALID_MODE = 0x03
+            INVALID_IN_MODE = 0x03
 
         self.print_step(4, "Send ChangeToMode command with NewMode set to %d" % (old_current_mode_dut))
 
