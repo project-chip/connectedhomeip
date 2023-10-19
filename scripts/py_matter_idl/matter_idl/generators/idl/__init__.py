@@ -16,9 +16,9 @@ import os
 from typing import List
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.matter_idl_types import Cluster, ClusterSide, Idl, StructTag, FieldQuality, StructQuality, EventPriority, EventQuality, Event, AccessPrivilege, Struct, AttributeQuality
+from matter_idl.matter_idl_types import Cluster, ClusterSide, Idl, StructTag, FieldQuality, StructQuality, EventPriority, EventQuality, Event, AccessPrivilege, Struct, AttributeQuality, Command, CommandQuality
 
-def human_text_string(value: ClusterSide|StructTag|StructQuality|EventPriority|EventQuality|AccessPrivilege|AttributeQuality) -> str:
+def human_text_string(value: ClusterSide|StructTag|StructQuality|EventPriority|EventQuality|AccessPrivilege|AttributeQuality|CommandQuality) -> str:
     if type(value) is ClusterSide:
         if value == ClusterSide.CLIENT:
             return "client"
@@ -73,6 +73,13 @@ def human_text_string(value: ClusterSide|StructTag|StructQuality|EventPriority|E
         if AttributeQuality.NOSUBSCRIBE in value:
             result += "nosubscribe "
         return result
+    elif type(value) is CommandQuality:
+        result = ""
+        if CommandQuality.TIMED_INVOKE in value:
+            result += "timed "
+        if CommandQuality.FABRIC_SCOPED in value:
+            result += "fabric "
+        return result
 
     # wrong value in general
     return "Unknown/unsupported: %r" % value
@@ -90,8 +97,17 @@ def event_access_string(e: Event) -> str:
        return ""
    return f"access({result}) "
 
-def is_untagged_struct(s: Struct):
-    return s.tag is None
+def command_access_string(c: Command) -> str:
+   """Generates the access string required for an event. If string is non-empty it will
+      include a trailing space
+   """
+   result = ""
+   if c.invokeacl != AccessPrivilege.OPERATE:
+       result += "invoke: " + human_text_string(c.invokeacl)
+
+   if not result:
+       return ""
+   return f"access({result}) "
 
 
 class IdlGenerator(CodeGenerator):
@@ -104,8 +120,8 @@ class IdlGenerator(CodeGenerator):
 
         self.jinja_env.filters['idltxt'] = human_text_string
         self.jinja_env.filters['event_access'] = event_access_string
+        self.jinja_env.filters['command_access'] = command_access_string
 
-        self.jinja_env.tests['is_untagged_struct'] = is_untagged_struct
 
     def internal_render_all(self):
         """

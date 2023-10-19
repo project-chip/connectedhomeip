@@ -74,9 +74,9 @@
   {{render_struct(s)}}
 
   {% endfor %}
-
-  // FIXME:
-  //  - commands
+  {% for c in cluster.commands -%}
+  {{c.qualities | idltxt}}command {{c | command_access}}{{c.name}}({{c.input_param}}): {{c.output_param}} = {{c.code}};
+  {% endfor %}
 }
 
 {% endfor %}
