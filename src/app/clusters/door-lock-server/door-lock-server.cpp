@@ -202,6 +202,18 @@ bool DoorLockServer::SetPrivacyModeButton(chip::EndpointId endpointId, bool isEn
     return SetAttribute(endpointId, Attributes::EnablePrivacyModeButton::Id, Attributes::EnablePrivacyModeButton::Set, isEnabled);
 }
 
+void DoorLockServer::HandleLocalLockOperationError(chip::EndpointId endpointId, LockOperationTypeEnum opType,
+                                                   OperationSourceEnum opSource, Nullable<uint16_t> userId)
+{
+    SendLockOperationEvent(endpointId, opType, opSource, OperationErrorEnum::kInvalidCredential, userId,
+                           Nullable<chip::FabricIndex>(), Nullable<chip::NodeId>(), Nullable<List<const LockOpCredentials>>(),
+                           false);
+
+    HandleWrongCodeEntry(endpointId);
+
+    ChipLogProgress(Zcl, "Handling a local Lock Operation Error: [endpoint=%d, user=%d]", endpointId, userId.Value());
+}
+
 bool DoorLockServer::HandleWrongCodeEntry(chip::EndpointId endpointId)
 {
     auto endpointContext = getContext(endpointId);
