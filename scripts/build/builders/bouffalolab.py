@@ -158,8 +158,6 @@ class BouffalolabBuilder(GnBuilder):
         self.argsOpt.append(f'chip_enable_ethernet={str(enable_ethernet).lower()}')
         self.argsOpt.append(f'chip_enable_wifi={str(enable_wifi).lower()}')
         self.argsOpt.append(f'chip_enable_openthread={str(enable_thread).lower()}')
-        if not use_matter_openthread:
-            self.argsOpt.append('openthread_root="//third_party/connectedhomeip/third_party/bouffalolab/repo/components/network/thread/openthread"')
 
         # for enable_ethernet, do not need ble for commissioning
         self.argsOpt.append(f'chip_config_network_layer_ble={str(enable_wifi or enable_thread).lower()}')
@@ -169,6 +167,8 @@ class BouffalolabBuilder(GnBuilder):
 
         if enable_thread:
             self.argsOpt.append(f'openthread_project_core_config_file="{bouffalo_chip}-openthread-core-bl-config.h"')
+            if not use_matter_openthread:
+                self.argsOpt.append('openthread_root="//third_party/connectedhomeip/third_party/bouffalolab/repo/components/network/thread/openthread"')
 
         if enable_cdc:
             if bouffalo_chip != "bl702":
