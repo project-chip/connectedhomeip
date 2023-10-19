@@ -1092,12 +1092,19 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
                           clusterID:(NSNumber *)clusterID
                           commandID:(NSNumber *)commandID
-                      commandFields:(id)commandFields
+                      commandFields:(NSDictionary<NSString *, id> * _Nullable)commandFields
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
                               queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
 {
+    if (commandFields == nil) {
+        commandFields = @{
+            MTRTypeKey : MTRStructureValueType,
+            MTRValueKey : @[],
+        };
+    }
+
     [self invokeCommandWithEndpointID:endpointID
                             clusterID:clusterID
                             commandID:commandID
