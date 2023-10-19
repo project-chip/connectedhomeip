@@ -71,6 +71,10 @@ _TYPE_REMAP = {
     "sint48": "int48s",
     "sint52": "int52s",
     "sint64": "int54s",
+    # other
+    "bool": "boolean",
+    "string": "char_string",
+    "octets": "octet_string",
 }
 
 
@@ -135,7 +139,7 @@ def AttributesToAttribute(attrs) -> Attribute:
     assert "id" in attrs
 
     if "type" in attrs:
-        attr_type = attrs["type"]
+        attr_type = NormalizeDataType(attrs["type"])
     else:
         # TODO: we should NOT have this, however we are now lenient
         # to bad input data

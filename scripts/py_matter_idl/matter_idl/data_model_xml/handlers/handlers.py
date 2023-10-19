@@ -264,10 +264,15 @@ class AttributeHandler(BaseHandler):
         elif name == "quality":
             # Out of the many interesting bits, only "nullable" seems relevant for codegen
             if "nullable" in attrs and attrs["nullable"] != "false":
-                self._attribute.definition.qualities = self._attribute.definition.qualities | FieldQuality.NULLABLE
-
+                self._attribute.definition.qualities |= FieldQuality.NULLABLE
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        elif name in {"mandatoryConform", "optionalConform"}:
+        elif name == "optionalConform":
+            self._attribute.definition.qualities |= FieldQuality.OPTIONAL
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "mandatoryConform":
+            # Mandatory means that it may not be mandatory in some cases, so we mark
+            # as optional here too
+            self._attribute.definition.qualities |= FieldQuality.OPTIONAL
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "deprecateConform":
             self._deprecated = True
