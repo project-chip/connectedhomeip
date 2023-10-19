@@ -2441,7 +2441,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // NOTE: this array cannot have more than 9 entries, since the spec mandates that server only needs to support 9
         // See R1.1, 2.11.2 Interaction Model Limits
         app::AttributePathParams readPaths[2];
-        int numAttributes = 1;
+        size_t numAttributes = 1;
 
         readPaths[0] = app::AttributePathParams(endpoint, app::Clusters::GeneralCommissioning::Id,
                                                 app::Clusters::GeneralCommissioning::Attributes::SupportsConcurrentConnection::Id);
