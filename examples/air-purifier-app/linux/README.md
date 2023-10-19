@@ -4,9 +4,9 @@ An example showing the use of CHIP on the Linux. The document will describe how
 to build and run CHIP Air Purifier Example on A Linux System. This doc is tested
 on **Ubuntu 20.04 LTS**.
 
-The Air Purifier is a composed device with EP1 being the Air Purifier. EP2 is an
-Air Quality Sensor, EP3 is a Relative Humidity Sensor and EP4 is a Temperature
-Sensor.
+The Air Purifier is a composed device with Endpoint 1 being the Air Purifier.
+Endpoint 2 is an Air Quality Sensor, Endpoint 3 is a Relative Humidity Sensor
+and endpoint 4 is a Temperature Sensor.
 
 To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 **EVK**, see the associated
