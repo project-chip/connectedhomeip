@@ -18,6 +18,17 @@ from typing import List
 from matter_idl.generators import CodeGenerator, GeneratorStorage
 from matter_idl.matter_idl_types import Cluster, ClusterSide, Idl
 
+def HumanTextString(value: ClusterSide) -> str:
+    if type(value) is ClusterSide:
+        if value == ClusterSide.CLIENT:
+            return "client"
+        if value == ClusterSide.SERVER:
+            return "server"
+
+
+    # wrong value in general
+    return "Unknown/unsupported: %r" % value
+
 
 class IdlGenerator(CodeGenerator):
     """
@@ -26,6 +37,8 @@ class IdlGenerator(CodeGenerator):
 
     def __init__(self, storage: GeneratorStorage, idl: Idl, **kargs):
         super().__init__(storage, idl, fs_loader_searchpath=os.path.dirname(__file__))
+
+        self.jinja_env.filters['idltxt'] = HumanTextString 
 
     def internal_render_all(self):
         """

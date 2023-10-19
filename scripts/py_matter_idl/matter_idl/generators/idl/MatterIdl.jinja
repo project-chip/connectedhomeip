@@ -1,1 +1,17 @@
-FIXME: implement
+// This IDL was auto-generated from a parsed data structure
+
+{%  for cluster in idl.clusters -%}
+{{cluster.side | idltxt}} cluster {{cluster.name}} = {{cluster.code}} {
+  // FIXME: implement
+}
+
+{% endfor %}
+
+{%- if idl.endpoints %}
+{% for endpoint in idl.endpoints %}
+
+endpoint {{endpoint.number}} {
+  // FIXME: report endpoint
+}
+{%  endfor %}
+{%  endif %}
