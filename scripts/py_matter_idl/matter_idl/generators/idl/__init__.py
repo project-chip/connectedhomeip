@@ -17,10 +17,10 @@ from typing import List
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
 from matter_idl.matter_idl_types import (AccessPrivilege, AttributeQuality, Cluster, ClusterSide, Command, CommandQuality, Event,
-                                         EventPriority, EventQuality, FieldQuality, Idl, Struct, StructQuality, StructTag, Attribute)
+                                         EventPriority, EventQuality, FieldQuality, Idl, Struct, StructQuality, StructTag, Attribute, ApiMaturity)
 
 
-def human_text_string(value: ClusterSide | StructTag | StructQuality | EventPriority | EventQuality | AccessPrivilege | AttributeQuality | CommandQuality) -> str:
+def human_text_string(value: ClusterSide | StructTag | StructQuality | EventPriority | EventQuality | AccessPrivilege | AttributeQuality | CommandQuality | ApiMaturity) -> str:
     if type(value) is ClusterSide:
         if value == ClusterSide.CLIENT:
             return "client"
@@ -82,6 +82,15 @@ def human_text_string(value: ClusterSide | StructTag | StructQuality | EventPrio
         if CommandQuality.FABRIC_SCOPED in value:
             result += "fabric "
         return result
+    elif type(value) is ApiMaturity:
+        if value == ApiMaturity.STABLE:
+            return ""
+        if value == ApiMaturity.PROVISIONAL:
+            return "provisional "
+        if value == ApiMaturity.INTERNAL:
+            return "internal "
+        if value == ApiMaturity.DEPRECATED:
+            return "deprecated "
 
     # wrong value in general
     return "Unknown/unsupported: %r" % value
