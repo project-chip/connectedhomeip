@@ -5,18 +5,19 @@ Instruments CC32XX family of Wireless MCUs.
 
 ---
 
--   [Matter CC32XX Air Purifier Example Application](#matter-cc32xxsf-air-purifier-example-application)
+-   [Matter `CC32XXSF` Air Purifier Example Application](#matter-cc32xxsf-air-purifier-example-application)
     -   [Introduction](#introduction)
-        -   [Device UI](#device-ui)
+    -   [Device UI](#device-ui)
     -   [Building](#building)
         -   [Preparation](#preparation)
         -   [Compilation](#compilation)
+    -   [Adding DAC Certificates](#adding-dac-certificates)
     -   [Programming](#programming)
         -   [Code Composer Studio](#code-composer-studio)
     -   [Viewing Logging Output](#viewing-logging-output)
     -   [Running the Example](#running-the-example)
         -   [Provisioning](#provisioning)
-    -   [TI Support](#ti-support)
+            -   [Bluetooth LE Provisioning](#bluetooth-le-provisioning)
 
 ---
 
@@ -84,7 +85,6 @@ Ninja to build the executable.
     `/home/username/ti/sysconfig_1.13.0`. On Windows the default directory is
     `C:\ti`. Take note of this install path, as it will be used in the next
     step.
-
 
     ```
     $ cd ~/connectedhomeip/examples/air-purifier-app/cc32xx
