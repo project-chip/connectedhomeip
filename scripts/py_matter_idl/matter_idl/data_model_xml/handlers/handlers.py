@@ -88,7 +88,7 @@ class MandatoryConfirmFieldHandler(BaseHandler):
     def EndProcessing(self):
         # A mandatory conformance with conditions means it is
         # optional in some cases
-        if not self._hadConditions:
+        if self._hadConditions:
             self._field.qualities |= FieldQuality.OPTIONAL
 
 
