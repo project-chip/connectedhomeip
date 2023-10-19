@@ -125,6 +125,10 @@ class IdlGenerator(CodeGenerator):
         self.jinja_env.filters['event_access'] = event_access_string
         self.jinja_env.filters['command_access'] = command_access_string
 
+        # Easier whitespace management
+        self.jinja_env.trim_blocks = True
+        self.jinja_env.lstrip_blocks = True
+
     def internal_render_all(self):
         """
         Renders the output.
