@@ -46,6 +46,14 @@ class PrefixCppDocComment:
         while content[actual_pos] in ' \t\n\r':
             actual_pos += 1
 
+        # Allow to skip api maturity flags
+        for maturity in ["provisional", "internal", "stable", "deprecated"]:
+          if content[actual_pos:].startswith(maturity):
+              actual_pos += len(maturity)
+
+        while content[actual_pos] in ' \t\n\r':
+            actual_pos += 1
+
         # A doc comment will apply to any supported element assuming it immediately
         # preceeds id (skipping whitespace)
         for item in self.supported_types(idl):
