@@ -24,8 +24,6 @@
 #import "MTRBaseSubscriptionCallback.h"
 #import "MTRCluster.h"
 #import "MTRClusterConstants.h"
-#import "MTRCommandTimedCheck.h"
-#import "MTRDefines_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
@@ -1095,26 +1093,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                       commandFields:(id)commandFields
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
-                              queue:(dispatch_queue_t)queue
-                         completion:(MTRDeviceResponseHandler)completion
-{
-    [self invokeCommandWithEndpointID:endpointID
-                            clusterID:clusterID
-                            commandID:commandID
-                        commandFields:commandFields
-                       expectedValues:expectedValues
-                expectedValueInterval:expectedValueInterval
-                   timedInvokeTimeout:nil
-                                queue:queue
-                           completion:completion];
-}
-
-- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
-                          clusterID:(NSNumber *)clusterID
-                          commandID:(NSNumber *)commandID
-                      commandFields:(id)commandFields
-                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
-              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
                               queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
@@ -1154,10 +1132,6 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     serverSideProcessingTimeout = [serverSideProcessingTimeout copy];
     timeout = [timeout copy];
-
-    if (timeout == nil && MTRCommandNeedsTimedInvoke(clusterID, commandID)) {
-        timeout = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
-    }
 
     NSDate * cutoffTime;
     if (timeout) {
