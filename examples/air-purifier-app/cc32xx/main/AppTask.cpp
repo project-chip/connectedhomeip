@@ -181,8 +181,8 @@ int AppTask::Init()
 
     AirPurifierManager::InitInstance(EndpointId(AIR_PURIFIER_ENDPOINT), EndpointId(AIR_QUALITY_SENSOR_ENDPOINT),
                                      EndpointId(TEMPERATURE_SENSOR_ENDPOINT), EndpointId(RELATIVE_HUMIDITY_SENSOR_ENDPOINT));
-    
-    
+
+
     ConfigurationMgr().LogDeviceConfig();
 
     // QR code will be used with CHIP Tool
@@ -262,7 +262,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
         {
             // delete the kvs.cfg file and reset the matter part of the device
             PLAT_LOG("DispatchEvent: kEventType_ButtonRight: LONG clicked - clearing KVS");
-            
+
             uint32_t token = KVS_TOKEN;
             const unsigned char listName[] = "/sys/matter/kvs.cfg";
             sl_FsDel(listName,token);
