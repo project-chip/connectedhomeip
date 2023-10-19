@@ -123,11 +123,6 @@
             "path": "MTRAttributeSpecifiedCheck-src.zapt",
             "name": "Function to check if attribute is specified",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRAttributeSpecifiedCheck.mm"
-        },
-        {
-            "path": "MTRCommandTimedCheck-src.zapt",
-            "name": "Function to check if command needs timed invoke",
-            "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandTimedCheck.mm"
         }
     ]
 }

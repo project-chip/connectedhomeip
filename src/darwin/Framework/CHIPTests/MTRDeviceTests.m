@@ -2240,15 +2240,12 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  {
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
                                      NSArray * resultArray = values;
-                                     XCTAssertEqual(resultArray.count, 1);
                                      for (NSDictionary * result in resultArray) {
                                          MTRCommandPath * path = result[@"commandPath"];
                                          XCTAssertEqualObjects(path.endpoint, @1);
                                          XCTAssertEqualObjects(path.cluster, @6);
                                          XCTAssertEqualObjects(path.command, @1);
                                          XCTAssertNil(result[@"error"]);
-                                         // This command just has a status response.
-                                         XCTAssertNil(result[@"value"]);
                                      }
                                      XCTAssertEqual([resultArray count], 1);
                                  }
