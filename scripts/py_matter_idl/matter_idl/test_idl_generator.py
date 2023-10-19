@@ -49,18 +49,22 @@ class TestCaseStorage(GeneratorStorage):
             raise Exception("Unexpected extra data: single file generation expected")
         self.content = content
 
+
 def ReadMatterIdl(repo_path: str) -> Idl:
     path = os.path.join(os.path.dirname(__file__), "../../..", repo_path)
     with open(path, "rt") as stream:
         return stream.read()
 
+
 def ParseMatterIdl(repo_path: str, skip_meta: bool) -> Idl:
     return CreateParser(skip_meta=skip_meta).parse(ReadMatterIdl(repo_path))
+
 
 def RenderAsIdlTxt(idl: Idl) -> str:
     storage = TestCaseStorage()
     IdlGenerator(storage=storage, idl=idl).render(dry_run=False)
     return storage.content
+
 
 def SkipLeadingComments(txt: str) -> str:
     """Skips leading lines starting with // in a file. """
@@ -82,7 +86,7 @@ class TestIdlRendering(unittest.TestCase):
         path = "src/controller/data_model/controller-clusters.matter"
 
         # Files MUST be identical except the header comments which are different
-        original  = SkipLeadingComments(ReadMatterIdl(path))
+        original = SkipLeadingComments(ReadMatterIdl(path))
         generated = SkipLeadingComments(RenderAsIdlTxt(ParseMatterIdl(path, skip_meta=False)))
 
         self.assertEqual(original, generated)

@@ -1,10 +1,10 @@
 ## Generator description
 
-Generates a structured `Idl` data type into a human-readable
-text format (`.matter` file).
+Generates a structured `Idl` data type into a human-readable text format
+(`.matter` file).
 
-It is useful for tools that ingest non-idl data but convert into
-idl data (e.g. zapxml or CSA data model XML data.)
+It is useful for tools that ingest non-idl data but convert into idl data (e.g.
+zapxml or CSA data model XML data.)
 
 ### Usage
 
@@ -14,7 +14,8 @@ A no-op usage can be:
 ./scripts/codegen.py -g idl --output-dir out/idlgen examples/all-clusters-app/all-clusters-common/all-clusters-app.matter
 ```
 
-which would re-generate the entire `all-clusters-app.matter` into `out/idlgen/idl.matter`
+which would re-generate the entire `all-clusters-app.matter` into
+`out/idlgen/idl.matter`
 
-This generation is useful for testing/validating that both parsing and generation works. Actual
-usage of this generator would be inside XML tools.
+This generation is useful for testing/validating that both parsing and
+generation works. Actual usage of this generator would be inside XML tools.
