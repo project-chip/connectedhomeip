@@ -21,7 +21,7 @@
   {%- if s.tag %}{{s.tag | idltxt}} {% endif -%}
   {% if s.qualities %}{{s.qualities | idltxt}} {% endif -%}
   struct {{s.name}} {##}
-  {%- if s.code %}= {{s.code}} {% endif -%}
+  {%- if s.code is not none %}= {{s.code}} {% endif -%}
   {
     {% for field in s.fields %}
     {{render_field(field)}}
@@ -54,14 +54,21 @@
   }
   {% endfor %}
 
-  {%- for s in cluster.structs | rejectattr("tag") -%}
-  {{render_struct(s)}}
+  {%- for s in cluster.structs | rejectattr("tag") %}
+  {% if loop.first %}
 
+  {% endif %}
+  {{render_struct(s)}}
+  {% if not loop.last %}
+
+  {% endif %}
   {% endfor %}
 
   {%- for e in cluster.events %}
+  {% if loop.first %}
 
-  {% if e.qualities %}{{e.qualities | idltxt}} {% endif -%}
+  {% endif %}
+  {##}  {##}{% if e.qualities %}{{e.qualities | idltxt}} {% endif -%}
   {{e.priority | idltxt}} event {{e | event_access}}{{e.name}} = {{e.code}} {
     {% for field in e.fields %}
     {{render_field(field)}}
@@ -74,7 +81,7 @@
   {%- if loop.first %}
 
   {% endif %}
-  {{a.qualities | idltxt}}attribute {{render_field(a.definition)}}
+  {{a.qualities | idltxt}}attribute {{a | attribute_access}}{{render_field(a.definition)}}
   {% endfor %}
 
   {%- for s in cluster.structs | selectattr("tag") %}
@@ -96,7 +103,9 @@
   {% if c.description %}
   /** {{c.description}} */
   {% endif %}
-  {{c.qualities | idltxt}}command {{c | command_access}}{{c.name}}({{c.input_param}}): {{c.output_param}} = {{c.code}};
+  {{c.qualities | idltxt}}command {{c | command_access}}{{c.name}}(
+     {%- if c.input_param %}{{c.input_param}}{% endif -%}
+  ): {{c.output_param}} = {{c.code}};
   {% endfor %}
 }
 

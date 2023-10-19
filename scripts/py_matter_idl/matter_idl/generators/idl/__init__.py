@@ -17,7 +17,7 @@ from typing import List
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
 from matter_idl.matter_idl_types import (AccessPrivilege, AttributeQuality, Cluster, ClusterSide, Command, CommandQuality, Event,
-                                         EventPriority, EventQuality, FieldQuality, Idl, Struct, StructQuality, StructTag)
+                                         EventPriority, EventQuality, FieldQuality, Idl, Struct, StructQuality, StructTag, Attribute)
 
 
 def human_text_string(value: ClusterSide | StructTag | StructQuality | EventPriority | EventQuality | AccessPrivilege | AttributeQuality | CommandQuality) -> str:
@@ -101,7 +101,7 @@ def event_access_string(e: Event) -> str:
 
 
 def command_access_string(c: Command) -> str:
-    """Generates the access string required for an event. If string is non-empty it will
+    """Generates the access string required for a command. If string is non-empty it will
        include a trailing space
     """
     result = ""
@@ -111,6 +111,23 @@ def command_access_string(c: Command) -> str:
     if not result:
         return ""
     return f"access({result}) "
+
+def attribute_access_string(a: Attribute) -> str:
+    """Generates the access string required for a struct. If string is non-empty it will
+       include a trailing space
+    """
+    result = []
+
+    if a.readacl != AccessPrivilege.VIEW:
+        result.append("read: " + human_text_string(a.readacl))
+
+    if a.writeacl != AccessPrivilege.OPERATE:
+        result.append("write: " + human_text_string(a.writeacl))
+
+    if not result:
+        return ""
+
+    return f"access({', '.join(result)}) "
 
 
 class IdlGenerator(CodeGenerator):
@@ -124,6 +141,7 @@ class IdlGenerator(CodeGenerator):
         self.jinja_env.filters['idltxt'] = human_text_string
         self.jinja_env.filters['event_access'] = event_access_string
         self.jinja_env.filters['command_access'] = command_access_string
+        self.jinja_env.filters['attribute_access'] = attribute_access_string
 
         # Easier whitespace management
         self.jinja_env.trim_blocks = True
