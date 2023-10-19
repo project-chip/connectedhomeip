@@ -16,9 +16,11 @@ import os
 from typing import List
 
 from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.matter_idl_types import Cluster, ClusterSide, Idl, StructTag, FieldQuality, StructQuality, EventPriority, EventQuality, Event, AccessPrivilege, Struct, AttributeQuality, Command, CommandQuality
+from matter_idl.matter_idl_types import (AccessPrivilege, AttributeQuality, Cluster, ClusterSide, Command, CommandQuality, Event,
+                                         EventPriority, EventQuality, FieldQuality, Idl, Struct, StructQuality, StructTag)
 
-def human_text_string(value: ClusterSide|StructTag|StructQuality|EventPriority|EventQuality|AccessPrivilege|AttributeQuality|CommandQuality) -> str:
+
+def human_text_string(value: ClusterSide | StructTag | StructQuality | EventPriority | EventQuality | AccessPrivilege | AttributeQuality | CommandQuality) -> str:
     if type(value) is ClusterSide:
         if value == ClusterSide.CLIENT:
             return "client"
@@ -86,28 +88,29 @@ def human_text_string(value: ClusterSide|StructTag|StructQuality|EventPriority|E
 
 
 def event_access_string(e: Event) -> str:
-   """Generates the access string required for an event. If string is non-empty it will
-      include a trailing space
-   """
-   result = ""
-   if e.readacl != AccessPrivilege.VIEW:
-       result += "read: " + human_text_string(e.readacl)
+    """Generates the access string required for an event. If string is non-empty it will
+       include a trailing space
+    """
+    result = ""
+    if e.readacl != AccessPrivilege.VIEW:
+        result += "read: " + human_text_string(e.readacl)
 
-   if not result:
-       return ""
-   return f"access({result}) "
+    if not result:
+        return ""
+    return f"access({result}) "
+
 
 def command_access_string(c: Command) -> str:
-   """Generates the access string required for an event. If string is non-empty it will
-      include a trailing space
-   """
-   result = ""
-   if c.invokeacl != AccessPrivilege.OPERATE:
-       result += "invoke: " + human_text_string(c.invokeacl)
+    """Generates the access string required for an event. If string is non-empty it will
+       include a trailing space
+    """
+    result = ""
+    if c.invokeacl != AccessPrivilege.OPERATE:
+        result += "invoke: " + human_text_string(c.invokeacl)
 
-   if not result:
-       return ""
-   return f"access({result}) "
+    if not result:
+        return ""
+    return f"access({result}) "
 
 
 class IdlGenerator(CodeGenerator):
@@ -122,7 +125,6 @@ class IdlGenerator(CodeGenerator):
         self.jinja_env.filters['event_access'] = event_access_string
         self.jinja_env.filters['command_access'] = command_access_string
 
-
     def internal_render_all(self):
         """
         Renders the output.
@@ -136,4 +138,3 @@ class IdlGenerator(CodeGenerator):
                 'idl': self.idl
             }
         )
-
