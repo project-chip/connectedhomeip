@@ -17,7 +17,7 @@ name: 198.2.4. [TC-DISHALM-3.3] Door alarm functionality with DUT as Server
 
 PICS:
     - DISHALM.S
-    - PIXIT.DISHALM.DoorAlarmSupported
+    - DISHALM.S.M.DoorAlarmSupported
 
 config:
     nodeId: 0x12344321
@@ -167,7 +167,7 @@ tests:
           set to 1"
       PICS: DISHALM.S.F00 && DISHALM.S.C00.Rsp
       verification: |
-          dishwasheralarm reset  1 1 1
+          dishwasheralarm reset  4 1 1
           Verify the success response on TH(chip-tool)
           [1690974433.649056][3934:3936] CHIP:DMG:         ],
           [1690974433.649084][3934:3936] CHIP:DMG:

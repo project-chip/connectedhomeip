@@ -10,6 +10,7 @@
 #import "MTRStructsObjc.h"
 #import "MTRCommandPayloadsObjc.h"
 #import "MTRLogging_Internal.h"
+#import "MTRDefines_Internal.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -79,7 +80,7 @@ MTR{{cluster}}Cluster{{command}}Params
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
     {{#if mustUseTimedInvoke}}
     if (timedInvokeTimeoutMs == nil) {
-      timedInvokeTimeoutMs = @(10000);
+      timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
     }
     {{/if}}
 
@@ -133,7 +134,7 @@ MTR{{cluster}}Cluster{{command}}Params
     NSNumber *timedWriteTimeout = params.timedWriteTimeout;
     {{#if mustUseTimedWrite}}
     if (!timedWriteTimeout) {
-        timedWriteTimeout = @(10000);
+        timedWriteTimeout = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
     }
     {{/if}}
 
