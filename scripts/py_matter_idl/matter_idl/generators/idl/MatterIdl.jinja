@@ -36,7 +36,6 @@
 
 {% if cluster.description %}/** {{cluster.description}} */
 {% endif %}
-
 {{cluster.side | idltxt}} cluster {{cluster.name}} = {{cluster.code}} {
   {%- for enum in cluster.enums %}
 
