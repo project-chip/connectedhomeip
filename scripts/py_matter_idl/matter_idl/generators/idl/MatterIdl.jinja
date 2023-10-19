@@ -2,6 +2,14 @@
 
 {%  for cluster in idl.clusters -%}
 {{cluster.side | idltxt}} cluster {{cluster.name}} = {{cluster.code}} {
+  {%- for enum in cluster.enums %}
+  enum {{enum.name}} : {{ enum.base_type}} {
+    {%- for entry in enum.entries %}
+    {{entry.name}} = {{entry.code}};
+    {%- endfor %}
+  }
+
+  {%- endfor %}
   // FIXME: implement
 }
 
