@@ -168,7 +168,8 @@ class BouffalolabBuilder(GnBuilder):
         if enable_thread:
             self.argsOpt.append(f'openthread_project_core_config_file="{bouffalo_chip}-openthread-core-bl-config.h"')
             if not use_matter_openthread:
-                self.argsOpt.append('openthread_root="//third_party/connectedhomeip/third_party/bouffalolab/repo/components/network/thread/openthread"')
+                self.argsOpt.append(
+                    'openthread_root="//third_party/connectedhomeip/third_party/bouffalolab/repo/components/network/thread/openthread"')
 
         if enable_cdc:
             if bouffalo_chip != "bl702":
