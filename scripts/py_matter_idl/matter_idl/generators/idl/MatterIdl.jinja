@@ -8,7 +8,9 @@
 #}
 
 {%- if field.qualities %}{{field.qualities | idltxt}} {% endif -%}
-{{field.data_type.name}} {{field.name}}
+{{field.data_type.name}}
+{%- if field.data_type.max_length -%} <{{field.data_type.max_length}}> {%- endif -%}
+{##} {{field.name}}
 {%- if field.is_list %}[]{% endif -%}
 {##} = {{field.code}};
 {%- endmacro -%}
@@ -62,12 +64,12 @@
     {%- endfor %}
   }
   {%- endfor %}
-  {%- for a in cluster.attributes -%}
-    {{a.qualities | idltxt}}attribute {{render_field(a.definition)}}
+  {%- for a in cluster.attributes %}
+  {{a.qualities | idltxt}}attribute {{render_field(a.definition)}}
   {%- if loop.last %}
 
   {% endif %}
-  {% endfor %}
+  {%- endfor %}
   {%- for s in cluster.structs | selectattr("tag") -%}
   {{render_struct(s)}}
 
