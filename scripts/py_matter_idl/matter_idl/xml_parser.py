@@ -33,18 +33,18 @@ if __name__ == '__main__':
     from matter_idl.generators.idl import IdlGenerator
 
     class InMemoryStorage(GeneratorStorage):
-       def __init__(self):
-           super().__init__()
-           self.content: Optional[str] = None
+        def __init__(self):
+            super().__init__()
+            self.content: Optional[str] = None
 
-       def get_existing_data(self, relative_path: str):
-           # Force re-generation each time
-           return None
+        def get_existing_data(self, relative_path: str):
+            # Force re-generation each time
+            return None
 
-       def write_new_data(self, relative_path: str, content: str):
-           if self.content:
-               raise Exception("Unexpected extra data: single file generation expected")
-           self.content = content
+        def write_new_data(self, relative_path: str, content: str):
+            if self.content:
+                raise Exception("Unexpected extra data: single file generation expected")
+            self.content = content
 
     # Supported log levels, mapping string values required for argument
     # parsing into logging constants

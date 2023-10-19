@@ -22,12 +22,11 @@ generation works. Actual usage of this generator would be inside XML tools.
 
 ### Within XML parsers
 
-A XML parser will use this code generator to output a human readable view of
-the parsed data:
+A XML parser will use this code generator to output a human readable view of the
+parsed data:
 
 ```
 ./scripts/py_matter_idl/matter_idl/xml_parser.py \
     ./src/app/zap-templates/zcl/data-model/chip/onoff-cluster.xml \
     ./src/app/zap-templates/zcl/data-model/chip/global-attributes.xm
 ```
-
