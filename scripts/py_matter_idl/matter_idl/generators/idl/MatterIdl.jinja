@@ -131,7 +131,7 @@ endpoint {{endpoint.number}} {
     {% endfor %}
     {% for a in c.attributes %}
     {{"%-8s" | format(a.storage|idltxt) }} attribute {{a.name}}
-    {%- if a.default is not none %} default = {{a.default}} {%- endif %};
+    {%- if a.default is not none %} default = {{a.default|render_default}} {%- endif %};
     {% endfor %}
     {% for cmd in c.commands %}
     {% if loop.first %}
