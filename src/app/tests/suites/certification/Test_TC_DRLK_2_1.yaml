@@ -248,7 +248,7 @@ tests:
               minValue: 0
               maxValue: 11
 
-    - label: "Step 2c: TH writes LockType attribute as 10"
+    - label: "Step 2b: TH writes LockType attribute as 10"
       PICS: DRLK.S.A0001
       command: "writeAttribute"
       attribute: "LockType"

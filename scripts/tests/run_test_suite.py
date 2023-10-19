@@ -364,15 +364,15 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
             try:
                 if context.obj.dry_run:
                     logging.info("Would run test: %s" % test.name)
-                    continue
-
-                logging.info('%-20s - Starting test' % (test.name))
+                else:
+                    logging.info('%-20s - Starting test' % (test.name))
                 test.Run(
                     runner, apps_register, paths, pics_file, test_timeout_seconds, context.obj.dry_run,
                     test_runtime=context.obj.runtime)
-                test_end = time.monotonic()
-                logging.info('%-30s - Completed in %0.2f seconds' %
-                             (test.name, (test_end - test_start)))
+                if not context.obj.dry_run:
+                    test_end = time.monotonic()
+                    logging.info('%-30s - Completed in %0.2f seconds' %
+                                 (test.name, (test_end - test_start)))
             except Exception:
                 test_end = time.monotonic()
                 logging.exception('%-30s - FAILED in %0.2f seconds' %
