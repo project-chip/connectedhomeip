@@ -4,7 +4,7 @@ Generates a structured `Idl` data type into a human-readable text format
 (`.matter` file).
 
 It is useful for tools that ingest non-idl data but convert into idl data (e.g.
-zapxml or CSA data model XML data.)
+`zapxml` or CSA data model XML data.)
 
 ### Usage
 
@@ -20,7 +20,7 @@ which would re-generate the entire `all-clusters-app.matter` into
 This generation is useful for testing/validating that both parsing and
 generation works. Actual usage of this generator would be inside XML tools.
 
-### Within XML parsers
+### Within XML parsing
 
 A XML parser will use this code generator to output a human readable view of the
 parsed data:
