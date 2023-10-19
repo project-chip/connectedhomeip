@@ -80,7 +80,7 @@ _TYPE_REMAP = {
 
 def NormalizeDataType(t: str) -> str:
     """Convert data model xml types into matter idl types."""
-    return _TYPE_REMAP.get(t, t.replace("-", "_"))
+    return _TYPE_REMAP.get(t.lower(), t.replace("-", "_"))
 
 
 def NormalizeName(name: str) -> str:

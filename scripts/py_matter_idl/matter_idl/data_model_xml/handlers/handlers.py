@@ -75,6 +75,22 @@ class BitmapHandler(BaseHandler):
         else:
             return BaseHandler(self.context)
 
+class MandatoryConfirmFieldHandler(BaseHandler):
+    def __init__(self, context: Context, field: Field):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._field = field
+        self._hadConditions = False
+
+    def GetNextProcessor(self, name: str, attrs):
+        self._hadConditions = True
+        return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+
+    def EndProcessing(self):
+        # A mandatory conformance with conditions means it is
+        # optional in some cases
+        if not self._hadConditions:
+            self._field.qualities |= FieldQuality.OPTIONAL
+
 
 class FieldHandler(BaseHandler):
     def __init__(self, context: Context, field: Field):
@@ -85,8 +101,10 @@ class FieldHandler(BaseHandler):
         if name == "constraint":
             ApplyConstraint(attrs, self._field)
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
-        elif name in {"mandatoryConform", "optionalConform"}:
-            # Nothing to tag conformance
+        elif name == "mandatoryConform":
+            return MandatoryConfirmFieldHandler(self.context, self._field)
+        elif name == "optionalConform":
+            self._field.qualities |= FieldQuality.OPTIONAL
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "access":
             # per-field access is not something we model
@@ -270,10 +288,7 @@ class AttributeHandler(BaseHandler):
             self._attribute.definition.qualities |= FieldQuality.OPTIONAL
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "mandatoryConform":
-            # Mandatory means that it may not be mandatory in some cases, so we mark
-            # as optional here too
-            self._attribute.definition.qualities |= FieldQuality.OPTIONAL
-            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+            return MandatoryConfirmFieldHandler(self.context, self._attribute.definition)
         elif name == "deprecateConform":
             self._deprecated = True
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
@@ -360,8 +375,7 @@ class CommandHandler(BaseHandler):
 
     def GetNextProcessor(self, name: str, attrs):
         if name in {"mandatoryConform", "optionalConform", "disallowConform"}:
-            # Nothing to tag conformance
-            # TODO: what is disallowConform? Should it affect codegen?
+            # Unclear how commands may be optional or mandatory
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "access":
             # <access invokePrivilege="admin" timed="true"/>
