@@ -244,13 +244,16 @@ def CommandCallbackName(command: Command, cluster: Cluster):
         return 'DefaultSuccess'
     return '{}Cluster{}'.format(cluster.name, command.output_param)
 
+
 def JavaCommandCallbackName(command: Command):
     if command.output_param.lower() == 'defaultsuccess':
         return 'DefaultCluster'
     return '{}'.format(command.output_param)
 
+
 def IsCommandNotDefaultCallback(command: Command) -> bool:
     return command.output_param.lower() != 'defaultsuccess'
+
 
 def JavaAttributeCallbackName(attr: Attribute, context: TypeLookupContext) -> str:
     """
@@ -264,12 +267,14 @@ def JavaAttributeCallbackName(attr: Attribute, context: TypeLookupContext) -> st
 
     return '{}AttributeCallback'.format(capitalcase(attr.definition.name))
 
+
 def IsFieldGlobalName(field: Field, context: TypeLookupContext) -> bool:
     global_name = FieldToGlobalName(field, context)
     if global_name:
         return True
 
     return False
+
 
 def attributesWithSupportedCallback(attrs, context: TypeLookupContext):
     for attr in attrs:
