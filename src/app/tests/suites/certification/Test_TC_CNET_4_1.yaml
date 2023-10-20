@@ -25,6 +25,14 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Preconditions"
+      verification: |
+          1. DUT supports CNET.S.F00(WI)
+          2. DUT has a Network Commissioning cluster on endpoint PIXIT.CNET.ENDPOINT_WIFI with FeatureMap attribute of 1
+          3. DUT is commissioned on PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
+          4. TH can communicate with the DUT
+      disabled: true
+
     - label: "Step 1: Factory reset the DUT"
       verification: |
 

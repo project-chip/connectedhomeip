@@ -48,7 +48,7 @@ tests:
       response:
           constraints:
               type: bitmap32
-              hasMasksSet: [0x2]
+              hasMasksSet: [0x1]
 
     - label: "Step 2b: Read the global attribute: FeatureMap"
       PICS: " !AUDIOOUTPUT.S.F00 "
@@ -57,7 +57,7 @@ tests:
       response:
           constraints:
               type: bitmap32
-              hasMasksClear: [0x2]
+              hasMasksClear: [0x1]
 
     - label: "Step 3: Read the global attribute: AttributeList"
       PICS: PICS_EVENT_LIST_ENABLED

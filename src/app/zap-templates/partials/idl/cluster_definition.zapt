@@ -1,4 +1,5 @@
 /** {{description}} */
+{{#if apiMaturity}}{{apiMaturity}} {{/if~}}
 {{#if generateClientCluster}}client {{else}}server {{/if~}}
 cluster {{asUpperCamelCase name}} = {{!}}
      {{~#if manufacturerCode}}
@@ -7,7 +8,7 @@ cluster {{asUpperCamelCase name}} = {{!}}
         {{~code~}}
      {{/if}} {
   {{#zcl_enums}}
-  enum {{asUpperCamelCase name preserveAcronyms=true}} : ENUM{{multiply size 8}} {
+  enum {{asUpperCamelCase name preserveAcronyms=true}} : enum{{multiply size 8}} {
     {{#zcl_enum_items}}
     k{{asUpperCamelCase label preserveAcronyms=true}} = {{value}};
     {{/zcl_enum_items}}
@@ -15,7 +16,7 @@ cluster {{asUpperCamelCase name}} = {{!}}
 
   {{/zcl_enums}}
   {{#zcl_bitmaps}}
-  bitmap {{asUpperCamelCase name preserveAcronyms=true}} : BITMAP{{multiply size 8}} {
+  bitmap {{asUpperCamelCase name preserveAcronyms=true}} : bitmap{{multiply size 8}} {
     {{#zcl_bitmap_items}}
     k{{asUpperCamelCase label preserveAcronyms=true}} = {{asHex mask}};
     {{/zcl_bitmap_items}}

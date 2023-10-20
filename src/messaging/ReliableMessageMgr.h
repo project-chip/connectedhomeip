@@ -206,6 +206,14 @@ public:
 #endif // CHIP_CONFIG_TEST
 
 private:
+    /**
+     * Calculates the next retransmission time for the entry
+     * Function sets the nextRetransTime of the entry
+     *
+     * @param[in,out] entry RetransTableEntry for which we need to calculate the nextRetransTime
+     */
+    void CalculateNextRetransTime(RetransTableEntry & entry);
+
     ObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & mContextPool;
     chip::System::Layer * mSystemLayer;
 

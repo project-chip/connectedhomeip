@@ -12,6 +12,7 @@
 #import "MTRStructsObjc.h"
 #import "NSStringSpanConversion.h"
 #import "NSDataSpanConversion.h"
+#import "MTRDefines_Internal.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/im-client-callbacks.h>
@@ -97,7 +98,7 @@ MTR{{cluster}}Cluster{{command}}Params
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
     {{#if mustUseTimedInvoke}}
     if (timedInvokeTimeoutMs == nil) {
-      timedInvokeTimeoutMs = @(10000);
+      timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
     }
     {{/if}}
 
@@ -175,9 +176,9 @@ MTR{{cluster}}Cluster{{command}}Params
             timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
           }
         }
-        {{#if mustUseTimedInvoke}}
+        {{#if mustUseTimedWrite}}
         if (!timedWriteTimeout.HasValue()) {
-          timedWriteTimeout.SetValue(10000);
+          timedWriteTimeout.SetValue(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
         }
         {{/if}}
 

@@ -88,6 +88,13 @@ class MTRSwiftDeviceTestDelegate : NSObject, MTRDeviceDelegate {
     {
         onReportEnd?()
     }
+
+    @objc func unitTestMaxIntervalOverrideForSubscription(_ device : MTRDevice) -> NSNumber
+    {
+      // Make sure our subscriptions time out in finite time.
+      return 2; // seconds
+    }
+
 }
 
 // Because we are using things from Matter.framework that are flagged
