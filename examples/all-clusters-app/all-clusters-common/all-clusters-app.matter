@@ -3247,6 +3247,98 @@ server cluster ActivatedCarbonFilterMonitoring = 114 {
   command ResetCondition(): DefaultSuccess = 0;
 }
 
+/** This cluster is used to configure a boolean sensor. */
+server cluster BooleanSensorConfiguration = 128 {
+  enum SensitivityEnum : enum8 {
+    kHigh = 0;
+    kStandard = 1;
+    kLow = 2;
+  }
+
+  bitmap AlarmModeBitmap : bitmap8 {
+    kVisual = 0x1;
+    kAudible = 0x2;
+  }
+
+  bitmap Feature : bitmap32 {
+    kVisual = 0x1;
+    kAudible = 0x2;
+    kAlarmSupress = 0x4;
+    kSensitivityLevel = 0x8;
+  }
+
+  info event AlarmsStateChanged = 0 {
+    AlarmModeBitmap alarmsActive = 0;
+    optional AlarmModeBitmap alarmsSuppressed = 0;
+  }
+
+  info event SensorFault = 1 {
+  }
+
+  attribute SensitivityEnum sensitivityLevel = 0;
+  readonly attribute AlarmModeBitmap alarmsActive = 1;
+  readonly attribute AlarmModeBitmap alarmsSuppressed = 2;
+  attribute AlarmModeBitmap sensitivityLevel = 3;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SupressRequestRequest {
+    AlarmModeBitmap alarmsToSuppress = 0;
+  }
+
+  command SupressRequest(SupressRequestRequest): DefaultSuccess = 0;
+}
+
+/** This cluster is used to configure a valve. */
+server cluster ValveConfigurationAndControl = 129 {
+  enum ValveStateEnum : enum8 {
+    kOpen = 0;
+    kClosed = 1;
+  }
+
+  bitmap Feature : bitmap32 {
+    kTimeSync = 0x1;
+    kLevel = 0x2;
+  }
+
+  bitmap ValveFaultBitmap : bitmap16 {
+    kGeneralFault = 0x1;
+    kBlocked = 0x2;
+    kLeak = 0x4;
+  }
+
+  info event ValveStateChanged = 0 {
+    ValveStateEnum valveState = 0;
+  }
+
+  info event ValveFault = 1 {
+    ValveFaultBitmap valveFault = 0;
+  }
+
+  attribute access(write: manage) nullable elapsed_s openDuration = 0;
+  readonly attribute nullable epoch_us autoCloseTime = 1;
+  readonly attribute nullable elapsed_s remainingDuration = 2;
+  readonly attribute nullable ValveStateEnum currentState = 3;
+  readonly attribute nullable ValveStateEnum targetState = 4;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct OpenRequest {
+    optional elapsed_s openDuration = 0;
+  }
+
+  command Open(OpenRequest): DefaultSuccess = 0;
+  command Close(): DefaultSuccess = 1;
+}
+
 /** An interface to a generic way to secure a door */
 server cluster DoorLock = 257 {
   enum AlarmCodeEnum : enum8 {
@@ -6654,6 +6746,38 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command ResetCondition;
+  }
+
+  server cluster BooleanSensorConfiguration {
+    ram      attribute sensitivityLevel;
+    ram      attribute alarmsActive;
+    ram      attribute alarmsSuppressed;
+    ram      attribute sensitivityLevel;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0x0F;
+    ram      attribute clusterRevision default = 1;
+
+    handle command SupressRequest;
+  }
+
+  server cluster ValveConfigurationAndControl {
+    ram      attribute openDuration;
+    ram      attribute autoCloseTime;
+    ram      attribute remainingDuration;
+    ram      attribute currentState;
+    ram      attribute targetState;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 1;
+    ram      attribute clusterRevision default = 1;
+
+    handle command Open;
+    handle command Close;
   }
 
   server cluster DoorLock {
