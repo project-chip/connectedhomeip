@@ -107,7 +107,6 @@ void ReliableMessageContext::HandleRcvdAck(uint32_t ackMessageCounter)
 }
 
 CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t messageCounter, BitFlags<MessageFlagValues> messageFlags)
-
 {
     CHIP_ERROR err = HandleNeedsAckInner(messageCounter, messageFlags);
 

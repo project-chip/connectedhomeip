@@ -838,14 +838,24 @@ tests:
       disabled: true
 
     - label:
-          "Step 12: TH sends Subscribe Request Message to DUT with EventRequests
-          set to path which indicates a cluster event that is not supported."
+          "Step 12: TH sends Subscribe Request Message to DUT. DUT sends Report
+          Data message to DUT + TH sends Status Response Message with an error
+          Status."
       verification: |
           Mark this as not testable /NA. Out of Scope
+          SDK Issue : https://github.com/project-chip/connectedhomeip/issues/23990
       disabled: true
 
     - label:
           "Step 13: TH sends Subscribe Request Message to DUT with EventRequests
+          set to path which indicates a cluster event that is not supported."
+      verification: |
+          Mark this as not testable /NA. Out of Scope
+          SDK Issue : https://github.com/project-chip/connectedhomeip/issues/23990
+      disabled: true
+
+    - label:
+          "Step 14: TH sends Subscribe Request Message to DUT with EventRequests
           set to path which requires a privilege that is not granted for the
           cluster in the path."
       verification: |
@@ -899,7 +909,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 14: TH sends Subscribe Request Message to DUT with EventRequests
+          "Step 16: TH sends Subscribe Request Message to DUT with EventRequests
           set to Wildcard path where reading an event in the path requires a
           privilege that is not granted for the cluster in the path."
       verification: |

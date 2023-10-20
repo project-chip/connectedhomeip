@@ -47,6 +47,36 @@ tests:
               - name: "SceneTableSize"
                 saveAs: maxScenes
 
+    - label: "Arithmetic operation to get the maxScenes - 1"
+      cluster: "Unit Testing"
+      command: "TestAddArguments"
+      arguments:
+          values:
+              - name: "arg1"
+                value: maxScenes - 1
+              - name: "arg2"
+                value: 0
+      response:
+          values:
+              - name: "returnValue"
+                saveAs: maxScenesMinusOne
+                value: maxScenes - 1
+
+    - label: "Arithmetic operation to get the fabric Capacity"
+      cluster: "Unit Testing"
+      command: "TestAddArguments"
+      arguments:
+          values:
+              - name: "arg1"
+                value: maxScenesMinusOne / 2
+              - name: "arg2"
+                value: 0
+      response:
+          values:
+              - name: "returnValue"
+                saveAs: fabricCapacity
+                value: maxScenesMinusOne / 2
+
     - label:
           "Step 0a: preparation step for using commands from Groups cluster: Add
           KeySet"
@@ -137,7 +167,7 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "Capacity"
-                value: ( maxScenes / 2 )
+                value: fabricCapacity
               - name: "GroupID"
                 value: G1
 
@@ -526,7 +556,7 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "Capacity"
-                value: ( maxScenes / 2 ) - 1
+                value: fabricCapacity - 1
               - name: "GroupID"
                 value: G1
               - name: "SceneList"
@@ -563,7 +593,7 @@ tests:
                 value: 0x00
               - name: "Capacity"
                 constraints:
-                    anyOf: [( maxScenes / 2 ), 0xfe, 0x89]
+                    anyOf: [fabricCapacity, 0xfe, 0x89]
               - name: "GroupID"
                 value: G1
 
@@ -683,7 +713,7 @@ tests:
                 value: 0x00
               - name: "Capacity"
                 constraints:
-                    anyOf: [( maxScenes / 2 ) - 1, 0xfe, 0x89]
+                    anyOf: [fabricCapacity - 1, 0xfe, 0x89]
               - name: "GroupID"
                 value: G1
               - name: "SceneList"
@@ -724,7 +754,7 @@ tests:
                 value: 0x00
               - name: "Capacity"
                 constraints:
-                    anyOf: [( maxScenes / 2 ), 0xfe, 0x89]
+                    anyOf: [fabricCapacity, 0xfe, 0x89]
               - name: "GroupID"
                 value: G1
 
@@ -917,7 +947,7 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "Capacity"
-                value: ( maxScenes / 2 ) - 2
+                value: fabricCapacity - 2
               - name: "GroupID"
                 value: G1
               - name: "SceneList"
@@ -975,7 +1005,7 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "Capacity"
-                value: ( maxScenes / 2 ) - 2
+                value: fabricCapacity - 2
               - name: "GroupID"
                 value: G2
 
@@ -1070,7 +1100,7 @@ tests:
               - name: "Status"
                 value: 0x00
               - name: "Capacity"
-                value: ( maxScenes / 2 ) - 3
+                value: fabricCapacity - 3
               - name: "GroupID"
                 value: G2
               - name: "SceneList"

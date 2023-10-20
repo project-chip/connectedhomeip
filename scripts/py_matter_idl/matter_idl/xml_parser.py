@@ -16,6 +16,7 @@
 
 import logging
 import os
+from typing import Optional
 
 try:
     from matter_idl.zapxml import ParseSource, ParseXmls
@@ -28,11 +29,23 @@ except ImportError:
 
 
 if __name__ == '__main__':
-    # This Parser is generally not intended to be run as a stand-alone binary.
-    # The ability to run is for debug and to print out the parsed AST.
-    import pprint
-
     import click
+    from matter_idl.generators import GeneratorStorage
+    from matter_idl.generators.idl import IdlGenerator
+
+    class InMemoryStorage(GeneratorStorage):
+        def __init__(self):
+            super().__init__()
+            self.content: Optional[str] = None
+
+        def get_existing_data(self, relative_path: str):
+            # Force re-generation each time
+            return None
+
+        def write_new_data(self, relative_path: str, content: str):
+            if self.content:
+                raise Exception("Unexpected extra data: single file generation expected")
+            self.content = content
 
     # Supported log levels, mapping string values required for argument
     # parsing into logging constants
@@ -70,7 +83,8 @@ if __name__ == '__main__':
         logging.info("Parse completed")
 
         if not no_print:
-            print("Data:")
-            pprint.pp(data)
+            storage = InMemoryStorage()
+            IdlGenerator(storage=storage, idl=data).render(dry_run=False)
+            print(storage.content)
 
     main(auto_envvar_prefix='CHIP')

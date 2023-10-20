@@ -714,9 +714,8 @@ template("bl_iot_sdk") {
     defines = [ "OT_FREERTOS_ENABLE=1" ]
 
     include_dirs = [
-      "${chip_root}/platform/bl702",
-      "${chip_root}/third_party/openthread/repo/src/core",
-      "${chip_root}/third_party/openthread/repo/examples/platforms",
+      "${openthread_root}/src/core",
+      "${openthread_root}/examples/platforms",
       "${bl_iot_sdk_root}/components/network/thread/openthread_port/include",
       "${bl_iot_sdk_root}/components/network/thread/openthread_utils/include",
     ]

@@ -160,6 +160,14 @@ else()
     unset(GLOBAL_DTC_OVERLAY_FILE)
 endif()
 
+if(EXISTS "${CHIP_ROOT}/src/platform/telink/${FLASH_SIZE}_flash.overlay")
+    set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${FLASH_SIZE}_flash.overlay")
+    message(STATUS "Flash memory size is set to: " ${FLASH_SIZE} "b")
+else()
+    set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/2m_flash.overlay")
+    message(STATUS "Flash memory size is set to: 2mb")
+endif()
+
 if(EXISTS "${CHIP_ROOT}/config/telink/app/bootloader.conf")
     set(GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE "${CHIP_ROOT}/config/telink/app/bootloader.conf")
 else()
@@ -177,7 +185,7 @@ if (CONFIG_BOOTLOADER_MCUBOOT)
     add_custom_target(build_mcuboot ALL
         COMMAND
         west build -b ${BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
-            -- -DOVERLAY_CONFIG=${GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE} -DDTC_OVERLAY_FILE="${GLOBAL_DTC_OVERLAY_FILE};${USB_BOOT_DTC_OVERLAY_FILE}"
+            -- -DOVERLAY_CONFIG=${GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE} -DDTC_OVERLAY_FILE="${GLOBAL_DTC_OVERLAY_FILE};${FLASH_DTC_OVERLAY_FILE};${USB_BOOT_DTC_OVERLAY_FILE}"
         COMMAND
         cp ${PROJECT_BINARY_DIR}/../modules/chip-module/build_mcuboot/zephyr/zephyr.bin ${PROJECT_BINARY_DIR}/zephyr.mcuboot.bin
     )
