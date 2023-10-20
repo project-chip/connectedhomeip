@@ -93,7 +93,16 @@ def NormalizeName(name: str) -> str:
     while '__' in name:
         name = name.replace('__', '_')
 
-    # TODO: should we handle acronyms in some way?
+    # NOTE: zapt generators for IDL files use a construct of the form
+    #       `{{asUpperCamelCase name preserveAcronyms=true}}`
+    #       and it is somewhat unclear what preserveAcronyms will do.
+    #
+    #      Current assumption is that spec already has acronyms set in
+    #      the correct place and at least for some basic tests this method
+    #      generates good names
+    #
+    #      If any acronyms seem off in naming at some point, more logic may
+    #      be needed here.
 
     # At this point, we remove all _ and make sure _ is followed by an uppercase
     while name.endswith('_'):
