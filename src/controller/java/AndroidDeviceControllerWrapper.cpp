@@ -368,6 +368,12 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     return wrapper.release();
 }
 
+void AndroidDeviceControllerWrapper::Shutdown()
+{
+    mController->Shutdown();
+    DeviceControllerFactory::GetInstance().Shutdown();
+}
+
 CHIP_ERROR AndroidDeviceControllerWrapper::ApplyNetworkCredentials(chip::Controller::CommissioningParameters & params,
                                                                    jobject networkCredentials)
 {
