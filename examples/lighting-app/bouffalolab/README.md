@@ -80,7 +80,8 @@ Mac OS.
 
 ## Build CHIP Lighting App example
 
-The following steps take examples for `BL602-IoT-Matter-V1` BL602 board, `BL706DK` BL706 board, and `BL704LDK` BL704L board .
+The following steps take examples for `BL602-IoT-Matter-V1` BL602 board,
+`BL706DK` BL706 board, and `BL704LDK` BL704L board .
 
 -   Build lighting app with UART baudrate 2000000
 
@@ -162,8 +163,8 @@ The following steps take examples for `BL602-IoT-Matter-V1` BL602 board, `BL706D
     -   Type following command for image download. Please set serial port
         accordingly, here we use /dev/ttyACM0 as a serial port example.
 
-        -   `bl602-iot-matter-v1`, `bl706dk` and `bl704ldk` without
-            additional build options
+        -   `bl602-iot-matter-v1`, `bl706dk` and `bl704ldk` without additional
+            build options
 
             ```shell
             ./out/bouffalolab-bl602-iot-matter-v1-light/chip-bl602-lighting-example.flash.py --port /dev/ttyACM0

@@ -44,7 +44,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryMACAddress(MutableByteSpan buf)
         return CHIP_ERROR_INVALID_ARGUMENT;
 
     memcpy(buf.data(), deviceInterface_getNetif()->hwaddr, ConfigurationManager::kPrimaryMACAddressLength);
-    
+
     return CHIP_NO_ERROR;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET

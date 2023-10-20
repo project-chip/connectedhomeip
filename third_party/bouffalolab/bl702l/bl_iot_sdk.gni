@@ -426,7 +426,7 @@ template("bl_iot_sdk") {
     cflags_c = [
       "-Wno-shadow",
       "-Wno-sign-compare",
-      "-Wno-incompatible-pointer-types"
+      "-Wno-incompatible-pointer-types",
     ]
     configs += [
       ":${sdk_target_name}_config_bl702l_rom_a0",
