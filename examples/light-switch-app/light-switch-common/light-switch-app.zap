@@ -4839,6 +4839,7 @@
           "define": "SCENES_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "AddScene",
@@ -5831,5 +5832,6 @@
       "endpointId": 2,
       "networkId": 0
     }
-  ]
+  ],
+  "log": []
 }
