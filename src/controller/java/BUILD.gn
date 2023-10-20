@@ -471,6 +471,10 @@ android_library("java") {
 
   if (matter_enable_java_generated_api) {
     sources += [
+      "generated/java/chip/devicecontroller/ChipClusters.java",
+      "generated/java/chip/devicecontroller/ChipEventStructs.java",
+      "generated/java/chip/devicecontroller/ChipStructs.java",
+      "generated/java/chip/devicecontroller/ClusterInfoMapping.java",
       "generated/java/chip/devicecontroller/ClusterReadMapping.java",
       "generated/java/chip/devicecontroller/ClusterWriteMapping.java",
       "src/chip/clusterinfo/ClusterCommandCallback.java",
@@ -479,10 +483,6 @@ android_library("java") {
       "src/chip/clusterinfo/CommandResponseInfo.java",
       "src/chip/clusterinfo/DelegatedClusterCallback.java",
       "src/chip/clusterinfo/InteractionInfo.java",
-      "zap-generated/chip/devicecontroller/ChipClusters.java",
-      "zap-generated/chip/devicecontroller/ChipEventStructs.java",
-      "zap-generated/chip/devicecontroller/ChipStructs.java",
-      "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
     ]
   }
 
