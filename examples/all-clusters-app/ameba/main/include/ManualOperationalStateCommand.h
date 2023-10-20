@@ -92,14 +92,14 @@ CHIP_ERROR ManualOperationalStateSetErrorCommandHandler(int argc, char ** argv)
 
     switch (error)
     {
-    case to_underlying(OperationalState::ErrorStateEnum::kNoError):
-    case to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume):
-    case to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation):
-    case to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState):
+    case to_underlying(OperationalState::ErrorStateEnum::kNoError):                   // 0x00, 0
+    case to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume):     // 0x01, 1
+    case to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation): // 0x02, 2
+    case to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState):     // 0x03, 3
         err.errorStateID = error;
         break;
     default:
-        err.errorStateID = to_underlying(OperationalState::ErrorStateEnum::kUnknownEnumValue);
+        err.errorStateID = to_underlying(OperationalState::ErrorStateEnum::kUnknownEnumValue); // 0x04, 4
         break;
     }
 
@@ -174,7 +174,7 @@ CHIP_ERROR ManualRVCOperationalStateSetErrorCommandHandler(int argc, char ** arg
         err.errorStateID = error;
         break;
     default:
-        err.errorStateID = to_underlying(RvcOperationalState::ErrorStateEnum::kUnknownEnumValue);
+        err.errorStateID = to_underlying(OperationalState::ErrorStateEnum::kUnknownEnumValue); // 0x04, 4
         break;
     }
 
