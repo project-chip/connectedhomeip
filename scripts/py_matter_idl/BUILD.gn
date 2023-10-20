@@ -47,7 +47,7 @@ pw_python_package("matter_idl") {
     "matter_idl/tests/outputs/several_clusters/java/ChipClusters.java",
     "matter_idl/tests/outputs/several_clusters/java/ChipEventStructs.java",
     "matter_idl/tests/outputs/several_clusters/java/ChipStructs.java",
-    "matter_idl/tests/outputs/several_clusters/java/ChipInfoMapping.java",
+    "matter_idl/tests/outputs/several_clusters/java/ClusterInfoMapping.java",
     "matter_idl/tests/outputs/several_clusters/java/ClusterIDMapping.java",
     "matter_idl/tests/outputs/several_clusters/java/ClusterWriteMapping.java",
     "matter_idl/tests/outputs/several_clusters/jni/FirstClient-ReadImpl.cpp",
