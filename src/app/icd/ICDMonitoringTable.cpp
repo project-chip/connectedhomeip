@@ -77,7 +77,7 @@ CHIP_ERROR ICDMonitoringEntry::Deserialize(TLV::TLVReader & reader)
                 // Calling SetKey here would create another key in storage and will cause
                 // key leakage in some implementation.
                 memcpy(key.AsMutable<Crypto::Aes128KeyByteArray>(), buf.data(), sizeof(Crypto::Aes128KeyByteArray));
-                isKeySet = true;
+                keyHandleValid = true;
             }
             break;
             default:
@@ -95,20 +95,20 @@ void ICDMonitoringEntry::Clear()
 {
     this->checkInNodeID    = kUndefinedNodeId;
     this->monitoredSubject = kUndefinedNodeId;
-    this->isKeySet         = false;
+    this->keyHandleValid   = false;
 }
 
 CHIP_ERROR ICDMonitoringEntry::SetKey(ByteSpan keyData)
 {
     VerifyOrReturnError(keyData.size() == sizeof(Crypto::Aes128KeyByteArray), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(symmetricKeystore != nullptr, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(!isKeySet, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(!keyHandleValid, CHIP_ERROR_INTERNAL);
 
     Crypto::Aes128KeyByteArray keyMaterial;
     memcpy(keyMaterial, keyData.data(), sizeof(Crypto::Aes128KeyByteArray));
 
     ReturnErrorOnFailure(symmetricKeystore->CreateKey(keyMaterial, key));
-    isKeySet = true;
+    keyHandleValid = true;
 
     return CHIP_NO_ERROR;
 }
@@ -117,7 +117,7 @@ CHIP_ERROR ICDMonitoringEntry::DeleteKey()
 {
     VerifyOrReturnError(symmetricKeystore != nullptr, CHIP_ERROR_INTERNAL);
     symmetricKeystore->DestroyKey(this->key);
-    isKeySet = false;
+    keyHandleValid = false;
     return CHIP_NO_ERROR;
 }
 
@@ -125,7 +125,7 @@ bool ICDMonitoringEntry::IsKeyEquivalent(ByteSpan keyData)
 {
     VerifyOrReturnValue(keyData.size() == Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES, false);
     VerifyOrReturnValue(symmetricKeystore != nullptr, false);
-    VerifyOrReturnValue(isKeySet, false);
+    VerifyOrReturnValue(keyHandleValid, false);
 
     ICDMonitoringEntry tempEntry(symmetricKeystore);
 
@@ -190,7 +190,7 @@ CHIP_ERROR ICDMonitoringTable::Set(uint16_t index, const ICDMonitoringEntry & en
     VerifyOrReturnError(index < this->Limit(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(kUndefinedNodeId != entry.checkInNodeID, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(kUndefinedNodeId != entry.monitoredSubject, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(entry.isKeySet, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(entry.keyHandleValid, CHIP_ERROR_INVALID_ARGUMENT);
     ICDMonitoringEntry e(this->mFabric, index);
     e.checkInNodeID    = entry.checkInNodeID;
     e.monitoredSubject = entry.monitoredSubject;
@@ -220,6 +220,7 @@ CHIP_ERROR ICDMonitoringTable::Remove(uint16_t index)
     entry.fabricIndex = this->mFabric;
     entry.index       = index;
 
+    // entry.Delete() doesn't delete the key from the AES128KeyHandle
     return entry.Delete(this->mStorage);
 }
 

@@ -66,12 +66,8 @@ struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
      *        To avoid leaking keys, API consumers must either call the DeleteKey method
      *        or save the entry within the ICDMonitoring Table before this object goes out of scope.
      *
-     *       Calling SetKey() on an ICDMonitoringEntry that already has a valid key handle will lead to
-     *       the old key being deleted if the key handle is a key id, not raw data.  This can lead to keys
-     *       that were already persisted via the ICDMonitoring table getting lost.
-     *
-     *       Therefore a new entry object should be used for each key when adding entries to the ICDMonitoring
-     *       table.
+     *        A new entry object should be used for each key when adding entries to the ICDMonitoring
+     *        table.
      *
      * @param keyData A byte span containing the raw key
      * @return CHIP_ERROR CHIP_NO_ERROR     success
@@ -103,7 +99,7 @@ struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
     chip::NodeId checkInNodeID                    = kUndefinedNodeId;
     uint64_t monitoredSubject                     = static_cast<uint64_t>(0);
     Crypto::Aes128KeyHandle key                   = Crypto::Aes128KeyHandle();
-    bool isKeySet                                 = false;
+    bool keyHandleValid                           = false;
     uint16_t index                                = 0;
     Crypto::SymmetricKeystore * symmetricKeystore = nullptr;
 };
