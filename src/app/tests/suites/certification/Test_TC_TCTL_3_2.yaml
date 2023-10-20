@@ -120,6 +120,8 @@ tests:
           TemperatureSetpoint attribute."
       PICS: TCTL.S.A0000
       verification: |
+          After a few seconds, please send the below mentioned command to read TemperatureSetpoint attribute from TH to DUT
+
           ./chip-tool temperaturecontrol read temperature-setpoint 1 1
           On TH(chip-tool), Verify that the DUT response contains a temperatureValue and the value is the same setTemp value written in step 5
           [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true,
@@ -175,6 +177,8 @@ tests:
           TemperatureSetpoint attribute."
       PICS: TCTL.S.A0000
       verification: |
+          After a few seconds, please send the below mentioned command to read TemperatureSetpoint attribute from TH to DUT
+
           ./chip-tool temperaturecontrol read temperature-setpoint 1 1
           On TH(chip-tool), Verify that the DUT response contains a temperatureValue and the value is the same setTemp value written in step 5
           [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true,
@@ -240,6 +244,8 @@ tests:
           TemperatureSetpoint attribute."
       PICS: TCTL.S.M.SupportsInvalidInMode && TCTL.S.A0000
       verification: |
+          After a few seconds, please send the below mentioned command to read TemperatureSetpoint attribute from TH to DUT
+
           ./chip-tool temperaturecontrol read temperature-setpoint 1 1
           On TH(chip-tool), Verify that the DUT response contains a temperatureValue and the value is the same setTemp value written in step 5
           [1689770673.417838][9280:9282] CHIP:DMG:         SuppressResponse = true,

@@ -7581,8 +7581,12 @@
           - ProxyDiscovery
           - ProxyValid
 
-- release: "Future"
-  versions: "future"
+- release: "Fall 2023 #3"
+  versions:
+      ios: "17.2"
+      macos: "14.2"
+      watchos: "10.2"
+      tvos: "17.2"
   introduced:
       command payloads:
           TimeSynchronization:
@@ -7593,7 +7597,52 @@
                   - utcTime
                   - granularity
                   - timeSource
+      enums:
+          OTASoftwareUpdateProvider:
+              - StatusEnum
+              - ApplyUpdateActionEnum
+              - DownloadProtocolEnum
+          OTASoftwareUpdateRequestor:
+              - AnnouncementReasonEnum
+              - UpdateStateEnum
+              - ChangeReasonEnum
       enum values:
+          OTASoftwareUpdateProvider:
+              StatusEnum:
+                  - UpdateAvailable
+                  - Busy
+                  - NotAvailable
+                  - DownloadProtocolNotSupported
+              ApplyUpdateActionEnum:
+                  - Proceed
+                  - AwaitNextAction
+                  - Discontinue
+              DownloadProtocolEnum:
+                  - BDXSynchronous
+                  - BDXAsynchronous
+                  - HTTPS
+                  - VendorSpecific
+          OTASoftwareUpdateRequestor:
+              AnnouncementReasonEnum:
+                  - SimpleAnnouncement
+                  - UpdateAvailable
+                  - UrgentUpdateAvailable
+              UpdateStateEnum:
+                  - Unknown
+                  - Idle
+                  - Querying
+                  - DelayedOnQuery
+                  - Downloading
+                  - Applying
+                  - DelayedOnApply
+                  - RollingBack
+                  - DelayedOnUserConsent
+              ChangeReasonEnum:
+                  - Unknown
+                  - Success
+                  - Failure
+                  - TimeOut
+                  - DelayByProvider
           OnOff:
               DelayedAllOffEffectVariantEnum:
                   - DelayedOffFastFade
@@ -7612,6 +7661,15 @@
               OnOffControlBitmap:
                   - AcceptOnlyWhenOn
   deprecated:
+      enums:
+          OTASoftwareUpdateProvider:
+              - OTAQueryStatus
+              - OTAApplyUpdateAction
+              - OTADownloadProtocol
+          OTASoftwareUpdateRequestor:
+              - OTAAnnouncementReason
+              - OTAUpdateStateEnum
+              - OTAChangeReasonEnum
       enum values:
           OnOff:
               DelayedAllOffEffectVariantEnum:
@@ -7633,11 +7691,24 @@
           BarrierControl:
               - BarrierControlCapabilities
               - BarrierControlSafetyStatus
+          BallastConfiguration:
+              # The BallastConfiguration cluster is provisional for now, but not marked that way.
+              - BallastStatusBitmap
+              - LampAlarmModeBitmap
       attributes:
           GeneralDiagnostics:
               # Not in the spec yet.
               - AverageWearCount
   renames:
+      enums:
+          OTASoftwareUpdateProvider:
+              StatusEnum: OTAQueryStatus
+              ApplyUpdateActionEnum: OTAApplyUpdateAction
+              DownloadProtocolEnum: OTADownloadProtocol
+          OTASoftwareUpdateRequestor:
+              AnnouncementReasonEnum: OTAAnnouncementReason
+              UpdateStateEnum: OTAUpdateStateEnum
+              ChangeReasonEnum: OTAChangeReasonEnum
       enum values:
           OnOff:
               DelayedAllOffEffectVariantEnum:
@@ -7654,3 +7725,6 @@
           OnOff:
               Feature:
                   DeadFrontBehavior: DeadFront
+
+- release: "Future"
+  versions: "future"

@@ -70,6 +70,7 @@ class BaseApplication
 public:
     BaseApplication() = default;
     virtual ~BaseApplication(){};
+    static bool sIsProvisioned;
 
     /**
      * @brief Create AppTask task and Event Queue
@@ -103,6 +104,7 @@ public:
      *        Turns off Status LED before stopping timer
      */
     static void StopStatusLEDTimer(void);
+    static bool getWifiProvisionStatus(void);
 
 #ifdef EMBER_AF_PLUGIN_IDENTIFY_SERVER
     // Idenfiy server command callbacks.

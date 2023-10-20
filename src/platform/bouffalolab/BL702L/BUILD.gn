@@ -57,6 +57,8 @@ static_library("BL702L") {
     ]
   }
 
+  deps = [ "${chip_root}/src/platform/logging:headers" ]
+
   defines =
       [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
   if (chip_enable_factory_data || chip_enable_factory_data_test) {
@@ -71,7 +73,7 @@ static_library("BL702L") {
 
     import("//build_overrides/bouffalolab_iot_sdk.gni")
     import("${bouffalolab_iot_sdk_build_root}/bl702l/bl_iot_sdk.gni")
-    deps = [ "${bouffalolab_iot_sdk_build_root}/bl702l:bl_iot_sdk" ]
+    deps += [ "${bouffalolab_iot_sdk_build_root}/bl702l:bl_iot_sdk" ]
 
     sources += [
       "../../OpenThread/OpenThreadUtils.cpp",

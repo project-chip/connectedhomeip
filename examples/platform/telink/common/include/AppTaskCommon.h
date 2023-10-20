@@ -76,8 +76,12 @@ public:
     {
         kButtonId_ExampleAction = 1,
         kButtonId_FactoryReset,
+#if APP_USE_THREAD_START_BUTTON
         kButtonId_StartThread,
+#endif
+#if APP_USE_BLE_START_BUTTON
         kButtonId_StartBleAdv
+#endif
     } ButtonId;
 #endif
 

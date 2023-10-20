@@ -70,27 +70,26 @@ private:
         switch (testIndex)
         {
         case 0: {
-            LogStep(0, "DUT reads the FeatureMap attribute from TH");
-            VerifyOrDo(!ShouldSkip("WNCV.C.Afffc"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            LogStep(0, "Step 1a: DUT reads the FeatureMap attribute from TH");
             return WaitAttribute(GetEndpoint(0), WindowCovering::Id, WindowCovering::Attributes::FeatureMap::Id);
         }
         case 1: {
-            LogStep(1, "DUT reads the Type attribute from TH");
+            LogStep(1, "Step 2a: DUT reads the Type attribute from TH");
             VerifyOrDo(!ShouldSkip("WNCV.C.A0000"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), WindowCovering::Id, WindowCovering::Attributes::Type::Id);
         }
         case 2: {
-            LogStep(2, "DUT reads the EndProductType attribute from TH");
+            LogStep(2, "Step 2b: DUT reads the EndProductType attribute from TH");
             VerifyOrDo(!ShouldSkip("WNCV.C.A000d"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), WindowCovering::Id, WindowCovering::Attributes::EndProductType::Id);
         }
         case 3: {
-            LogStep(3, "DUT reads the Mode attribute from TH");
+            LogStep(3, "Step 3a: DUT reads the Mode attribute from TH");
             VerifyOrDo(!ShouldSkip("WNCV.C.A0017"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), WindowCovering::Id, WindowCovering::Attributes::Mode::Id);
         }
         case 4: {
-            LogStep(4, "DUT reads the ConfigStatus attribute from TH");
+            LogStep(4, "Step 3b: DUT reads the ConfigStatus attribute from TH");
             VerifyOrDo(!ShouldSkip("WNCV.C.A0007"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitAttribute(GetEndpoint(0), WindowCovering::Id, WindowCovering::Attributes::ConfigStatus::Id);
         }
@@ -376,17 +375,17 @@ private:
         switch (testIndex)
         {
         case 0: {
-            LogStep(0, "DUT sends UpOrOpen command to TH");
+            LogStep(0, "Step 1a: DUT sends UpOrOpen command to TH");
             VerifyOrDo(!ShouldSkip("WNCV.C.C00.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitCommand(GetEndpoint(0), WindowCovering::Id, WindowCovering::Commands::UpOrOpen::Id);
         }
         case 1: {
-            LogStep(1, "DUT sends DownOrClose command to TH");
+            LogStep(1, "Step 2a: DUT sends DownOrClose command to TH");
             VerifyOrDo(!ShouldSkip("WNCV.C.C01.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitCommand(GetEndpoint(0), WindowCovering::Id, WindowCovering::Commands::DownOrClose::Id);
         }
         case 2: {
-            LogStep(2, "DUT sends StopMotion command to TH");
+            LogStep(2, "Step 3a: DUT sends StopMotion command to TH");
             VerifyOrDo(!ShouldSkip("WNCV.C.C02.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitCommand(GetEndpoint(0), WindowCovering::Id, WindowCovering::Commands::StopMotion::Id);
         }
@@ -442,12 +441,12 @@ private:
         switch (testIndex)
         {
         case 0: {
-            LogStep(0, "If (PA_LF & LF) DUT sends GoToLiftPercentage command with 50% to DUT");
+            LogStep(0, "Step 1a: If (PA_LF & LF) DUT sends GoToLiftPercentage command with 50% to DUT");
             VerifyOrDo(!ShouldSkip("WNCV.C.C05.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitCommand(GetEndpoint(0), WindowCovering::Id, WindowCovering::Commands::GoToLiftPercentage::Id);
         }
         case 1: {
-            LogStep(1, "If (PA_TL & TL) DUT sends GoToTiltPercentage command with 50% to DUT");
+            LogStep(1, "Step 2a: If (PA_TL & TL) DUT sends GoToTiltPercentage command with 50% to DUT");
             VerifyOrDo(!ShouldSkip("WNCV.C.C08.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitCommand(GetEndpoint(0), WindowCovering::Id, WindowCovering::Commands::GoToTiltPercentage::Id);
         }

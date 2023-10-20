@@ -178,11 +178,6 @@ public:
     static_assert(kConnectionRecoveryMinIntervalMs < kConnectionRecoveryMaxIntervalMs);
     static_assert(kConnectionRecoveryJitterMs <= kConnectionRecoveryMaxIntervalMs);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    static constexpr uint8_t kDefaultDTIMInterval = 3;
-    static constexpr uint8_t kBeaconIntervalMs    = 100;
-#endif
-
     CHIP_ERROR Init();
     CHIP_ERROR Scan(const ByteSpan & ssid, ScanResultCallback resultCallback, ScanDoneCallback doneCallback,
                     bool internalScan = false);

@@ -74,7 +74,7 @@ static_library("mw320") {
   # Use ethernet/wifi interface for network commissioning. Default: WiFi
   defines += [ "USE_ETHERNET_COMMISSION=0" ]
 
-  deps = []
+  deps = [ "${chip_root}/src/platform/logging:headers" ]
 
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 

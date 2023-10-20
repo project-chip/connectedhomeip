@@ -18,6 +18,7 @@
 #import "MTRCommandPayloadsObjc.h"
 #import "MTRBackwardsCompatShims.h"
 #import "MTRBaseDevice_Internal.h"
+#import "MTRCommandPayloadExtensions_Internal.h"
 #import "MTRCommandPayloads_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
@@ -9783,6 +9784,79 @@ NS_ASSUME_NONNULL_BEGIN
         err = chip::app::DataModel::Decode(reader, decodedStruct);
         if (err == CHIP_NO_ERROR) {
             err = [self _setFieldsFromDecodableStruct:decodedStruct];
+            if (err == CHIP_NO_ERROR) {
+                do {
+                    // AttestationResponse has an extra attestationChallenge field.  Once we
+                    // have some sort of more direct decoding from the responseValue, we can
+                    // probably make this less hardcoded.
+                    //
+                    // It might be simpler to look for the right profile tag in the TLV, but let's stick to examining
+                    // the responseValue we were handed.
+                    id data = responseValue[MTRDataKey];
+                    if (![data isKindOfClass:NSDictionary.class]) {
+                        err = CHIP_ERROR_INVALID_ARGUMENT;
+                        break;
+                    }
+
+                    NSDictionary * dataDictionary = data;
+                    if (dataDictionary[MTRTypeKey] == nil || ![dataDictionary[MTRTypeKey] isKindOfClass:NSString.class] || ![dataDictionary[MTRTypeKey] isEqualToString:MTRStructureValueType]) {
+                        err = CHIP_ERROR_INVALID_ARGUMENT;
+                        break;
+                    }
+
+                    id value = dataDictionary[MTRValueKey];
+                    if (value == nil || ![value isKindOfClass:NSArray.class]) {
+                        err = CHIP_ERROR_INVALID_ARGUMENT;
+                        break;
+                    }
+
+                    NSArray * valueArray = value;
+                    for (id item in valueArray) {
+                        if (![item isKindOfClass:NSDictionary.class]) {
+                            err = CHIP_ERROR_INVALID_ARGUMENT;
+                            break;
+                        }
+
+                        NSDictionary * itemDictionary = item;
+                        id contextTag = itemDictionary[MTRContextTagKey];
+                        if (contextTag == nil || ![contextTag isKindOfClass:NSNumber.class]) {
+                            err = CHIP_ERROR_INVALID_ARGUMENT;
+                            break;
+                        }
+
+                        NSNumber * contextTagNumber = contextTag;
+                        if (![contextTagNumber isEqualToNumber:@(kAttestationChallengeTagValue)]) {
+                            // Not the right field; keep going.
+                            continue;
+                        }
+
+                        id data = itemDictionary[MTRDataKey];
+                        if (data == nil || ![data isKindOfClass:NSDictionary.class]) {
+                            err = CHIP_ERROR_INVALID_ARGUMENT;
+                            break;
+                        }
+
+                        NSDictionary * dataDictionary = data;
+                        id dataType = dataDictionary[MTRTypeKey];
+                        id dataValue = dataDictionary[MTRValueKey];
+                        if (dataType == nil || dataValue == nil || ![dataType isKindOfClass:NSString.class] || ![dataValue isKindOfClass:NSData.class]) {
+                            err = CHIP_ERROR_INVALID_ARGUMENT;
+                            break;
+                        }
+
+                        NSString * dataTypeString = dataType;
+                        if (![dataTypeString isEqualToString:MTROctetStringValueType]) {
+                            err = CHIP_ERROR_INVALID_ARGUMENT;
+                            break;
+                        }
+
+                        self.attestationChallenge = dataValue;
+                        break;
+                    }
+
+                    // Do not add code here without first checking whether err is success.
+                } while (0);
+            }
             if (err == CHIP_NO_ERROR) {
                 return self;
             }

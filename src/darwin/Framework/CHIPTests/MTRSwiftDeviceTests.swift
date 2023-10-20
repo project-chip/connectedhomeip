@@ -88,6 +88,13 @@ class MTRSwiftDeviceTestDelegate : NSObject, MTRDeviceDelegate {
     {
         onReportEnd?()
     }
+
+    @objc func unitTestMaxIntervalOverrideForSubscription(_ device : MTRDevice) -> NSNumber
+    {
+      // Make sure our subscriptions time out in finite time.
+      return 2; // seconds
+    }
+
 }
 
 // Because we are using things from Matter.framework that are flagged
@@ -388,6 +395,9 @@ class MTRSwiftDeviceTests : XCTestCase {
         XCTAssertEqual(attributeReportsReceived, 0);
         XCTAssertEqual(eventReportsReceived, 0);
     }
+
+    // Note: test027_AttestationChallenge is not implementable in Swift so far,
+    // because the attestationChallenge property is internal-only
 
     func test999_TearDown()
     {

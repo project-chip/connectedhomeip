@@ -16,34 +16,44 @@ import("//build_overrides/chip.gni")
 import("icd.gni")
 
 # ICD Server sources and configurations
-
-source_set("observer-srcs") {
+source_set("observer") {
   sources = [ "ICDStateObserver.h" ]
+}
+
+source_set("notifier") {
+  sources = [
+    "ICDNotifier.cpp",
+    "ICDNotifier.h",
+  ]
+
+  deps = [ "${chip_root}/src/lib/core" ]
+  public_deps = [ "${chip_root}/src/app:app_config" ]
 }
 
 # ICD Manager source-set is broken out of the main source-set to enable unit tests
 # All sources and configurations used by the ICDManager need to go in this source-set
-source_set("manager-srcs") {
+source_set("manager") {
   sources = [
     "ICDManager.cpp",
     "ICDManager.h",
   ]
 
   public_deps = [
-    ":cluster-srcs",
-    ":observer-srcs",
+    ":cluster",
+    ":notifier",
+    ":observer",
     "${chip_root}/src/credentials:credentials",
   ]
 }
 
 # ICD management cluster source-set is broken out of the main source-set to enable unit tests
 # All sources and configurations used by the ICD management cluster need to go in this source-set
-source_set("cluster-srcs") {
+source_set("cluster") {
   sources = [
-    "IcdManagementServer.cpp",
-    "IcdManagementServer.h",
-    "IcdMonitoringTable.cpp",
-    "IcdMonitoringTable.h",
+    "ICDManagementServer.cpp",
+    "ICDManagementServer.h",
+    "ICDMonitoringTable.cpp",
+    "ICDMonitoringTable.h",
   ]
 
   public_deps = [
@@ -51,17 +61,4 @@ source_set("cluster-srcs") {
     "${chip_root}/src/platform:platform",
     "${chip_root}/src/protocols:im_status",
   ]
-}
-
-# servers-srcs source-set contains all the sources and configurations necessary to build the ICD Server functionality
-# All sources, configurations and dependencies necessary for the ICD Server featureset need to go in this source-set
-#
-# The ICD Server featureset is enabled with the chip_enable_icd_server in the src/app/BUILD.gn file
-source_set("server-srcs") {
-  sources = [
-    "ICDEventManager.cpp",
-    "ICDEventManager.h",
-  ]
-
-  public_deps = [ ":manager-srcs" ]
 }

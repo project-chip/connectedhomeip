@@ -28,18 +28,14 @@ CHIP_ERROR AndroidControllerExceptions::CreateAndroidControllerException(JNIEnv 
                                                                          jthrowable & outEx)
 {
     jclass controllerExceptionCls;
-    CHIP_ERROR err = JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipDeviceControllerException",
-                                                              controllerExceptionCls);
+    CHIP_ERROR err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ChipDeviceControllerException",
+                                                                   controllerExceptionCls);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
 
-    JniObject controllerExceptionJniCls(env, static_cast<jobject>(controllerExceptionCls));
-
     jmethodID exceptionConstructor = env->GetMethodID(controllerExceptionCls, "<init>", "(JLjava/lang/String;)V");
-    jobject localRef =
-        env->NewObject(controllerExceptionCls, exceptionConstructor, static_cast<jlong>(errorCode), env->NewStringUTF(message));
-    VerifyOrReturnError(localRef != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
-    outEx = (jthrowable) (env->NewGlobalRef(localRef));
-    VerifyOrReturnError(outEx != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
+    outEx                          = static_cast<jthrowable>(
+        env->NewObject(controllerExceptionCls, exceptionConstructor, static_cast<jlong>(errorCode), env->NewStringUTF(message)));
+    VerifyOrReturnError(outEx != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
     return CHIP_NO_ERROR;
 }
 

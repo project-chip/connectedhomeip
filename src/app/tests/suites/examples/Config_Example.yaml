@@ -3,5 +3,5 @@ config:
     endpoint: 1
     identity: "beta" # Uses secondary commissioner
     exampleVariable: # See Config variables example
-        type: INT16U
+        type: int16u
         defaultValue: 110

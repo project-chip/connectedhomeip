@@ -6,11 +6,24 @@ WeakEnums:
     - ColorControlOptions
     - ColorMode
     - EnhancedColorMode
-    - InterfaceTypeEnum
     - MoveMode
     - PHYRateEnum
-    - RadioFaultEnum
     - StepMode
+
+EnumsNotUsedAsTypeInXML:
+    # List of enums that are not used as a type in XML. By adding an enum
+    # to this list you prevent incorrectly assuming from code that you are
+    # able to use kUnknownEnumValue safely. This happens for derived clusters
+    # such as ModeBase where there are CommonTag, DerivedClusterTags, MfgTags.
+    - "DishwasherMode::ModeTag"
+    - "LaundryWasherMode::ModeTag"
+    - "RefrigeratorAndTemperatureControlledCabinetMode::ModeTag"
+    - "RvcRunMode::ModeTag"
+    - "RvcRunMode::StatusCode"
+    - "RvcCleanMode::ModeTag"
+    - "RvcCleanMode::StatusCode"
+    - "RvcOperationalState::OperationalStateEnum"
+    - "RvcOperationalState::ErrorStateEnum"
 
 CommandHandlerInterfaceOnlyClusters:
     # List of clusters that are implemented entirely with
