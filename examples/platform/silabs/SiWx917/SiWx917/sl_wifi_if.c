@@ -179,7 +179,7 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
         if (is_wifi_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
         {
             xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
-        } 
+        }
         is_wifi_disconnection_event = true;
         return SL_STATUS_FAIL;
     }
