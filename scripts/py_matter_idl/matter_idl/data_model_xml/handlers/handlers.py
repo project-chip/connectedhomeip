@@ -14,9 +14,8 @@
 
 import logging
 
-from matter_idl.matter_idl_types import (Attribute, AttributeQuality, Bitmap, Cluster, ClusterSide, 
-                                         ConstantEntry, DataType, Enum, Field, FieldQuality,
-                                         Idl, Struct, StructTag)
+from matter_idl.matter_idl_types import (Attribute, AttributeQuality, Bitmap, Cluster, ClusterSide, ConstantEntry, DataType, Enum,
+                                         Field, FieldQuality, Idl, Struct, StructTag)
 
 from .base import BaseHandler, HandledDepth
 from .context import Context
