@@ -75,6 +75,7 @@ class BitmapHandler(BaseHandler):
         else:
             return BaseHandler(self.context)
 
+
 class MandatoryConfirmFieldHandler(BaseHandler):
     def __init__(self, context: Context, field: Field):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
@@ -470,7 +471,7 @@ class ClusterHandler(BaseHandler):
                 code=code,
                 name=name,
                 is_list=is_list,
-                ), qualities=AttributeQuality.READABLE))
+            ), qualities=AttributeQuality.READABLE))
         self._idl.clusters.append(self._cluster)
 
     def GetNextProcessor(self, name: str, attrs):

@@ -27,10 +27,11 @@ except ImportError:
         os.path.join(os.path.dirname(__file__), '..')))
     from matter_idl.data_model_xml import ParseSource, ParseXmls
 
-from matter_idl_parser import CreateParser
 from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Bitmap, Cluster, ClusterSide, Command,
                                          ConstantEntry, DataType, Enum, Event, EventPriority, EventQuality, Field, FieldQuality,
                                          Idl, Struct, StructQuality, StructTag)
+from matter_idl_parser import CreateParser
+
 
 def XmlToIdl(what: Union[str, List[str]]) -> Idl:
     if not isinstance(what, list):
@@ -42,6 +43,7 @@ def XmlToIdl(what: Union[str, List[str]]) -> Idl:
             txt), name=("Input %d" % (idx + 1))))
 
     return ParseXmls(sources, include_meta_data=False)
+
 
 def IdlTextToIdl(what: str) -> Idl:
     return CreateParser(skip_meta=True).parse(what)

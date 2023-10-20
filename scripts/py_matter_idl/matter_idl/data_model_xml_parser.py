@@ -43,7 +43,8 @@ if __name__ == '__main__':
 
         def write_new_data(self, relative_path: str, content: str):
             if self.content:
-                raise Exception("Unexpected extra data: single file generation expected")
+                raise Exception(
+                    "Unexpected extra data: single file generation expected")
             self.content = content
 
     # Supported log levels, mapping string values required for argument
