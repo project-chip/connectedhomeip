@@ -179,12 +179,8 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
         if (is_wifi_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
         {
             xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
-        }
-
-        if (wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED)
-        {
-            is_wifi_disconnection_event = true;
-        }
+        } 
+        is_wifi_disconnection_event = true;
         return SL_STATUS_FAIL;
     }
     /*
@@ -260,7 +256,6 @@ int32_t wfx_wifi_rsi_init(void)
 static sl_status_t wfx_rsi_init(void)
 {
     sl_status_t status;
-    sl_wifi_version_string_t version = { 0 };
 
 #ifndef RSI_M4_INTERFACE
     status = wfx_wifi_rsi_init();
@@ -270,20 +265,15 @@ static sl_status_t wfx_rsi_init(void)
         return status;
     }
 #endif
-
     status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, (sl_mac_address_t *) &wfx_rsi.sta_mac.octet[0]);
     if (status != SL_STATUS_OK)
     {
         SILABS_LOG("sl_wifi_get_mac_address failed: %x", status);
         return status;
     }
-
     wfx_rsi.events = xEventGroupCreateStatic(&rsiDriverEventGroup);
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
     osSemaphoreRelease(sl_rs_ble_init_sem);
-    status = sl_wifi_get_firmware_version(&version);
-    SILABS_LOG("Firmware version %s", version.version);
-    VERIFY_STATUS_AND_RETURN(status);
     return status;
 }
 
