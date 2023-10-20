@@ -126,10 +126,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 /**
  * Invoke a command with a designated command path
  *
- * @param commandFields command fields object. The object must be a data-value NSDictionary object
- *                      as described in the MTRDeviceResponseHandler.
- *                      The value must be a Structure, i.e.,
- *                      the NSDictionary MTRTypeKey key must have the value MTRStructureValueType.
+ * @param commandFields command fields object. If not nil, the object must be a data-value
+ *                      NSDictionary object as described in the MTRDeviceResponseHandler
+ *                      documentation. The value must be a Structure, i.e., the NSDictionary
+ *                      MTRTypeKey key must have the value MTRStructureValueType.
+ *
+ *                      If commandFields is nil, it will be treated as a Structure with no fields.
  *
  * @param expectedValues The expected values of attributes that will be affected by the command, if
  *                       any.  If these are provided, the relevant attributes will have the provided
@@ -168,7 +170,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
                           clusterID:(NSNumber *)clusterID
                           commandID:(NSNumber *)commandID
-                      commandFields:(id)commandFields
+                      commandFields:(NSDictionary<NSString *, id> * _Nullable)commandFields
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
                               queue:(dispatch_queue_t)queue
