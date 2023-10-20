@@ -44,7 +44,7 @@ extern "C" {
 namespace chip {
 namespace DeviceLayer {
 
-extern "C" void bl_rand_stream(unsigned char *, int);
+extern "C" int bl_rand_stream(unsigned char *, int);
 
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {

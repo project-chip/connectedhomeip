@@ -245,6 +245,37 @@ def CommandCallbackName(command: Command, cluster: Cluster):
     return '{}Cluster{}'.format(cluster.name, command.output_param)
 
 
+def JavaCommandCallbackName(command: Command):
+    if command.output_param.lower() == 'defaultsuccess':
+        return 'DefaultCluster'
+    return '{}'.format(command.output_param)
+
+
+def IsCommandNotDefaultCallback(command: Command) -> bool:
+    return command.output_param.lower() != 'defaultsuccess'
+
+
+def JavaAttributeCallbackName(attr: Attribute, context: TypeLookupContext) -> str:
+    """
+    Figure out what callback name to use when building a *AttributeCallback
+    in java codegen.
+    """
+    global_name = FieldToGlobalName(attr.definition, context)
+
+    if global_name:
+        return '{}AttributeCallback'.format(GlobalNameToJavaName(global_name))
+
+    return '{}AttributeCallback'.format(capitalcase(attr.definition.name))
+
+
+def IsFieldGlobalName(field: Field, context: TypeLookupContext) -> bool:
+    global_name = FieldToGlobalName(field, context)
+    if global_name:
+        return True
+
+    return False
+
+
 def attributesWithSupportedCallback(attrs, context: TypeLookupContext):
     for attr in attrs:
         # Attributes will be generated for all types
@@ -675,6 +706,9 @@ class __JavaCodeGenerator(CodeGenerator):
         self.jinja_env.filters['chipClustersCallbackName'] = ChipClustersCallbackName
         self.jinja_env.filters['delegatedCallbackName'] = DelegatedCallbackName
         self.jinja_env.filters['commandCallbackName'] = CommandCallbackName
+        self.jinja_env.filters['javaCommandCallbackName'] = JavaCommandCallbackName
+        self.jinja_env.filters['isCommandNotDefaultCallback'] = IsCommandNotDefaultCallback
+        self.jinja_env.filters['javaAttributeCallbackName'] = JavaAttributeCallbackName
         self.jinja_env.filters['named'] = NamedFilter
         self.jinja_env.filters['toBoxedJavaType'] = ToBoxedJavaType
         self.jinja_env.filters['lowercaseFirst'] = LowercaseFirst
@@ -687,6 +721,7 @@ class __JavaCodeGenerator(CodeGenerator):
 
         self.jinja_env.tests['is_response_struct'] = IsResponseStruct
         self.jinja_env.tests['is_using_global_callback'] = _IsUsingGlobalCallback
+        self.jinja_env.tests['is_field_global_name'] = IsFieldGlobalName
 
 
 class JavaJNIGenerator(__JavaCodeGenerator):
@@ -790,6 +825,42 @@ class JavaClassGenerator(__JavaCodeGenerator):
         self.internal_render_one_output(
             template_path="ClusterIDMapping.jinja",
             output_file_name="java/chip/devicecontroller/ClusterIDMapping.java",
+            vars={
+                'idl': self.idl,
+                'clientClusters': clientClusters,
+            }
+        )
+
+        self.internal_render_one_output(
+            template_path="ChipClusters_java.jinja",
+            output_file_name="java/chip/devicecontroller/ChipClusters.java",
+            vars={
+                'idl': self.idl,
+                'clientClusters': clientClusters,
+            }
+        )
+
+        self.internal_render_one_output(
+            template_path="ChipStructs_java.jinja",
+            output_file_name="java/chip/devicecontroller/ChipStructs.java",
+            vars={
+                'idl': self.idl,
+                'clientClusters': clientClusters,
+            }
+        )
+
+        self.internal_render_one_output(
+            template_path="ChipEventStructs_java.jinja",
+            output_file_name="java/chip/devicecontroller/ChipEventStructs.java",
+            vars={
+                'idl': self.idl,
+                'clientClusters': clientClusters,
+            }
+        )
+
+        self.internal_render_one_output(
+            template_path="ClusterInfoMapping_java.jinja",
+            output_file_name="java/chip/devicecontroller/ClusterInfoMapping.java",
             vars={
                 'idl': self.idl,
                 'clientClusters': clientClusters,
