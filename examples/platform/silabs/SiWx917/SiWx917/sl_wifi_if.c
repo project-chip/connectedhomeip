@@ -180,7 +180,11 @@ sl_status_t join_callback_handler(sl_wifi_event_t event, char * result, uint32_t
         {
             xEventGroupSetBits(wfx_rsi.events, WFX_EVT_STA_START_JOIN);
         }
-        is_wifi_disconnection_event = true;
+
+        if (wfx_rsi.dev_state & WFX_RSI_ST_STA_PROVISIONED)
+        {
+            is_wifi_disconnection_event = true;
+        }
         return SL_STATUS_FAIL;
     }
     /*
@@ -256,6 +260,7 @@ int32_t wfx_wifi_rsi_init(void)
 static sl_status_t wfx_rsi_init(void)
 {
     sl_status_t status;
+    sl_wifi_version_string_t version = { 0 };
 
 #ifndef RSI_M4_INTERFACE
     status = wfx_wifi_rsi_init();
@@ -276,6 +281,9 @@ static sl_status_t wfx_rsi_init(void)
     wfx_rsi.events = xEventGroupCreateStatic(&rsiDriverEventGroup);
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
     osSemaphoreRelease(sl_rs_ble_init_sem);
+    status = sl_wifi_get_firmware_version(&version);
+    SILABS_LOG("Firmware version %s", version.version);
+    VERIFY_STATUS_AND_RETURN(status);
     return status;
 }
 
@@ -401,15 +409,19 @@ static void wfx_rsi_save_ap_info() // translation
     }
     wfx_rsi.dev_state |= WFX_RSI_ST_SCANSTARTED;
     sl_status_t status                                   = SL_STATUS_OK;
-    // TODO: this changes will be reverted back after the SDK team fix the scan API
-//    sl_wifi_scan_configuration_t wifi_scan_configuration = { 0 };
-//    wifi_scan_configuration                              = default_wifi_scan_configuration;
+    #if (!(EXP_BOARD)) {
+        // TODO: this changes will be reverted back after the SDK team fix the scan API
+        sl_wifi_scan_configuration_t wifi_scan_configuration = { 0 };
+        wifi_scan_configuration                              = default_wifi_scan_configuration;
+    }
     sl_wifi_ssid_t ssid_arg;
     ssid_arg.length = strlen(wfx_rsi.sec.ssid);
     memcpy(ssid_arg.value, (int8_t *) &wfx_rsi.sec.ssid[0], ssid_arg.length);
     sl_wifi_set_scan_callback(scan_callback_handler, NULL);
-    // TODO: this changes will be reverted back after the SDK team fix the scan API
-    //status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &ssid_arg, &wifi_scan_configuration);
+    #if (!(EXP_BOARD)) {
+        // TODO: this changes will be reverted back after the SDK team fix the scan API
+        status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &ssid_arg, &wifi_scan_configuration);
+    }
     if (SL_STATUS_IN_PROGRESS == status)
     {
         const uint32_t start = osKernelGetTickCount();
@@ -512,6 +524,7 @@ static sl_status_t wfx_rsi_do_join(void)
         {
             while (is_wifi_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
             {
+                SILABS_LOG("%s: Wifi connect failed with status: %x", __func__, status);
                 SILABS_LOG("%s: failed. retry: %d", __func__, wfx_rsi.join_retries);
                 wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries++);
                 if (is_wifi_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
