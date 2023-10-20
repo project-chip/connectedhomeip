@@ -48,6 +48,8 @@ AIDL
 AlarmCode
 algs
 alloc
+ambd
+ambiot
 Ameba
 amebad
 amebaiot
@@ -558,6 +560,7 @@ FlowMeasurement
 FluorideConcentrationMeasurement
 focusable
 forkpty
+formaldehydeconcentrationmeasurement
 formatOnSave
 FOTA
 FreeRTOS
@@ -892,6 +895,7 @@ MoveToHue
 MoveToLevel
 MoveToSaturation
 MoveWithOnOff
+mpp
 MPSL
 MRP
 MTD
@@ -1141,6 +1145,7 @@ READMEs
 readonly
 readthedocs
 Reag
+realtek
 rebase
 recommand
 recommanded
