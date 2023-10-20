@@ -493,8 +493,18 @@ tests:
           clusters on all endpoints on a Node for which it does not have access.
           AttributePath = [[ ]]."
       verification: |
-          Chip-Tool support required to validate this step : SDK Issue - https://github.com/project-chip/connectedhomeip/issues/28360
-          Not Testable
+          sending a command along with unregistered commissioner node id (5)
+
+          any subscribe-by-id 0xFFFFFFFF 0xFFFFFFFF 10 100 1 0XFFFF --commissioner-nodeid 5
+          On CR2, Verify that the DUT returns a "INVALID_ACTION" status response.
+
+          [1695815340.162063][2522:2524] CHIP:EM: Rxd Ack; Removing MessageCounter:187875065 from Retrans Table on exchange 10455i
+          [1695815340.162181][2522:2524] CHIP:DMG: StatusResponseMessage =
+          [1695815340.162244][2522:2524] CHIP:DMG: {
+          [1695815340.162298][2522:2524] CHIP:DMG:         Status = 0x80 (INVALID_ACTION),
+          [1695815340.162357][2522:2524] CHIP:DMG:         InteractionModelRevision = 11
+          [1695815340.162412][2522:2524] CHIP:DMG: }
+          [1695815340.162501][2522:2524] CHIP:IM: Received status response, status is 0x80 (INVALID_ACTION)
       disabled: true
 
     - label:

@@ -450,7 +450,7 @@ tests:
           0-Single"
       PICS: DRLK.S.F08 && DRLK.S.C1a.Rsp
       verification: |
-          ./chip-tool doorlock set-user 0 2 xxx 6452 3 0 0 1 1  --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock set-user 0 2 xxx 6452 1 0 0 1 1  --timedInteractionTimeoutMs 1000
 
           Via the TH (chip-tool), verify the SUCCESS response for setting the users details.
 
@@ -459,15 +459,6 @@ tests:
           [1658994912.123915][4290:4295] CHIP:DMG:                                        status = 0x00 (SUCCESS),
           [1658994912.123959][4290:4295] CHIP:DMG:                                },
           [1658994912.124003][4290:4295] CHIP:DMG:
-          [1658994912.124039][4290:4295] CHIP:DMG:                        },
-          [1658994912.124079][4290:4295] CHIP:DMG:
-          [1658994912.124110][4290:4295] CHIP:DMG:                },
-          [1658994912.124147][4290:4295] CHIP:DMG:
-          [1658994912.124176][4290:4295] CHIP:DMG:        ],
-          [1658994912.124212][4290:4295] CHIP:DMG:
-          [1658994912.124241][4290:4295] CHIP:DMG:        InteractionModelRevision = 1
-          [1658994912.124270][4290:4295] CHIP:DMG: },
-          [1658994912.124341][4290:4295] CHIP:DMG: Received Command Response Status for Endpoint=1 Cluster=0x0000_0101 Command=0x0000_001A Status=0x0
       disabled: true
 
     - label: "Step 5b: TH reads the LockUserChange event from DUT"
@@ -631,7 +622,7 @@ tests:
           [1658995364.178185][4383:4388] CHIP:DMG:                                },
 
 
-          ./chip-tool doorlock set-user 0 1 xxx 6452 3 0 0 1 1  --timedInteractionTimeoutMs 1000
+          ./chip-tool doorlock set-user 0 1 xxx 6452 1 0 0 1 1  --timedInteractionTimeoutMs 1000
 
           Via the TH (chip-tool), verify the SUCCESS response for setting the users details.
 

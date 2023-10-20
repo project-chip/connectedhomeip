@@ -37,9 +37,9 @@ tests:
       disabled: true
 
     - label:
-          "Step 1a: For each of the following test cases, start the TH using the
-          appropriate certificate set, commission the TH using the DUT, then
-          factory reset the TH:"
+          "Step 1:Precondition: For each of the following test cases, start the
+          TH using the appropriate certificate set, commission the TH using the
+          DUT, then factory reset the TH:"
       verification: |
           Perform the following actions (PIs use equivalent command on their respective platform)
           - Start the TH using the required certificate set and PID. For chip-all-clusters-app, use the command given in the chip-all-clusters app command column
@@ -49,7 +49,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1b: CD Test Vector: The product_id_array field has one PID value
+          "Step 1: CD Test Vector: The product_id_array field has one PID value
           which matches the PID value in DAC."
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -78,7 +78,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1c: DAC Test Vector: Valid certificate signature algorithm
+          "Step 2: DAC Test Vector: Valid certificate signature algorithm
           ECDSA_WITH_SHA256"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -105,7 +105,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1d: PAI Test Vector: Certificate Key Usage extension
+          "Step 3: PAI Test Vector: Certificate Key Usage extension
           digitalSignature field is wrong (not present for DAC and present for
           PAI, which is OK as optional)"
       verification: |
@@ -128,7 +128,7 @@ tests:
           [1690282103.319847][14495:14495] CHIP:DIS: Responding with _matter._tcp.local
       disabled: true
 
-    - label: "Step 1e: CD Test Vector: Valid CMS digest algorithm SHA256."
+    - label: "Step 4: CD Test Vector: Valid CMS digest algorithm SHA256."
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
           ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_cms_digest_algo_sha256/test_case_vector.json --product-id 32768
@@ -153,7 +153,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1f: DAC Test Vector: Fallback VID and PID encoding example from
+          "Step 5: DAC Test Vector: Fallback VID and PID encoding example from
           spec: valid and recommended since easily human-readable"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -177,7 +177,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1g: PAI Test Vector: Valid certificate public key curve
+          "Step 6: PAI Test Vector: Valid certificate public key curve
           prime256v1"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -207,7 +207,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1h: DAC Test Vector: Fallback VID and PID encoding example from
+          "Step 7: DAC Test Vector: Fallback VID and PID encoding example from
           spec: valid, but highly discouraged, since embedding of substrings
           within other substrings may be confusing to human readers"
       verification: |
@@ -236,7 +236,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1i: PAI Test Vector: Valid certificate signature algorithm
+          "Step 8: PAI Test Vector: Valid certificate signature algorithm
           ECDSA_WITH_SHA256"
 
       verification: |
@@ -264,7 +264,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1j: DAC Test Vector: Fallback VID and PID encoding example from
+          "Step 9: DAC Test Vector: Fallback VID and PID encoding example from
           spec: valid, but less readable"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -290,7 +290,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1k: CD Test Vector: Valid CMS signature algorithm
+          "Step 10: CD Test Vector: Valid CMS signature algorithm
           ECDSA_WITH_SHA256."
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -326,7 +326,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1l: PAI Test Vector: Fallback VID and PID encoding example from
+          "Step 11: PAI Test Vector: Fallback VID and PID encoding example from
           spec: valid, but less readable"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -356,7 +356,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1m: DAC Test Vector: Certificate includes optional Extended Key
+          "Step 12: DAC Test Vector: Certificate includes optional Extended Key
           Usage extension"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -380,7 +380,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1n: DAC Test Vector: Mix of Fallback and Matter OID encoding for
+          "Step 14: DAC Test Vector: Mix of Fallback and Matter OID encoding for
           VID and PID: valid, Matter OIDs are used and wrong values in the
           common-name are ignored"
       verification: |
@@ -404,7 +404,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1o: CD Test Vector: The product_id_array field has one PID value
+          "Step 15: CD Test Vector: The product_id_array field has one PID value
           which matches the PID value in DAC."
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -439,7 +439,7 @@ tests:
           [1690280928.950815][13907:13907] CHIP:DIS: mDNS service published: _matter._tcp
       disabled: true
 
-    - label: "Step 1p: CD Test Vector: Valid format_version field set to 1."
+    - label: "Step 16: CD Test Vector: Valid format_version field set to 1."
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
           ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_format_version_1/test_case_vector.json --product-id 32768
@@ -464,7 +464,7 @@ tests:
           [1690283303.543293][15037:15037] CHIP:DIS: Responding with 8C1D96786A130000.local
       disabled: true
 
-    - label: "Step 1q: CD Test Vector: Valid CMS eContentType pkcs7-data."
+    - label: "Step 17: CD Test Vector: Valid CMS eContentType pkcs7-data."
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
           ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_cms_econtent_type_pkcs7_data/test_case_vector.json --product-id 32768
@@ -492,7 +492,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1r: DAC Test Vector: Fallback VID and PID encoding example from
+          "Step 19: DAC Test Vector: Fallback VID and PID encoding example from
           spec: valid example showing that order or separators are not
           considered at all for the overall validity of the embedded fields"
       verification: |
@@ -517,10 +517,9 @@ tests:
           [1691133683.538318][11126:11126] CHIP:DIS: Responding with _matter._tcp.local
       disabled: true
 
-    - label: "Step 1s: struct_cd_authorized_paa_list_count1_valid (pid=32768)"
-      PICS:
-          "CD Test Vector: The authorized_paa_list contains one valid PAA which
-          is authorized to sign the PAI."
+    - label:
+          "Step 20: CD Test Vector: The authorized_paa_list contains one valid
+          PAA which is authorized to sign the PAI."
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
           ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_authorized_paa_list_count1_valid/test_case_vector.json --product-id 32768
@@ -547,7 +546,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1t: DAC Test Vector: Certificate includes optional Authority
+          "Step 21: DAC Test Vector: Certificate includes optional Authority
           Information Access extension"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -574,7 +573,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1u: PAI Test Vector: Certificate includes optional Subject
+          "Step 22: PAI Test Vector: Certificate includes optional Subject
           Alternative Name extension"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -606,7 +605,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1v: PAI Test Vector: Valid certificate version field set to
+          "Step 23: PAI Test Vector: Valid certificate version field set to
           v3(2)"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -638,7 +637,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1x: DAC Test Vector: Valid certificate public key curve
+          "Step 24: DAC Test Vector: Valid certificate public key curve
           prime256v1"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -668,7 +667,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1y: CD Test Vector: Origin VID/PID different than VID/PID
+          "Step 25: CD Test Vector: Origin VID/PID different than VID/PID
           (correct use of origin)"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -704,7 +703,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1z: DAC Test Vector: Fallback VID and PID encoding example:
+          "Step 26: DAC Test Vector: Fallback VID and PID encoding example:
           valid, but less human-readable"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -735,38 +734,33 @@ tests:
       disabled: true
 
     - label:
-          "Step 1a1: CD Test Vector: The optional authorized_paa_list field is
+          "Step 27: CD Test Vector: The optional authorized_paa_list field is
           not present."
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
-          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_dac_vidpid_fallback_encoding_11/test_case_vector.json --product-id 177
+          ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_authorized_paa_list_missing/test_case_vector.json --product-id 32768
 
           Once TH(all-clusters-app) reach the  commissionable state pls send below mentioned command on DUT(chip-tool). Pls use equivalent command on the respective platform
-           ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
+          ./chip-tool pairing onnetwork 1 20202021 --trace_decode 1
 
           On TH(all-clusters-app), Verify that the DUT(chip-tool) and TH(all-clusters-app) is successfully commissioned
 
-          [1691133604.268090][11108:11108] CHIP:IN: (S) Sending msg 242960033 on secure session with LSID: 63451
-          [1691133604.268262][11108:11108] CHIP:DMG: Command handler moving to [CommandSen]
-          [1691133604.268288][11108:11108] CHIP:DMG: Command handler moving to [AwaitingDe]
-          [1691133604.268325][11108:11108] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
-          [1691133604.268347][11108:11108] CHIP:SVR: Commissioning completed successfully
-          [1691133604.268383][11108:11108] CHIP:DIS: Updating services using commissioning mode 0
-          [1691133604.276764][11108:11108] CHIP:DIS: CHIP minimal mDNS started advertising.
-          [1691133604.304404][11108:11108] CHIP:DL: Using wifi MAC for hostname
-          [1691133604.304458][11108:11108] CHIP:DIS: Advertise operational node 3CBA812920C1A81B-0000000000000001
-          [1691133604.304504][11108:11108] CHIP:DIS: Responding with _matter._tcp.local
-          [1691133604.304525][11108:11108] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
-          [1691133604.304549][11108:11108] CHIP:DIS: Responding with 3CBA812920C1A81B-0000000000000001._matter._tcp.local
-          [1691133604.304567][11108:11108] CHIP:DIS: Responding with E45F010F1A010000.local
-          [1691133604.304584][11108:11108] CHIP:DIS: Responding with E45F010F1A010000.local
-          [1691133604.304607][11108:11108] CHIP:DIS: Responding with _I3CBA812920C1A81B._sub._matter._tcp.local
-          [1691133604.304625][11108:11108] CHIP:DIS: CHIP minimal mDNS configured as 'Operational device'; instance name: 3CBA812920C1A81B-0000000000000001.
-          [1691133604.318978][11108:11108] CHIP:DIS: mDNS service published: _matter._tcp
+          [1696578156.356111][16897:16897] CHIP:DMG: Command handler moving to [CommandSen]
+          [1696578156.356116][16897:16897] CHIP:DMG: Command handler moving to [AwaitingDe]
+          [1696578156.356122][16897:16897] CHIP:DL: HandlePlatformSpecificBLEEvent 32782
+          [1696578156.356125][16897:16897] CHIP:SVR: Commissioning completed successfully
+          [1696578156.356135][16897:16897] CHIP:DIS: Updating services using commissioning mode 0
+          [1696578156.356317][16897:16897] CHIP:DIS: CHIP minimal mDNS started advertising.
+          [1696578156.356884][16897:16897] CHIP:DL: Using wifi MAC for hostname
+          [1696578156.356892][16897:16897] CHIP:DIS: Advertise operational node 35F3EA0B1085A647-0000000000000001
+          [1696578156.356901][16897:16897] CHIP:DIS: Responding with _matter._tcp.local
+          [1696578156.356904][16897:16897] CHIP:DIS: Responding with 35F3EA0B1085A647-0000000000000001._matter._tcp.local
+          [1696578156.356907][16897:16897] CHIP:DIS: Responding with 35F3EA0B1085A647-0000000000000001._matter._tcp.local
+          [1696578156.356910][16897:16897] CHIP:DIS: Responding with 8C1D96786A130000.local
       disabled: true
 
     - label:
-          "Step 1a2: PAI Test Vector: Certificate Basic Constraint extension
+          "Step 28: PAI Test Vector: Certificate Basic Constraint extension
           PathLen field set to 0"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -794,7 +788,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1a3: PAI Test Vector: Certificate includes optional Extended Key
+          "Step 29: PAI Test Vector: Certificate includes optional Extended Key
           Usage extension"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -822,7 +816,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1a4: CD Test Vector: The authorized_paa_list contains two PAAs
+          "Step 30: CD Test Vector: The authorized_paa_list contains two PAAs
           one of which is valid PAA authorized to sign the PAI."
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -857,7 +851,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1a5: PAI Test Vector: Fallback VID and PID encoding example:
+          "Step 31: PAI Test Vector: Fallback VID and PID encoding example:
           valid, but less human-readable"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -885,7 +879,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1a6: PAI Test Vector: Certificate includes optional Authority
+          "Step 32: PAI Test Vector: Certificate includes optional Authority
           Information Access extension"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -912,8 +906,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 1a7: CD Test Vector: The product_id_array field has 10 PID
-          values one of which matches the PID value in DAC."
+          "Step 33: CD Test Vector: The product_id_array field has 10 PID values
+          one of which matches the PID value in DAC."
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
           ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_pid_array_count10_valid/test_case_vector.json --product-id 32768
@@ -943,7 +937,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1a8: PAI Test Vector: Fallback VID and PID encoding example from
+          "Step 34: PAI Test Vector: Fallback VID and PID encoding example from
           spec: valid and recommended since easily human-readable"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -971,8 +965,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 1a9: PAI Test Vector: Mix of Fallback and Matter OID encoding
-          for VID and PID: valid, Matter OIDs are used and wrong values in the
+          "Step 35: PAI Test Vector: Mix of Fallback and Matter OID encoding for
+          VID and PID: valid, Matter OIDs are used and wrong values in the
           common-name are ignored"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -1000,7 +994,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1a10: CD Test Vector: The dac_origin_vendor_id and
+          "Step 36: CD Test Vector: The dac_origin_vendor_id and
           dac_origin_product_id fields are not present."
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -1028,9 +1022,9 @@ tests:
       disabled: true
 
     - label:
-          "Step 1a11: PAI Test Vector: Fallback VID and PID encoding example
-          from spec: valid, but highly discouraged, since embedding of
-          substrings within other substrings may be confusing to human readers"
+          "Step 37: PAI Test Vector: Fallback VID and PID encoding example from
+          spec: valid, but highly discouraged, since embedding of substrings
+          within other substrings may be confusing to human readers"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
           ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_pai_vidpid_fallback_encoding_05/test_case_vector.json --product-id 177
@@ -1060,8 +1054,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 1a12: DAC Test Vector: Fallback VID and PID encoding example
-          from spec: valid and recommended since easily human-readable"
+          "Step 38: DAC Test Vector: Fallback VID and PID encoding example from
+          spec: valid and recommended since easily human-readable"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
           ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_dac_vidpid_fallback_encoding_01/test_case_vector.json --product-id 177
@@ -1086,7 +1080,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1a13: CD Test Vector: The product_id_array field has 100 PID
+          "Step 39: CD Test Vector: The product_id_array field has 100 PID
           values one of which matches the PID value in DAC."
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -1110,7 +1104,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1a14: CD Test Vector: The authorized_paa_list contains ten PAAs
+          "Step 40: CD Test Vector: The authorized_paa_list contains ten PAAs
           one of which is valid PAA authorized to sign the PAI."
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -1139,7 +1133,7 @@ tests:
           [1690284741.166783][15669:15669] CHIP:DIS: Responding with 8C1D96786A130000.local
       disabled: true
 
-    - label: "Step 1a15: CD Test Vector: Valid CMS version set to v3."
+    - label: "Step 41: CD Test Vector: Valid CMS version set to v3."
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
           ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_cms_v3/test_case_vector.json --product-id 32768
@@ -1168,10 +1162,9 @@ tests:
       disabled: true
 
     - label:
-          "Step 1a16: CD Test Vector: The version_number field matches the VID
-          and PID used in a DeviceSoftwareVersionModel entry in the DCL matching
-          the certification record associated with the product presenting this
-          CD."
+          "Step 42: CD Test Vector: The version_number field matches the VID and
+          PID used in a DeviceSoftwareVersionModel entry in the DCL matching the
+          certification record associated with the product presenting this CD."
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
           ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_version_number_match/test_case_vector.json --product-id 32768
@@ -1197,8 +1190,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 1a17: CD Test Vector: The subjectKeyIdentifier contains SKID of
-          a well-known Zigbee Alliance certificate."
+          "Step 43: CD Test Vector: The subjectKeyIdentifier contains SKID of a
+          well-known Zigbee Alliance certificate."
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
           ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_cd_signer_info_skid_valid/test_case_vector.json --product-id 32768
@@ -1226,8 +1219,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 1a18: PAI Test Vector: Fallback VID and PID encoding example
-          from spec: valid example showing that order or separators are not
+          "Step 44: PAI Test Vector: Fallback VID and PID encoding example from
+          spec: valid example showing that order or separators are not
           considered at all for the overall validity of the embedded fields"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -1256,7 +1249,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1a19: DAC Test Vector: Certificate includes optional Subject
+          "Step 45: DAC Test Vector: Certificate includes optional Subject
           Alternative Name extension"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -1285,7 +1278,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 1a20: DAC Test Vector: Valid certificate version field set to
+          "Step 46: DAC Test Vector: Valid certificate version field set to
           v3(2)"
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
@@ -1321,8 +1314,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 1a21: PAI Test Vector: Fallback VID and PID encoding example
-          from spec: valid and recommended since easily human-readable "
+          "Step 47: PAI Test Vector: Fallback VID and PID encoding example from
+          spec: valid and recommended since easily human-readable "
       verification: |
           Execute the below mentioned command to put TH(all-cluster-app) into a commissionable state, Pls use equivalent command on the respective Platform
           ./chip-all-clusters-app --trace_decode 1 --dac_provider $CHIP_ROOT/credentials/development/commissioner_dut/struct_pai_vidpid_fallback_encoding_02/test_case_vector.json --product-id 177

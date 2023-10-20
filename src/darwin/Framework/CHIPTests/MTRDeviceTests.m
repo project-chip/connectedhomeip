@@ -160,6 +160,12 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
     }
 }
 
+- (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device
+{
+    // Make sure our subscriptions time out in finite time.
+    return @(2); // seconds
+}
+
 @end
 
 @interface MTRDeviceTests : XCTestCase
@@ -1744,13 +1750,18 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                      }];
 
     XCTestExpectation * offExpectation = [self expectationWithDescription:@"Off command executed"];
-    [onOffCluster offWithParams:nil
-                 expectedValues:nil
-          expectedValueInterval:nil
-                     completion:^(NSError * _Nullable error) {
-                         XCTAssertNil(error);
-                         [offExpectation fulfill];
-                     }];
+    // Send this one via MTRDevice, to test that codepath.
+    [device invokeCommandWithEndpointID:@(1)
+                              clusterID:@(MTRClusterIDTypeOnOffID)
+                              commandID:@(MTRCommandIDTypeClusterOnOffCommandOffID)
+                          commandFields:nil
+                         expectedValues:nil
+                  expectedValueInterval:nil
+                                  queue:queue
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 XCTAssertNil(error);
+                                 [offExpectation fulfill];
+                             }];
 
     XCTestExpectation * onFailedExpectation = [self expectationWithDescription:@"On command failed"];
     [badOnOffCluster onWithParams:nil
@@ -2234,12 +2245,15 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  {
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
                                      NSArray * resultArray = values;
+                                     XCTAssertEqual(resultArray.count, 1);
                                      for (NSDictionary * result in resultArray) {
                                          MTRCommandPath * path = result[@"commandPath"];
                                          XCTAssertEqualObjects(path.endpoint, @1);
                                          XCTAssertEqualObjects(path.cluster, @6);
                                          XCTAssertEqualObjects(path.command, @1);
                                          XCTAssertNil(result[@"error"]);
+                                         // This command just has a status response.
+                                         XCTAssertNil(result[@"value"]);
                                      }
                                      XCTAssertEqual([resultArray count], 1);
                                  }

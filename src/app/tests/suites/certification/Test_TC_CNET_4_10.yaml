@@ -26,15 +26,12 @@ config:
     endpoint: 0
 
 tests:
-    - label: "Precondition"
+    - label: "Preconditions"
       verification: |
-          Commission TH and DUT on Thread setup
-
-          The cluster Identifier 49 (0x0031) is present in the ServerList attribute
-
-          The FeatureMap attribute value is 2
-
-          MaxNetworks attribute value is at least 1 which is saved as 'MaxNetworksValue' for future use
+          1. DUT supports CNET.S.F01(TH)
+          2. DUT has a Network Commissioning cluster on endpoint PIXIT.CNET.ENDPOINT_THREAD with FeatureMap attribute of 2
+          3. DUT is commissioned on PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
+          4. TH can communicate with the DUT on PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET
       disabled: true
 
     - label:
@@ -92,7 +89,7 @@ tests:
 
           Below is an example:
 
-           ./chip-tool networkcommissioning  remove-network hex:1850171990782922 62 0
+           ./chip-tool networkcommissioning  remove-network hex:1850171990782922 62 0 --Breadcrumb 1
 
           Via the TH (chip-tool), Verify the NetworkConfigResponse that contains Networking Status value as 0 (success).
 
@@ -230,7 +227,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 11: TH sends ArmFailSafe command to the DUT with
+          "Step 13: TH sends ArmFailSafe command to the DUT with
           ExpiryLengthSeconds set to 900"
       verification: |
           ./chip-tool generalcommissioning arm-fail-safe 900 1 1 0
@@ -248,7 +245,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 12: TH sends RemoveNetwork Command to the DUT with NetworkID
+          "Step 14: TH sends RemoveNetwork Command to the DUT with NetworkID
           field set to extended PAN ID of
           PIXIT.CNET.THREAD_1ST_OPERATIONALDATASET and Breadcrumb field set to 1"
       PICS: CNET.S.C04.Rsp && CNET.S.C05.Tx
@@ -271,7 +268,7 @@ tests:
           [1657791030.762608][5336:5341] CHIP:EM: Sending Standalone Ack for MessageCounter:266194732 on exchange 7795i
       disabled: true
 
-    - label: "Step 13: TH sends the CommissioningComplete command to the DUT"
+    - label: "Step 15: TH sends the CommissioningComplete command to the DUT"
       PICS: CNET.S.C04.Rsp
       verification: |
           ./chip-tool generalcommissioning commissioning-complete 1 0
@@ -289,7 +286,7 @@ tests:
       disabled: true
 
     - label:
-          "Step 14: TH sends ArmFailSafe command to the DUT with
+          "Step 16: TH sends ArmFailSafe command to the DUT with
           ExpiryLengthSeconds set to 0 to ensure the CommissioningComplete call
           properly persisted the failsafe context. This call should have no
           effect if Commissioning Complete call is handled correctly"
@@ -309,7 +306,7 @@ tests:
           [1657626274.219632][2802:2807] CHIP:EM: Sending Standalone Ack for MessageCounter:52231112 on exchange 13160i
       disabled: true
 
-    - label: "Step 15: TH reads Networks attribute from the DUT"
+    - label: "Step 17: TH reads Networks attribute from the DUT"
       PICS: CNET.S.A0001
       verification: |
           ./chip-tool networkcommissioning read networks 1 0

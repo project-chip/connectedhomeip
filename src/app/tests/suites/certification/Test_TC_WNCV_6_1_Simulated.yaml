@@ -27,14 +27,14 @@ tests:
     #  cluster: "DelayCommands"
     #  command: "WaitForCommissioning"
 
-    - label: "DUT sends UpOrOpen command to TH"
+    - label: "Step 1a: DUT sends UpOrOpen command to TH"
       wait: "UpOrOpen"
       PICS: WNCV.C.C00.Tx
 
-    - label: "DUT sends DownOrClose command to TH"
+    - label: "Step 2a: DUT sends DownOrClose command to TH"
       wait: "DownOrClose"
       PICS: WNCV.C.C01.Tx
 
-    - label: "DUT sends StopMotion command to TH"
+    - label: "Step 3a: DUT sends StopMotion command to TH"
       wait: "StopMotion"
       PICS: WNCV.C.C02.Tx

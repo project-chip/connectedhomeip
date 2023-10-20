@@ -27,6 +27,43 @@ tests:
     - label: "Preconditions"
       verification: |
           Commission TH to DUT, if not done so already. In some cases, such as with a Casting Video Player, the TH commissions the DUT.
+
+          Product maker needs to provide instructions for how to trigger the command on the DUT. For comparison, the DUT behavior for this test step can be simulated using chip-tool (when DUT is a commissioner) or tv-casting-app (when DUT is a commissionee):
+
+          The following command on the example tv-app will launch a content app on endpoint 4:
+          ./chip-tool applicationlauncher launch-app '{"catalogVendorID": 123, "applicationID": "exampleid"}' 1 1
+          ./chip-tv-casting-app applicationlauncher launch-app '{"catalogVendorID": 123, "applicationID": "exampleid"}' 1 1
+          On TH (tv-app), Verify the launch app command is received successfully.
+          1666779708.066501][24994:24994] CHIP:DMG: InvokeRequestMessage =
+          [1666779708.066504][24994:24994] CHIP:DMG: {
+          [1666779708.066507][24994:24994] CHIP:DMG:         suppressResponse = false,
+          [1666779708.066509][24994:24994] CHIP:DMG:         timedRequest = false,
+          [1666779708.066512][24994:24994] CHIP:DMG:         InvokeRequests =
+          [1666779708.066517][24994:24994] CHIP:DMG:         [
+          [1666779708.066520][24994:24994] CHIP:DMG:                 CommandDataIB =
+          [1666779708.066524][24994:24994] CHIP:DMG:                 {
+          [1666779708.066527][24994:24994] CHIP:DMG:                         CommandPathIB =
+          [1666779708.066532][24994:24994] CHIP:DMG:                         {
+          [1666779708.066536][24994:24994] CHIP:DMG:                                 EndpointId = 0x1,
+          [1666779708.066540][24994:24994] CHIP:DMG:                                 ClusterId = 0x50c,
+          [1666779708.066545][24994:24994] CHIP:DMG:                                 CommandId = 0x0,
+          [1666779708.066547][24994:24994] CHIP:DMG:                         },
+          [1666779708.066551][24994:24994] CHIP:DMG:
+          [1666779708.066553][24994:24994] CHIP:DMG:                         CommandFields =
+          [1666779708.066555][24994:24994] CHIP:DMG:                         {
+          [1666779708.066557][24994:24994] CHIP:DMG:                                 0x0 =
+          [1666779708.066560][24994:24994] CHIP:DMG:                                 {
+          [1666779708.066566][24994:24994] CHIP:DMG:                                         0x0 = 123,
+          [1666779708.066569][24994:24994] CHIP:DMG:                                         0x1 = "exampleid" (9 chars),
+          [1666779708.066572][24994:24994] CHIP:DMG:                                 },
+          [1666779708.066575][24994:24994] CHIP:DMG:                         },
+          [1666779708.066578][24994:24994] CHIP:DMG:                 },
+          [1666779708.066581][24994:24994] CHIP:DMG:
+          [1666779708.066583][24994:24994] CHIP:DMG:         ],
+          [1666779708.066586][24994:24994] CHIP:DMG:
+          [1666779708.066588][24994:24994] CHIP:DMG:         InteractionModelRevision = 1
+          [1666779708.066590][24994:24994] CHIP:DMG: },
+          [1666779708.066602][24994:24994] CHIP:DMG: AccessControl: checking f=2 a=c s=0x000000000001B669 t= c=0x0000_050C e=1 p=o
       disabled: true
 
     - label: "Step 1: DUT sends GetSetupPIN command to TH"
