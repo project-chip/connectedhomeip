@@ -2874,10 +2874,14 @@ endpoint 1 {
     ram      attribute currentGroup default = 0x0000;
     ram      attribute sceneValid default = 0x00;
     ram      attribute nameSupport;
-    ram      attribute sceneTableSize;
-    callback attribute remainingCapacity;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    ram      attribute sceneTableSize default = 16;
+    callback attribute remainingCapacity default = 8;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 7;
+    ram      attribute clusterRevision default = 5;
 
     handle command AddScene;
     handle command AddSceneResponse;
