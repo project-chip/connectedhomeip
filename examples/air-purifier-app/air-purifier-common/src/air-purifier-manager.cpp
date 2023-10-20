@@ -63,7 +63,6 @@ void AirPurifierManager::Init()
     }
 
     // Set up some sane initial values for temperature and humidity - note these are fixed values for testing purposes only
-    // TODO: Make these values settable via linux pipe
     mTemperatureSensorManager.OnTemperatureChangeHandler(2000);
     mHumiditySensorManager.OnHumidityChangeHandler(5000);
 }

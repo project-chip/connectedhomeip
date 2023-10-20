@@ -29,7 +29,7 @@ void AirQualitySensorManager::Init()
 {
     /*
      * Note these values are for testing purposes only and are not actual values for the air quality sensor.
-     * They are also fixed. TODO: Make these values settable via linux pipe
+     * They are also fixed.
      */
 
     // Air Quality
