@@ -34,31 +34,9 @@ namespace DeviceManager {
 class DeviceManagerCallbacks
 {
 public:
-    /**
-     * @brief
-     *   Called after an attribute has been changed
-     *
-     * @param endpoint           endpoint id
-     * @param clusterID          cluster id
-     * @param attributeId        attribute id that was changed
-     * @param type               attribute type
-     * @param size               size of the attribute
-     * @param value              pointer to the new value
-     */
     virtual void PostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t type,
                                              uint16_t size, uint8_t * value){};
 
-    /**
-     * @brief
-     *  Called before an attribute is changed
-     *
-     * @param endpoint           endpoint id
-     * @param clusterID          cluster id
-     * @param attributeId        attribute id that was changed
-     * @param type               attribute type
-     * @param size               size of the attribute
-     * @param value              pointer to the new value
-     */
     Protocols::InteractionModel::Status PreAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId,
                                                                    AttributeId attributeId, uint8_t type, uint16_t size,
                                                                    uint8_t * value)

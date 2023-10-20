@@ -19,9 +19,7 @@
 //*****************************************************************************
 // Includes
 //*****************************************************************************
-// Standard includes
-#ifndef WIFI_SETTINGS_H
-#define WIFI_SETTINGS_H
+#pragma once
 
 //*****************************************************************************
 //                 WIFI IF INTRODUCTION
@@ -99,5 +97,3 @@
  * off: disconnected, blinking: provisionig, on: connected
  * Comment the definition in case the auto control is not required */
 #define WIFI_LED_HANDLE gLedBlueHandle
-
-#endif // WIFI_SETTINGS_H

@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef APP_CONFIG_H
-#define APP_CONFIG_H
+#pragma once
 
 // Logging
 #ifdef __cplusplus
@@ -30,4 +29,3 @@ void cc32xxLog(const char * aFormat, ...);
 #ifdef __cplusplus
 }
 #endif
-#endif // APP_CONFIG_H
