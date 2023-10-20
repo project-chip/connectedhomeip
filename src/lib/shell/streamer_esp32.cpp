@@ -56,11 +56,11 @@ int streamer_esp32_init(streamer_t * streamer)
     fsync(fileno(stdout));
     setvbuf(stdin, NULL, _IONBF, 0);
 #if CONFIG_ESP_CONSOLE_UART_DEFAULT || CONFIG_ESP_CONSOLE_UART_CUSTOM
-    esp_vfs_dev_uart_port_set_rx_line_endings(CONFIG_ESP_CONSOLE_UART_NUM, ESP_LINE_ENDINGS_CR);
-    esp_vfs_dev_uart_port_set_tx_line_endings(CONFIG_ESP_CONSOLE_UART_NUM, ESP_LINE_ENDINGS_CRLF);
-    if (!uart_is_driver_installed(CONFIG_ESP_CONSOLE_UART_NUM))
+    esp_vfs_dev_uart_port_set_rx_line_endings((uart_port_t) CONFIG_ESP_CONSOLE_UART_NUM, ESP_LINE_ENDINGS_CR);
+    esp_vfs_dev_uart_port_set_tx_line_endings((uart_port_t) CONFIG_ESP_CONSOLE_UART_NUM, ESP_LINE_ENDINGS_CRLF);
+    if (!uart_is_driver_installed((uart_port_t) CONFIG_ESP_CONSOLE_UART_NUM))
     {
-        ESP_ERROR_CHECK(uart_driver_install(CONFIG_ESP_CONSOLE_UART_NUM, 256, 0, 0, NULL, 0));
+        ESP_ERROR_CHECK(uart_driver_install((uart_port_t) CONFIG_ESP_CONSOLE_UART_NUM, 256, 0, 0, NULL, 0));
     }
     uart_config_t uart_config = {
         .baud_rate           = CONFIG_ESP_CONSOLE_UART_BAUDRATE,
@@ -75,7 +75,7 @@ int streamer_esp32_init(streamer_t * streamer)
         .source_clk = UART_SCLK_APB,
 #endif
     };
-    ESP_ERROR_CHECK(uart_param_config(CONFIG_ESP_CONSOLE_UART_NUM, &uart_config));
+    ESP_ERROR_CHECK(uart_param_config((uart_port_t) CONFIG_ESP_CONSOLE_UART_NUM, &uart_config));
     esp_vfs_dev_uart_use_driver(0);
 #endif // CONFIG_ESP_CONSOLE_UART_DEFAULT || CONFIG_ESP_CONSOLE_UART_CUSTOM
 
@@ -122,7 +122,7 @@ ssize_t streamer_esp32_read(streamer_t * streamer, char * buf, size_t len)
 ssize_t streamer_esp32_write(streamer_t * streamer, const char * buf, size_t len)
 {
 #if CONFIG_ESP_CONSOLE_UART_DEFAULT || CONFIG_ESP_CONSOLE_UART_CUSTOM
-    return uart_write_bytes(CONFIG_ESP_CONSOLE_UART_NUM, buf, len);
+    return uart_write_bytes((uart_port_t) CONFIG_ESP_CONSOLE_UART_NUM, buf, len);
 #endif
 #if CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG
     return usb_serial_jtag_write_bytes(buf, len, 0);
