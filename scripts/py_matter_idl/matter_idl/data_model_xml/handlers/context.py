@@ -16,7 +16,7 @@ import logging
 import xml.sax.xmlreader
 from typing import List, Optional
 
-from matter_idl.matter_idl_types import Attribute, Idl, ParseMetaData
+from matter_idl.matter_idl_types import Idl, ParseMetaData
 
 
 class IdlPostProcessor:

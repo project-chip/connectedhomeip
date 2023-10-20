@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Project CHIP Authors
+# Copyright (c) 2023 Project CHIP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,11 +13,10 @@
 # limitations under the License.
 
 import logging
-from typing import Any, Optional
 
-from matter_idl.matter_idl_types import (Attribute, AttributeQuality, Bitmap, Cluster, ClusterSide, Command, CommandQuality,
-                                         ConstantEntry, DataType, Enum, Event, EventPriority, EventQuality, Field, FieldQuality,
-                                         Idl, Struct, StructQuality, StructTag)
+from matter_idl.matter_idl_types import (Attribute, AttributeQuality, Bitmap, Cluster, ClusterSide, 
+                                         ConstantEntry, DataType, Enum, Field, FieldQuality,
+                                         Idl, Struct, StructTag)
 
 from .base import BaseHandler, HandledDepth
 from .context import Context

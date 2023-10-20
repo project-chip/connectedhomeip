@@ -17,8 +17,8 @@ import re
 from typing import Optional
 
 from matter_idl.generators.types import GetDataTypeSizeInBits, IsSignedDataType
-from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Command, ConstantEntry, DataType, Event,
-                                         EventPriority, Field, FieldQuality)
+from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, Command, ConstantEntry, DataType, Event,
+                                         EventPriority, Field)
 
 LOGGER = logging.getLogger('data-model-xml-data-parsing')
 
