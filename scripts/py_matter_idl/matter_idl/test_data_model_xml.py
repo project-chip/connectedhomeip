@@ -27,20 +27,10 @@ except ImportError:
         os.path.join(os.path.dirname(__file__), '..')))
     from matter_idl.data_model_xml import ParseSource, ParseXmls
 
+from matter_idl_parser import CreateParser
 from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Bitmap, Cluster, ClusterSide, Command,
                                          ConstantEntry, DataType, Enum, Event, EventPriority, EventQuality, Field, FieldQuality,
                                          Idl, Struct, StructQuality, StructTag)
-
-def GlobalAttributes() -> List[Attribute]:
-    return [
-        Attribute(definition=Field(data_type=DataType(name="attrib_id"), code=65531, name="attributeList", is_list=True)),
-        Attribute(definition=Field(data_type=DataType(name="event_id"), code=65530, name="eventList", is_list=True)),
-        Attribute(definition=Field(data_type=DataType(name="command_id"), code=65529, name="acceptedCommandList", is_list=True)),
-        Attribute(definition=Field(data_type=DataType(name="command_id"), code=65528, name="generatedCommandList", is_list=True)),
-        Attribute(definition=Field(data_type=DataType(name="bitmap32"), code=65532, name="featureMap", is_list=False)),
-        Attribute(definition=Field(data_type=DataType(name="int16u"), code=65533, name="clusterRevision", is_list=False)),
-    ]
-
 
 def XmlToIdl(what: Union[str, List[str]]) -> Idl:
     if not isinstance(what, list):
@@ -53,15 +43,26 @@ def XmlToIdl(what: Union[str, List[str]]) -> Idl:
 
     return ParseXmls(sources, include_meta_data=False)
 
+def IdlTextToIdl(what: str) -> Idl:
+    return CreateParser(skip_meta=True).parse(what)
+
 
 class TestXmlParser(unittest.TestCase):
 
     def testBasicInput(self):
-        idl = XmlToIdl('<cluster id="123" name="Test" revision="1"/>')
+        xml_idl = XmlToIdl('<cluster id="123" name="Test" revision="1"/>')
+        expected_idl = IdlTextToIdl('''
+        client cluster Test = 123 {
+           readonly attribute attrib_id attributeList[] = 65531;
+           readonly attribute event_id eventList[] = 65530;
+           readonly attribute command_id acceptedCommandList[] = 65529;
+           readonly attribute command_id generatedCommandList[] = 65528;
+           readonly attribute bitmap32 featureMap = 65532;
+           readonly attribute int16u clusterRevision = 65533;
+        }
+        ''')
 
-        self.assertEqual(idl, Idl(
-            clusters=[Cluster(side=ClusterSide.CLIENT, name="Test", code=123, attributes=GlobalAttributes())]
-        ))
+        self.assertEqual(xml_idl, expected_idl)
 
 
 if __name__ == '__main__':

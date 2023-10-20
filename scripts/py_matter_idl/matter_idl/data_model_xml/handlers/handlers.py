@@ -466,7 +466,11 @@ class ClusterHandler(BaseHandler):
 
         for data_type, code, name, is_list in to_add:
             self._cluster.attributes.append(Attribute(definition=Field(
-                data_type=DataType(name=data_type), code=code, name=name, is_list=is_list)))
+                data_type=DataType(name=data_type),
+                code=code,
+                name=name,
+                is_list=is_list,
+                ), qualities=AttributeQuality.READABLE))
         self._idl.clusters.append(self._cluster)
 
     def GetNextProcessor(self, name: str, attrs):
