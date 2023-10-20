@@ -422,6 +422,12 @@ class CommandHandler(BaseHandler):
                     LOGGER.warn(
                         f"Ignoring invoke privilege for {self._struct.name}")
 
+            if "timed" in attrs and attrs["timed"] != "false":
+                self._command.qualities |= CommandQuality.TIMED_INVOKE
+
+            if "fabricScoped" in attrs and attrs["fabricScoped"] != "false":
+                self._command.qualities |= CommandQuality.FABRIC_SCOPED
+
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name == "field":
             field = AttributesToField(attrs)
