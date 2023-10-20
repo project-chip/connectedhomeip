@@ -75,6 +75,8 @@ class TestXmlParser(unittest.TestCase):
         self.assertEqual(xml_idl, expected_idl)
 
     def testComplexInput(self):
+        # This parses a known copy of Switch.xml which happens to be fully
+        # spec-conformant (so assuming it as a good input)
         xml_idl = XmlToIdl('''
              <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x003b" name="Switch" revision="1">
                 <revisionHistory>
