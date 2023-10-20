@@ -817,6 +817,34 @@ static constexpr CommandId Id = 0x00000000;
 } // namespace Commands
 } // namespace ActivatedCarbonFilterMonitoring
 
+namespace BooleanSensorConfiguration {
+namespace Commands {
+
+namespace SupressRequest {
+static constexpr CommandId Id = 0x00000000;
+} // namespace SupressRequest
+
+} // namespace Commands
+} // namespace BooleanSensorConfiguration
+
+namespace ValveConfigurationAndControl {
+namespace Commands {
+
+namespace Open {
+static constexpr CommandId Id = 0x00000000;
+} // namespace Open
+
+namespace Close {
+static constexpr CommandId Id = 0x00000001;
+} // namespace Close
+
+namespace SetLevel {
+static constexpr CommandId Id = 0x00000002;
+} // namespace SetLevel
+
+} // namespace Commands
+} // namespace ValveConfigurationAndControl
+
 namespace DoorLock {
 namespace Commands {
 

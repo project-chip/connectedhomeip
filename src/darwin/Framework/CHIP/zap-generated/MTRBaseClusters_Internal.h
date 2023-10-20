@@ -236,6 +236,14 @@
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @end
 
+@interface MTRBaseClusterBooleanSensorConfiguration ()
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@end
+
+@interface MTRBaseClusterValveConfigurationAndControl ()
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@end
+
 @interface MTRBaseClusterDoorLock ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @end

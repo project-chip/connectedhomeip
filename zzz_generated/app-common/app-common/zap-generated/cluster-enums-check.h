@@ -1443,6 +1443,33 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ActivatedCarbonFilterMo
     }
 }
 
+static auto __attribute__((unused)) EnsureKnownEnumValue(BooleanSensorConfiguration::SensitivityEnum val)
+{
+    using EnumType = BooleanSensorConfiguration::SensitivityEnum;
+    switch (val)
+    {
+    case EnumType::kHigh:
+    case EnumType::kStandard:
+    case EnumType::kLow:
+        return val;
+    default:
+        return static_cast<EnumType>(3);
+    }
+}
+
+static auto __attribute__((unused)) EnsureKnownEnumValue(ValveConfigurationAndControl::ValveStateEnum val)
+{
+    using EnumType = ValveConfigurationAndControl::ValveStateEnum;
+    switch (val)
+    {
+    case EnumType::kOpen:
+    case EnumType::kClosed:
+        return val;
+    default:
+        return static_cast<EnumType>(2);
+    }
+}
+
 static auto __attribute__((unused)) EnsureKnownEnumValue(DoorLock::AlarmCodeEnum val)
 {
     using EnumType = DoorLock::AlarmCodeEnum;

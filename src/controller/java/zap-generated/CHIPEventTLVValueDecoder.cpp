@@ -3427,6 +3427,180 @@ jobject DecodeEventValue(const app::ConcreteEventPath & aPath, TLV::TLVReader & 
         }
         break;
     }
+    case app::Clusters::BooleanSensorConfiguration::Id: {
+        using namespace app::Clusters::BooleanSensorConfiguration;
+        switch (aPath.mEventId)
+        {
+        case Events::AlarmsStateChanged::Id: {
+            Events::AlarmsStateChanged::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_alarmsActive;
+            std::string value_alarmsActiveClassName     = "java/lang/Integer";
+            std::string value_alarmsActiveCtorSignature = "(I)V";
+            jint jnivalue_alarmsActive                  = static_cast<jint>(cppValue.alarmsActive.Raw());
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(value_alarmsActiveClassName.c_str(),
+                                                                       value_alarmsActiveCtorSignature.c_str(),
+                                                                       jnivalue_alarmsActive, value_alarmsActive);
+
+            jobject value_alarmsSuppressed;
+            if (!cppValue.alarmsSuppressed.HasValue())
+            {
+                chip::JniReferences::GetInstance().CreateOptional(nullptr, value_alarmsSuppressed);
+            }
+            else
+            {
+                jobject value_alarmsSuppressedInsideOptional;
+                std::string value_alarmsSuppressedInsideOptionalClassName     = "java/lang/Integer";
+                std::string value_alarmsSuppressedInsideOptionalCtorSignature = "(I)V";
+                jint jnivalue_alarmsSuppressedInsideOptional = static_cast<jint>(cppValue.alarmsSuppressed.Value().Raw());
+                chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                    value_alarmsSuppressedInsideOptionalClassName.c_str(),
+                    value_alarmsSuppressedInsideOptionalCtorSignature.c_str(), jnivalue_alarmsSuppressedInsideOptional,
+                    value_alarmsSuppressedInsideOptional);
+                chip::JniReferences::GetInstance().CreateOptional(value_alarmsSuppressedInsideOptional, value_alarmsSuppressed);
+            }
+
+            jclass alarmsStateChangedStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$BooleanSensorConfigurationClusterAlarmsStateChangedEvent",
+                alarmsStateChangedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$BooleanSensorConfigurationClusterAlarmsStateChangedEvent");
+                return nullptr;
+            }
+            jmethodID alarmsStateChangedStructCtor =
+                env->GetMethodID(alarmsStateChangedStructClass, "<init>", "(Ljava/lang/Integer;Ljava/util/Optional;)V");
+            if (alarmsStateChangedStructCtor == nullptr)
+            {
+                ChipLogError(
+                    Zcl, "Could not find ChipEventStructs$BooleanSensorConfigurationClusterAlarmsStateChangedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(alarmsStateChangedStructClass, alarmsStateChangedStructCtor, value_alarmsActive,
+                                           value_alarmsSuppressed);
+
+            return value;
+        }
+        case Events::SensorFault::Id: {
+            Events::SensorFault::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jclass sensorFaultStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$BooleanSensorConfigurationClusterSensorFaultEvent",
+                sensorFaultStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$BooleanSensorConfigurationClusterSensorFaultEvent");
+                return nullptr;
+            }
+            jmethodID sensorFaultStructCtor = env->GetMethodID(sensorFaultStructClass, "<init>", "()V");
+            if (sensorFaultStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$BooleanSensorConfigurationClusterSensorFaultEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(sensorFaultStructClass, sensorFaultStructCtor);
+
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
+    case app::Clusters::ValveConfigurationAndControl::Id: {
+        using namespace app::Clusters::ValveConfigurationAndControl;
+        switch (aPath.mEventId)
+        {
+        case Events::ValveStateChanged::Id: {
+            Events::ValveStateChanged::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_valveState;
+            std::string value_valveStateClassName     = "java/lang/Integer";
+            std::string value_valveStateCtorSignature = "(I)V";
+            jint jnivalue_valveState                  = static_cast<jint>(cppValue.valveState);
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_valveStateClassName.c_str(), value_valveStateCtorSignature.c_str(), jnivalue_valveState, value_valveState);
+
+            jclass valveStateChangedStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$ValveConfigurationAndControlClusterValveStateChangedEvent",
+                valveStateChangedStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl,
+                             "Could not find class ChipEventStructs$ValveConfigurationAndControlClusterValveStateChangedEvent");
+                return nullptr;
+            }
+            jmethodID valveStateChangedStructCtor =
+                env->GetMethodID(valveStateChangedStructClass, "<init>", "(Ljava/lang/Integer;)V");
+            if (valveStateChangedStructCtor == nullptr)
+            {
+                ChipLogError(
+                    Zcl, "Could not find ChipEventStructs$ValveConfigurationAndControlClusterValveStateChangedEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(valveStateChangedStructClass, valveStateChangedStructCtor, value_valveState);
+
+            return value;
+        }
+        case Events::ValveFault::Id: {
+            Events::ValveFault::DecodableType cppValue;
+            *aError = app::DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR)
+            {
+                return nullptr;
+            }
+            jobject value_valveFault;
+            std::string value_valveFaultClassName     = "java/lang/Integer";
+            std::string value_valveFaultCtorSignature = "(I)V";
+            jint jnivalue_valveFault                  = static_cast<jint>(cppValue.valveFault.Raw());
+            chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                value_valveFaultClassName.c_str(), value_valveFaultCtorSignature.c_str(), jnivalue_valveFault, value_valveFault);
+
+            jclass valveFaultStructClass;
+            err = chip::JniReferences::GetInstance().GetClassRef(
+                env, "chip/devicecontroller/ChipEventStructs$ValveConfigurationAndControlClusterValveFaultEvent",
+                valveFaultStructClass);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Could not find class ChipEventStructs$ValveConfigurationAndControlClusterValveFaultEvent");
+                return nullptr;
+            }
+            jmethodID valveFaultStructCtor = env->GetMethodID(valveFaultStructClass, "<init>", "(Ljava/lang/Integer;)V");
+            if (valveFaultStructCtor == nullptr)
+            {
+                ChipLogError(Zcl, "Could not find ChipEventStructs$ValveConfigurationAndControlClusterValveFaultEvent constructor");
+                return nullptr;
+            }
+
+            jobject value = env->NewObject(valveFaultStructClass, valveFaultStructCtor, value_valveFault);
+
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+            break;
+        }
+        break;
+    }
     case app::Clusters::DoorLock::Id: {
         using namespace app::Clusters::DoorLock;
         switch (aPath.mEventId)

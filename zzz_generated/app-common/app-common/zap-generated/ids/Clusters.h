@@ -196,6 +196,12 @@ static constexpr ClusterId Id = 0x00000071;
 namespace ActivatedCarbonFilterMonitoring {
 static constexpr ClusterId Id = 0x00000072;
 } // namespace ActivatedCarbonFilterMonitoring
+namespace BooleanSensorConfiguration {
+static constexpr ClusterId Id = 0x00000080;
+} // namespace BooleanSensorConfiguration
+namespace ValveConfigurationAndControl {
+static constexpr ClusterId Id = 0x00000081;
+} // namespace ValveConfigurationAndControl
 namespace DoorLock {
 static constexpr ClusterId Id = 0x00000101;
 } // namespace DoorLock

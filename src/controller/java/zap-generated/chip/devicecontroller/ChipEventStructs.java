@@ -1428,6 +1428,90 @@ public @Nullable Optional<Long> pausedTime;
   }
 }
 
+public static class BooleanSensorConfigurationClusterAlarmsStateChangedEvent {
+public Integer alarmsActive;
+public Optional<Integer> alarmsSuppressed;
+
+  public BooleanSensorConfigurationClusterAlarmsStateChangedEvent(
+    Integer alarmsActive
+      , Optional<Integer> alarmsSuppressed
+  ) {
+    this.alarmsActive = alarmsActive;
+    this.alarmsSuppressed = alarmsSuppressed;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BooleanSensorConfigurationClusterAlarmsStateChangedEvent {\n");
+    output.append("\talarmsActive: ");
+    output.append(alarmsActive);
+        output.append("\n");
+    output.append("\talarmsSuppressed: ");
+    output.append(alarmsSuppressed);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class BooleanSensorConfigurationClusterSensorFaultEvent {
+
+  public BooleanSensorConfigurationClusterSensorFaultEvent(
+) {
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("BooleanSensorConfigurationClusterSensorFaultEvent {\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class ValveConfigurationAndControlClusterValveStateChangedEvent {
+public Integer valveState;
+
+  public ValveConfigurationAndControlClusterValveStateChangedEvent(
+    Integer valveState
+  ) {
+    this.valveState = valveState;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ValveConfigurationAndControlClusterValveStateChangedEvent {\n");
+    output.append("\tvalveState: ");
+    output.append(valveState);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
+public static class ValveConfigurationAndControlClusterValveFaultEvent {
+public Integer valveFault;
+
+  public ValveConfigurationAndControlClusterValveFaultEvent(
+    Integer valveFault
+  ) {
+    this.valveFault = valveFault;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ValveConfigurationAndControlClusterValveFaultEvent {\n");
+    output.append("\tvalveFault: ");
+    output.append(valveFault);
+        output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
+
 public static class DoorLockClusterDoorLockAlarmEvent {
 public Integer alarmCode;
 

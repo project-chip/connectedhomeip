@@ -237,6 +237,14 @@
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
+@interface MTRClusterBooleanSensorConfiguration ()
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
+@interface MTRClusterValveConfigurationAndControl ()
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
 @interface MTRClusterDoorLock ()
 @property (nonatomic, readonly) MTRDevice * device;
 @end

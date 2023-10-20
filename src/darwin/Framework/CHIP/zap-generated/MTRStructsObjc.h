@@ -987,6 +987,26 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSString * _Nonnull productIdentifierValue MTR_PROVISIONALLY_AVAILABLE;
 @end
 
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRBooleanSensorConfigurationClusterAlarmsStateChangedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull alarmsActive MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nullable alarmsSuppressed MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRBooleanSensorConfigurationClusterSensorFaultEvent : NSObject <NSCopying>
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRValveConfigurationAndControlClusterValveStateChangedEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull valveState MTR_PROVISIONALLY_AVAILABLE;
+@end
+
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRValveConfigurationAndControlClusterValveFaultEvent : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull valveFault MTR_PROVISIONALLY_AVAILABLE;
+@end
+
 MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4))
 @interface MTRDoorLockClusterCredentialStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull credentialType MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
