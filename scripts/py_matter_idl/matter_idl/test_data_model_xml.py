@@ -270,8 +270,5 @@ class TestXmlParser(unittest.TestCase):
         self.assertEqual(xml_idl, expected_idl)
 
 
-
 if __name__ == '__main__':
     unittest.main()
-
-
