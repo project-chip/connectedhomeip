@@ -14,10 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import click
 import logging
 import os
 import sys
+
+import click
 
 try:
     from matter_idl.data_model_xml import ParseSource, ParseXmls
@@ -26,11 +27,11 @@ except ImportError:
         os.path.join(os.path.dirname(__file__), '..')))
     from matter_idl.data_model_xml import ParseSource, ParseXmls
 
-
 from matter_idl.generators import GeneratorStorage
 from matter_idl.generators.idl import IdlGenerator
 from matter_idl.matter_idl_parser import CreateParser
 from matter_idl.matter_idl_types import Idl
+
 
 class InMemoryStorage(GeneratorStorage):
     def __init__(self):
@@ -47,6 +48,7 @@ class InMemoryStorage(GeneratorStorage):
                 "Unexpected extra data: single file generation expected")
         self.content = content
 
+
 def normalize_order(idl: Idl):
     """Re-sorts contents of things inside a cluster so that
        output is easily diffed by humans
@@ -62,6 +64,7 @@ def normalize_order(idl: Idl):
         cluster.structs.sort(key=lambda s: s.name)
         cluster.commands.sort(key=lambda c: c.code)
 
+
 # Supported log levels, mapping string values required for argument
 # parsing into logging constants
 __LOG_LEVELS__ = {
@@ -70,6 +73,7 @@ __LOG_LEVELS__ = {
     'warn': logging.WARN,
     'fatal': logging.FATAL,
 }
+
 
 @click.command()
 @click.option(
@@ -90,19 +94,19 @@ __LOG_LEVELS__ = {
     default=None,
     type=click.Path(),
     help="Where to output the parsed IDL."
-    )
+)
 @click.option(
     "--compare",
     default=None,
     type=click.Path(exists=True),
     help="An input .matter IDL to compare with."
-    )
+)
 @click.option(
     "--compare-output",
     default=None,
     type=click.Path(),
     help="Where to output the compare IDL"
-    )
+)
 @click.argument('filenames', nargs=-1)
 def main(log_level, no_print, output, compare, compare_output, filenames):
     """
@@ -125,7 +129,8 @@ def main(log_level, no_print, output, compare, compare_output, filenames):
     )
 
     if (compare is None) != (compare_output is None):
-        logging.error("Either both or none of --compare AND --compare-output must be set")
+        logging.error(
+            "Either both or none of --compare AND --compare-output must be set")
         sys.exit(1)
 
     logging.info("Starting to parse ...")
@@ -135,12 +140,14 @@ def main(log_level, no_print, output, compare, compare_output, filenames):
     logging.info("Parse completed")
 
     if compare:
-        other_idl = CreateParser(skip_meta=True).parse(open(compare).read(), file_name=compare)
+        other_idl = CreateParser(skip_meta=True).parse(
+            open(compare).read(), file_name=compare)
 
         # ensure that input file is filtered to only interesting
         # clusters
         loaded_clusters = set([c.code for c in data.clusters])
-        other_idl.clusters = [c for c in other_idl.clusters if c.code in loaded_clusters]
+        other_idl.clusters = [
+            c for c in other_idl.clusters if c.code in loaded_clusters]
 
         # Ensure consistent ordering for compares
         normalize_order(data)
@@ -150,7 +157,6 @@ def main(log_level, no_print, output, compare, compare_output, filenames):
         IdlGenerator(storage=storage, idl=other_idl).render(dry_run=False)
         with open(compare_output, 'wt', encoding="utf8") as o:
             o.write(storage.content)
-
 
     storage = InMemoryStorage()
     IdlGenerator(storage=storage, idl=data).render(dry_run=False)
