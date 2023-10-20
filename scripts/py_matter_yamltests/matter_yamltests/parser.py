@@ -844,6 +844,7 @@ class TestStep:
             received_value = received_values.pop(0)
 
             if expected_value != received_value:
+                logging.warning(f"Cluster wait validation mismatch: Expected Result: {expected_value} / Received Value: {received_value}")
                 result.error(check_type, error_failure.format(
                     expected=expected_value, received=received_value))
                 success = False
@@ -868,6 +869,7 @@ class TestStep:
             result.success(check_type, error_success.format(
                 error=expected_error))
         elif expected_error and received_error:
+            logging.warning(f"Response error validation mismatch: Expected Error: {expected_error} / Received Error: {received_error}")
             result.error(check_type, error_wrong_error.format(
                 error=expected_error, value=received_error))
         elif expected_error and not received_error:
@@ -896,6 +898,7 @@ class TestStep:
                 result.success(check_type, error_success.format(
                     error=expected_error))
             elif received_error:
+                logging.warning(f"Response cluster validation mismatch: Expected Error: {expected_error} / Received Error: {received_error}")
                 result.error(check_type, error_wrong_error.format(
                     error=expected_error, value=received_error))
             else:
@@ -952,6 +955,7 @@ class TestStep:
                 result.success(check_type, error_success.format(
                     name=expected_name, value=expected_value))
             else:
+                logging.warning(f"Response values validation mismatch: Expected Result: {expected_value} / Received Value: {received_value}")
                 result.error(check_type, error_failure.format(
                     name=expected_name, value=expected_value))
 
