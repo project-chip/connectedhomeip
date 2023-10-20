@@ -25,11 +25,21 @@ except ImportError:
 
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
-    from matter_idl.zapxml import ParseSource, ParseXmls
+    from matter_idl.data_model_xml import ParseSource, ParseXmls
 
 from matter_idl.matter_idl_types import (AccessPrivilege, Attribute, AttributeQuality, Bitmap, Cluster, ClusterSide, Command,
                                          ConstantEntry, DataType, Enum, Event, EventPriority, EventQuality, Field, FieldQuality,
                                          Idl, Struct, StructQuality, StructTag)
+
+def GlobalAttributes() -> List[Attribute]:
+    return [
+        Attribute(definition=Field(data_type=DataType(name="attrib_id"), code=65531, name="attributeList", is_list=True)),
+        Attribute(definition=Field(data_type=DataType(name="event_id"), code=65530, name="eventList", is_list=True)),
+        Attribute(definition=Field(data_type=DataType(name="command_id"), code=65529, name="acceptedCommandList", is_list=True)),
+        Attribute(definition=Field(data_type=DataType(name="command_id"), code=65528, name="generatedCommandList", is_list=True)),
+        Attribute(definition=Field(data_type=DataType(name="bitmap32"), code=65532, name="featureMap", is_list=False)),
+        Attribute(definition=Field(data_type=DataType(name="int16u"), code=65533, name="clusterRevision", is_list=False)),
+    ]
 
 
 def XmlToIdl(what: Union[str, List[str]]) -> Idl:
@@ -46,9 +56,12 @@ def XmlToIdl(what: Union[str, List[str]]) -> Idl:
 
 class TestXmlParser(unittest.TestCase):
 
-    def testEmptyInput(self):
-        idl = XmlToIdl('<cluster/>')
-        self.assertEqual(idl, Idl())
+    def testBasicInput(self):
+        idl = XmlToIdl('<cluster id="123" name="Test" revision="1"/>')
+
+        self.assertEqual(idl, Idl(
+            clusters=[Cluster(side=ClusterSide.CLIENT, name="Test", code=123, attributes=GlobalAttributes())]
+        ))
 
 
 if __name__ == '__main__':
