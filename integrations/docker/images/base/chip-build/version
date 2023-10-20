@@ -1,1 +1,1 @@
-21 : [chip-build-java] Ensure java is actually available in the docker image
+22 : [Telink] Cleanup Docker image
