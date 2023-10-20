@@ -49,12 +49,12 @@ matter_idl_generator_sources = [
   "${chip_root}/scripts/py_matter_idl/matter_idl/zapxml/handlers/handlers.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/zapxml/handlers/parsing.py",
   "${chip_root}/scripts/py_matter_idl/matter_idl/zapxml_parser.py",
-  "${chip_root}scripts/py_matter_idl/matter_idl/data_model_xml/__init__.py",
-  "${chip_root}scripts/py_matter_idl/matter_idl/data_model_xml/handlers/__init__.py",
-  "${chip_root}scripts/py_matter_idl/matter_idl/data_model_xml/handlers/base.py",
-  "${chip_root}scripts/py_matter_idl/matter_idl/data_model_xml/handlers/context.py",
-  "${chip_root}scripts/py_matter_idl/matter_idl/data_model_xml/handlers/handlers.py",
-  "${chip_root}scripts/py_matter_idl/matter_idl/data_model_xml/handlers/parsing.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/data_model_xml/__init__.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/data_model_xml/handlers/__init__.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/data_model_xml/handlers/base.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/data_model_xml/handlers/context.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/data_model_xml/handlers/handlers.py",
+  "${chip_root}/scripts/py_matter_idl/matter_idl/data_model_xml/handlers/parsing.py",
 ]
 
 # All the files that the matter idl infrastructure will use
