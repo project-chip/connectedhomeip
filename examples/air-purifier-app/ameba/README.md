@@ -21,7 +21,8 @@ The CHIP demo application is supported on
 
 ## Building the Example Application
 
--   Check out the Ameba repository in the same folder/directory as the Matter SDK repository:
+-   Check out the Ameba repository in the same folder/directory as the Matter
+    SDK repository:
 
           git clone https://github.com/ambiot/ambd_matter.git
 
@@ -54,10 +55,12 @@ The CHIP demo application is supported on
 
 -   Flash the combined image using the **Ameba Image Tool**:
 
-1. Connect your device via USB
-2. Edit the ambd_matter/tools/AmebaD/mpp.ini file with the correct port setting (the rest of the settings should be correct)
-4. Click **Download** button and the **Reset** button to get the board into serial download mode
-5. Flash on the image:
+1.  Connect your device via USB
+2.  Edit the ambd_matter/tools/AmebaD/mpp.ini file with the correct port setting
+    (the rest of the settings should be correct)
+3.  Click **Download** button and the **Reset** button to get the board into
+    serial download mode
+4.  Flash on the image:
 
           $ cd ambd_matter/tools/AmebaD/Image_Tool_Linux
           $ ./AmebaD_ImageTool -download
@@ -83,16 +86,17 @@ There are two commissioning modes supported by Ameba platform:
 
 ## Cluster Control
 
-After successful commissioning, the air purifier clusters can be read and controlled using the chip-tool. See:
+After successful commissioning, the air purifier clusters can be read and
+controlled using the chip-tool. See:
 
     [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool#using-the-client-to-send-matter-commands)
 
 The example has endpoints configured as follows:
 
-- Air purifier on endpoint 1
-- Air quality sensor on endpoint 2
-- Temperature sensor on endpoint 3
-- Relative humidity sensor on endpoint 4
+-   Air purifier on endpoint 1
+-   Air quality sensor on endpoint 2
+-   Temperature sensor on endpoint 3
+-   Relative humidity sensor on endpoint 4
 
 Example commands using the chip tool:
 
@@ -100,4 +104,3 @@ Example commands using the chip tool:
           $ ./chip-tool formaldehydeconcentrationmeasurement read level-value ${NODE_ID_TO_ASSIGN} 2
           $ ./chip-tool temperaturemeasurement read measured-value ${NODE_ID_TO_ASSIGN} 3
           $ ./chip-tool relativehumiditymeasurement read measured-value ${NODE_ID_TO_ASSIGN} 4
-
