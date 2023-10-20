@@ -55,11 +55,29 @@ class BitmapHandler(BaseHandler):
 
         # TODO: base type is GUESSED here because xml does not contain it
         self._bitmap = Bitmap(name=NormalizeName(
-            attrs["name"]), base_type="bitmap32", entries=[])
+            attrs["name"]), base_type="UNKNOWN", entries=[])
 
     def EndProcessing(self):
-        if self._bitmap.entries:
-            self._cluster.bitmaps.append(self._bitmap)
+        if not self._bitmap.entries:
+            return
+
+        # try to find the best size that fits
+        # TODO: this is a pure heuristic. XML containing this would be better.
+        acceptable = {8, 16, 32}
+        for entry in self._bitmap.entries:
+            if entry.code > 0xFF:
+                acceptable.remove(8)
+            if entry.code > 0xFFFF:
+                acceptable.remove(16)
+
+        if 8 in acceptable:
+            self._bitmap.base_type = "bitmap8"
+        elif 16 in acceptable:
+            self._bitmap.base_type = "bitmap16"
+        else:
+            self._bitmap.base_type = "bitmap32"
+
+        self._cluster.bitmaps.append(self._bitmap)
 
     def GetNextProcessor(self, name: str, attrs):
         if name == "section":
@@ -194,11 +212,29 @@ class EnumHandler(BaseHandler):
 
         # TODO: base type is GUESSED here because xml does not contain it
         self._enum = Enum(name=NormalizeName(
-            attrs["name"]), base_type="enum32", entries=[])
+            attrs["name"]), base_type="UNKNOWN", entries=[])
 
     def EndProcessing(self):
-        if self._enum.entries:
-            self._cluster.enums.append(self._enum)
+        if not self._enum.entries:
+            return
+
+        # try to find the best enum size that fits out of enum8, enum32 and enum32
+        # TODO: this is a pure heuristic. XML containing this would be better.
+        acceptable = {8, 16, 32}
+        for entry in self._enum.entries:
+            if entry.code > 0xFF:
+                acceptable.remove(8)
+            if entry.code > 0xFFFF:
+                acceptable.remove(16)
+
+        if 8 in acceptable:
+            self._enum.base_type = "enum8"
+        elif 16 in acceptable:
+            self._enum.base_type = "enum16"
+        else:
+            self._enum.base_type = "enum32"
+
+        self._cluster.enums.append(self._enum)
 
     def GetNextProcessor(self, name: str, attrs):
         if name == "section":
