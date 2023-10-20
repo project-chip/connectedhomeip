@@ -11591,7 +11591,7 @@
               "reportableChange": 0
             },
             {
-              "name": "SensitivityLevel",
+              "name": "AlarmsEnabled",
               "code": 3,
               "mfgCode": null,
               "side": "server",

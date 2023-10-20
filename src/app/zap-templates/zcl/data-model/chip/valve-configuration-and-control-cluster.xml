@@ -46,7 +46,7 @@ limitations under the License.
     <description>This cluster is used to configure a valve.</description>
     <globalAttribute side="either" code="0xFFFD" value="1"/>
 
-    <attribute side="server" code="0x0000" define="OPEN_DURATION" type="elapsed_s" isNullable="true" min="1" writable="true" optional="false">
+    <attribute side="server" code="0x0000" define="OPEN_DURATION" type="elapsed_s" isNullable="true" writable="true" optional="false">
       <description>OpenDuration</description>
       <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>

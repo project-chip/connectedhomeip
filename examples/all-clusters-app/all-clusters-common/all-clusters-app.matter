@@ -3406,7 +3406,7 @@ server cluster BooleanSensorConfiguration = 128 {
   attribute SensitivityEnum sensitivityLevel = 0;
   readonly attribute AlarmModeBitmap alarmsActive = 1;
   readonly attribute AlarmModeBitmap alarmsSuppressed = 2;
-  attribute AlarmModeBitmap sensitivityLevel = 3;
+  attribute AlarmModeBitmap alarmsEnabled = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -6947,7 +6947,7 @@ endpoint 1 {
     ram      attribute sensitivityLevel;
     ram      attribute alarmsActive;
     ram      attribute alarmsSuppressed;
-    ram      attribute sensitivityLevel;
+    ram      attribute alarmsEnabled;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
