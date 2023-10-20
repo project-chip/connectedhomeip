@@ -135,7 +135,9 @@
         "BASIC_INFORMATION_CLUSTER": ["basic-information"],
         "BINARY_INPUT_BASIC_CLUSTER": [],
         "BINDING_CLUSTER": ["bindings"],
-        "BOOLEAN_SENSOR_CONFIGURATION_CLUSTER": ["boolean-sensor-configuration-server"],
+        "BOOLEAN_SENSOR_CONFIGURATION_CLUSTER": [
+            "boolean-sensor-configuration-server"
+        ],
         "BOOLEAN_STATE_CLUSTER": [],
         "BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER": [
             "bridged-device-basic-information-server"
@@ -260,7 +262,9 @@
         "UNIT_LOCALIZATION_CLUSTER": [],
         "UNIT_TESTING_CLUSTER": ["test-cluster-server"],
         "USER_LABEL_CLUSTER": ["user-label-server"],
-        "VALVE_CONFIGURATION_AND_CONTROL_CLUSTER": ["valve-configuration-and-control-server"],
+        "VALVE_CONFIGURATION_AND_CONTROL_CLUSTER": [
+            "valve-configuration-and-control-server"
+        ],
         "WAKE_ON_LAN_CLUSTER": ["wake-on-lan-server"],
         "LAUNDRY_WASHER_CONTROLS_CLUSTER": ["laundry-washer-controls-server"],
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": ["wifi-network-diagnostics-server"],
