@@ -27,12 +27,12 @@
 #include "CHIPDeviceManager.h"
 #include <air-purifier-manager.h>
 #include <app/util/basic-types.h>
+#include <core/ErrorStr.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/Ameba/FactoryDataProvider.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
-#include <core/ErrorStr.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
