@@ -217,9 +217,6 @@ static constexpr ClusterId Id = 0x00000080;
 namespace ValveConfigurationAndControl {
 static constexpr ClusterId Id = 0x00000081;
 } // namespace ValveConfigurationAndControl
-namespace DemandResponseLoadControl {
-static constexpr ClusterId Id = 0x00000096;
-} // namespace DemandResponseLoadControl
 namespace DoorLock {
 static constexpr ClusterId Id = 0x00000101;
 } // namespace DoorLock

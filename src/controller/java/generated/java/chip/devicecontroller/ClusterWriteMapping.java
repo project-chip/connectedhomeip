@@ -1276,52 +1276,6 @@ public class ClusterWriteMapping {
     );
     writeValveConfigurationAndControlInteractionInfo.put("writeOpenLevelAttribute", writeValveConfigurationAndControlOpenLevelAttributeInteractionInfo);
     writeAttributeMap.put("valveConfigurationAndControl", writeValveConfigurationAndControlInteractionInfo);
-    Map<String, InteractionInfo> writeDemandResponseLoadControlInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeDemandResponseLoadControlDefaultRandomStartCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo demandResponseLoadControldefaultRandomStartCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeDemandResponseLoadControlDefaultRandomStartCommandParams.put(
-        "value",
-        demandResponseLoadControldefaultRandomStartCommandParameterInfo
-    );
-    InteractionInfo writeDemandResponseLoadControlDefaultRandomStartAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.DemandResponseLoadControlCluster) cluster).writeDefaultRandomStartAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeDemandResponseLoadControlDefaultRandomStartCommandParams
-    );
-    writeDemandResponseLoadControlInteractionInfo.put("writeDefaultRandomStartAttribute", writeDemandResponseLoadControlDefaultRandomStartAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeDemandResponseLoadControlDefaultRandomDurationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo demandResponseLoadControldefaultRandomDurationCommandParameterInfo =
-        new CommandParameterInfo(
-            "value", 
-            Integer.class, 
-            Integer.class 
-        );
-    writeDemandResponseLoadControlDefaultRandomDurationCommandParams.put(
-        "value",
-        demandResponseLoadControldefaultRandomDurationCommandParameterInfo
-    );
-    InteractionInfo writeDemandResponseLoadControlDefaultRandomDurationAttributeInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.DemandResponseLoadControlCluster) cluster).writeDefaultRandomDurationAttribute(
-          (DefaultClusterCallback) callback,
-          (Integer) commandArguments.get("value")
-        );
-      },
-      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeDemandResponseLoadControlDefaultRandomDurationCommandParams
-    );
-    writeDemandResponseLoadControlInteractionInfo.put("writeDefaultRandomDurationAttribute", writeDemandResponseLoadControlDefaultRandomDurationAttributeInteractionInfo);
-    writeAttributeMap.put("demandResponseLoadControl", writeDemandResponseLoadControlInteractionInfo);
     Map<String, InteractionInfo> writeDoorLockInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeDoorLockDoorOpenEventsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo doorLockdoorOpenEventsCommandParameterInfo =

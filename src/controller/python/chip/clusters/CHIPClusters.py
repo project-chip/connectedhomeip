@@ -6037,7 +6037,7 @@ class ChipClusters:
         "commands": {
             0x00000000: {
                 "commandId": 0x00000000,
-                "commandName": "SuppressRequest",
+                "commandName": "SupressRequest",
                 "args": {
                     "alarmsToSuppress": "int",
                 },
@@ -6197,135 +6197,6 @@ class ChipClusters:
                 "attributeId": 0x00000009,
                 "type": "int",
                 "reportable": True,
-            },
-            0x0000FFF8: {
-                "attributeName": "GeneratedCommandList",
-                "attributeId": 0x0000FFF8,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFF9: {
-                "attributeName": "AcceptedCommandList",
-                "attributeId": 0x0000FFF9,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFA: {
-                "attributeName": "EventList",
-                "attributeId": 0x0000FFFA,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFB: {
-                "attributeName": "AttributeList",
-                "attributeId": 0x0000FFFB,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFC: {
-                "attributeName": "FeatureMap",
-                "attributeId": 0x0000FFFC,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000FFFD: {
-                "attributeName": "ClusterRevision",
-                "attributeId": 0x0000FFFD,
-                "type": "int",
-                "reportable": True,
-            },
-        },
-    }
-    _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO = {
-        "clusterName": "DemandResponseLoadControl",
-        "clusterId": 0x00000096,
-        "commands": {
-            0x00000000: {
-                "commandId": 0x00000000,
-                "commandName": "RegisterLoadControlProgramRequest",
-                "args": {
-                    "loadControlProgram": "LoadControlProgramStruct",
-                },
-            },
-            0x00000001: {
-                "commandId": 0x00000001,
-                "commandName": "UnregisterLoadControlProgramRequest",
-                "args": {
-                    "loadControlProgramID": "bytes",
-                },
-            },
-            0x00000002: {
-                "commandId": 0x00000002,
-                "commandName": "AddLoadControlEventRequest",
-                "args": {
-                    "event": "LoadControlEventStruct",
-                },
-            },
-            0x00000003: {
-                "commandId": 0x00000003,
-                "commandName": "RemoveLoadControlEventRequest",
-                "args": {
-                    "eventID": "bytes",
-                    "cancelControl": "int",
-                },
-            },
-            0x00000004: {
-                "commandId": 0x00000004,
-                "commandName": "ClearLoadControlEventsRequest",
-                "args": {
-                },
-            },
-        },
-        "attributes": {
-            0x00000000: {
-                "attributeName": "LoadControlPrograms",
-                "attributeId": 0x00000000,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "NumberOfLoadControlPrograms",
-                "attributeId": 0x00000001,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "Events",
-                "attributeId": 0x00000002,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "ActiveEvents",
-                "attributeId": 0x00000003,
-                "type": "",
-                "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "NumberOfEventsPerProgram",
-                "attributeId": 0x00000004,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "NumberOfTransitions",
-                "attributeId": 0x00000005,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000006: {
-                "attributeName": "DefaultRandomStart",
-                "attributeId": 0x00000006,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
-            },
-            0x00000007: {
-                "attributeName": "DefaultRandomDuration",
-                "attributeId": 0x00000007,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
@@ -12982,7 +12853,6 @@ class ChipClusters:
         0x00000072: _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
         0x00000080: _BOOLEAN_SENSOR_CONFIGURATION_CLUSTER_INFO,
         0x00000081: _VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
-        0x00000096: _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO,
         0x00000101: _DOOR_LOCK_CLUSTER_INFO,
         0x00000102: _WINDOW_COVERING_CLUSTER_INFO,
         0x00000103: _BARRIER_CONTROL_CLUSTER_INFO,
@@ -13091,7 +12961,6 @@ class ChipClusters:
         "ActivatedCarbonFilterMonitoring": _ACTIVATED_CARBON_FILTER_MONITORING_CLUSTER_INFO,
         "BooleanSensorConfiguration": _BOOLEAN_SENSOR_CONFIGURATION_CLUSTER_INFO,
         "ValveConfigurationAndControl": _VALVE_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
-        "DemandResponseLoadControl": _DEMAND_RESPONSE_LOAD_CONTROL_CLUSTER_INFO,
         "DoorLock": _DOOR_LOCK_CLUSTER_INFO,
         "WindowCovering": _WINDOW_COVERING_CLUSTER_INFO,
         "BarrierControl": _BARRIER_CONTROL_CLUSTER_INFO,
