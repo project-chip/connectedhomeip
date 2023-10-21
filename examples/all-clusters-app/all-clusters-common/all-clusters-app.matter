@@ -3248,7 +3248,7 @@ server cluster ActivatedCarbonFilterMonitoring = 114 {
 }
 
 /** This cluster is used to configure a boolean sensor. */
-server cluster BooleanSensorConfiguration = 128 {
+provisional server cluster BooleanSensorConfiguration = 128 {
   enum SensitivityEnum : enum8 {
     kHigh = 0;
     kStandard = 1;
@@ -3294,7 +3294,7 @@ server cluster BooleanSensorConfiguration = 128 {
 }
 
 /** This cluster is used to configure a valve. */
-server cluster ValveConfigurationAndControl = 129 {
+provisional server cluster ValveConfigurationAndControl = 129 {
   enum ValveStateEnum : enum8 {
     kOpen = 0;
     kClosed = 1;

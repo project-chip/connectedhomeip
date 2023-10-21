@@ -38,7 +38,7 @@ limitations under the License.
     <item name="Low" value="0x2"/>
   </enum>
 
-  <cluster>
+  <cluster apiMaturity="provisional">
     <name>Boolean Sensor Configuration</name>
     <domain>Measurement &amp; Sensing</domain>
     <code>0x0080</code>
