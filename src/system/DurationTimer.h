@@ -21,52 +21,37 @@
 #endif // CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME etal
 
 
-#if CHIP_DEVICE_USES_SYS_TIME
+//#if CHIP_DEVICE_USES_SYS_TIME
 /**
  * Use SystemClock/clock-gettime  
  * */
 #include <system/SystemClock.h>
-#endif
+//#endif
 
 #if CHIP_DEVICE_USES_TIME_H
 /**
  * SystemClock/clock-gettime not supported therefore use time.h
  * */
-#include <time.h>
+//#include <time.h>
 #endif
-
-using namespace std;
 
 namespace chip {
 namespace timing {
 
 class DurationTimer
 {
-#if CHIP_DEVICE_USES_SYS_TIME
+//#if CHIP_DEVICE_USES_SYS_TIME
 /**
  * SystemClock/clock-gettime supported therefore timeval struct.
  * */
 private:
-    string toTimeStr(timeval * time);
+    std::string toTimeStr(chip::System::Clock::Timestamp time);
 
 protected:
-    timeval t1;
-    timeval t2;
-    string label;
-#endif
-
-#if CHIP_DEVICE_USES_TIME_H
-/**
- * clock-SystemClock/clock-gettime not supported therefore use timespec struct
- * */
-private:
-    string toTimeStr(timespec * time);
-
-protected:
-    timespec t1;
-    timespec t2;
-    string label;
-#endif
+    chip::System::Clock::Timestamp  t1;
+    chip::System::Clock::Timestamp  t2;
+    std::string label;
+//#endif
 
 
 public:
@@ -74,7 +59,7 @@ public:
     /**
      * Constructor sets label as an identifier of a unique process.
     */
-    DurationTimer(string s) { label = s; }
+    DurationTimer(std::string s) { label = s; }
 
     //default destructor
     ~DurationTimer() = default;
@@ -96,8 +81,8 @@ public:
     double duration();
 };
 
-DurationTimer GetDefaultTimingInstance(string label);
-DurationTimer * GetDefaultTimingInstancePtr(string label);
+DurationTimer GetDefaultTimingInstance(std::string label);
+DurationTimer * GetDefaultTimingInstancePtr(std::string label);
 
 } // namespace timing
 } // namespace chip
