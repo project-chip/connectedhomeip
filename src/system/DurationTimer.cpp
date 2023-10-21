@@ -50,7 +50,7 @@ double DurationTimer::duration()
     millis -= seconds;
     //printf("Timer: secs %d  millis %d  \n", seconds.count(), ((int)millis.count()) );
     
-    time_t  oseconds = static_cast<time_t>(seconds.count());
+    //time_t  oseconds = static_cast<time_t>(seconds.count());
     auto dur =  millis.count();//t2.count() - t1.count();
     suseconds_t omillis = static_cast<suseconds_t>(dur);
 
