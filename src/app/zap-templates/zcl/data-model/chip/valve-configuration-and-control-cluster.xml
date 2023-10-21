@@ -36,7 +36,7 @@ limitations under the License.
     <item name="Closed" value="0x1"/>
   </enum>
 
-  <cluster>
+  <cluster apiMaturity="provisional">
     <name>Valve Configuration and Control</name>
     <domain>HVAC</domain>
     <code>0x0081</code>
