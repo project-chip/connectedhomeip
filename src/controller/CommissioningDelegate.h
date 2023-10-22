@@ -511,6 +511,8 @@ public:
         mAttestationSignature.ClearValue();
         mPAI.ClearValue();
         mDAC.ClearValue();
+        mTimeZone.ClearValue();
+        mDSTOffsets.ClearValue();
     }
 
 private:
