@@ -57,7 +57,7 @@ double DurationTimer::duration()
     std::string timestr = toTimeStr(t2);
 
     //ChipLogDetail(DeviceLayer, "Timer: %s TIME_SPENT (sec) %f , %s ", label.c_str(), dur, timestr.c_str());
-    printf("Timer: %s %s TIME_SPENT (millisec) %ld \n", label.c_str(),timestr.c_str(), omillis );
+    printf("Timer: %s %s TIME_SPENT (millisec) %d \n", label.c_str(),timestr.c_str(), ((int)omillis) );
 
     return (double)dur;
 }
@@ -79,9 +79,9 @@ std::string DurationTimer::toTimeStr(chip::System::Clock::Timestamp time)
 
     struct tm * tm_info = gmtime(&oseconds);
     strftime(buff, DATETIME_LEN, DATETIME_PATTERN, tm_info);
-    char * str = new char[ISO8601_LEN];
+    char * str = new char[ISO8601_LEN];//TODO look into Direct leak of 68 byte(s) in 2 object(s) allocated from:
     //snprintf(str, ISO8601_LEN, "time: %s.%05ld", buff, omillis);
-    snprintf(str, ISO8601_LEN, "time: %s.%ld", buff, omillis);
+    snprintf(str, ISO8601_LEN, "time: %s.%d", buff, ((int)omillis));
 
     return str;
 }
