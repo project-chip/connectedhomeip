@@ -51,15 +51,15 @@ double DurationTimer::duration()
     //printf("Timer: secs %d  millis %d  \n", seconds.count(), ((int)millis.count()) );
     
     //time_t  oseconds = static_cast<time_t>(seconds.count());
-    auto dur =  millis.count();//t2.count() - t1.count();
-    suseconds_t omillis = static_cast<suseconds_t>(dur);
+    //auto dur =  millis.count();//t2.count() - t1.count();
+    suseconds_t omillis = static_cast<suseconds_t>(millis.count());
 
-    std::string timestr = toTimeStr(t2);
+    //std::string timestr = toTimeStr(t2);
 
     //ChipLogDetail(DeviceLayer, "Timer: %s TIME_SPENT (sec) %f , %s ", label.c_str(), dur, timestr.c_str());
-    printf("Timer: %s %s TIME_SPENT (millisec) %d \n", label.c_str(),timestr.c_str(), ((int)omillis) );
+    printf("Timer: %s %s TIME_SPENT (millisec) %d \n", label.c_str(), toTimeStr(t2).c_str(), ((int)omillis) );
 
-    return (double)dur;
+    return (double)millis.count();
 }
 
 // utility method
@@ -81,7 +81,7 @@ std::string DurationTimer::toTimeStr(chip::System::Clock::Timestamp time)
     strftime(buff, DATETIME_LEN, DATETIME_PATTERN, tm_info);
     char * str = new char[ISO8601_LEN];//TODO look into Direct leak of 68 byte(s) in 2 object(s) allocated from:
     //snprintf(str, ISO8601_LEN, "time: %s.%05ld", buff, omillis);
-    snprintf(str, ISO8601_LEN, "time: %s.%d", buff, ((int)omillis));
+    snprintf(str, ISO8601_LEN, "time: %s.%03d", buff, ((int)omillis));
 
     return str;
 }
