@@ -920,7 +920,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                                           problem=f'Attribute 0x{attribute_id:02x} is required, but is not present on the DUT')
                         success = False
 
-                def check_spec_conformance_for_commands(self, command_type: CommandType) -> bool:
+                def check_spec_conformance_for_commands(command_type: CommandType) -> bool:
                     success = True
                     # TODO: once IDM-10.1 lands, use the globals
                     global_attribute_id = 0xFFF9 if command_type == CommandType.ACCEPTED else 0xFFF8
@@ -953,9 +953,9 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                     return success
 
                 # Command conformance checking
-                cmd_success = check_spec_conformance_for_commands(self, CommandType.ACCEPTED)
+                cmd_success = check_spec_conformance_for_commands(CommandType.ACCEPTED)
                 success = False if not cmd_success else success
-                cmd_success = check_spec_conformance_for_commands(self, CommandType.GENERATED)
+                cmd_success = check_spec_conformance_for_commands(CommandType.GENERATED)
                 success = False if not cmd_success else success
 
         # TODO: Add choice checkers

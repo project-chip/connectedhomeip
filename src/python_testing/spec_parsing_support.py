@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+import glob
 import os
 import xml.etree.ElementTree as ElementTree
 from copy import deepcopy
@@ -94,19 +95,19 @@ def has_zigbee_conformance(conformance: ElementTree.Element) -> bool:
 
 class ClusterParser:
     def __init__(self, cluster, cluster_id, name):
-        self.problems: list[ProblemNotice] = []
-        self.cluster = cluster
-        self.cluster_id = cluster_id
-        self.name = name
+        self._problems: list[ProblemNotice] = []
+        self._cluster = cluster
+        self._cluster_id = cluster_id
+        self._name = name
 
-        self.derived = None
+        self._derived = None
         try:
             classification = next(cluster.iter('classification'))
             hierarchy = classification.attrib['hierarchy']
             if hierarchy.lower() == 'derived':
-                self.derived = classification.attrib['baseCluster']
+                self._derived = classification.attrib['baseCluster']
         except (KeyError, StopIteration):
-            self.derived = None
+            self._derived = None
 
         self.feature_elements = self.get_all_feature_elements()
         self.attribute_elements = self.get_all_attribute_elements()
@@ -122,23 +123,23 @@ class ClusterParser:
 
         # Conformance is missing, so let's record the problem and treat it as optional for lack of a better choice
         if element.tag == 'feature':
-            location = FeaturePathLocation(endpoint_id=0, cluster_id=self.cluster_id, feature_code=element.attrib['code'])
+            location = FeaturePathLocation(endpoint_id=0, cluster_id=self._cluster_id, feature_code=element.attrib['code'])
         elif element.tag == 'command':
-            location = CommandPathLocation(endpoint_id=0, cluster_id=self.cluster_id, command_id=element.attrib['id'])
+            location = CommandPathLocation(endpoint_id=0, cluster_id=self._cluster_id, command_id=element.attrib['id'])
         elif element.tag == 'attribute':
-            location = AttributePathLocation(endpoint_id=0, cluster_id=self.cluster_id, attribute_id=element.attrib['id'])
+            location = AttributePathLocation(endpoint_id=0, cluster_id=self._cluster_id, attribute_id=element.attrib['id'])
         elif element.tag == 'event':
-            location = EventPathLocation(endpoint_id=0, cluster_id=self.cluster_id, event_id=element.attrib['id'])
+            location = EventPathLocation(endpoint_id=0, cluster_id=self._cluster_id, event_id=element.attrib['id'])
         else:
-            location = ClusterPathLocation(endpoing_id=0, cluster_id=self.cluster_id)
-        self.problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
-                             severity=ProblemSeverity.WARNING, problem='Unable to find conformance element'))
+            location = ClusterPathLocation(endpoing_id=0, cluster_id=self._cluster_id)
+        self._problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
+                                            severity=ProblemSeverity.WARNING, problem='Unable to find conformance element'))
 
         return ElementTree.Element(OPTIONAL_CONFORM)
 
     def get_all_type(self, type_container: str, type_name: str, key_name: str) -> list[tuple[ElementTree.Element, ElementTree.Element]]:
         ret = []
-        container_tags = self.cluster.iter(type_container)
+        container_tags = self._cluster.iter(type_container)
         for container in container_tags:
             elements = container.iter(type_name)
             for element in elements:
@@ -243,8 +244,8 @@ class ClusterParser:
         return events
 
     def create_cluster(self) -> XmlCluster:
-        return XmlCluster(revision=self.cluster.attrib['revision'], derived=self.derived,
-                          name=self.name, feature_map=self.params.feature_map,
+        return XmlCluster(revision=self._cluster.attrib['revision'], derived=self._derived,
+                          name=self._name, feature_map=self.params.feature_map,
                           attribute_map=self.params.attribute_map, command_map=self.params.command_map,
                           features=self.parse_features(),
                           attributes=self.parse_attributes(),
@@ -253,7 +254,7 @@ class ClusterParser:
                           events=self.parse_events())
 
     def get_problems(self) -> list[ProblemNotice]:
-        return self.problems
+        return self._problems
 
 
 def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
@@ -262,8 +263,8 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
     derived_clusters: dict[str, XmlCluster] = {}
     ids_by_name = {}
     problems = []
-    for xml in os.listdir(dir):
-        tree = ElementTree.parse(f'{dir}/{xml}')
+    for xml in glob.glob(f"{dir}/*.xml"):
+        tree = ElementTree.parse(f'{xml}')
         root = tree.getroot()
         cluster = root.iter('cluster')
         for c in cluster:

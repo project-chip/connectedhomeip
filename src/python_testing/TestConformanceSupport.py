@@ -24,540 +24,551 @@ from mobly import asserts
 
 class TestConformanceSupport(MatterBaseTest):
     @async_test_body
-    async def test_conformance_from_xml(self):
+    async def setup_class(self):
+        super().setup_class()
         # a small feature map
-        feature_names_to_bits = {'AB': 0x01, 'CD': 0x02}
+        self.feature_names_to_bits = {'AB': 0x01, 'CD': 0x02}
 
         # none, AB, CD, AB&CD
-        feature_maps = [0x00, 0x01, 0x02, 0x03]
-        has_ab = [False, True, False, True]
-        has_cd = [False, False, True, True]
+        self.feature_maps = [0x00, 0x01, 0x02, 0x03]
+        self.has_ab = [False, True, False, True]
+        self.has_cd = [False, False, True, True]
 
-        attribute_names_to_values = {'attr1': 0x00, 'attr2': 0x01}
-        attribute_lists = [[], [0x00], [0x01], [0x00, 0x01]]
-        has_attr1 = [False, True, False, True]
-        has_attr2 = [False, False, True, True]
+        self.attribute_names_to_values = {'attr1': 0x00, 'attr2': 0x01}
+        self.attribute_lists = [[], [0x00], [0x01], [0x00, 0x01]]
+        self.has_attr1 = [False, True, False, True]
+        self.has_attr2 = [False, False, True, True]
 
-        command_names_to_values = {'cmd1': 0x00, 'cmd2': 0x01}
-        cmd_lists = [[], [0x00], [0x01], [0x00, 0x01]]
-        has_cmd1 = [False, True, False, True]
-        has_cmd2 = [False, False, True, True]
+        self.command_names_to_values = {'cmd1': 0x00, 'cmd2': 0x01}
+        self.cmd_lists = [[], [0x00], [0x01], [0x00, 0x01]]
+        self.has_cmd1 = [False, True, False, True]
+        self.has_cmd2 = [False, False, True, True]
+        self.params = ConformanceParseParameters(
+            feature_map=self.feature_names_to_bits, attribute_map=self.attribute_names_to_values, command_map=self.command_names_to_values)
 
-        params = ConformanceParseParameters(
-            feature_map=feature_names_to_bits, attribute_map=attribute_names_to_values, command_map=command_names_to_values)
-
-        # Start simple - mandatory, optional, disallowed
+    @async_test_body
+    async def test_conformance_mandatory(self):
         xml = '<mandatoryConform />'
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for f in feature_maps:
-            asserts.assert_equal(callable(f, [], []), ConformanceDecision.MANDATORY)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for f in self.feature_maps:
+            asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.MANDATORY)
 
+    @async_test_body
+    async def test_conformance_optional(self):
         xml = '<optionalConform />'
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for f in feature_maps:
-            asserts.assert_equal(callable(f, [], []), ConformanceDecision.OPTIONAL)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for f in self.feature_maps:
+            asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.OPTIONAL)
 
+    @async_test_body
+    async def test_conformance_disallowed(self):
         xml = '<disallowConform />'
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for f in feature_maps:
-            asserts.assert_equal(callable(f, [], []), ConformanceDecision.DISALLOWED)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for f in self.feature_maps:
+            asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.DISALLOWED)
 
         xml = '<deprecateConform />'
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for f in feature_maps:
-            asserts.assert_equal(callable(f, [], []), ConformanceDecision.DISALLOWED)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for f in self.feature_maps:
+            asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.DISALLOWED)
 
+    @async_test_body
+    async def test_conformance_provisional(self):
         xml = '<provisionalConform />'
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for f in feature_maps:
-            asserts.assert_equal(callable(f, [], []), ConformanceDecision.PROVISIONAL)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for f in self.feature_maps:
+            asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.PROVISIONAL)
 
-        # single feature mandatory
-        xml = '<mandatoryConform>\n'
-        xml = xml + '<feature name="AB" />\n'
-        xml = xml + '</mandatoryConform>'
+    @async_test_body
+    async def test_conformance_mandatory_on_condition(self):
+        xml = ('<mandatoryConform>'
+               '<feature name="AB" />'
+               '</mandatoryConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, f in enumerate(feature_maps):
-            if has_ab[i]:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.MANDATORY)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, f in enumerate(self.feature_maps):
+            if self.has_ab[i]:
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.MANDATORY)
             else:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
 
-        xml = '<mandatoryConform>\n'
-        xml = xml + '<feature name="CD" />\n'
-        xml = xml + '</mandatoryConform>'
+        xml = ('<mandatoryConform>'
+               '<feature name="CD" />'
+               '</mandatoryConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, f in enumerate(feature_maps):
-            if has_cd[i]:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.MANDATORY)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, f in enumerate(self.feature_maps):
+            if self.has_cd[i]:
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.MANDATORY)
             else:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
 
         # single attribute mandatory
-        xml = '<mandatoryConform>\n'
-        xml = xml + '<attribute name="attr1" />\n'
-        xml = xml + '</mandatoryConform>'
+        xml = ('<mandatoryConform>'
+               '<attribute name="attr1" />'
+               '</mandatoryConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, a in enumerate(attribute_lists):
-            if has_attr1[i]:
-                asserts.assert_equal(callable(0x00, a, []), ConformanceDecision.MANDATORY)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, a in enumerate(self.attribute_lists):
+            if self.has_attr1[i]:
+                asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.MANDATORY)
             else:
-                asserts.assert_equal(callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
 
-        xml = '<mandatoryConform>\n'
-        xml = xml + '<attribute name="attr2" />\n'
-        xml = xml + '</mandatoryConform>'
+        xml = ('<mandatoryConform>'
+               '<attribute name="attr2" />'
+               '</mandatoryConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, a in enumerate(attribute_lists):
-            if has_attr2[i]:
-                asserts.assert_equal(callable(0x00, a, []), ConformanceDecision.MANDATORY)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, a in enumerate(self.attribute_lists):
+            if self.has_attr2[i]:
+                asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.MANDATORY)
             else:
-                asserts.assert_equal(callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
 
         # test command in optional and in boolean - this is the same as attribute essentially, so testing every permutation is overkill
 
+    @async_test_body
+    async def test_conformance_optional_on_condition(self):
         # single feature optional
-        xml = '<optionalConform>\n'
-        xml = xml + '<feature name="AB" />\n'
-        xml = xml + '</optionalConform>'
+        xml = ('<optionalConform>'
+               '<feature name="AB" />'
+               '</optionalConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, f in enumerate(feature_maps):
-            if has_ab[i]:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.OPTIONAL)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, f in enumerate(self.feature_maps):
+            if self.has_ab[i]:
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.OPTIONAL)
             else:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
 
-        xml = '<optionalConform>\n'
-        xml = xml + '<feature name="CD" />\n'
-        xml = xml + '</optionalConform>'
+        xml = ('<optionalConform>'
+               '<feature name="CD" />'
+               '</optionalConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, f in enumerate(feature_maps):
-            if has_cd[i]:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.OPTIONAL)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, f in enumerate(self.feature_maps):
+            if self.has_cd[i]:
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.OPTIONAL)
             else:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
 
         # single attribute optional
-        xml = '<optionalConform>\n'
-        xml = xml + '<attribute name="attr1" />\n'
-        xml = xml + '</optionalConform>'
+        xml = ('<optionalConform>'
+               '<attribute name="attr1" />'
+               '</optionalConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, a in enumerate(attribute_lists):
-            if has_attr1[i]:
-                asserts.assert_equal(callable(0x00, a, []), ConformanceDecision.OPTIONAL)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, a in enumerate(self.attribute_lists):
+            if self.has_attr1[i]:
+                asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.OPTIONAL)
             else:
-                asserts.assert_equal(callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
 
-        xml = '<optionalConform>\n'
-        xml = xml + '<attribute name="attr2" />\n'
-        xml = xml + '</optionalConform>'
+        xml = ('<optionalConform>'
+               '<attribute name="attr2" />'
+               '</optionalConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, a in enumerate(attribute_lists):
-            if has_attr2[i]:
-                asserts.assert_equal(callable(0x00, a, []), ConformanceDecision.OPTIONAL)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, a in enumerate(self.attribute_lists):
+            if self.has_attr2[i]:
+                asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.OPTIONAL)
             else:
-                asserts.assert_equal(callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
 
         # single command optional
-        xml = '<optionalConform>\n'
-        xml = xml + '<command name="cmd1" />\n'
-        xml = xml + '</optionalConform>'
+        xml = ('<optionalConform>'
+               '<command name="cmd1" />'
+               '</optionalConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, c in enumerate(cmd_lists):
-            if has_cmd1[i]:
-                asserts.assert_equal(callable(0x00, [], c), ConformanceDecision.OPTIONAL)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, c in enumerate(self.cmd_lists):
+            if self.has_cmd1[i]:
+                asserts.assert_equal(xml_callable(0x00, [], c), ConformanceDecision.OPTIONAL)
             else:
-                asserts.assert_equal(callable(0x00, [], c), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(0x00, [], c), ConformanceDecision.NOT_APPLICABLE)
 
-        xml = '<optionalConform>\n'
-        xml = xml + '<command name="cmd2" />\n'
-        xml = xml + '</optionalConform>'
+        xml = ('<optionalConform>'
+               '<command name="cmd2" />'
+               '</optionalConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, c in enumerate(cmd_lists):
-            if has_cmd2[i]:
-                asserts.assert_equal(callable(0x00, [], c), ConformanceDecision.OPTIONAL)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, c in enumerate(self.cmd_lists):
+            if self.has_cmd2[i]:
+                asserts.assert_equal(xml_callable(0x00, [], c), ConformanceDecision.OPTIONAL)
             else:
-                asserts.assert_equal(callable(0x00, [], c), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(0x00, [], c), ConformanceDecision.NOT_APPLICABLE)
 
+    @async_test_body
+    async def test_conformance_not_term_mandatory(self):
         # single feature not mandatory
-        xml = '<mandatoryConform>\n'
-        xml = xml + '<notTerm>'
-        xml = xml + '<feature name="AB" />\n'
-        xml = xml + '</notTerm>'
-        xml = xml + '</mandatoryConform>'
+        xml = ('<mandatoryConform>'
+               '<notTerm>'
+               '<feature name="AB" />'
+               '</notTerm>'
+               '</mandatoryConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, f in enumerate(feature_maps):
-            if not has_ab[i]:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.MANDATORY)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, f in enumerate(self.feature_maps):
+            if not self.has_ab[i]:
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.MANDATORY)
             else:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
 
-        xml = '<mandatoryConform>\n'
-        xml = xml + '<notTerm>'
-        xml = xml + '<feature name="CD" />\n'
-        xml = xml + '</notTerm>'
-        xml = xml + '</mandatoryConform>'
+        xml = ('<mandatoryConform>'
+               '<notTerm>'
+               '<feature name="CD" />'
+               '</notTerm>'
+               '</mandatoryConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, f in enumerate(feature_maps):
-            if not has_cd[i]:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.MANDATORY)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, f in enumerate(self.feature_maps):
+            if not self.has_cd[i]:
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.MANDATORY)
             else:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
 
         # single attribute not mandatory
-        xml = '<mandatoryConform>\n'
-        xml = xml + '<notTerm>'
-        xml = xml + '<attribute name="attr1" />\n'
-        xml = xml + '</notTerm>'
-        xml = xml + '</mandatoryConform>'
+        xml = ('<mandatoryConform>'
+               '<notTerm>'
+               '<attribute name="attr1" />'
+               '</notTerm>'
+               '</mandatoryConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, a in enumerate(attribute_lists):
-            if not has_attr1[i]:
-                asserts.assert_equal(callable(0x00, a, []), ConformanceDecision.MANDATORY)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, a in enumerate(self.attribute_lists):
+            if not self.has_attr1[i]:
+                asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.MANDATORY)
             else:
-                asserts.assert_equal(callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
 
-        xml = '<mandatoryConform>\n'
-        xml = xml + '<notTerm>'
-        xml = xml + '<attribute name="attr2" />\n'
-        xml = xml + '</notTerm>'
-        xml = xml + '</mandatoryConform>'
+        xml = ('<mandatoryConform>'
+               '<notTerm>'
+               '<attribute name="attr2" />'
+               '</notTerm>'
+               '</mandatoryConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, a in enumerate(attribute_lists):
-            if not has_attr2[i]:
-                asserts.assert_equal(callable(0x00, a, []), ConformanceDecision.MANDATORY)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, a in enumerate(self.attribute_lists):
+            if not self.has_attr2[i]:
+                asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.MANDATORY)
             else:
-                asserts.assert_equal(callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
 
+    @async_test_body
+    async def test_conformance_not_term_optional(self):
         # single feature not optional
-        xml = '<optionalConform>\n'
-        xml = xml + '<notTerm>'
-        xml = xml + '<feature name="AB" />\n'
-        xml = xml + '</notTerm>'
-        xml = xml + '</optionalConform>'
+        xml = ('<optionalConform>'
+               '<notTerm>'
+               '<feature name="AB" />'
+               '</notTerm>'
+               '</optionalConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, f in enumerate(feature_maps):
-            if not has_ab[i]:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.OPTIONAL)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, f in enumerate(self.feature_maps):
+            if not self.has_ab[i]:
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.OPTIONAL)
             else:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
 
-        xml = '<optionalConform>\n'
-        xml = xml + '<notTerm>'
-        xml = xml + '<feature name="CD" />\n'
-        xml = xml + '</notTerm>'
-        xml = xml + '</optionalConform>'
+        xml = ('<optionalConform>'
+               '<notTerm>'
+               '<feature name="CD" />'
+               '</notTerm>'
+               '</optionalConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, f in enumerate(feature_maps):
-            if not has_cd[i]:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.OPTIONAL)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, f in enumerate(self.feature_maps):
+            if not self.has_cd[i]:
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.OPTIONAL)
             else:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
 
+    @async_test_body
+    async def test_conformance_and_term(self):
         # and term for features only
-        xml = '<mandatoryConform>\n'
-        xml = xml + '<andTerm>\n'
-        xml = xml + '<feature name="AB" />\n'
-        xml = xml + '<feature name="CD" />\n'
-        xml = xml + '</andTerm>\n'
-        xml = xml + '</mandatoryConform>'
+        xml = ('<mandatoryConform>'
+               '<andTerm>'
+               '<feature name="AB" />'
+               '<feature name="CD" />'
+               '</andTerm>'
+               '</mandatoryConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, f in enumerate(feature_maps):
-            if has_ab[i] and has_cd[i]:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.MANDATORY)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, f in enumerate(self.feature_maps):
+            if self.has_ab[i] and self.has_cd[i]:
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.MANDATORY)
             else:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
 
         # and term for attributes only
-        xml = '<mandatoryConform>\n'
-        xml = xml + '<andTerm>\n'
-        xml = xml + '<attribute name="attr1" />\n'
-        xml = xml + '<attribute name="attr2" />\n'
-        xml = xml + '</andTerm>\n'
-        xml = xml + '</mandatoryConform>'
+        xml = ('<mandatoryConform>'
+               '<andTerm>'
+               '<attribute name="attr1" />'
+               '<attribute name="attr2" />'
+               '</andTerm>'
+               '</mandatoryConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, a in enumerate(attribute_lists):
-            if has_attr1[i] and has_attr2[i]:
-                asserts.assert_equal(callable(0x00, a, []), ConformanceDecision.MANDATORY)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, a in enumerate(self.attribute_lists):
+            if self.has_attr1[i] and self.has_attr2[i]:
+                asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.MANDATORY)
             else:
-                asserts.assert_equal(callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
 
         # and term for feature and attribute
-        xml = '<mandatoryConform>\n'
-        xml = xml + '<andTerm>\n'
-        xml = xml + '<feature name="AB" />\n'
-        xml = xml + '<attribute name="attr2" />\n'
-        xml = xml + '</andTerm>\n'
-        xml = xml + '</mandatoryConform>'
+        xml = ('<mandatoryConform>'
+               '<andTerm>'
+               '<feature name="AB" />'
+               '<attribute name="attr2" />'
+               '</andTerm>'
+               '</mandatoryConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, f in enumerate(feature_maps):
-            for j, a in enumerate(attribute_lists):
-                if has_ab[i] and has_attr2[j]:
-                    asserts.assert_equal(callable(f, a, []), ConformanceDecision.MANDATORY)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, f in enumerate(self.feature_maps):
+            for j, a in enumerate(self.attribute_lists):
+                if self.has_ab[i] and self.has_attr2[j]:
+                    asserts.assert_equal(xml_callable(f, a, []), ConformanceDecision.MANDATORY)
                 else:
-                    asserts.assert_equal(callable(f, a, []), ConformanceDecision.NOT_APPLICABLE)
+                    asserts.assert_equal(xml_callable(f, a, []), ConformanceDecision.NOT_APPLICABLE)
 
+    @async_test_body
+    async def test_conformance_or_term(self):
         # or term feature only
-        xml = '<mandatoryConform>\n'
-        xml = xml + '<orTerm>\n'
-        xml = xml + '<feature name="AB" />\n'
-        xml = xml + '<feature name="CD" />\n'
-        xml = xml + '</orTerm>\n'
-        xml = xml + '</mandatoryConform>'
+        xml = ('<mandatoryConform>'
+               '<orTerm>'
+               '<feature name="AB" />'
+               '<feature name="CD" />'
+               '</orTerm>'
+               '</mandatoryConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, f in enumerate(feature_maps):
-            if has_ab[i] or has_cd[i]:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.MANDATORY)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, f in enumerate(self.feature_maps):
+            if self.has_ab[i] or self.has_cd[i]:
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.MANDATORY)
             else:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
 
         # or term attribute only
-        xml = '<mandatoryConform>\n'
-        xml = xml + '<orTerm>\n'
-        xml = xml + '<attribute name="attr1" />\n'
-        xml = xml + '<attribute name="attr2" />\n'
-        xml = xml + '</orTerm>\n'
-        xml = xml + '</mandatoryConform>'
+        xml = ('<mandatoryConform>'
+               '<orTerm>'
+               '<attribute name="attr1" />'
+               '<attribute name="attr2" />'
+               '</orTerm>'
+               '</mandatoryConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, a in enumerate(attribute_lists):
-            if has_attr1[i] or has_attr2[i]:
-                asserts.assert_equal(callable(0x00, a, []), ConformanceDecision.MANDATORY)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, a in enumerate(self.attribute_lists):
+            if self.has_attr1[i] or self.has_attr2[i]:
+                asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.MANDATORY)
             else:
-                asserts.assert_equal(callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(0x00, a, []), ConformanceDecision.NOT_APPLICABLE)
 
         # or term feature and attribute
-        xml = '<mandatoryConform>\n'
-        xml = xml + '<orTerm>\n'
-        xml = xml + '<feature name="AB" />\n'
-        xml = xml + '<attribute name="attr2" />\n'
-        xml = xml + '</orTerm>\n'
-        xml = xml + '</mandatoryConform>'
+        xml = ('<mandatoryConform>'
+               '<orTerm>'
+               '<feature name="AB" />'
+               '<attribute name="attr2" />'
+               '</orTerm>'
+               '</mandatoryConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, f in enumerate(feature_maps):
-            for j, a in enumerate(attribute_lists):
-                if has_ab[i] or has_attr2[j]:
-                    asserts.assert_equal(callable(f, a, []), ConformanceDecision.MANDATORY)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, f in enumerate(self.feature_maps):
+            for j, a in enumerate(self.attribute_lists):
+                if self.has_ab[i] or self.has_attr2[j]:
+                    asserts.assert_equal(xml_callable(f, a, []), ConformanceDecision.MANDATORY)
                 else:
-                    asserts.assert_equal(callable(f, a, []), ConformanceDecision.NOT_APPLICABLE)
+                    asserts.assert_equal(xml_callable(f, a, []), ConformanceDecision.NOT_APPLICABLE)
 
+    @async_test_body
+    async def test_conformance_and_term_with_not(self):
         # and term with not
-        xml = '<optionalConform>\n'
-        xml = xml + '<andTerm>\n'
-        xml = xml + '<notTerm>'
-        xml = xml + '<feature name="AB" />\n'
-        xml = xml + '</notTerm>'
-        xml = xml + '<feature name="CD" />\n'
-        xml = xml + '</andTerm>\n'
-        xml = xml + '</optionalConform>'
+        xml = ('<optionalConform>'
+               '<andTerm>'
+               '<notTerm>'
+               '<feature name="AB" />'
+               '</notTerm>'
+               '<feature name="CD" />'
+               '</andTerm>'
+               '</optionalConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, f in enumerate(feature_maps):
-            if not has_ab[i] and has_cd[i]:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.OPTIONAL)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, f in enumerate(self.feature_maps):
+            if not self.has_ab[i] and self.has_cd[i]:
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.OPTIONAL)
             else:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
 
+    @async_test_body
+    async def test_conformance_or_term_with_not(self):
         # or term with not on second feature
-        xml = '<mandatoryConform>\n'
-        xml = xml + '<orTerm>\n'
-        xml = xml + '<feature name="AB" />\n'
-        xml = xml + '<notTerm>'
-        xml = xml + '<feature name="CD" />\n'
-        xml = xml + '</notTerm>'
-        xml = xml + '</orTerm>\n'
-        xml = xml + '</mandatoryConform>'
+        xml = ('<mandatoryConform>'
+               '<orTerm>'
+               '<feature name="AB" />'
+               '<notTerm>'
+               '<feature name="CD" />'
+               '</notTerm>'
+               '</orTerm>'
+               '</mandatoryConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, f in enumerate(feature_maps):
-            if has_ab[i] or not has_cd[i]:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.MANDATORY)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, f in enumerate(self.feature_maps):
+            if self.has_ab[i] or not self.has_cd[i]:
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.MANDATORY)
             else:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
 
         # not around or term with
-        xml = '<optionalConform>\n'
-        xml = xml + '<notTerm>'
-        xml = xml + '<orTerm>\n'
-        xml = xml + '<feature name="AB" />\n'
-        xml = xml + '<feature name="CD" />\n'
-        xml = xml + '</orTerm>\n'
-        xml = xml + '</notTerm>'
-        xml = xml + '</optionalConform>'
+        xml = ('<optionalConform>'
+               '<notTerm>'
+               '<orTerm>'
+               '<feature name="AB" />'
+               '<feature name="CD" />'
+               '</orTerm>'
+               '</notTerm>'
+               '</optionalConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, f in enumerate(feature_maps):
-            if not (has_ab[i] or has_cd[i]):
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.OPTIONAL)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, f in enumerate(self.feature_maps):
+            if not (self.has_ab[i] or self.has_cd[i]):
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.OPTIONAL)
             else:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
 
+    @async_test_body
+    async def test_conformance_and_term_with_three_terms(self):
         # and term with three features
-        xml = '<optionalConform>\n'
-        xml = xml + '<andTerm>\n'
-        xml = xml + '<feature name="AB" />\n'
-        xml = xml + '<feature name="CD" />\n'
-        xml = xml + '<feature name="EF" />\n'
-        xml = xml + '</andTerm>\n'
-        xml = xml + '</optionalConform>'
-        feature_names_to_bits['EF'] = 0x04
+        xml = ('<optionalConform>'
+               '<andTerm>'
+               '<feature name="AB" />'
+               '<feature name="CD" />'
+               '<feature name="EF" />'
+               '</andTerm>'
+               '</optionalConform>')
+        self.feature_names_to_bits['EF'] = 0x04
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
+        xml_callable = parse_callable_from_xml(et, self.params)
         # no features
-        asserts.assert_equal(callable(0x00, [], []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(xml_callable(0x00, [], []), ConformanceDecision.NOT_APPLICABLE)
         # one feature
-        asserts.assert_equal(callable(0x01, [], []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(xml_callable(0x01, [], []), ConformanceDecision.NOT_APPLICABLE)
         # all features
-        asserts.assert_equal(callable(0x07, [], []), ConformanceDecision.OPTIONAL)
+        asserts.assert_equal(xml_callable(0x07, [], []), ConformanceDecision.OPTIONAL)
 
         # and term with one of each
-        xml = '<optionalConform>\n'
-        xml = xml + '<andTerm>\n'
-        xml = xml + '<feature name="AB" />\n'
-        xml = xml + '<attribute name="attr1" />\n'
-        xml = xml + '<command name="cmd1" />\n'
-        xml = xml + '</andTerm>\n'
-        xml = xml + '</optionalConform>'
+        xml = ('<optionalConform>'
+               '<andTerm>'
+               '<feature name="AB" />'
+               '<attribute name="attr1" />'
+               '<command name="cmd1" />'
+               '</andTerm>'
+               '</optionalConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, f in enumerate(feature_maps):
-            for j, a in enumerate(attribute_lists):
-                for k, c in enumerate(cmd_lists):
-                    if has_ab[i] and has_attr1[j] and has_cmd1[k]:
-                        asserts.assert_equal(callable(f, a, c), ConformanceDecision.OPTIONAL)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, f in enumerate(self.feature_maps):
+            for j, a in enumerate(self.attribute_lists):
+                for k, c in enumerate(self.cmd_lists):
+                    if self.has_ab[i] and self.has_attr1[j] and self.has_cmd1[k]:
+                        asserts.assert_equal(xml_callable(f, a, c), ConformanceDecision.OPTIONAL)
                     else:
-                        asserts.assert_equal(callable(f, a, c), ConformanceDecision.NOT_APPLICABLE)
+                        asserts.assert_equal(xml_callable(f, a, c), ConformanceDecision.NOT_APPLICABLE)
 
+    @async_test_body
+    async def test_conformance_or_term_with_three_terms(self):
         # or term with three features
-        xml = '<optionalConform>\n'
-        xml = xml + '<orTerm>\n'
-        xml = xml + '<feature name="AB" />\n'
-        xml = xml + '<feature name="CD" />\n'
-        xml = xml + '<feature name="EF" />\n'
-        xml = xml + '</orTerm>\n'
-        xml = xml + '</optionalConform>'
+        xml = ('<optionalConform>'
+               '<orTerm>'
+               '<feature name="AB" />'
+               '<feature name="CD" />'
+               '<feature name="EF" />'
+               '</orTerm>'
+               '</optionalConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
+        xml_callable = parse_callable_from_xml(et, self.params)
         # no features
-        asserts.assert_equal(callable(0x00, [], []), ConformanceDecision.NOT_APPLICABLE)
+        asserts.assert_equal(xml_callable(0x00, [], []), ConformanceDecision.NOT_APPLICABLE)
         # one feature
-        asserts.assert_equal(callable(0x01, [], []), ConformanceDecision.OPTIONAL)
+        asserts.assert_equal(xml_callable(0x01, [], []), ConformanceDecision.OPTIONAL)
         # all features
-        asserts.assert_equal(callable(0x07, [], []), ConformanceDecision.OPTIONAL)
+        asserts.assert_equal(xml_callable(0x07, [], []), ConformanceDecision.OPTIONAL)
 
         # or term with one of each
-        xml = '<optionalConform>\n'
-        xml = xml + '<orTerm>\n'
-        xml = xml + '<feature name="AB" />\n'
-        xml = xml + '<attribute name="attr1" />\n'
-        xml = xml + '<command name="cmd1" />\n'
-        xml = xml + '</orTerm>\n'
-        xml = xml + '</optionalConform>'
+        xml = ('<optionalConform>'
+               '<orTerm>'
+               '<feature name="AB" />'
+               '<attribute name="attr1" />'
+               '<command name="cmd1" />'
+               '</orTerm>'
+               '</optionalConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, f in enumerate(feature_maps):
-            for j, a in enumerate(attribute_lists):
-                for k, c in enumerate(cmd_lists):
-                    if has_ab[i] or has_attr1[j] or has_cmd1[k]:
-                        asserts.assert_equal(callable(f, a, c), ConformanceDecision.OPTIONAL)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, f in enumerate(self.feature_maps):
+            for j, a in enumerate(self.attribute_lists):
+                for k, c in enumerate(self.cmd_lists):
+                    if self.has_ab[i] or self.has_attr1[j] or self.has_cmd1[k]:
+                        asserts.assert_equal(xml_callable(f, a, c), ConformanceDecision.OPTIONAL)
                     else:
-                        asserts.assert_equal(callable(f, a, c), ConformanceDecision.NOT_APPLICABLE)
+                        asserts.assert_equal(xml_callable(f, a, c), ConformanceDecision.NOT_APPLICABLE)
 
-    def test_otherwise_conformance_from_xml(self):
-        # a small feature map
-        feature_names_to_bits = {'AB': 0x01, 'CD': 0x02}
-
-        # none, AB, CD, AB&CD
-        feature_maps = [0x00, 0x01, 0x02, 0x03]
-        has_ab = [False, True, False, True]
-        has_cd = [False, False, True, True]
-
-        attribute_names_to_values = {'attr1': 0x00, 'attr2': 0x01}
-
-        command_names_to_values = {'cmd1': 0x00, 'cmd2': 0x01}
-
-        params = ConformanceParseParameters(
-            feature_map=feature_names_to_bits, attribute_map=attribute_names_to_values, command_map=command_names_to_values)
-
+    def test_conformance_otherwise(self):
         # AB, O
-        xml = '<otherwiseConform>\n'
-        xml = xml + '<mandatoryConform>\n'
-        xml = xml + '<feature name="AB" />\n'
-        xml = xml + '</mandatoryConform>\n'
-        xml = xml + '<optionalConform />\n'
-        xml = xml + '</otherwiseConform>\n'
+        xml = ('<otherwiseConform>'
+               '<mandatoryConform>'
+               '<feature name="AB" />'
+               '</mandatoryConform>'
+               '<optionalConform />'
+               '</otherwiseConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, f in enumerate(feature_maps):
-            if has_ab[i]:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.MANDATORY)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, f in enumerate(self.feature_maps):
+            if self.has_ab[i]:
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.MANDATORY)
             else:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.OPTIONAL)
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.OPTIONAL)
 
         # AB, [CD]
-        xml = '<otherwiseConform>\n'
-        xml = xml + '<mandatoryConform>\n'
-        xml = xml + '<feature name="AB" />\n'
-        xml = xml + '</mandatoryConform>\n'
-        xml = xml + '<optionalConform>\n'
-        xml = xml + '<feature name="CD" />\n'
-        xml = xml + '</optionalConform>\n'
-        xml = xml + '</otherwiseConform>\n'
+        xml = ('<otherwiseConform>'
+               '<mandatoryConform>'
+               '<feature name="AB" />'
+               '</mandatoryConform>'
+               '<optionalConform>'
+               '<feature name="CD" />'
+               '</optionalConform>'
+               '</otherwiseConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, f in enumerate(feature_maps):
-            if has_ab[i]:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.MANDATORY)
-            elif has_cd[i]:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.OPTIONAL)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, f in enumerate(self.feature_maps):
+            if self.has_ab[i]:
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.MANDATORY)
+            elif self.has_cd[i]:
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.OPTIONAL)
             else:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
 
         # AB & !CD, P
-        xml = '<otherwiseConform>\n'
-        xml = xml + '<mandatoryConform>\n'
-        xml = xml + '<andTerm>\n'
-        xml = xml + '<feature name="AB" />\n'
-        xml = xml + '<notTerm>\n'
-        xml = xml + '<feature name="CD" />\n'
-        xml = xml + '</notTerm>\n'
-        xml = xml + '</andTerm>\n'
-        xml = xml + '</mandatoryConform>\n'
-        xml = xml + '<provisionalConform />\n'
-        xml = xml + '</otherwiseConform>\n'
+        xml = ('<otherwiseConform>'
+               '<mandatoryConform>'
+               '<andTerm>'
+               '<feature name="AB" />'
+               '<notTerm>'
+               '<feature name="CD" />'
+               '</notTerm>'
+               '</andTerm>'
+               '</mandatoryConform>'
+               '<provisionalConform />'
+               '</otherwiseConform>')
         et = ElementTree.fromstring(xml)
-        callable = parse_callable_from_xml(et, params)
-        for i, f in enumerate(feature_maps):
-            if has_ab[i] and not has_cd[i]:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.MANDATORY)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for i, f in enumerate(self.feature_maps):
+            if self.has_ab[i] and not self.has_cd[i]:
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.MANDATORY)
             else:
-                asserts.assert_equal(callable(f, [], []), ConformanceDecision.DISALLOWED)
+                asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.PROVISIONAL)
 
 
 if __name__ == "__main__":
