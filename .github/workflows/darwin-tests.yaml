@@ -62,17 +62,6 @@ jobs:
                 platform: darwin
                 bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}
 
-            - name: Run macOS Darwin Framework Tool Build Debug
-              working-directory: src/darwin/Framework
-              # Keep whatever Xcode settings
-              # for OTHER_CFLAGS exist by using ${inherited}.
-              #
-              # Enable -Wconversion by hand as well, because it seems to not be
-              # enabled by default in the Xcode config.
-              #
-              # Disable availability annotations, since we are not building against a system
-              # Matter.framework.
-              run: xcodebuild -target "darwin-framework-tool" -sdk macosx -configuration Debug OTHER_CFLAGS='${inherited} -Wconversion' GCC_PREPROCESSOR_DEFINITIONS='${inherited} MTR_NO_AVAILABILITY=1'
             - name: Delete Defaults
               run: defaults delete com.apple.dt.xctest.tool
               continue-on-error: true
@@ -84,12 +73,6 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --target darwin-x64-darwin-framework-tool-${BUILD_VARIANT} \
-                        --target darwin-x64-all-clusters-${BUILD_VARIANT} \
-                        --target darwin-x64-lock-${BUILD_VARIANT} \
-                        --target darwin-x64-ota-provider-${BUILD_VARIANT} \
-                        --target darwin-x64-ota-requestor-${BUILD_VARIANT} \
-                        --target darwin-x64-tv-app-${BUILD_VARIANT} \
-                        --target darwin-x64-bridge-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
