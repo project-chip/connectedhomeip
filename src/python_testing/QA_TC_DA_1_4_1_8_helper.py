@@ -18,11 +18,12 @@
 #    This script is intended for QA use only and does not automatically
 #    verify the results of the commissioning process. Please use with caution.
 
-import click
 import json
 import os
 import signal
 import subprocess
+
+import click
 
 CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
 DEFAULT_APP = os.path.abspath(os.path.join(CHIP_ROOT, 'out',
