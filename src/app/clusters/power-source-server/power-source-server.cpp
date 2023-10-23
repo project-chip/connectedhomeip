@@ -21,9 +21,9 @@
 
 #include "power-source-server.h"
 
-#include <app/util/af.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -76,7 +76,7 @@ static constexpr uint16_t kNumStaticEndpoints = EMBER_AF_POWER_SOURCE_CLUSTER_SE
 #define POWER_SERVER_NUM_SUPPORTED_ENDPOINTS                                                                                       \
     (EMBER_AF_POWER_SOURCE_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
 #else
-static constexpr uint16_t kNumStaticEndpoints = 0;
+static constexpr uint16_t kNumStaticEndpoints    = 0;
 #define POWER_SERVER_NUM_SUPPORTED_ENDPOINTS CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
 #endif
 static constexpr size_t kNumSupportedEndpoints = POWER_SERVER_NUM_SUPPORTED_ENDPOINTS;

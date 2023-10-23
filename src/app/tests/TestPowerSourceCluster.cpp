@@ -17,9 +17,9 @@
  */
 
 #include "lib/support/CHIPMem.h"
-#include <app/util/af.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/power-source-server/power-source-server.h>
+#include <app/util/af.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/TLV.h>
 #include <lib/core/TLVDebug.h>
@@ -38,10 +38,13 @@
 namespace {
 chip::EndpointId numEndpoints = 0;
 }
-extern uint16_t emberAfGetClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId cluster, uint16_t fixedClusterServerEndpointCount) {
+extern uint16_t emberAfGetClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                     uint16_t fixedClusterServerEndpointCount)
+{
     // Very simple mapping here, we're just going to return the endpoint that matches the given endpoint index because the test
     // uses the endpoints in order.
-    if (endpoint >= numEndpoints) {
+    if (endpoint >= numEndpoints)
+    {
         return kEmberInvalidEndpointIndex;
     }
     return endpoint;
