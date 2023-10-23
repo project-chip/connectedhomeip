@@ -115,6 +115,12 @@ try:
     # Build the chip package...
     #
     packages = manifest['packages']
+    package_data = {}
+    for package in manifest['typed_packages']:
+        package_data[package] = [ "py.typed" ]
+
+    if libName:
+        package_data[packages[0]]: [ libName ]
 
     print("packageName: {}".format(packageName))
     print("libName: {}".format(libName))
@@ -140,11 +146,7 @@ try:
             # By default, look in the tmp directory for packages/modules to be included.
             '': tmpDir,
         },
-        package_data={
-            packages[0]: [
-                libName
-            ]
-        } if libName else {},
+        package_data=package_data,
         scripts=[name for name in map(
             lambda script: os.path.join(tmpDir, script.installName),
             installScripts
