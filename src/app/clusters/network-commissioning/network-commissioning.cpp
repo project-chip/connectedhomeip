@@ -474,7 +474,7 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
     }
 }
 
-void Instance::HandleNonConcurrentConnectNetwork(void)
+void Instance::HandleNonConcurrentConnectNetwork()
 {
     ChipLogProgress(NetworkProvisioning, "HandleNonConcurrentConnectNetwork()");    
     mpWirelessDriver->ConnectNetwork(nonConcurrentNetworkID, this);
