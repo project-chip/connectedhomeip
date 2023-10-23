@@ -28,8 +28,8 @@ class TC_OPCREDS_3_1(MatterBaseTest):
     @async_test_body
     async def test_TC_OPCREDS_3_1(self):
 
-
         # TODO: Factory reset
-        
+
+
 if __name__ == "__main__":
     default_matter_test_main()
