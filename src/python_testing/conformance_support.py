@@ -15,11 +15,12 @@
 #    limitations under the License.
 #
 
-from enum import Enum, auto
-from chip.tlv import uint
-from dataclasses import dataclass
-from typing import Callable
 import xml.etree.ElementTree as ElementTree
+from dataclasses import dataclass
+from enum import Enum, auto
+from typing import Callable
+
+from chip.tlv import uint
 
 OTHERWISE_CONFORM = 'otherwiseConform'
 OPTIONAL_CONFORM = 'optionalConform'

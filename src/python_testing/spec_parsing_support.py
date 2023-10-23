@@ -15,15 +15,19 @@
 #    limitations under the License.
 #
 
-from copy import deepcopy
-from enum import Enum, auto
-from chip.tlv import uint
-from typing import Callable
-import xml.etree.ElementTree as ElementTree
 import os
+import xml.etree.ElementTree as ElementTree
+from copy import deepcopy
 from dataclasses import dataclass
-from conformance_support import parse_callable_from_xml, ConformanceDecision, ConformanceException, ConformanceParseParameters, OTHERWISE_CONFORM, MANDATORY_CONFORM, OPTIONAL_CONFORM, DISALLOW_CONFORM, DEPRECATE_CONFORM, PROVISIONAL_CONFORM, or_operation
-from matter_testing_support import ProblemNotice, ProblemSeverity, CommandPathLocation, AttributePathLocation, EventPathLocation, FeaturePathLocation, ClusterPathLocation
+from enum import Enum, auto
+from typing import Callable
+
+from chip.tlv import uint
+from conformance_support import (DEPRECATE_CONFORM, DISALLOW_CONFORM, MANDATORY_CONFORM, OPTIONAL_CONFORM, OTHERWISE_CONFORM,
+                                 PROVISIONAL_CONFORM, ConformanceDecision, ConformanceParseParameters, or_operation,
+                                 parse_callable_from_xml)
+from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, EventPathLocation,
+                                    FeaturePathLocation, ProblemNotice, ProblemSeverity)
 
 
 @dataclass
@@ -139,7 +143,7 @@ class ClusterParser:
             elements = container.iter(type_name)
             for element in elements:
                 try:
-                    key = element.attrib[key_name]
+                    element.attrib[key_name]
                 except KeyError:
                     # This is a conformance tag, which uses the same name
                     continue

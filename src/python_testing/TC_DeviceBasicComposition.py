@@ -30,12 +30,12 @@ from typing import Any, Callable, Optional
 import chip.clusters as Clusters
 import chip.clusters.ClusterObjects
 import chip.tlv
-from chip.tlv import uint
 from chip.clusters.Attribute import ValueDecodeFailure
 from conformance_support import ConformanceDecision, conformance_allowed
-from matter_testing_support import AttributePathLocation, CommandPathLocation, ClusterPathLocation, MatterBaseTest, async_test_body, default_matter_test_main
-from spec_parsing_support import build_xml_clusters, XmlCluster, CommandType
+from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest,
+                                    async_test_body, default_matter_test_main)
 from mobly import asserts
+from spec_parsing_support import CommandType, build_xml_clusters
 
 
 def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:

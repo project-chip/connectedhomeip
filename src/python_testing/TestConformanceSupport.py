@@ -15,11 +15,10 @@
 #    limitations under the License.
 #
 
-from chip.tlv import uint
-from typing import Callable
-from matter_testing_support import MatterBaseTest, default_matter_test_main, async_test_body
-from conformance_support import parse_callable_from_xml, ConformanceDecision, ConformanceException, ConformanceParseParameters
 import xml.etree.ElementTree as ElementTree
+
+from conformance_support import ConformanceDecision, ConformanceParseParameters, parse_callable_from_xml
+from matter_testing_support import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -500,14 +499,8 @@ class TestConformanceSupport(MatterBaseTest):
         has_cd = [False, False, True, True]
 
         attribute_names_to_values = {'attr1': 0x00, 'attr2': 0x01}
-        attribute_lists = [[], [0x00], [0x01], [0x01, 0x02]]
-        has_attr1 = [False, True, False, True]
-        has_attr2 = [False, False, True, True]
 
         command_names_to_values = {'cmd1': 0x00, 'cmd2': 0x01}
-        cmd_lists = [[], [0x00], [0x01], [0x00, 0x01]]
-        has_cmd1 = [False, True, False, True]
-        has_cmd2 = [False, False, True, True]
 
         params = ConformanceParseParameters(
             feature_map=feature_names_to_bits, attribute_map=attribute_names_to_values, command_map=command_names_to_values)
