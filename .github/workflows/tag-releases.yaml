@@ -15,8 +15,6 @@ name: "Tag Releases"
 
 on:
   workflow_dispatch:
-#   schedule:
-#     - cron: '0 5 * * *'
 
 jobs:
     tag_main_release:
@@ -35,6 +33,6 @@ jobs:
                 && sudo apt install gh -y
                 
           - name: Tag Release & Generate Notes
-            run: ./scripts/tagging/tag_new_release.sh --generate-notes -d
+            run: ./scripts/tagging/tag_new_release.sh --generate-notes -d # Note this is a draft for now.
 
       
