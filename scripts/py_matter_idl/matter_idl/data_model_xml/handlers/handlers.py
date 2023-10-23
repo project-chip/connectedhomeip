@@ -13,9 +13,10 @@
 # limitations under the License.
 
 import logging
+from typing import Optional
 
-from matter_idl.matter_idl_types import (Attribute, AttributeQuality, Bitmap, Cluster, ClusterSide, CommandQuality, ConstantEntry,
-                                         DataType, Enum, Field, FieldQuality, Idl, Struct, StructTag)
+from matter_idl.matter_idl_types import (Attribute, AttributeQuality, Bitmap, Cluster, ClusterSide, Command, CommandQuality,
+                                         ConstantEntry, DataType, Enum, Field, FieldQuality, Idl, Struct, StructTag)
 
 from .base import BaseHandler, HandledDepth
 from .context import Context
@@ -350,6 +351,7 @@ class CommandHandler(BaseHandler):
     def __init__(self, context: Context, cluster: Cluster, attrs):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._cluster = cluster
+        self._command: Optional[Command] = None
 
         # Command information layout:
         #   "response":
@@ -388,7 +390,6 @@ class CommandHandler(BaseHandler):
                                   tag=StructTag.REQUEST,
                                   )
         else:
-            self._command = None
             self._struct = Struct(
                 name=NormalizeName(attrs["name"]),
                 fields=[],
@@ -422,11 +423,12 @@ class CommandHandler(BaseHandler):
                     LOGGER.warn(
                         f"Ignoring invoke privilege for {self._struct.name}")
 
-            if "timed" in attrs and attrs["timed"] != "false":
-                self._command.qualities |= CommandQuality.TIMED_INVOKE
+            if self._command:
+                if "timed" in attrs and attrs["timed"] != "false":
+                    self._command.qualities |= CommandQuality.TIMED_INVOKE
 
-            if "fabricScoped" in attrs and attrs["fabricScoped"] != "false":
-                self._command.qualities |= CommandQuality.FABRIC_SCOPED
+                if "fabricScoped" in attrs and attrs["fabricScoped"] != "false":
+                    self._command.qualities |= CommandQuality.FABRIC_SCOPED
 
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name == "field":

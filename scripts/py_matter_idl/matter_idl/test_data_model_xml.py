@@ -27,8 +27,8 @@ except ImportError:
         os.path.join(os.path.dirname(__file__), '..')))
     from matter_idl.data_model_xml import ParseSource, ParseXmls
 
+from matter_idl.matter_idl_parser import CreateParser
 from matter_idl.matter_idl_types import Idl
-from matter_idl_parser import CreateParser
 
 
 def XmlToIdl(what: Union[str, List[str]]) -> Idl:
