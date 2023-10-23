@@ -103,6 +103,8 @@ public:
      */
     CHIP_ERROR Init(CHIPDeviceManagerCallbacks * cb);
 
+    void Shutdown();
+
     /**
      * @brief
      *   Fetch a pointer to the registered CHIPDeviceManagerCallbacks object.

@@ -125,37 +125,31 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-
-
     public void readSomeIntegerAttribute(
         IntegerAttributeCallback callback) {
         readSomeIntegerAttribute(chipClusterPtr, callback);
     }
+
     public void writeSomeIntegerAttribute(DefaultClusterCallback callback, Integer value) {
         writeSomeIntegerAttribute(chipClusterPtr, callback, value, null);
     }
 
-
     public void writeSomeIntegerAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
         writeSomeIntegerAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
-
-
 
     public void subscribeSomeIntegerAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
         subscribeSomeIntegerAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-
-    private native void readSomeIntegerAttribute(long chipClusterPtr
-    , IntegerAttributeCallback callback);
+    private native void readSomeIntegerAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void writeSomeIntegerAttribute(long chipClusterPtr, DefaultClusterCallback callback, Integer value, @Nullable Integer timedWriteTimeoutMs);
 
-    private native void subscribeSomeIntegerAttribute(long chipClusterPtr
-    , IntegerAttributeCallback callback, int minInterval, int maxInterval);
+    private native void subscribeSomeIntegerAttribute(long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
+
   public static class SecondCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 2L;
 
@@ -165,7 +159,6 @@ public class ChipClusters {
 
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
-
 
     public interface FabricsAttributeCallback {
       void onSuccess(List<ChipStructs.SecondClusterFabricDescriptorStruct> value);
@@ -177,11 +170,11 @@ public class ChipClusters {
         FabricsAttributeCallback callback) {
         readFabricsAttribute(chipClusterPtr, callback, true);
     }
+
     public void readFabricsAttributeWithFabricFilter(
         FabricsAttributeCallback callback, boolean isFabricFiltered) {
         readFabricsAttribute(chipClusterPtr, callback, isFabricFiltered);
     }
-
 
 
     public void subscribeFabricsAttribute(
@@ -199,18 +192,15 @@ public class ChipClusters {
         subscribeSomeBytesAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    private native void readFabricsAttribute(long chipClusterPtr, FabricsAttributeCallback callback, boolean isFabricFiltered);
 
-    private native void readFabricsAttribute(long chipClusterPtr
-    , FabricsAttributeCallback callback, boolean isFabricFiltered);
+    private native void subscribeFabricsAttribute(long chipClusterPtr, FabricsAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void subscribeFabricsAttribute(long chipClusterPtr
-    , FabricsAttributeCallback callback, int minInterval, int maxInterval);
-    private native void readSomeBytesAttribute(long chipClusterPtr
-    , OctetStringAttributeCallback callback);
+    private native void readSomeBytesAttribute(long chipClusterPtr, OctetStringAttributeCallback callback);
 
-    private native void subscribeSomeBytesAttribute(long chipClusterPtr
-    , OctetStringAttributeCallback callback, int minInterval, int maxInterval);
+    private native void subscribeSomeBytesAttribute(long chipClusterPtr, OctetStringAttributeCallback callback, int minInterval, int maxInterval);
   }
+
   public static class ThirdCluster extends BaseChipCluster {
     public static final long CLUSTER_ID = 3L;
 
@@ -221,22 +211,18 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-
-
     public void readSomeEnumAttribute(
         IntegerAttributeCallback callback) {
         readSomeEnumAttribute(chipClusterPtr, callback);
     }
+
     public void writeSomeEnumAttribute(DefaultClusterCallback callback, Integer value) {
         writeSomeEnumAttribute(chipClusterPtr, callback, value, null);
     }
 
-
     public void writeSomeEnumAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
         writeSomeEnumAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
-
-
 
     public void subscribeSomeEnumAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
@@ -247,36 +233,30 @@ public class ChipClusters {
         IntegerAttributeCallback callback) {
         readOptionsAttribute(chipClusterPtr, callback);
     }
+
     public void writeOptionsAttribute(DefaultClusterCallback callback, Integer value) {
         writeOptionsAttribute(chipClusterPtr, callback, value, null);
     }
 
-
     public void writeOptionsAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
         writeOptionsAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
-
-
 
     public void subscribeOptionsAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
         subscribeOptionsAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-
-    private native void readSomeEnumAttribute(long chipClusterPtr
-    , IntegerAttributeCallback callback);
+    private native void readSomeEnumAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void writeSomeEnumAttribute(long chipClusterPtr, DefaultClusterCallback callback, Integer value, @Nullable Integer timedWriteTimeoutMs);
 
-    private native void subscribeSomeEnumAttribute(long chipClusterPtr
-    , IntegerAttributeCallback callback, int minInterval, int maxInterval);
-    private native void readOptionsAttribute(long chipClusterPtr
-    , IntegerAttributeCallback callback);
+    private native void subscribeSomeEnumAttribute(long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readOptionsAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void writeOptionsAttribute(long chipClusterPtr, DefaultClusterCallback callback, Integer value, @Nullable Integer timedWriteTimeoutMs);
 
-    private native void subscribeOptionsAttribute(long chipClusterPtr
-    , IntegerAttributeCallback callback, int minInterval, int maxInterval);
+    private native void subscribeOptionsAttribute(long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 }
