@@ -110,7 +110,6 @@ def build_darwin_framework(args):
             "CC={}".format(get_file_from_pigweed("clang")),
             "CXX={}".format(get_file_from_pigweed("clang++")),
             "COMPILER_INDEX_STORE_ENABLE=NO",
-            "CLANG_ENABLE_MODULES=NO",
         ]
 
         ldflags += [

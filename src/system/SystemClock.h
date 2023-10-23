@@ -41,6 +41,7 @@
 #endif
 
 #include <chrono>
+#include <ratio>
 #include <stdint.h>
 
 namespace chip {
