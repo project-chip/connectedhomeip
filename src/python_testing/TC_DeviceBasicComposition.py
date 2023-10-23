@@ -624,9 +624,14 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                     success = False
 
         self.print_step(
-            6, "Validate that none of the global attribute IDs contain values with prefixes outside of the allowed standard, MEI or Test Vendor prefix range")
-        # none of the lists should have any prefix > 0xFFF4
-        bad_prefix_min = 0xFFF5_0000
+            6, "Validate that none of the global attribute IDs contain values with prefixes outside of the allowed standard or MEI prefix range")
+        is_ci = self.check_pics('PICS_SDK_CI_ONLY')
+        if is_ci:
+            # test vendor prefixes are allowed in the CI because we use them internally in examples
+            bad_prefix_min = 0xFFF5_0000
+        else:
+            # test vendor prefixes are not allowed in products
+            bad_prefix_min = 0xFFF1_0000
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
                 attr_prefixes = [a & 0xFFFF_0000 for a in cluster[ATTRIBUTE_LIST_ID]]
