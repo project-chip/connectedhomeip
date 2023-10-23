@@ -166,7 +166,7 @@ CERT_STRUCT_TEST_CASES = [
         "is_success_case": 'false',
     },
     {
-        "description": "Certificate Key Usage extension diginalSignature field is wrong "
+        "description": "Certificate Key Usage extension digitalSignature field is wrong "
         "(not present for DAC and present for PAI, which is OK as optional)",
         "test_folder": 'ext_key_usage_dig_sig_wrong',
         "error_flag": 'ext-key-usage-dig-sig',
