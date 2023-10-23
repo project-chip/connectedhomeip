@@ -1960,7 +1960,7 @@ JNI_METHOD(void, shutdownCommissioning)
     StopIOThread();
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    wrapper->Controller()->Shutdown();
+    wrapper->Shutdown();
 }
 
 JNI_METHOD(jbyteArray, getAttestationChallenge)
