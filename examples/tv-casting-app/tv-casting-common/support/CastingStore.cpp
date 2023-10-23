@@ -333,7 +333,8 @@ CHIP_ERROR CastingStore::WriteAll(std::vector<core::CastingPlayer> castingPlayer
     ChipLogProgress(AppServer,
                     "CastingStore::WriteAll TLV(CastingStoreData).LengthWritten: %d bytes, CastingPlayers size: %lu "
                     "and version: %d",
-                    tlvWriter.GetLengthWritten(), castingPlayers.size(), kCurrentCastingStoreDataVersion);
+                    tlvWriter.GetLengthWritten(), static_cast<unsigned long>(castingPlayers.size()),
+                    kCurrentCastingStoreDataVersion);
     return chip::DeviceLayer::PersistedStorage::KeyValueStoreMgr().Put(kCastingStoreDataKey, castingStoreData,
                                                                        tlvWriter.GetLengthWritten());
 }
