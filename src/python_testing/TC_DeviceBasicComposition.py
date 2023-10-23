@@ -684,7 +684,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                         ), location=location, problem=f'Manufacturer command in the undefined suffix range {manufacturer_value} in cluster {cluster_id}', spec_location='Manufacturer Extensible Identifier (MEI)')
                         success = False
 
-        self.print_step(8, "Validate that all cluster ID prefixes are in the standard, MEI or test vendor range")
+        self.print_step(8, "Validate that all cluster ID prefixes are in the standard or MEI range")
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             cluster_prefixes = [a & 0xFFFF_0000 for a in endpoint.keys()]
             bad_clusters_ids = [a for a in cluster_prefixes if a >= bad_prefix_min]
