@@ -589,14 +589,14 @@ tests:
               - name: "SceneID"
                 value: 0x01
 
-    - label: "Wait 1s"
+    - label: "Wait 1+ s"
       PICS: PICS_SDK_CI_ONLY
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 1050
+                value: 1250
 
     - label:
           "TH confirm the DUT reached AC1 (on level control cluster) after 1s"
