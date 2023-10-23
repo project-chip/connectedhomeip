@@ -179,8 +179,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     if (params.GetDSTOffsets().HasValue())
     {
         ChipLogProgress(Controller, "Setting DST offsets from parameters");
-        size_t size = params.GetDSTOffsets().Value().size();
-        size        = size > kMaxSupportedDstStructs ? kMaxSupportedDstStructs : size;
+        size_t size = std::min(params.GetDSTOffsets().Value().size(), kMaxSupportedDstStructs);
         for (size_t i = 0; i < size; ++i)
         {
             mDstOffsetsBuf[i] = params.GetDSTOffsets().Value()[i];
@@ -191,8 +190,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     if (params.GetTimeZone().HasValue())
     {
         ChipLogProgress(Controller, "Setting Time Zone from parameters");
-        size_t size = params.GetTimeZone().Value().size();
-        size        = size > kMaxSupportedTimeZones ? kMaxSupportedTimeZones : size;
+        size_t size = std::min(params.GetTimeZone().Value().size(), kMaxSupportedTimeZones);
         for (size_t i = 0; i < size; ++i)
         {
             mTimeZoneBuf[i] = params.GetTimeZone().Value()[i];
