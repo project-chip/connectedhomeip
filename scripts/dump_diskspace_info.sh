@@ -23,7 +23,7 @@
 echo "Disk Space Usage:"
 df -h
 
-listOfDirectories=("third_party/" ".environment/" "out/")
+listOfDirectories=("third_party/" ".environment/" "out/" "$HOME/.cipd-cache-dir/")
 
 pipCacheDir=$(python -m pip cache dir)
 exitcode=$?
