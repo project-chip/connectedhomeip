@@ -86,7 +86,8 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
          IsUnsafeSpan(params.GetAttestationElements(), mParams.GetAttestationElements()) ||
          IsUnsafeSpan(params.GetAttestationSignature(), mParams.GetAttestationSignature()) ||
          IsUnsafeSpan(params.GetPAI(), mParams.GetPAI()) || IsUnsafeSpan(params.GetDAC(), mParams.GetDAC()) ||
-         IsUnsafeSpan(params.GetTimeZone(), mParams.GetTimeZone()) || IsUnsafeSpan(params.GetDSTOffsets(), mParams.GetDSTOffsets()));
+         IsUnsafeSpan(params.GetTimeZone(), mParams.GetTimeZone()) ||
+         IsUnsafeSpan(params.GetDSTOffsets(), mParams.GetDSTOffsets()));
 
     mParams = params;
 
@@ -175,27 +176,31 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     }
     mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
 
-    if (params.GetDSTOffsets().HasValue()) {
+    if (params.GetDSTOffsets().HasValue())
+    {
         ChipLogProgress(Controller, "Setting DST offsets from parameters");
         size_t size = params.GetDSTOffsets().Value().size();
-        size = size > kMaxSupportedDstStructs ? kMaxSupportedDstStructs : size;
-        for (size_t i = 0; i < size; ++i) {
+        size        = size > kMaxSupportedDstStructs ? kMaxSupportedDstStructs : size;
+        for (size_t i = 0; i < size; ++i)
+        {
             mDstOffsetsBuf[i] = params.GetDSTOffsets().Value()[i];
         }
         auto list = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>(mDstOffsetsBuf, size);
         mParams.SetDSTOffsets(list);
     }
-    if (params.GetTimeZone().HasValue()) {
+    if (params.GetTimeZone().HasValue())
+    {
         ChipLogProgress(Controller, "Setting Time Zone from parameters");
         size_t size = params.GetTimeZone().Value().size();
-        size = size > kMaxSupportedTimeZones ? kMaxSupportedTimeZones : size;
-        for (size_t i = 0; i < size; ++i) {
+        size        = size > kMaxSupportedTimeZones ? kMaxSupportedTimeZones : size;
+        for (size_t i = 0; i < size; ++i)
+        {
             mTimeZoneBuf[i] = params.GetTimeZone().Value()[i];
-            if (mTimeZoneBuf[i].name.HasValue()) {
+            if (mTimeZoneBuf[i].name.HasValue())
+            {
                 auto span = MutableCharSpan(mTimeZoneNames[i], kMaxTimeZoneNameLen);
                 CopyCharSpanToMutableCharSpan(mTimeZoneBuf[i].name.Value(), span);
                 mTimeZoneBuf[i].name.SetValue(span);
-
             }
         }
     }
