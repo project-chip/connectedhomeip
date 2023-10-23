@@ -27,7 +27,8 @@ else
     SDK_RELEASE_REVISIONS="$(echo "$CURRENT_RELEASE" | cut -d'.' -f4)"
 fi
 
-if [ "$SDK_RELEASE_REVISIONS" != 0 ]; then
+if [ ! -z "$CURRENT_RELEASE" ]; then
+    CURRENT_RELEASE="v$CURRENT_SPEC_VERSION.$SDK_RELEASE_REVISIONS"
     SDK_RELEASE_REVISIONS=$(($SDK_RELEASE_REVISIONS + 1))
 fi
 
@@ -37,4 +38,4 @@ echo "Current release: $CURRENT_RELEASE"
 echo "SDK release revisions: $SDK_RELEASE_REVISIONS"
 echo "New release: $NEW_RELEASE_TAG"
 
-gh release create "$NEW_RELEASE_TAG" "$@"
+gh release create --notes-start-tag "$CURRENT_RELEASE" "$NEW_RELEASE_TAG" "$@"
