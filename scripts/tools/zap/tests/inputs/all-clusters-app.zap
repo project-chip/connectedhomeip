@@ -5473,6 +5473,7 @@
           "define": "FAULT_INJECTION_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "apiMaturity": "internal",
           "commands": [
             {
               "name": "FailAtFault",
@@ -5978,6 +5979,7 @@
           "define": "SCENES_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "AddScene",
@@ -10119,6 +10121,7 @@
           "define": "FAN_CONTROL_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "attributes": [
             {
               "name": "FanMode",
@@ -13261,6 +13264,7 @@
           "define": "UNIT_TESTING_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "apiMaturity": "internal",
           "commands": [
             {
               "name": "Test",
@@ -15222,6 +15226,7 @@
           "define": "SCENES_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "AddScene",
