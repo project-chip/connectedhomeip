@@ -467,7 +467,7 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
     }
 }
 
-void Instance::HandleNonConcurrentConnectNetwork(void)
+void Instance::HandleNonConcurrentConnectNetwork()
 {
     ByteSpan nonConcurrentNetworkID = ByteSpan(mConnectingNetworkID, mConnectingNetworkIDLen);
     ChipLogProgress(NetworkProvisioning, "HandleNonConcurrentConnectNetwork() SSID=%s", mConnectingNetworkID);
