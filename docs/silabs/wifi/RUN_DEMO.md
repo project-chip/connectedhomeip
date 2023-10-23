@@ -1,19 +1,84 @@
-# Running the Matter Demo over Wi-Fi on an EFR32 device
+# Getting Started with EFR32 Host in NCP Mode
+This page describes how to get started with developing an application on EFR32 host in Network Co-Processor (NCP) mode, where the application runs on the EFR32 host and the connectivity stack runs on the Wi-Fi chipset.
 
-## Flashing Images/Binaries on EFR32MG24 Platform using Ozone, Simplicity Studio, or Simplicity Commander
+## Hardware Requirements
+The following hardware devices are required for executing Matter over Wi-Fi for NCP Mode:
+ - Refer, [Hardware Requirements](../general/HARDWARE_REQUIREMENTS.md#matter-over-wi-fi-accessory-device-requirements-for-ncp-mode)
+ - Additional hardwares required for NCP Boards:
+    - Windows/Linux/MacOS computer with a USB port
+    - USB cable for connecting WSTK Board to Computer
+    - Raspberry Pi with a >32 GB SD Card
+    - Access Point with Internet Access
+    - Interconnect board (included in the Wi-Fi kits)
+    - SPI Cable (included in the RS9116 kit)
+    - Jumper Cables (included in the RS9116 kit)
 
-> Note: If you are coming from Simplicity Studio, you may have already installed
-> the demo image using Simplicity Studio, in which case you can skip to the
-> next step.
+## Software Requirements
+Below are the software tools, packages and images required for executing Matter over Wi-Fi for NCP Mode:
+
+### Software Tools Requirements
+ - Simplicity Commander for flashing bootloader and binary on EFR32 Boards
+ - Tera Term for flashing firmware on EFR32 NCP Boards.
+ - Putty for controlling EFR32 hardware using chip-tool controller
+ - Ozone Debugger for logging and debugging (Optional)
+ - JLink RTT for logging only (Optional)
+To install above software tools , refer [Software Installation](../general/SOFTWARE_REQUIREMENTS.md)
+
+## Connect the Boards to a Computer
+1. Mount the EFx32 radio board on the EFx32 WSTK board.
+        
+   ![Silicon Labs - design](./images/mount-efr32.png)
+
+2. Connect the NCP expansion board to the EXP header on the EFx32 WSTK board.
+        
+   ![Silicon Labs - design](./images/mount-expansion.png)
+
+3. Toggle the upper switch on the NCP expansion board to EXP-UART.
+
+## Updating NCP Boards Connectivity Firmware
+- We recommend to upgrade the NCP combos connectivity firmware to the latest available version when
+  - first received a EFx32 evaluation kit (EVK)
+  - first received a radio board,
+- Download the recommended version of firmware before you start with the update process from the [Matter Artifacts page](../general/ARTIFACTS.md)
+
+### Steps to update the firmware on NCP boards using Tera Term
+- SiWx917 NCP or RS9116 EVK connectivity firmware can be upgraded using tera-term or kermit.
+1. Make sure that the switches on the expansion board are towards UART side.
+
+   ![Switch Position before firmware flash](./images/si917-board.png)
+
+2. Refer [Updating the Firmware](https://docs.silabs.com/rs9116/wiseconnect/2.0/update-evk-firmware) 
+
+**Note**:Instructions are the same for both SiWx917 NCP and RS9116 EVK.
+
+3. Once firmware flashing is done make sure to make switches back to Expansion mode, while using it with the host platform.
+
+   ![Switch Position after firmware flash](./images/mg21-si917-board.jpg)
+
+### Troubleshoot NCP Firmware Update Failure
+If the firmware update fails, try the following:
+  - Toggle the power switch towards AEM (Advanced Energy Monitoring) on the WSTK board.
+  - Perform the following steps and try the firmware update again
+     - Toggle the ISP switch towards ISP on the radio board.
+     - Press the RESET button on the WSTK board.
+     - Toggle the ISP switch away from ISP on the radio board.
+     - In the Flash section in step 5 above, click Erase chip.
+     - The flash will be erased.
+     - Retry the firmware upgrade.
+
+## Building Matter Application on EFR32 device
+- To build Matter Application on EFR32 device, refer [Building Procedure](./SW_SETUP.md)
+
+## Flashing Images/Binaries on EFR32 Platform using Ozone, or Simplicity Commander
 
 1.  Plug the WSTK and EFR into the laptop.
 
 2.  Based on the Application being built, make sure to flash proper [bootloader](../general/ARTIFACTS.md) internal or external binaries. 
 
-3.  Launch Ozone, Simplicity Studio or Simplicity Commander Standalone - this
+3.  Launch Ozone, or Simplicity Commander Standalone - this
     will display a GUI. 
     
-    If you are using Simplicity Studio or Simplicity Commander, you can follow the general instructions for flashing a Silicon Labs device.
+    If you are using Simplicity Commander, you can follow the general instructions for flashing a Silicon Labs device.
     [Flash a Silicon Labs Device](../general/FLASH_SILABS_DEVICE.md). If you are using Ozone, you can follow the instructions below.
 
 ## Directions for Flashing using Ozone
@@ -71,7 +136,7 @@
     > following commands will provide you with a serial console of the EFR32
 
     ```shell
-    $ konsole -e JLinkExe -device EFR32MG24Bxxx1536 -if JTAG -speed 4000 -autoconnect 1 &
+    $ console -e JLinkExe -device EFR32MG24Bxxx1536 -if JTAG -speed 4000 -autoconnect 1 &
     ```
 
     > (Put it in the background)
@@ -81,10 +146,25 @@
     ```
 
     ```shell
-    $ konsole -e JLinkRTTClient &
+    $ console -e JLinkRTTClient &
     ```
 
     > You may need to press <ENTER> in the JLinkExe console first
+
+## Enabling JLink RTT Logs for EFR32 Boards
+1. Open JLink RTT Viewer and click on three dots beside **Specify Target Device**
+
+   ![Silicon Labs - design](./images/jlink-rtt-ncp-selection.png)
+
+2. select Manufacturer as **Silicon Labs** and device section search `EFR32MG24BxxxF1536` or `EFR32MG12PxxxF1024` as per board connected to machine then click "ok" 
+
+   ![Silicon Labs - design](./images/jlink-rtt-ncp-board-selection.png)
+
+3. Select Target Interface as `JTAG` & Speed as `8000KHz`(Default) then click "ok"
+
+4. Now the JLink-RTT is connected and will print the device logs
+
+   ![Silicon Labs - design](./images/jlink-rtt-connected-logs.png)
 
 ## Demo Execution - Commissioning a Wi-Fi Device using chip-tool for Linux
 

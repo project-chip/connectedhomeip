@@ -17,7 +17,7 @@
 
     - [Flash tool for EFR32 and SiWx917 Devices](../general/FLASH_SILABS_DEVICE.md)
 
-        Simplicity Commander standalone or Simplicity Studio can be used to flash Silicon Labs hardware with firmware images for the RCP and the Matter Accessory Device.
+        Simplicity Commander standalone can be used to flash Silicon Labs hardware with firmware images for the RCP and the Matter Accessory Device.
 
     - [Additional Flash tools for SiWx917 SoC Device](../general/FLASH_SILABS_SiWx917_SOC_DEVICE.md)
 
@@ -26,7 +26,11 @@
         > **Note:** 
         > The SiWx917 SoC device is not yet officially added in Ozone, but it can be configured in Ozone by following the [SiWx917 Ozone Configuration Guide](../wifi/SiWx917_Enablement_For_Ozone.md).
 
-4. [Git Version Control ](https://git-scm.com/downloads)[only required for
+4. [Tera Term](https://osdn.net/projects/ttssh2/releases/)
+
+    Tera Term is the terminal emulator for Microsoft Windows that supports serial port, telnet and SSH connections.
+
+5. [Git Version Control ](https://git-scm.com/downloads)[only required for
    building images and development]
 
     Clone the Silicon Labs Matter repo, then enter and sync all the necessary
@@ -44,7 +48,7 @@
     $ ./scripts/checkout_submodules.py --shallow --recursive --platform efr32
     ```
 
-5. If you are using an EFR32MG2x device you will require a bootloader to run the
+6. If you are using an EFR32MG2x device you will require a bootloader to run the
    demo applications. When you flash your application image be sure to include a
    bootloader as well (if one is not already present). Bootloader images are provided on the [Matter Artifacts page](../general/ARTIFACTS.md).
 
@@ -74,23 +78,26 @@ users building their own images.
     $ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     ```
 
-2. Install pkg-config, openssl, git-lfs
+2. Install pkg-config, openssl, git-lfs, python3
 
     ```shell
-    $ brew install pkg-config openssl git-lfs
+    $ brew install pkg-config openssl git-lfs python3
     ```
 
-3. Install ARM GNU Toolchain (https://developer.arm.com/downloads/-/gnu-rm)
+3. Install ARM GNU Toolchain (https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads/12-2-rel1)
+
+    Use the x86_64-arm-none-eabi package for Intel-based Macs and arm64-arm-none-eabi for M1/M2-based Macs.
+
 4. Add ARM GCC toolchain to the search path within `bootstrap.sh` by adding this
    line of code:
 
     ```shell
-    $ export PATH="/Applications/ARM/bin:$PATH"
+    $ export PATH="/Applications/ArmGNUToolchain/12.2.rel1/arm-none-eabi/bin:$PATH"
     ```
     
     Depending on your Mac processor, you will have to complete the following additional steps.
 
-### Apple Silicon (M1) Software Requirements:
+### Apple Silicon (M1/M2) Software Requirements:
 
 Users may also have to specify which `pkg-config`/`openssl` to use by adding
 these lines of code to `bootstrap.sh`:
@@ -134,12 +141,11 @@ satisfied with the following:
 $ sudo apt-get install git gcc g++ pkg-config libssl-dev libdbus-1-dev libglib2.0-dev libavahi-client-dev ninja-build python3-venv python3-dev python3-pip unzip libgirepository1.0-dev libcairo2-dev libreadline-dev
 ```
 
-## Wi-Fi RS9116 Specific Requirements:
+## Wi-Fi Specific Requirements:
 
-Before you run the demo or development on the RS9116 please be sure that you
-update the RS9116 firmware.
+Before you run the demo or development on the Wi-Fi, please be sure that you update the NCP firmware to the latest version.
 
-Pre-Built RS9116 firmware is available in the github repository under `third_party/silabs/wiseconnect-wifi-bt-sdk/firmware`
+Pre-Built firmware images are available in the github repository under `third_party/silabs/wiseconnect-wifi-bt-sdk/firmware`
 
 1. [Setting up TeraTerm](https://docs.silabs.com/rs9116/wiseconnect/2.0/tera-term-setup)
 2. [Updating the RS9116 Firmware](https://docs.silabs.com/rs9116/wiseconnect/2.0/update-evk-firmware)
@@ -147,13 +153,11 @@ Pre-Built RS9116 firmware is available in the github repository under `third_par
 
 ## Wi-Fi SiWx917 Specific Requirements:
 
-Before you run the demo or development on the SiWx917 please be sure that you
-update the SiWx917 firmware.
+Before you run the demo or development on the SiWx917, please be sure that you update the SiWx917 firmware to the latest version.
 
-Pre-Built SiWx917 firmware is available under `third_party/silabs/wifi-sdk/connectivity_firmware`
+Pre-Built SiWx917 firmware images are available in the github repository under `third_party/silabs/wifi-sdk/connectivity_firmware`
 
 1. [Setting up TeraTerm](https://docs.silabs.com/SiWx917/wiseconnect/2.0/tera-term-setup)
-2. For updating the SiWx917 NCP Firmware, refer [Updating the RS9116 Firmware](https://docs.silabs.com/rs9116/wiseconnect/2.0/update-evk-firmware). Instructions are the same for both SiWx917 and RS9116.
-3. For updating the SiWx917 SoC Firmware, you have several options outlined here:
-   - [Updating the SiWx917 SoC Firmware using Simplicity Commander](../wifi/RUN_DEMO_SiWx917_SoC.md)
-   - [Updating the SiWx917 SoC Firmware using Tera Term (Legacy Mode)](../wifi/SiWx917_SoC_FWUpdate.md)
+2. For updating the SiWx917 NCP Firmware, refer [Updating the RS9116 Firmware](https://docs.silabs.com/rs9116/wiseconnect/2.0/update-evk-firmware). 
+Instructions are the same for both SiWx917 and RS9116.
+3. For updating the SiWx917 SoC Firmware, refer [Updating the SiWx917 SOC Firmware Using Simplicity Commander](../wifi/RUN_DEMO_SiWx917_SoC.md#steps-to-update-the-firmware-on-siwx917-soc-radio-board-using-simplicity-commander)

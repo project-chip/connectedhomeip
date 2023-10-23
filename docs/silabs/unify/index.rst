@@ -1,10 +1,8 @@
-Unify Matter Bridge
+Unify Matter Solutions
 =========================
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
-   readme_overview.md
-   readme_user.md
-   readme_building.md
-   readme_building_x86_64.md
+   ./matter-bridge/index
+   ./matter-protocol-controller/index

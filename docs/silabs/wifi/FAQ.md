@@ -117,9 +117,9 @@ Note:
 
     > You can find the currently using firmware version in the DUT log.
 
-2.  How to check whether you are using correct firmware vesrsion or not?
+2.  How to check whether you are using correct firmware version or not?
 
-    > Compare last 5 digits of fimware version mention in the above path with
+    > Compare last 5 digits of firmware version mention in the above path with
     > the currently using firmware version.
 
 ### 5 . Apple Homepod associated failures

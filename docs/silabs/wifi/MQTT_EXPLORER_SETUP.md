@@ -1,9 +1,7 @@
 # Set Up MQTT Explorer
-    Download and install the MQTT Explorer from https://mqtt-explorer.com/
-    Setting up MQTT Explorer for testing.
- 
- ![MQTT Explorer settings](./images/mqtt_explorer_1.png)
-## Connecting to MQTT Server
+- [Download](https://mqtt-explorer.com/) and install the MQTT Explorer.
+
+## Setting up MQTT Explorer
 ### Connecting to AWS 
    - Host : Your Host name (examples: a2m21kovu9tcsh-ats.iot.ap-southeast-1.amazonaws.com)
    - Port : 8883

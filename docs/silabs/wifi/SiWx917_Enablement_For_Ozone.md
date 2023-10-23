@@ -1,11 +1,11 @@
-# Ozone Environment Setup for a SiWx917 SoC Device
+# Ozone and JLink RTT Environment Setup for a SiWx917 SoC Device
 
-**Note:** 
-- Ozone debugging support is enabled for SiWx917 Dual flash boards only
+- Ozone debugging support is enabled for SiWx917 Dual flash boards only.
+- For Common Flash Boards Ozone debugging support is not enabled.
 - Auto detection of SiWx917 SoC device in Ozone is not enabled.
 - Follow the steps to manually configure the SiWx917 SoC with Latest Ozone Debugger.
 
-## Steps to Configure the SiWx917 SoC on the Ozone Debugger
+## Steps to Configure the SiWx917 SoC on the JLink-RTT Logging and Ozone Debugger
 
 1.  Update the **JlinkDevices.xml** and **ELF** files found in the [Matter Artifacts page](../general/ARTIFACTS.md).
 
@@ -17,7 +17,7 @@
 
 2.  Launch Ozone. The SiWx917 Dual Flash SoC device should be visible in the **Device** field's selection list.
 
-![Silicon Labs - SiWx917 SoC](./images/SiWx917_Target_Ozone.png)
+    ![Silicon Labs - SiWx917 SoC](./images/SiWx917_Target_Ozone.png)
 
 3.  In the **New Project Wizard**:
 
@@ -60,3 +60,17 @@
 1. The output of the SiWX917 SoC application will be displayed on the Ozone terminal or J-Link RTT Client.
 2. The RTT Client is provided with Ozone and does not have to be downloaded separately.
  
+## SiWx917 SOC Factory Reset
+### Factory Reset without Ozone
+
+1. Press the BTN0 on WSTK for about 6-7 seconds. The LED0 will flash 5 times and board will reboot.
+
+### Factory Reset with Ozone
+
+1. You will get "Target Connection Lost" pop-up on Ozone, click **YES**.
+   
+   ![Silicon Labs - SiWx917 SoC Ozone Target Connection Lost](./images/SiWx917_SoC_TargetConnectionLost.png)
+
+2. Select **Attach to Running Program** in the dropdown next to the **Power** button on the top-left hand corner of the page.
+   
+   ![Silicon Labs - SiWx917 SoC Ozone Target Connection Lost](./images/SiWx917SoC_AttachToRunningProgram.png)

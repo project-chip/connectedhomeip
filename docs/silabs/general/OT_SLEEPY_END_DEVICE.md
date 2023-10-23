@@ -41,35 +41,18 @@ The Thread router will send all buffered messages to the ICD when it polls the r
 
 ## Configuration
 
-Matter exposes some defines to configure the ICD mode intervals and the polling intervals of the openthread stack in both Idle and Active modes. 
+Matter exposes some defines to configure the polling intervals of the openthread stack in both Idle and Active modes. 
 
 | Parameter Name | Define | Description | Default Value | Maximum allowed Value |
 | - | - | - | - | - |
-| IdleModeInterval | CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL | Maximum interval in seconds the server can stay in idle mode. | 600 s | 64800 s |
-| ActiveModeInterval | CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL | Minimum interval in milliseconds the server typically will stay in active mode | 1000 ms | NA |
-| ActiveModeThreshold | CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD | Minimum amount of time in milliseconds the server typically will stay active after network activity when in active mode. | 500 ms | NA |
 | SlowPollInterval | CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL | Interval, in milliseconds, at which the thread radio will poll its network in idle mode. | 15000 ms | <= IdleModeInterval |
 | FastPollInterval | CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL | Interval, in milliseconds, at which the thread radio will poll its network in active mode. | 200 ms | < ActiveModeInterval |
+
+For Matter configuration, see the [Matter ICD](./MATTER_ICD.md) documentation.
 
 ### Usage
 
 The default values for these defines for the Silabs platform is split in two files:
-
-In `src/platform/silabs/CHIPPlatformConfig.h` you will find the ICD cluster related default defines;
-
-```c++
-#ifndef CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL
-#define CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL SL_IDLE_MODE_INTERVAL
-#endif // CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL
-
-#ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL
-#define CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL SL_ACTIVE_MODE_INTERVAL
-#endif // CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL
-
-#ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD
-#define CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD SL_ACTIVE_MODE_THRESHOLD
-#endif // CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD
-```
 
 and `src/platform/silabs/CHIPDevicePlatformConfig.h` is where the openthread polling intervals default are set.
 
@@ -89,11 +72,6 @@ The default values for the defines previously shown are located `third_party/sil
   # ICD Openthread Configuration flags
   sl_ot_idle_interval_ms = 15000  # 15s Idle Intervals
   sl_ot_active_interval_ms = 200  # 200ms Active Intervals
-
-  # ICD Matter Configuration flags
-  sl_idle_mode_interval_ms = 600000  # 10min Idle Mode Interval
-  sl_active_mode_interval_ms = 1000  # 1s Active Mode Interval
-  sl_active_mode_threshold_ms = 500  # 500ms Active Mode Threshold
 ```
 
 In some cases, as with the light-switch-app, these default values are overridden as in: `examples/light-switch-app/silabs/openthread.gni`
@@ -101,11 +79,6 @@ In some cases, as with the light-switch-app, these default values are overridden
   # Openthread Configuration flags
   sl_ot_idle_interval_ms = 30000  # 30s Idle Intervals
   sl_ot_active_interval_ms = 500  # 500ms Active Intervals
-
-  # ICD Matter Configuration flags
-  sl_idle_mode_interval_ms = 3600000  # 60min Idle Mode Interval
-  sl_active_mode_interval_ms = 60000  # 60s Active Mode Interval
-  sl_active_mode_threshold_ms = 1000  # 1s Active Mode Threshold
 ```
 
 There are two methods with which you can change these defaults values.
@@ -116,9 +89,6 @@ For the lighting-app, the file is `examples/lighting-app/silabs/include/CHIPProj
 ```c++
 #define CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL chip::System::Clock::Milliseconds32(<value_ms>)
 #define CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL chip::System::Clock::Milliseconds32(<value_ms>)
-#define CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL <value_ms>
-#define CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL  <value_ms>
-#define CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD <value_ms>
 ```
 
 The second method is by adding arguments to the build command. Here is an example building the EFR32MG24 BRD4186C with different values.

@@ -11,7 +11,7 @@ This content covers
 - Software and Hardware prerequisites for working with Silicon Labs Matter.
 - [Thread demo and development information](./thread/DEMO_OVERVIEW.md)
 - [Wi-Fi demo and development information](./wifi/DEMO_OVERVIEW.md)
-- [Getting started with Unify Matter Bridge](./unify/readme_user.md)
+- [Getting started with Unify Matter Bridge](./unify/matter-bridge/readme_user.md)
 - Information on using [VSCode and the provided container environment](./dev/vscode/SETUP.md)
 - A list of useful reference guides
 - Frequently asked questions about both Thread and Wi-Fi development 

@@ -125,22 +125,12 @@ A complete list of hardware supported is included on the [Hardware Requirements 
 
 Enable or disable the lighting application's features using the following flags.
 
-1.  `rs91x_wpa3_only` : Use this flag while building to enable wpa3 mode in rs91x wifi chip.
-
-    ```shell
-    $ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/rs911x_lighting BRD41xxx rs91x_wpa3_only=true --wifi rs9116 |& tee out/rs911x_lighting.log
-    ```
-
-> **Note:** 
-> 1. WPA/WPA2 is enabled by default for the rs911x
-> 2. Enabling WPA3 will disable WPA and WPA2 support
-
-2.  `segger_rtt_buffer_size_up` : Flag to get the complete logs without truncation.
+1.  `segger_rtt_buffer_size_up` : Flag to get the complete logs without truncation.
 
     ```shell
     $ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/rs911x_lighting BRD41xxx segger_rtt_buffer_size_up=2068 --wifi rs9116 |& tee out/rs911x_lighting.log
     ```
-3.  `show_qr_code=false` : Use this flag while building to disable QR code.
+2.  `show_qr_code=false` : Use this flag while building to disable QR code.
 
     ```shell
     $ ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/rs911x_lighting BRD41xxx show_qr_code=false --wifi rs9116 |& tee out/rs911x_lighting.log
@@ -149,7 +139,7 @@ Enable or disable the lighting application's features using the following flags.
 >    1. QR code is enabled by default for all except MG24
 >    2. QR code is disabled for MG24 because of lcd disable. It cannot be enabled using the flag.
 
-4. `chip_enable_wifi_ipv4` : Use this flag while building to enable IPV4 (disabled by default).
+3. `chip_enable_wifi_ipv4` : Use this flag while building to enable IPV4 (disabled by default).
 
     ```shell
     ./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/rs911x_lighting BRD41xxx chip_enable_wifi_ipv4=true --wifi rs9116 |& tee out/rs911x_lighting.log

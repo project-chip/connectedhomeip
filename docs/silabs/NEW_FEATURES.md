@@ -1,5 +1,26 @@
 # Silicon Labs Matter New Features
 
+## New Features for v2.2.0-1.2
+
+- GA support for Intermittently Connected Devices
+- Introduction of a third LCD screen to display application information
+- Introduction of the Dishwasher Demo Application
+- Adds support of Matter 1.2 Apps on all Wi-Fi devices.
+- Adds Matter support on SiWx917 SoC Common flash variants - BRD4338A.
+- Adds LCD display support on SiWx917 SoC for all the Wi-Fi Matter Apps.
+- Adds support for Direct Internet Connectivity on the SiWx917 SoC & NCP
+
+### ICD Sample Apps
+With the official introduction of Matter Short Idle Time (SIT) ICDs, both the door-lock sample app and the light-switch sample app are configured as SIT ICDs by default.
+The default configurations can be found in their respective openthread.gni.
+
+### Self-Provisioning Mode
+
+Silicon Labs' Matter examples now include a self-provision mode, which enables the application to be used as Generator Firmware with the provisioning script:
+  - e.g.:`python3 provision.py -c config/silabs.json -gf ../out/light/BRD4187C/matter-silabs-lighting-example.s37`
+
+To enter the self-provisioning mode, factory reset the device pressing buttons BTN0 and BTN1 for six seconds. Using this method, the device application only needs to be flashed once, provisioned multiple times, and be ready for commissioning after each provisioning.
+
 ## New Features for v2.2.0-1.2-alpha.1
 
 ### Support for Intermittently Connected Devices (ICD)
@@ -12,10 +33,10 @@
 - ICD Manager and ICD Event manager has been implemented to manage the Idle and Active mode of the ICD
 - NEW DNS advertisement Text Key SAI: indicates the SLEEPY_ACTIVE_INTERVAL (default to 4000 ms when ICD is not enabled)
 - NEW Matter ICD configuration defines:
-	- CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL set value for the ICD IdleInterval attribute
-	- CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL set value for the ICD ActiveInterval attribute
-	- CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD set value for the ICD ActiveThreshold attribute
-	- CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC set value for the ICD ClientsSupportedPerFabric attribute
+  - CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL set value for the ICD IdleInterval attribute
+  - CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL set value for the ICD ActiveInterval attribute
+  - CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD set value for the ICD ActiveThreshold attribute
+  - CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC set value for the ICD ClientsSupportedPerFabric attribute
     - All of these defines can be configured by our following build arguments (default values listed here)
       - sl_idle_mode_interval_ms = 600000  `# 10min Idle Mode Interval`
       - sl_active_mode_interval_ms = 1000  `# 1s Active Mode Interval`
@@ -24,7 +45,7 @@
     - The OpenThread polling rates used in either ICD mode can be configured with (default value listed here)
       - sl_ot_idle_interval_ms = 15000  `# 15s Idle Intervals`
       - sl_ot_active_interval_ms = 200  `# 200ms Active Intervals`
-	
+
 - CHANGES:
   - Optimized the subscription reports by synchronizing all client’s subscriptions with the ICD idle mode interval. This ensures the minimal amount of wake ups possible due to subscription reports
   - The previous `--sed` build preset has been replaced by `--icd`. This goes in line with previous sleepy end device behavior being deprecated and replaced by the ICD behavior.

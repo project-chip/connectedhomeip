@@ -1,166 +1,149 @@
 # Matter Software Update with EFR32 Example Applications
 
-The Over The Air (OTA) Software Update functionality is enabled by default for
-all of the EFR32 example applications. Its inclusion in an application is
+The Over The Air (OTA) Software Update functionality is enabled by default for 
+all of the EFR32 example applications. Its inclusion in an application is 
 controlled by the `chip_enable_ota_requestor` compile flag.
 
-## Running the OTA Download Scenario
+## Hardware Requirements
+- To run matter ota on Silicon Labs Platform, refer to: [Hardware Requirements](../general/HARDWARE_REQUIREMENTS.md)
 
--   For Matter with OpenThread: Bring up the OpenThread Border Router as
-    discussed in [Thread Demo Overview](../thread/DEMO_OVERVIEW.md) and get its operational
-    dataset.
+## Software Requirements
+- To run matter ota on Silicon Labs Platform, refer to: [Software Requirements](../general/SOFTWARE_REQUIREMENTS.md)
 
--   On a Linux or Darwin platform build the chip-tool and the ota-provider-app
-    as follows:
+## Setting up OTA Environment
+- To execute OTA on Silicon Labs Platform Wi-Fi Boards, we need to build two different applications below:
+  - **OTA-A** is a normal application with default or older software version. It acts as **ota-requestor** where it needs to update the latest software version.
+  - **OTA-B** is a normal application with an updated software version.
+  - **Chip-tool** is a controller for sending commands to the ota-requestor to update the software version and receiving commands from device.
+  - **OTA-Provider** is the server that has the latest software version and from which ota-requestor will download the updated software.
 
-    ```shell
-    $ scripts/examples/gn_build_example.sh examples/chip-tool out/
-    ```
+### Setting up Chip-tool Controller
 
-    ```shell
-    $ scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
-    ```
+If you have not downloaded or cloned this repository, you can run the following 
+commands on a Linux terminal running on either Linux machine, WSL or Virtual
+Machine to clone the repository and run bootstrap to prepare to build the sample
+application images.
 
--   Build or download the Gecko Bootloader binary. Follow the instructions in
-    [Creating the Bootloader for Use in Matter OTA](OTA_BOOTLOADER.md). For the
-    bootloader using the external flash select the "external SPI" bootloader
-    type configured with a single slot of at least 1000 KB. For the bootloader
-    using the internal flash see the Internal Storage Bootloader section below.
-    Pre-built binaries for some configurations are available on the
-    [Matter Artifacts page](./ARTIFACTS.md), see README.md for details.
-
--   Using the commander tool, upload the bootloader to the device running the
-    application.
-
--   Create a bootable image file (using the Lighting application image as an
-    example):
+1. To download the [SiliconLabs Matter codebase](https://github.com/SiliconLabs/matter.git), run the following commands.
 
     ```shell
-    $ commander gbl create chip-efr32-lighting-example.gbl --app chip-efr32-lighting-example.s37
+     $ git clone https://github.com/SiliconLabs/matter.git
     ```
 
--   Create the Matter OTA file from the bootable image file:
+2. Bootstrapping:
 
     ```shell
-    $ ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 2 -vs "2.0" -da sha256 chip-efr32-lighting-example.gbl chip-efr32-lighting-example.ota
+    $ cd matter
+    $ ./scripts/checkout_submodules.py --shallow --recursive --platform efr32
+    $ . scripts/bootstrap.sh
+    # Create a directory where binaries will be updated/compiled called `out`
+    $ mkdir out
     ```
 
--   In a terminal start the Provider app and pass to it the path to the Matter
-    OTA file created in the previous step:
+In order to control the Wi-Fi Matter Accessory Device, you will have to compile 
+and run the chip-tool on either a Linux, Mac or Raspberry Pi. The chip-tool builds 
+faster on the Mac and Linux machines, so that is recommended, but if you have 
+access to a Raspberry Pi that will work as well.
+
+3. Build the chip-tool
 
     ```shell
-    $ rm -r /tmp/chip_kvs_provider
+    $ ./scripts/examples/gn_build_example.sh examples/chip-tool out/standalone
     ```
 
-    ```shell
-    $ ./out/debug/chip-ota-provider-app --KVS /tmp/chip_kvs_provider -f chip-efr32-lighting-example.ota
-    ```
+This will build chip-tool in `out/standalone`.
 
--   In a separate terminal run the chip-tool commands to provision the Provider:
 
-    ```shell
-    $ ./out/chip-tool pairing onnetwork 1 20202021
-    ```
-
-    ```shell
-    $ ./out/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' 1 0
-    ```
-
--   If the application device had been previously commissioned, hold Button 0
-    for six seconds to factory-reset the device.
-
--   In the chip-tool terminal enter:
-    ```shell
-    $ ./out/chip-tool pairing ble-thread 2 hex:<operationalDataset> 20202021 3840
-    ```
-
-where operationalDataset is obtained from the OpenThread Border Router.
-
--   Once the commissioning process completes enter:
-
-    ```shell
-    $ ./out/chip-tool otasoftwareupdaterequestor announce-otaprovider 1 0 0 0 2 0
-    ```
-
--   The application device will connect to the Provider and start the image
-    download. Once the image is downloaded the device will reboot into the
-    downloaded image.
-
-## Internal Storage Bootloader
-
-Internal storage bootloader for Matter OTA software update is supported on MG24
-boards only. In this use case both the running image and the downloadable update
-image must fit on the internal flash at the same time. This in turn requires
-that both images are built with a reduced feature set, such as disabled logging
-and Matter shell. The following set of compile flags leaves out all the optional
-features and results in the minimal image size:
-
-    chip_detail_logging=false
-    chip_automation_logging=false
-    chip_progress_logging=false
-    is_debug=false
-    show_qr_code=false
-    chip_build_libshell=false
-    enable_openthread_cli=false
-    chip_openthread_ftd=true
-
-Using LZMA compression when building the .gbl file ( passing `--compress lzma`
-parameter to the `commander gbl create` command) further reduces the downloaded
-image size.
-
-When building an internal storage bootloader the two key configuration
-parameters are the Slot Start Address and Slot Size in the Bootloader Storage
-Slot component. The storage slot must not overlap with the running image and the
-NVM section of the flash. In other words, the slot start address must be greater
-than the end of the running image address and the sum of the start address and
-the slot size must be less than the address of the NVM section. The simplest way
-to get the relevant addresses for the running image and NVM is by using the
-Silicon Labs `Simplicity Commander` (Device Info->Main Flash->Flash Map).
-
-The pre-built bootloader binaries are configured with slot start address of
-0x080EC000 and slot size of 548864
-
-## Managing the Software Version
-
-In order for the Provider to successfully serve the image to a device during the
-OTA Software Update process the Software Version parameter that the .ota file
-was built with must be greater than the
-CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION parameter set in the application's
-`CHIPProjectConfig.h` file. The Software Version parameter is set by the `-vn`
-parameter passed to the `ota_image_tool.py create` command. For example, if the
-application's running image was built with
-CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION set to 1 and if the `.ota` file is
-built with `-vn 2` then the Provider will serve the update image when requested.
-
-In order for the OTA Software Update subsystem to consider an update to be
-successful and for the NotifyUpdateApplied command to be transmitted the
-CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION in the updated image must exceed the
-software version of the running image (continuing the above example, the image
-for the update must be built with CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION set
-to 2).
-
-## Managing the Vendor and Product ID
-
-Starting the ota-provider-app with the --otaImageList command line option allows
-the user to supply a JSON file specifying the Software Version, Vendor and
-Product ID that identify the image served by the Provider, see
-[ota-provider-app](https://github.com/SiliconLabs/matter/blob/latest/examples/ota-provider-app/linux/README.md)
-
-Example provider configuration file:
-
-```cpp
-        { "foo": 1, // ignored by parser
-          "deviceSoftwareVersionModel":
-          [
-           { 
-            "vendorId": 65521, "productId": 32773, "softwareVersion": 1, "softwareVersionString": "1.0.0", "cDVersionNumber": 18, "softwareVersionValid": true, "minApplicableSoftwareVersion": 0, "maxApplicableSoftwareVersion": 100, "otaURL": "chip-efr32-lighting-example.ota" 
-            }
-          ]
-        }
+### Setting up OTA-Provider
+- To Build OTA-Provider app for Linux Platform, run below command in the matter repository.
+```shell
+    scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
 ```
 
-## Additional Info
+## Matter OTA Images
+- To create and Build matter OTA from matter code, need two different applications to build mentioned below:
+  - OTA A
+  - OTA B
 
-Developers can find more resources on
-[Silicon Labs Matter Community Page](https://community.silabs.com/s/article/connected-home-over-ip-chip-faq?language=en_US)
-.
+### Build OTA A Application
+ - Matter OTA-A Application will be used to flash on the matter device.
+ - In matter cloned directory run below commands to build an OTA A application.
+```
+For RS9116: 
+
+./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/rs911x_lighting_A BRD41xxx disable_lcd=true use_external_flash=false chip_enable_ble_rs911x=true --wifi rs9116
+
+For WF200
+
+./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/wf200_lighting_A BRD41xxx chip_build_libshell=false --wifi wf200
+```
+**Note:** Matter OTA-A application will be having software version as 1 by default in **third_party/silabs/BUILD.gn** file.
+
+### Build OTA B Application
+- Matter OTA-B application will be used to create gbl & OTA file.
+- Open the file **third_party/silabs/BUILD.gn** from matter code cloned directory and modify **sl_matter_version = 1** to any number.
+
+**Note:** Make sure always **sl_matter_version** should be greater than **sl_hardware_version**
+- After Modifying software version build OTA B application using below commands for EFR boards
+
+```
+For RS9116: 
+
+./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/rs911x_lighting_B BRD41xxx disable_lcd=true use_external_flash=false chip_enable_ble_rs911x=true --wifi rs9116
+
+For WF200
+
+./scripts/examples/gn_silabs_example.sh examples/lighting-app/silabs/ out/wf200_lighting_B BRD41xxx chip_build_libshell=false --wifi wf200
+```
+
+## Executing OTA Scenario
+
+### Generating the OTA image
+1. Locate Simplicity Commander Path via **Command Prompt Terminal**.
+2. Create a bootable image file by running below command in commander terminal(using the Lighting application as an
+example):
+```shell
+    commander gbl create chip-efr32-lighting-example.gbl --compress lzma --app chip-efr32-lighting-example.s37
+```
+**Note**:- Using LZMA compression when building the .gbl file ( passing `--compress lzma` parameter to the `commander gbl create` command) further reduces the downloaded image size.
+
+3. Create the Matter OTA file by running below command in **${WORKSPACE_DIR}/matter** path:
+```shell
+    ./src/app/ota_image_tool.py create -v 0xFFF1 -p 0x8005 -vn 2 -vs "2.0" -da sha256 chip-efr32-lighting-example.gbl chip-efr32-lighting-example.ota
+```
+**Note**: Modify **-vn** to **sl_matter_version** as per OTA-B application Building step [Build OTA B](#build-ota-b-application)
+
+### Running OTA Provider
+- Locate **ota-provider** terminal and start the Provider app passing to it the path to the Matter OTA file created in the previous step:
+```shell
+    rm -rf /tmp/chip_*
+    ./out/debug/chip-ota-provider-app -f chip-efr32-lighting-example.ota
+```
+### Setting up OTA-Requestor
+- Before running **ota-requestor** app flash the bootloader binary images for Silicon Labs Devices.
+#### Flash Bootloader Images
+- Bootloader binaries will be flashed using Simplicity Commander only. It will support EFR32 NCP Boards only.
+- Silicon Labs Devices will supports below Bootloader variants for EFR32 Boards.
+    - Internal Storage Bootloader
+    - External Storage Bootloader
+- To Flash the Bootloader Binary along with the application for Silicon Labs Device, refer [Flashing Binaries](../general/FLASHING_USING_COMMANDER.md)
+
+### Running OTA-Requestor
+1. In a separate terminal, locate the chip-tool and ota-requestor and run the chip-tool commands to provision the Provider:
+```shell
+    ./out/chip-tool pairing onnetwork 1 20202021
+    ./out/chip-tool accesscontrol write acl '[{"fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null}, {"fabricIndex": 1, "privilege": 3, "authMode": 2, "subjects": null, "targets": null}]' 1 0
+```
+2. If the application device had been previously commissioned hold Button 0 for six seconds to factory-reset the device.
+
+3. In the chip-tool terminal, commission the Device by passing below command:
+```shell
+    ./out/chip-tool pairing ble-wifi "node_id" "SSID" "PSK" 20202021 3840
+```
+where SSID and PSK are AP username and password.
+
+4. Once the commissioning process completes in the same terminal, run below requestor command to start downloading the image:
+```shell
+    ./out/chip-tool otasoftwareupdaterequestor announce-otaprovider 1 0 0 0 2 0
+```
+- The application device will connect to the Provider and start the image download. Once the image is downloaded the device will reboot into the downloaded image.

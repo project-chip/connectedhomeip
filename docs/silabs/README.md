@@ -25,6 +25,8 @@
     5. [Matter Wi-Fi Sleepy End Devices](wifi/WIFI_SLEEPY_END_DEVICE.md)
     6. [Matter Wi-Fi Sleepy End Device Power Measurement](wifi/WIFI_Sleepy_Device_Power_Measurement.md)
     7. [Matter Wi-Fi Direct Internet Connectivity(DIC)](wifi/DIC_Wi-Fi.md)
+    8. [Matter Shell Console](wifi/MATTER_SHELL.md)
+    9. [Matter Wi-Fi Interoperability With Ecosystem](wifi/ECOSYSTEM_SETUP.md)
 
 6. Matter Bridging to Zigbee/Z-Wave
 
