@@ -66,7 +66,7 @@ server cluster OnOff = 6 {
 
   bitmap Feature : bitmap32 {
     kLighting = 0x1;
-    kDeadFrontBehavior = 0x2;
+    kDeadFrontBehaviour = 0x2;
   }
 
   bitmap OnOffControlBitmap : bitmap8 {

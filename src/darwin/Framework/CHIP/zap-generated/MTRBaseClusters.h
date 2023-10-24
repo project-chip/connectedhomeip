@@ -13304,8 +13304,7 @@ typedef NS_ENUM(uint8_t, MTROnOffStartUpOnOff) {
 
 typedef NS_OPTIONS(uint32_t, MTROnOffFeature) {
     MTROnOffFeatureLighting MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
-    MTROnOffFeatureDeadFrontBehavior MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x2,
-    MTROnOffFeatureDeadFront MTR_DEPRECATED("Please use MTROnOffFeatureDeadFrontBehavior", ios(17.1, 17.2), macos(14.1, 14.2), watchos(10.1, 10.2), tvos(17.1, 17.2)) = 0x2,
+    MTROnOffFeatureDeadFrontBehaviour MTR_PROVISIONALLY_AVAILABLE = 0x2,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint8_t, MTROnOffControlBitmap) {
