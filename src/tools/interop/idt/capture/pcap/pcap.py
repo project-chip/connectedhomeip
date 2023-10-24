@@ -63,4 +63,3 @@ class PacketCaptureRunner:
     def stop_pcap(self) -> None:
         self.logger.info("Stopping pcap proc")
         self.pcap_proc.stop_command(soft=True)
-
