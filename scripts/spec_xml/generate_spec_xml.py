@@ -88,8 +88,7 @@ def main(scraper, spec_root, output_dir, dry_run):
 
     # Put the current spec sha into the cluster dir
     sha_file = os.path.abspath(os.path.join(output_dir, 'spec_sha'))
-    os.chdir(spec_root)
-    out = subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True, encoding="utf8")
+    out = subprocess.run(['git', 'rev-parse', 'HEAD'], capture_output=True, encoding="utf8", cwd=spec_root)
     sha = out.stdout
     with open(sha_file, 'wt', encoding='utf8') as output:
         output.write(sha)
