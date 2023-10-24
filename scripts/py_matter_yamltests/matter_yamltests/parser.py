@@ -844,7 +844,6 @@ class TestStep:
             received_value = received_values.pop(0)
 
             if expected_value != received_value:
-                logging.warning(f"Cluster wait validation mismatch: Expected Result: {expected_value} / Received Value: {received_value}")
                 result.error(check_type, error_failure.format(
                     expected=expected_value, received=received_value))
                 success = False
@@ -869,7 +868,6 @@ class TestStep:
             result.success(check_type, error_success.format(
                 error=expected_error))
         elif expected_error and received_error:
-            logging.warning(f"Response error validation mismatch: Expected Error: {expected_error} / Received Error: {received_error}")
             result.error(check_type, error_wrong_error.format(
                 error=expected_error, value=received_error))
         elif expected_error and not received_error:
@@ -898,7 +896,6 @@ class TestStep:
                 result.success(check_type, error_success.format(
                     error=expected_error))
             elif received_error:
-                logging.warning(f"Response cluster validation mismatch: Expected Error: {expected_error} / Received Error: {received_error}")
                 result.error(check_type, error_wrong_error.format(
                     error=expected_error, value=received_error))
             else:
@@ -925,7 +922,7 @@ class TestStep:
     def _response_values_validation(self, expected_response, received_response, result):
         check_type = PostProcessCheckType.RESPONSE_VALIDATION
         error_success = 'The test expectation "{name} == {value}" is true'
-        error_failure = 'The test expectation "{name} == {value}" is false'
+        error_failure = 'The test expectation "{name} ({actual}) == {value}" is false'
         error_name_does_not_exist = 'The test expects a value named "{name}" but it does not exists in the response."'
         error_value_does_not_exist = 'The test expects a value but it does not exists in the response."'
 
@@ -955,9 +952,8 @@ class TestStep:
                 result.success(check_type, error_success.format(
                     name=expected_name, value=expected_value))
             else:
-                logging.warning(f"Response values validation mismatch: Expected Result: {expected_value} / Received Value: {received_value}")
                 result.error(check_type, error_failure.format(
-                    name=expected_name, value=expected_value))
+                    name=expected_name, actual=received_value, value=expected_value))
 
     def _response_value_validation(self, expected_value, received_value):
         if isinstance(expected_value, list):
