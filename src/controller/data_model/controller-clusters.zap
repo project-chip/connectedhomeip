@@ -219,6 +219,7 @@
           "define": "SCENES_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "AddScene",
@@ -3274,7 +3275,8 @@
           "mfgCode": null,
           "define": "FAN_CONTROL_CLUSTER",
           "side": "client",
-          "enabled": 1
+          "enabled": 1,
+          "apiMaturity": "provisional"
         },
         {
           "name": "Thermostat User Interface Configuration",
@@ -3489,6 +3491,7 @@
           "define": "BALLAST_CONFIGURATION_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "attributes": [
             {
               "name": "FeatureMap",
@@ -4769,6 +4772,7 @@
           "define": "UNIT_TESTING_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "internal",
           "commands": [
             {
               "name": "Test",
