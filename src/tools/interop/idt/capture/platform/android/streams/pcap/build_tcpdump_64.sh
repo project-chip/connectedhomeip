@@ -20,18 +20,18 @@ set -e
 export TCPDUMP=4.99.4
 export LIBPCAP=1.10.4
 
-wget https://www.tcpdump.org/release/tcpdump-$TCPDUMP.tar.gz
-wget https://www.tcpdump.org/release/libpcap-$LIBPCAP.tar.gz
+wget https://www.tcpdump.org/release/tcpdump-"$TCPDUMP".tar.gz
+wget https://www.tcpdump.org/release/libpcap-"$LIBPCAP".tar.gz
 
-tar zxvf tcpdump-$TCPDUMP.tar.gz
-tar zxvf libpcap-$LIBPCAP.tar.gz
+tar zxvf tcpdump-"$TCPDUMP".tar.gz
+tar zxvf libpcap-"$LIBPCAP".tar.gz
 export CC=aarch64-linux-gnu-gcc
-cd libpcap-$LIBPCAP
+cd libpcap-"$LIBPCAP"
 ./configure --host=arm-linux --with-pcap=linux
 make
 cd ..
 
-cd tcpdump-$TCPDUMP
+cd tcpdump-"$TCPDUMP"
 export ac_cv_linux_vers=2
 export CFLAGS=-static
 export CPPFLAGS=-static
@@ -43,7 +43,7 @@ make
 aarch64-linux-gnu-strip tcpdump
 cp tcpdump ..
 cd ..
-rm -R libpcap-$LIBPCAP
-rm -R tcpdump-$TCPDUMP
-rm libpcap-$LIBPCAP.tar.gz
-rm tcpdump-$TCPDUMP.tar.gz
+rm -R libpcap-"$LIBPCAP"
+rm -R tcpdump-"$TCPDUMP"
+rm libpcap-"$LIBPCAP".tar.gz
+rm tcpdump-"$TCPDUMP".tar.gz
