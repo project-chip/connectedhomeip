@@ -18,20 +18,26 @@
 
 CURRENT_SPEC_VERSION=$(cat SPECIFICATION_VERSION)
 
+# Pulls the most recent release from gihub, matching the spec version on the current tree
 CURRENT_RELEASE=$(gh release list --exclude-pre-releases | grep -Fi "$CURRENT_SPEC_VERSION" | awk '{print $1}' | head -n1)
 
 if [ -z "$CURRENT_RELEASE" ]; then
+    # If there are no releases, this is our first one for this Spec version
     SDK_RELEASE_REVISIONS=0
     echo "No revision found for current release"
 else
+    # Otherwise pull the SDK revision (4th item) from the release
     SDK_RELEASE_REVISIONS="$(echo "$CURRENT_RELEASE" | cut -d'.' -f4)"
 fi
 
 if [ ! -z "$CURRENT_RELEASE" ]; then
+    # If there is current release, construct a string like 1.2.0.0 based o the current one
     CURRENT_RELEASE="v$CURRENT_SPEC_VERSION.$SDK_RELEASE_REVISIONS"
+    # Then revise the SDK release to be +1
     SDK_RELEASE_REVISIONS=$(($SDK_RELEASE_REVISIONS + 1))
 fi
 
+# Construct a final tag, eg: 1.2.0.5 (MAJOR.MINOR.PATCH.SDK_REVISION)
 NEW_RELEASE_TAG="v$CURRENT_SPEC_VERSION.$SDK_RELEASE_REVISIONS"
 
 echo "Current release: $CURRENT_RELEASE"
