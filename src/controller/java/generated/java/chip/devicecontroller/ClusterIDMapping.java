@@ -5962,8 +5962,8 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            IdleModeInterval(0L),
-            ActiveModeInterval(1L),
+            IdleModeDuration(0L),
+            ActiveModeDuration(1L),
             ActiveModeThreshold(2L),
             RegisteredClients(3L),
             ICDCounter(4L),

@@ -195,8 +195,8 @@
             "FeatureMap"
         ],
         "ICD Management": [
-            "IdleModeInterval",
-            "ActiveModeInterval",
+            "IdleModeDuration",
+            "ActiveModeDuration",
             "ActiveModeThreshold",
             "RegisteredClients",
             "ICDCounter",

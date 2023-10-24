@@ -2386,13 +2386,13 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace IcdManagement {
 namespace Attributes {
 
-namespace IdleModeInterval {
+namespace IdleModeDuration {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace IdleModeInterval
+} // namespace IdleModeDuration
 
-namespace ActiveModeInterval {
+namespace ActiveModeDuration {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace ActiveModeInterval
+} // namespace ActiveModeDuration
 
 namespace ActiveModeThreshold {
 static constexpr AttributeId Id = 0x00000002;

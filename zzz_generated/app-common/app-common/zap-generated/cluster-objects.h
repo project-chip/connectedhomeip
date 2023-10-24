@@ -14042,7 +14042,7 @@ public:
 
 namespace Attributes {
 
-namespace IdleModeInterval {
+namespace IdleModeDuration {
 struct TypeInfo
 {
     using Type             = uint32_t;
@@ -14050,11 +14050,11 @@ struct TypeInfo
     using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::IdleModeInterval::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::IdleModeDuration::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace IdleModeInterval
-namespace ActiveModeInterval {
+} // namespace IdleModeDuration
+namespace ActiveModeDuration {
 struct TypeInfo
 {
     using Type             = uint32_t;
@@ -14062,10 +14062,10 @@ struct TypeInfo
     using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveModeInterval::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveModeDuration::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace ActiveModeInterval
+} // namespace ActiveModeDuration
 namespace ActiveModeThreshold {
 struct TypeInfo
 {
@@ -14161,8 +14161,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::IdleModeInterval::TypeInfo::DecodableType idleModeInterval       = static_cast<uint32_t>(0);
-        Attributes::ActiveModeInterval::TypeInfo::DecodableType activeModeInterval   = static_cast<uint32_t>(0);
+        Attributes::IdleModeDuration::TypeInfo::DecodableType idleModeDuration       = static_cast<uint32_t>(0);
+        Attributes::ActiveModeDuration::TypeInfo::DecodableType activeModeDuration   = static_cast<uint32_t>(0);
         Attributes::ActiveModeThreshold::TypeInfo::DecodableType activeModeThreshold = static_cast<uint16_t>(0);
         Attributes::RegisteredClients::TypeInfo::DecodableType registeredClients;
         Attributes::ICDCounter::TypeInfo::DecodableType ICDCounter                               = static_cast<uint32_t>(0);

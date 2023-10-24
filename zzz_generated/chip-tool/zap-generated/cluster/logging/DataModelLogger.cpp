@@ -7966,15 +7966,15 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case IcdManagement::Id: {
         switch (path.mAttributeId)
         {
-        case IcdManagement::Attributes::IdleModeInterval::Id: {
+        case IcdManagement::Attributes::IdleModeDuration::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("IdleModeInterval", 1, value);
+            return DataModelLogger::LogValue("IdleModeDuration", 1, value);
         }
-        case IcdManagement::Attributes::ActiveModeInterval::Id: {
+        case IcdManagement::Attributes::ActiveModeDuration::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ActiveModeInterval", 1, value);
+            return DataModelLogger::LogValue("ActiveModeDuration", 1, value);
         }
         case IcdManagement::Attributes::ActiveModeThreshold::Id: {
             uint16_t value;

@@ -3505,7 +3505,7 @@
           ],
           "attributes": [
             {
-              "name": "IdleModeInterval",
+              "name": "IdleModeDuration",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -3521,7 +3521,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ActiveModeInterval",
+              "name": "ActiveModeDuration",
               "code": 1,
               "mfgCode": null,
               "side": "server",

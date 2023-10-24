@@ -10425,10 +10425,10 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::IdleModeInterval::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, idleModeInterval);
-    case Attributes::ActiveModeInterval::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeModeInterval);
+    case Attributes::IdleModeDuration::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, idleModeDuration);
+    case Attributes::ActiveModeDuration::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, activeModeDuration);
     case Attributes::ActiveModeThreshold::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, activeModeThreshold);
     case Attributes::RegisteredClients::TypeInfo::GetAttributeId():

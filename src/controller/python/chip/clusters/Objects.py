@@ -14695,8 +14695,8 @@ class IcdManagement(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="idleModeInterval", Tag=0x00000000, Type=uint),
-                ClusterObjectFieldDescriptor(Label="activeModeInterval", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="idleModeDuration", Tag=0x00000000, Type=uint),
+                ClusterObjectFieldDescriptor(Label="activeModeDuration", Tag=0x00000001, Type=uint),
                 ClusterObjectFieldDescriptor(Label="activeModeThreshold", Tag=0x00000002, Type=uint),
                 ClusterObjectFieldDescriptor(Label="registeredClients", Tag=0x00000003, Type=typing.Optional[typing.List[IcdManagement.Structs.MonitoringRegistrationStruct]]),
                 ClusterObjectFieldDescriptor(Label="ICDCounter", Tag=0x00000004, Type=typing.Optional[uint]),
@@ -14709,8 +14709,8 @@ class IcdManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    idleModeInterval: 'uint' = None
-    activeModeInterval: 'uint' = None
+    idleModeDuration: 'uint' = None
+    activeModeDuration: 'uint' = None
     activeModeThreshold: 'uint' = None
     registeredClients: 'typing.Optional[typing.List[IcdManagement.Structs.MonitoringRegistrationStruct]]' = None
     ICDCounter: 'typing.Optional[uint]' = None
@@ -14816,7 +14816,7 @@ class IcdManagement(Cluster):
 
     class Attributes:
         @dataclass
-        class IdleModeInterval(ClusterAttributeDescriptor):
+        class IdleModeDuration(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000046
@@ -14832,7 +14832,7 @@ class IcdManagement(Cluster):
             value: 'uint' = 0
 
         @dataclass
-        class ActiveModeInterval(ClusterAttributeDescriptor):
+        class ActiveModeDuration(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000046
