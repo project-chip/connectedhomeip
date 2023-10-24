@@ -6392,7 +6392,7 @@ client cluster AccountLogin = 1294 {
   }
 
   response struct GetSetupPINResponse = 1 {
-    char_string setupPIN = 0;
+    nullable char_string setupPIN = 0;
   }
 
   request struct LoginRequest {

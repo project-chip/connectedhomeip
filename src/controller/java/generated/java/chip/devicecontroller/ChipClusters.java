@@ -27245,7 +27245,7 @@ public class ChipClusters {
     private native void logout(long chipClusterPtr, DefaultClusterCallback callback, @Nullable Integer timedInvokeTimeoutMs);
 
     public interface GetSetupPINResponseCallback {
-      void onSuccess(String setupPIN);
+      void onSuccess(@Nullable String setupPIN);
       void onError(Exception error);
     }
 

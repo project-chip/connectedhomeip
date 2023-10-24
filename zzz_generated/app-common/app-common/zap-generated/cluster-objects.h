@@ -30497,7 +30497,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetSetupPINResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
 
-    chip::CharSpan setupPIN;
+    DataModel::Nullable<chip::CharSpan> setupPIN;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -30512,7 +30512,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetSetupPINResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
 
-    chip::CharSpan setupPIN;
+    DataModel::Nullable<chip::CharSpan> setupPIN;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetSetupPINResponse

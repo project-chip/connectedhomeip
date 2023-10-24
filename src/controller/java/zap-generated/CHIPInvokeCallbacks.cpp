@@ -4901,7 +4901,14 @@ void CHIPAccountLoginClusterGetSetupPINResponseCallback::CallbackFn(
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     jobject SetupPIN;
-    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.setupPIN, SetupPIN));
+    if (dataResponse.setupPIN.IsNull())
+    {
+        SetupPIN = nullptr;
+    }
+    else
+    {
+        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(dataResponse.setupPIN.Value(), SetupPIN));
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, SetupPIN);
 }

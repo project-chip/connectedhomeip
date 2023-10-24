@@ -15196,7 +15196,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(String setupPIN) {
+    public void onSuccess(@Nullable String setupPIN) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo setupPINResponseValue = new CommandResponseInfo("setupPIN", "String");

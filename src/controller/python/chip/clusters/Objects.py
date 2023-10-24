@@ -35343,10 +35343,10 @@ class AccountLogin(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="setupPIN", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="setupPIN", Tag=0, Type=typing.Union[Nullable, str]),
                     ])
 
-            setupPIN: 'str' = ""
+            setupPIN: 'typing.Union[Nullable, str]' = NullValue
 
         @dataclass
         class Login(ClusterCommand):

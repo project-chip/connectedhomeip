@@ -8317,7 +8317,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @interface MTRAccountLoginClusterGetSetupPINResponseParams : NSObject <NSCopying>
 
-@property (nonatomic, copy) NSString * _Nonnull setupPIN MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+@property (nonatomic, copy) NSString * _Nullable setupPIN MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
