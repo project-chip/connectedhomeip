@@ -93,7 +93,7 @@ class BitmapHandler(BaseHandler):
             return BaseHandler(self.context)
 
 
-class MandatoryConfirmFieldHandler(BaseHandler):
+class MandatoryConformFieldHandler(BaseHandler):
     def __init__(self, context: Context, field: Field):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._field = field
@@ -120,7 +120,7 @@ class FieldHandler(BaseHandler):
             ApplyConstraint(attrs, self._field)
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name == "mandatoryConform":
-            return MandatoryConfirmFieldHandler(self.context, self._field)
+            return MandatoryConformFieldHandler(self.context, self._field)
         elif name == "optionalConform":
             self._field.qualities |= FieldQuality.OPTIONAL
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
@@ -323,8 +323,11 @@ class AttributeHandler(BaseHandler):
         elif name == "optionalConform":
             self._attribute.definition.qualities |= FieldQuality.OPTIONAL
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "otherwiseConform":
+            self._attribute.definition.qualities |= FieldQuality.OPTIONAL
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "mandatoryConform":
-            return MandatoryConfirmFieldHandler(self.context, self._attribute.definition)
+            return MandatoryConformFieldHandler(self.context, self._attribute.definition)
         elif name == "deprecateConform":
             self._deprecated = True
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
