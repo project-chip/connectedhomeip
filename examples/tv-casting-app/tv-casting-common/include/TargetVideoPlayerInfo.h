@@ -95,8 +95,8 @@ public:
     bool IsAsleep() { return mIsAsleep; }
     void SetMACAddress(chip::CharSpan MACAddress)
     {
-        memcpy(mMACAddressBuf, MACAddress.data(), MACAddress.size());
-        mMACAddress = chip::CharSpan(mMACAddressBuf, MACAddress.size());
+        memcpy(mMACAddressBuf, MACAddress.data(), sizeof(mMACAddressBuf));
+        mMACAddress = chip::CharSpan(mMACAddressBuf, sizeof(mMACAddressBuf));
     }
     chip::System::Clock::Timestamp GetLastDiscovered() { return mLastDiscovered; }
     void SetLastDiscovered(chip::System::Clock::Timestamp lastDiscovered) { mLastDiscovered = lastDiscovered; }
@@ -106,7 +106,7 @@ public:
         // it was recently discoverable if its mLastDiscovered.count is within
         // CHIP_DEVICE_CONFIG_STR_CACHE_LAST_DISCOVERED_HOURS of current time
         chip::System::Clock::Timestamp currentUnixTimeMS = chip::System::Clock::kZero;
-        chip::System::SystemClock().GetClock_RealTimeMS(currentUnixTimeMS);
+        VerifyOrReturnValue(chip::System::SystemClock().GetClock_RealTimeMS(currentUnixTimeMS) == CHIP_NO_ERROR, true);
         ChipLogProgress(AppServer, "WasRecentlyDiscoverable currentUnixTimeMS: %lu mLastDiscovered: %lu",
                         static_cast<unsigned long>(currentUnixTimeMS.count()), static_cast<unsigned long>(mLastDiscovered.count()));
         return mLastDiscovered.count() >
@@ -211,7 +211,7 @@ private:
     char mInstanceName[chip::Dnssd::Commission::kInstanceNameMaxLength + 1];
     uint16_t mPort;
     chip::CharSpan mMACAddress;
-    char mMACAddressBuf[2 * chip::DeviceLayer::ConfigurationManager::kMaxMACAddressLength];
+    char mMACAddressBuf[2 * chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength];
     chip::System::Clock::Timestamp mLastDiscovered;
     bool mIsAsleep    = false;
     bool mInitialized = false;

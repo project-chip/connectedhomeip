@@ -19,8 +19,9 @@
 #pragma once
 
 #include "Types.h"
-#include "lib/support/logging/CHIPLogging.h"
+#include "support/ChipDeviceEventHandler.h"
 
+#include "lib/support/logging/CHIPLogging.h"
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <string.h>
@@ -30,33 +31,44 @@ namespace matter {
 namespace casting {
 namespace core {
 
-enum ConnectionError
-{
-    NO_CONNECTION_ERROR = 0,
-    FAILED_TO_CONNECT   = 1
-};
-
-using ConnectCallback    = std::function<void(ConnectionError)>;
-using DisconnectCallback = std::function<void(void)>;
-
 const int kPortMaxLength = 5; // port is uint16_t
 // +1 for the : between the hostname and the port.
-const int kIdMaxLength = chip::Dnssd::kHostNameMaxLength + kPortMaxLength + 1;
+const int kIdMaxLength                                      = chip::Dnssd::kHostNameMaxLength + kPortMaxLength + 1;
+const unsigned long long int kCommissioningWindowTimeoutSec = 3 * 60; // 3 minutes
 
 class CastingPlayerAttributes
 {
 public:
-    char id[kIdMaxLength + 1]                              = {};
-    char deviceName[chip::Dnssd::kMaxDeviceNameLen + 1]    = {};
-    char hostName[chip::Dnssd::kHostNameMaxLength + 1]     = {};
-    char instanceName[chip::Dnssd::kHostNameMaxLength + 1] = {};
+    char id[kIdMaxLength + 1]                                              = {};
+    char deviceName[chip::Dnssd::kMaxDeviceNameLen + 1]                    = {};
+    char hostName[chip::Dnssd::kHostNameMaxLength + 1]                     = {};
+    char instanceName[chip::Dnssd::Commission::kInstanceNameMaxLength + 1] = {};
     unsigned int numIPs; // number of valid IP addresses
     chip::Inet::IPAddress ipAddresses[chip::Dnssd::CommonResolutionData::kMaxIPAddresses];
+    chip::Inet::InterfaceId interfaceId;
     uint16_t port;
     uint16_t productId;
     uint16_t vendorId;
     uint32_t deviceType;
+
+    chip::NodeId nodeId           = 0;
+    chip::FabricIndex fabricIndex = 0;
 };
+
+/**
+ * @brief Represents CastingPlayer ConnectionState.
+ *
+ */
+enum ConnectionState
+{
+    CASTING_PLAYER_NOT_CONNECTED,
+    CASTING_PLAYER_CONNECTING,
+    CASTING_PLAYER_CONNECTED,
+};
+
+class ConnectionContext;
+class CastingPlayer;
+using ConnectCallback = std::function<void(CHIP_ERROR, CastingPlayer *)>;
 
 /**
  * @brief CastingPlayer represents a Matter commissioner that is able to play media to a physical
@@ -64,13 +76,42 @@ public:
  */
 class CastingPlayer : public std::enable_shared_from_this<CastingPlayer>
 {
-private:
-    // std::vector<memory::Strong<Endpoint>> endpoints;
-    bool mConnected = false;
-    CastingPlayerAttributes mAttributes;
-
 public:
     CastingPlayer(CastingPlayerAttributes playerAttributes) { mAttributes = playerAttributes; }
+
+    /**
+     * @brief Get the CastingPlayer object targeted currently (may not be connected)
+     */
+    static CastingPlayer * GetTargetCastingPlayer() { return mTargetCastingPlayer; }
+
+    /**
+     * @brief Compares based on the Id
+     */
+    bool operator==(const CastingPlayer & other) const
+    {
+        int compareResult = strcmp(this->mAttributes.id, other.mAttributes.id);
+        return (compareResult == 0) ? 1 : 0;
+    }
+
+    /**
+     * @return true if this CastingPlayer is connected to the CastingApp
+     */
+    bool IsConnected() const { return mConnectionState == CASTING_PLAYER_CONNECTED; }
+
+    /**
+     * @brief Verifies that a connection exists with this CastingPlayer, or triggers a new session
+     * request. If the CastingApp does not have the nodeId and fabricIndex of this CastingPlayer cached on disk,
+     * this will execute the user directed commissioning process.
+     *
+     * @param onCompleted for success - called back with CHIP_NO_ERROR and CastingPlayer *.
+     * For failure - called back with an error and nullptr.
+     * @param commissioningWindowTimeoutSec time (in sec) to keep the commissioning window open, if commissioning is required.
+     * Defaults to kCommissioningWindowTimeoutSec.
+     */
+    void VerifyOrEstablishConnection(ConnectCallback onCompleted,
+                                     unsigned long long int commissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec);
+    void LogDetail() const;
+
     const char * GetId() const { return mAttributes.id; }
 
     const char * GetDeviceName() const { return mAttributes.deviceName; }
@@ -91,77 +132,77 @@ public:
 
     uint32_t GetDeviceType() const { return mAttributes.deviceType; }
 
-    // public:
+    chip::NodeId GetNodeId() const { return mAttributes.nodeId; }
+
+    chip::FabricIndex GetFabricIndex() const { return mAttributes.fabricIndex; }
+
+    void SetNodeId(chip::NodeId nodeId) { mAttributes.nodeId = nodeId; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex) { mAttributes.fabricIndex = fabricIndex; }
+
     // void RegisterEndpoint(const memory::Strong<Endpoint> endpoint) { endpoints.push_back(endpoint); }
 
     // const std::vector<memory::Strong<Endpoint>> GetEndpoints() const { return endpoints; }
 
-    /**
-     * @brief Compares based on the Id
-     */
-    bool operator==(const CastingPlayer & other) const
-    {
-        int compareResult = strcmp(this->mAttributes.id, other.mAttributes.id);
-        return (compareResult == 0) ? 1 : 0;
-    }
+private:
+    // std::vector<memory::Strong<Endpoint>> endpoints;
+    ConnectionState mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
+    CastingPlayerAttributes mAttributes;
+    static CastingPlayer * mTargetCastingPlayer;
+    unsigned long long int mCommissioningWindowTimeoutSec = kCommissioningWindowTimeoutSec;
+    ConnectCallback mOnCompleted                          = {};
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+    /**
+     * @brief Sends the user directed commissioning request to this CastingPlayer
+     */
+    CHIP_ERROR SendUserDirectedCommissioningRequest();
+
+    /**
+     * @brief Selects an IP Address to send the UDC request to.
+     * Prioritizes IPV4 addresses over IPV6.
+     *
+     * @return chip::Inet::IPAddress*
+     */
+    chip::Inet::IPAddress * GetIpAddressForUDCRequest();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+
+    /**
+     * @brief Find an existing session for this CastingPlayer, or trigger a new session
+     * request.
+     *
+     * The caller can optionally provide `onDeviceConnected` and `onDeviceConnectionFailure` callback
+     * objects. If provided, these will be used to inform the caller about
+     * successful or failed connection establishment.
+     *
+     * If the connection is already established, the `onDeviceConnected` callback
+     * will be immediately called, before FindOrEstablishSession returns.
+     *
+     * The `onDeviceConnectionFailure` callback may be called before the FindOrEstablishSession
+     * call returns, for error cases that are detected synchronously.
+     */
+    void FindOrEstablishSession(void * clientContext, chip::OnDeviceConnected onDeviceConnected,
+                                chip::OnDeviceConnectionFailure onDeviceConnectionFailure);
+
+    // ChipDeviceEventHandler handles chip::DeviceLayer::ChipDeviceEvent events and helps the CastingPlayer class commission with
+    // and connect to a CastingPlayer
+    friend class support::ChipDeviceEventHandler;
+    friend class ConnectionContext;
+};
+
+class ConnectionContext
+{
 public:
-    /**
-     * @return true if this CastingPlayer is connected to the CastingApp
-     */
-    bool IsConnected() const { return mConnected; }
+    ConnectionContext(void * clientContext, core::CastingPlayer * targetCastingPlayer, chip::OnDeviceConnected onDeviceConnected,
+                      chip::OnDeviceConnectionFailure onDeviceConnectionFailure);
+    ~ConnectionContext();
 
-    void Connect(const long timeout, ConnectCallback onCompleted);
-    void Disconnect(const long timeout, DisconnectCallback onCompleted);
-
-    void LogDetail() const
-    {
-        if (strlen(mAttributes.id) != 0)
-        {
-            ChipLogDetail(Discovery, "\tID: %s", mAttributes.id);
-        }
-        if (strlen(mAttributes.deviceName) != 0)
-        {
-            ChipLogDetail(Discovery, "\tName: %s", mAttributes.deviceName);
-        }
-        if (strlen(mAttributes.hostName) != 0)
-        {
-            ChipLogDetail(Discovery, "\tHost Name: %s", mAttributes.hostName);
-        }
-        if (strlen(mAttributes.instanceName) != 0)
-        {
-            ChipLogDetail(Discovery, "\tInstance Name: %s", mAttributes.instanceName);
-        }
-        if (mAttributes.numIPs > 0)
-        {
-            ChipLogDetail(Discovery, "\tNumber of IPs: %u", mAttributes.numIPs);
-        }
-        char buf[chip::Inet::IPAddress::kMaxStringLength];
-        if (strlen(mAttributes.ipAddresses[0].ToString(buf)) != 0)
-        {
-            for (unsigned j = 0; j < mAttributes.numIPs; j++)
-            {
-                char * ipAddressOut = mAttributes.ipAddresses[j].ToString(buf);
-                ChipLogDetail(AppServer, "\tIP Address #%d: %s", j + 1, ipAddressOut);
-            }
-        }
-        if (mAttributes.port > 0)
-        {
-            ChipLogDetail(Discovery, "\tPort: %u", mAttributes.port);
-        }
-        if (mAttributes.productId > 0)
-        {
-            ChipLogDetail(Discovery, "\tProduct ID: %u", mAttributes.productId);
-        }
-        if (mAttributes.vendorId > 0)
-        {
-            ChipLogDetail(Discovery, "\tVendor ID: %u", mAttributes.vendorId);
-        }
-        if (mAttributes.deviceType > 0)
-        {
-            ChipLogDetail(Discovery, "\tDevice Type: %" PRIu32, mAttributes.deviceType);
-        }
-    }
+    void * mClientContext                                                                    = nullptr;
+    core::CastingPlayer * mTargetCastingPlayer                                               = nullptr;
+    chip::OnDeviceConnected mOnDeviceConnectedFn                                             = nullptr;
+    chip::OnDeviceConnectionFailure mOnDeviceConnectionFailureFn                             = nullptr;
+    chip::Callback::Callback<chip::OnDeviceConnected> * mOnConnectedCallback                 = nullptr;
+    chip::Callback::Callback<chip::OnDeviceConnectionFailure> * mOnConnectionFailureCallback = nullptr;
 };
 
 }; // namespace core

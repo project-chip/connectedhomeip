@@ -267,11 +267,11 @@ CHIP_ERROR PersistenceManager::ReadAllVideoPlayers(TargetVideoPlayerInfo outVide
     char hostName[chip::Dnssd::kHostNameMaxLength + 1]  = {};
     size_t numIPs                                       = 0;
     Inet::IPAddress ipAddress[chip::Dnssd::CommonResolutionData::kMaxIPAddresses];
-    uint64_t lastDiscoveredMs                                                             = 0;
-    char MACAddressBuf[2 * chip::DeviceLayer::ConfigurationManager::kMaxMACAddressLength] = {};
-    uint32_t MACAddressLength                                                             = 0;
-    char instanceName[chip::Dnssd::Commission::kInstanceNameMaxLength + 1]                = {};
-    uint16_t port                                                                         = 0;
+    uint64_t lastDiscoveredMs                                                                 = 0;
+    char MACAddressBuf[2 * chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength] = {};
+    uint32_t MACAddressLength                                                                 = 0;
+    char instanceName[chip::Dnssd::Commission::kInstanceNameMaxLength + 1]                    = {};
+    uint16_t port                                                                             = 0;
 
     CHIP_ERROR err;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
@@ -349,7 +349,7 @@ CHIP_ERROR PersistenceManager::ReadAllVideoPlayers(TargetVideoPlayerInfo outVide
         {
             MACAddressLength = reader.GetLength();
             ReturnErrorOnFailure(reader.GetBytes(reinterpret_cast<uint8_t *>(MACAddressBuf),
-                                                 2 * chip::DeviceLayer::ConfigurationManager::kMaxMACAddressLength));
+                                                 2 * chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength));
             continue;
         }
 
