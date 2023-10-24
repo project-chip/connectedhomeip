@@ -119,16 +119,10 @@ static void InitServer(intptr_t context)
     emberAfEndpointEnableDisable(kNetworkCommissioningEndpointSecondary, false);
 #endif
 
-    CHIP_ERROR err = GetAppTask().LockInit();
-    if (err != CHIP_NO_ERROR)
-    {
-        ESP_LOGE(TAG, "Failed to initialize app task lock, err:%" CHIP_ERROR_FORMAT, err.Format());
-    }
-
 #if CONFIG_DEVICE_TYPE_M5STACK
     SetupPretendDevices();
 #endif
-    err = app::Clusters::ModeSelect::StaticSupportedModesManager::getStaticSupportedModesManagerInstance().InitEndpointArray(
+    CHIP_ERROR err = app::Clusters::ModeSelect::StaticSupportedModesManager::getStaticSupportedModesManagerInstance().InitEndpointArray(
         FIXED_ENDPOINT_COUNT);
     if (err != CHIP_NO_ERROR)
     {
