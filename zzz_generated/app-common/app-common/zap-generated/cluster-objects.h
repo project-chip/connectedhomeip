@@ -6055,9 +6055,9 @@ namespace Attributes {
 namespace TemperatureUnit {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::UnitLocalization::TempUnitEnum;
-    using DecodableType    = chip::app::Clusters::UnitLocalization::TempUnitEnum;
-    using DecodableArgType = chip::app::Clusters::UnitLocalization::TempUnitEnum;
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::UnitLocalization::TempUnitEnum>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::UnitLocalization::TempUnitEnum>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::UnitLocalization::TempUnitEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::UnitLocalization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureUnit::Id; }
@@ -6109,8 +6109,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::TemperatureUnit::TypeInfo::DecodableType temperatureUnit =
-            static_cast<chip::app::Clusters::UnitLocalization::TempUnitEnum>(0);
+        Attributes::TemperatureUnit::TypeInfo::DecodableType temperatureUnit;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

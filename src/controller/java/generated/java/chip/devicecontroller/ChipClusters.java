@@ -4361,6 +4361,12 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
+    public interface TemperatureUnitAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+      void onError(Exception ex);
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
     public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> value);
       void onError(Exception ex);
@@ -4386,7 +4392,7 @@ public class ChipClusters {
     }
 
     public void readTemperatureUnitAttribute(
-        IntegerAttributeCallback callback) {
+        TemperatureUnitAttributeCallback callback) {
         readTemperatureUnitAttribute(chipClusterPtr, callback);
     }
 
@@ -4399,7 +4405,7 @@ public class ChipClusters {
     }
 
     public void subscribeTemperatureUnitAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        TemperatureUnitAttributeCallback callback, int minInterval, int maxInterval) {
         subscribeTemperatureUnitAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -4463,11 +4469,11 @@ public class ChipClusters {
         subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    private native void readTemperatureUnitAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
+    private native void readTemperatureUnitAttribute(long chipClusterPtr, TemperatureUnitAttributeCallback callback);
 
     private native void writeTemperatureUnitAttribute(long chipClusterPtr, DefaultClusterCallback callback, Integer value, @Nullable Integer timedWriteTimeoutMs);
 
-    private native void subscribeTemperatureUnitAttribute(long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+    private native void subscribeTemperatureUnitAttribute(long chipClusterPtr, TemperatureUnitAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 
