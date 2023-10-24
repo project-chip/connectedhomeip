@@ -93,9 +93,12 @@ void AccountLoginManager::GetSetupPin(char * setupPin, size_t setupPinSize, cons
     GetSetupPINResponse pinResponse = mCommandDelegate->FormatGetSetupPINResponse(response, status);
     if (status == chip::Protocols::InteractionModel::Status::Success)
     {
-        if (pinResponse.setupPIN.IsNull()) {
+        if (pinResponse.setupPIN.IsNull())
+        {
             setupPin[0] = '\0';
-        } else {
+        }
+        else
+        {
             CopyString(setupPin, setupPinSize, pinResponse.setupPIN.Value());
         }
     }
