@@ -3648,8 +3648,8 @@ server cluster AccountLogin = 1294 {
     char_string setupPIN = 0;
   }
 
-  timed command GetSetupPIN(GetSetupPINRequest): GetSetupPINResponse = 0;
-  timed command Login(LoginRequest): DefaultSuccess = 2;
+  timed command access(invoke: administer) GetSetupPIN(GetSetupPINRequest): GetSetupPINResponse = 0;
+  timed command access(invoke: administer) Login(LoginRequest): DefaultSuccess = 2;
   timed command Logout(): DefaultSuccess = 3;
 }
 
