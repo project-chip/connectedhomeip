@@ -18,8 +18,8 @@ void DurationTimer::start()
 {
     t1 = chip::System::SystemClock().GetMonotonicTimestamp();
 
-    //ChipLogDetail(DeviceLayer, "Timer: %s start %s ", label.c_str(), toTimeStr(&t1).c_str());
-    printf("Timer: %s start %s \n", label.c_str(), toTimeStr(t1).c_str());
+    ChipLogProgress(DeviceLayer,"Timer: %s start %s \n", label.c_str(), toTimeStr(t1).c_str());
+    //printf("Timer: %s start %s \n", label.c_str(), toTimeStr(t1).c_str());
 
 }
 
@@ -28,8 +28,8 @@ void DurationTimer::stop()
 
     t2 = chip::System::SystemClock().GetMonotonicTimestamp();
 
-    //ChipLogDetail(DeviceLayer, "Timer: %s stop %s ", label.c_str(), toTimeStr(&t2).c_str());
-     printf("Timer: %s stop %s \n", label.c_str(), toTimeStr(t2).c_str());
+    ChipLogProgress(DeviceLayer,"Timer: %s stop %s \n", label.c_str(), toTimeStr(t2).c_str());
+    //printf("Timer: %s stop %s \n", label.c_str(), toTimeStr(t2).c_str());
 
     duration();
 }
@@ -41,8 +41,8 @@ double DurationTimer::duration()
     millis -= seconds;
     suseconds_t omillis = static_cast<suseconds_t>(millis.count());
 
-    //printf("Timer: %s %s TIME_SPENT (millisec) %d \n", label.c_str(), toTimeStr(t2).c_str(), ((int)omillis) );
-    printf("Timer: %s TIME_SPENT (millisec) %d \n", label.c_str(), ((int)omillis) );
+    ChipLogProgress(DeviceLayer,"Timer: %s TIME_SPENT (millisec) %d \n", label.c_str(), ((int)omillis) );
+    //printf("Timer: %s TIME_SPENT (millisec) %d \n", label.c_str(), ((int)omillis) );
 
     return (double)millis.count();
 }
@@ -64,7 +64,7 @@ std::string DurationTimer::toTimeStr(chip::System::Clock::Timestamp time)
     struct tm * tm_info = gmtime(&oseconds);
     strftime(buff, DATETIME_LEN, DATETIME_PATTERN, tm_info);
     //snprintf(str, ISO8601_LEN, "time: %s.%05ld", buff, omillis);
-    snprintf(str, ISO8601_LEN, "time: %s.%03d", buff, ((int)omillis));
+    snprintf(str,ISO8601_LEN, "time: %s.%03d", buff, ((int)omillis));
     #endif
     return str;
 }

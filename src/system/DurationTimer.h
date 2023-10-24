@@ -3,6 +3,7 @@
 #include <string>
 #include <system/SystemConfig.h>
 #include <system/SystemClock.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 /**
  * @file
@@ -20,6 +21,7 @@
 */
 
 #define DURATION_SHOW_TIME 0
+#define DURATION_STARTSTOP_PRINT_LOG 0
 
 namespace chip {
 namespace timing {
