@@ -122,8 +122,9 @@ static void InitServer(intptr_t context)
 #if CONFIG_DEVICE_TYPE_M5STACK
     SetupPretendDevices();
 #endif
-    CHIP_ERROR err = app::Clusters::ModeSelect::StaticSupportedModesManager::getStaticSupportedModesManagerInstance().InitEndpointArray(
-        FIXED_ENDPOINT_COUNT);
+    CHIP_ERROR err =
+        app::Clusters::ModeSelect::StaticSupportedModesManager::getStaticSupportedModesManagerInstance().InitEndpointArray(
+            FIXED_ENDPOINT_COUNT);
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Failed to initialize endpoint array for supported-modes, err:%" CHIP_ERROR_FORMAT, err.Format());
