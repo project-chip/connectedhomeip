@@ -44,7 +44,7 @@ limitations under the License.
 
     <command source="server" code="0x01" name="GetSetupPINResponse" optional="false" disableDefaultResponse="true">
       <description>This message is sent in response to the GetSetupPIN Request, and contains the Setup PIN code, or null when the accounts identified in the request does not match the active account of the running Content App.</description>
-      <arg name="SetupPIN" type="char_string" nullable="true"/>
+      <arg name="SetupPIN" type="char_string" isNullable="true"/>
     </command>
 
   </cluster>
