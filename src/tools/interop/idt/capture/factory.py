@@ -24,11 +24,11 @@ import typing
 from multiprocessing import Process
 
 import capture
-from capture.utils.async_control import get_timeout
-from capture.base import EcosystemCapture, PlatformLogStreamer, UnsupportedCapturePlatformException
-from capture.utils.artifact import safe_mkdir, create_standard_log_name
-from log import border_print
 import log
+from capture.base import EcosystemCapture, PlatformLogStreamer, UnsupportedCapturePlatformException
+from capture.utils.artifact import create_standard_log_name, safe_mkdir
+from capture.utils.async_control import get_timeout
+from log import border_print
 
 _PLATFORM_MAP: typing.Dict[str, PlatformLogStreamer] = {}
 _ECOSYSTEM_MAP: typing.Dict[str, PlatformLogStreamer] = {}

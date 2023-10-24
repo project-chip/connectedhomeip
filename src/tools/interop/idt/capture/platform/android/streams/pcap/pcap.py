@@ -17,10 +17,11 @@
 
 import asyncio
 import os
+from typing import TYPE_CHECKING
 
 from capture.utils.artifact import create_standard_log_name, safe_mkdir
 from capture.utils.shell import Bash
-from typing import TYPE_CHECKING
+
 from ... import config
 from ..base import AndroidStream
 

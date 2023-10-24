@@ -1,4 +1,5 @@
 from capture.loader import CaptureImplsLoader
+
 from .base import AndroidStream
 
 impl_loader = CaptureImplsLoader(

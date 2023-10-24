@@ -22,11 +22,12 @@ import shutil
 import sys
 from pathlib import Path
 
-import config
 from capture import EcosystemController, EcosystemFactory, PacketCaptureRunner, PlatformFactory
 from capture.utils.artifact import create_file_timestamp, safe_mkdir
-from log import border_print
 from discovery import MatterBleScanner, MatterDnssdListener
+from log import border_print
+
+import config
 
 splash = '''\x1b[0m
 \x1b[32;1m┌────────┐\x1b[33;20m▪\x1b[32;1m \x1b[34;1m┌──────┐ \x1b[33;20m• \x1b[35;1m┌──────────┐ \x1b[33;20m●

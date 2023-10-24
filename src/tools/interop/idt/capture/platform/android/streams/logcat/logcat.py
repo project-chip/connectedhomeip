@@ -17,12 +17,12 @@
 
 import multiprocessing
 import time
-
-from capture.utils.artifact import create_standard_log_name, get_observer_proc
 from typing import TYPE_CHECKING
-from ..base import AndroidStream
 
 import log
+from capture.utils.artifact import create_standard_log_name, get_observer_proc
+
+from ..base import AndroidStream
 
 logger = log.get_logger(__file__)
 

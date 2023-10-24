@@ -20,13 +20,12 @@ import os
 import traceback
 import typing
 
+import log
 from capture.base import PlatformLogStreamer
 from capture.utils.shell import Bash
-from . import config
-from . import streams
-from .capabilities import Capabilities
 
-import log
+from . import config, streams
+from .capabilities import Capabilities
 
 logger = log.get_logger(__file__)
 

@@ -15,8 +15,9 @@
 #    limitations under the License.
 #
 
-from zeroconf import ServiceBrowser, ServiceInfo, ServiceListener, Zeroconf
 import log
+from zeroconf import ServiceBrowser, ServiceInfo, ServiceListener, Zeroconf
+
 logger = log.get_logger(__file__)
 
 

@@ -18,10 +18,9 @@
 import os
 import time
 
+import log
 from capture.utils.artifact import create_standard_log_name
 from capture.utils.shell import Bash
-
-import log
 
 logger = log.get_logger(__file__)
 

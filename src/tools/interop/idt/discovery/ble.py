@@ -20,9 +20,10 @@ import datetime
 import os
 import time
 
+import log
 from bleak import AdvertisementData, BleakScanner, BLEDevice
 from bleak.exc import BleakDBusError
-import log
+
 logger = log.get_logger(__file__)
 
 

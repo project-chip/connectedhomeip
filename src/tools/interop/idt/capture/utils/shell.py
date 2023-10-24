@@ -18,9 +18,8 @@
 import shlex
 import subprocess
 
-from mobly.utils import stop_standing_subprocess
-
 import log
+from mobly.utils import stop_standing_subprocess
 
 logger = log.get_logger(__file__)
 

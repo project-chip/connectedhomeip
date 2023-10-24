@@ -18,9 +18,10 @@
 import asyncio
 import multiprocessing
 import os
+from typing import TYPE_CHECKING
 
 from capture.utils.artifact import create_standard_log_name
-from typing import TYPE_CHECKING
+
 from ..base import AndroidStream
 
 if TYPE_CHECKING:

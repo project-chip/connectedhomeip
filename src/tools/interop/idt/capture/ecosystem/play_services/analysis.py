@@ -18,9 +18,9 @@
 import os
 
 import log
-from capture.utils.artifact import create_standard_log_name
-from log import print_and_write, add_border
 from capture.platform.android import Android
+from capture.utils.artifact import create_standard_log_name
+from log import add_border, print_and_write
 
 logger = log.get_logger(__file__)
 

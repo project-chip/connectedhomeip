@@ -18,9 +18,9 @@
 import os
 
 from capture.base import EcosystemCapture, UnsupportedCapturePlatformException
+from capture.platform.android.android import Android
 from capture.utils.artifact import create_standard_log_name
 from log import print_and_write
-from capture.platform.android.android import Android
 
 
 class PlayServicesUser(EcosystemCapture):

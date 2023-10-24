@@ -20,16 +20,15 @@ import os
 import time
 from typing import Dict
 
+import log
 from capture.base import EcosystemCapture, UnsupportedCapturePlatformException
-from capture.utils.artifact import create_standard_log_name
 from capture.platform.android import Android
+from capture.utils.artifact import create_standard_log_name
 
 from . import config
 from .analysis import PlayServicesAnalysis
 from .command_map import dumpsys, getprop
 from .prober import PlayServicesProber
-
-import log
 
 logger = log.get_logger(__file__)
 

@@ -1,12 +1,13 @@
 from typing import TYPE_CHECKING
 
-from capture.utils.shell import Bash
 from capture.utils.artifact import create_standard_log_name
+from capture.utils.shell import Bash
 
 if TYPE_CHECKING:
     from capture.platform.android import Android
 
 import log
+
 from . import config
 
 logger = log.get_logger(__file__)
