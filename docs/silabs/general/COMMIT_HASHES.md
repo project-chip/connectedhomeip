@@ -19,7 +19,7 @@ in this release of the Silicon Labs Matter Out of Box Experience
 
 | Repo                                            | Branch | Commit Hash                              |
 | ----------------------------------------------- | ------ | ---------------------------------------- |
-| https://github.com/project-chip/connectedhomeip | master | 684b9d6246e5e5ef33db589af61a30e224d61ee3 |
+| https://github.com/project-chip/connectedhomeip | master | d140d5c87751603278f2483523993ee81922e7be |
 
 ## Matter chip-tool
 

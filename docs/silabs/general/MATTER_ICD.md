@@ -37,17 +37,17 @@ The ICDM Cluster exposes three configuration attributes that enable to configure
 
 | Attribute | Type | Constraints | Description |
 |-|-|-|-|
-| IdleModeInterval      | uint32 | 1 to 64800 | Maximum interval in seconds the server can stay in idle mode |
+| IdleModeInterval      | uint32 | 1 to 64800 | Maximum interval in seconds or milliseconds the server can stay in idle mode |
 | ActiveModeInterval    | uint32 | min 300    | minimum interval in milliseconds the server will stay in active mode |
 | ActiveModeThreshold   | uint32 | min 300    | minimum amount of time in milliseconds the server typically will stay active after network activity when in active mode |
 
 These configurations can be change two different ways.
 
 They can be changed by using the following build configuration.
-```shell
-sl_idle_mode_interval_ms = 600000  # 10min Idle Mode Interval
-sl_active_mode_interval_ms = 1000  # 1s Active Mode Interval
-sl_active_mode_threshold_ms = 500  # 500ms Active Mode Threshold
+```cpp
+    sl_idle_mode_interval_ms = 600000  //10min Idle Mode Interval
+    sl_active_mode_interval_ms = 1000  //1s Active Mode Interval
+    sl_active_mode_threshold_ms = 500  //500ms Active Mode Threshold
 ```
 
 To change them within a build command
@@ -57,11 +57,11 @@ To change them within a build command
 
 These options can also be change by setting them to a default value in the projects `openthread.gni` file.
 See `examples/lock-app/silabs/openthread.gni` for an example on how they can be configured.
-```
-# ICD Matter Configuration flags
-sl_idle_mode_interval_s = 600  # 10min Idle Mode Interval
-sl_active_mode_interval_ms = 10000  # 10s Active Mode Interval
-sl_active_mode_threshold_ms = 1000  # 1s Active Mode Threshold
+```cpp
+// ICD Matter Configuration flags
+sl_idle_mode_interval_s = 600       //10min Idle Mode Interval
+sl_active_mode_interval_ms = 10000  //10s Active Mode Interval
+sl_active_mode_threshold_ms = 1000  //1s Active Mode Threshold
 ```
 
 The second way of changing the configuration is to set these defines in the projects `ChipProjectConfig.h`.
