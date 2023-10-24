@@ -20759,29 +20759,29 @@ namespace ApplicationName {
 
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan & value)
 {
-    uint8_t zclString[256 + 1];
+    uint8_t zclString[256 + 2];
     EmberAfStatus status = emberAfReadAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    size_t length = emberAfStringLength(zclString);
-    if (length == NumericAttributeTraits<uint8_t>::kNullValue)
+    size_t length = emberAfLongStringLength(zclString);
+    if (length == NumericAttributeTraits<uint16_t>::kNullValue)
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
 
     VerifyOrReturnError(value.size() == 256, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
-    memcpy(value.data(), &zclString[1], 256);
+    memcpy(value.data(), &zclString[2], 256);
     value.reduce_size(length);
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    static_assert(256 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    static_assert(256 < NumericAttributeTraits<uint16_t>::kNullValue, "value.size() might be too big");
     VerifyOrReturnError(value.size() <= 256, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
-    uint8_t zclString[256 + 1];
-    auto length = static_cast<uint8_t>(value.size());
-    Encoding::Put8(zclString, length);
-    memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    uint8_t zclString[256 + 2];
+    auto length = static_cast<uint16_t>(value.size());
+    Encoding::LittleEndian::Put16(zclString, length);
+    memcpy(&zclString[2], value.data(), value.size());
+    return emberAfWriteAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, zclString, ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE);
 }
 
 } // namespace ApplicationName
