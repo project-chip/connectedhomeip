@@ -321,11 +321,11 @@ GetSetupPINResponseType ContentAppCommandDelegate::FormatGetSetupPINResponse(Jso
         std::to_string(to_underlying(app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Fields::kSetupPIN));
     if (!value[setupPINFieldId].empty())
     {
-        getSetupPINresponse.setupPIN = CharSpan::fromCharString(value[setupPINFieldId].asCString());
+        getSetupPINresponse.setupPIN.SetNonNull(CharSpan::fromCharString(value[setupPINFieldId].asCString()));
     }
     else
     {
-        getSetupPINresponse.setupPIN = "";
+        getSetupPINresponse.setupPIN.SetNull();
     }
     return getSetupPINresponse;
 }
