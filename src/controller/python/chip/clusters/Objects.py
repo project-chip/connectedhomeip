@@ -22738,7 +22738,7 @@ class PumpConfigurationAndControl(Cluster):
 
         class PumpStatusBitmap(IntFlag):
             kDeviceFault = 0x1
-            kSupplyfault = 0x2
+            kSupplyFault = 0x2
             kSpeedLow = 0x4
             kSpeedHigh = 0x8
             kLocalOverride = 0x10
