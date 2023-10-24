@@ -88,6 +88,7 @@
     /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: view */ \
     /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
+    0x0000050D, /* Cluster: Application Basic, Attribute: AllowedVendorList, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
@@ -151,6 +152,7 @@
     /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: view */ \
     /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
+    0x00000007, /* Cluster: Application Basic, Attribute: AllowedVendorList, Privilege: administer */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
@@ -214,6 +216,7 @@
     /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: view */ \
     /* Cluster: Color Control, Attribute: StartUpColorTemperatureMireds, Privilege: view */ \
+    kMatterAccessPrivilegeAdminister, /* Cluster: Application Basic, Attribute: AllowedVendorList, Privilege: administer */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////

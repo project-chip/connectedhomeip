@@ -3613,11 +3613,11 @@ server cluster ApplicationBasic = 1293 {
     char_string applicationID = 1;
   }
 
-  readonly attribute char_string<32> applicationName = 2;
+  readonly attribute char_string<256> applicationName = 2;
   readonly attribute ApplicationStruct application = 4;
   readonly attribute ApplicationStatusEnum status = 5;
   readonly attribute char_string<32> applicationVersion = 6;
-  readonly attribute vendor_id allowedVendorList[] = 7;
+  readonly attribute access(read: administer) vendor_id allowedVendorList[] = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
