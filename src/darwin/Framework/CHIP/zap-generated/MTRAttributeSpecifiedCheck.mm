@@ -990,6 +990,15 @@ static BOOL AttributeIsSpecifiedInNetworkCommissioningCluster(AttributeId aAttri
     case Attributes::LastConnectErrorValue::Id: {
         return YES;
     }
+    case Attributes::SupportedWiFiBands::Id: {
+        return YES;
+    }
+    case Attributes::SupportedThreadFeatures::Id: {
+        return YES;
+    }
+    case Attributes::ThreadVersion::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

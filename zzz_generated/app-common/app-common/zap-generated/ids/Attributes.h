@@ -1216,6 +1216,18 @@ namespace LastConnectErrorValue {
 static constexpr AttributeId Id = 0x00000007;
 } // namespace LastConnectErrorValue
 
+namespace SupportedWiFiBands {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace SupportedWiFiBands
+
+namespace SupportedThreadFeatures {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace SupportedThreadFeatures
+
+namespace ThreadVersion {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace ThreadVersion
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

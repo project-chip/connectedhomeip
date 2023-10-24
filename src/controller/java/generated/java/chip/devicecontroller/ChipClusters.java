@@ -5631,6 +5631,12 @@ public class ChipClusters {
       default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
+    public interface SupportedWiFiBandsAttributeCallback {
+      void onSuccess(List<Integer> value);
+      void onError(Exception ex);
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
     public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> value);
       void onError(Exception ex);
@@ -5743,6 +5749,36 @@ public class ChipClusters {
         subscribeLastConnectErrorValueAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readSupportedWiFiBandsAttribute(
+        SupportedWiFiBandsAttributeCallback callback) {
+        readSupportedWiFiBandsAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeSupportedWiFiBandsAttribute(
+        SupportedWiFiBandsAttributeCallback callback, int minInterval, int maxInterval) {
+        subscribeSupportedWiFiBandsAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readSupportedThreadFeaturesAttribute(
+        IntegerAttributeCallback callback) {
+        readSupportedThreadFeaturesAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeSupportedThreadFeaturesAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        subscribeSupportedThreadFeaturesAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readThreadVersionAttribute(
+        IntegerAttributeCallback callback) {
+        readThreadVersionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeThreadVersionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        subscribeThreadVersionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readGeneratedCommandListAttribute(
         GeneratedCommandListAttributeCallback callback) {
         readGeneratedCommandListAttribute(chipClusterPtr, callback);
@@ -5836,6 +5872,18 @@ public class ChipClusters {
     private native void readLastConnectErrorValueAttribute(long chipClusterPtr, LastConnectErrorValueAttributeCallback callback);
 
     private native void subscribeLastConnectErrorValueAttribute(long chipClusterPtr, LastConnectErrorValueAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readSupportedWiFiBandsAttribute(long chipClusterPtr, SupportedWiFiBandsAttributeCallback callback);
+
+    private native void subscribeSupportedWiFiBandsAttribute(long chipClusterPtr, SupportedWiFiBandsAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readSupportedThreadFeaturesAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeSupportedThreadFeaturesAttribute(long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readThreadVersionAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeThreadVersionAttribute(long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 

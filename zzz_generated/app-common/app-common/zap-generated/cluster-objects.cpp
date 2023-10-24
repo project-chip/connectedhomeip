@@ -6191,6 +6191,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, lastNetworkID);
     case Attributes::LastConnectErrorValue::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, lastConnectErrorValue);
+    case Attributes::SupportedWiFiBands::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, supportedWiFiBands);
+    case Attributes::SupportedThreadFeatures::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, supportedThreadFeatures);
+    case Attributes::ThreadVersion::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, threadVersion);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

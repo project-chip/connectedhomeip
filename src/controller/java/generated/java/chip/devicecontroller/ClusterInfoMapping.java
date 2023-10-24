@@ -3421,6 +3421,27 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedNetworkCommissioningClusterSupportedWiFiBandsAttributeCallback implements ChipClusters.NetworkCommissioningCluster.SupportedWiFiBandsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Integer> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedNetworkCommissioningClusterGeneratedCommandListAttributeCallback implements ChipClusters.NetworkCommissioningCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override

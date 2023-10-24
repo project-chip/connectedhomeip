@@ -7857,6 +7857,42 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LastConnectErrorValue
+namespace SupportedWiFiBands {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::app::Clusters::NetworkCommissioning::WiFiBandEnum>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::WiFiBandEnum>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::WiFiBandEnum> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedWiFiBands::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedWiFiBands
+namespace SupportedThreadFeatures {
+struct TypeInfo
+{
+    using Type             = chip::BitMask<chip::app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedThreadFeatures::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedThreadFeatures
+namespace ThreadVersion {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ThreadVersion::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ThreadVersion
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -7910,6 +7946,10 @@ struct TypeInfo
         Attributes::LastNetworkingStatus::TypeInfo::DecodableType lastNetworkingStatus;
         Attributes::LastNetworkID::TypeInfo::DecodableType lastNetworkID;
         Attributes::LastConnectErrorValue::TypeInfo::DecodableType lastConnectErrorValue;
+        Attributes::SupportedWiFiBands::TypeInfo::DecodableType supportedWiFiBands;
+        Attributes::SupportedThreadFeatures::TypeInfo::DecodableType supportedThreadFeatures =
+            static_cast<chip::BitMask<chip::app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap>>(0);
+        Attributes::ThreadVersion::TypeInfo::DecodableType threadVersion = static_cast<uint16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
