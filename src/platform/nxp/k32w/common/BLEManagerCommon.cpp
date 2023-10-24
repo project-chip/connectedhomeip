@@ -914,6 +914,13 @@ void BLEManagerCommon::DoBleProcessing(void)
     }
 }
 
+void BLEManagerCommon::RegisterAppCallbacks(BLECallbackDelegate::GapGenericCallback gapCallback,
+                                            BLECallbackDelegate::GattServerCallback gattCallback)
+{
+    callbackDelegate.gapCallback = gapCallback;
+    callbackDelegate.gattCallback = gattCallback;
+}
+
 void BLEManagerCommon::HandleConnectEvent(blekw_msg_t * msg)
 {
     uint8_t deviceId = msg->data.u8;
@@ -1078,6 +1085,11 @@ void BLEManagerCommon::blekw_generic_cb(gapGenericEvent_t * pGenericEvent)
     /* Call BLE Conn Manager */
     BleConnManager_GenericEvent(pGenericEvent);
 
+    if (sImplInstance->callbackDelegate.gapCallback)
+    {
+        sImplInstance->callbackDelegate.gapCallback(pGenericEvent);
+    }
+
     switch (pGenericEvent->eventType)
     {
     case gInternalError_c:
@@ -1223,6 +1235,11 @@ void BLEManagerCommon::blekw_stop_connection_timeout(void)
 
 void BLEManagerCommon::blekw_gatt_server_cb(deviceId_t deviceId, gattServerEvent_t * pServerEvent)
 {
+    if (sImplInstance->callbackDelegate.gattCallback)
+    {
+        sImplInstance->callbackDelegate.gattCallback(deviceId, pServerEvent);
+    }
+
     switch (pServerEvent->eventType)
     {
     case gEvtMtuChanged_c: {
