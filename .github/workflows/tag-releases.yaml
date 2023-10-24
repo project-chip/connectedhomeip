@@ -33,6 +33,9 @@ jobs:
                 && sudo apt install gh -y
                 
           - name: Tag Release & Generate Notes
-            run: ./scripts/tagging/tag_new_release.sh --generate-notes -d # Note this is a draft for now.
+            run: |
+              BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+              echo "Tagging against branch: $BRANCH_NAME"
+              ./scripts/tagging/tag_new_release.sh --generate-notes --target $BRANCH_NAME -d # Note this is a draft for now.
 
       
