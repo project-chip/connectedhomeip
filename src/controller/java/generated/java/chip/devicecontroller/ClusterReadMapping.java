@@ -2915,6 +2915,39 @@ public class ClusterReadMapping {
           readNetworkCommissioningLastConnectErrorValueCommandParams
         );
         result.put("readLastConnectErrorValueAttribute", readNetworkCommissioningLastConnectErrorValueAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readNetworkCommissioningSupportedWiFiBandsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readNetworkCommissioningSupportedWiFiBandsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.NetworkCommissioningCluster) cluster).readSupportedWiFiBandsAttribute(
+              (ChipClusters.NetworkCommissioningCluster.SupportedWiFiBandsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedNetworkCommissioningClusterSupportedWiFiBandsAttributeCallback(),
+          readNetworkCommissioningSupportedWiFiBandsCommandParams
+        );
+        result.put("readSupportedWiFiBandsAttribute", readNetworkCommissioningSupportedWiFiBandsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readNetworkCommissioningSupportedThreadFeaturesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readNetworkCommissioningSupportedThreadFeaturesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.NetworkCommissioningCluster) cluster).readSupportedThreadFeaturesAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readNetworkCommissioningSupportedThreadFeaturesCommandParams
+        );
+        result.put("readSupportedThreadFeaturesAttribute", readNetworkCommissioningSupportedThreadFeaturesAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readNetworkCommissioningThreadVersionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readNetworkCommissioningThreadVersionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.NetworkCommissioningCluster) cluster).readThreadVersionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readNetworkCommissioningThreadVersionCommandParams
+        );
+        result.put("readThreadVersionAttribute", readNetworkCommissioningThreadVersionAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readNetworkCommissioningGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readNetworkCommissioningGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

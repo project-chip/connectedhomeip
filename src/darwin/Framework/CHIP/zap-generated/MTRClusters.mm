@@ -4205,6 +4205,21 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeNetworkCommissioningID) attributeID:@(MTRAttributeIDTypeClusterNetworkCommissioningAttributeLastConnectErrorValueID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedWiFiBandsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeNetworkCommissioningID) attributeID:@(MTRAttributeIDTypeClusterNetworkCommissioningAttributeSupportedWiFiBandsID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedThreadFeaturesWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeNetworkCommissioningID) attributeID:@(MTRAttributeIDTypeClusterNetworkCommissioningAttributeSupportedThreadFeaturesID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeThreadVersionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeNetworkCommissioningID) attributeID:@(MTRAttributeIDTypeClusterNetworkCommissioningAttributeThreadVersionID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:@(self.endpoint) clusterID:@(MTRClusterIDTypeNetworkCommissioningID) attributeID:@(MTRAttributeIDTypeClusterNetworkCommissioningAttributeGeneratedCommandListID) params:params];

@@ -7400,6 +7400,9 @@ class NetworkCommissioning(Cluster):
                 ClusterObjectFieldDescriptor(Label="lastNetworkingStatus", Tag=0x00000005, Type=typing.Union[Nullable, NetworkCommissioning.Enums.NetworkCommissioningStatusEnum]),
                 ClusterObjectFieldDescriptor(Label="lastNetworkID", Tag=0x00000006, Type=typing.Union[Nullable, bytes]),
                 ClusterObjectFieldDescriptor(Label="lastConnectErrorValue", Tag=0x00000007, Type=typing.Union[Nullable, int]),
+                ClusterObjectFieldDescriptor(Label="supportedWiFiBands", Tag=0x00000008, Type=typing.Optional[typing.List[NetworkCommissioning.Enums.WiFiBandEnum]]),
+                ClusterObjectFieldDescriptor(Label="supportedThreadFeatures", Tag=0x00000009, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="threadVersion", Tag=0x0000000A, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -7416,6 +7419,9 @@ class NetworkCommissioning(Cluster):
     lastNetworkingStatus: 'typing.Union[Nullable, NetworkCommissioning.Enums.NetworkCommissioningStatusEnum]' = None
     lastNetworkID: 'typing.Union[Nullable, bytes]' = None
     lastConnectErrorValue: 'typing.Union[Nullable, int]' = None
+    supportedWiFiBands: 'typing.Optional[typing.List[NetworkCommissioning.Enums.WiFiBandEnum]]' = None
+    supportedThreadFeatures: 'typing.Optional[uint]' = None
+    threadVersion: 'typing.Optional[uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -7462,6 +7468,13 @@ class NetworkCommissioning(Cluster):
             kWiFiNetworkInterface = 0x1
             kThreadNetworkInterface = 0x2
             kEthernetNetworkInterface = 0x4
+
+        class ThreadCapabilitiesBitmap(IntFlag):
+            kIsBorderRouterCapable = 0x1
+            kIsRouterCapable = 0x2
+            kIsSleepyEndDeviceCapable = 0x4
+            kIsFullThreadDevice = 0x8
+            kIsSynchronizedSleepyEndDeviceCapable = 0x10
 
         class WiFiSecurityBitmap(IntFlag):
             kUnencrypted = 0x1
@@ -7833,6 +7846,54 @@ class NetworkCommissioning(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, int])
 
             value: 'typing.Union[Nullable, int]' = NullValue
+
+        @dataclass
+        class SupportedWiFiBands(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000031
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000008
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[NetworkCommissioning.Enums.WiFiBandEnum]])
+
+            value: 'typing.Optional[typing.List[NetworkCommissioning.Enums.WiFiBandEnum]]' = None
+
+        @dataclass
+        class SupportedThreadFeatures(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000031
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000009
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class ThreadVersion(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000031
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000A
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

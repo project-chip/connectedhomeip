@@ -6513,6 +6513,21 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LastConnectErrorValue", 1, value);
         }
+        case NetworkCommissioning::Attributes::SupportedWiFiBands::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::WiFiBandEnum> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedWiFiBands", 1, value);
+        }
+        case NetworkCommissioning::Attributes::SupportedThreadFeatures::Id: {
+            chip::BitMask<chip::app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedThreadFeatures", 1, value);
+        }
+        case NetworkCommissioning::Attributes::ThreadVersion::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ThreadVersion", 1, value);
+        }
         case NetworkCommissioning::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
