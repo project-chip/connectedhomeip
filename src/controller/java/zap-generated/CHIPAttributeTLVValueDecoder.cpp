@@ -12356,8 +12356,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
         using namespace app::Clusters::IcdManagement;
         switch (aPath.mAttributeId)
         {
-        case Attributes::IdleModeInterval::Id: {
-            using TypeInfo = Attributes::IdleModeInterval::TypeInfo;
+        case Attributes::IdleModeDuration::Id: {
+            using TypeInfo = Attributes::IdleModeDuration::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -12372,8 +12372,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                                                                         jnivalue, value);
             return value;
         }
-        case Attributes::ActiveModeInterval::Id: {
-            using TypeInfo = Attributes::ActiveModeInterval::TypeInfo;
+        case Attributes::ActiveModeDuration::Id: {
+            using TypeInfo = Attributes::ActiveModeDuration::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

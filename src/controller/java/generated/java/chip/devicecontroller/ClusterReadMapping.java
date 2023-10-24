@@ -5851,28 +5851,28 @@ public class ClusterReadMapping {
        return result;
     }
     private static Map<String, InteractionInfo> readIcdManagementInteractionInfo() {
-       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readIcdManagementIdleModeIntervalCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readIcdManagementIdleModeIntervalAttributeInteractionInfo = new InteractionInfo(
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readIcdManagementIdleModeDurationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readIcdManagementIdleModeDurationAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.IcdManagementCluster) cluster).readIdleModeIntervalAttribute(
+            ((ChipClusters.IcdManagementCluster) cluster).readIdleModeDurationAttribute(
               (ChipClusters.LongAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-          readIcdManagementIdleModeIntervalCommandParams
+          readIcdManagementIdleModeDurationCommandParams
         );
-        result.put("readIdleModeIntervalAttribute", readIcdManagementIdleModeIntervalAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readIcdManagementActiveModeIntervalCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readIcdManagementActiveModeIntervalAttributeInteractionInfo = new InteractionInfo(
+        result.put("readIdleModeDurationAttribute", readIcdManagementIdleModeDurationAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readIcdManagementActiveModeDurationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readIcdManagementActiveModeDurationAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.IcdManagementCluster) cluster).readActiveModeIntervalAttribute(
+            ((ChipClusters.IcdManagementCluster) cluster).readActiveModeDurationAttribute(
               (ChipClusters.LongAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-          readIcdManagementActiveModeIntervalCommandParams
+          readIcdManagementActiveModeDurationCommandParams
         );
-        result.put("readActiveModeIntervalAttribute", readIcdManagementActiveModeIntervalAttributeInteractionInfo);
+        result.put("readActiveModeDurationAttribute", readIcdManagementActiveModeDurationAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readIcdManagementActiveModeThresholdCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readIcdManagementActiveModeThresholdAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

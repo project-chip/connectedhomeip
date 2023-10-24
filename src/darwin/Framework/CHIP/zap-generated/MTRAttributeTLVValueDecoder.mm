@@ -5104,8 +5104,8 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(AttributeId aAtt
     using namespace Clusters::IcdManagement;
     switch (aAttributeId) {
 #if MTR_ENABLE_PROVISIONAL
-    case Attributes::IdleModeInterval::Id: {
-        using TypeInfo = Attributes::IdleModeInterval::TypeInfo;
+    case Attributes::IdleModeDuration::Id: {
+        using TypeInfo = Attributes::IdleModeDuration::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -5117,8 +5117,8 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(AttributeId aAtt
     }
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
-    case Attributes::ActiveModeInterval::Id: {
-        using TypeInfo = Attributes::ActiveModeInterval::TypeInfo;
+    case Attributes::ActiveModeDuration::Id: {
+        using TypeInfo = Attributes::ActiveModeDuration::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {

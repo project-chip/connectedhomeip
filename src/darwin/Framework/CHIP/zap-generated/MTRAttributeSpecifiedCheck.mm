@@ -1872,10 +1872,10 @@ static BOOL AttributeIsSpecifiedInICDManagementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::IcdManagement;
     switch (aAttributeId) {
-    case Attributes::IdleModeInterval::Id: {
+    case Attributes::IdleModeDuration::Id: {
         return YES;
     }
-    case Attributes::ActiveModeInterval::Id: {
+    case Attributes::ActiveModeDuration::Id: {
         return YES;
     }
     case Attributes::ActiveModeThreshold::Id: {

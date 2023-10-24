@@ -4231,13 +4231,13 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "IdleModeInterval",
+                "attributeName": "IdleModeDuration",
                 "attributeId": 0x00000000,
                 "type": "int",
                 "reportable": True,
             },
             0x00000001: {
-                "attributeName": "ActiveModeInterval",
+                "attributeName": "ActiveModeDuration",
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,

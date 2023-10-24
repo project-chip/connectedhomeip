@@ -10872,24 +10872,24 @@ public class ChipClusters {
       default void onSubscriptionEstablished(long subscriptionId) {}
     }
 
-    public void readIdleModeIntervalAttribute(
+    public void readIdleModeDurationAttribute(
         LongAttributeCallback callback) {
-        readIdleModeIntervalAttribute(chipClusterPtr, callback);
+        readIdleModeDurationAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeIdleModeIntervalAttribute(
+    public void subscribeIdleModeDurationAttribute(
         LongAttributeCallback callback, int minInterval, int maxInterval) {
-        subscribeIdleModeIntervalAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+        subscribeIdleModeDurationAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readActiveModeIntervalAttribute(
+    public void readActiveModeDurationAttribute(
         LongAttributeCallback callback) {
-        readActiveModeIntervalAttribute(chipClusterPtr, callback);
+        readActiveModeDurationAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeActiveModeIntervalAttribute(
+    public void subscribeActiveModeDurationAttribute(
         LongAttributeCallback callback, int minInterval, int maxInterval) {
-        subscribeActiveModeIntervalAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+        subscribeActiveModeDurationAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readActiveModeThresholdAttribute(
@@ -10998,13 +10998,13 @@ public class ChipClusters {
         subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    private native void readIdleModeIntervalAttribute(long chipClusterPtr, LongAttributeCallback callback);
+    private native void readIdleModeDurationAttribute(long chipClusterPtr, LongAttributeCallback callback);
 
-    private native void subscribeIdleModeIntervalAttribute(long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+    private native void subscribeIdleModeDurationAttribute(long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readActiveModeIntervalAttribute(long chipClusterPtr, LongAttributeCallback callback);
+    private native void readActiveModeDurationAttribute(long chipClusterPtr, LongAttributeCallback callback);
 
-    private native void subscribeActiveModeIntervalAttribute(long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+    private native void subscribeActiveModeDurationAttribute(long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readActiveModeThresholdAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
 
