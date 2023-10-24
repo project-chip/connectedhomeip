@@ -53,11 +53,29 @@ limitations under the License.
     <!-- Lamp Information Attribute Set -->
     <attribute side="server" code="0x0020" define="LAMP_QUANTITY" type="int8u" writable="false" optional="false">LampQuantity</attribute>
     <!-- Lamp Settings Attribute Set -->
-    <attribute side="server" code="0x0030" define="LAMP_TYPE" type="char_string" length="16" writable="true" optional="true">LampType</attribute>
-    <attribute side="server" code="0x0031" define="LAMP_MANUFACTURER" type="char_string" length="16" writable="true" optional="true">LampManufacturer</attribute>
-    <attribute side="server" code="0x0032" define="LAMP_RATED_HOURS" type="int24u" writable="true" default="0xFFFFFF" isNullable="true" optional="true">LampRatedHours</attribute>
-    <attribute side="server" code="0x0033" define="LAMP_BURN_HOURS" type="int24u" writable="true" default="0x000000" isNullable="true" optional="true">LampBurnHours</attribute>
-    <attribute side="server" code="0x0034" define="LAMP_ALARM_MODE" type="LampAlarmModeBitmap" min="0x00" max="0x01" writable="true" default="0x00" optional="true">LampAlarmMode</attribute>
-    <attribute side="server" code="0x0035" define="LAMP_BURN_HOURS_TRIP_POINT" type="int24u" writable="true" default="0xFFFFFF" isNullable="true" optional="true">LampBurnHoursTripPoint</attribute>
+    <attribute side="server" code="0x0030" define="LAMP_TYPE" type="char_string" length="16" writable="true" optional="true">
+        <description>LampType</description>
+        <access op="write" privilege="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0031" define="LAMP_MANUFACTURER" type="char_string" length="16" writable="true" optional="true">
+        <description>LampManufacturer</description>
+        <access op="write" privilege="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0032" define="LAMP_RATED_HOURS" type="int24u" writable="true" default="0xFFFFFF" isNullable="true" optional="true">
+        <description>LampRatedHours</description>
+        <access op="write" privilege="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0033" define="LAMP_BURN_HOURS" type="int24u" writable="true" default="0x000000" isNullable="true" optional="true">
+        <description>LampBurnHours</description>
+        <access op="write" privilege="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0034" define="LAMP_ALARM_MODE" type="LampAlarmModeBitmap" min="0x00" max="0x01" writable="true" default="0x00" optional="true">
+        <description>LampAlarmMode</description>
+        <access op="write" privilege="manage"/>
+    </attribute>
+    <attribute side="server" code="0x0035" define="LAMP_BURN_HOURS_TRIP_POINT" type="int24u" writable="true" default="0xFFFFFF" isNullable="true" optional="true">
+        <description>LampBurnHoursTripPoint</description>
+        <access op="write" privilege="manage"/>
+    </attribute>
   </cluster>
 </configurator>
