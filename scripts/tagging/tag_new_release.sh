@@ -55,4 +55,4 @@ echo "New release: $NEW_RELEASE_TAG"
 echo "Additional arguments: $ADDITIONAL_ARGS"
 
 echo executing: gh release create "$NEW_RELEASE_TAG" --notes-start-tag "$CURRENT_RELEASE" "$@" "$ADDITIONAL_ARGS"
-gh release create $NEW_RELEASE_TAG "--notes-start-tag" $CURRENT_RELEASE $@ $ADDITIONAL_ARGS
+gh release create "$NEW_RELEASE_TAG" "--notes-start-tag" "$CURRENT_RELEASE" "$@" "$ADDITIONAL_ARGS"
