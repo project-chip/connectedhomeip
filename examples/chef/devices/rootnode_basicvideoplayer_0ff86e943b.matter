@@ -1424,6 +1424,7 @@ server cluster AudioOutput = 1291 {
   }
 
   readonly attribute OutputInfoStruct outputList[] = 0;
+  readonly attribute int8u currentOutput = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1779,6 +1780,7 @@ endpoint 1 {
 
   server cluster AudioOutput {
     callback attribute outputList;
+    ram      attribute currentOutput default = 0x00;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
