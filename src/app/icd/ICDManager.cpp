@@ -61,9 +61,9 @@ void ICDManager::Init(PersistentStorageDelegate * storage, FabricTable * fabricT
     ICDManagementServer::GetInstance().SetSymmetricKeystore(mSymmetricKeystore);
 
     // Removing the check for now since it is possible for the Fast polling
-    // to be larger than the ActiveModeInterval for now
-    // uint32_t activeModeInterval = ICDManagementServer::GetInstance().GetActiveModeIntervalMs();
-    // VerifyOrDie(kFastPollingInterval.count() < activeModeInterval);
+    // to be larger than the ActiveModeDuration for now
+    // uint32_t activeModeDuration = ICDManagementServer::GetInstance().GetActiveModeDurationMs();
+    // VerifyOrDie(kFastPollingInterval.count() < activeModeDuration);
 
     UpdateICDMode();
     UpdateOperationState(OperationalState::ActiveMode);
@@ -138,10 +138,10 @@ void ICDManager::UpdateOperationState(OperationalState state)
         mOperationalState = OperationalState::IdleMode;
 
         // When the active mode interval is 0, we stay in idleMode until a notification brings the icd into active mode
-        if (ICDManagementServer::GetInstance().GetActiveModeIntervalMs() > 0)
+        if (ICDManagementServer::GetInstance().GetActiveModeDurationMs() > 0)
         {
-            uint32_t idleModeInterval = ICDManagementServer::GetInstance().GetIdleModeIntervalSec();
-            DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(idleModeInterval), OnIdleModeDone, this);
+            uint32_t idleModeDuration = ICDManagementServer::GetInstance().GetIdleModeDurationSec();
+            DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(idleModeDuration), OnIdleModeDone, this);
         }
 
         System::Clock::Milliseconds32 slowPollInterval = GetSlowPollingInterval();
@@ -169,19 +169,19 @@ void ICDManager::UpdateOperationState(OperationalState state)
             DeviceLayer::SystemLayer().CancelTimer(OnIdleModeDone, this);
 
             mOperationalState           = OperationalState::ActiveMode;
-            uint32_t activeModeInterval = ICDManagementServer::GetInstance().GetActiveModeIntervalMs();
+            uint32_t activeModeDuration = ICDManagementServer::GetInstance().GetActiveModeDurationMs();
 
-            if (activeModeInterval == 0 && !mKeepActiveFlags.HasAny())
+            if (activeModeDuration == 0 && !mKeepActiveFlags.HasAny())
             {
-                // A Network Activity triggered the active mode and activeModeInterval is 0.
+                // A Network Activity triggered the active mode and activeModeDuration is 0.
                 // Stay active for at least Active Mode Threshold.
-                activeModeInterval = ICDManagementServer::GetInstance().GetActiveModeThresholdMs();
+                activeModeDuration = ICDManagementServer::GetInstance().GetActiveModeThresholdMs();
             }
 
-            DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeInterval), OnActiveModeDone, this);
+            DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeDuration), OnActiveModeDone, this);
 
             uint32_t activeModeJitterInterval =
-                (activeModeInterval >= ICD_ACTIVE_TIME_JITTER_MS) ? activeModeInterval - ICD_ACTIVE_TIME_JITTER_MS : 0;
+                (activeModeDuration >= ICD_ACTIVE_TIME_JITTER_MS) ? activeModeDuration - ICD_ACTIVE_TIME_JITTER_MS : 0;
             DeviceLayer::SystemLayer().StartTimer(System::Clock::Timeout(activeModeJitterInterval), OnTransitionToIdle, this);
 
             CHIP_ERROR err = DeviceLayer::ConnectivityMgr().SetPollingInterval(GetFastPollingInterval());

@@ -27,7 +27,7 @@ namespace app {
 /**
  * The ICDManager implements the ICDListener functions and is always subscribed to the ICDNotifier
  * This allows other Matter modules to inform the ICDManager that it needs to go and may have to stay in Active Mode,
- * outside of its standard ActiveModeInterval and IdleModeInterval, without being tightly coupled the  application data model
+ * outside of its standard ActiveModeDuration and IdleModeDuration, without being tightly coupled the  application data model
  *
  * This implementation also allows other modules to implement an ICDListener and subscribe to ICDNotifier
  * to couple behaviours with the ICD cycles. In such cases, ICD_MAX_NOTIFICATION_SUBSCRIBERS need to be adjusted

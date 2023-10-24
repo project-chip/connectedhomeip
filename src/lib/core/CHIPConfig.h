@@ -1484,21 +1484,21 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC
+ * @def CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
  *
- * @brief Default value for the ICD Management cluster IdleModeInterval attribute, in seconds
+ * @brief Default value for the ICD Management cluster IdleModeDuration attribute, in seconds
  */
-#ifndef CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC
-#define CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC 2
+#ifndef CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
+#define CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC 2
 #endif
 
 /**
- * @def CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS
+ * @def CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS
  *
- * @brief Default value for the ICD Management cluster ActiveModeInterval attribute, in milliseconds
+ * @brief Default value for the ICD Management cluster ActiveModeDuration attribute, in milliseconds
  */
-#ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS
-#define CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS 300
+#ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS
+#define CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS 300
 #endif
 
 /**
