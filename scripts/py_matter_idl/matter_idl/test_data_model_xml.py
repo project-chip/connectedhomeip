@@ -91,6 +91,17 @@ class TestXmlParser(unittest.TestCase):
                   <access read="true" readPrivilege="view"/>
                   <mandatoryConform/>
                 </attribute>
+                <attribute id="0x0001" name="TestConform" type="enum8">
+                  <access read="true" readPrivilege="view"/>
+                  <otherwiseConform>
+                    <mandatoryConform>
+                      <feature name="PRSCONST"/>
+                    </mandatoryConform>
+                    <optionalConform>
+                      <feature name="AUTO"/>
+                    </optionalConform>
+                  </otherwiseConform>
+                </attribute>
               </attributes>
             </cluster>
         ''')
@@ -102,6 +113,7 @@ class TestXmlParser(unittest.TestCase):
                }
 
                readonly attribute OutputInfoStruct outputList[] = 0;
+               readonly attribute optional enum8 testConform = 1;
 
                readonly attribute attrib_id attributeList[] = 65531;
                readonly attribute event_id eventList[] = 65530;
