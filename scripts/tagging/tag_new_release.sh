@@ -44,9 +44,9 @@ ADDITIONAL_ARGS=""
 
 # Look for any prerelease information in the spec version (eg: 1.3.0-sve), and target the prerelease channel
 case "$NEW_RELEASE_TAG" in
-*alpha* | *beta* | *prerelease* | *testevent* | *te* | *sve*)
-    ADDITIONAL_ARGS="$ADDITIONAL_ARGS --prerelease"
-    ;;
+    *alpha* | *beta* | *prerelease* | *testevent* | *te* | *sve*)
+        ADDITIONAL_ARGS="$ADDITIONAL_ARGS --prerelease"
+        ;;
 esac
 
 echo "Current release: $CURRENT_RELEASE"
