@@ -8,7 +8,7 @@ original specification `AsciiDoc` files.
 ## How to update
 
 The matter specification is not currently public. As such, as script exists to
-update the spec XMLs however this is not done automatically.
+update the spec XML files, however this is not done automatically.
 
 You will require access to the following tools locally:
 
