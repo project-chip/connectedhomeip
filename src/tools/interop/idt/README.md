@@ -193,7 +193,8 @@ Follow the Linux installation steps above, but do not use Docker.
 > **_IMPORTANT_**  
 > `idt_` commands are shell aliases helpful for administrative commands.  
 > `idt` invokes the `idt` python package.  
-> Output from `idt` will always be colorized while output from subprocesses is generally not.
+> Output from `idt` will always be colorized while output from subprocesses is
+> generally not.
 
 RPi users, as needed:
 
@@ -292,7 +293,7 @@ usage: idt capture [-h] [--platform {Android}] [--ecosystem {DemoExtEcosystem...
 
 > **IMPORTANT:** Note the following runtime expectations of ecosystems:  
 > `analyze_capture` will be run as a target of `multiprocessing.Process`, \
-meaning the ecosystem object will be copied into a forked process at this time.
+> meaning the ecosystem object will be copied into a forked process at this time.
 
 The platform loader functions the same as `capture/ecosystem`.
 
@@ -303,40 +304,53 @@ This module must contain a single class which is a subclass of
 
 ## Project overview
 
-- The entry point is in `idt.py` which contains simple CLI parsing with `argparse`.
-- `log` contains logging utilities used by everything in the project.
+-   The entry point is in `idt.py` which contains simple CLI parsing with
+    `argparse`.
+-   `log` contains logging utilities used by everything in the project.
 
 For capture:
 
-- `base.py` contains the base clases for ecosystems and platforms.
-- `factory.py` contains the ecosystem and platform producer and controller
-- `loader` is a generic class loader that dynamically imports all classes matching a given subclass.
-- `utils/shell` contains a simple helper class for background and foreground Bash commands.
-- `utils/artifact` contains helper functions for managing artifacts.
+-   `base.py` contains the base clases for ecosystems and platforms.
+-   `factory.py` contains the ecosystem and platform producer and controller
+-   `loader` is a generic class loader that dynamically imports all classes
+    matching a given subclass.
+-   `utils/shell` contains a simple helper class for background and foreground
+    Bash commands.
+-   `utils/artifact` contains helper functions for managing artifacts.
 
 For discovery:
 
-- `matter_ble` provides a simple ble scanner that shows matter devices being discovered
-  and lost, as well as their VID/PID, RSSI, etc.
-- `matter_dnssd` provides a smple DNS-SD browser that searches for matter devices
-  and thread border routers.
+-   `matter_ble` provides a simple ble scanner that shows matter devices being
+    discovered and lost, as well as their VID/PID, RSSI, etc.
+-   `matter_dnssd` provides a smple DNS-SD browser that searches for matter
+    devices and thread border routers.
 
 ### Conventions
 
-- `config.py` should be used to hold development configs within the directory where they are needed. 
-  - It may also hold configs for flaky/cumbersome features that might need to be disabled in an emergency. 
-  - `config.py` **should not** be used for everyday operation.
-- When needed, execute builds in a folder called `BUILD` within the source tree. 
-  - `idt_clean_all` deletes all `BUILD` dirs and `BUILD` is in `.gitignore`.
-- Although many things are marked as coroutines, almost all real concurrency in the current implementation comes from multiprocessing. 
-  - A general direction should be decided for the project in the next iteration.
-  - Multiprocessing allows for easier implementation where ecosystems are less likely to block each other
-  - Async allows for better shared states and flexibility
+-   `config.py` should be used to hold development configs within the directory
+    where they are needed.
+    -   It may also hold configs for flaky/cumbersome features that might need
+        to be disabled in an emergency.
+    -   `config.py` **should not** be used for everyday operation.
+-   When needed, execute builds in a folder called `BUILD` within the source
+    tree.
+    -   `idt_clean_all` deletes all `BUILD` dirs and `BUILD` is in `.gitignore`.
+-   Although many things are marked as coroutines, almost all real concurrency
+    in the current implementation comes from multiprocessing.
+    -   A general direction should be decided for the project in the next
+        iteration.
+    -   Multiprocessing allows for easier implementation where ecosystems are
+        less likely to block each other
+    -   Async allows for better shared states and flexibility
 
 ## Troubleshooting
 
-- Change log level from `INFO` to `DEBUG` in `config.py` for additional logging.
-- It is expected that this script will be run on a system with `bash`, `tcpdump`, and `adb` already available.
-- Compiling tcpdump for android may require additional dependencies. 
-  - If the build script fails for you, try `idt_go && source idt/scripts/compilers.sh`.
-- You may disable colors and splash by setting `enable_color` in `config.py` to `False`. 
+-   Change log level from `INFO` to `DEBUG` in `config.py` for additional
+    logging.
+-   It is expected that this script will be run on a system with `bash`,
+    `tcpdump`, and `adb` already available.
+-   Compiling tcpdump for android may require additional dependencies.
+    -   If the build script fails for you, try
+        `idt_go && source idt/scripts/compilers.sh`.
+-   You may disable colors and splash by setting `enable_color` in `config.py`
+    to `False`.
