@@ -35,15 +35,15 @@ class PlayServicesProber:
 
     async def _probe_tracert_icmp_foyer(self) -> None:
         self.logger.info(f"icmp traceroute to {self.target}")
-        Bash(f"sudo traceroute {self.target} {self.command_suffix}", sync=True).start_command()
+        Bash(f"traceroute {self.target} {self.command_suffix}", sync=True).start_command()
 
     async def _probe_tracert_udp_foyer(self) -> None:
         self.logger.info(f"udp traceroute to {self.target}")
-        Bash(f"sudo traceroute -U -p 443 {self.target} {self.command_suffix}", sync=True).start_command()
+        Bash(f"traceroute -U -p 443 {self.target} {self.command_suffix}", sync=True).start_command()
 
     async def _probe_tracert_tcp_foyer(self) -> None:
         self.logger.info(f"tcp traceroute to {self.target}")
-        Bash(f"sudo traceroute -T -p 443 {self.target} {self.command_suffix}", sync=True).start_command()
+        Bash(f"traceroute -T -p 443 {self.target} {self.command_suffix}", sync=True).start_command()
 
     async def _probe_ping_foyer(self) -> None:
         self.logger.info(f"ping {self.target}")
