@@ -2990,8 +2990,8 @@ provisional server cluster BallastConfiguration = 769 {
 
   readonly attribute int8u physicalMinLevel = 0;
   readonly attribute int8u physicalMaxLevel = 1;
-  attribute int8u minLevel = 16;
-  attribute int8u maxLevel = 17;
+  attribute access(write: manage) int8u minLevel = 16;
+  attribute access(write: manage) int8u maxLevel = 17;
   readonly attribute int8u lampQuantity = 32;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
