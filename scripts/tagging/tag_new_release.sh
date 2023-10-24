@@ -40,8 +40,18 @@ fi
 # Construct a final tag, eg: 1.2.0.5 (MAJOR.MINOR.PATCH.SDK_REVISION)
 NEW_RELEASE_TAG="v$CURRENT_SPEC_VERSION.$SDK_RELEASE_REVISIONS"
 
+ADDITIONAL_ARGS=""
+
+# Look for any prerelease information in the spec version (eg: 1.3.0-sve), and target the prerelease channel
+case "$NEW_RELEASE_TAG" in
+*alpha* | *beta* | *prerelease* | *testevent* | *te* | *sve*)
+    ADDITIONAL_ARGS="$ADDITIONAL_ARGS --prerelease"
+    ;;
+esac
+
 echo "Current release: $CURRENT_RELEASE"
 echo "SDK release revisions: $SDK_RELEASE_REVISIONS"
 echo "New release: $NEW_RELEASE_TAG"
+echo "Additional arguments: $ADDITIONAL_ARGS"
 
-gh release create --notes-start-tag "$CURRENT_RELEASE" "$NEW_RELEASE_TAG" "$@"
+gh release create $ADDITIONAL_ARGS --notes-start-tag "$CURRENT_RELEASE" "$NEW_RELEASE_TAG" "$@"
