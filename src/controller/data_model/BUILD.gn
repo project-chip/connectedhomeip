@@ -256,6 +256,8 @@ if (current_os == "android" || matter_enable_java_compilation) {
       "jni/WakeOnLanClient-ReadImpl.cpp",
       "jni/LaundryWasherControlsClient-InvokeSubscribeImpl.cpp",
       "jni/LaundryWasherControlsClient-ReadImpl.cpp",
+      "jni/LaundryDryerControlsClient-InvokeSubscribeImpl.cpp",
+      "jni/LaundryDryerControlsClient-ReadImpl.cpp",
       "jni/WiFiNetworkDiagnosticsClient-InvokeSubscribeImpl.cpp",
       "jni/WiFiNetworkDiagnosticsClient-ReadImpl.cpp",
       "jni/WindowCoveringClient-InvokeSubscribeImpl.cpp",

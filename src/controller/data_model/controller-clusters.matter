@@ -2792,6 +2792,26 @@ client cluster IcdManagement = 70 {
   command access(invoke: manage) StayActiveRequest(): DefaultSuccess = 3;
 }
 
+/** This cluster supports remotely monitoring and controling the different typs of
+            functionality available to a drying device, such as a laundry dryer. */
+client cluster LaundryDryerControls = 74 {
+  enum DrynessLevelEnum : enum8 {
+    kLow = 0;
+    kNormal = 1;
+    kExtra = 2;
+    kMax = 3;
+  }
+
+  readonly attribute optional DrynessLevelEnum supportedDrynessLevels[] = 0;
+  attribute optional nullable DrynessLevelEnum selectedDrynessLevel = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** Attributes and commands for selecting a mode from a list of supported options. */
 client cluster ModeSelect = 80 {
   bitmap Feature : bitmap32 {
