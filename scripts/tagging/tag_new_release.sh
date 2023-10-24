@@ -54,4 +54,4 @@ echo "SDK release revisions: $SDK_RELEASE_REVISIONS"
 echo "New release: $NEW_RELEASE_TAG"
 echo "Additional arguments: $ADDITIONAL_ARGS"
 
-gh release create $ADDITIONAL_ARGS --notes-start-tag "$CURRENT_RELEASE" "$NEW_RELEASE_TAG" "$@"
+gh release create "$ADDITIONAL_ARGS" --notes-start-tag "$CURRENT_RELEASE" "$NEW_RELEASE_TAG" "$@"
