@@ -14,18 +14,20 @@
 
 import logging
 import re
-from typing import Optional
 from dataclasses import dataclass
+from typing import Optional
 
 from matter_idl.generators.types import GetDataTypeSizeInBits, IsSignedDataType
 from matter_idl.matter_idl_types import AccessPrivilege, Attribute, Command, ConstantEntry, DataType, Event, EventPriority, Field
 
 LOGGER = logging.getLogger('data-model-xml-data-parsing')
 
+
 @dataclass
 class ParsedType:
     name: str
     is_list: bool = False
+
 
 def ParseInt(value: str, data_type: Optional[DataType] = None) -> int:
     """
@@ -102,7 +104,6 @@ def ParseType(t: str) -> ParsedType:
         t = t[:-5]
 
     return ParsedType(name=NormalizeDataType(t), is_list=is_list)
-
 
 
 def NormalizeName(name: str) -> str:
