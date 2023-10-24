@@ -14,12 +14,19 @@
 
 import logging
 import re
+from dataclasses import dataclass
 from typing import Optional
 
 from matter_idl.generators.types import GetDataTypeSizeInBits, IsSignedDataType
 from matter_idl.matter_idl_types import AccessPrivilege, Attribute, Command, ConstantEntry, DataType, Event, EventPriority, Field
 
 LOGGER = logging.getLogger('data-model-xml-data-parsing')
+
+
+@dataclass
+class ParsedType:
+    name: str
+    is_list: bool = False
 
 
 def ParseInt(value: str, data_type: Optional[DataType] = None) -> int:
@@ -61,7 +68,7 @@ _TYPE_REMAP = {
     "uint32": "int32u",
     "uint48": "int48u",
     "uint52": "int52u",
-    "uint64": "int54u",
+    "uint64": "int64u",
     # signed
     "sint8": "int8s",
     "sint16": "int16s",
@@ -69,7 +76,7 @@ _TYPE_REMAP = {
     "sint32": "int32s",
     "sint48": "int48s",
     "sint52": "int52s",
-    "sint64": "int54s",
+    "sint64": "int64s",
     # other
     "bool": "boolean",
     "string": "char_string",
@@ -80,6 +87,23 @@ _TYPE_REMAP = {
 def NormalizeDataType(t: str) -> str:
     """Convert data model xml types into matter idl types."""
     return _TYPE_REMAP.get(t.lower(), t.replace("-", "_"))
+
+
+def ParseType(t: str) -> ParsedType:
+    """Parse a data type entry.
+
+    Specifically parses a name like "list[Foo Type]".
+    """
+    # very rough matcher ...
+    is_list = False
+    if t.startswith("list[") and t.endswith("]"):
+        is_list = True
+        t = t[5:-1]
+
+    if t.endswith(" Type"):
+        t = t[:-5]
+
+    return ParsedType(name=NormalizeDataType(t), is_list=is_list)
 
 
 def NormalizeName(name: str) -> str:
@@ -126,10 +150,13 @@ def AttributesToField(attrs) -> Field:
     assert "id" in attrs
     assert "type" in attrs
 
+    t = ParseType(attrs["type"])
+
     return Field(
         name=FieldName(attrs["name"]),
         code=ParseInt(attrs["id"]),
-        data_type=DataType(name=NormalizeDataType(attrs["type"]))
+        is_list=t.is_list,
+        data_type=DataType(name=t.name),
     )
 
 
@@ -154,11 +181,14 @@ def AttributesToAttribute(attrs) -> Attribute:
         LOGGER.error(f"Attribute {attrs['name']} has no type")
         attr_type = "sint32"
 
+    t = ParseType(attr_type)
+
     return Attribute(
         definition=Field(
             code=ParseInt(attrs["id"]),
             name=FieldName(attrs["name"]),
-            data_type=DataType(name=attr_type),
+            is_list=t.is_list,
+            data_type=DataType(name=t.name),
         )
     )
 

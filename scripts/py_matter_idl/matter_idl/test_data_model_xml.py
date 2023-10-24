@@ -72,6 +72,48 @@ class TestXmlParser(unittest.TestCase):
 
         self.assertEqual(xml_idl, expected_idl)
 
+    def testAttributes(self):
+        # Validate an attribute with a type list
+        # This is a very stripped down version from the original AudioOutput.xml
+
+        xml_idl = XmlToIdl('''
+            <cluster id="123" name="Test" revision="1">
+              <dataTypes>
+                <struct name="OutputInfoStruct">
+                  <field id="0" name="Index" type="uint8">
+                    <access read="true" write="true"/>
+                    <mandatoryConform/>
+                  </field>
+                </struct>
+              </dataTypes>
+              <attributes>
+                <attribute id="0x0000" name="OutputList" type="list[OutputInfoStruct Type]">
+                  <access read="true" readPrivilege="view"/>
+                  <mandatoryConform/>
+                </attribute>
+              </attributes>
+            </cluster>
+        ''')
+
+        expected_idl = IdlTextToIdl('''
+            client cluster Test = 123 {
+               struct OutputInfoStruct {
+                  int8u index = 0;
+               }
+
+               readonly attribute OutputInfoStruct outputList[] = 0;
+
+               readonly attribute attrib_id attributeList[] = 65531;
+               readonly attribute event_id eventList[] = 65530;
+               readonly attribute command_id acceptedCommandList[] = 65529;
+               readonly attribute command_id generatedCommandList[] = 65528;
+               readonly attribute bitmap32 featureMap = 65532;
+               readonly attribute int16u clusterRevision = 65533;
+           }
+        ''')
+
+        self.assertEqual(xml_idl, expected_idl)
+
     def testComplexInput(self):
         # This parses a known copy of Switch.xml which happens to be fully
         # spec-conformant (so assuming it as a good input)
