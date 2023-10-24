@@ -45,8 +45,8 @@ jobs:
             env:
               GH_TOKEN: ${{ github.token }} 
             run: |
-              BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+              export BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
               echo "Tagging against branch: $BRANCH_NAME"
-              ./scripts/tagging/tag_new_release.sh --generate-notes --target $BRANCH_NAME -d # Note this is a draft for now.
+              ./scripts/tagging/tag_new_release.sh --generate-notes --target "$BRANCH_NAME" -d # Note this is a draft for now.
 
       
