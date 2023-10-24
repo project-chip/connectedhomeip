@@ -213,16 +213,18 @@ private:
     CHIP_ERROR AllocEntry(UnauthenticatedSession::SessionRole sessionRole, NodeId ephemeralInitiatorNodeID,
                           const ReliableMessageProtocolConfig & config, UnauthenticatedSession *& entry)
     {
-        entry = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, config);
-        if (entry != nullptr)
-            return CHIP_NO_ERROR;
 
         entry = FindLeastRecentUsedEntry();
         if (entry == nullptr)
         {
-            return CHIP_ERROR_NO_MEMORY;
+            entry = mEntries.CreateObject(sessionRole, ephemeralInitiatorNodeID, config);
+            if (entry != nullptr)
+                return CHIP_NO_ERROR;
+            else
+                return CHIP_ERROR_NO_MEMORY;
         }
 
+        ChipLogProgress(ExchangeManager, "Allocated new session. Current session count: %zu", mEntries.Allocated());
         mEntries.ResetObject(entry, sessionRole, ephemeralInitiatorNodeID, config);
         return CHIP_NO_ERROR;
     }
