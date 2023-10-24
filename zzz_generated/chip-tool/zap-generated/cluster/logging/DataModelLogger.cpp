@@ -10797,12 +10797,12 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("UltrasonicUnoccupiedToOccupiedThreshold", 1, value);
         }
         case OccupancySensing::Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id: {
-            uint16_t value;
+            chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PhysicalContactOccupiedToUnoccupiedDelay", 1, value);
         }
         case OccupancySensing::Attributes::PhysicalContactUnoccupiedToOccupiedDelay::Id: {
-            uint16_t value;
+            chip::app::DataModel::Nullable<uint16_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("PhysicalContactUnoccupiedToOccupiedDelay", 1, value);
         }

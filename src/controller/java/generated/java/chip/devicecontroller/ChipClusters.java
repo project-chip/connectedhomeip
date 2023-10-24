@@ -21675,6 +21675,18 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
+    public interface PhysicalContactOccupiedToUnoccupiedDelayAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+      void onError(Exception ex);
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
+    public interface PhysicalContactUnoccupiedToOccupiedDelayAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+      void onError(Exception ex);
+      default void onSubscriptionEstablished(long subscriptionId) {}
+    }
+
     public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> value);
       void onError(Exception ex);
@@ -21838,7 +21850,7 @@ public class ChipClusters {
     }
 
     public void readPhysicalContactOccupiedToUnoccupiedDelayAttribute(
-        IntegerAttributeCallback callback) {
+        PhysicalContactOccupiedToUnoccupiedDelayAttributeCallback callback) {
         readPhysicalContactOccupiedToUnoccupiedDelayAttribute(chipClusterPtr, callback);
     }
 
@@ -21851,12 +21863,12 @@ public class ChipClusters {
     }
 
     public void subscribePhysicalContactOccupiedToUnoccupiedDelayAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        PhysicalContactOccupiedToUnoccupiedDelayAttributeCallback callback, int minInterval, int maxInterval) {
         subscribePhysicalContactOccupiedToUnoccupiedDelayAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readPhysicalContactUnoccupiedToOccupiedDelayAttribute(
-        IntegerAttributeCallback callback) {
+        PhysicalContactUnoccupiedToOccupiedDelayAttributeCallback callback) {
         readPhysicalContactUnoccupiedToOccupiedDelayAttribute(chipClusterPtr, callback);
     }
 
@@ -21869,7 +21881,7 @@ public class ChipClusters {
     }
 
     public void subscribePhysicalContactUnoccupiedToOccupiedDelayAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        PhysicalContactUnoccupiedToOccupiedDelayAttributeCallback callback, int minInterval, int maxInterval) {
         subscribePhysicalContactUnoccupiedToOccupiedDelayAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -21999,17 +22011,17 @@ public class ChipClusters {
 
     private native void subscribeUltrasonicUnoccupiedToOccupiedThresholdAttribute(long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readPhysicalContactOccupiedToUnoccupiedDelayAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
+    private native void readPhysicalContactOccupiedToUnoccupiedDelayAttribute(long chipClusterPtr, PhysicalContactOccupiedToUnoccupiedDelayAttributeCallback callback);
 
     private native void writePhysicalContactOccupiedToUnoccupiedDelayAttribute(long chipClusterPtr, DefaultClusterCallback callback, Integer value, @Nullable Integer timedWriteTimeoutMs);
 
-    private native void subscribePhysicalContactOccupiedToUnoccupiedDelayAttribute(long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+    private native void subscribePhysicalContactOccupiedToUnoccupiedDelayAttribute(long chipClusterPtr, PhysicalContactOccupiedToUnoccupiedDelayAttributeCallback callback, int minInterval, int maxInterval);
 
-    private native void readPhysicalContactUnoccupiedToOccupiedDelayAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
+    private native void readPhysicalContactUnoccupiedToOccupiedDelayAttribute(long chipClusterPtr, PhysicalContactUnoccupiedToOccupiedDelayAttributeCallback callback);
 
     private native void writePhysicalContactUnoccupiedToOccupiedDelayAttribute(long chipClusterPtr, DefaultClusterCallback callback, Integer value, @Nullable Integer timedWriteTimeoutMs);
 
-    private native void subscribePhysicalContactUnoccupiedToOccupiedDelayAttribute(long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+    private native void subscribePhysicalContactUnoccupiedToOccupiedDelayAttribute(long chipClusterPtr, PhysicalContactUnoccupiedToOccupiedDelayAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readPhysicalContactUnoccupiedToOccupiedThresholdAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
 

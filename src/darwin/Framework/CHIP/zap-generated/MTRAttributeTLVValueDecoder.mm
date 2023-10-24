@@ -10299,8 +10299,12 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId a
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedShort:cppValue];
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+        }
         return value;
     }
     case Attributes::PhysicalContactUnoccupiedToOccupiedDelay::Id: {
@@ -10310,8 +10314,12 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId a
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedShort:cppValue];
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+        }
         return value;
     }
     case Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::Id: {

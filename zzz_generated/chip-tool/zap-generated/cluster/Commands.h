@@ -18350,12 +18350,12 @@ void registerClusterOccupancySensing(Commands & commands, CredentialIssuerComman
         make_unique<WriteAttribute<uint8_t>>(Id, "ultrasonic-unoccupied-to-occupied-threshold", 0, UINT8_MAX,
                                              Attributes::UltrasonicUnoccupiedToOccupiedThreshold::Id, WriteCommandType::kWrite,
                                              credsIssuerConfig), //
-        make_unique<WriteAttribute<uint16_t>>(Id, "physical-contact-occupied-to-unoccupied-delay", 0, UINT16_MAX,
-                                              Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id, WriteCommandType::kWrite,
-                                              credsIssuerConfig), //
-        make_unique<WriteAttribute<uint16_t>>(Id, "physical-contact-unoccupied-to-occupied-delay", 0, UINT16_MAX,
-                                              Attributes::PhysicalContactUnoccupiedToOccupiedDelay::Id, WriteCommandType::kWrite,
-                                              credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(
+            Id, "physical-contact-occupied-to-unoccupied-delay", 0, UINT16_MAX,
+            Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(
+            Id, "physical-contact-unoccupied-to-occupied-delay", 0, UINT16_MAX,
+            Attributes::PhysicalContactUnoccupiedToOccupiedDelay::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "physical-contact-unoccupied-to-occupied-threshold", 0, UINT8_MAX,
                                              Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::Id, WriteCommandType::kWrite,
                                              credsIssuerConfig), //

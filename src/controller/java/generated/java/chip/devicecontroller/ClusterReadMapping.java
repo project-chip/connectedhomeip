@@ -11743,10 +11743,10 @@ public class ClusterReadMapping {
         InteractionInfo readOccupancySensingPhysicalContactOccupiedToUnoccupiedDelayAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.OccupancySensingCluster) cluster).readPhysicalContactOccupiedToUnoccupiedDelayAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
+              (ChipClusters.OccupancySensingCluster.PhysicalContactOccupiedToUnoccupiedDelayAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          () -> new ClusterInfoMapping.DelegatedOccupancySensingClusterPhysicalContactOccupiedToUnoccupiedDelayAttributeCallback(),
           readOccupancySensingPhysicalContactOccupiedToUnoccupiedDelayCommandParams
         );
         result.put("readPhysicalContactOccupiedToUnoccupiedDelayAttribute", readOccupancySensingPhysicalContactOccupiedToUnoccupiedDelayAttributeInteractionInfo);
@@ -11754,10 +11754,10 @@ public class ClusterReadMapping {
         InteractionInfo readOccupancySensingPhysicalContactUnoccupiedToOccupiedDelayAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
             ((ChipClusters.OccupancySensingCluster) cluster).readPhysicalContactUnoccupiedToOccupiedDelayAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
+              (ChipClusters.OccupancySensingCluster.PhysicalContactUnoccupiedToOccupiedDelayAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          () -> new ClusterInfoMapping.DelegatedOccupancySensingClusterPhysicalContactUnoccupiedToOccupiedDelayAttributeCallback(),
           readOccupancySensingPhysicalContactUnoccupiedToOccupiedDelayCommandParams
         );
         result.put("readPhysicalContactUnoccupiedToOccupiedDelayAttribute", readOccupancySensingPhysicalContactUnoccupiedToOccupiedDelayAttributeInteractionInfo);
