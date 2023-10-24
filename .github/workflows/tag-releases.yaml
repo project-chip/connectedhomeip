@@ -42,6 +42,8 @@ jobs:
                 && sudo apt install gh -y
                 
           - name: Tag Release & Generate Notes
+            env:
+              GH_TOKEN: ${{ github.token }} 
             run: |
               BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
               echo "Tagging against branch: $BRANCH_NAME"
