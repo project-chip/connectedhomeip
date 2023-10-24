@@ -121,7 +121,7 @@ class {{asUpperCamelCase name}}(Cluster):
             {{~#if responseName}}
             response_type: typing.ClassVar[str] = '{{asUpperCamelCase responseName}}'
             {{else}}
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[typing.Optional[str]] = None
             {{/if}}
 
             @ChipUtility.classproperty
