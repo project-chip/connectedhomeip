@@ -3,6 +3,7 @@ import json
 
 _LIST_OF_PACKAGES_TO_EXCLUDE = {'rust'}
 
+
 def include_package(package: dict) -> bool:
     if 'path' in package:
         path_full = package['path']
@@ -11,18 +12,18 @@ def include_package(package: dict) -> bool:
         if exclusion_match:
             return False
     return True
-    
+
 
 def generate_new_cipd_package_json(input, output):
     with open(input) as ins:
         packages = json.load(ins)
         file_packages = packages.get('packages')
         new_file_packages = [x for x in file_packages if include_package(x)]
-    
+
     new_packages = {'packages': new_file_packages}
     with open(output, 'w') as f:
         json.dump(new_packages, f, indent=2)
-            
+
 
 def main():
     parser = argparse.ArgumentParser(
