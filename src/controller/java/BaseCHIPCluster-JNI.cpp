@@ -3,6 +3,8 @@
 #include <lib/support/JniReferences.h>
 #include <platform/PlatformManager.h>
 
+#include "AndroidCallbacks.h"
+
 #define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipClusters_00024##CLASS_NAME##_##METHOD_NAME
 
@@ -55,5 +57,65 @@ JNI_METHOD(void, BaseChipCluster, setCommandTimeout)
     else
     {
         cluster->SetCommandTimeout(chip::NullOptional);
+    }
+}
+// (long callbackHandle, long deviceControllerPtr, int endpointId, long attributeId, boolean isFabricFiltered, int imTimeoutMs);
+JNI_METHOD(void, BaseChipCluster, readAttribute)
+(JNIEnv * env, jobject self, jlong callbackHandle, jlong devicePtr, jint jEndpointId, jlong jClusterId, jlong jAttributeId, jboolean isFabricFiltered, jint imTimeoutMs)
+{
+    using namespace chip;
+    using namespace chip::Controller;
+
+    ChipLogError(Controller, "BaseChipCluster:readAttribute");
+    DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    auto callback = reinterpret_cast<ReportCallback *>(callbackHandle);
+    std::vector<app::AttributePathParams> attributePathParamsList;
+    app::ReadClient * readClient = nullptr;
+    DeviceProxy * device         = reinterpret_cast<DeviceProxy *>(devicePtr);
+    if (device == nullptr)
+    {
+        ChipLogProgress(Controller, "Could not cast device pointer to Device object");
+        return;
+    }
+    chip::app::ReadPrepareParams params(device->GetSecureSession().Value());
+
+    EndpointId endpointId = static_cast<EndpointId>(jEndpointId);
+    ClusterId clusterId = static_cast<ClusterId>(jClusterId);
+    AttributeId attributeId = static_cast<AttributeId>(jAttributeId);
+    attributePathParamsList.push_back(app::AttributePathParams(endpointId, clusterId, attributeId));
+
+    params.mpAttributePathParamsList    = attributePathParamsList.data();
+    params.mAttributePathParamsListSize = 1;
+
+    params.mIsFabricFiltered = (isFabricFiltered != JNI_FALSE);
+    params.mTimeout          = imTimeoutMs != 0 ? System::Clock::Milliseconds32(imTimeoutMs) : System::Clock::kZero;
+
+    readClient = Platform::New<app::ReadClient>(app::InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
+                                                callback->mClusterCacheAdapter.GetBufferedCallback(),
+                                                app::ReadClient::InteractionType::Read);
+
+    SuccessOrExit(err = readClient->SendRequest(params));
+    callback->mReadClient = readClient;
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "JNI IM Read Error: %s", err.AsString());
+        if (err == CHIP_JNI_ERROR_EXCEPTION_THROWN)
+        {
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+        }
+        callback->OnError(err);
+        if (readClient != nullptr)
+        {
+            Platform::Delete(readClient);
+        }
+        if (callback != nullptr)
+        {
+            Platform::Delete(callback);
+        }
     }
 }

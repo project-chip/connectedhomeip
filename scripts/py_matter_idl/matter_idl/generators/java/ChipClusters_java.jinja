@@ -56,11 +56,21 @@
 
 package chip.devicecontroller;
 
+import chip.devicecontroller.model.ChipAttributePath;
+import chip.devicecontroller.model.ChipEventPath;
+import chip.devicecontroller.model.NodeState;
+import chip.devicecontroller.model.EndpointState;
+import chip.devicecontroller.model.ClusterState;
+import chip.devicecontroller.model.AttributeState;
+
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class ChipClusters {
 
@@ -69,55 +79,52 @@ public class ChipClusters {
     void onError(Exception error);
   }
 
-  public interface CharStringAttributeCallback {
+  public interface BaseAttributeCallback {
+    void onError(Exception error);
+    default void onSubscriptionEstablished(long subscriptionId) {}
+  }
+
+  public interface CharStringAttributeCallback extends BaseAttributeCallback {
     /** Indicates a successful read for a CHAR_STRING attribute. */
     void onSuccess(String value);
-    void onError(Exception error);
-    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
-  public interface OctetStringAttributeCallback {
+  public interface OctetStringAttributeCallback extends BaseAttributeCallback {
     /** Indicates a successful read for an OCTET_STRING attribute. */
     void onSuccess(byte[] value);
-    void onError(Exception error);
-    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
-  public interface IntegerAttributeCallback {
+  public interface IntegerAttributeCallback extends BaseAttributeCallback {
     void onSuccess(int value);
-    void onError(Exception error);
-    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
-  public interface LongAttributeCallback {
+  public interface LongAttributeCallback extends BaseAttributeCallback {
     void onSuccess(long value);
-    void onError(Exception error);
-    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
-  public interface BooleanAttributeCallback {
+  public interface BooleanAttributeCallback extends BaseAttributeCallback {
     void onSuccess(boolean value);
-    void onError(Exception error);
-    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
-  public interface FloatAttributeCallback {
+  public interface FloatAttributeCallback extends BaseAttributeCallback {
     void onSuccess(float value);
-    void onError(Exception error);
-    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
-  public interface DoubleAttributeCallback {
+  public interface DoubleAttributeCallback extends BaseAttributeCallback {
     void onSuccess(double value);
-    void onError(Exception error);
-    default void onSubscriptionEstablished(long subscriptionId) {}
   }
 
   public static abstract class BaseChipCluster {
     protected long chipClusterPtr;
 
+    protected long devicePtr;
+    protected int endpointId;
+
     public BaseChipCluster(long devicePtr, int endpointId) {
       chipClusterPtr = initWithDevice(devicePtr, endpointId);
+
+      this.devicePtr = devicePtr;
+      this.endpointId = endpointId;
     }
 
     /**
@@ -141,6 +148,13 @@ public class ChipClusters {
 
     public abstract long initWithDevice(long devicePtr, int endpointId);
 
+    protected void readAttribute(ReportCallback callback, long clusterId, long attributeId, boolean isFabricFiltered, int imTimeoutMs) {
+        ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback, null);
+        readAttribute(jniCallback.getCallbackHandle(), devicePtr, endpointId, clusterId, attributeId, isFabricFiltered, imTimeoutMs);
+    }
+
+    private native void readAttribute(long callbackHandle, long devicePtr, int endpointId, long clusterId, long attributeId, boolean isFabricFiltered, int imTimeoutMs);
+
     public native void deleteCluster(long chipClusterPtr);
     
     @SuppressWarnings("deprecation")
@@ -152,6 +166,62 @@ public class ChipClusters {
         chipClusterPtr = 0;
       }
     }
+  }
+
+  abstract static class ReportCallbackImpl implements ReportCallback {
+    private BaseAttributeCallback callback;
+    private ChipAttributePath path;
+
+    private static final long CHIP_ERROR_UNSUPPORTED_ATTRIBUTE = 0x86;
+
+    ReportCallbackImpl(BaseAttributeCallback callback, ChipAttributePath path) {
+      this.callback = callback;
+      this.path = path;
+    }
+
+    @Override
+    public void onError(
+        @Nullable ChipAttributePath attributePath,
+        @Nullable ChipEventPath eventPath,
+        @Nonnull Exception e) {
+      callback.onError(e);
+    }
+
+    @Override
+    public void onReport(NodeState nodeState) {
+      if (nodeState == null) {
+        callback.onError(new ChipClusterException());
+        return;
+      }
+
+      EndpointState endpointState = nodeState.getEndpointState((int)path.getEndpointId().getId());
+      if (endpointState == null) {
+        callback.onError(new ChipClusterException(CHIP_ERROR_UNSUPPORTED_ATTRIBUTE));
+        return;
+      }
+
+      ClusterState clusterState = endpointState.getClusterState(path.getClusterId().getId());
+      if (clusterState == null) {
+        callback.onError(new ChipClusterException(CHIP_ERROR_UNSUPPORTED_ATTRIBUTE));
+        return;
+      }
+
+      AttributeState attributeState = clusterState.getAttributeState(path.getAttributeId().getId());
+      if (attributeState == null) {
+        callback.onError(new ChipClusterException(CHIP_ERROR_UNSUPPORTED_ATTRIBUTE));
+        return;
+      }
+
+      byte[] tlv = attributeState.getTlv();
+      if (tlv == null) {
+          callback.onError(new ChipClusterException(CHIP_ERROR_UNSUPPORTED_ATTRIBUTE));
+          return;
+      }
+
+      onSuccess(tlv);
+    }
+
+    public abstract void onSuccess(byte[] tlv);
   }
 {% for cluster in clientClusters | sort(attribute='code') %}
 {%- set typeLookup = idl | createLookupContext(cluster) %}
@@ -239,33 +309,41 @@ public class ChipClusters {
 {%- set encodable = attribute.definition | asEncodable(typeLookup) -%}
 {%- set interfaceName = attribute | javaAttributeCallbackName(typeLookup) -%}
 {%- if interfaceName not in already_handled_attribute %}
-    public interface {{interfaceName}} {
+    public interface {{interfaceName}} extends BaseAttributeCallback {
       void onSuccess({{encode_value_without_optional(cluster, encodable, 0)}} value);
-      void onError(Exception ex);
-      default void onSubscriptionEstablished(long subscriptionId) {}
     }
 {% if already_handled_attribute.append(interfaceName) -%}
 {#- This block does nothing, it only exists to append to already_handled_attribute. -#}
 {%- endif -%}
 {%- endif -%}
 {% endfor -%}
-{% for attribute in cluster.attributes | sort(attribute='code') %}
+{% for attribute in cluster.attributes | sort(attribute='code') -%}
+{%- if attribute | isFabricScopedList(typeLookup) %}
     public void read{{attribute.definition.name | upfirst}}Attribute(
         {{attribute | javaAttributeCallbackName(typeLookup) }} callback) {
-        read{{attribute.definition.name | upfirst}}Attribute(chipClusterPtr, callback
-{%- if attribute | isFabricScopedList(typeLookup) -%}
-, true
-{%- endif -%}
-      );
-    }
-{% if attribute | isFabricScopedList(typeLookup) %}
-    public void read{{attribute.definition.name | upfirst}}AttributeWithFabricFilter(
-        {{attribute | javaAttributeCallbackName(typeLookup) }} callback, boolean isFabricFiltered) {
-        read{{attribute.definition.name | upfirst}}Attribute(chipClusterPtr, callback, isFabricFiltered);
+        read{{attribute.definition.name | upfirst}}AttributeWithFabricFilter(callback, true);
     }
 
-{% endif -%}
-{%- if attribute.is_writable %}
+    public void read{{attribute.definition.name | upfirst}}AttributeWithFabricFilter(
+        {{attribute | javaAttributeCallbackName(typeLookup) }} callback, boolean isFabricFiltered) {
+{%- else %}
+    public void read{{attribute.definition.name | upfirst}}Attribute(
+        {{attribute | javaAttributeCallbackName(typeLookup) }} callback) {
+{%- endif %}
+      long clusterId = CLUSTER_ID;
+      long attributeId = {{attribute.definition.code}}L;
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, attributeId); 
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            {%- set encodable = attribute.definition | asEncodable(typeLookup) %}
+            {{encode_value_without_optional(cluster, encodable, 0)}} value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        } , clusterId, attributeId, {% if attribute | isFabricScopedList(typeLookup) -%}isFabricFiltered{%- else -%}true{%- endif -%}, 0);
+    }
+{% if attribute.is_writable %}
 {%- set encodable = attribute.definition | asEncodable(typeLookup) -%}
 {%- set encodable2 = attribute.definition | asEncodable(typeLookup) -%}
 {%- if not attribute.requires_timed_write %}
@@ -283,14 +361,9 @@ public class ChipClusters {
         subscribe{{attribute.definition.name | upfirst}}Attribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 {% endif -%}
-{%- endfor %}
-{%- for attribute in cluster.attributes %}
-    private native void read{{attribute.definition.name | upfirst}}Attribute(long chipClusterPtr, {{attribute | javaAttributeCallbackName(typeLookup) }} callback
-{%- if attribute | isFabricScopedList(typeLookup) -%}
-    , boolean isFabricFiltered
-{%- endif -%}
-    );
-{% if attribute.is_writable -%}
+{%- endfor -%}
+{%- for attribute in cluster.attributes -%}
+{%- if attribute.is_writable -%}
 {%- set encodable = attribute.definition | asEncodable(typeLookup) %}
     private native void write{{attribute.definition.name | upfirst}}Attribute(long chipClusterPtr, DefaultClusterCallback callback, {{encode_value_without_optional_nullable(cluster, encodable, 0)}} value, @Nullable Integer timedWriteTimeoutMs);
 {% endif -%}
