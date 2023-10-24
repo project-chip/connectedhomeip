@@ -201,6 +201,8 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
                 mTimeZoneBuf[i].name.SetValue(span);
             }
         }
+        auto list = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>(mTimeZoneBuf, size);
+        mParams.SetTimeZone(list);
     }
 
     return CHIP_NO_ERROR;
