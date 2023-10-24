@@ -309,7 +309,7 @@ client cluster OnOff = 6 {
 
   bitmap Feature : bitmap32 {
     kLighting = 0x1;
-    kDeadFrontBehaviour = 0x2;
+    kDeadFrontBehavior = 0x2;
   }
 
   bitmap OnOffControlBitmap : bitmap8 {
@@ -330,7 +330,7 @@ client cluster OnOff = 6 {
 
   request struct OffWithEffectRequest {
     EffectIdentifierEnum effectIdentifier = 0;
-    enum8 effectVariant = 1;
+    int8u effectVariant = 1;
   }
 
   request struct OnWithTimedOffRequest {
@@ -378,7 +378,7 @@ server cluster OnOff = 6 {
 
   bitmap Feature : bitmap32 {
     kLighting = 0x1;
-    kDeadFrontBehaviour = 0x2;
+    kDeadFrontBehavior = 0x2;
   }
 
   bitmap OnOffControlBitmap : bitmap8 {
@@ -399,7 +399,7 @@ server cluster OnOff = 6 {
 
   request struct OffWithEffectRequest {
     EffectIdentifierEnum effectIdentifier = 0;
-    enum8 effectVariant = 1;
+    int8u effectVariant = 1;
   }
 
   request struct OnWithTimedOffRequest {

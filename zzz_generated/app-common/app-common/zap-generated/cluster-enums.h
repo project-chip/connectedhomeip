@@ -160,8 +160,8 @@ enum class StartUpOnOffEnum : uint8_t
 // Bitmap for Feature
 enum class Feature : uint32_t
 {
-    kLighting           = 0x1,
-    kDeadFrontBehaviour = 0x2,
+    kLighting          = 0x1,
+    kDeadFrontBehavior = 0x2,
 };
 
 // Bitmap for OnOffControlBitmap
