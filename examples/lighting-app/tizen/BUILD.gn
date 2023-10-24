@@ -55,6 +55,9 @@ executable("chip-lighting-app") {
     deps += [ ":chip-lighting-app-manager" ]
     defines = [ "ENABLE_DBUS_UI=1" ]
   }
+  else {
+    defines = [ "ENABLE_DBUS_UI=0" ]
+  }
 
   include_dirs = [ "include" ]
 
