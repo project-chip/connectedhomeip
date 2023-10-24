@@ -181,7 +181,7 @@ def AttributesToAttribute(attrs) -> Attribute:
         LOGGER.error(f"Attribute {attrs['name']} has no type")
         attr_type = "sint32"
 
-    t = ParseType(attrs["type"])
+    t = ParseType(attr_type)
 
     return Attribute(
         definition=Field(
