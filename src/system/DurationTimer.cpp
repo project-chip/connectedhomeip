@@ -1,17 +1,15 @@
 
-#include <stdint.h>
+//#include <stdint.h>
 #include <system/DurationTimer.h>
 
-using namespace std::literals;
+//using namespace std::literals;
 
 namespace chip {
 namespace timing {
 
 #if (DURATION_SHOW_TIME)
 #define DATETIME_PATTERN ("%Y-%m-%dT%H:%M:%S")
-
 #define DATETIME_LEN (sizeof "1970-01-01T23:59:59")
-
 #define ISO8601_LEN (sizeof "time: 1970-01-01T23:59:59.123456Z")
 #endif
 
@@ -38,20 +36,11 @@ void DurationTimer::stop()
 
 double DurationTimer::duration()
 {
-    //double dur = ((t2 - t1) * 1e-6);
     chip::System::Clock::Milliseconds64 millis = std::chrono::duration_cast<chip::System::Clock::Milliseconds64>(t2-t1);
     chip::System::Clock::Seconds32 seconds = std::chrono::duration_cast<chip::System::Clock::Seconds32>(t2-t1);
-    //printf("Timer: secs %d  millis %lld  \n", seconds.count(), ((long long int)millis.count()) );
     millis -= seconds;
-    //printf("Timer: secs %d  millis %d  \n", seconds.count(), ((int)millis.count()) );
-    
-    //time_t  oseconds = static_cast<time_t>(seconds.count());
-    //auto dur =  millis.count();//t2.count() - t1.count();
     suseconds_t omillis = static_cast<suseconds_t>(millis.count());
 
-    //std::string timestr = toTimeStr(t2);
-
-    //ChipLogDetail(DeviceLayer, "Timer: %s TIME_SPENT (sec) %f , %s ", label.c_str(), dur, timestr.c_str());
     //printf("Timer: %s %s TIME_SPENT (millisec) %d \n", label.c_str(), toTimeStr(t2).c_str(), ((int)omillis) );
     printf("Timer: %s TIME_SPENT (millisec) %d \n", label.c_str(), ((int)omillis) );
 
@@ -62,7 +51,7 @@ double DurationTimer::duration()
 std::string DurationTimer::toTimeStr(chip::System::Clock::Timestamp time)
 {
     #if (!DURATION_SHOW_TIME)
-    std::string str = "";
+    std::string str;
     #else
     char * str = new char[ISO8601_LEN];//TODO look into Direct leak of 68 byte(s) in 2 object(s) allocated from:
     chip::System::Clock::Milliseconds64 in = std::chrono::duration_cast<chip::System::Clock::Milliseconds64>(time);
