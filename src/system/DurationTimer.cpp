@@ -44,7 +44,7 @@ double DurationTimer::duration()
     ChipLogProgress(DeviceLayer,"Timer: %s TIME_SPENT (millisec) %d \n", label.c_str(), ((int)omillis) );
     //printf("Timer: %s TIME_SPENT (millisec) %d \n", label.c_str(), ((int)omillis) );
 
-    return (double)millis.count();
+    return (double)omillis;
 }
 
 // utility method
