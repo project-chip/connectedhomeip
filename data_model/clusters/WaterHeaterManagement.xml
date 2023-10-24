@@ -51,79 +51,109 @@ are the sole property of their respective owners.
 
 This notice and disclaimer must be included on all copies of this document.
 
-Connectivity Standards Alliance +
-508 Second Street, Suite 206 +
+Connectivity Standards Alliance
+508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0053" name="Laundry Washer Controls" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0094" name="Water Heater Management" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial release"/>
+    <revision revision="1" summary="Initial Release in Matter"/>
   </revisionHistory>
-  <classification hierarchy="base" role="application" picsCode="WASHERCTRL" scope="Endpoint"/>
+  <classification hierarchy="base" role="application" picsCode="WHM" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="SPIN" name="Spin" summary="Multiple spin speeds supported">
-      <optionalConform/>
-    </feature>
-    <feature bit="1" code="RINSE" name="Rinse" summary="Multiple rinse cycles supported">
+    <feature bit="1" code="EM" name="EnergyManagement" summary="Allows energy management control of the tank">
       <optionalConform/>
     </feature>
   </features>
   <dataTypes>
-    <enum name="NumberOfRinsesEnum">
-      <item value="0" name="None" summary="This laundry mode does not perform rinse cycles">
-        <mandatoryConform>
-          <feature name="RINSE"/>
-        </mandatoryConform>
-      </item>
-      <item value="1" name="Normal" summary="This laundry mode performs normal rinse cycles determined by the manufacturer">
-        <mandatoryConform>
-          <feature name="RINSE"/>
-        </mandatoryConform>
-      </item>
-      <item value="2" name="Extra" summary="This laundry mode performs an extra rinse cycle">
-        <mandatoryConform>
-          <feature name="RINSE"/>
-        </mandatoryConform>
-      </item>
-      <item value="3" name="Max" summary="This laundry mode performs the maximum number of rinse cycles determined by the manufacturer">
-        <mandatoryConform>
-          <feature name="RINSE"/>
-        </mandatoryConform>
-      </item>
-    </enum>
+    <bitmap name="WaterHeaterDemandBitmap">
+      <bitfield name="ImmersionElement1" bit="0" summary="Immersion Heating Element1 State On">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ImmersionElement2" bit="1" summary="Immersion Heating Element2 State On">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="HeatPump" bit="2" summary="Heat pump Heating State On">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Boiler" bit="3" summary="Boiler Heating State On">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Other" bit="4" summary="Other Heating State On">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="WaterHeaterTypeBitmap">
+      <bitfield name="ImmersionElement1" bit="0" summary="Supports Immersion Heating Element1">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ImmersionElement2" bit="1" summary="Supports Immersion Heating Element2">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="HeatPump" bit="2" summary="Supports Heat pump Heating">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Boiler" bit="3" summary="Supports Boiler Heating (e.g. Gas or Oil)">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Other" bit="4" summary="Supports Other Heating">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="SpinSpeeds" type="list">
-      <entry type="string">
-        <constraint type="maxLength" value="64"/>
-      </entry>
+    <attribute id="0x0000" name="HeaterTypes" type="WaterHeaterTypeBitmap" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="HeatDemand" type="WaterHeaterDemandBitmap" default="0">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="TankVolume" type="uint16" default="0">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
-        <feature name="SPIN"/>
+        <feature name="EM"/>
       </mandatoryConform>
-      <constraint type="maxCount" value="16"/>
     </attribute>
-    <attribute id="0x0001" name="SpinSpeedCurrent" type="uint8" default="desc">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
-        <feature name="SPIN"/>
-      </mandatoryConform>
-      <constraint type="between" from="0" to="15"/>
-    </attribute>
-    <attribute id="0x0002" name="NumberOfRinses" type="NumberOfRinsesEnum" default="1">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <mandatoryConform>
-        <feature name="RINSE"/>
-      </mandatoryConform>
-      <constraint type="desc"/>
-    </attribute>
-    <attribute id="0x0003" name="SupportedRinses" type="list[NumberOfRinsesEnum Type]">
+    <attribute id="0x0003" name="EstimatedHeatRequired" type="&lt;&lt;ref_Energy&gt;&gt;" default="0">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform>
-        <feature name="RINSE"/>
+        <feature name="EM"/>
       </mandatoryConform>
-      <constraint type="max" value="4"/>
+    </attribute>
+    <attribute id="0x0004" name="TankPercentage" type="percent" default="0">
+      <access read="true" readPrivilege="view"/>
+      <optionalConform/>
     </attribute>
   </attributes>
+  <commands>
+    <command id="0x01" name="Boost" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform/>
+      <field id="0" name="Duration" type="elapsed-s">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="OneShot" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="EmergencyBoost" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="TemporarySetpoint" type="temperature">
+        <optionalConform/>
+      </field>
+      <field id="4" name="TargetPercentage" type="percent">
+        <optionalConform/>
+      </field>
+      <field id="5" name="TargetReheat" type="percent">
+        <optionalConform/>
+      </field>
+    </command>
+    <command id="0x01" name="CancelBoost" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform/>
+    </command>
+  </commands>
 </cluster>

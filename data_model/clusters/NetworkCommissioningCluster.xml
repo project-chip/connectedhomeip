@@ -57,9 +57,10 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0031" name="Network Commissioning" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0031" name="Network Commissioning" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
+    <revision revision="2" summary="Support determining capabilities for Wi-Fi and Thread interfaces. Additional Wi-Fi directed scanning requirements."/>
   </revisionHistory>
   <classification hierarchy="base" role="utility" picsCode="CNET" scope="Node"/>
   <features>
@@ -135,6 +136,23 @@ Davis, CA 95616, USA
         <optionalConform choice="a" more="true"/>
       </item>
     </enum>
+    <bitmap name="ThreadCapabilitiesBitmap">
+      <bitfield name="IsBorderRouterCapable" bit="0" summary="Thread Border Router functionality is present">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="IsRouterCapable" bit="1" summary="Router mode is supported (interface could be in router or REED mode)">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="IsSleepyEndDeviceCapable" bit="2" summary="Sleepy end-device mode is supported">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="IsFullThreadDevice" bit="3" summary="Device is a full Thread device (opposite of Minimal Thread Device)">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="IsSynchronizedSleepyEndDeviceCapable" bit="4" summary="Synchronized sleepy end-device mode is supported">
+        <optionalConform/>
+      </bitfield>
+    </bitmap>
     <bitmap name="WiFiSecurityBitmap">
       <bitfield name="Unencrypted" bit="0" summary="Supports unencrypted Wi-Fi">
         <mandatoryConform/>
@@ -294,6 +312,28 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="admin"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
       <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0008" name="SupportedWiFiBands" type="&lt;&lt;ref_DataTypeList&gt;&gt;[WiFiBandEnum]" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform>
+        <feature name="WI"/>
+      </mandatoryConform>
+      <constraint type="min" value="1"/>
+    </attribute>
+    <attribute id="0x0009" name="SupportedThreadFeatures" type="ThreadCapabilitiesBitmap" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform>
+        <feature name="TH"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x000a" name="ThreadVersion" type="uint16" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform>
+        <feature name="TH"/>
+      </mandatoryConform>
     </attribute>
   </attributes>
   <commands>

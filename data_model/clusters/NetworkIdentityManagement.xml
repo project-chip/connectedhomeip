@@ -51,79 +51,98 @@ are the sole property of their respective owners.
 
 This notice and disclaimer must be included on all copies of this document.
 
-Connectivity Standards Alliance +
-508 Second Street, Suite 206 +
+Connectivity Standards Alliance
+508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0053" name="Laundry Washer Controls" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Network Identity Management" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial release"/>
+    <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
-  <classification hierarchy="base" role="application" picsCode="WASHERCTRL" scope="Endpoint"/>
-  <features>
-    <feature bit="0" code="SPIN" name="Spin" summary="Multiple spin speeds supported">
-      <optionalConform/>
-    </feature>
-    <feature bit="1" code="RINSE" name="Rinse" summary="Multiple rinse cycles supported">
-      <optionalConform/>
-    </feature>
-  </features>
+  <classification hierarchy="base" role="application" picsCode="TODO" scope="Endpoint"/>
   <dataTypes>
-    <enum name="NumberOfRinsesEnum">
-      <item value="0" name="None" summary="This laundry mode does not perform rinse cycles">
-        <mandatoryConform>
-          <feature name="RINSE"/>
-        </mandatoryConform>
-      </item>
-      <item value="1" name="Normal" summary="This laundry mode performs normal rinse cycles determined by the manufacturer">
-        <mandatoryConform>
-          <feature name="RINSE"/>
-        </mandatoryConform>
-      </item>
-      <item value="2" name="Extra" summary="This laundry mode performs an extra rinse cycle">
-        <mandatoryConform>
-          <feature name="RINSE"/>
-        </mandatoryConform>
-      </item>
-      <item value="3" name="Max" summary="This laundry mode performs the maximum number of rinse cycles determined by the manufacturer">
-        <mandatoryConform>
-          <feature name="RINSE"/>
-        </mandatoryConform>
-      </item>
-    </enum>
+    <number name="Client Table" type=""/>
+    <struct name="ClientStruct">
+      <field id="0" name="ClientNumber" type="uint16">
+        <mandatoryConform/>
+        <constraint type="between" from="1" to="2047"/>
+      </field>
+      <field id="1" name="ClientIdentifier" type="octets">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="20"/>
+      </field>
+      <field id="2" name="Endorsements" type="list[EndorsementStruct Type]">
+        <mandatoryConform/>
+        <constraint type="between" from="1" to="SupportedFabrics"/>
+      </field>
+    </struct>
+    <struct name="EndorsementStruct">
+      <field id="0" name="NodeID" type="node-id" default="null">
+        <access fabricSensitive="true"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="SpinSpeeds" type="list">
-      <entry type="string">
-        <constraint type="maxLength" value="64"/>
-      </entry>
+    <attribute id="0x0000" name="NetworkIdentifier" type="octets" default="null">
       <access read="true" readPrivilege="view"/>
-      <mandatoryConform>
-        <feature name="SPIN"/>
-      </mandatoryConform>
-      <constraint type="maxCount" value="16"/>
-    </attribute>
-    <attribute id="0x0001" name="SpinSpeedCurrent" type="uint8" default="desc">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
       <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
-        <feature name="SPIN"/>
-      </mandatoryConform>
-      <constraint type="between" from="0" to="15"/>
+      <mandatoryConform/>
+      <constraint type="maxLength" value="20"/>
     </attribute>
-    <attribute id="0x0002" name="NumberOfRinses" type="NumberOfRinsesEnum" default="1">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <mandatoryConform>
-        <feature name="RINSE"/>
-      </mandatoryConform>
-      <constraint type="desc"/>
-    </attribute>
-    <attribute id="0x0003" name="SupportedRinses" type="list[NumberOfRinsesEnum Type]">
+    <attribute id="0x0001" name="NetworkIdentity" type="octets" default="null">
       <access read="true" readPrivilege="view"/>
-      <mandatoryConform>
-        <feature name="RINSE"/>
-      </mandatoryConform>
-      <constraint type="max" value="4"/>
+      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <mandatoryConform/>
+      <constraint type="maxLength" value="140"/>
+    </attribute>
+    <attribute id="0x0002" name="Clients" type="list[ClientStruct Type]">
+      <access read="true" readPrivilege="admin"/>
+      <mandatoryConform/>
+      <constraint type="max" value="ClientTableSize"/>
+    </attribute>
+    <attribute id="0x0003" name="ClientTableSize" type="uint16" default="500">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform/>
+      <constraint type="between" from="500" to="2047"/>
     </attribute>
   </attributes>
+  <commands>
+    <command id="0x00" name="SetNetworkIdentity" response="Y">
+      <access invokePrivilege="admin" timed="true"/>
+      <mandatoryConform/>
+      <field id="0" name="NetworkIdentity" type="octets">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="140"/>
+      </field>
+      <field id="1" name="PrivateKey" type="octets">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="32"/>
+      </field>
+    </command>
+    <command id="0x01" name="AddOrUpdateClient" response="Y">
+      <access invokePrivilege="admin" timed="true"/>
+      <mandatoryConform/>
+      <field id="0" name="ClientIdentity" type="octets">
+        <mandatoryConform/>
+        <constraint type="maxLength" value="140"/>
+      </field>
+      <field id="1" name="NodeID" type="node-id">
+        <optionalConform/>
+      </field>
+    </command>
+    <command id="0x02" name="RemoveClient" response="Y">
+      <access invokePrivilege="admin" timed="true"/>
+      <mandatoryConform/>
+      <field id="0" name="ClientNumber" type="uint16">
+        <optionalConform choice="a"/>
+      </field>
+      <field id="1" name="ClientIdentifier" type="octets">
+        <optionalConform choice="a"/>
+        <constraint type="maxLength" value="20"/>
+      </field>
+    </command>
+  </commands>
 </cluster>
