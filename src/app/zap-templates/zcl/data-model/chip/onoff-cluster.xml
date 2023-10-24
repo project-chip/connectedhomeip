@@ -80,7 +80,7 @@ limitations under the License.
     <command source="client" code="0x40" name="OffWithEffect" optional="true">
       <description>The OffWithEffect command allows devices to be turned off using enhanced ways of fading.</description>
       <arg name="EffectIdentifier" type="EffectIdentifierEnum"/>
-      <arg name="EffectVariant" type="int8u"/>
+      <arg name="EffectVariant" type="enum8"/>
     </command>
 
     <command source="client" code="0x41" name="OnWithRecallGlobalScene" optional="true">
@@ -98,6 +98,6 @@ limitations under the License.
   <bitmap name="Feature" type="bitmap32">
     <cluster code="0x0006" />
     <field name="Lighting" mask="0x01" />
-    <field name="DeadFrontBehavior" mask="0x02" />
+    <field name="DeadFrontBehaviour" mask="0x02" />
   </bitmap>
 </configurator>
