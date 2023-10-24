@@ -15,8 +15,7 @@
 #    limitations under the License.
 #
 
-from .android import Android
-
-__all__ = [
-    'Android',
-]
+sudo apt-get install gcc-arm-linux-gnueabi
+sudo apt-get install gcc-aarch64-linux-gnu
+sudo apt-get install byacc
+sudo apt-get install flex

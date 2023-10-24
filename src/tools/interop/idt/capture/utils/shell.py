@@ -20,31 +20,34 @@ import subprocess
 
 from mobly.utils import stop_standing_subprocess
 
+import log
+
+logger = log.get_logger(__file__)
+
 
 class Bash:
-    """
-    Uses subprocess to execute bash commands
-    Intended to be instantiated and then only interacted with through instance methods
-    """
 
     def __init__(self, command: str, sync: bool = False,
-                 capture_output: bool = False) -> None:
+                 capture_output: bool = False,
+                 cwd: str = None) -> None:
         """
         Run a bash command as a sub process
         :param command: Command to run
         :param sync: If True, wait for command to terminate
-        :param capture_output: Only applies to sync; if True, store stdout and stderr
+        :param capture_output: Only applies to sync; if True, store and supress stdout and stderr
+        :param cwd: Set working directory of command
         """
+        self.logger = logger
         self.command: str = command
         self.sync = sync
         self.capture_output = capture_output
+        self.cwd = cwd
 
         self.args: list[str] = []
         self._init_args()
-        self.proc = subprocess.run(self.args, capture_output=capture_output) if self.sync else None
+        self.proc: None | subprocess.CompletedProcess | subprocess.Popen = None
 
     def _init_args(self) -> None:
-        """Escape quotes, call bash, and prep command for subprocess args"""
         command_escaped = self.command.replace('"', '\"')
         self.args = shlex.split(f'/bin/bash -c "{command_escaped}"')
 
@@ -52,15 +55,17 @@ class Bash:
         return self.proc is not None and self.proc.poll() is None
 
     def get_captured_output(self) -> str:
-        """Return captured output when the relevant instance var is set"""
         return "" if not self.capture_output or not self.sync \
             else self.proc.stdout.decode().strip()
 
     def start_command(self) -> None:
-        if not self.sync and not self.command_is_running():
-            self.proc = subprocess.Popen(self.args)
+        if self.sync:
+            self.proc = subprocess.run(self.args, capture_output=self.capture_output, cwd=self.cwd)
+            return
+        if not self.command_is_running():
+            self.proc = subprocess.Popen(self.args, cwd=self.cwd)
         else:
-            print(f'INFO {self.command} start requested while running')
+            self.logger.warning(f'{self.command} start requested while running')
 
     def stop_command(self, soft: bool = False) -> None:
         if self.command_is_running():
@@ -74,5 +79,11 @@ class Bash:
             else:
                 stop_standing_subprocess(self.proc)
         else:
-            print(f'INFO {self.command} stop requested while not running')
+            self.logger.warning(f'{self.command} stop requested while not running')
         self.proc = None
+
+    def finished_success(self) -> bool:
+        if not self.sync:
+            return not self.command_is_running() and self.proc.returncode == 0
+        else:
+            return self.proc is not None and self.proc.returncode == 0

@@ -17,19 +17,20 @@
 
 import asyncio
 import datetime
-import logging
 import os
 import time
 
 from bleak import AdvertisementData, BleakScanner, BLEDevice
 from bleak.exc import BleakDBusError
+import log
+logger = log.get_logger(__file__)
 
 
 class MatterBleScanner:
 
     def __init__(self, artifact_dir: str):
         self.artifact_dir = artifact_dir
-        self.logger = logging.getLogger(__file__)
+        self.logger = logger
         self.devices_seen_last_time: set[str] = set()
         self.devices_seen_this_time: set[str] = set()
         self.throttle_seconds = 1
@@ -50,7 +51,7 @@ class MatterBleScanner:
             ts = datetime.datetime.now().isoformat(sep=' ', timespec='milliseconds')
             to_write = f"{ts}\n{to_write}\n\n"
             log_file.write(to_write)
-            print(to_write)
+            self.logger.info(to_write)
 
     @staticmethod
     def is_matter_device(service_uuid: str) -> bool:
@@ -100,5 +101,5 @@ class MatterBleScanner:
                 time.sleep(self.throttle_seconds)
                 asyncio.run(self.browse(scanner))
             except BleakDBusError as e:
-                self.logger.warning(e)
+                self.logger.critical(e)
                 time.sleep(self.error_seconds)

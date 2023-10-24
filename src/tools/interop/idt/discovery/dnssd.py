@@ -15,9 +15,10 @@
 #    limitations under the License.
 #
 
-import logging
-
 from zeroconf import ServiceBrowser, ServiceInfo, ServiceListener, Zeroconf
+import log
+logger = log.get_logger(__file__)
+
 
 _MDNS_TYPES = {
     "_matterd._udp.local.": "COMMISSIONER",
@@ -32,7 +33,7 @@ class MatterDnssdListener(ServiceListener):
     def __init__(self, artifact_dir: str) -> None:
         super().__init__()
         self.artifact_dir = artifact_dir
-        self.logger = logging.getLogger(__file__)
+        self.logger = logger
 
     @staticmethod
     def log_addr(info: ServiceInfo) -> str:

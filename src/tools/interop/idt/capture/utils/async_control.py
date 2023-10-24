@@ -15,8 +15,10 @@
 #    limitations under the License.
 #
 
-from .android import Android
+import asyncio
 
-__all__ = [
-    'Android',
-]
+from capture import config
+
+
+def get_timeout():
+    return asyncio.get_running_loop().time() + config.async_timeout

@@ -31,18 +31,23 @@ class PlatformLogStreamer(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def connect(self) -> None:
+        """
+        Establish connections to log targets for this platform
+        """
+        raise NotImplementedError
+
+    @abstractmethod
     async def start_streaming(self) -> None:
         """
         Begin streaming logs
-        Start should be able to be called repeatedly without restarting streaming
         """
         raise NotImplementedError
 
     @abstractmethod
     async def stop_streaming(self) -> None:
         """
-        Stop streaming logs
-        Stop should not cause an error even if the stream is not running
+        Stop the capture and pull any artifacts from remote devices
         """
         raise NotImplementedError
 
@@ -71,20 +76,29 @@ class EcosystemCapture(ABC):
     async def start_capture(self) -> None:
         """
         Start the capture
+        Platform is already started
         """
         raise NotImplementedError
 
     @abstractmethod
     async def stop_capture(self) -> None:
         """
-        Stop the capture
+        Stop the capture and pull any artifacts from remote devices
+        Platform is already stopped
         """
         raise NotImplementedError
 
     @abstractmethod
-    async def analyze_capture(self) -> None:
+    def analyze_capture(self) -> None:
         """
         Parse the capture and create + display helpful analysis artifacts that are unique to the ecosystem
-        Write analysis artifacts to artifact_dir
+        IMPORTANT: This function will be run as a separate process to allow real time analysis!!!
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    async def probe_capture(self) -> None:
+        """
+        Probe the local environment, e.g. ping relevant remote services and write respective artifacts
         """
         raise NotImplementedError

@@ -18,7 +18,8 @@
 import os
 
 from capture.base import EcosystemCapture, UnsupportedCapturePlatformException
-from capture.file_utils import create_standard_log_name, print_and_write
+from capture.utils.artifact import create_standard_log_name
+from log import print_and_write
 from capture.platform.android.android import Android
 
 
@@ -41,26 +42,41 @@ class PlayServicesUser(EcosystemCapture):
         self.platform = platform
 
     async def start_capture(self) -> None:
-        await self.platform.start_streaming()
+        pass
 
     async def stop_capture(self) -> None:
-        await self.platform.stop_streaming()
+        self.show_analysis()
 
-    async def analyze_capture(self) -> None:
+    @staticmethod
+    def proc_line(line, analysis_file) -> None:
+        if "CommissioningServiceBin: Binding to service" in line:
+            print_and_write(
+                f"3P commissioner initiated Play Services commissioning\n{line}",
+                analysis_file)
+        elif "CommissioningServiceBin: Sending commissioning request to bound service" in line:
+            print_and_write(
+                f"Play Services commissioning complete; passing back to 3P\n{line}",
+                analysis_file)
+        elif "CommissioningServiceBin: Received commissioning complete from bound service" in line:
+            print_and_write(
+                f"3P commissioning complete!\n{line}",
+                analysis_file)
+
+    def analyze_capture(self) -> None:
         """"Show the start and end times of commissioning boundaries"""
+        fd = open(self.platform.streams["LogcatStreamer"].logcat_artifact, "r")
+        while True:
+            for line in fd.readlines():
+                self.proc_line(line, open("/dev/null", mode="w"))
+        fd.close()
+
+    def show_analysis(self) -> None:
+        # TODO: Make more elegant
         analysis_file = open(self.analysis_file, mode='w+')
-        with open(self.platform.logcat_output_path, mode='r') as logcat_file:
+        with open(self.platform.streams["LogcatStreamer"].logcat_artifact, mode='r') as logcat_file:
             for line in logcat_file:
-                if "CommissioningServiceBin: Binding to service" in line:
-                    print_and_write(
-                        f"3P commissioner initiated Play Services commissioning\n{line}",
-                        analysis_file)
-                elif "CommissioningServiceBin: Sending commissioning request to bound service" in line:
-                    print_and_write(
-                        f"Play Services commissioning complete; passing back to 3P\n{line}",
-                        analysis_file)
-                elif "CommissioningServiceBin: Received commissioning complete from bound service" in line:
-                    print_and_write(
-                        f"3P commissioning complete!\n{line}",
-                        analysis_file)
+                self.proc_line(line, analysis_file)
         analysis_file.close()
+
+    async def probe_capture(self) -> None:
+        pass

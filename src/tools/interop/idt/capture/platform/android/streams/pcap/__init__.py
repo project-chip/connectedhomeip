@@ -15,8 +15,6 @@
 #    limitations under the License.
 #
 
-from .android import Android
+from .pcap import AndroidPcap
 
-__all__ = [
-    'Android',
-]
+__all__ = ["AndroidPcap"]

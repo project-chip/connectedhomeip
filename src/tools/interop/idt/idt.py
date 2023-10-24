@@ -17,25 +17,35 @@
 
 import argparse
 import asyncio
-import logging
 import os
 import shutil
 import sys
 from pathlib import Path
 
+import config
 from capture import EcosystemController, EcosystemFactory, PacketCaptureRunner, PlatformFactory
-from capture.file_utils import border_print, create_file_timestamp, safe_mkdir
+from capture.utils.artifact import create_file_timestamp, safe_mkdir
+from log import border_print
 from discovery import MatterBleScanner, MatterDnssdListener
 
-logging.basicConfig(
-    format='%(asctime)s.%(msecs)03d %(levelname)s {%(module)s} [%(funcName)s]\n%(message)s \n',
-    level=logging.INFO)
+splash = '''\x1b[0m
+\x1b[32;1m┌────────┐\x1b[33;20m▪\x1b[32;1m \x1b[34;1m┌──────┐ \x1b[33;20m• \x1b[35;1m┌──────────┐ \x1b[33;20m●
+\x1b[32;1m│░░░░░░░░│  \x1b[34;1m│░░░░░░└┐ \x1b[33;20mﾟ\x1b[35;1m│░░░░░░░░░░│ 
+\x1b[32;1m└──┐░░┌──┘\x1b[33;20m۰\x1b[32;1m \x1b[34;1m│░░┌┐░░░│  \x1b[35;1m└───┐░░┌───┘ 
+\x1b[32;1m   │░░│     \x1b[34;1m│░░│└┐░░│\x1b[33;20m▫ \x1b[35;1m \x1b[33;20m۰\x1b[35;1m  │░░│  \x1b[33;20m｡
+\x1b[32;1m \x1b[33;20m•\x1b[32;1m │░░│  \x1b[33;20m●  \x1b[34;1m│░░│┌┘░░│  \x1b[35;1m    │░░│ 
+\x1b[32;1m┌──┘░░└──┐  \x1b[34;1m│░░└┘░░░│  \x1b[35;1m    │░░│ \x1b[33;20m•
+\x1b[32;1m│░░░░░░░░│  \x1b[34;1m│░░░░░░┌┘\x1b[33;20m۰ \x1b[35;1m \x1b[33;20m▪\x1b[35;1m  │░░│
+\x1b[32;1m└────────┘\x1b[33;20m•\x1b[32;1m \x1b[34;1m└──────┘\x1b[33;20m｡  \x1b[35;1m    └──┘ \x1b[33;20m▫
+\x1b[32;1m✰ Interop\x1b[34;1m  ✰ Debugging\x1b[35;1m   ✰ Tool
+\x1b[0m'''
 
 
 class InteropDebuggingTool:
 
     def __init__(self) -> None:
-
+        if config.enable_color:
+            print(splash)
         self.artifact_dir = None
         create_artifact_dir = True
         if len(sys.argv) == 1:
@@ -165,7 +175,7 @@ class InteropDebuggingTool:
                                            'zip',
                                            root_dir=self.artifact_dir)
         output_zip = shutil.move(archive_file, self.artifact_dir_parent)
-        print(f'Output zip: {output_zip}')
+        border_print(f'Output zip: {output_zip}')
 
     def command_capture(self, args: argparse.Namespace) -> None:
 
@@ -181,8 +191,9 @@ class InteropDebuggingTool:
                                                      args.ecosystem,
                                                      self.artifact_dir))
         asyncio.run(EcosystemController.start())
+        EcosystemController.analyze()
 
-        border_print("Press enter twice to stop streaming", important=True)
+        border_print("Press enter three times to stop streaming", important=True)
         input("")
 
         if pcap:
@@ -190,7 +201,13 @@ class InteropDebuggingTool:
             pcap_runner.stop_pcap()
 
         asyncio.run(EcosystemController.stop())
-        asyncio.run(EcosystemController.analyze())
 
-        border_print("Compressing artifacts, this may take some time!")
+        asyncio.run(EcosystemController.probe())
+
+        # TODO: Write error traces to artifacts
+        if EcosystemController.has_errors():
+            border_print("Errors seen this run:")
+            EcosystemController.error_report(self.artifact_dir)
+
+        border_print("Compressing artifacts...")
         self.zip_artifacts()

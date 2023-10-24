@@ -15,8 +15,6 @@
 #    limitations under the License.
 #
 
-from .android import Android
-
-__all__ = [
-    'Android',
-]
+enable_build_push_tcpdump = True
+enable_bug_report = True
+hci_log_level = "full"

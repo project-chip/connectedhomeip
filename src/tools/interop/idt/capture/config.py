@@ -15,8 +15,6 @@
 #    limitations under the License.
 #
 
-from .android import Android
+import logging
 
-__all__ = [
-    'Android',
-]
+async_timeout = 45.0

@@ -15,8 +15,10 @@
 #    limitations under the License.
 #
 
-from .android import Android
+from . import artifact, async_control, shell
 
 __all__ = [
-    'Android',
+    'artifact',
+    'async_control',
+    'shell',
 ]

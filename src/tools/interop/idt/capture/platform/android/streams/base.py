@@ -15,8 +15,15 @@
 #    limitations under the License.
 #
 
-from .android import Android
+from abc import ABC, abstractmethod
 
-__all__ = [
-    'Android',
-]
+
+class AndroidStream(ABC):
+
+    @abstractmethod
+    async def start(self) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def stop(self) -> None:
+        raise NotImplementedError

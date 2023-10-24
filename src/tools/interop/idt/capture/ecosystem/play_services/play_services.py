@@ -17,14 +17,21 @@
 
 import json
 import os
+import time
 from typing import Dict
 
 from capture.base import EcosystemCapture, UnsupportedCapturePlatformException
-from capture.file_utils import create_standard_log_name
+from capture.utils.artifact import create_standard_log_name
 from capture.platform.android import Android
 
+from . import config
 from .analysis import PlayServicesAnalysis
 from .command_map import dumpsys, getprop
+from .prober import PlayServicesProber
+
+import log
+
+logger = log.get_logger(__file__)
 
 
 class PlayServices(EcosystemCapture):
@@ -33,7 +40,7 @@ class PlayServices(EcosystemCapture):
     """
 
     def __init__(self, platform: Android, artifact_dir: str) -> None:
-
+        self.logger = logger
         self.artifact_dir = artifact_dir
 
         if not isinstance(platform, Android):
@@ -53,9 +60,13 @@ class PlayServices(EcosystemCapture):
                             '168',  # mDNS
                             ]
 
+        if config.test_error_init:
+            self.logger.critical("Throwing exception in init for test!")
+            raise Exception("Test init exception from Play Services!")
+
     def _write_standard_info_file(self) -> None:
         for k, v in self.standard_info_data.items():
-            print(f"{k}: {v}")
+            self.logger.info(f"{k}: {v}")
         standard_info_data_json = json.dumps(self.standard_info_data, indent=2)
         with open(self.standard_info_file_path, mode='w+') as standard_info_file:
             standard_info_file.write(standard_info_data_json)
@@ -87,10 +98,22 @@ class PlayServices(EcosystemCapture):
             verbose_command = f"shell setprop log.tag.gms_svc_id:{service_id} VERBOSE"
             self.platform.run_adb_command(verbose_command)
         self._get_standard_info()
-        await self.platform.start_streaming()
+        if config.test_error_execution:
+            self.logger.critical("Throwing exception in execution for test!")
+            raise Exception("Test exe exception from Play Services!")
 
     async def stop_capture(self) -> None:
-        await self.platform.stop_streaming()
+        self.analysis.show_analysis()
 
-    async def analyze_capture(self) -> None:
-        self.analysis.do_analysis()
+    def analyze_capture(self):
+        fd = open(self.platform.streams["LogcatStreamer"].logcat_artifact, "r")
+        while True:
+            self.analysis.do_analysis(fd.readlines())
+            time.sleep(4)
+        fd.close()
+
+    async def probe_capture(self) -> None:
+        if config.enable_foyer_probers:
+            await PlayServicesProber(self.platform).probe_services()
+        else:
+            self.logger.critical("Foyer probers disabled in config!")

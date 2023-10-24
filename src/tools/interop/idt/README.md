@@ -192,7 +192,8 @@ Follow the Linux installation steps above, but do not use Docker.
 
 > **_IMPORTANT_**  
 > `idt_` commands are shell aliases helpful for administrative commands.  
-> `idt` invokes the `idt` python package.
+> `idt` invokes the `idt` python package.  
+> Output from `idt` will always be colorized while output from subprocesses is generally not.
 
 RPi users, as needed:
 
@@ -211,28 +212,18 @@ RPi users, as needed:
 ```
 idt capture -h
 
-usage: idt capture [-h] [--platform {Android}]
-                   [--ecosystem {PlayServices,PlayServicesUser,ALL}]
-                   [--pcap {t,f}]
-                   [--interface {wlp0s20f3,docker0,lo}]
-                   [--additional {t,f}]
+usage: idt capture [-h] [--platform {Android}] [--ecosystem {PlayServicesUser,PlayServices,ALL}] [--pcap {t,f}] [--interface {wlp0s20f3,lo,docker0,any}]
 
 options:
   -h, --help            show this help message and exit
   --platform {Android}, -p {Android}
-                        Run capture for a particular platform
-                        (default Android)
-  --ecosystem {PlayServices,PlayServicesUser,ALL}, -e {PlayServices,PlayServicesUser,ALL}
-                        Run capture for a particular ecosystem or ALL
-                        ecosystems (default ALL)
+                        Run capture for a particular platform (default Android)
+  --ecosystem {PlayServicesUser,PlayServices,ALL}, -e {PlayServicesUser,PlayServices,ALL}
+                        Run capture for a particular ecosystem or ALL ecosystems (default ALL)
   --pcap {t,f}, -c {t,f}
                         Run packet capture (default t)
-  --interface {wlp0s20f3,docker0,lo}, -i {wlp0s20f3,docker0,lo}
-                        Run packet capture against a specified
-                        interface (default wlp0s20f3)
-  --additional {t,f}, -a {t,f}
-                        Run ble and mdns scanners in the background
-                        while capturing (default t)
+  --interface {wlp0s20f3,lo,docker0,any}, -i {wlp0s20f3,lo,docker0,any}
+                        Specify packet capture interface (default any)
 ```
 
 #### Artifacts
@@ -299,6 +290,10 @@ $ idt capture -h
 usage: idt capture [-h] [--platform {Android}] [--ecosystem {DemoExtEcosystem...
 ```
 
+> **IMPORTANT:** Note the following runtime expectations of ecosystems:  
+> `analyze_capture` will be run as a target of `multiprocessing.Process`, \
+meaning the ecosystem object will be copied into a forked process at this time.
+
 The platform loader functions the same as `capture/ecosystem`.
 
 For each package in `capture/platform`, the platform loader expects a module
@@ -306,7 +301,42 @@ name matching the package name.
 This module must contain a single class which is a subclass of
 `capture.base.PlatformLogStreamer`.
 
-Note the following runtime expectations of platforms:
+## Project overview
 
--   Start should be able to be called repeatedly without restarting streaming.
--   Stop should not cause an error even if the stream is not running.
+- The entry point is in `idt.py` which contains simple CLI parsing with `argparse`.
+- `log` contains logging utilities used by everything in the project.
+
+For capture:
+
+- `base.py` contains the base clases for ecosystems and platforms.
+- `factory.py` contains the ecosystem and platform producer and controller
+- `loader` is a generic class loader that dynamically imports all classes matching a given subclass.
+- `utils/shell` contains a simple helper class for background and foreground Bash commands.
+- `utils/artifact` contains helper functions for managing artifacts.
+
+For discovery:
+
+- `matter_ble` provides a simple ble scanner that shows matter devices being discovered
+  and lost, as well as their VID/PID, RSSI, etc.
+- `matter_dnssd` provides a smple DNS-SD browser that searches for matter devices
+  and thread border routers.
+
+### Conventions
+
+- `config.py` should be used to hold development configs within the directory where they are needed. 
+  - It may also hold configs for flaky/cumbersome features that might need to be disabled in an emergency. 
+  - `config.py` **should not** be used for everyday operation.
+- When needed, execute builds in a folder called `BUILD` within the source tree. 
+  - `idt_clean_all` deletes all `BUILD` dirs and `BUILD` is in `.gitignore`.
+- Although many things are marked as coroutines, almost all real concurrency in the current implementation comes from multiprocessing. 
+  - A general direction should be decided for the project in the next iteration.
+  - Multiprocessing allows for easier implementation where ecosystems are less likely to block each other
+  - Async allows for better shared states and flexibility
+
+## Troubleshooting
+
+- Change log level from `INFO` to `DEBUG` in `config.py` for additional logging.
+- It is expected that this script will be run on a system with `bash`, `tcpdump`, and `adb` already available.
+- Compiling tcpdump for android may require additional dependencies. 
+  - If the build script fails for you, try `idt_go && source idt/scripts/compilers.sh`.
+- You may disable colors and splash by setting `enable_color` in `config.py` to `False`. 

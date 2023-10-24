@@ -15,8 +15,6 @@
 #    limitations under the License.
 #
 
-from .android import Android
+from .logcat import LogcatStreamer
 
-__all__ = [
-    'Android',
-]
+__all__ = ["LogcatStreamer"]
