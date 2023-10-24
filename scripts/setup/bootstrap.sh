@@ -68,6 +68,12 @@ _bootstrap_or_activate() {
     # Strip off the 'scripts[/setup]' directory, leaving the root of the repo.
     _CHIP_ROOT="$(cd "${_BOOTSTRAP_DIR%/setup}/.." && pwd)"
 
+    local _PIGWEED_CIPD_JSON_FILE="$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/pigweed.json"
+    # TODO need to find a better location then /tmp/test.json
+    local _GENERATED_PIGWEED_CIPD_JSON_FILE="/tmp/test.json"
+    # TODO this call into python is very hacky. This needs to be fixed
+    python3 scripts/setup/gen_pigweed_cipd.py -i $_PIGWEED_CIPD_JSON_FILE -o $_GENERATED_PIGWEED_CIPD_JSON_FILE
+
     local _CONFIG_FILE="scripts/setup/environment.json"
 
     if [ -n "$PW_CONFIG_FILE" ]; then
@@ -131,7 +137,8 @@ EOF
         pw_bootstrap --shell-file "$_SETUP_SH" \
             --install-dir "$_PW_ACTUAL_ENVIRONMENT_ROOT" \
             --config-file "$_CHIP_ROOT/$_CONFIG_FILE" \
-            --virtualenv-gn-out-dir "$_PW_ACTUAL_ENVIRONMENT_ROOT/gn_out"
+            --virtualenv-gn-out-dir "$_PW_ACTUAL_ENVIRONMENT_ROOT/gn_out" \
+            --additional-cipd-file "$_GENERATED_PIGWEED_CIPD_JSON_FILE"
         pw_finalize bootstrap "$_SETUP_SH"
         _ACTION_TAKEN="bootstrap"
     else
