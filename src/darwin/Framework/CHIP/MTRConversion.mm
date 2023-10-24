@@ -18,6 +18,7 @@
 #import "MTRLogging_Internal.h"
 
 #include <lib/support/SafeInt.h>
+#include <lib/support/TimeUtils.h>
 
 CHIP_ERROR SetToCATValues(NSSet<NSNumber *> * catSet, chip::CATValues & values)
 {
@@ -58,4 +59,22 @@ NSSet<NSNumber *> * CATValuesToSet(const chip::CATValues & values)
         }
     }
     return [NSSet setWithSet:catSet];
+}
+
+bool DateToMatterEpochSeconds(NSDate * date, uint32_t & matterEpochSeconds)
+{
+    NSCalendar * calendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    NSDateComponents * components = [calendar componentsInTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0] fromDate:date];
+
+    if (!chip::CanCastTo<uint16_t>(components.year)) {
+        return false;
+    }
+
+    uint16_t year = static_cast<uint16_t>([components year]);
+    uint8_t month = static_cast<uint8_t>([components month]);
+    uint8_t day = static_cast<uint8_t>([components day]);
+    uint8_t hour = static_cast<uint8_t>([components hour]);
+    uint8_t minute = static_cast<uint8_t>([components minute]);
+    uint8_t second = static_cast<uint8_t>([components second]);
+    return chip::CalendarToChipEpochTime(year, month, day, hour, minute, second, matterEpochSeconds);
 }
