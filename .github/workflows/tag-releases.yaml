@@ -15,7 +15,16 @@ name: "Tag Releases"
 
 on:
   workflow_dispatch:
-
+    # inputs:
+    #   draft_release:
+    #     description: 'Create Draft'
+    #     required: true
+    #     default: true
+    #     type: boolean
+    #   branch:
+    #     description: 'Branch'
+    #     required: false
+    #     type: string
 jobs:
     tag_main_release:
         name: Tag Current Release
