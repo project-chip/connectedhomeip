@@ -340,14 +340,12 @@
         "RVC Clean Mode": [
             "SupportedModes",
             "CurrentMode",
-            "StartUpMode",
             "OnMode",
             "FeatureMap"
         ],
         "RVC Run Mode": [
             "SupportedModes",
             "CurrentMode",
-            "StartUpMode",
             "OnMode",
             "FeatureMap"
         ],
