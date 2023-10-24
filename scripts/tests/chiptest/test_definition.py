@@ -288,45 +288,56 @@ class TestDefinition:
                 raise Exception("Unknown test target - "
                                 "don't know which application to run")
 
-            for path in paths.items():
-                # Do not add chip-tool or chip-repl-yaml-tester-cmd to the register
-                if path == paths.chip_tool or path == paths.chip_repl_yaml_tester_cmd or path == paths.chip_tool_with_python_cmd:
-                    continue
+            if not dry_run:
+                for path in paths.items():
+                    # Do not add chip-tool or chip-repl-yaml-tester-cmd to the register
+                    if path == paths.chip_tool or path == paths.chip_repl_yaml_tester_cmd or path == paths.chip_tool_with_python_cmd:
+                        continue
 
-                # Skip items where we don't actually have a path.  This can
-                # happen if the relevant application does not exist.  It's
-                # non-fatal as long as we are not trying to run any tests that
-                # need that application.
-                if path[-1] is None:
-                    continue
+                    # Skip items where we don't actually have a path.  This can
+                    # happen if the relevant application does not exist.  It's
+                    # non-fatal as long as we are not trying to run any tests that
+                    # need that application.
+                    if path[-1] is None:
+                        continue
 
-                # For the app indicated by self.target, give it the 'default' key to add to the register
-                if path == target_app:
-                    key = 'default'
-                else:
-                    key = os.path.basename(path[-1])
+                    # For the app indicated by self.target, give it the 'default' key to add to the register
+                    if path == target_app:
+                        key = 'default'
+                    else:
+                        key = os.path.basename(path[-1])
 
-                app = App(runner, path)
-                # Add the App to the register immediately, so if it fails during
-                # start() we will be able to clean things up properly.
-                apps_register.add(key, app)
-                # Remove server application storage (factory reset),
-                # so it will be commissionable again.
-                app.factoryReset()
+                    app = App(runner, path)
+                    # Add the App to the register immediately, so if it fails during
+                    # start() we will be able to clean things up properly.
+                    apps_register.add(key, app)
+                    # Remove server application storage (factory reset),
+                    # so it will be commissionable again.
+                    app.factoryReset()
 
             tool_cmd = paths.chip_tool if test_runtime != TestRunTime.CHIP_TOOL_PYTHON else paths.chip_tool_with_python_cmd
 
-            tool_storage_dir = tempfile.mkdtemp()
-            tool_storage_args = ['--storage-directory', tool_storage_dir]
+            if dry_run:
+                tool_storage_dir = None
+                tool_storage_args = []
+            else:
+                tool_storage_dir = tempfile.mkdtemp()
+                tool_storage_args = ['--storage-directory', tool_storage_dir]
 
             # Only start and pair the default app
-            app = apps_register.get('default')
-            app.start()
-            pairing_cmd = tool_cmd + ['pairing', 'code', TEST_NODE_ID, app.setupCode]
+            if dry_run:
+                setupCode = '${SETUP_PAYLOAD}'
+            else:
+                app = apps_register.get('default')
+                app.start()
+                setupCode = app.setupCode
+
+            pairing_cmd = tool_cmd + ['pairing', 'code', TEST_NODE_ID, setupCode]
             test_cmd = tool_cmd + ['tests', self.run_name] + ['--PICS', pics_file]
             if test_runtime == TestRunTime.CHIP_TOOL_PYTHON:
                 server_args = ['--server_path', paths.chip_tool[-1]] + \
-                    ['--server_arguments', 'interactive server ' + ' '.join(tool_storage_args)]
+                    ['--server_arguments', 'interactive server' +
+                        (' ' if len(tool_storage_args) else '') + ' '.join(tool_storage_args)]
                 pairing_cmd += server_args
                 test_cmd += server_args
             elif test_runtime == TestRunTime.CHIP_TOOL_BUILTIN:
@@ -334,8 +345,11 @@ class TestDefinition:
                 test_cmd += tool_storage_args
 
             if dry_run:
-                logging.info(" ".join(pairing_cmd))
-                logging.info(" ".join(test_cmd))
+                # Some of our command arguments have spaces in them, so if we are
+                # trying to log commands people can run we should quote those.
+                def quoter(arg): return f"'{arg}'" if ' ' in arg else arg
+                logging.info(" ".join(map(quoter, pairing_cmd)))
+                logging.info(" ".join(map(quoter, test_cmd)))
             elif test_runtime == TestRunTime.CHIP_REPL_PYTHON:
                 chip_repl_yaml_tester_cmd = paths.chip_repl_yaml_tester_cmd
                 python_cmd = chip_repl_yaml_tester_cmd + \

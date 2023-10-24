@@ -2266,6 +2266,7 @@
           "define": "SCENES_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "AddScene",
@@ -2812,22 +2813,6 @@
               "reportableChange": 0
             },
             {
-              "name": "StartUpMode",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int8u",
-              "included": 1,
-              "storageOption": "External",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
               "name": "OnMode",
               "code": 3,
               "mfgCode": null,
@@ -2986,22 +2971,6 @@
             {
               "name": "CurrentMode",
               "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "type": "int8u",
-              "included": 1,
-              "storageOption": "External",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "StartUpMode",
-              "code": 2,
               "mfgCode": null,
               "side": "server",
               "type": "int8u",

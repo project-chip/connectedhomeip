@@ -1,0 +1,76 @@
+# .github/release.yml
+
+changelog:
+  exclude:
+    labels:
+      - scripts
+      - external dependency
+      - submodules
+      - integrations
+      - documentation
+    authors:
+      - restyled-io
+      - octocat
+      - pullapprove
+      - jira
+      - issue-label-bot
+      - github-actions
+      - github-labels
+      - buildjet
+  categories:
+    - title: Highlighted Fixes
+      labels:
+        - release note
+    - title: Security Fixes
+      labels:
+        - security
+    - title: Bug Fixes
+      labels:
+        - bug
+    - title: Bluetooth Related Changes
+      labels:
+        - ble
+    - title: Spec Alignment Changes
+      labels:
+        - spec
+    - title: Transport/Messaging Layer Changes
+      labels:
+        - inet
+        - transport
+        - messaging
+        - protocols
+        - lwip
+    - title: Crypto Changes
+      labels:
+        - crypto
+    - title: Core Library Changes
+      labels:
+        - lib
+    - title: Core Changes
+      labels:
+        - core
+    - title: Controller Changes
+      labels:
+        - controller
+    - title: System Level Changes
+      labels:
+        - system
+        - attestation
+    - title: App Level Changes
+      labels:
+        - app
+    - title: Platform Changes
+      labels:
+        - platform
+        - darwin
+        - android
+    - title: Example App Changes
+      labels:
+        - examples
+    - title: Test Changes
+      labels:
+        - tests
+    - title: Build Related Changes
+      labels:
+        - gn
+        - build

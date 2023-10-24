@@ -7581,8 +7581,12 @@
           - ProxyDiscovery
           - ProxyValid
 
-- release: "Future"
-  versions: "future"
+- release: "Fall 2023 #3"
+  versions:
+      ios: "17.2"
+      macos: "14.2"
+      watchos: "10.2"
+      tvos: "17.2"
   introduced:
       command payloads:
           TimeSynchronization:
@@ -7721,3 +7725,6 @@
           OnOff:
               Feature:
                   DeadFrontBehavior: DeadFront
+
+- release: "Future"
+  versions: "future"

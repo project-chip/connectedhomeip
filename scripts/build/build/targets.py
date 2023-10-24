@@ -655,6 +655,7 @@ def BuildBouffalolabTarget():
     target.AppendModifier('thread', enable_thread=True)
     target.AppendModifier('fp', enable_frame_ptr=True)
     target.AppendModifier('memmonitor', enable_heap_monitoring=True)
+    target.AppendModifier('mot', use_matter_openthread=True)
 
     return target
 
@@ -720,6 +721,7 @@ def BuildTelinkTarget():
     ])
 
     target.AppendModifier('ota', enable_ota=True)
+    target.AppendModifier('dfu', enable_dfu=True)
     target.AppendModifier('shell', enable_shell=True)
     target.AppendModifier('rpc', enable_rpcs=True)
     target.AppendModifier('factory-data', enable_factory_data=True)
