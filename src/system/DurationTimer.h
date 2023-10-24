@@ -21,7 +21,7 @@
 */
 
 #define DURATION_SHOW_TIME 0
-#define DURATION_STARTSTOP_PRINT_LOG 0
+//#define DURATION_STARTSTOP_PRINT_LOG 0
 
 namespace chip {
 namespace timing {
