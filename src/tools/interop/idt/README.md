@@ -193,7 +193,7 @@ Follow the Linux installation steps above, but do not use Docker.
 > **_IMPORTANT_**  
 > `idt_` commands are shell aliases helpful for administrative commands.  
 > `idt` invokes the `idt` python package.  
-> Output from `idt` will always be colorized while output from sub processes is
+> Output from `idt` will generally be colorized while output from sub processes is
 > generally not.
 
 RPi users, as needed:
@@ -354,3 +354,4 @@ For discovery:
         `idt_go && source idt/scripts/compilers.sh`.
 -   You may disable colors and splash by setting `enable_color` in `config.py`
     to `False`.
+-   Wireless `adb` may fail to connect indefinitely depending on network configuration.
