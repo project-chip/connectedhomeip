@@ -197,9 +197,26 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
             if (mTimeZoneBuf[i].name.HasValue())
             {
                 auto span = MutableCharSpan(mTimeZoneNames[i], kMaxTimeZoneNameLen);
+                // This buffer is statically allocated and if of size kMaxSupportedTimeZones, so this should never fail
                 CopyCharSpanToMutableCharSpan(mTimeZoneBuf[i].name.Value(), span);
                 mTimeZoneBuf[i].name.SetValue(span);
             }
+        }
+        auto list = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>(mTimeZoneBuf, size);
+        mParams.SetTimeZone(list);
+    }
+    if (params.GetDefaultNTP().HasValue()) {
+        ChipLogProgress(Controller, "Setting Default NTP from parameters");
+        // This parameter is an optional nullable, so we need to go two levels deep here.
+        if (!params.GetDefaultNTP().Value().IsNull()) {
+            size_t size = std::min(params.GetDefaultNTP().Value().Value().size(), kMaxDefaultNtpSize);
+            // This buffer is statically allocated and is of size kMaxDefaultNtpSize.
+            auto span = MutableCharSpan(mDefaultNtp, kMaxDefaultNtpSize);
+            CopyCharSpanToMutableCharSpan(params.GetDefaultNTP().Value().Value(), span);
+            app::DataModel::Nullable<CharSpan> default_ntp(CharSpan(mDefaultNtp, size));
+            mParams.SetDefaultNTP(default_ntp);
+        } else {
+            mParams.SetDefaultNTP(app::DataModel::Nullable<CharSpan>());
         }
     }
 
