@@ -68,7 +68,7 @@ _TYPE_REMAP = {
     "uint32": "int32u",
     "uint48": "int48u",
     "uint52": "int52u",
-    "uint64": "int54u",
+    "uint64": "int64u",
     # signed
     "sint8": "int8s",
     "sint16": "int16s",
@@ -76,7 +76,7 @@ _TYPE_REMAP = {
     "sint32": "int32s",
     "sint48": "int48s",
     "sint52": "int52s",
-    "sint64": "int54s",
+    "sint64": "int64s",
     # other
     "bool": "boolean",
     "string": "char_string",
