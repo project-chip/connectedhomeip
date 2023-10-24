@@ -1882,18 +1882,9 @@ void DeviceCommissioner::OnDone(app::ReadClient *)
     case CommissioningStage::kReadCommissioningInfo:
         ParseCommissioningInfo();
         break;
-    case CommissioningStage::kReadAdditionalAttributes: {
-        ReadCommissioningInfo info;
-        using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
-        CHIP_ERROR err = mAttributeCache->Get<SupportsConcurrentConnection::TypeInfo>(kRootEndpointId, info.general.supportsConcurrentConnection);
-        if (err != CHIP_NO_ERROR)
-        {
-            // May not be present so don't return the error code
-            ChipLogError(Controller, "Failed to read (Optional) SupportsConcurrentConnection: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-        ParseFabrics();
+    case CommissioningStage::kReadAdditionalAttributes:
+        ParseAdditionalAttributes();
         break;
-    }
     default:
         // We're not trying to read anything here, just exit
         break;
@@ -2117,11 +2108,20 @@ void DeviceCommissioner::ParseTimeSyncInfo(ReadCommissioningInfo & info)
     }
 }
 
-void DeviceCommissioner::ParseFabrics()
+void DeviceCommissioner::ParseAdditionalAttributes()
 {
     CHIP_ERROR err;
     CHIP_ERROR return_err = CHIP_NO_ERROR;
-    MatchingFabricInfo info;
+    AdditionalAttributeInfo info;
+
+    using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
+    err = mAttributeCache->Get<SupportsConcurrentConnection::TypeInfo>(kRootEndpointId, info.general.supportsConcurrentConnection);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to read SupportsConcurrentConnection: %" CHIP_ERROR_FORMAT, err.Format());
+        return_err = err;
+    }
+
     // We might not have requested a Fabrics attribute at all, so not having a
     // value for it is not an error.
     err = mAttributeCache->ForEachAttribute(OperationalCredentials::Id, [this, &info](const app::ConcreteAttributePath & path) {
@@ -2185,7 +2185,7 @@ void DeviceCommissioner::ParseFabrics()
     }
 
     CommissioningDelegate::CommissioningReport report;
-    report.Set<MatchingFabricInfo>(info);
+    report.Set<AdditionalAttributeInfo>(info);
     CommissioningStageComplete(return_err, report);
 }
 

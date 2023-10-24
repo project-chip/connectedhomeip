@@ -938,7 +938,7 @@ private:
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     // Parsers for the two different read clients
     void ParseCommissioningInfo();
-    void ParseFabrics();
+    void ParseAdditionalAttributes();
     // Called by ParseCommissioningInfo
     void ParseTimeSyncInfo(ReadCommissioningInfo & info);
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT

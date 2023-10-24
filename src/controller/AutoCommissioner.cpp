@@ -632,9 +632,10 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             mNeedsDST = false;
             break;
         case CommissioningStage::kReadAdditionalAttributes: {
-            mParams.SetSupportsConcurrentConnection(mDeviceCommissioningInfo.general.supportsConcurrentConnection);
+            bool supportsConcurrentConnection = report.Get<AdditionalAttributeInfo>().general.supportsConcurrentConnection;
+            mParams.SetSupportsConcurrentConnection(supportsConcurrentConnection);
 
-            chip::NodeId nodeId = report.Get<MatchingFabricInfo>().nodeId;
+            chip::NodeId nodeId = report.Get<AdditionalAttributeInfo>().nodeId;
             if (nodeId != kUndefinedNodeId)
             {
                 mParams.SetRemoteNodeId(nodeId);

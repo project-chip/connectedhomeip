@@ -644,9 +644,10 @@ struct ReadCommissioningInfo
     uint8_t maxTimeZoneSize        = 1;
     uint8_t maxDSTSize             = 1;
 };
-struct MatchingFabricInfo
+struct AdditionalAttributeInfo
 {
     NodeId nodeId = kUndefinedNodeId;
+    GeneralCommissioningInfo general;
 };
 
 struct TimeZoneResponseInfo
@@ -706,7 +707,7 @@ public:
      */
     struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData,
                                          ReadCommissioningInfo, AttestationErrorInfo, CommissioningErrorInfo,
-                                         NetworkCommissioningStatusInfo, MatchingFabricInfo, TimeZoneResponseInfo>
+                                         NetworkCommissioningStatusInfo, AdditionalAttributeInfo, TimeZoneResponseInfo>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;
