@@ -17,16 +17,19 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class NetworkCommissioningClusterNetworkInfoStruct(
-  val networkID: ByteArray,
-  val connected: Boolean
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class NetworkCommissioningClusterNetworkInfoStruct (
+    val networkID: ByteArray,
+    val connected: Boolean) {
+  override fun toString(): String  = buildString {
     append("NetworkCommissioningClusterNetworkInfoStruct {\n")
     append("\tnetworkID : $networkID\n")
     append("\tconnected : $connected\n")
@@ -46,11 +49,11 @@ class NetworkCommissioningClusterNetworkInfoStruct(
     private const val TAG_NETWORK_I_D = 0
     private const val TAG_CONNECTED = 1
 
-    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): NetworkCommissioningClusterNetworkInfoStruct {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : NetworkCommissioningClusterNetworkInfoStruct {
       tlvReader.enterStructure(tlvTag)
       val networkID = tlvReader.getByteArray(ContextSpecificTag(TAG_NETWORK_I_D))
       val connected = tlvReader.getBoolean(ContextSpecificTag(TAG_CONNECTED))
-
+      
       tlvReader.exitContainer()
 
       return NetworkCommissioningClusterNetworkInfoStruct(networkID, connected)
