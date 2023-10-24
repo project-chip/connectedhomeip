@@ -184,7 +184,7 @@ class Android(PlatformLogStreamer):
             self.logger.info(f"Doing {action} for {stream_name}!")
             try:
                 await getattr(stream, action)()
-            except:
+            except Exception:
                 self.logger.error(traceback.format_exc())
                 had_error = True
         if had_error:

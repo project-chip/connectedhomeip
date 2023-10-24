@@ -15,6 +15,4 @@
 #    limitations under the License.
 #
 
-import logging
-
 async_timeout = 45.0
