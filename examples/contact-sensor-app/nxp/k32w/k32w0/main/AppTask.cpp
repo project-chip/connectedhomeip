@@ -45,6 +45,8 @@
 #include <src/platform/nxp/k32w/common/OTAImageProcessorImpl.h>
 #endif
 
+#include <src/platform/nxp/k32w/k32w0/BLEManagerImpl.h>
+
 #include "Keyboard.h"
 #include "LED.h"
 #include "LEDWidget.h"
@@ -121,6 +123,18 @@ CHIP_ERROR AppTask::StartAppTask()
     }
 
     return err;
+}
+
+static void app_gap_callback(gapGenericEvent_t * event)
+{
+    /* This callback is called in the context of BLE task, so event processing
+     * should be posted to app task. */
+}
+
+static void app_gatt_callback(deviceId_t id, gattServerEvent_t * event)
+{
+    /* This callback is called in the context of BLE task, so event processing
+     * should be posted to app task. */
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -246,6 +260,10 @@ CHIP_ERROR AppTask::Init()
     extern uint32_t __MATTER_SSBL_VERSION_START[];
     K32W_LOG("Current SSBL Version: %ld. Found at address 0x%lx", *((uint32_t*) __MATTER_SSBL_VERSION_START), (uint32_t)__MATTER_SSBL_VERSION_START);
 #endif
+
+    auto& bleManager = chip::DeviceLayer::Internal::BLEMgrImpl();
+    bleManager.RegisterAppCallbacks(app_gap_callback, app_gatt_callback);
+
     return err;
 }
 
