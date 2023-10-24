@@ -33,7 +33,7 @@ class Bash:
         Run a bash command as a sub process
         :param command: Command to run
         :param sync: If True, wait for command to terminate
-        :param capture_output: Only applies to sync; if True, store and supress stdout and stderr
+        :param capture_output: Only applies to sync; if True, store and suppress stdout and stderr
         :param cwd: Set working directory of command
         """
         self.logger = logger

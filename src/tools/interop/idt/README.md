@@ -193,7 +193,7 @@ Follow the Linux installation steps above, but do not use Docker.
 > **_IMPORTANT_**  
 > `idt_` commands are shell aliases helpful for administrative commands.  
 > `idt` invokes the `idt` python package.  
-> Output from `idt` will always be colorized while output from subprocesses is
+> Output from `idt` will always be colorized while output from sub processes is
 > generally not.
 
 RPi users, as needed:
@@ -310,7 +310,7 @@ This module must contain a single class which is a subclass of
 
 For capture:
 
--   `base.py` contains the base clases for ecosystems and platforms.
+-   `base.py` contains the base classes for ecosystems and platforms.
 -   `factory.py` contains the ecosystem and platform producer and controller
 -   `loader` is a generic class loader that dynamically imports all classes
     matching a given subclass.
@@ -322,7 +322,7 @@ For discovery:
 
 -   `matter_ble` provides a simple ble scanner that shows matter devices being
     discovered and lost, as well as their VID/PID, RSSI, etc.
--   `matter_dnssd` provides a smple DNS-SD browser that searches for matter
+-   `matter_dnssd` provides a simple DNS-SD browser that searches for matter
     devices and thread border routers.
 
 ### Conventions
@@ -335,7 +335,7 @@ For discovery:
 -   When needed, execute builds in a folder called `BUILD` within the source
     tree.
     -   `idt_clean_all` deletes all `BUILD` dirs and `BUILD` is in `.gitignore`.
--   Although many things are marked as coroutines, almost all real concurrency
+-   Although many things are marked as co routines, almost all real concurrency
     in the current implementation comes from multiprocessing.
     -   A general direction should be decided for the project in the next
         iteration.
@@ -349,7 +349,7 @@ For discovery:
     logging.
 -   It is expected that this script will be run on a system with `bash`,
     `tcpdump`, and `adb` already available.
--   Compiling tcpdump for android may require additional dependencies.
+-   Compiling `tcpdump` for android may require additional dependencies.
     -   If the build script fails for you, try
         `idt_go && source idt/scripts/compilers.sh`.
 -   You may disable colors and splash by setting `enable_color` in `config.py`
