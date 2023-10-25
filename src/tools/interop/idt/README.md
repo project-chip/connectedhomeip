@@ -313,7 +313,7 @@ For capture:
 -   `base.py` contains the base classes for ecosystems and platforms.
 -   `factory.py` contains the ecosystem and platform producer and controller
 -   `loader` is a generic class loader that dynamically imports all classes
-    matching a given subclass.
+    matching a given super class.
 -   `utils/shell` contains a simple helper class for background and foreground
     Bash commands.
 -   `utils/artifact` contains helper functions for managing artifacts.
