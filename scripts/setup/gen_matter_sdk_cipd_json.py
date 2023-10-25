@@ -17,14 +17,16 @@
 import argparse
 import json
 
-_LIST_OF_PACKAGES_TO_EXCLUDE = {'rust'}
+_LIST_OF_PACKAGES_TO_EXCLUDE = ['fuchsia/third_party/rust/']
 
 
 def include_package(package: dict) -> bool:
     if 'path' in package:
-        path_full = package['path']
-        path = path_full.split('/')
-        exclusion_match = any(dir in _LIST_OF_PACKAGES_TO_EXCLUDE for dir in path)
+        path = package['path']
+        exclusion_match = any(
+            path.startswith(package_to_exclude)
+            for package_to_exclude in _LIST_OF_PACKAGES_TO_EXCLUDE
+        )
         if exclusion_match:
             return False
     return True
