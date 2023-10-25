@@ -432,26 +432,20 @@ BluezGattService1 * BluezEndpoint::BluezServiceCreate()
 
 void BluezEndpoint::BluezObjectsSetup()
 {
-    GList * objects = nullptr;
-    GList * l;
-    char * expectedPath = nullptr;
+    char expectedPath[32];
+    snprintf(expectedPath, sizeof(expectedPath), BLUEZ_PATH "/hci%u", mAdapterId);
 
-    expectedPath = g_strdup_printf("%s/hci%d", BLUEZ_PATH, mAdapterId);
-    objects      = g_dbus_object_manager_get_objects(mpObjMgr);
-
-    for (l = objects; l != nullptr && mpAdapter == nullptr; l = l->next)
+    GList * objects = g_dbus_object_manager_get_objects(mpObjMgr);
+    for (auto l = objects; l != nullptr && mpAdapter == nullptr; l = l->next)
     {
         BluezObject * object = BLUEZ_OBJECT(l->data);
-        GList * interfaces;
-        GList * ll;
-        interfaces = g_dbus_object_get_interfaces(G_DBUS_OBJECT(object));
 
-        for (ll = interfaces; ll != nullptr; ll = ll->next)
+        GList * interfaces = g_dbus_object_get_interfaces(G_DBUS_OBJECT(object));
+        for (auto ll = interfaces; ll != nullptr; ll = ll->next)
         {
             if (BLUEZ_IS_ADAPTER1(ll->data))
             { // we found the adapter
                 BluezAdapter1 * adapter = BLUEZ_ADAPTER1(ll->data);
-                char * addr             = const_cast<char *>(bluez_adapter1_get_address(adapter));
                 if (mpAdapterAddr == nullptr) // no adapter address provided, bind to the hci indicated by nodeid
                 {
                     if (strcmp(g_dbus_proxy_get_object_path(G_DBUS_PROXY(adapter)), expectedPath) == 0)
@@ -461,7 +455,7 @@ void BluezEndpoint::BluezObjectsSetup()
                 }
                 else
                 {
-                    if (strcmp(mpAdapterAddr, addr) == 0)
+                    if (strcmp(bluez_adapter1_get_address(adapter), mpAdapterAddr) == 0)
                     {
                         mpAdapter = static_cast<BluezAdapter1 *>(g_object_ref(adapter));
                     }
@@ -470,7 +464,9 @@ void BluezEndpoint::BluezObjectsSetup()
         }
         g_list_free_full(interfaces, g_object_unref);
     }
+
     VerifyOrExit(mpAdapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mpAdapter in %s", __func__));
+
     bluez_adapter1_set_powered(mpAdapter, TRUE);
 
     // Setting "Discoverable" to False on the adapter and to True on the advertisement convinces
@@ -480,7 +476,6 @@ void BluezEndpoint::BluezObjectsSetup()
 
 exit:
     g_list_free_full(objects, g_object_unref);
-    g_free(expectedPath);
 }
 
 BluezConnection * BluezEndpoint::GetBluezConnectionViaDevice()
