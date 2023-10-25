@@ -120,7 +120,6 @@ _bootstrap_or_activate() {
     mkdir -p "$_PW_ACTUAL_ENVIRONMENT_ROOT"
     local _GENERATED_MATTER_SDK_CIPD_JSON="$_PW_ACTUAL_ENVIRONMENT_ROOT/matter_sdk_cipd.json"
     scripts/setup/gen_pigweed_cipd.py -i $_PIGWEED_CIPD_JSON -o $_GENERATED_MATTER_SDK_CIPD_JSON
-    return
 
     if test -n "$GITHUB_ACTION"; then
         tee <<EOF >"${_PW_ACTUAL_ENVIRONMENT_ROOT}/pip.conf"
