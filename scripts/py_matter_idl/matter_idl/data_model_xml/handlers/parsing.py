@@ -77,6 +77,14 @@ _TYPE_REMAP = {
     "sint48": "int48s",
     "sint52": "int52s",
     "sint64": "int64s",
+    # Default to signed
+    "int8": "int8s",
+    "int16": "int16s",
+    "int24": "int24s",
+    "int32": "int32s",
+    "int48": "int48s",
+    "int52": "int52s",
+    "int64": "int64s",
     # other
     "bool": "boolean",
     "string": "char_string",
