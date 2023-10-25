@@ -85,10 +85,13 @@ private:
         uint16_t mNumRetries = 0;
     };
 
-    BluezGattService1 * BluezServiceCreate();
+    void SetupAdapter();
+    void SetupGattService();
+
+    BluezGattService1 * CreateGattService(const char * aUUID);
+    BluezGattCharacteristic1 * CreateGattCharacteristic(BluezGattService1 * aService, const char * aCharName, const char * aUUID);
+
     void BluezOnBusAcquired(GDBusConnection * aConn, const char * aName);
-    void BluezPeripheralObjectsSetup();
-    void BluezObjectsSetup();
 
     static CHIP_ERROR StartupEndpointBindings(BluezEndpoint * endpoint);
 
