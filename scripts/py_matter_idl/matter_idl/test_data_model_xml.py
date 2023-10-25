@@ -78,6 +78,17 @@ class TestXmlParser(unittest.TestCase):
         xml_idl = XmlToIdl('''
             <cluster id="123" name="Test" revision="1">
               <dataTypes>
+                <bitmap name="Basic">
+                  <bitfield name="One" bit="0">
+                    <mandatoryConform/>
+                  </bitfield>
+                  <bitfield name="Two" bit="1">
+                    <mandatoryConform/>
+                  </bitfield>
+                  <bitfield name="Three" bit="2">
+                    <mandatoryConform/>
+                  </bitfield>
+                </bitmap>
                 <bitmap name="OneLarge">
                   <bitfield name="Ten" bit="10">
                     <mandatoryConform/>
@@ -105,6 +116,12 @@ class TestXmlParser(unittest.TestCase):
 
         expected_idl = IdlTextToIdl('''
             client cluster Test = 123 {
+               bitmap Basic: bitmap8 {
+                  kOne = 0x01;
+                  kTwo = 0x02;
+                  kThree = 0x04;
+               }
+
                bitmap OneLarge: bitmap16 {
                   kTen = 0x400;
                }
