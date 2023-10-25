@@ -27,12 +27,6 @@ CHIP_ERROR AppTask::Init(void)
 {
     InitCommonParts();
 
-    // Starts commissioning window automatically. Starts BLE advertising when BLE enabled
-    if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "OpenBasicCommissioningWindow() failed");
-    }
-
 #if CONFIG_CHIP_LIB_SHELL
     int rc = Engine::Root().Init();
     if (rc != 0)
