@@ -1406,6 +1406,12 @@ enum class StatusCode : uint8_t
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 0,
 };
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kBasic = 0x1,
+};
 } // namespace AdministratorCommissioning
 
 namespace OperationalCredentials {

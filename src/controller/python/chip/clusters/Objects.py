@@ -12782,6 +12782,10 @@ class AdministratorCommissioning(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 0,
 
+    class Bitmaps:
+        class Feature(IntFlag):
+            kBasic = 0x1
+
     class Commands:
         @dataclass
         class OpenCommissioningWindow(ClusterCommand):
