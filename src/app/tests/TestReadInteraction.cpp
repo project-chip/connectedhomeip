@@ -340,7 +340,7 @@ public:
     static void TestICDProcessSubscribeRequestInfMaxIntervalCeiling(nlTestSuite * apSuite, void * apContext);
     static void TestICDProcessSubscribeRequestSupMinInterval(nlTestSuite * apSuite, void * apContext);
     static void TestICDProcessSubscribeRequestMaxMinInterval(nlTestSuite * apSuite, void * apContext);
-    static void TestICDProcessSubscribeRequestInvalidIdleModeInterval(nlTestSuite * apSuite, void * apContext);
+    static void TestICDProcessSubscribeRequestInvalidIdleModeDuration(nlTestSuite * apSuite, void * apContext);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     static void TestReadRoundtrip(nlTestSuite * apSuite, void * apContext);
     static void TestPostSubscribeRoundtripChunkReport(nlTestSuite * apSuite, void * apContext);
@@ -1520,7 +1520,7 @@ void TestReadInteraction::TestProcessSubscribeRequest(nlTestSuite * apSuite, voi
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 /**
- * @brief Test validates that an ICD will choose its IdleModeInterval (GetPublisherSelectedIntervalLimit)
+ * @brief Test validates that an ICD will choose its IdleModeDuration (GetPublisherSelectedIntervalLimit)
  *        as MaxInterval when the MaxIntervalCeiling is superior.
  */
 void TestReadInteraction::TestICDProcessSubscribeRequestSupMaxIntervalCeiling(nlTestSuite * apSuite, void * apContext)
@@ -1581,14 +1581,14 @@ void TestReadInteraction::TestICDProcessSubscribeRequestSupMaxIntervalCeiling(nl
         err = readHandler.ProcessSubscribeRequest(std::move(subscribeRequestbuf));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        uint16_t idleModeInterval = readHandler.GetPublisherSelectedIntervalLimit();
+        uint16_t idleModeDuration = readHandler.GetPublisherSelectedIntervalLimit();
 
         uint16_t minInterval;
         uint16_t maxInterval;
         readHandler.GetReportingIntervals(minInterval, maxInterval);
 
         NL_TEST_ASSERT(apSuite, minInterval == kMinInterval);
-        NL_TEST_ASSERT(apSuite, maxInterval == idleModeInterval);
+        NL_TEST_ASSERT(apSuite, maxInterval == idleModeDuration);
     }
     engine->Shutdown();
 
@@ -1596,7 +1596,7 @@ void TestReadInteraction::TestICDProcessSubscribeRequestSupMaxIntervalCeiling(nl
 }
 
 /**
- * @brief Test validates that an ICD will choose its IdleModeInterval (GetPublisherSelectedIntervalLimit)
+ * @brief Test validates that an ICD will choose its IdleModeDuration (GetPublisherSelectedIntervalLimit)
  *        as MaxInterval when the MaxIntervalCeiling is inferior.
  */
 void TestReadInteraction::TestICDProcessSubscribeRequestInfMaxIntervalCeiling(nlTestSuite * apSuite, void * apContext)
@@ -1657,14 +1657,14 @@ void TestReadInteraction::TestICDProcessSubscribeRequestInfMaxIntervalCeiling(nl
         err = readHandler.ProcessSubscribeRequest(std::move(subscribeRequestbuf));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        uint16_t idleModeInterval = readHandler.GetPublisherSelectedIntervalLimit();
+        uint16_t idleModeDuration = readHandler.GetPublisherSelectedIntervalLimit();
 
         uint16_t minInterval;
         uint16_t maxInterval;
         readHandler.GetReportingIntervals(minInterval, maxInterval);
 
         NL_TEST_ASSERT(apSuite, minInterval == kMinInterval);
-        NL_TEST_ASSERT(apSuite, maxInterval == idleModeInterval);
+        NL_TEST_ASSERT(apSuite, maxInterval == idleModeDuration);
     }
     engine->Shutdown();
 
@@ -1672,8 +1672,8 @@ void TestReadInteraction::TestICDProcessSubscribeRequestInfMaxIntervalCeiling(nl
 }
 
 /**
- * @brief Test validates that an ICD will choose a multiple of its IdleModeInterval (GetPublisherSelectedIntervalLimit)
- *        as MaxInterval when the MinInterval > IdleModeInterval.
+ * @brief Test validates that an ICD will choose a multiple of its IdleModeDuration (GetPublisherSelectedIntervalLimit)
+ *        as MaxInterval when the MinInterval > IdleModeDuration.
  */
 void TestReadInteraction::TestICDProcessSubscribeRequestSupMinInterval(nlTestSuite * apSuite, void * apContext)
 {
@@ -1733,14 +1733,14 @@ void TestReadInteraction::TestICDProcessSubscribeRequestSupMinInterval(nlTestSui
         err = readHandler.ProcessSubscribeRequest(std::move(subscribeRequestbuf));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-        uint16_t idleModeInterval = readHandler.GetPublisherSelectedIntervalLimit();
+        uint16_t idleModeDuration = readHandler.GetPublisherSelectedIntervalLimit();
 
         uint16_t minInterval;
         uint16_t maxInterval;
         readHandler.GetReportingIntervals(minInterval, maxInterval);
 
         NL_TEST_ASSERT(apSuite, minInterval == kMinInterval);
-        NL_TEST_ASSERT(apSuite, maxInterval == (2 * idleModeInterval));
+        NL_TEST_ASSERT(apSuite, maxInterval == (2 * idleModeDuration));
     }
     engine->Shutdown();
 
@@ -1748,7 +1748,7 @@ void TestReadInteraction::TestICDProcessSubscribeRequestSupMinInterval(nlTestSui
 }
 
 /**
- * @brief Test validates that an ICD will choose a maximal value for an uint16 if the multiple of the IdleModeInterval
+ * @brief Test validates that an ICD will choose a maximal value for an uint16 if the multiple of the IdleModeDuration
  *        is greater than variable size.
  */
 void TestReadInteraction::TestICDProcessSubscribeRequestMaxMinInterval(nlTestSuite * apSuite, void * apContext)
@@ -1823,9 +1823,9 @@ void TestReadInteraction::TestICDProcessSubscribeRequestMaxMinInterval(nlTestSui
 
 /**
  * @brief Test validates that an ICD will choose the MaxIntervalCeiling as MaxInterval if the next multiple after the MinInterval
- *        is greater than the IdleModeInterval and MaxIntervalCeiling
+ *        is greater than the IdleModeDuration and MaxIntervalCeiling
  */
-void TestReadInteraction::TestICDProcessSubscribeRequestInvalidIdleModeInterval(nlTestSuite * apSuite, void * apContext)
+void TestReadInteraction::TestICDProcessSubscribeRequestInvalidIdleModeDuration(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -4935,7 +4935,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestICDProcessSubscribeRequestInfMaxIntervalCeiling", chip::app::TestReadInteraction::TestICDProcessSubscribeRequestInfMaxIntervalCeiling),
     NL_TEST_DEF("TestICDProcessSubscribeRequestSupMinInterval", chip::app::TestReadInteraction::TestICDProcessSubscribeRequestSupMinInterval),
     NL_TEST_DEF("TestICDProcessSubscribeRequestMaxMinInterval", chip::app::TestReadInteraction::TestICDProcessSubscribeRequestMaxMinInterval),
-    NL_TEST_DEF("TestICDProcessSubscribeRequestInvalidIdleModeInterval", chip::app::TestReadInteraction::TestICDProcessSubscribeRequestInvalidIdleModeInterval),
+    NL_TEST_DEF("TestICDProcessSubscribeRequestInvalidIdleModeDuration", chip::app::TestReadInteraction::TestICDProcessSubscribeRequestInvalidIdleModeDuration),
 #endif // #if CHIP_CONFIG_ENABLE_ICD_SERVER
     NL_TEST_DEF("TestSubscribeRoundtrip", chip::app::TestReadInteraction::TestSubscribeRoundtrip),
     NL_TEST_DEF("TestSubscribeEarlyReport", chip::app::TestReadInteraction::TestSubscribeEarlyReport),

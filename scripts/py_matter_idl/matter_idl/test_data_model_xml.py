@@ -27,8 +27,8 @@ except ImportError:
         os.path.join(os.path.dirname(__file__), '..')))
     from matter_idl.data_model_xml import ParseSource, ParseXmls
 
+from matter_idl.matter_idl_parser import CreateParser
 from matter_idl.matter_idl_types import Idl
-from matter_idl_parser import CreateParser
 
 
 def XmlToIdl(what: Union[str, List[str]]) -> Idl:
@@ -61,6 +61,123 @@ class TestXmlParser(unittest.TestCase):
 
         expected_idl = IdlTextToIdl('''
             client cluster Test = 123 {
+               readonly attribute attrib_id attributeList[] = 65531;
+               readonly attribute event_id eventList[] = 65530;
+               readonly attribute command_id acceptedCommandList[] = 65529;
+               readonly attribute command_id generatedCommandList[] = 65528;
+               readonly attribute bitmap32 featureMap = 65532;
+               readonly attribute int16u clusterRevision = 65533;
+           }
+        ''')
+
+        self.assertEqual(xml_idl, expected_idl)
+
+    def testEnumRange(self):
+        # Check heuristic for enum ranges
+
+        xml_idl = XmlToIdl('''
+            <cluster id="123" name="Test" revision="1">
+              <dataTypes>
+                <bitmap name="Basic">
+                  <bitfield name="One" bit="0">
+                    <mandatoryConform/>
+                  </bitfield>
+                  <bitfield name="Two" bit="1">
+                    <mandatoryConform/>
+                  </bitfield>
+                  <bitfield name="Three" bit="2">
+                    <mandatoryConform/>
+                  </bitfield>
+                </bitmap>
+                <bitmap name="OneLarge">
+                  <bitfield name="Ten" bit="10">
+                    <mandatoryConform/>
+                  </bitfield>
+                </bitmap>
+                <bitmap name="LargeBitmap">
+                  <bitfield name="One" bit="0">
+                    <mandatoryConform/>
+                  </bitfield>
+                  <bitfield name="Ten" bit="10">
+                    <mandatoryConform/>
+                  </bitfield>
+                  <bitfield name="Twenty" bit="20">
+                    <mandatoryConform/>
+                  </bitfield>
+                </bitmap>
+                <bitmap name="HugeBitmap">
+                  <bitfield name="Forty" bit="40">
+                    <mandatoryConform/>
+                  </bitfield>
+                </bitmap>
+              </dataTypes>
+            </cluster>
+        ''')
+
+        expected_idl = IdlTextToIdl('''
+            client cluster Test = 123 {
+               bitmap Basic: bitmap8 {
+                  kOne = 0x01;
+                  kTwo = 0x02;
+                  kThree = 0x04;
+               }
+
+               bitmap OneLarge: bitmap16 {
+                  kTen = 0x400;
+               }
+
+               bitmap LargeBitmap: bitmap32 {
+                  kOne = 0x1;
+                  kTen = 0x400;
+                  kTwenty = 0x100000;
+               }
+
+               bitmap HugeBitmap: bitmap64 {
+                  kForty = 0x10000000000;
+               }
+
+               readonly attribute attrib_id attributeList[] = 65531;
+               readonly attribute event_id eventList[] = 65530;
+               readonly attribute command_id acceptedCommandList[] = 65529;
+               readonly attribute command_id generatedCommandList[] = 65528;
+               readonly attribute bitmap32 featureMap = 65532;
+               readonly attribute int16u clusterRevision = 65533;
+           }
+        ''')
+
+        self.assertEqual(xml_idl, expected_idl)
+
+    def testAttributes(self):
+        # Validate an attribute with a type list
+        # This is a very stripped down version from the original AudioOutput.xml
+
+        xml_idl = XmlToIdl('''
+            <cluster id="123" name="Test" revision="1">
+              <dataTypes>
+                <struct name="OutputInfoStruct">
+                  <field id="0" name="Index" type="uint8">
+                    <access read="true" write="true"/>
+                    <mandatoryConform/>
+                  </field>
+                </struct>
+              </dataTypes>
+              <attributes>
+                <attribute id="0x0000" name="OutputList" type="list[OutputInfoStruct Type]">
+                  <access read="true" readPrivilege="view"/>
+                  <mandatoryConform/>
+                </attribute>
+              </attributes>
+            </cluster>
+        ''')
+
+        expected_idl = IdlTextToIdl('''
+            client cluster Test = 123 {
+               struct OutputInfoStruct {
+                  int8u index = 0;
+               }
+
+               readonly attribute OutputInfoStruct outputList[] = 0;
+
                readonly attribute attrib_id attributeList[] = 65531;
                readonly attribute event_id eventList[] = 65530;
                readonly attribute command_id acceptedCommandList[] = 65529;

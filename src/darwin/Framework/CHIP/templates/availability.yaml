@@ -74,10 +74,10 @@
 
 - release: "Initial release"
   versions:
-      ios: "16.1"
-      macos: "13.0"
-      watchos: "9.1"
-      tvos: "16.1"
+      iOS: "16.1"
+      macOS: "13.0"
+      watchOS: "9.1"
+      tvOS: "16.1"
   introduced:
       clusters:
           - Identify
@@ -4722,10 +4722,10 @@
 
 - release: "First dot-release"
   versions:
-      ios: "16.2"
-      macos: "13.1"
-      watchos: "9.2"
-      tvos: "16.2"
+      iOS: "16.2"
+      macOS: "13.1"
+      watchOS: "9.2"
+      tvOS: "16.2"
   introduced:
       attributes:
           TestCluster:
@@ -4778,10 +4778,10 @@
 
 - release: "First major API revamp"
   versions:
-      ios: "16.4"
-      macos: "13.3"
-      watchos: "9.4"
-      tvos: "16.4"
+      iOS: "16.4"
+      macOS: "13.3"
+      watchOS: "9.4"
+      tvOS: "16.4"
   introduced:
       clusters:
           - OTASoftwareUpdateProvider
@@ -6723,10 +6723,10 @@
 
 - release: "First after major API revamp"
   versions:
-      ios: "16.5"
-      macos: "13.4"
-      watchos: "9.5"
-      tvos: "16.5"
+      iOS: "16.5"
+      macOS: "13.4"
+      watchOS: "9.5"
+      tvOS: "16.5"
   introduced:
       ids:
           attributes:
@@ -7031,10 +7031,10 @@
 
 - release: "Fall 2023"
   versions:
-      ios: "17.0"
-      macos: "14.0"
-      watchos: "10.0"
-      tvos: "17.0"
+      iOS: "17.0"
+      macOS: "14.0"
+      watchOS: "10.0"
+      tvOS: "17.0"
   introduced:
       attributes:
           BasicInformation:
@@ -7515,10 +7515,10 @@
 
 - release: "Fall 2023 #2"
   versions:
-      ios: "17.1"
-      macos: "14.1"
-      watchos: "10.1"
-      tvos: "17.1"
+      iOS: "17.1"
+      macOS: "14.1"
+      watchOS: "10.1"
+      tvOS: "17.1"
   introduced:
       bitmaps:
           TimeFormatLocalization:
@@ -7583,10 +7583,10 @@
 
 - release: "Fall 2023 #3"
   versions:
-      ios: "17.2"
-      macos: "14.2"
-      watchos: "10.2"
-      tvos: "17.2"
+      iOS: "17.2"
+      macOS: "14.2"
+      watchOS: "10.2"
+      tvOS: "17.2"
   introduced:
       command payloads:
           TimeSynchronization:
@@ -7728,3 +7728,18 @@
 
 - release: "Future"
   versions: "future"
+  introduced:
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpStatusBitmap:
+                  - SupplyFault
+  deprecated:
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpStatusBitmap:
+                  - Supplyfault
+  renames:
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpStatusBitmap:
+                  SupplyFault: Supplyfault
