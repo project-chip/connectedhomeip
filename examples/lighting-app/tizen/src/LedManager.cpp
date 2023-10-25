@@ -65,4 +65,5 @@ void LedManager::InitOnOff()
     VerifyOrReturn(status == EMBER_ZCL_STATUS_SUCCESS, ChipLogError(NotSpecified, "Error getting OnOff: 0x%x", status));
     SetOnOff(isOn);
 }
+
 } // namespace example
