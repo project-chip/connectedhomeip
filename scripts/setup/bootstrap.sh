@@ -68,12 +68,6 @@ _bootstrap_or_activate() {
     # Strip off the 'scripts[/setup]' directory, leaving the root of the repo.
     _CHIP_ROOT="$(cd "${_BOOTSTRAP_DIR%/setup}/.." && pwd)"
 
-    local _PIGWEED_CIPD_JSON_FILE="$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/pigweed.json"
-    # TODO need to find a better location then /tmp/test.json
-    local _GENERATED_PIGWEED_CIPD_JSON_FILE="/tmp/test.json"
-    # TODO this call into python is very hacky. This needs to be fixed
-    python3 scripts/setup/gen_pigweed_cipd.py -i $_PIGWEED_CIPD_JSON_FILE -o $_GENERATED_PIGWEED_CIPD_JSON_FILE
-
     local _CONFIG_FILE="scripts/setup/environment.json"
 
     if [ -n "$PW_CONFIG_FILE" ]; then
@@ -122,8 +116,13 @@ _bootstrap_or_activate() {
     export PW_DOCTOR_SKIP_CIPD_CHECKS=1
     export PATH # https://bugs.chromium.org/p/pigweed/issues/detail?id=281
 
+    local _PIGWEED_CIPD_JSON="$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/pigweed.json"
+    mkdir -p "$_PW_ACTUAL_ENVIRONMENT_ROOT"
+    local _GENERATED_MATTER_SDK_CIPD_JSON="$_PW_ACTUAL_ENVIRONMENT_ROOT/matter_sdk_cipd.json"
+    scripts/setup/gen_pigweed_cipd.py -i $_PIGWEED_CIPD_JSON -o $_GENERATED_MATTER_SDK_CIPD_JSON
+    return
+
     if test -n "$GITHUB_ACTION"; then
-        mkdir -p "$_PW_ACTUAL_ENVIRONMENT_ROOT"
         tee <<EOF >"${_PW_ACTUAL_ENVIRONMENT_ROOT}/pip.conf"
 [global]
 cache-dir = ${_PW_ACTUAL_ENVIRONMENT_ROOT}/pip-cache
@@ -138,7 +137,7 @@ EOF
             --install-dir "$_PW_ACTUAL_ENVIRONMENT_ROOT" \
             --config-file "$_CHIP_ROOT/$_CONFIG_FILE" \
             --virtualenv-gn-out-dir "$_PW_ACTUAL_ENVIRONMENT_ROOT/gn_out" \
-            --additional-cipd-file "$_GENERATED_PIGWEED_CIPD_JSON_FILE"
+            --additional-cipd-file "$_GENERATED_MATTER_SDK_CIPD_JSON"
         pw_finalize bootstrap "$_SETUP_SH"
         _ACTION_TAKEN="bootstrap"
     else
