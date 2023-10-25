@@ -79,6 +79,7 @@ Generally regenerate using one of:
 |        129 |       0x81 | ValveConfigurationAndControl                            |
 |        150 |       0x96 | DemandResponseLoadControl                               |
 |        153 |       0x99 | EnergyEvse                                              |
+|        155 |       0x9B | EnergyPreference                                        |
 |        257 |      0x101 | DoorLock                                                |
 |        258 |      0x102 | WindowCovering                                          |
 |        259 |      0x103 | BarrierControl                                          |

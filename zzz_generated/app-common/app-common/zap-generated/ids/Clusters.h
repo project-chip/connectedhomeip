@@ -226,6 +226,9 @@ static constexpr ClusterId Id = 0x00000096;
 namespace EnergyEvse {
 static constexpr ClusterId Id = 0x00000099;
 } // namespace EnergyEvse
+namespace EnergyPreference {
+static constexpr ClusterId Id = 0x0000009B;
+} // namespace EnergyPreference
 namespace DoorLock {
 static constexpr ClusterId Id = 0x00000101;
 } // namespace DoorLock
