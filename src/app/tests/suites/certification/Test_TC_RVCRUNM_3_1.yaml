@@ -17,13 +17,15 @@ name: 87.4.1. [TC-RVCRUNM-3.1] On Mode functionality with DUT as Server
 PICS:
     - RVCRUNM.S.A0003
     - RVCRUNM.S.F00
+    - OO.S.C00.Rsp
+    - OO.S.C01.Rsp
 
 config:
     nodeId: 0x12344321
     cluster: "RVC Run Mode"
     endpoint: 1
 
-    ConfigureOnMode:
+    nonNull_OnMode_value:
         type: int8u
         defaultValue: 0
     new_mode_th:
@@ -41,12 +43,12 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Precondition: TH writes from the DUT the OnMode attribute."
+    - label: "Precondition: The OnMode attribute is set to a non-NULL value"
       PICS: RVCRUNM.S.A0003 && RVCRUNM.S.F00
       command: "writeAttribute"
       attribute: "OnMode"
       arguments:
-          value: ConfigureOnMode
+          value: nonNull_OnMode_value
 
     - label: "Step 2: TH reads from the DUT the OnMode attribute."
       PICS: RVCRUNM.S.A0003 && RVCRUNM.S.F00
