@@ -23,7 +23,6 @@
 class AppTask : public AppTaskCommon
 {
 public:
-
 private:
     friend AppTask & GetAppTask(void);
     friend class AppTaskCommon;
