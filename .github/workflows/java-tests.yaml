@@ -40,7 +40,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build-java:1
+            image: ghcr.io/project-chip/chip-build-java:22
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 
@@ -210,6 +210,17 @@ jobs:
                      --tool-args "code --nodeid 1 --setup-payload 34970112332 --discover-once 1 --use-only-onnetwork-discovery 0 -t 1000" \
                      --factoryreset \
                   '
+            - name: Run Pairing Onnetwork Test
+              run: |
+                  scripts/run_in_python_env.sh out/venv \
+                  './scripts/tests/run_kotlin_test.py \
+                     --app out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app \
+                     --app-args "--discriminator 3840 --interface-id -1" \
+                     --tool-path out/linux-x64-kotlin-matter-controller \
+                     --tool-cluster "pairing" \
+                     --tool-args "onnetwork-long --nodeid 1 --setup-pin-code 20202021 --discriminator 3840 -t 1000" \
+                     --factoryreset \
+                  '                  
             - name: Run Kotlin IM Invoke Test
               run: |
                   scripts/run_in_python_env.sh out/venv \

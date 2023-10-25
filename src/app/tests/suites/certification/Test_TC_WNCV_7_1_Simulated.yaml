@@ -30,11 +30,13 @@ tests:
     #  command: "WaitForCommissioning"
 
     - label:
-          "If (PA_LF & LF) DUT sends GoToLiftPercentage command with 50% to DUT"
+          "Step 1a: If (PA_LF & LF) DUT sends GoToLiftPercentage command with
+          50% to DUT"
       wait: "GoToLiftPercentage"
       PICS: WNCV.C.C05.Tx
 
     - label:
-          "If (PA_TL & TL) DUT sends GoToTiltPercentage command with 50% to DUT"
+          "Step 2a: If (PA_TL & TL) DUT sends GoToTiltPercentage command with
+          50% to DUT"
       wait: "GoToTiltPercentage"
       PICS: WNCV.C.C08.Tx

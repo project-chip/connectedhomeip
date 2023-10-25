@@ -160,6 +160,12 @@ typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *
     }
 }
 
+- (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device
+{
+    // Make sure our subscriptions time out in finite time.
+    return @(2); // seconds
+}
+
 @end
 
 @interface MTRDeviceTests : XCTestCase
@@ -1507,6 +1513,23 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertNotEqual(attributeReportsReceived, 0);
     XCTAssertNotEqual(eventReportsReceived, 0);
 
+    // Check that we can read one of those attributes we received.
+    __auto_type * descriptorCluster = [[MTRClusterDescriptor alloc] initWithDevice:device endpointID:@(0) queue:queue];
+    __auto_type * partsListDictionary = [descriptorCluster readAttributePartsListWithParams:nil];
+    XCTAssertNotNil(partsListDictionary);
+
+    __auto_type * responseValue = @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)],
+        MTRDataKey : partsListDictionary,
+    };
+
+    NSError * error;
+    __auto_type * report = [[MTRAttributeReport alloc] initWithResponseValue:responseValue error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(report);
+    XCTAssertNotNil(report.value);
+    XCTAssertTrue([report.value isKindOfClass:NSArray.class]);
+
     // Before resubscribe, first test write failure and expected value effects
     NSNumber * testEndpointID = @(1);
     NSNumber * testClusterID = @(8);
@@ -1744,13 +1767,18 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                      }];
 
     XCTestExpectation * offExpectation = [self expectationWithDescription:@"Off command executed"];
-    [onOffCluster offWithParams:nil
-                 expectedValues:nil
-          expectedValueInterval:nil
-                     completion:^(NSError * _Nullable error) {
-                         XCTAssertNil(error);
-                         [offExpectation fulfill];
-                     }];
+    // Send this one via MTRDevice, to test that codepath.
+    [device invokeCommandWithEndpointID:@(1)
+                              clusterID:@(MTRClusterIDTypeOnOffID)
+                              commandID:@(MTRCommandIDTypeClusterOnOffCommandOffID)
+                          commandFields:nil
+                         expectedValues:nil
+                  expectedValueInterval:nil
+                                  queue:queue
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 XCTAssertNil(error);
+                                 [offExpectation fulfill];
+                             }];
 
     XCTestExpectation * onFailedExpectation = [self expectationWithDescription:@"On command failed"];
     [badOnOffCluster onWithParams:nil
@@ -2234,12 +2262,15 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
                                  {
                                      XCTAssertTrue([values isKindOfClass:[NSArray class]]);
                                      NSArray * resultArray = values;
+                                     XCTAssertEqual(resultArray.count, 1);
                                      for (NSDictionary * result in resultArray) {
                                          MTRCommandPath * path = result[@"commandPath"];
                                          XCTAssertEqualObjects(path.endpoint, @1);
                                          XCTAssertEqualObjects(path.cluster, @6);
                                          XCTAssertEqualObjects(path.command, @1);
                                          XCTAssertNil(result[@"error"]);
+                                         // This command just has a status response.
+                                         XCTAssertNil(result[@"value"]);
                                      }
                                      XCTAssertEqual([resultArray count], 1);
                                  }
@@ -2522,6 +2553,73 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     }];
 
     [self waitForExpectations:@[ attestationRequestedViaDevice ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test028_TimeZoneAndDST
+{
+    // Time synchronization is marked provisional so far, so we can only test it
+    // when MTR_ENABLE_PROVISIONAL is set.
+#if MTR_ENABLE_PROVISIONAL
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * device = GetConnectedDevice();
+    __auto_type * cluster = [[MTRBaseClusterTimeSynchronization alloc] initWithDevice:device endpointID:@(0) queue:queue];
+
+    XCTestExpectation * readTimeZoneExpectation = [self expectationWithDescription:@"Read TimeZone attribute"];
+    __block NSArray<MTRTimeSynchronizationClusterTimeZoneStruct *> * timeZone;
+    [cluster readAttributeTimeZoneWithCompletion:^(NSArray * _Nullable value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        timeZone = value;
+        [readTimeZoneExpectation fulfill];
+    }];
+
+    [self waitForExpectations:@[ readTimeZoneExpectation ] timeout:kTimeoutInSeconds];
+
+    __block NSArray<MTRTimeSynchronizationClusterDSTOffsetStruct *> * dstOffset;
+    XCTestExpectation * readDSTOffsetExpectation = [self expectationWithDescription:@"Read DSTOffset attribute"];
+    [cluster readAttributeDSTOffsetWithCompletion:^(NSArray * _Nullable value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        dstOffset = value;
+        [readDSTOffsetExpectation fulfill];
+    }];
+
+    [self waitForExpectations:@[ readDSTOffsetExpectation ] timeout:kTimeoutInSeconds];
+
+    // Check that the first DST offset entry matches what we expect.  If we
+    // happened to cross a DST boundary during execution of this function, some
+    // of these checks will fail, but that seems pretty low-probability.
+
+    XCTAssertTrue(dstOffset.count > 0);
+    MTRTimeSynchronizationClusterDSTOffsetStruct * currentDSTOffset = dstOffset[0];
+
+    __auto_type * utcTz = [NSTimeZone timeZoneForSecondsFromGMT:0];
+    __auto_type * dateComponents = [[NSDateComponents alloc] init];
+    dateComponents.timeZone = utcTz;
+    dateComponents.year = 2000;
+    dateComponents.month = 1;
+    dateComponents.day = 1;
+    NSCalendar * gregorianCalendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    NSDate * matterEpoch = [gregorianCalendar dateFromComponents:dateComponents];
+
+    NSDate * nextReportedDSTTransition;
+    if (currentDSTOffset.validUntil == nil) {
+        nextReportedDSTTransition = nil;
+    } else {
+        double validUntilMicroSeconds = currentDSTOffset.validUntil.doubleValue;
+        nextReportedDSTTransition = [NSDate dateWithTimeInterval:validUntilMicroSeconds / 1e6 sinceDate:matterEpoch];
+    }
+
+    __auto_type * tz = [NSTimeZone localTimeZone];
+    NSDate * nextDSTTransition = tz.nextDaylightSavingTimeTransition;
+    XCTAssertEqualObjects(nextReportedDSTTransition, nextDSTTransition);
+
+    XCTAssertEqual(currentDSTOffset.offset.intValue, tz.daylightSavingTimeOffset);
+
+    // Now check the timezone info we got.  We always set exactly one timezone.
+    XCTAssertEqual(timeZone.count, 1);
+    MTRTimeSynchronizationClusterTimeZoneStruct * currentTimeZone = timeZone[0];
+    XCTAssertEqual(tz.secondsFromGMT, currentTimeZone.offset.intValue + currentDSTOffset.offset.intValue);
+#endif // MTR_ENABLE_PROVISIONAL
 }
 
 - (void)test900_SubscribeAllAttributes

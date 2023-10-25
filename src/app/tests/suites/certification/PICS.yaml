@@ -7584,36 +7584,6 @@ PICS:
           attribute implemented on the server ?"
       id: WNCV.C.A001a
 
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFF8)
-          GeneratedCommandList attribute implemented on the server ?"
-      id: WNCV.C.Afff8
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFF9)
-          AcceptedCommandList attribute implemented on the server ?"
-      id: WNCV.C.Afff9
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFFA)
-          EventList attribute implemented on the server ?"
-      id: WNCV.C.Afffa
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFFB)
-          AttributeList attribute implemented on the server ?"
-      id: WNCV.C.Afffb
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFFC)
-          FeatureMap attribute implemented on the server ?"
-      id: WNCV.C.Afffc
-
-    - label:
-          "Does the DUT(client) have access privileges for the (0xFFFD)
-          ClusterRevision attribute implemented on the server ?"
-      id: WNCV.C.Afffd
-
     #
     # client / commandsGenerated
     #
@@ -8578,10 +8548,10 @@ PICS:
     #
     # Server Attribute
     #
-    - label: "Does the device implement the IdleModeInterval attribute?"
+    - label: "Does the device implement the IdleModeDuration attribute?"
       id: ICDM.S.A0000
 
-    - label: "Does the device implement the ActiveModeInterval attribute?"
+    - label: "Does the device implement the ActiveModeDuration attribute?"
       id: ICDM.S.A0001
 
     - label: "Does the device implement the ActiveModeThreshold attribute?"
@@ -8600,10 +8570,10 @@ PICS:
     #
     # Client Attribute
     #
-    - label: "Does the device implement the IdleModeInterval attribute?"
+    - label: "Does the device implement the IdleModeDuration attribute?"
       id: ICDM.C.A0000
 
-    - label: "Does the device implement the ActiveModeInterval attribute?"
+    - label: "Does the device implement the ActiveModeDuration attribute?"
       id: ICDM.C.A0001
 
     - label: "Does the device implement the ActiveModeThreshold attribute?"

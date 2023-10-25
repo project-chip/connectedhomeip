@@ -221,20 +221,6 @@ void SetLogFilter(uint8_t category)
     gLogFilter = category;
 }
 
-#else  // CHIP_LOG_FILTERING
-
-uint8_t GetLogFilter()
-{
-    return kLogCategory_Max;
-}
-
-void SetLogFilter(uint8_t category)
-{
-    IgnoreUnusedVariable(category);
-}
-#endif // CHIP_LOG_FILTERING
-
-#if CHIP_LOG_FILTERING
 bool IsCategoryEnabled(uint8_t category)
 {
     return (category <= gLogFilter);

@@ -42,6 +42,9 @@ config:
     incorrectSetupCodePayload:
         type: char_string
         defaultValue: "MT:-24J0AFN00I.0648G00"
+    PIXIT.CADMIN.CwDuration:
+        type: int16u
+        defaultValue: 180
 
 tests:
     - label: "Precondition: Reset Devices to factory defaults"
@@ -63,6 +66,17 @@ tests:
                 value: "y"
 
     - label: "Step 1: TH_CR1 starts a commissioning process with DUT_CE"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: correctPayload
+
+    - label: "Step 1a: TH_CR1 commissioned with DUT_CE"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       PICS: CADMIN.S
@@ -79,9 +93,10 @@ tests:
       arguments:
           values:
               - name: "CommissioningTimeout"
-                value: 900
+                value: PIXIT.CADMIN.CwDuration
 
     - label: "Step 2a: Waiting after opening commissioning window"
+      PICS: CADMIN.S.C01.Rsp
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -89,27 +104,14 @@ tests:
               - name: "ms"
                 value: waitAfterCommissioning
 
-    #Check for DNS-SD advertisement CM is not possible in YAML
     - label: "Step 3: Verify that the DNS-SD advertisement shows CM=1"
-      verification: |
-          On TH_CR1 send the below command
-
-          ubuntu@ubuntu:~/may16_cntrl/connectedhomeip/examples/chip-tool/out/debug$ avahi-browse -rt _matterc._udp
-          +   eth0 IPv6 2664ED6939FC373C                              _matterc._udp        local
-          =   eth0 IPv6 2664ED6939FC373C                              _matterc._udp        local
-            hostname = [E45F010F27530000.local]
-            address = [fe80::e65f:1ff:fe0f:2753]
-            port = [5540]
-            txt = ["PI=" "PH=36" "CM=1" "D=3840" "T=1" "SAI=300" "SII=5000" "VP=65521+32769"]
-      cluster: "LogCommands"
-      command: "UserPrompt"
-      PICS: PICS_SKIP_SAMPLE_APP
-      arguments:
+      PICS: CADMIN.S.C01.Rsp
+      cluster: "DiscoveryCommands"
+      command: "FindCommissionable"
+      response:
           values:
-              - name: "message"
-                value: "enter 'y' after success"
-              - name: "expectedValue"
-                value: "y"
+              - name: "commissioningMode"
+                value: 1
 
     #As per issue https://github.com/CHIP-Specifications/chip-test-scripts/issues/495 adding --discover-once flag
     - label:

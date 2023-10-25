@@ -61,7 +61,7 @@ Draft
 				<feature>Does the device implement the StartUpMode attribute?</feature>
 				<reference>89.2.2. Attributes - allclusters.html[pdf]</reference>
 				<status cond="RVCCLEANM.S">O</status>
-				<support>true</support>
+				<support>false</support>
 			</picsItem>
 			<picsItem>
 				<itemNumber>RVCCLEANM.S.A0003</itemNumber>

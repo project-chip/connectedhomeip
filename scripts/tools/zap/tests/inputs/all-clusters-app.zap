@@ -5473,6 +5473,7 @@
           "define": "FAULT_INJECTION_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "apiMaturity": "internal",
           "commands": [
             {
               "name": "FailAtFault",
@@ -5978,6 +5979,7 @@
           "define": "SCENES_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "AddScene",
@@ -6175,7 +6177,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "16",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -6191,7 +6193,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "8",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -6271,7 +6273,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "7",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -10104,7 +10106,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -10119,6 +10121,7 @@
           "define": "FAN_CONTROL_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "attributes": [
             {
               "name": "FanMode",
@@ -13261,6 +13264,7 @@
           "define": "UNIT_TESTING_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "apiMaturity": "internal",
           "commands": [
             {
               "name": "Test",
@@ -15222,6 +15226,7 @@
           "define": "SCENES_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "AddScene",
@@ -15419,7 +15424,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "16",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -15435,7 +15440,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "8",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -15515,7 +15520,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "7",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -16664,6 +16669,5 @@
       "endpointId": 65534,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

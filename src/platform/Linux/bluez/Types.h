@@ -46,10 +46,20 @@
 #pragma once
 
 #include <platform/CHIPDeviceConfig.h>
+#include <platform/GLibTypeDeleter.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include <platform/Linux/dbus/bluez/DbusBluez.h>
+
 namespace chip {
+
+template <>
+struct GAutoPtrDeleter<BluezDevice1>
+{
+    using deleter = GObjectDeleter;
+};
+
 namespace DeviceLayer {
 namespace Internal {
 

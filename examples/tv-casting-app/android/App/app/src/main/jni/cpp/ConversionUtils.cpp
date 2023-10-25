@@ -183,7 +183,7 @@ CHIP_ERROR convertJVideoPlayerToTargetVideoPlayerInfo(jobject videoPlayer, Targe
 
     if (MACAddress != nullptr)
     {
-        chip::CharSpan MACAddressSpan(MACAddress, strlen(MACAddress) - 1);
+        chip::CharSpan MACAddressSpan(MACAddress, 2 * 2 * chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength);
         outTargetVideoPlayerInfo.SetMACAddress(MACAddressSpan);
     }
 
@@ -257,9 +257,9 @@ CHIP_ERROR convertTargetVideoPlayerInfoToJVideoPlayer(TargetVideoPlayerInfo * ta
         jstring MACAddress = nullptr;
         if (targetVideoPlayerInfo->GetMACAddress() != nullptr && targetVideoPlayerInfo->GetMACAddress()->data() != nullptr)
         {
-            char MACAddressWithNil[2 * chip::DeviceLayer::ConfigurationManager::kMaxMACAddressLength + 1];
-            strncpy(MACAddressWithNil, targetVideoPlayerInfo->GetMACAddress()->data(),
-                    targetVideoPlayerInfo->GetMACAddress()->size());
+            char MACAddressWithNil[2 * chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength + 1];
+            memcpy(MACAddressWithNil, targetVideoPlayerInfo->GetMACAddress()->data(),
+                   targetVideoPlayerInfo->GetMACAddress()->size());
             MACAddressWithNil[targetVideoPlayerInfo->GetMACAddress()->size()] = '\0';
             MACAddress                                                        = env->NewStringUTF(MACAddressWithNil);
         }

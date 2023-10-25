@@ -33,7 +33,7 @@ limitations under the License.
   </struct>
 
   <domain name="CHIP"/>
-    <cluster>
+  <cluster apiMaturity="provisional">
     <name>Scenes</name>
     <domain>General</domain>
     <description>Attributes and commands for scene configuration and manipulation.</description>
@@ -49,7 +49,7 @@ limitations under the License.
     <attribute side="server" code="0x0003" define="SCENE_VALID" type="boolean" min="0x00" max="0x01" writable="false" default="0x00" optional="false">SceneValid</attribute>
     <attribute side="server" code="0x0004" define="SCENE_NAME_SUPPORT" type="bitmap8" min="0x00" max="0x80" writable="false" default="0x00" optional="false">NameSupport</attribute>
     <attribute side="server" code="0x0005" define="LAST_CONFIGURED_BY" type="node_id" writable="false" isNullable="true" optional="true">LastConfiguredBy</attribute>
-    <attribute side="server" code="0x0006" define="SCENE_TABLE_SIZE" type="int16u" writable="false" optional="false">SceneTableSize</attribute>
+    <attribute side="server" code="0x0006" define="SCENE_TABLE_SIZE" type="int16u" min="16" default="16" writable="false" optional="false">SceneTableSize</attribute>
     <attribute side="server" code="0x0007" define="REMAINING_CAPACITY" type="int8u" writable="false" optional="false">RemainingCapacity</attribute>
     <command source="client" code="0x00" name="AddScene" response="AddSceneResponse" isFabricScoped="true" optional="false" cli="chip scenes add">
       <description>
