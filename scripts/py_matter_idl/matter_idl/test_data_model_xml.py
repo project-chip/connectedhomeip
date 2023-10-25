@@ -72,6 +72,46 @@ class TestXmlParser(unittest.TestCase):
 
         self.assertEqual(xml_idl, expected_idl)
 
+    def testEnumRange(self):
+        # Check heuristic for enum ranges
+
+        xml_idl = XmlToIdl('''
+            <cluster id="123" name="Test" revision="1">
+              <dataTypes>
+                <bitmap name="LargeBitmap">
+                  <bitfield name="One" bit="0">
+                    <mandatoryConform/>
+                  </bitfield>
+                  <bitfield name="Ten" bit="10">
+                    <mandatoryConform/>
+                  </bitfield>
+                  <bitfield name="Twenty" bit="20">
+                    <mandatoryConform/>
+                  </bitfield>
+                </bitmap>
+              </dataTypes>
+            </cluster>
+        ''')
+
+        expected_idl = IdlTextToIdl('''
+            client cluster Test = 123 {
+               bitmap LargeBitmap: bitmap32 {
+                  kOne = 0x1;
+                  kTen = 0x400;
+                  kTwenty = 0x100000;
+               }
+
+               readonly attribute attrib_id attributeList[] = 65531;
+               readonly attribute event_id eventList[] = 65530;
+               readonly attribute command_id acceptedCommandList[] = 65529;
+               readonly attribute command_id generatedCommandList[] = 65528;
+               readonly attribute bitmap32 featureMap = 65532;
+               readonly attribute int16u clusterRevision = 65533;
+           }
+        ''')
+
+        self.assertEqual(xml_idl, expected_idl)
+
     def testAttributes(self):
         # Validate an attribute with a type list
         # This is a very stripped down version from the original AudioOutput.xml

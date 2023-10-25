@@ -66,9 +66,9 @@ class BitmapHandler(BaseHandler):
         # TODO: this is a pure heuristic. XML containing this would be better.
         acceptable = {8, 16, 32}
         for entry in self._bitmap.entries:
-            if entry.code > 0xFF:
+            if entry.code > 0xFF and 8 in acceptable:
                 acceptable.remove(8)
-            if entry.code > 0xFFFF:
+            if entry.code > 0xFFFF and 16 in acceptable:
                 acceptable.remove(16)
 
         if 8 in acceptable:
@@ -223,9 +223,9 @@ class EnumHandler(BaseHandler):
         # TODO: this is a pure heuristic. XML containing this would be better.
         acceptable = {8, 16, 32}
         for entry in self._enum.entries:
-            if entry.code > 0xFF:
+            if entry.code > 0xFF and 8 in acceptable:
                 acceptable.remove(8)
-            if entry.code > 0xFFFF:
+            if entry.code > 0xFFFF and 16 in acceptable:
                 acceptable.remove(16)
 
         if 8 in acceptable:
