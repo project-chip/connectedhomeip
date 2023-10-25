@@ -54,8 +54,7 @@ executable("chip-lighting-app") {
     sources += [ "src/DBusInterface.cpp" ]
     deps += [ ":chip-lighting-app-manager" ]
     defines = [ "ENABLE_DBUS_UI=1" ]
-  }
-  else {
+  } else {
     defines = [ "ENABLE_DBUS_UI=0" ]
   }
 
