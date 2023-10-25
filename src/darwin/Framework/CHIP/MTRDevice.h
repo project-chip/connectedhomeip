@@ -29,6 +29,17 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
     MTRDeviceStateUnreachable = 2
 };
 
+/**
+ * This enum is used to specify the type of log requested from this device.
+ *
+ * The log types are : End User Support, Network Diagnostics and Crash logs.
+ */
+typedef NS_ENUM(NSInteger, MTRDiagnosticLogType) {
+    MTRDiagnosticLogTypeEndUserSupport = 0, // End user support log is requested
+    MTRDiagnosticLogTypeNetworkDiagnostics = 1, // Network Diagnostics log is requested
+    MTRDiagnosticLogTypeCrash = 2 // Crash log is requested
+};
+
 @protocol MTRDeviceDelegate;
 
 @interface MTRDevice : NSObject
@@ -200,6 +211,25 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
                                            queue:(dispatch_queue_t)queue
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
     MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
+
+/**
+ * Download log of the desired type from the device.
+ *
+ * Note: The consumer of this API should move the file that the NSURL in the MTRDiagnosticLogResult points to
+ * or open it for reading before the completion handler returns. Otherwise, the file will be deleted, and the data will be lost.
+ *
+ * @param type       The type of log being requested. This should correspond to a value in the enum MTRDiagnosticLogType.
+ * @param timeout    The timeout for getting the log. If the timeout expires, completion will be called with whatever
+ *                   has been retrieved by that point (which might be none or a partial log).
+ *                   If the timeout is set to 0, the request will not expire and completion will not be called until
+ *                   the log is fully retrieved or an error occurs.
+ * @param queue      The queue on which completion will be called.
+ * @param completion The completion that will be called to pass in the URL for the requested log.
+ */
+- (void)downloadLogOfType:(MTRDiagnosticLogType)type
+                  timeout:(NSTimeInterval)timeout
+                    queue:(dispatch_queue_t)queue
+               completion:(void (^)(NSURL * _Nullable logResult, NSError * error))completion;
 
 @end
 

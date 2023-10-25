@@ -314,6 +314,14 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/${cluster}.h",
         ]
+      } else if (cluster == "diagnostic-logs-server") {
+        sources += [
+          "${_app_root}/bdx/DiagnosticLogsBDXTransferHandler.cpp",
+          "${_app_root}/bdx/DiagnosticLogsBDXTransferHandler.h",
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/${cluster}.h",
+          "${_app_root}/clusters/${cluster}/diagnostic-logs-provider-delegate.h",
+        ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }

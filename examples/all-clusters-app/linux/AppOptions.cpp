@@ -18,17 +18,22 @@
 
 #include "AppOptions.h"
 
+#include "diagnostic-logs-provider-delegate-impl.h"
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
 
 using namespace chip::ArgParser;
+using namespace chip::app::Clusters::DiagnosticLogs;
 
 using chip::ArgParser::OptionDef;
 using chip::ArgParser::OptionSet;
 using chip::ArgParser::PrintArgError;
 
-constexpr uint16_t kOptionDacProviderFilePath     = 0xFF01;
-constexpr uint16_t kOptionMinCommissioningTimeout = 0xFF02;
+constexpr uint16_t kOptionDacProviderFilePath        = 0xFF01;
+constexpr uint16_t kOptionMinCommissioningTimeout    = 0xFF02;
+constexpr uint16_t kOptionEndUserSupportFilePath     = 0xFF03;
+constexpr uint16_t kOptionNetworkDiagnosticsFilePath = 0xFF04;
+constexpr uint16_t kOptionCrashFilePath              = 0xFF05;
 
 static chip::Credentials::Examples::TestHarnessDACProvider mDacProvider;
 
@@ -38,11 +43,25 @@ bool AppOptions::HandleOptions(const char * program, OptionSet * options, int id
     switch (identifier)
     {
     case kOptionDacProviderFilePath:
+        ChipLogError(BDX, "dac provider path");
         mDacProvider.Init(value);
         break;
     case kOptionMinCommissioningTimeout: {
         auto & commissionMgr = chip::Server::GetInstance().GetCommissioningWindowManager();
         commissionMgr.OverrideMinCommissioningTimeout(chip::System::Clock::Seconds16(static_cast<uint16_t>(atoi(value))));
+        break;
+    }
+    case kOptionEndUserSupportFilePath: {
+        ChipLogError(BDX, "kOptionEndUserSupportFilePath setting end user fd");
+        LogProvider::getLogProvider().SetEndUserSupportLogFileDesignator(value);
+        break;
+    }
+    case kOptionNetworkDiagnosticsFilePath: {
+        LogProvider::getLogProvider().SetNetworkDiagnosticsLogFileDesignator(value);
+        break;
+    }
+    case kOptionCrashFilePath: {
+        LogProvider::getLogProvider().SetCrashLogFileDesignator(value);
         break;
     }
     default:
@@ -59,6 +78,9 @@ OptionSet * AppOptions::GetOptions()
     static OptionDef optionsDef[] = {
         { "dac_provider", kArgumentRequired, kOptionDacProviderFilePath },
         { "min_commissioning_timeout", kArgumentRequired, kOptionMinCommissioningTimeout },
+        { "end_user_support_log", kArgumentRequired, kOptionEndUserSupportFilePath },
+        { "network_diagnostics_log", kArgumentRequired, kOptionNetworkDiagnosticsFilePath },
+        { "crash_log", kArgumentRequired, kOptionCrashFilePath },
         {},
     };
 
@@ -68,6 +90,12 @@ OptionSet * AppOptions::GetOptions()
         "       A json file with data used by the example dac provider to validate device attestation procedure.\n"
         "  --min_commissioning_timeout <value>\n"
         "       The minimum time in seconds during which commissioning session establishment is allowed by the Node.\n"
+        "  --end_user_support_log <value>\n"
+        "       The end user support log file to be used for diagnostic logs transfer.\n"
+        "  --network_diagnostics_log <value>\n"
+        "       The network diagnostics log file to be used for diagnostic logs transfer.\n"
+        "  --crash_log <value>\n"
+        "       The crash log file to be used for diagnostic logs transfer\n"
     };
 
     return &options;

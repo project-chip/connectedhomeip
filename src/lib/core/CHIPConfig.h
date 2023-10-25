@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2023 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    Copyright (c) 2013-2018 Nest Labs, Inc.
  *
@@ -1598,6 +1598,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
 #define CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED 0
+#endif
+
+/**
+ * @def CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
+ *
+ * @brief Enables support for diagnostic logs transfer using the BDX protocol
+ *
+ */
+#ifndef CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
+#define CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER 0
 #endif
 
 /**

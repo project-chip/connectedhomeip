@@ -42,3 +42,5 @@
 
 // Marks that a ModeBase Derived cluster is being used.
 #define EMBER_AF_PLUGIN_MODE_BASE
+
+#define CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER 1

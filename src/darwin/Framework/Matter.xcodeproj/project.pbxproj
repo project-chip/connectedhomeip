@@ -299,6 +299,8 @@
 		B4E2621B2AA0D02000DBA5BC /* SleepCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4E262192AA0D01D00DBA5BC /* SleepCommand.mm */; };
 		B4E2621E2AA0D02D00DBA5BC /* WaitForCommissioneeCommand.mm in Sources */ = {isa = PBXBuildFile; fileRef = B4E2621C2AA0D02A00DBA5BC /* WaitForCommissioneeCommand.mm */; };
 		BA09EB43247477BA00605257 /* libCHIP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BA09EB3F2474762900605257 /* libCHIP.a */; };
+		CFA0EDAD2AD9D75600C7FA40 /* MTRDiagnosticLogsTransferHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFA0EDAC2AD9D75600C7FA40 /* MTRDiagnosticLogsTransferHandler.mm */; };
+		CFA0EDAF2AD9D76000C7FA40 /* MTRDiagnosticLogsTransferHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = CFA0EDAE2AD9D76000C7FA40 /* MTRDiagnosticLogsTransferHandler.h */; };
 		D4772A46285AE98400383630 /* MTRClusterConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = D4772A45285AE98300383630 /* MTRClusterConstants.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
@@ -660,6 +662,8 @@
 		B4E2621C2AA0D02A00DBA5BC /* WaitForCommissioneeCommand.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WaitForCommissioneeCommand.mm; sourceTree = "<group>"; };
 		BA09EB3F2474762900605257 /* libCHIP.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCHIP.a; path = lib/libCHIP.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA107AEE2470CFBB004287EB /* chip_xcode_build_connector.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = chip_xcode_build_connector.sh; sourceTree = "<group>"; };
+		CFA0EDAC2AD9D75600C7FA40 /* MTRDiagnosticLogsTransferHandler.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDiagnosticLogsTransferHandler.mm; sourceTree = "<group>"; };
+		CFA0EDAE2AD9D76000C7FA40 /* MTRDiagnosticLogsTransferHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRDiagnosticLogsTransferHandler.h; sourceTree = "<group>"; };
 		D437613E285BDC0D0051FEA2 /* MTRErrorTestUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRErrorTestUtils.h; sourceTree = "<group>"; };
 		D437613F285BDC0D0051FEA2 /* MTRTestKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestKeys.h; sourceTree = "<group>"; };
 		D4376140285BDC0D0051FEA2 /* MTRTestStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRTestStorage.h; sourceTree = "<group>"; };
@@ -1083,6 +1087,8 @@
 		B202528F2459E34F00F97062 /* CHIP */ = {
 			isa = PBXGroup;
 			children = (
+				CFA0EDAE2AD9D76000C7FA40 /* MTRDiagnosticLogsTransferHandler.h */,
+				CFA0EDAC2AD9D75600C7FA40 /* MTRDiagnosticLogsTransferHandler.mm */,
 				1E4D655129C30A8700BC3478 /* MTRCommissionableBrowser.mm */,
 				1E4D654C29C208DD00BC3478 /* MTRCommissionableBrowser.h */,
 				1E4D654D29C208DD00BC3478 /* MTRCommissionableBrowserDelegate.h */,
@@ -1414,6 +1420,7 @@
 				3CF134AF289D90FF0017A19E /* MTROperationalCertificateIssuer.h in Headers */,
 				3CF134AB289D8DF70017A19E /* MTRDeviceAttestationInfo.h in Headers */,
 				B2E0D7B2245B0B5C003C5B48 /* MTRManualSetupPayloadParser.h in Headers */,
+				CFA0EDAF2AD9D76000C7FA40 /* MTRDiagnosticLogsTransferHandler.h in Headers */,
 				3CF134A7289D8ADA0017A19E /* MTRCSRInfo.h in Headers */,
 				B2E0D7B1245B0B5C003C5B48 /* Matter.h in Headers */,
 				7596A84428762729004DAE0E /* MTRDevice.h in Headers */,
@@ -1746,6 +1753,7 @@
 				5A6FEC9827B5C6AF00F25F42 /* MTRDeviceOverXPC.mm in Sources */,
 				514654492A72F9DF00904E61 /* MTRDemuxingStorage.mm in Sources */,
 				1E4D655229C30A8700BC3478 /* MTRCommissionableBrowser.mm in Sources */,
+				CFA0EDAD2AD9D75600C7FA40 /* MTRDiagnosticLogsTransferHandler.mm in Sources */,
 				3DA1A3562ABAB3B4004F0BB9 /* MTRAsyncWorkQueue.mm in Sources */,
 				3DECCB722934AFE200585AEC /* MTRLogging.mm in Sources */,
 				7596A84528762729004DAE0E /* MTRDevice.mm in Sources */,

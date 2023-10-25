@@ -47,6 +47,9 @@ public:
     TransferFacilitator() : mExchangeCtx(nullptr), mSystemLayer(nullptr), mPollFreq(kDefaultPollFreq) {}
     ~TransferFacilitator() override = default;
 
+    CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
+                                 chip::System::PacketBufferHandle && payload) override;
+
 private:
     //// UnsolicitedMessageHandler Implementation ////
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, ExchangeDelegate *& newDelegate) override
@@ -58,8 +61,7 @@ private:
     }
 
     // Inherited from ExchangeContext
-    CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
-                                 chip::System::PacketBufferHandle && payload) override;
+
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
     /**
@@ -145,6 +147,8 @@ public:
     CHIP_ERROR InitiateTransfer(System::Layer * layer, TransferRole role, const TransferSession::TransferInitData & initData,
                                 System::Clock::Timeout timeout,
                                 System::Clock::Timeout pollFreq = TransferFacilitator::kDefaultPollFreq);
+
+    void ResetTransfer();
 };
 
 } // namespace bdx

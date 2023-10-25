@@ -18,31 +18,80 @@
 
 #pragma once
 
+#include <lib/core/CHIPConfig.h>
+
+#if CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
+#include <app/bdx/DiagnosticLogsBDXTransferHandler.h>
+#endif
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandlerInterface.h>
-#include <lib/support/BytesCircularBuffer.h>
+#include <app/clusters/diagnostic-logs-server/diagnostic-logs-provider-delegate.h>
 
-#include <array>
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace DiagnosticLogs {
+
+// Spec mandated max file designator length
+static constexpr uint8_t kLogFileDesignatorMaxLen = 32;
+
+static constexpr const uint16_t kDiagnosticLogsEndpoint = 0;
+
+// Spec mandated max size of the log content field in the Response paylod
+static constexpr uint16_t kLogContentMaxSize = 1024;
 
 /// A reference implementation for DiagnosticLogs source.
-class DiagnosticLogsCommandHandler : public chip::app::CommandHandlerInterface
+class DiagnosticLogsServer
 {
 public:
-    static constexpr const uint16_t kDiagnosticLogsEndpoint   = 0;
-    static constexpr const uint16_t kDiagnosticLogsBufferSize = 4 * 1024; // 4K internal memory to store text logs
+    static DiagnosticLogsServer & Instance();
 
-    DiagnosticLogsCommandHandler() :
-        CommandHandlerInterface(chip::MakeOptional<chip::EndpointId>(chip::EndpointId(kDiagnosticLogsEndpoint)),
-                                chip::app::Clusters::DiagnosticLogs::Id),
-        mBuffer(mStorage.data(), mStorage.size())
-    {}
+    /**
+     * Set the default delegate of the diagnostic logs cluster for the specified endpoint
+     *
+     * @param endpoint ID of the endpoint
+     *
+     * @param delegate The default lofg provider delegate at the endpoint
+     */
+    void SetDefaultLogProviderDelegate(EndpointId endpoint, LogProviderDelegate * delegate);
 
-    // Inherited from CommandHandlerInterface
-    void InvokeCommand(HandlerContext & handlerContext) override;
+    void HandleLogRequestForResponsePayload(chip::app::CommandHandler * commandHandler, chip::app::ConcreteCommandPath path,
+                                            IntentEnum intent);
 
-    CHIP_ERROR PushLog(const chip::ByteSpan & payload);
+#if CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
+
+    void HandleBDXResponse(CHIP_ERROR error);
+
+    CHIP_ERROR HandleLogRequestForBDXProtocol(chip::Messaging::ExchangeContext * exchangeCtx, chip::EndpointId endpointId,
+                                              IntentEnum intent, chip::CharSpan fileDesignator);
+
+    void SetAsyncCommandHandleAndPath(CommandHandler * commandObj, const ConcreteCommandPath & commandPath);
+
+    bool HasValidFileDesignator(chip::CharSpan transferFileDesignator);
+
+    bool IsBDXProtocolRequested(TransferProtocolEnum requestedProtocol);
+
+#endif
 
 private:
-    std::array<uint8_t, kDiagnosticLogsBufferSize> mStorage;
-    chip::BytesCircularBuffer mBuffer;
+#if CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
+
+    DiagnosticLogsBDXTransferHandler mDiagnosticLogsBDXTransferHandler;
+
+#endif
+
+    LogSessionHandle mLogSessionHandle;
+
+    chip::app::CommandHandler::Handle mAsyncCommandHandle;
+    chip::app::ConcreteCommandPath mRequestPath = chip::app::ConcreteCommandPath(0, 0, 0);
+    ;
+    IntentEnum mIntent;
+
+    // Instance
+    static DiagnosticLogsServer sInstance;
 };
+
+} // namespace DiagnosticLogs
+} // namespace Clusters
+} // namespace app
+} // namespace chip
