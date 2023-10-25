@@ -118,8 +118,8 @@ _bootstrap_or_activate() {
 
     local _PIGWEED_CIPD_JSON="$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/pigweed.json"
     mkdir -p "$_PW_ACTUAL_ENVIRONMENT_ROOT"
-    local _GENERATED_MATTER_SDK_CIPD_JSON="$_PW_ACTUAL_ENVIRONMENT_ROOT/matter_sdk_cipd.json"
-    scripts/setup/gen_matter_sdk_cipd_json.py -i $_PIGWEED_CIPD_JSON -o $_GENERATED_MATTER_SDK_CIPD_JSON
+    local _GENERATED_PIGWEED_CIPD_JSON="$_PW_ACTUAL_ENVIRONMENT_ROOT/pigweed.json"
+    scripts/setup/gen_pigweed_cipd_json.py -i $_PIGWEED_CIPD_JSON -o $_GENERATED_PIGWEED_CIPD_JSON
 
     if test -n "$GITHUB_ACTION"; then
         tee <<EOF >"${_PW_ACTUAL_ENVIRONMENT_ROOT}/pip.conf"
@@ -136,7 +136,7 @@ EOF
             --install-dir "$_PW_ACTUAL_ENVIRONMENT_ROOT" \
             --config-file "$_CHIP_ROOT/$_CONFIG_FILE" \
             --virtualenv-gn-out-dir "$_PW_ACTUAL_ENVIRONMENT_ROOT/gn_out" \
-            --additional-cipd-file "$_GENERATED_MATTER_SDK_CIPD_JSON"
+            --additional-cipd-file "$_GENERATED_PIGWEED_CIPD_JSON"
         pw_finalize bootstrap "$_SETUP_SH"
         _ACTION_TAKEN="bootstrap"
     else
