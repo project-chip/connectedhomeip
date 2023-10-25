@@ -213,10 +213,10 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
             // This buffer is statically allocated and is of size kMaxDefaultNtpSize.
             auto span = MutableCharSpan(mDefaultNtp, kMaxDefaultNtpSize);
             CopyCharSpanToMutableCharSpan(params.GetDefaultNTP().Value().Value(), span);
-            app::DataModel::Nullable<CharSpan> default_ntp(CharSpan(mDefaultNtp, size));
+            auto default_ntp = MakeNullable(CharSpan(mDefaultNtp, size));
             mParams.SetDefaultNTP(default_ntp);
         } else {
-            mParams.SetDefaultNTP(app::DataModel::Nullable<CharSpan>());
+            mParams.SetDefaultNTP(NullNullable);
         }
     }
 
