@@ -69,15 +69,7 @@ _TYPE_REMAP = {
     "uint48": "int48u",
     "uint52": "int52u",
     "uint64": "int64u",
-    # signed
-    "sint8": "int8s",
-    "sint16": "int16s",
-    "sint24": "int24s",
-    "sint32": "int32s",
-    "sint48": "int48s",
-    "sint52": "int52s",
-    "sint64": "int64s",
-    # Default to signed
+    # signed (map to what zapxml/matter currently has)
     "int8": "int8s",
     "int16": "int16s",
     "int24": "int24s",
