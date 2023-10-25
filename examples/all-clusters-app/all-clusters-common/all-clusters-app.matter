@@ -2690,7 +2690,6 @@ server cluster RvcRunMode = 84 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute nullable int8u startUpMode = 2;
   attribute nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2740,7 +2739,6 @@ server cluster RvcCleanMode = 85 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute nullable int8u startUpMode = 2;
   attribute nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -5925,7 +5923,6 @@ endpoint 1 {
   server cluster RvcRunMode {
     callback attribute supportedModes;
     callback attribute currentMode;
-    callback attribute startUpMode;
     callback attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -5940,7 +5937,6 @@ endpoint 1 {
   server cluster RvcCleanMode {
     callback attribute supportedModes;
     callback attribute currentMode;
-    callback attribute startUpMode;
     callback attribute onMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
