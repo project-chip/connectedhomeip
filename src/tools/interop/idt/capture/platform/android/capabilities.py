@@ -35,7 +35,6 @@ class Capabilities:
                                                                      capture_output=True).get_captured_output()
 
     def check_capabilities(self):
-        # TODO: Write capabilities to artifacts
         self.logger.info("Checking if device has root")
         self.c_has_root = self.platform.run_adb_command(
             "shell which su", capture_output=True).finished_success()
