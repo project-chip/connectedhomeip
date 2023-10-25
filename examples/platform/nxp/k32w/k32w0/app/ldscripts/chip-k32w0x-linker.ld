@@ -432,8 +432,8 @@ SECTIONS
 
     __StackLimit = _vStackTop - STACK_SIZE;
 
-    __FACTORY_DATA_START = FACTORY_DATA_START_ADDRESS;
-    __FACTORY_DATA_SIZE = m_factory_data_size;
+    __MATTER_FACTORY_DATA_START = FACTORY_DATA_START_ADDRESS;
+    __MATTER_FACTORY_DATA_SIZE = m_factory_data_size;
      
     ASSERT(((m_app_start + m_app_size + m_app_meta_data + m_factory_data_size + m_flash_config_size) <= m_int_flash_size),
             "Internal flash capacity exceeded")

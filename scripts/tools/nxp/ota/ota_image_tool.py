@@ -34,7 +34,10 @@ import glob
 import json
 import logging
 import os
+import struct
 import sys
+import string
+import crypto_utils
 
 import jsonschema
 
@@ -55,6 +58,7 @@ OTA_APP_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_app_tlv.bin
 OTA_BOOTLOADER_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_ssbl_tlv.bin")
 OTA_FACTORY_TLV_TEMP = os.path.join(os.path.dirname(__file__), "ota_temp_factory_tlv.bin")
 
+INITIALIZATION_VECTOR = "00000010111213141516171800000000"
 
 class TAG:
     APPLICATION = 1
@@ -92,8 +96,15 @@ def generate_factory_data(args: object):
     if fields:
         writer = TLVWriter()
         writer.put(None, fields)
-        payload = generate_header(TAG.FACTORY_DATA, len(writer.encoding))
-        payload += writer.encoding
+        logging.info(f"factory data encryption enable: {args.enc_enable}")
+        if args.enc_enable:
+            enc_factory_data = crypto_utils.encryptData(writer.encoding, args.input_ota_key, INITIALIZATION_VECTOR)
+            enc_factory_data1 = bytes([ord(x) for x in enc_factory_data])
+            payload = generate_header(TAG.FACTORY_DATA, len(enc_factory_data1))
+            payload += enc_factory_data1
+        else:
+            payload = generate_header(TAG.FACTORY_DATA, len(writer.encoding))
+            payload += writer.encoding
 
     write_to_temp(OTA_FACTORY_TLV_TEMP, payload)
 
@@ -126,13 +137,23 @@ def generate_app(args: object):
     logging.info("App descriptor information:")
 
     descriptor = generate_descriptor(args.app_version, args.app_version_str, args.app_build_date)
-    file_size = os.path.getsize(args.app_input_file)
-    payload = generate_header(TAG.APPLICATION, len(descriptor) + file_size) + descriptor
+    logging.info(f"App encryption enable: {args.enc_enable}")
+    if args.enc_enable:
+        inputFile = open(args.app_input_file,"rb")
+        enc_file = crypto_utils.encryptData(inputFile.read(), args.input_ota_key, INITIALIZATION_VECTOR)
+        enc_file1 = bytes([ord(x) for x in enc_file])
+        file_size = len(enc_file1)
+        payload = generate_header(TAG.APPLICATION, len(descriptor) + file_size) + descriptor + enc_file1
+    else:
+        file_size = os.path.getsize(args.app_input_file)
+        logging.info(f"file size: {file_size}")
+        payload = generate_header(TAG.APPLICATION, len(descriptor) + file_size) + descriptor
 
     write_to_temp(OTA_APP_TLV_TEMP, payload)
-
-    return [OTA_APP_TLV_TEMP, args.app_input_file]
-
+    if args.enc_enable:
+        return [OTA_APP_TLV_TEMP]
+    else:
+        return [OTA_APP_TLV_TEMP, args.app_input_file]
 
 def generate_bootloader(args: object):
     """
@@ -141,13 +162,23 @@ def generate_bootloader(args: object):
     logging.info("SSBL descriptor information:")
 
     descriptor = generate_descriptor(args.bl_version, args.bl_version_str, args.bl_build_date)
-    file_size = os.path.getsize(args.bl_input_file)
-    payload = generate_header(TAG.BOOTLOADER, len(descriptor) + file_size) + descriptor
+    logging.info(f"Bootloader encryption enable: {args.enc_enable}")
+    if args.enc_enable:
+        inputFile = open(args.bl_input_file,"rb")
+        enc_file = crypto_utils.encryptData(inputFile.read(), args.input_ota_key, INITIALIZATION_VECTOR)
+        enc_file1 = bytes([ord(x) for x in enc_file])
+        file_size = len(enc_file1)
+        payload = generate_header(TAG.BOOTLOADER, len(descriptor) + file_size) + descriptor + enc_file1
+    else:
+        file_size = os.path.getsize(args.bl_input_file)
+        logging.info(f"file size: {file_size}")
+        payload = generate_header(TAG.BOOTLOADER, len(descriptor) + file_size) + descriptor
 
     write_to_temp(OTA_BOOTLOADER_TLV_TEMP, payload)
-
-    return [OTA_BOOTLOADER_TLV_TEMP, args.bl_input_file]
-
+    if args.enc_enable:
+        return [OTA_BOOTLOADER_TLV_TEMP]
+    else:
+        return [OTA_BOOTLOADER_TLV_TEMP, args.bl_input_file]
 
 def validate_json(data: str):
     with open(os.path.join(os.path.dirname(__file__), 'ota_payload.schema'), 'r') as fd:
@@ -231,7 +262,9 @@ def create_image(args: object):
 
     for filename in glob.glob(os.path.dirname(__file__) + "/ota_temp_*"):
         os.remove(filename)
-
+    if args.enc_enable:
+        for filename in glob.glob(os.path.dirname(__file__) + "/enc_ota_temp_*"):
+            os.remove(filename)
 
 def main():
     """
@@ -301,6 +334,9 @@ def main():
 
     # Path to input JSON file which describes custom TLVs.
     create_parser.add_argument('--json', help="[path] Path to the JSON describing custom TLVs")
+
+    create_parser.add_argument('--enc_enable', action="store_true", help='enable ota encryption')
+    create_parser.add_argument('--input_ota_key', type=str, help='Input OTA Encryption KEY (string:16Bytes)')
 
     create_parser.add_argument('-i', '--input_files', default=list(),
                                help='Path to input image payload file')

@@ -145,3 +145,14 @@
 #define kNvmId_FactoryDataBackup (uint16_t) 0x7000
 #endif
 #endif // CONFIG_CHIP_LOAD_REAL_FACTORY_DATA
+
+/**
+ * @def kKVS_RamBufferSize
+ *
+ * Size of KVS values RAM storage buffer.
+ * This value is empirical, based on some minimal resource requirements tests.
+ * Applications should overwrite this value if necessary.
+ */
+#ifndef kKVS_RamBufferSize
+#define kKVS_RamBufferSize (12 * 1024)
+#endif

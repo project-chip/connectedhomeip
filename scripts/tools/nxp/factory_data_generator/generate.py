@@ -27,6 +27,8 @@ from custom import (CertDeclaration, DacCert, DacPKey, Discriminator, HardwareVe
                     SetupPasscode, StrArgument, UniqueId, VendorId, VendorName, Verifier)
 from default import InputArgument
 
+# Global variable for hash ID
+hash_id = "CE47BA5E"
 
 def set_logger():
     stdout_handler = logging.StreamHandler(stream=sys.stdout)
@@ -155,9 +157,9 @@ class KlvGenerator:
                 fullContentCipher = size.to_bytes(4, "little") + fullContentCipher
 
                 # Add hash id
-                hashId = bytearray.fromhex("CE47BA5E")
+                hashId = bytearray.fromhex(hash_id)
                 hashId.reverse()
-                fullContentCipher = hashId.reverse() + fullContentCipher
+                fullContentCipher = hashId + fullContentCipher
 
                 size = len(fullContentCipher)
 

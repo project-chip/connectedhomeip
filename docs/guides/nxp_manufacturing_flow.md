@@ -11,27 +11,23 @@ using the procedure described below.
 
 ## 1. Prerequisites
 
+Generate build files from Matter root folder by running:
+
+```
+gn gen out
+```
+
 Build `chip-cert` tool:
 
 ```
-cd src/tools/chip-cert
-gn gen out
-ninja -C out
+ninja -C out chip-cert
 ```
 
 Build `spake2p` tool:
 
 ```
-cd src/tool/spake2p
-gn gen out
-ninja -C out
+ninja -C out spake2p
 ```
-
-### Environment variables
-
-A user can customize the certificate generation by setting some environment
-variables that are used within the utility scripts. Please note that the values
-below are just an example and should be modified accordingly:
 
 ```
 export FACTORY_DATA_DEST=path/factory/data/dest
