@@ -94,6 +94,11 @@ class TestXmlParser(unittest.TestCase):
                     <mandatoryConform/>
                   </bitfield>
                 </bitmap>
+                <bitmap name="HugeBitmap">
+                  <bitfield name="Forty" bit="40">
+                    <mandatoryConform/>
+                  </bitfield>
+                </bitmap>
               </dataTypes>
             </cluster>
         ''')
@@ -108,6 +113,10 @@ class TestXmlParser(unittest.TestCase):
                   kOne = 0x1;
                   kTen = 0x400;
                   kTwenty = 0x100000;
+               }
+
+               bitmap HugeBitmap: bitmap64 {
+                  kForty = 0x10000000000;
                }
 
                readonly attribute attrib_id attributeList[] = 65531;

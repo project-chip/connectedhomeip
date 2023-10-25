@@ -65,19 +65,23 @@ class BitmapHandler(BaseHandler):
         # try to find the best size that fits
         # TODO: this is a pure heuristic. XML containing this would be better.
         #       https://github.com/csa-data-model/projects/issues/345
-        acceptable = {8, 16, 32}
+        acceptable = {8, 16, 32, 64}
         for entry in self._bitmap.entries:
             if entry.code > 0xFF and 8 in acceptable:
                 acceptable.remove(8)
             if entry.code > 0xFFFF and 16 in acceptable:
                 acceptable.remove(16)
+            if entry.code > 0xFFFFFFFF and 32 in acceptable:
+                acceptable.remove(32)
 
         if 8 in acceptable:
             self._bitmap.base_type = "bitmap8"
         elif 16 in acceptable:
             self._bitmap.base_type = "bitmap16"
-        else:
+        elif 32 in acceptable:
             self._bitmap.base_type = "bitmap32"
+        else:
+            self._bitmap.base_type = "bitmap64"
 
         self._cluster.bitmaps.append(self._bitmap)
 
@@ -223,19 +227,15 @@ class EnumHandler(BaseHandler):
         # try to find the best enum size that fits out of enum8, enum32 and enum32
         # TODO: this is a pure heuristic. XML containing this would be better.
         #       https://github.com/csa-data-model/projects/issues/345
-        acceptable = {8, 16, 32}
+        acceptable = {8, 16}
         for entry in self._enum.entries:
             if entry.code > 0xFF and 8 in acceptable:
                 acceptable.remove(8)
-            if entry.code > 0xFFFF and 16 in acceptable:
-                acceptable.remove(16)
 
         if 8 in acceptable:
             self._enum.base_type = "enum8"
-        elif 16 in acceptable:
-            self._enum.base_type = "enum16"
         else:
-            self._enum.base_type = "enum32"
+            self._enum.base_type = "enum16"
 
         self._cluster.enums.append(self._enum)
 
