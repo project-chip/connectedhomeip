@@ -64,6 +64,7 @@ class BitmapHandler(BaseHandler):
 
         # try to find the best size that fits
         # TODO: this is a pure heuristic. XML containing this would be better.
+        #       https://github.com/csa-data-model/projects/issues/345
         acceptable = {8, 16, 32}
         for entry in self._bitmap.entries:
             if entry.code > 0xFF and 8 in acceptable:
@@ -221,6 +222,7 @@ class EnumHandler(BaseHandler):
 
         # try to find the best enum size that fits out of enum8, enum32 and enum32
         # TODO: this is a pure heuristic. XML containing this would be better.
+        #       https://github.com/csa-data-model/projects/issues/345
         acceptable = {8, 16, 32}
         for entry in self._enum.entries:
             if entry.code > 0xFF and 8 in acceptable:
