@@ -25,11 +25,17 @@ config:
     PIXIT.DISHM.MODE_CHANGE_FAIL:
         type: int8u
         defaultValue: 0
+    MODE_CHANGE_FAIL_LABEL:
+        type: char_string
+        defaultValue: "Normal"
+    MODE_CHANGE_FAIL_VALUE:
+        type: enum16
+        defaultValue: 16384
     PIXIT.DISHM.MODE_CHANGE_OK:
         type: int8u
         defaultValue: 2
     invalid_mode_th:
-        Type: int8u
+        type: int8u
         defaultValue: 4
 
 tests:
@@ -53,9 +59,9 @@ tests:
               contains:
                   [
                       {
-                          Label: "Normal",
+                          Label: MODE_CHANGE_FAIL_LABEL,
                           Mode: PIXIT.DISHM.MODE_CHANGE_FAIL,
-                          ModeTags: [{ Value: 16384 }],
+                          ModeTags: [{ Value: MODE_CHANGE_FAIL_VALUE }],
                       },
                   ]
 
@@ -100,7 +106,7 @@ tests:
                 value: "y"
 
     - label: "Step 6: TH reads from the DUT the CurrentMode attribute"
-      PICS: DISHM.S.A0001 && DISHM.S.M.CAN_MANUALLY_CONTROLLED
+      PICS: DISHM.S.A0001
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
@@ -138,7 +144,7 @@ tests:
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
-          value: old_current_mode_dut
+          value: Step6_Old_current_mode_value
 
     - label:
           "Step 9: Manually put the device in a state from which it will FAIL to

@@ -1807,8 +1807,11 @@ PICS:
     - label: "Does the device implement the DISHM cluster as a server?"
       id: DISHM.S
 
-    - label: "IDoes the DUT support testing the failed ChangeToMode command?"
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
       id: DISHM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label: "Can the mode changed by manually control at the device?"
+      id: DISHM.S.M.CAN_MANUALLY_CONTROLLED
 
     # PIXIT
 

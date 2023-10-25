@@ -73,14 +73,7 @@
         "Test_TC_DISHALM_3_5",
         "Test_TC_DISHALM_3_6"
     ],
-    "DishwasherMode": [
-        "Test_TC_DISHM_1_1",
-        "Test_TC_DISHM_1_2",
-        "Test_TC_DISHM_2_1",
-        "Test_TC_DISHM_3_1",
-        "Test_TC_DISHM_3_2",
-        "Test_TC_DISHM_3_3"
-    ],
+    "DishwasherMode": ["Test_TC_DISHM_1_2"],
     "DeviceManagement": [
         "Test_TC_BINFO_3_1",
         "Test_TC_OPCREDS_3_1",
@@ -274,7 +267,7 @@
     ],
     "RVCCleanMode": ["Test_TC_RVCCLEANM_3_3"],
     "RVCOperationalState": ["Test_TC_RVCOPSTATE_2_2"],
-    "RVCRunMode": ["Test_TC_RVCRUNM_3_3"],
+    "RVCRunMode": [],
     "TemperatureControlledCabinetMode": [
         "Test_TC_TCCM_1_2",
         "Test_TC_TCCM_2_1",

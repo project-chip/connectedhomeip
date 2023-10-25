@@ -160,14 +160,14 @@ tests:
                 value: nodeId
 
     - label: "Step 9: TH reads the StartUpMode attribute from the DUT"
-      PICS: DISHM.S.A0002
+      PICS: DISHM.S.A0002 && PICS_USER_PROMPT
       command: "readAttribute"
       attribute: "StartUpMode"
       response:
           value: new_start_up_mode_th
 
     - label: "Step 10: TH reads the CurrentMode attribute from the DUT"
-      PICS: DISHM.S.A0001
+      PICS: DISHM.S.A0001 && PICS_USER_PROMPT
       command: "readAttribute"
       attribute: "CurrentMode"
       response:

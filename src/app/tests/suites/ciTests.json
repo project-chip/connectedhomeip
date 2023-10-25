@@ -56,6 +56,13 @@
         "Test_TC_DGETH_2_2"
     ],
     "DiagnosticsLogs": ["Test_TC_DLOG_1_1"],
+    "DishwasherMode": [
+        "Test_TC_DISHM_1_1",
+        "Test_TC_DISHM_2_1",
+        "Test_TC_DISHM_3_1",
+        "Test_TC_DISHM_3_2",
+        "Test_TC_DISHM_3_3"
+    ],
     "FlowMeasurement": ["Test_TC_FLW_1_1", "Test_TC_FLW_2_1"],
     "FixedLabel": ["Test_TC_FLABEL_1_1", "Test_TC_FLABEL_2_1"],
     "FanControl": [
@@ -184,6 +191,8 @@
     "RoboticVacuumCleaner": [
         "Test_TC_RVCCLEANM_1_1",
         "Test_TC_RVCRUNM_1_1",
+        "Test_TC_RVCRUNM_3_1",
+        "Test_TC_RVCRUNM_3_3",
         "Test_TC_RVCOPSTATE_1_1"
     ],
     "SecureChannel": [],
@@ -369,6 +378,7 @@
         "DeviceManagement",
         "Descriptor",
         "DiagnosticsLogs",
+        "DishwasherMode",
         "EthernetNetworkDiagnostics",
         "FlowMeasurement",
         "FixedLabel",

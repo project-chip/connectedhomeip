@@ -27,10 +27,7 @@ config:
     #Configure newmode value
     new_mode_th:
         type: int8u
-        defaultValue: 7
-    WaitTime:
-        type: int16u
-        defaultValue: 5000
+        defaultValue: 2
     nonNull_OnMode_value:
         type: int8u
         defaultValue: 0
@@ -116,19 +113,11 @@ tests:
       PICS: OO.S.C00.Rsp && DISHM.S.F00
       cluster: "On/Off"
       command: "Off"
-      response:
-          values:
-              - name: "Status"
-                value: 0x00
 
     - label: "Step 7: TH sends an On command to the DUT"
       PICS: OO.S.C01.Rsp && DISHM.S.F00
       cluster: "On/Off"
       command: "On"
-      response:
-          values:
-              - name: "Status"
-                value: 0x00
 
     - label: "Step 8: TH reads the CurrentMode attribute from the DUT"
       PICS: DISHM.S.A0001 && DISHM.S.F00

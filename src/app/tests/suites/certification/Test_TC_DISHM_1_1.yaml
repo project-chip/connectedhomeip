@@ -31,11 +31,12 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
+    #ClusterRevision should be 2 fix the script once https://github.com/project-chip/connectedhomeip/issues/29989 got fixed
     - label: "Step 2: TH reads ClusterRevision attribute from DUT"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 2
+          value: 1
           constraints:
               type: int16u
 

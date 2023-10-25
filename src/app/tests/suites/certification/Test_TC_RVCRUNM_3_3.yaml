@@ -176,14 +176,14 @@ tests:
                 value: nodeId
 
     - label: "Step 11: TH reads the StartUpMode attribute from the DUT"
-      PICS: RVCRUNM.S.A0002
+      PICS: RVCRUNM.S.A0002 && PICS_USER_PROMPT
       command: "readAttribute"
       attribute: "StartUpMode"
       response:
           value: new_start_up_mode_th
 
     - label: "Step 12: TH reads the CurrentMode attribute from the DUT"
-      PICS: RVCRUNM.S.A0001
+      PICS: RVCRUNM.S.A0001 && PICS_USER_PROMPT
       command: "readAttribute"
       attribute: "CurrentMode"
       response:
