@@ -397,6 +397,7 @@ void WiFiManager::ScanDoneHandler(Platform::UniquePtr<uint8_t> data)
                 ChipLogProgress(DeviceLayer, "Starting connection recover: re-scanning... (next attempt in %d ms)",
                                 currentTimeout.count());
                 DeviceLayer::SystemLayer().StartTimer(currentTimeout, Recover, nullptr);
+                return;
             }
 
             Instance().mWiFiState = WIFI_STATE_ASSOCIATING;
