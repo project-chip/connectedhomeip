@@ -1,0 +1,47 @@
+{{> header excludeZapComment=true}}
+
+#import "MTRDeviceTypeMetadata.h"
+
+using namespace chip;
+
+namespace {
+enum class DeviceTypeClass {
+  Utility,
+  Simple,
+  Node, // Might not be a real class, but we have it for Root Node for now.
+  // If new classes get added, plase audit MTRIsKnownUtilityDeviceType below.
+};
+
+struct DeviceTypeData {
+  DeviceTypeId id;
+  DeviceTypeClass deviceClass;
+  const char * name;
+};
+
+constexpr DeviceTypeData knownDeviceTypes[] = {
+  {{#zcl_device_types}}
+  {{#if class}}
+  {{! For now work around the "Dynamic Utility" thing on Aggregator by just
+      taking the last word. }}
+  { {{asHex code 8}}, DeviceTypeClass::{{asLastWord class}}, "{{caption}}" },
+  {{/if}}
+  {{/zcl_device_types}}
+};
+
+{{#zcl_device_types}}
+{{#unless class}}
+static_assert(ExtractVendorFromMEI({{asHex code 8}}) != 0, "Must have class defined for \"{{caption}}\" if it's a standard device type");
+{{/unless}}
+{{/zcl_device_types}}
+
+} // anonymous namespace
+
+BOOL MTRIsKnownUtilityDeviceType(DeviceTypeId aDeviceTypeId)
+{
+    for (auto & deviceType : knownDeviceTypes) {
+        if (deviceType.id == aDeviceTypeId) {
+            return deviceType.deviceClass != DeviceTypeClass::Simple;
+        }
+    }
+    return NO;
+}

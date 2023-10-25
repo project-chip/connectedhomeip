@@ -429,7 +429,7 @@ server cluster OperationalCredentials = 62 {
 }
 
 endpoint 0 {
-  device type ma_all_clusters_app = 0, version 1;
+  device type ma_all_clusters_app = 4293984259, version 1;
 
 
   server cluster AccessControl {

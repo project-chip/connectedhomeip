@@ -6869,7 +6869,7 @@ endpoint 2 {
   }
 }
 endpoint 65534 {
-  device type ma_secondary_network_commissioning = 61442, version 1;
+  device type ma_secondary_network_commissioning = 4293984258, version 1;
 
 
   server cluster Descriptor {
@@ -6877,6 +6877,10 @@ endpoint 65534 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 2;
   }
@@ -6890,6 +6894,10 @@ endpoint 65534 {
     callback attribute lastNetworkingStatus;
     callback attribute lastNetworkID;
     callback attribute lastConnectErrorValue;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     callback attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
 
