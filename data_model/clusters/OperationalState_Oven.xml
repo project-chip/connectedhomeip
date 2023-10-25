@@ -55,75 +55,28 @@ Connectivity Standards Alliance +
 508 Second Street, Suite 206 +
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0053" name="Laundry Washer Controls" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0048" name="Oven Cavity Operational State" revision="1">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
-  <classification hierarchy="base" role="application" picsCode="WASHERCTRL" scope="Endpoint"/>
-  <features>
-    <feature bit="0" code="SPIN" name="Spin" summary="Multiple spin speeds supported">
-      <optionalConform/>
-    </feature>
-    <feature bit="1" code="RINSE" name="Rinse" summary="Multiple rinse cycles supported">
-      <optionalConform/>
-    </feature>
-  </features>
+  <classification hierarchy="derived" baseCluster="Operational State" role="application" picsCode="OVENOPSTATE" scope="Endpoint"/>
   <dataTypes>
-    <enum name="NumberOfRinsesEnum">
-      <item value="0" name="None" summary="This laundry mode does not perform rinse cycles">
-        <mandatoryConform>
-          <feature name="RINSE"/>
-        </mandatoryConform>
+    <enum name="OperationalStateEnum">
+      <item value="1" name="Running" summary="The device is operating">
+        <disallowConform/>
       </item>
-      <item value="1" name="Normal" summary="This laundry mode performs normal rinse cycles determined by the manufacturer">
-        <mandatoryConform>
-          <feature name="RINSE"/>
-        </mandatoryConform>
+      <item value="64" name="Preheating" summary="The device is preheating the cavity">
+        <mandatoryConform/>
       </item>
-      <item value="2" name="Extra" summary="This laundry mode performs an extra rinse cycle">
-        <mandatoryConform>
-          <feature name="RINSE"/>
-        </mandatoryConform>
+      <item value="65" name="Preheated" summary="The device is finished preheating the cavity">
+        <mandatoryConform/>
       </item>
-      <item value="3" name="Max" summary="This laundry mode performs the maximum number of rinse cycles determined by the manufacturer">
-        <mandatoryConform>
-          <feature name="RINSE"/>
-        </mandatoryConform>
+      <item value="66" name="CoolingDown" summary="The device is finished running and is cooling down">
+        <mandatoryConform/>
+      </item>
+      <item value="67" name="SelfCleaning" summary="The device is self-cleaning and the cavity cannot be opened">
+        <mandatoryConform/>
       </item>
     </enum>
   </dataTypes>
-  <attributes>
-    <attribute id="0x0000" name="SpinSpeeds" type="list">
-      <entry type="string">
-        <constraint type="maxLength" value="64"/>
-      </entry>
-      <access read="true" readPrivilege="view"/>
-      <mandatoryConform>
-        <feature name="SPIN"/>
-      </mandatoryConform>
-      <constraint type="maxCount" value="16"/>
-    </attribute>
-    <attribute id="0x0001" name="SpinSpeedCurrent" type="uint8" default="desc">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
-      <mandatoryConform>
-        <feature name="SPIN"/>
-      </mandatoryConform>
-      <constraint type="between" from="0" to="15"/>
-    </attribute>
-    <attribute id="0x0002" name="NumberOfRinses" type="NumberOfRinsesEnum" default="1">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <mandatoryConform>
-        <feature name="RINSE"/>
-      </mandatoryConform>
-      <constraint type="desc"/>
-    </attribute>
-    <attribute id="0x0003" name="SupportedRinses" type="list[NumberOfRinsesEnum Type]">
-      <access read="true" readPrivilege="view"/>
-      <mandatoryConform>
-        <feature name="RINSE"/>
-      </mandatoryConform>
-      <constraint type="max" value="4"/>
-    </attribute>
-  </attributes>
 </cluster>

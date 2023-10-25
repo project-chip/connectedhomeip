@@ -51,79 +51,91 @@ are the sole property of their respective owners.
 
 This notice and disclaimer must be included on all copies of this document.
 
-Connectivity Standards Alliance +
-508 Second Street, Suite 206 +
+Connectivity Standards Alliance
+508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0053" name="Laundry Washer Controls" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x009b" name="Energy Preference" revision="1">
   <revisionHistory>
-    <revision revision="1" summary="Initial release"/>
+    <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
-  <classification hierarchy="base" role="application" picsCode="WASHERCTRL" scope="Endpoint"/>
+  <classification hierarchy="base" role="application" picsCode="EPREF" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="SPIN" name="Spin" summary="Multiple spin speeds supported">
-      <optionalConform/>
+    <feature bit="0" code="BALA" name="EnergyBalance" summary="Device can balance energy consumption vs. another priority">
+      <optionalConform choice="a" more="true"/>
     </feature>
-    <feature bit="1" code="RINSE" name="Rinse" summary="Multiple rinse cycles supported">
-      <optionalConform/>
+    <feature bit="0" code="LPMS" name="LowPowerModeSensitivity" summary="Device can adjust the conditions for entering a low power mode">
+      <optionalConform choice="a" more="true"/>
     </feature>
   </features>
   <dataTypes>
-    <enum name="NumberOfRinsesEnum">
-      <item value="0" name="None" summary="This laundry mode does not perform rinse cycles">
-        <mandatoryConform>
-          <feature name="RINSE"/>
-        </mandatoryConform>
+    <enum name="EnergyPriorityEnum">
+      <item value="0" name="Comfort">
+        <mandatoryConform/>
       </item>
-      <item value="1" name="Normal" summary="This laundry mode performs normal rinse cycles determined by the manufacturer">
-        <mandatoryConform>
-          <feature name="RINSE"/>
-        </mandatoryConform>
+      <item value="1" name="Speed">
+        <mandatoryConform/>
       </item>
-      <item value="2" name="Extra" summary="This laundry mode performs an extra rinse cycle">
-        <mandatoryConform>
-          <feature name="RINSE"/>
-        </mandatoryConform>
+      <item value="2" name="Efficiency">
+        <mandatoryConform/>
       </item>
-      <item value="3" name="Max" summary="This laundry mode performs the maximum number of rinse cycles determined by the manufacturer">
-        <mandatoryConform>
-          <feature name="RINSE"/>
-        </mandatoryConform>
+      <item value="3" name="WaterConsumption">
+        <mandatoryConform/>
       </item>
     </enum>
+    <struct name="BalanceStruct">
+      <field id="0" name="Step" type="uint8" default="MS">
+        <access read="true"/>
+        <mandatoryConform/>
+        <constraint type="allowed" value="percent"/>
+      </field>
+      <field id="1" name="Label" type="string">
+        <access read="true"/>
+        <optionalConform/>
+        <constraint type="maxLength" value="64"/>
+      </field>
+    </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="SpinSpeeds" type="list">
-      <entry type="string">
-        <constraint type="maxLength" value="64"/>
-      </entry>
+    <attribute id="0x0000" name="EnergyBalances" type="list[BalanceStruct Type]">
       <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
       <mandatoryConform>
-        <feature name="SPIN"/>
+        <feature name="BALA"/>
       </mandatoryConform>
-      <constraint type="maxCount" value="16"/>
+      <constraint type="between" from="2" to="10"/>
     </attribute>
-    <attribute id="0x0001" name="SpinSpeedCurrent" type="uint8" default="desc">
+    <attribute id="0x0001" name="CurrentEnergyBalance" type="uint8">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform>
-        <feature name="SPIN"/>
-      </mandatoryConform>
-      <constraint type="between" from="0" to="15"/>
-    </attribute>
-    <attribute id="0x0002" name="NumberOfRinses" type="NumberOfRinsesEnum" default="1">
-      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <mandatoryConform>
-        <feature name="RINSE"/>
+        <feature name="BALA"/>
       </mandatoryConform>
       <constraint type="desc"/>
     </attribute>
-    <attribute id="0x0003" name="SupportedRinses" type="list[NumberOfRinsesEnum Type]">
-      <access read="true" readPrivilege="view"/>
+    <attribute id="0x0001" name="CurrentLowPowerModeSensitivity" type="uint8">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false"/>
       <mandatoryConform>
-        <feature name="RINSE"/>
+        <feature name="LPMS"/>
       </mandatoryConform>
-      <constraint type="max" value="4"/>
+      <constraint type="desc"/>
+    </attribute>
+    <attribute id="0x0002" name="EnergyPriorities" type="list[EnergyPriorityEnum Type]">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform>
+        <feature name="BALA"/>
+      </mandatoryConform>
+      <constraint type="allowed" value="2"/>
+    </attribute>
+    <attribute id="0x0003" name="LowPowerModeSensitivities" type="list[BalanceStruct Type]">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform>
+        <feature name="LPMS"/>
+      </mandatoryConform>
+      <constraint type="desc"/>
     </attribute>
   </attributes>
 </cluster>
