@@ -535,7 +535,7 @@ void BluezEndpoint::SetupGattService()
     static const char * const c3_flags[] = { "read", nullptr };
 #endif
 
-    mpService = CreateGattService("0xFFF6");
+    mpService = CreateGattService(CHIP_BLE_UUID_SERVICE_SHORT_STRING);
 
     // C1 characteristic
     mpC1 = CreateGattCharacteristic(mpService, "c1", CHIP_PLAT_BLE_UUID_C1_STRING);
