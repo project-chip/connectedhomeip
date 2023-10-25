@@ -36,7 +36,12 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         {
     {{/first}}
         case Commands::{{asUpperCamelCase commandName}}::Id: {
-        {{> im_command_handler_cluster_commands}}
+            Commands::{{asUpperCamelCase commandName}}::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAf{{asUpperCamelCase parent.clusterName}}Cluster{{asUpperCamelCase commandName}}Callback(apCommandObj, aCommandPath, commandData);
+            }
             break;
         }
     {{#last}}

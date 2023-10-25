@@ -60,6 +60,7 @@ chip_data_model("tv-casting-common") {
     "include/CastingServer.h",
     "include/Channel.h",
     "include/ContentLauncher.h",
+    "include/ConversionUtils.h",
     "include/KeypadInput.h",
     "include/LevelControl.h",
     "include/MediaBase.h",
@@ -72,11 +73,13 @@ chip_data_model("tv-casting-common") {
     "include/TargetEndpointInfo.h",
     "include/TargetNavigator.h",
     "include/TargetVideoPlayerInfo.h",
+    "include/WakeOnLan.h",
     "src/AppParams.cpp",
     "src/ApplicationLauncher.cpp",
     "src/CastingServer.cpp",
     "src/Channel.cpp",
     "src/ContentLauncher.cpp",
+    "src/ConversionUtils.cpp",
     "src/KeypadInput.cpp",
     "src/LevelControl.cpp",
     "src/MediaPlayback.cpp",
@@ -85,17 +88,23 @@ chip_data_model("tv-casting-common") {
     "src/TargetEndpointInfo.cpp",
     "src/TargetNavigator.cpp",
     "src/TargetVideoPlayerInfo.cpp",
+    "src/WakeOnLan.cpp",
   ]
 
   # Add simplified casting API files here
   sources += [
     "core/CastingApp.cpp",
     "core/CastingApp.h",
+    "core/CastingPlayer.cpp",
     "core/CastingPlayer.h",
     "core/CastingPlayerDiscovery.cpp",
     "core/CastingPlayerDiscovery.h",
     "core/Types.h",
     "support/AppParameters.h",
+    "support/CastingStore.cpp",
+    "support/CastingStore.h",
+    "support/ChipDeviceEventHandler.cpp",
+    "support/ChipDeviceEventHandler.h",
     "support/DataProvider.h",
   ]
 

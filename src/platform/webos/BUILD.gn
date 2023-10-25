@@ -100,7 +100,10 @@ static_library("webos") {
     "SystemTimeSupport.cpp",
   ]
 
-  deps = [ "${chip_root}/src/setup_payload" ]
+  deps = [
+    "${chip_root}/src/platform/logging:headers",
+    "${chip_root}/src/setup_payload",
+  ]
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",

@@ -46,4 +46,17 @@
     _Pragma("clang diagnostic ignored \"-Wshadow\"")            \
     __strong typeof(local) _Nullable local = _mtr_weak_##local  \
     _Pragma("clang diagnostic pop")
+
+/// Declares an unused local of unspecified type, to prevent accidental
+/// references to a shadowed variable of the same name. Note that hiding
+/// `self` does not prevent implicit references to self due to ivar access.
+#define mtr_hide(local)                                         \
+    _Pragma("clang diagnostic push")                            \
+    _Pragma("clang diagnostic ignored \"-Wshadow\"")            \
+    __attribute__((unused)) variable_hidden_by_mtr_hide local;  \
+    _Pragma("clang diagnostic pop")
+typedef struct {} variable_hidden_by_mtr_hide;
 // clang-format on
+
+// Default timed interaction timeout, in ms, if another one is not provided.
+#define MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS 10000

@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 import("common_flags.gni")
 import("icd/icd.gni")
@@ -59,6 +60,7 @@ buildconfig_header("app_buildconfig") {
     "CHIP_CONFIG_ENABLE_ICD_SERVER=${chip_enable_icd_server}",
     "CHIP_CONFIG_ENABLE_READ_CLIENT=${chip_enable_read_client}",
     "ICD_REPORT_ON_ENTER_ACTIVE_MODE=${chip_report_on_active_mode}",
+    "ICD_MAX_NOTIFICATION_SUBSCRIBERS=${icd_max_notification_subscribers}",
   ]
 }
 
@@ -236,7 +238,8 @@ static_library("app") {
   public_deps = [
     ":app_config",
     "${chip_root}/src/access",
-    "${chip_root}/src/app/icd:observer-srcs",
+    "${chip_root}/src/app/icd:notifier",
+    "${chip_root}/src/app/icd:observer",
     "${chip_root}/src/lib/address_resolve",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
@@ -246,7 +249,7 @@ static_library("app") {
   ]
 
   if (chip_enable_icd_server) {
-    public_deps += [ "${chip_root}/src/app/icd:server-srcs" ]
+    public_deps += [ "${chip_root}/src/app/icd:manager" ]
   }
 
   cflags = [ "-Wconversion" ]

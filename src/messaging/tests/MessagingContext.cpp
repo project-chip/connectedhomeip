@@ -163,10 +163,24 @@ CHIP_ERROR MessagingContext::CreateSessionBobToAlice()
                                                         mBobFabricIndex, mAliceAddress, CryptoContext::SessionRole::kInitiator);
 }
 
+CHIP_ERROR MessagingContext::CreateCASESessionBobToAlice()
+{
+    return mSessionManager.InjectCaseSessionWithTestKey(mSessionBobToAlice, kBobKeyId, kAliceKeyId, GetBobFabric()->GetNodeId(),
+                                                        GetAliceFabric()->GetNodeId(), mBobFabricIndex, mAliceAddress,
+                                                        CryptoContext::SessionRole::kInitiator);
+}
+
 CHIP_ERROR MessagingContext::CreateSessionAliceToBob()
 {
     return mSessionManager.InjectPaseSessionWithTestKey(mSessionAliceToBob, kAliceKeyId, GetBobFabric()->GetNodeId(), kBobKeyId,
                                                         mAliceFabricIndex, mBobAddress, CryptoContext::SessionRole::kResponder);
+}
+
+CHIP_ERROR MessagingContext::CreateCASESessionAliceToBob()
+{
+    return mSessionManager.InjectCaseSessionWithTestKey(mSessionAliceToBob, kAliceKeyId, kBobKeyId, GetAliceFabric()->GetNodeId(),
+                                                        GetBobFabric()->GetNodeId(), mAliceFabricIndex, mBobAddress,
+                                                        CryptoContext::SessionRole::kResponder);
 }
 
 CHIP_ERROR MessagingContext::CreatePASESessionCharlieToDavid()

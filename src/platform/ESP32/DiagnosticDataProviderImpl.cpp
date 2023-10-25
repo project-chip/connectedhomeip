@@ -53,12 +53,12 @@ namespace {
 InterfaceTypeEnum GetInterfaceType(const char * if_desc)
 {
     if (strncmp(if_desc, "ap", strnlen(if_desc, 2)) == 0 || strncmp(if_desc, "sta", strnlen(if_desc, 3)) == 0)
-        return InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI;
+        return InterfaceTypeEnum::kWiFi;
     if (strncmp(if_desc, "openthread", strnlen(if_desc, 10)) == 0)
-        return InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD;
+        return InterfaceTypeEnum::kThread;
     if (strncmp(if_desc, "eth", strnlen(if_desc, 3)) == 0)
-        return InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET;
-    return InterfaceTypeEnum::EMBER_ZCL_INTERFACE_TYPE_ENUM_UNSPECIFIED;
+        return InterfaceTypeEnum::kEthernet;
+    return InterfaceTypeEnum::kUnspecified;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI

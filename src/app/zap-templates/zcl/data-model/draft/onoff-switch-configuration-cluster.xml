@@ -27,7 +27,7 @@ limitations under the License.
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
 
-    <attribute side="server" code="0x0000" define="SWITCH_TYPE" type="ENUM8" min="0x00" max="0x01" writable="false" optional="false">switch type</attribute>
-    <attribute side="server" code="0x0010" define="SWITCH_ACTIONS" type="ENUM8" min="0x00" max="0x02" writable="true" default="0x00" optional="false">switch actions</attribute>
+    <attribute side="server" code="0x0000" define="SWITCH_TYPE" type="enum8" min="0x00" max="0x01" writable="false" optional="false">switch type</attribute>
+    <attribute side="server" code="0x0010" define="SWITCH_ACTIONS" type="enum8" min="0x00" max="0x02" writable="true" default="0x00" optional="false">switch actions</attribute>
   </cluster>
 </configurator>

@@ -25,8 +25,9 @@ from chip.tlv import uint
 from matter_testing_support import (MatterBaseTest, async_test_body, compare_time, default_matter_test_main,
                                     get_wait_seconds_from_set_time, parse_pics, type_matches, utc_time_in_matter_epoch)
 from mobly import asserts, signals
-from TC_DeviceBasicComposition import (TagProblem, create_device_type_lists, find_tag_list_problems, find_tree_roots,
-                                       get_all_children, parts_list_cycles, separate_endpoint_types)
+from TC_DeviceBasicComposition import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
+                                       find_tag_list_problems, find_tree_roots, get_all_children, get_direct_children_of_root,
+                                       parts_list_cycles, separate_endpoint_types)
 
 
 def get_raw_type_list():
@@ -537,6 +538,52 @@ class TestMatterTestingSupport(MatterBaseTest):
         simple[3][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [tag1, tag2, tag3]
         problems = find_tag_list_problems(roots, device_types, simple)
         asserts.assert_equal(len(problems), 0, "Unexpected problems found in list")
+
+    def test_root_node_tag_list_functions(self):
+        # Example topology - see comment above for the layout.
+        # There are 4 direct children of root 0
+        # node 2, node 6 and node 10 all have device ID 1
+        # node 11 is an aggregator
+        endpoints = self.create_example_topology()
+        expected = {2, 6, 10, 11}
+        direct = get_direct_children_of_root(endpoints)
+        asserts.assert_equal(expected, direct, 'Incorrect list of direct children returned from root')
+
+        # add a new child endpoint that's an aggregator on EP 20
+        aggregator_desc = {Clusters.Descriptor.Attributes.FeatureMap: 1,
+                           Clusters.Descriptor.Attributes.PartsList: [],
+                           Clusters.Descriptor.Attributes.DeviceTypeList: [Clusters.Descriptor.Structs.DeviceTypeStruct(0xe)],
+                           }
+        endpoints[22] = {Clusters.Descriptor: aggregator_desc}
+        endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList].append(22)
+        expected.add(22)
+        direct = get_direct_children_of_root(endpoints)
+        asserts.assert_equal(expected, direct, 'Incorrect list of direct children returned from root')
+
+        device_type_list = create_device_type_list_for_root(direct, endpoints)
+        asserts.assert_equal(len(device_type_list), 2, 'Incorrect number of device types returned in root device type list')
+        expected_device_types = {1, 0xe}
+        asserts.assert_equal(set(device_type_list.keys()), expected_device_types, 'Unexpected device type list returned')
+        expected_eps_dt1 = {2, 6, 10}
+        asserts.assert_equal(set(device_type_list[1]), expected_eps_dt1, 'Unexpected endpoint list for DT1')
+        expected_eps_dte = {11, 22}
+        asserts.assert_equal(set(device_type_list[0xe]), expected_eps_dte, 'Unexpected endpoint list for DT 0xe')
+
+        problems = find_tag_list_problems(roots=[0], device_types={0: device_type_list}, endpoint_dict=endpoints)
+
+        # NONE of the endpoints currently have tags, so they should ALL be reported as having problems
+        expected_problems = {2, 6, 10, 11, 22}
+        asserts.assert_equal(set(problems.keys()), expected_problems, "Unexpected problem list returned for root node")
+
+        # Let's add correct tags to everything and make sure we get no problems reported.
+        # the various problems are tested individually in the above test case, so the intent is to ensure this also
+        # works for the root
+        for ep in expected_problems:
+            endpoints[ep][Clusters.Descriptor][Clusters.Descriptor.Attributes.TagList] = [
+                Clusters.Descriptor.Structs.SemanticTagStruct(namespaceID=ep)]
+            endpoints[ep][Clusters.Descriptor][Clusters.Descriptor.Attributes.FeatureMap] = 1
+        problems = find_tag_list_problems(roots=[0], device_types={0: device_type_list}, endpoint_dict=endpoints)
+        asserts.assert_equal(len(problems.keys()), 0, 'Unexpected problems found in root endpoint')
 
 
 if __name__ == "__main__":

@@ -1,0 +1,189 @@
+/*
+ *
+ *    Copyright (c) 2023 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include "ChipDeviceEventHandler.h"
+
+#include "core/CastingPlayer.h"
+#include "core/Types.h"
+#include "support/CastingStore.h"
+
+#include "app/clusters/bindings/BindingManager.h"
+
+namespace matter {
+namespace casting {
+namespace support {
+
+using namespace matter::casting::core;
+
+bool ChipDeviceEventHandler::sUdcInProgress = false;
+
+void ChipDeviceEventHandler::Handle(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    ChipLogProgress(AppServer, "ChipDeviceEventHandler::Handle called");
+
+    bool runPostCommissioning           = false;
+    chip::NodeId targetNodeId           = 0;
+    chip::FabricIndex targetFabricIndex = 0;
+
+    if (event->Type == chip::DeviceLayer::DeviceEventType::kFailSafeTimerExpired &&
+        CastingPlayer::GetTargetCastingPlayer()->mConnectionState == CASTING_PLAYER_CONNECTING)
+    {
+        HandleFailSafeTimerExpired();
+    }
+    else if (event->Type == chip::DeviceLayer::DeviceEventType::kBindingsChangedViaCluster &&
+             CastingPlayer::GetTargetCastingPlayer() != nullptr)
+    {
+        HandleBindingsChangedViaCluster(event, arg, runPostCommissioning, targetNodeId, targetFabricIndex);
+    }
+    else if (event->Type == chip::DeviceLayer::DeviceEventType::kCommissioningComplete)
+    {
+        HandleCommissioningComplete(event, arg, runPostCommissioning, targetNodeId, targetFabricIndex);
+    }
+
+    if (runPostCommissioning)
+    {
+        sUdcInProgress = false;
+        CastingPlayer::GetTargetCastingPlayer()->SetNodeId(targetNodeId);
+        CastingPlayer::GetTargetCastingPlayer()->SetFabricIndex(targetFabricIndex);
+
+        CastingPlayer::GetTargetCastingPlayer()->FindOrEstablishSession(
+            nullptr,
+            [](void * context, chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle) {
+                ChipLogProgress(AppServer, "ChipDeviceEventHandler::Handle: Connection to CastingPlayer successful");
+                CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_CONNECTED;
+                support::CastingStore::GetInstance()->AddOrUpdate(*CastingPlayer::GetTargetCastingPlayer());
+                VerifyOrReturn(CastingPlayer::GetTargetCastingPlayer()->mOnCompleted);
+                CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(CHIP_NO_ERROR, CastingPlayer::GetTargetCastingPlayer());
+            },
+            [](void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error) {
+                ChipLogError(AppServer, "ChipDeviceEventHandler::Handle: Connection to CastingPlayer failed");
+                CastingPlayer::GetTargetCastingPlayer()->mConnectionState = CASTING_PLAYER_NOT_CONNECTED;
+                support::CastingStore::GetInstance()->Delete(*CastingPlayer::GetTargetCastingPlayer());
+                VerifyOrReturn(CastingPlayer::GetTargetCastingPlayer()->mOnCompleted);
+                CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(error, nullptr);
+                CastingPlayer::mTargetCastingPlayer = nullptr;
+            });
+    }
+}
+
+void ChipDeviceEventHandler::HandleFailSafeTimerExpired()
+{
+    ChipLogProgress(AppServer, "ChipDeviceEventHandler::HandleFailSafeTimerExpired called");
+    chip::DeviceLayer::SystemLayer().StartTimer(
+        chip::System::Clock::Milliseconds32(1),
+        [](chip::System::Layer * aSystemLayer, void * aAppState) {
+            ChipLogProgress(AppServer, "ChipDeviceEventHandler::Handle running OpenBasicCommissioningWindow");
+            CHIP_ERROR err = chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(
+                chip::System::Clock::Seconds16(CastingPlayer::GetTargetCastingPlayer()->mCommissioningWindowTimeoutSec));
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "ChipDeviceEventHandler::Handle Failed to OpenBasicCommissioningWindow %" CHIP_ERROR_FORMAT,
+                             err.Format());
+                CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(err, nullptr);
+                return;
+            }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+            err = CastingPlayer::GetTargetCastingPlayer()->SendUserDirectedCommissioningRequest();
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer,
+                             "ChipDeviceEventHandler::Handle Failed to SendUserDirectedCommissioningRequest %" CHIP_ERROR_FORMAT,
+                             err.Format());
+                CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(err, nullptr);
+                return;
+            }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
+        },
+        nullptr);
+}
+
+void ChipDeviceEventHandler::HandleBindingsChangedViaCluster(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg,
+                                                             bool & runPostCommissioning, chip::NodeId & targetNodeId,
+                                                             chip::FabricIndex & targetFabricIndex)
+{
+    ChipLogProgress(AppServer, "ChipDeviceEventHandler::HandleBindingsChangedViaCluster called");
+
+    if (CastingPlayer::GetTargetCastingPlayer()->IsConnected())
+    {
+        // re-use existing nodeId and fabricIndex
+        ChipLogProgress(AppServer, "ChipDeviceEventHandler::HandleBindingsChangedViaCluster already connected to video player");
+        runPostCommissioning = true;
+        targetNodeId         = CastingPlayer::GetTargetCastingPlayer()->GetNodeId();
+        targetFabricIndex    = CastingPlayer::GetTargetCastingPlayer()->GetFabricIndex();
+    }
+    // handle the "re-commissioning" use case i.e. we received a kBindingsChangedViaCluster event when UDC was in progress (i.e. no
+    // kCommissioningComplete received)
+    else if (sUdcInProgress)
+    {
+        ChipLogProgress(AppServer,
+                        "ChipDeviceEventHandler::HandleBindingsChangedViaCluster UDC is in progress while handling "
+                        "kBindingsChangedViaCluster with "
+                        "fabricIndex: %d",
+                        event->BindingsChanged.fabricIndex);
+        sUdcInProgress = false;
+
+        // find targetNodeId from binding table by matching the binding's fabricIndex with the accessing fabricIndex
+        // received in BindingsChanged event
+        for (const auto & binding : chip::BindingTable::GetInstance())
+        {
+            ChipLogProgress(AppServer,
+                            "ChipDeviceEventHandler::HandleBindingsChangedViaCluster Read cached binding type=%d fabrixIndex=%d "
+                            "nodeId=0x" ChipLogFormatX64
+                            " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
+                            binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
+                            binding.remote, ChipLogValueMEI(binding.clusterId.ValueOr(0)));
+            if (binding.type == EMBER_UNICAST_BINDING && event->BindingsChanged.fabricIndex == binding.fabricIndex)
+            {
+                ChipLogProgress(AppServer,
+                                "ChipDeviceEventHandler::HandleBindingsChangedViaCluster Matched accessingFabricIndex with "
+                                "nodeId=0x" ChipLogFormatX64,
+                                ChipLogValueX64(binding.nodeId));
+                targetNodeId         = binding.nodeId;
+                targetFabricIndex    = binding.fabricIndex;
+                runPostCommissioning = true;
+                break;
+            }
+        }
+
+        if (targetNodeId == 0 && runPostCommissioning == false)
+        {
+            ChipLogError(AppServer,
+                         "ChipDeviceEventHandler::HandleBindingsChangedViaCluster accessingFabricIndex: %d did not match bindings",
+                         event->BindingsChanged.fabricIndex);
+            CastingPlayer::GetTargetCastingPlayer()->mOnCompleted(CHIP_ERROR_INCORRECT_STATE,
+                                                                  CastingPlayer::GetTargetCastingPlayer());
+            return;
+        }
+    }
+}
+
+void ChipDeviceEventHandler::HandleCommissioningComplete(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg,
+                                                         bool & runPostCommissioning, chip::NodeId & targetNodeId,
+                                                         chip::FabricIndex & targetFabricIndex)
+{
+    ChipLogProgress(AppServer, "ChipDeviceEventHandler::HandleCommissioningComplete called");
+    sUdcInProgress       = false;
+    targetNodeId         = event->CommissioningComplete.nodeId;
+    targetFabricIndex    = event->CommissioningComplete.fabricIndex;
+    runPostCommissioning = true;
+}
+
+}; // namespace support
+}; // namespace casting
+}; // namespace matter

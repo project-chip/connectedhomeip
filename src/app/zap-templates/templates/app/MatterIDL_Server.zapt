@@ -51,6 +51,12 @@ endpoint {{endpointId}} {
         ;
       {{/if}}
     {{/user_cluster_attributes}}
+    {{#user_cluster_commands}}
+    {{~#first}}
+
+    {{/first}}
+    handle command {{asUpperCamelCase name}};
+    {{/user_cluster_commands}}
   }
       {{/if}}
     {{/if}}

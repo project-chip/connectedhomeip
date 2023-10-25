@@ -23,12 +23,13 @@
 #include <lib/support/CommonIterator.h>
 #include <lib/support/PersistentData.h>
 #include <lib/support/Pool.h>
+#include <zap-generated/gen_config.h>
 
 namespace chip {
 namespace scenes {
 
-static constexpr uint16_t kMaxScenesPerFabric   = CHIP_CONFIG_SCENES_MAX_PER_FABRIC;
-static constexpr uint16_t kMaxScenesPerEndpoint = CHIP_CONFIG_MAX_SCENES_PER_ENDPOINT;
+static constexpr uint16_t kMaxScenesPerFabric   = (MATTER_SCENES_TABLE_SIZE - 1) / 2;
+static constexpr uint16_t kMaxScenesPerEndpoint = MATTER_SCENES_TABLE_SIZE;
 
 using clusterId = chip::ClusterId;
 

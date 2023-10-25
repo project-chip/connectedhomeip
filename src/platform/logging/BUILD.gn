@@ -19,6 +19,7 @@ if (current_os == "android") {
       "${chip_root}/src/lib/support:attributes",
       "${chip_root}/src/lib/support:logging_constants",
       "${chip_root}/src/platform:platform_buildconfig",
+      "${chip_root}/src/platform/logging:headers",
     ]
 
     libs = [ "log" ]
@@ -43,6 +44,7 @@ static_library("stdio") {
     "${chip_root}/src/lib/support:attributes",
     "${chip_root}/src/lib/support:logging_constants",
     "${chip_root}/src/platform:platform_buildconfig",
+    "${chip_root}/src/platform/logging:headers",
   ]
 
   # Ensure we end up with the expected output file name

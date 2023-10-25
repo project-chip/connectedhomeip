@@ -5990,7 +5990,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("UpdatePossible", 1, value);
         }
         case OtaSoftwareUpdateRequestor::Attributes::UpdateState::Id: {
-            chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value;
+            chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("UpdateState", 1, value);
         }
@@ -6512,6 +6512,21 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             chip::app::DataModel::Nullable<int32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LastConnectErrorValue", 1, value);
+        }
+        case NetworkCommissioning::Attributes::SupportedWiFiBands::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::WiFiBandEnum> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedWiFiBands", 1, value);
+        }
+        case NetworkCommissioning::Attributes::SupportedThreadFeatures::Id: {
+            chip::BitMask<chip::app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedThreadFeatures", 1, value);
+        }
+        case NetworkCommissioning::Attributes::ThreadVersion::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ThreadVersion", 1, value);
         }
         case NetworkCommissioning::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -7951,15 +7966,15 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case IcdManagement::Id: {
         switch (path.mAttributeId)
         {
-        case IcdManagement::Attributes::IdleModeInterval::Id: {
+        case IcdManagement::Attributes::IdleModeDuration::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("IdleModeInterval", 1, value);
+            return DataModelLogger::LogValue("IdleModeDuration", 1, value);
         }
-        case IcdManagement::Attributes::ActiveModeInterval::Id: {
+        case IcdManagement::Attributes::ActiveModeDuration::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ActiveModeInterval", 1, value);
+            return DataModelLogger::LogValue("ActiveModeDuration", 1, value);
         }
         case IcdManagement::Attributes::ActiveModeThreshold::Id: {
             uint16_t value;
@@ -10346,7 +10361,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("PhysicalMaxLevel", 1, value);
         }
         case BallastConfiguration::Attributes::BallastStatus::Id: {
-            uint8_t value;
+            chip::BitMask<chip::app::Clusters::BallastConfiguration::BallastStatusBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("BallastStatus", 1, value);
         }
@@ -10396,7 +10411,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("LampBurnHours", 1, value);
         }
         case BallastConfiguration::Attributes::LampAlarmMode::Id: {
-            uint8_t value;
+            chip::BitMask<chip::app::Clusters::BallastConfiguration::LampAlarmModeBitmap> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LampAlarmMode", 1, value);
         }

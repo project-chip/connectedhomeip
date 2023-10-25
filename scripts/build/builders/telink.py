@@ -21,6 +21,7 @@ from .builder import Builder
 
 
 class TelinkApp(Enum):
+    AIR_QUALITY_SENSOR = auto()
     ALL_CLUSTERS = auto()
     ALL_CLUSTERS_MINIMAL = auto()
     BRIDGE = auto()
@@ -39,7 +40,9 @@ class TelinkApp(Enum):
     WINDOW_COVERING = auto()
 
     def ExampleName(self):
-        if self == TelinkApp.ALL_CLUSTERS:
+        if self == TelinkApp.AIR_QUALITY_SENSOR:
+            return 'air-quality-sensor-app'
+        elif self == TelinkApp.ALL_CLUSTERS:
             return 'all-clusters-app'
         elif self == TelinkApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app'
@@ -75,7 +78,9 @@ class TelinkApp(Enum):
             raise Exception('Unknown app type: %r' % self)
 
     def AppNamePrefix(self):
-        if self == TelinkApp.ALL_CLUSTERS:
+        if self == TelinkApp.AIR_QUALITY_SENSOR:
+            return 'chip-telink-air-quality-sensor-example'
+        elif self == TelinkApp.ALL_CLUSTERS:
             return 'chip-telink-all-clusters-example'
         elif self == TelinkApp.ALL_CLUSTERS_MINIMAL:
             return 'chip-telink-all-clusters-minimal-example'
@@ -131,15 +136,21 @@ class TelinkBuilder(Builder):
                  runner,
                  app: TelinkApp = TelinkApp,
                  board: TelinkBoard = TelinkBoard,
+                 enable_ota: bool = False,
+                 enable_dfu: bool = False,
                  enable_shell: bool = False,
                  enable_rpcs: bool = False,
-                 enable_factory_data: bool = False):
+                 enable_factory_data: bool = False,
+                 enable_4mb_flash: bool = False):
         super(TelinkBuilder, self).__init__(root, runner)
         self.app = app
         self.board = board
+        self.enable_ota = enable_ota
+        self.enable_dfu = enable_dfu
         self.enable_shell = enable_shell
         self.enable_rpcs = enable_rpcs
         self.enable_factory_data = enable_factory_data
+        self.enable_4mb_flash = enable_4mb_flash
 
     def get_cmd_prefixes(self):
         if not self._runner.dry_run:
@@ -160,14 +171,23 @@ class TelinkBuilder(Builder):
             return
 
         flags = []
+        if self.enable_ota:
+            flags.append("-DCONFIG_CHIP_OTA_REQUESTOR=y")
+
+        if self.enable_dfu:
+            flags.append("-DCONFIG_BOOTLOADER_MCUBOOT=y")
+
         if self.enable_shell:
-            flags.append("-DOVERLAY_CONFIG=shell.overlay")
+            flags.append("-DCONFIG_CHIP_LIB_SHELL=y")
 
         if self.enable_rpcs:
             flags.append("-DOVERLAY_CONFIG=rpc.overlay")
 
         if self.enable_factory_data:
-            flags.append("-DOVERLAY_CONFIG=factory_data.overlay")
+            flags.append("-DCONFIG_CHIP_FACTORY_DATA=y -DCONFIG_CHIP_FACTORY_DATA_BUILD=y -DCONFIG_CHIP_FACTORY_DATA_MERGE_WITH_FIRMWARE=y")
+
+        if self.enable_4mb_flash:
+            flags.append("-DFLASH_SIZE=4m")
 
         if self.options.pregen_dir:
             flags.append(f"-DCHIP_CODEGEN_PREGEN_DIR={shlex.quote(self.options.pregen_dir)}")

@@ -40,7 +40,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:1
+            image: ghcr.io/project-chip/chip-build:22
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -85,17 +85,21 @@ jobs:
             # - name: Upload Code Coverage
             #   if: ${{ contains('main', env.BUILD_TYPE) }}
             #   run: bash <(curl -s https://codecov.io/bash)
-            - name: Setup Build Without Detail Logging
+            - name: Set up Build Without Detail Logging
               run: scripts/build/gn_gen.sh --args="chip_detail_logging=false"
             - name: Run Build Without Detail Logging
               run: scripts/run_in_build_env.sh "ninja -C ./out"
-            - name: Setup Build Without Progress Logging
+            - name: Set up Build Without Progress Logging
               run: scripts/build/gn_gen.sh --args="chip_detail_logging=false chip_progress_logging=false"
             - name: Run Build Without Progress Logging
               run: scripts/run_in_build_env.sh "ninja -C ./out"
-            - name: Setup Build Without Error Logging
+            - name: Set up Build Without Error Logging
               run: scripts/build/gn_gen.sh --args="chip_detail_logging=false chip_progress_logging=false chip_error_logging=false"
             - name: Run Build Without Error Logging
+              run: scripts/run_in_build_env.sh "ninja -C ./out"
+            - name: Set up Build Without Logging
+              run: scripts/build/gn_gen.sh --args="chip_logging=false"
+            - name: Run Build Without Logging
               run: scripts/run_in_build_env.sh "ninja -C ./out"
             - name: Uploading core files
               uses: actions/upload-artifact@v3
@@ -131,7 +135,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:1
+            image: ghcr.io/project-chip/chip-build:22
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -279,7 +283,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:1
+            image: ghcr.io/project-chip/chip-build:22
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -331,6 +335,39 @@ jobs:
                   source pyenv/bin/activate
                   pip3 install -r src/setup_payload/python/requirements.txt
                   python3 src/setup_payload/tests/run_python_setup_payload_gen_test.py out/chip-tool
+
+    build_linux_python_lighting_device:
+        name: Build on Linux (python lighting-app)
+
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+
+        container:
+            image: ghcr.io/project-chip/chip-build:22
+            volumes:
+                - "/tmp/log_output:/tmp/test_logs"
+            options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
+                net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+
+        steps:
+            - name: Dump GitHub context
+              env:
+                  GITHUB_CONTEXT: ${{ toJSON(github) }}
+              run: echo "$GITHUB_CONTEXT"
+            - name: Dump Concurrency context
+              env:
+                  CONCURRENCY_CONTEXT: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+              run: echo "$CONCURRENCY_CONTEXT"
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: linux
+
+            - name: Setup Build
+              run: |
+                  scripts/build_python_device.sh --chip_detail_logging true
 
     build_darwin:
         name: Build on Darwin (clang, python_lib, simulated)
@@ -414,7 +451,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:1
+            image: ghcr.io/project-chip/chip-build:22
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0

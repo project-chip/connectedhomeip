@@ -35,7 +35,7 @@
 #include <app/reporting/Engine.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-#include <app/icd/IcdManagementServer.h> // nogncheck
+#include <app/icd/ICDManagementServer.h> // nogncheck
 #endif
 
 namespace chip {
@@ -45,7 +45,7 @@ using Status = Protocols::InteractionModel::Status;
 uint16_t ReadHandler::GetPublisherSelectedIntervalLimit()
 {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
-    return static_cast<uint16_t>(IcdManagementServer::GetInstance().GetIdleModeIntervalSec());
+    return static_cast<uint16_t>(ICDManagementServer::GetInstance().GetIdleModeDurationSec());
 #else
     return kSubscriptionMaxIntervalPublisherLimit;
 #endif
@@ -719,17 +719,17 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 
-    // Default behavior for ICDs where the wanted MaxInterval for a subscription is the IdleModeInterval
+    // Default behavior for ICDs where the wanted MaxInterval for a subscription is the IdleModeDuration
     // defined in the ICD Management Cluster.
     // Behavior can be changed with the OnSubscriptionRequested function defined in the application callbacks
 
     // Default Behavior Steps :
-    // If MinInterval > IdleModeInterval, try to set the MaxInterval to the first interval of IdleModeIntervals above the
+    // If MinInterval > IdleModeDuration, try to set the MaxInterval to the first interval of IdleModeDurations above the
     // MinInterval.
     // If the next interval is greater than the MaxIntervalCeiling, use the MaxIntervalCeiling.
-    // Otherwise, use IdleModeInterval as MaxInterval
+    // Otherwise, use IdleModeDuration as MaxInterval
 
-    // GetPublisherSelectedIntervalLimit() returns the IdleModeInterval if the device is an ICD
+    // GetPublisherSelectedIntervalLimit() returns the IdleModeDuration if the device is an ICD
     uint32_t decidedMaxInterval = GetPublisherSelectedIntervalLimit();
 
     // Check if the PublisherSelectedIntervalLimit is 0. If so, set decidedMaxInterval to MaxIntervalCeiling

@@ -46,6 +46,7 @@ executable("chip-${chip_tests_zap_config}") {
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/support:testing",  # For sleepMillis. TODO: this is
                                              # odd and should be fixed
+    "${chip_root}/src/platform/logging:headers",
     "${chip_root}/third_party/jsoncpp",
   ]
 
