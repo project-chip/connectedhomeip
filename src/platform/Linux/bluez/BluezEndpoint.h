@@ -85,15 +85,17 @@ private:
         uint16_t mNumRetries = 0;
     };
 
+    static CHIP_ERROR StartupEndpointBindings(BluezEndpoint * endpoint);
+    void BluezOnBusAcquired(GDBusConnection * aConn, const char * aName);
+
     void SetupAdapter();
     void SetupGattService();
 
     BluezGattService1 * CreateGattService(const char * aUUID);
     BluezGattCharacteristic1 * CreateGattCharacteristic(BluezGattService1 * aService, const char * aCharName, const char * aUUID);
+    BluezLEAdvertisement1 * CreateLEAdvertisement();
 
-    void BluezOnBusAcquired(GDBusConnection * aConn, const char * aName);
-
-    static CHIP_ERROR StartupEndpointBindings(BluezEndpoint * endpoint);
+    static CHIP_ERROR BluezGattAppRegisterImpl(BluezEndpoint * endpoint);
 
     static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer apParams);
     static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams);

@@ -282,7 +282,7 @@ static void BluezPeripheralRegisterAppDone(GObject * aObject, GAsyncResult * aRe
     ChipLogDetail(DeviceLayer, "BluezPeripheralRegisterAppDone done");
 }
 
-static CHIP_ERROR BluezPeripheralRegisterApp(BluezEndpoint * endpoint)
+CHIP_ERROR BluezEndpoint::BluezGattAppRegisterImpl(BluezEndpoint * endpoint)
 {
     GDBusObject * adapter;
     BluezGattManager1 * gattMgr;
@@ -638,9 +638,9 @@ BluezEndpoint::~BluezEndpoint()
 
 CHIP_ERROR BluezEndpoint::BluezGattAppRegister()
 {
-    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(BluezPeripheralRegisterApp, this);
+    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(BluezGattAppRegisterImpl, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE,
-                        ChipLogError(Ble, "Failed to schedule BluezPeripheralRegisterApp() on CHIPoBluez thread"));
+                        ChipLogError(Ble, "Failed to schedule BluezGattAppRegister() on CHIPoBluez thread"));
     return err;
 }
 
