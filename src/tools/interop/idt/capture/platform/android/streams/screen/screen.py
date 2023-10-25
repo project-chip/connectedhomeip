@@ -53,18 +53,12 @@ class ScreenRecorder(AndroidStream):
         return "true" in screen_cmd_output.get_captured_output()
 
     async def prepare_screen_recording(self) -> None:
-        # try:
-        # async with asyncio.timeout_at(asyncio.get_running_loop().time() + 20.0):
         screen_on = self.check_screen()
         while not screen_on:
             await asyncio.sleep(4)
             screen_on = self.check_screen()
             if not screen_on:
                 self.logger.error("Please turn the screen on so screen recording can start or check connection!")
-
-    # except TimeoutError:
-    # self.logger.error("Screen recording timeout")
-    # return
 
     def update_commands(self) -> None:
         self.screen_artifact = create_standard_log_name("screencast" + str(self.file_counter),
