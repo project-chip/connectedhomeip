@@ -14,7 +14,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
+import asyncio
 import ipaddress
 import os
 import traceback
@@ -193,6 +193,11 @@ class Android(PlatformLogStreamer):
 
     async def start_streaming(self) -> None:
         await self.handle_stream_action("start")
+
+    async def run_observers(self) -> None:
+        observer_tasks = []
+        for stream_name, stream in self.streams.items():
+            observer_tasks.append(asyncio.create_task(stream.run_observer()))
 
     async def stop_streaming(self) -> None:
         await self.handle_stream_action("stop")

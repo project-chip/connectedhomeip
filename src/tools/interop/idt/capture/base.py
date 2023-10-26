@@ -45,6 +45,14 @@ class PlatformLogStreamer(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def run_observers(self) -> None:
+        """
+        Observe log procs and restart as needed
+        Must be async aware and not interact with stdin
+        """
+        raise NotImplementedError
+
+    @abstractmethod
     async def stop_streaming(self) -> None:
         """
         Stop the capture and pull any artifacts from remote devices

@@ -80,6 +80,10 @@ class AndroidPcap(AndroidStream):
         self.pcap_proc.start_command()
         self.pcap_pull = True
 
+    async def run_observer(self) -> None:
+        # TODO: Implement
+        pass
+
     async def stop(self):
         self.logger.info("Stopping android pcap proc")
         self.pcap_proc.stop_command()

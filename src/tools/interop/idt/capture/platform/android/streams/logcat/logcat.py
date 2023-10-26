@@ -15,6 +15,8 @@
 #    limitations under the License.
 #
 
+import asyncio
+import os
 from typing import TYPE_CHECKING
 
 import log
@@ -38,10 +40,24 @@ class LogcatStreamer(AndroidStream):
         self.logcat_proc = platform.get_adb_background_command(self.logcat_command)
         self.was_ever_running = False
 
-    async def start_observer(self):
-        # TODO: async restart logcat as needed
-        # TODO: async warn if file not growing as needed
-        pass
+    async def run_observer(self) -> None:
+        last_size = 0
+        if not os.path.exists(self.logcat_artifact):
+            self.logger.warning(f"Logcat artifact does not exist yes, this might be normal at the start of execution")
+            asyncio.sleep(15)
+        while True:
+            try:
+                new_size = os.path.getsize(self.logcat_artifact)
+                if not (new_size > last_size):
+                    self.logger.error(f"Logcat file not growing for {self.platform.device_id}, check connection!")
+                last_size = new_size
+            except OSError:
+                self.logger.error(f"Logcat file does not exist for {self.platfrom.device_id}, check connection!")
+            if not self.logcat_proc.command_is_running():
+                self.logger.error(f"Logcat proc is not running, trying to restart!")
+                self.logcat_proc = self.platform.get_adb_background_command(self.logcat_command)
+                self.logcat_proc.start_command()
+            await asyncio.sleep(4)
 
     async def start(self):
         self.logcat_proc.start_command()

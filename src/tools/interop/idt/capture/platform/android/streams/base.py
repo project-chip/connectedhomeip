@@ -25,5 +25,9 @@ class AndroidStream(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def run_observer(self) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
     async def stop(self) -> None:
         raise NotImplementedError

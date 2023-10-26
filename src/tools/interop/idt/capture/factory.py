@@ -144,15 +144,23 @@ class EcosystemController:
     @staticmethod
     async def run_analyzers():
         border_print("Starting real time analysis, press enter to stop!", important=True)
-        tasks = []
+        analysis_tasks = []
+        monitor_tasks = []
+        for platform_name, platform in _PLATFORM_MAP.items():
+            logger.info(f"Creating monitor task for {platform_name}")
+            monitor_tasks.append(asyncio.create_task(platform.run_observers()))
         for ecosystem_name, ecosystem in _ECOSYSTEM_MAP.items():
             logger.info(f"Creating analysis task for {ecosystem_name}")
-            tasks.append(asyncio.create_task(ecosystem.analyze_capture()))
+            analysis_tasks.append(asyncio.create_task(ecosystem.analyze_capture()))
         logger.info("Done creating analysis tasks")
         await asyncio.get_event_loop().run_in_executor(
             None, sys.stdin.readline)
+        border_print("Cancelling monitor tasks")
+        for task in monitor_tasks:
+            task.cancel()
+        logger.info("Done cancelling monitor tasks")
         border_print("Cancelling analysis tasks")
-        for task in tasks:
+        for task in analysis_tasks:
             task.cancel()
         logger.info("Done cancelling analysis tasks")
 

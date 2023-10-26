@@ -16,7 +16,6 @@
 #
 
 import asyncio
-import multiprocessing
 import os
 from typing import TYPE_CHECKING
 
@@ -74,13 +73,20 @@ class ScreenRecorder(AndroidStream):
 
     async def start(self):
         await self.prepare_screen_recording()
-        if self.check_screen() and not self.screen_pull:
-            # TODO: Make screen recording run on loop, replace removed multiproc solution with async
+        if self.check_screen():
             self.screen_pull = True
             self.update_commands()
-            self.logger.info(f"New screen recording file started {self.screen_phone_out_path} {self.screen_artifact}")
             self.screen_proc = self.platform.get_adb_background_command(self.screen_command)
             self.screen_proc.start_command()
+            self.logger.info(f"New screen recording file started {self.screen_phone_out_path} {self.screen_artifact}")
+
+    async def run_observer(self) -> None:
+        while True:
+            if not self.screen_proc.command_is_running():
+                self.logger.error(f"Screen recording proc not running for {self.platform.device_id}, check connection!")
+
+                await self.start()
+            await asyncio.sleep(4)
 
     async def pull_screen_recording(self) -> None:
         if self.screen_pull:
