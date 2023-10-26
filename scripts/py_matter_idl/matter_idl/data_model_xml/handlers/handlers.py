@@ -17,7 +17,7 @@ import logging
 from typing import Optional
 from xml.sax.xmlreader import AttributesImpl
 
-from matter_idl.matter_idl_types import (Attribute, AttributeQuality, Bitmap, Cluster, ClusterSide, Command, CommandQuality,
+from matter_idl.matter_idl_types import (ApiMaturity, Attribute, AttributeQuality, Bitmap, Cluster, ClusterSide, Command, CommandQuality,
                                          ConstantEntry, DataType, Enum, Field, FieldQuality, Idl, Struct, StructTag)
 
 from .base import BaseHandler, HandledDepth
@@ -29,7 +29,7 @@ from .parsing import (ApplyConstraint, AttributesToAttribute, AttributesToBitFie
 LOGGER = logging.getLogger('data-model-xml-parser')
 
 
-def is_unused_name(attrs):
+def is_unused_name(attrs: AttributesImpl):
     """Existing XML adds various entries for base/derived reserved items.
 
        Those items seem to have no actual meaning.
@@ -53,7 +53,7 @@ class FeaturesHandler(BaseHandler):
         if self._bitmap.entries:
             self._cluster.bitmaps.append(self._bitmap)
 
-    def GetNextProcessor(self, name: str, attrs):
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name in {"section", "optionalConform"}:
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "feature":
@@ -71,7 +71,7 @@ class FeaturesHandler(BaseHandler):
 
 
 class BitmapHandler(BaseHandler):
-    def __init__(self, context: Context, cluster: Cluster, attrs):
+    def __init__(self, context: Context, cluster: Cluster, attrs: AttributesImpl):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._cluster = cluster
 
@@ -106,7 +106,7 @@ class BitmapHandler(BaseHandler):
 
         self._cluster.bitmaps.append(self._bitmap)
 
-    def GetNextProcessor(self, name: str, attrs):
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "section":
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
@@ -125,7 +125,7 @@ class MandatoryConfirmFieldHandler(BaseHandler):
         self._field = field
         self._hadConditions = False
 
-    def GetNextProcessor(self, name: str, attrs):
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         self._hadConditions = True
         return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
 
@@ -141,7 +141,7 @@ class FieldHandler(BaseHandler):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._field = field
 
-    def GetNextProcessor(self, name: str, attrs):
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "constraint":
             ApplyConstraint(attrs, self._field)
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
@@ -183,7 +183,7 @@ class FieldHandler(BaseHandler):
 
 
 class StructHandler(BaseHandler):
-    def __init__(self, context: Context, cluster: Cluster, attrs):
+    def __init__(self, context: Context, cluster: Cluster, attrs: AttributesImpl):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._cluster = cluster
         self._struct = Struct(name=NormalizeName(attrs["name"]), fields=[])
@@ -191,7 +191,7 @@ class StructHandler(BaseHandler):
     def EndProcessing(self):
         self._cluster.structs.append(self._struct)
 
-    def GetNextProcessor(self, name: str, attrs):
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "section":
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
@@ -204,7 +204,7 @@ class StructHandler(BaseHandler):
 
 
 class EventHandler(BaseHandler):
-    def __init__(self, context: Context, cluster: Cluster, attrs):
+    def __init__(self, context: Context, cluster: Cluster, attrs: AttributesImpl):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._cluster = cluster
         self._event = AttributesToEvent(attrs)
@@ -212,7 +212,7 @@ class EventHandler(BaseHandler):
     def EndProcessing(self):
         self._cluster.events.append(self._event)
 
-    def GetNextProcessor(self, name: str, attrs):
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "section":
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
@@ -233,7 +233,7 @@ class EventHandler(BaseHandler):
 
 
 class EnumHandler(BaseHandler):
-    def __init__(self, context: Context, cluster: Cluster, attrs):
+    def __init__(self, context: Context, cluster: Cluster, attrs: AttributesImpl):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._cluster = cluster
 
@@ -260,7 +260,7 @@ class EnumHandler(BaseHandler):
 
         self._cluster.enums.append(self._enum)
 
-    def GetNextProcessor(self, name: str, attrs):
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "section":
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
@@ -287,7 +287,7 @@ class EventsHandler(BaseHandler):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._cluster = cluster
 
-    def GetNextProcessor(self, name: str, attrs):
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "section":
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
@@ -298,7 +298,7 @@ class EventsHandler(BaseHandler):
 
 
 class AttributeHandler(BaseHandler):
-    def __init__(self, context: Context, cluster: Cluster, attrs):
+    def __init__(self, context: Context, cluster: Cluster, attrs: AttributesImpl):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._cluster = cluster
         self._attribute = AttributesToAttribute(attrs)
@@ -311,7 +311,7 @@ class AttributeHandler(BaseHandler):
 
         self._cluster.attributes.append(self._attribute)
 
-    def GetNextProcessor(self, name: str, attrs):
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "enum":
             LOGGER.warning(
                 f"Anonymous enumeration not supported when handling attribute {self._cluster.name}::{self._attribute.definition.name}")
@@ -348,6 +348,9 @@ class AttributeHandler(BaseHandler):
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "mandatoryConform":
             return MandatoryConfirmFieldHandler(self.context, self._attribute.definition)
+        elif name == "provisionalConform":
+            self._attribute.api_maturity = ApiMaturity.PROVISIONAL
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "deprecateConform":
             self._deprecated = True
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
@@ -363,7 +366,7 @@ class AttributesHandler(BaseHandler):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._cluster = cluster
 
-    def GetNextProcessor(self, name: str, attrs):
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "attribute":
             if is_unused_name(attrs):
                 LOGGER.warn(f"Ignoring attribute data for {attrs['name']}")
@@ -374,7 +377,7 @@ class AttributesHandler(BaseHandler):
 
 
 class CommandHandler(BaseHandler):
-    def __init__(self, context: Context, cluster: Cluster, attrs):
+    def __init__(self, context: Context, cluster: Cluster, attrs: AttributesImpl):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._cluster = cluster
         self._command: Optional[Command] = None
@@ -435,7 +438,7 @@ class CommandHandler(BaseHandler):
         if self._command:
             self._cluster.commands.append(self._command)
 
-    def GetNextProcessor(self, name: str, attrs):
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name in {"mandatoryConform", "optionalConform", "disallowConform"}:
             # Unclear how commands may be optional or mandatory
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
@@ -525,7 +528,7 @@ class ClusterHandler(BaseHandler):
     """ Handling /cluster elements."""
 
     @staticmethod
-    def ForAttributes(context: Context, idl: Idl, attrs):
+    def ForAttributes(context: Context, idl: Idl, attrs: AttributesImpl):
         assert ("name" in attrs)
         assert ("id" in attrs)
 
@@ -573,7 +576,7 @@ class ClusterHandler(BaseHandler):
             ), qualities=AttributeQuality.READABLE))
         self._idl.clusters.append(self._cluster)
 
-    def GetNextProcessor(self, name: str, attrs):
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "revisionHistory":
             # Revision history COULD be used to find the latest revision of a cluster
             # however current IDL files do NOT have a revision info field

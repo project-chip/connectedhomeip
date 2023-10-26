@@ -82,7 +82,7 @@ class Context:
         self.file_name = None
         self._not_handled: set[str] = set()
         self._idl_post_processors: list[IdlPostProcessor] = []
-        self.base_clusters: map[str, Cluster] = {}
+        self.base_clusters: dict[str, Cluster] = {}
 
     def AddBaseCluster(self, name: str, parse_meta: Optional[ParseMetaData] = None) -> Cluster:
         """Creates a new cluster entry for the given name in the list of known
@@ -92,7 +92,7 @@ class Context:
 
         cluster = Cluster(side=ClusterSide.CLIENT, name=name,
                           code=-1, parse_meta=parse_meta)
-        self.base_clusters = cluster
+        self.base_clusters[name] = cluster
 
         return cluster
 
