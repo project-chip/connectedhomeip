@@ -672,6 +672,14 @@ server cluster NetworkCommissioning = 49 {
     kEthernetNetworkInterface = 0x4;
   }
 
+  bitmap ThreadCapabilitiesBitmap : bitmap16 {
+    kIsBorderRouterCapable = 0x1;
+    kIsRouterCapable = 0x2;
+    kIsSleepyEndDeviceCapable = 0x4;
+    kIsFullThreadDevice = 0x8;
+    kIsSynchronizedSleepyEndDeviceCapable = 0x10;
+  }
+
   bitmap WiFiSecurityBitmap : bitmap8 {
     kUnencrypted = 0x1;
     kWEP = 0x2;
@@ -1411,7 +1419,7 @@ endpoint 1 {
   }
 }
 endpoint 65534 {
-  device type ma_secondary_network_commissioning = 61442, version 1;
+  device type ma_secondary_network_commissioning = 4293984258, version 1;
 
 
   server cluster Descriptor {
@@ -1419,6 +1427,10 @@ endpoint 65534 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
   }
@@ -1432,6 +1444,10 @@ endpoint 65534 {
     callback attribute lastNetworkingStatus;
     callback attribute lastNetworkID;
     callback attribute lastConnectErrorValue;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     callback attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
 

@@ -3499,6 +3499,7 @@
           "define": "FAN_CONTROL_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "attributes": [
             {
               "name": "FeatureMap",

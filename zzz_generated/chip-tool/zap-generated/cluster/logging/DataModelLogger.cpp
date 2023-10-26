@@ -6513,6 +6513,21 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("LastConnectErrorValue", 1, value);
         }
+        case NetworkCommissioning::Attributes::SupportedWiFiBands::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::WiFiBandEnum> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedWiFiBands", 1, value);
+        }
+        case NetworkCommissioning::Attributes::SupportedThreadFeatures::Id: {
+            chip::BitMask<chip::app::Clusters::NetworkCommissioning::ThreadCapabilitiesBitmap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("SupportedThreadFeatures", 1, value);
+        }
+        case NetworkCommissioning::Attributes::ThreadVersion::Id: {
+            uint16_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ThreadVersion", 1, value);
+        }
         case NetworkCommissioning::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -7951,15 +7966,15 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
     case IcdManagement::Id: {
         switch (path.mAttributeId)
         {
-        case IcdManagement::Attributes::IdleModeInterval::Id: {
+        case IcdManagement::Attributes::IdleModeDuration::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("IdleModeInterval", 1, value);
+            return DataModelLogger::LogValue("IdleModeDuration", 1, value);
         }
-        case IcdManagement::Attributes::ActiveModeInterval::Id: {
+        case IcdManagement::Attributes::ActiveModeDuration::Id: {
             uint32_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ActiveModeInterval", 1, value);
+            return DataModelLogger::LogValue("ActiveModeDuration", 1, value);
         }
         case IcdManagement::Attributes::ActiveModeThreshold::Id: {
             uint16_t value;
@@ -8266,11 +8281,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentMode", 1, value);
         }
-        case RvcRunMode::Attributes::StartUpMode::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("StartUpMode", 1, value);
-        }
         case RvcRunMode::Attributes::OnMode::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
@@ -8321,11 +8331,6 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             uint8_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentMode", 1, value);
-        }
-        case RvcCleanMode::Attributes::StartUpMode::Id: {
-            chip::app::DataModel::Nullable<uint8_t> value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("StartUpMode", 1, value);
         }
         case RvcCleanMode::Attributes::OnMode::Id: {
             chip::app::DataModel::Nullable<uint8_t> value;

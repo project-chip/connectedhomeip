@@ -336,6 +336,14 @@ server cluster NetworkCommissioning = 49 {
     kEthernetNetworkInterface = 0x4;
   }
 
+  bitmap ThreadCapabilitiesBitmap : bitmap16 {
+    kIsBorderRouterCapable = 0x1;
+    kIsRouterCapable = 0x2;
+    kIsSleepyEndDeviceCapable = 0x4;
+    kIsFullThreadDevice = 0x8;
+    kIsSynchronizedSleepyEndDeviceCapable = 0x10;
+  }
+
   bitmap WiFiSecurityBitmap : bitmap8 {
     kUnencrypted = 0x1;
     kWEP = 0x2;
@@ -1184,7 +1192,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ChangeToMode;
     handle command ChangeToModeResponse;
@@ -1198,7 +1206,7 @@ endpoint 1 {
     callback attribute eventList;
     callback attribute attributeList;
     callback attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    ram      attribute clusterRevision default = 2;
 
     handle command ChangeToMode;
     handle command ChangeToModeResponse;

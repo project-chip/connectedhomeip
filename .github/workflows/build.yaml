@@ -40,7 +40,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:21
+            image: ghcr.io/project-chip/chip-build:22
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -85,17 +85,21 @@ jobs:
             # - name: Upload Code Coverage
             #   if: ${{ contains('main', env.BUILD_TYPE) }}
             #   run: bash <(curl -s https://codecov.io/bash)
-            - name: Setup Build Without Detail Logging
+            - name: Set up Build Without Detail Logging
               run: scripts/build/gn_gen.sh --args="chip_detail_logging=false"
             - name: Run Build Without Detail Logging
               run: scripts/run_in_build_env.sh "ninja -C ./out"
-            - name: Setup Build Without Progress Logging
+            - name: Set up Build Without Progress Logging
               run: scripts/build/gn_gen.sh --args="chip_detail_logging=false chip_progress_logging=false"
             - name: Run Build Without Progress Logging
               run: scripts/run_in_build_env.sh "ninja -C ./out"
-            - name: Setup Build Without Error Logging
+            - name: Set up Build Without Error Logging
               run: scripts/build/gn_gen.sh --args="chip_detail_logging=false chip_progress_logging=false chip_error_logging=false"
             - name: Run Build Without Error Logging
+              run: scripts/run_in_build_env.sh "ninja -C ./out"
+            - name: Set up Build Without Logging
+              run: scripts/build/gn_gen.sh --args="chip_logging=false"
+            - name: Run Build Without Logging
               run: scripts/run_in_build_env.sh "ninja -C ./out"
             - name: Uploading core files
               uses: actions/upload-artifact@v3
@@ -131,7 +135,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:21
+            image: ghcr.io/project-chip/chip-build:22
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -279,7 +283,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:21
+            image: ghcr.io/project-chip/chip-build:22
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -339,7 +343,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:21
+            image: ghcr.io/project-chip/chip-build:22
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --sysctl "net.ipv6.conf.all.disable_ipv6=0
@@ -447,7 +451,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:21
+            image: ghcr.io/project-chip/chip-build:22
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0

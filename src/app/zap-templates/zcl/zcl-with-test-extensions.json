@@ -197,8 +197,8 @@
             "FeatureMap"
         ],
         "ICD Management": [
-            "IdleModeInterval",
-            "ActiveModeInterval",
+            "IdleModeDuration",
+            "ActiveModeDuration",
             "ActiveModeThreshold",
             "RegisteredClients",
             "ICDCounter",
@@ -340,14 +340,12 @@
         "RVC Clean Mode": [
             "SupportedModes",
             "CurrentMode",
-            "StartUpMode",
             "OnMode",
             "FeatureMap"
         ],
         "RVC Run Mode": [
             "SupportedModes",
             "CurrentMode",
-            "StartUpMode",
             "OnMode",
             "FeatureMap"
         ],

@@ -18,8 +18,7 @@
  */
 
 #pragma once
-#include <lock/AppEvent.h>
-#include <lock/BoltLockManager.h>
+#include "AppEvent.h"
 #include <platform/CHIPDeviceLayer.h>
 
 // Application-defined error codes in the CHIP_ERROR space.
@@ -39,13 +38,9 @@ public:
     void PostEvent(const AppEvent * event);
     void ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction);
     static void ButtonPressedAction(AppEvent * aEvent);
-    CHIP_ERROR LockInit();
 
 private:
     CHIP_ERROR Init();
-
-    static void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(BoltLockManager::Action_t aAction);
 
     void StartTimer(uint32_t aTimeoutMs);
     void CancelTimer(void);

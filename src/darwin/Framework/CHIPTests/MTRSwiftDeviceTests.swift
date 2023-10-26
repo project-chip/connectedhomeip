@@ -7,8 +7,8 @@ struct DeviceConstants {
     static let testVendorID = 0xFFF1
     static let onboardingPayload = "MT:-24J0AFN00KA0648G00"
     static let deviceID = 0x12344321
-    static let timeoutInSeconds : UInt16 = 3
-    static let pairingTimeoutInSeconds : UInt16 = 10
+    static let timeoutInSeconds : Double = 3
+    static let pairingTimeoutInSeconds : Double = 10
 }
 
 var sConnectedDevice: MTRBaseDevice? = nil
@@ -100,8 +100,8 @@ class MTRSwiftDeviceTestDelegate : NSObject, MTRDeviceDelegate {
 // Because we are using things from Matter.framework that are flagged
 // as only being available starting with macOS 13.5, we need to flag our
 // code with the same availability annotation.
-@available(macOS, introduced: 14.1)
-@available(iOS, introduced: 17.1)
+@available(macOS, introduced: 14.2)
+@available(iOS, introduced: 17.2)
 class MTRSwiftDeviceTests : XCTestCase {
     static var sStackInitRan : Bool = false
     static var sNeedsStackShutdown : Bool = true
@@ -191,7 +191,7 @@ class MTRSwiftDeviceTests : XCTestCase {
             XCTFail("Could not start setting up PASE session: \(error)")
             return        }
 
-        wait(for: [expectation], timeout: TimeInterval(DeviceConstants.pairingTimeoutInSeconds))
+        wait(for: [expectation], timeout: DeviceConstants.pairingTimeoutInSeconds)
     }
 
     static func shutdownStack()
@@ -291,6 +291,22 @@ class MTRSwiftDeviceTests : XCTestCase {
 
         XCTAssertNotEqual(attributeReportsReceived, 0)
         XCTAssertNotEqual(eventReportsReceived, 0)
+
+        // Check that we can read one of those attributes we received.
+        let descriptorCluster = MTRClusterDescriptor(device: device, endpointID: 0)
+        let partsListDictionary = descriptorCluster.readAttributePartsList(with: nil)
+        XCTAssertNotNil(partsListDictionary);
+
+        let path = MTRAttributePath(endpointID: 0,
+                                     clusterID: MTRClusterIDType.descriptorID.rawValue as NSNumber,
+                                   attributeID: MTRAttributeIDType.clusterDescriptorAttributePartsListID.rawValue as NSNumber)
+        let responseValue : [String: Any] = [
+            MTRAttributePathKey: path,
+            MTRDataKey: partsListDictionary!,
+        ]
+        let report = try! MTRAttributeReport(responseValue: responseValue)
+        XCTAssertNotNil(report.value)
+        XCTAssertTrue(report.value is [NSNumber])
 
         // Before resubscribe, first test write failure and expected value effects
         let testEndpointID = 1 as NSNumber
@@ -396,12 +412,157 @@ class MTRSwiftDeviceTests : XCTestCase {
         XCTAssertEqual(eventReportsReceived, 0);
     }
 
+    func test018_SubscriptionErrorWhenNotResubscribing()
+    {
+        let device = sConnectedDevice!
+        let queue = DispatchQueue.main
+
+        let firstSubscribeExpectation = expectation(description: "First subscription complete")
+        let errorExpectation = expectation(description: "First subscription errored out")
+
+        // Subscribe
+        let params = MTRSubscribeParams(minInterval: 1, maxInterval: 10)
+        params.shouldResubscribeAutomatically = false
+        params.shouldReplaceExistingSubscriptions = true // Not strictly needed, but checking that doing this does not
+                                                         // affect this subscription erroring out correctly.
+        var subscriptionEstablished = false
+        device.subscribeToAttributes(withEndpointID: 1,
+                                     clusterID: 6,
+                                     attributeID: 0,
+                                     params: params,
+                                     queue: queue,
+                                     reportHandler: { values, error in
+            if (subscriptionEstablished) {
+                // We should only get an error here.
+                XCTAssertNil(values)
+                XCTAssertNotNil(error)
+                errorExpectation.fulfill()
+            } else {
+                XCTAssertNotNil(values)
+                XCTAssertNil(error)
+            }
+        },
+                                     subscriptionEstablished: {
+            NSLog("subscribe attribute: OnOff established")
+            XCTAssertFalse(subscriptionEstablished)
+            subscriptionEstablished = true
+            firstSubscribeExpectation.fulfill()
+        })
+
+        // Wait till establishment
+        wait(for: [ firstSubscribeExpectation ], timeout: DeviceConstants.timeoutInSeconds)
+
+        // Create second subscription which will cancel the first subscription.  We
+        // can use a non-existent path here to cut down on the work that gets done.
+        params.shouldReplaceExistingSubscriptions = true
+
+        device.subscribeToAttributes(withEndpointID: 10000,
+                                     clusterID: 6,
+                                     attributeID: 0,
+                                     params: params,
+                                     queue: queue,
+                                     reportHandler: { _, _ in
+        })
+        wait(for: [ errorExpectation ], timeout: 60)
+    }
+
+    func test019_MTRDeviceMultipleCommands() async
+    {
+        let device = MTRDevice(nodeID: DeviceConstants.deviceID as NSNumber, controller:sController!)
+        let queue = DispatchQueue.main
+
+        let opcredsCluster = MTRClusterOperationalCredentials(device: device, endpointID: 0, queue: queue)!
+        let onOffCluster = MTRClusterOnOff(device: device, endpointID: 1, queue: queue)!
+        let badOnOffCluster = MTRClusterOnOff(device: device, endpointID: 0, queue: queue)!
+
+        // Ensure our existing fabric label is not "Test".  This uses a "base"
+        // cluster to ensure read-through to the other side.
+        let baseOpCredsCluster = MTRBaseClusterOperationalCredentials(device: sConnectedDevice!, endpointID: 0, queue: queue)!
+        var fabricList = try! await baseOpCredsCluster.readAttributeFabrics(with: nil)
+        XCTAssertEqual(fabricList.count, 1)
+        var entry = fabricList[0] as! MTROperationalCredentialsClusterFabricDescriptorStruct
+        XCTAssertNotEqual(entry.label, "Test")
+
+        let currentFabricIndex = try! await baseOpCredsCluster.readAttributeCurrentFabricIndex()
+
+        // NOTE: The command invocations do not use "await", because we actually want
+        // to do them all sort of in parallel, or at least queue them all on the MTRDevice
+        // before we get a chance to finish the first one.
+        let onExpectation = expectation(description: "On command executed")
+        onOffCluster.on(withExpectedValues: nil, expectedValueInterval: nil) { error in
+            XCTAssertNil(error)
+            onExpectation.fulfill()
+        }
+
+        let offFailedExpectation = expectation(description: "Off command failed")
+        badOnOffCluster.off(withExpectedValues: nil, expectedValueInterval: nil) { error in
+            XCTAssertNotNil(error)
+            offFailedExpectation.fulfill()
+        }
+
+        let updateLabelExpectation = expectation(description: "Fabric label updated")
+        let params = MTROperationalCredentialsClusterUpdateFabricLabelParams()
+        params.label = "Test"
+        opcredsCluster.updateFabricLabel(with: params, expectedValues: nil, expectedValueInterval: nil) { data, error in
+            XCTAssertNil(error)
+            XCTAssertNotNil(data)
+            XCTAssertEqual(data?.statusCode, 0)
+            XCTAssertEqual(data?.fabricIndex, currentFabricIndex)
+            updateLabelExpectation.fulfill()
+        }
+
+        let offExpectation = expectation(description: "Off command executed")
+        // Send this one via MTRDevice, to test that codepath
+        device.invokeCommand(withEndpointID: 1,
+                             clusterID: NSNumber(value: MTRClusterIDType.onOffID.rawValue),
+                             commandID: NSNumber(value: MTRCommandIDType.clusterOnOffCommandOffID.rawValue),
+                             commandFields: nil,
+                             expectedValues: nil,
+                             expectedValueInterval: nil,
+                             queue: queue) { data, error in
+            XCTAssertNil(error)
+            offExpectation.fulfill()
+        }
+
+        let onFailedExpectation = expectation(description: "On command failed")
+        badOnOffCluster.on(withExpectedValues: nil, expectedValueInterval: nil) { error in
+            XCTAssertNotNil(error)
+            onFailedExpectation.fulfill()
+        }
+
+        let updateLabelFailedExpectation = expectation(description: "Fabric label update failed")
+        params.label = "12345678901234567890123445678901234567890" // Too long
+        opcredsCluster.updateFabricLabel(with: params,
+                                         expectedValues: nil,
+                                         expectedValueInterval: nil) { data, error in
+            XCTAssertNotNil(error)
+            XCTAssertNil(data)
+            updateLabelFailedExpectation.fulfill()
+        }
+
+        wait(for: [ onExpectation,
+                    offFailedExpectation,
+                    updateLabelExpectation,
+                    offExpectation,
+                    onFailedExpectation,
+                    updateLabelFailedExpectation ],
+             timeout: 60,
+             enforceOrder: true)
+
+        // Now make sure our fabric label got updated.
+        fabricList = try! await baseOpCredsCluster.readAttributeFabrics(with: nil)
+        XCTAssertNotNil(fabricList)
+        XCTAssertEqual(fabricList.count, 1)
+        entry = fabricList[0] as! MTROperationalCredentialsClusterFabricDescriptorStruct
+        XCTAssertEqual(entry.label, "Test")
+    }
+
     // Note: test027_AttestationChallenge is not implementable in Swift so far,
     // because the attestationChallenge property is internal-only
 
     func test999_TearDown()
     {
-        ResetCommissionee(sConnectedDevice, DispatchQueue.main, self, DeviceConstants.timeoutInSeconds)
+        ResetCommissionee(sConnectedDevice, DispatchQueue.main, self, UInt16(DeviceConstants.timeoutInSeconds))
         type(of: self).shutdownStack()
     }
 }

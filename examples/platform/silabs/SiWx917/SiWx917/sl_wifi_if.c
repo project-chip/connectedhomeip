@@ -265,14 +265,12 @@ static sl_status_t wfx_rsi_init(void)
         return status;
     }
 #endif
-
     status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, (sl_mac_address_t *) &wfx_rsi.sta_mac.octet[0]);
     if (status != SL_STATUS_OK)
     {
         SILABS_LOG("sl_wifi_get_mac_address failed: %x", status);
         return status;
     }
-
     wfx_rsi.events = xEventGroupCreateStatic(&rsiDriverEventGroup);
     wfx_rsi.dev_state |= WFX_RSI_ST_DEV_READY;
     osSemaphoreRelease(sl_rs_ble_init_sem);
@@ -400,14 +398,19 @@ static void wfx_rsi_save_ap_info() // translation
         return;
     }
     wfx_rsi.dev_state |= WFX_RSI_ST_SCANSTARTED;
-    sl_status_t status                                   = SL_STATUS_OK;
+    sl_status_t status = SL_STATUS_OK;
+#ifndef EXP_BOARD // TODO: this changes will be reverted back after the SDK team fix the scan API
     sl_wifi_scan_configuration_t wifi_scan_configuration = { 0 };
     wifi_scan_configuration                              = default_wifi_scan_configuration;
+#endif
     sl_wifi_ssid_t ssid_arg;
     ssid_arg.length = strlen(wfx_rsi.sec.ssid);
     memcpy(ssid_arg.value, (int8_t *) &wfx_rsi.sec.ssid[0], ssid_arg.length);
     sl_wifi_set_scan_callback(scan_callback_handler, NULL);
+#ifndef EXP_BOARD
+    // TODO: this changes will be reverted back after the SDK team fix the scan API
     status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &ssid_arg, &wifi_scan_configuration);
+#endif
     if (SL_STATUS_IN_PROGRESS == status)
     {
         const uint32_t start = osKernelGetTickCount();
@@ -510,6 +513,7 @@ static sl_status_t wfx_rsi_do_join(void)
         {
             while (is_wifi_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)
             {
+                SILABS_LOG("%s: Wifi connect failed with status: %x", __func__, status);
                 SILABS_LOG("%s: failed. retry: %d", __func__, wfx_rsi.join_retries);
                 wfx_retry_interval_handler(is_wifi_disconnection_event, wfx_rsi.join_retries++);
                 if (is_wifi_disconnection_event || wfx_rsi.join_retries <= WFX_RSI_CONFIG_MAX_JOIN)

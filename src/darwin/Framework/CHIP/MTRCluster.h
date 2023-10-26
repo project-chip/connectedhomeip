@@ -39,6 +39,11 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRCluster : NSObject
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
+
+/**
+ * The endpoint this cluster lives on.
+ */
+@property (nonatomic, readonly) NSNumber * endpointID NS_REFINED_FOR_SWIFT MTR_NEWLY_AVAILABLE;
 @end
 
 /**

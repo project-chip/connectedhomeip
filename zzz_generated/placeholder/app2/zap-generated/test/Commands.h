@@ -815,7 +815,7 @@ private:
 class Test_TC_CC_5_4_SimulatedSuite : public TestCommand
 {
 public:
-    Test_TC_CC_5_4_SimulatedSuite() : TestCommand("Test_TC_CC_5_4_Simulated", 25)
+    Test_TC_CC_5_4_SimulatedSuite() : TestCommand("Test_TC_CC_5_4_Simulated", 9)
     {
         AddArgument("nodeId", 0, UINT64_MAX, &mNodeId);
         AddArgument("cluster", &mCluster);
@@ -845,19 +845,19 @@ private:
 
         switch (mTestIndex - 1)
         {
+        case 2:
+            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
+            shouldContinue = true;
+            break;
         case 4:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
-        case 10:
+        case 6:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
-        case 16:
-            VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
-            shouldContinue = true;
-            break;
-        case 22:
+        case 8:
             VerifyOrReturn(CheckValue("status", chip::to_underlying(status.mStatus), 0));
             shouldContinue = true;
             break;
@@ -886,14 +886,16 @@ private:
             return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveToColor::Id);
         }
         case 2: {
-            LogStep(2, "DUT reads CurrentX attribute from TH(potentially multiple times)");
-            VerifyOrDo(!ShouldSkip("CC.C.C07.Tx && CC.C.A0003 && CC.C.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentX::Id);
+            LogStep(2, "Wait for ConfigTransitionTime");
+            ListFreer listFreer;
+            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
+            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
+            return WaitForMs(kIdentityAlpha, value);
         }
         case 3: {
-            LogStep(3, "DUT reads CurrentY attribute from TH(potentially multiple times)");
-            VerifyOrDo(!ShouldSkip("CC.C.C07.Tx && CC.C.A0004 && CC.C.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentY::Id);
+            LogStep(3, "DUT sends MoveColor command to TH");
+            VerifyOrDo(!ShouldSkip("CC.C.C08.Tx && CC.C.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
+            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColor::Id);
         }
         case 4: {
             LogStep(4, "Wait for ConfigTransitionTime");
@@ -903,112 +905,28 @@ private:
             return WaitForMs(kIdentityAlpha, value);
         }
         case 5: {
-            LogStep(5, "DUT reads CurrentX attribute from TH(potentially multiple times)");
-            VerifyOrDo(!ShouldSkip("CC.C.C07.Tx && CC.C.A0003 && CC.C.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentX::Id);
-        }
-        case 6: {
-            LogStep(6, "DUT reads CurrentY attribute from TH(potentially multiple times)");
-            VerifyOrDo(!ShouldSkip("CC.C.C07.Tx && CC.C.A0004 && CC.C.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentY::Id);
-        }
-        case 7: {
-            LogStep(7, "DUT sends MoveColor command to TH");
-            VerifyOrDo(!ShouldSkip("CC.C.C08.Tx && CC.C.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::MoveColor::Id);
-        }
-        case 8: {
-            LogStep(8, "DUT reads CurrentX attribute from TH(potentially multiple times)");
-            VerifyOrDo(!ShouldSkip("CC.C.C08.Tx && CC.C.A0003 && CC.C.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentX::Id);
-        }
-        case 9: {
-            LogStep(9, "DUT reads CurrentY attribute from TH(potentially multiple times)");
-            VerifyOrDo(!ShouldSkip("CC.C.C08.Tx && CC.C.A0004 && CC.C.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentY::Id);
-        }
-        case 10: {
-            LogStep(10, "Wait for ConfigTransitionTime");
-            ListFreer listFreer;
-            chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
-            value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
-            return WaitForMs(kIdentityAlpha, value);
-        }
-        case 11: {
-            LogStep(11, "DUT reads CurrentX attribute from TH(potentially multiple times)");
-            VerifyOrDo(!ShouldSkip("CC.C.C08.Tx && CC.C.A0003 && CC.C.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentX::Id);
-        }
-        case 12: {
-            LogStep(12, "DUT reads CurrentY attribute from TH(potentially multiple times)");
-            VerifyOrDo(!ShouldSkip("CC.C.C08.Tx && CC.C.A0004 && CC.C.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentY::Id);
-        }
-        case 13: {
-            LogStep(13, "DUT sends StepColor command to TH");
+            LogStep(5, "DUT sends StepColor command to TH");
             VerifyOrDo(!ShouldSkip("CC.C.C09.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StepColor::Id);
         }
-        case 14: {
-            LogStep(14, "DUT reads CurrentX attribute from TH(potentially multiple times)");
-            VerifyOrDo(!ShouldSkip("CC.C.C09.Tx && CC.C.A0003 && CC.C.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentX::Id);
-        }
-        case 15: {
-            LogStep(15, "DUT reads CurrentY attribute from TH(potentially multiple times)");
-            VerifyOrDo(!ShouldSkip("CC.C.C09.Tx && CC.C.A0004 && CC.C.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentY::Id);
-        }
-        case 16: {
-            LogStep(16, "Wait for ConfigTransitionTime");
+        case 6: {
+            LogStep(6, "Wait for ConfigTransitionTime");
             ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
             return WaitForMs(kIdentityAlpha, value);
         }
-        case 17: {
-            LogStep(17, "DUT reads CurrentX attribute from TH(potentially multiple times)");
-            VerifyOrDo(!ShouldSkip("CC.C.C09.Tx && CC.C.A0003 && CC.C.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentX::Id);
-        }
-        case 18: {
-            LogStep(18, "DUT reads CurrentY attribute from TH(potentially multiple times)");
-            VerifyOrDo(!ShouldSkip("CC.C.C09.Tx && CC.C.A0004 && CC.C.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentY::Id);
-        }
-        case 19: {
-            LogStep(19, "DUT sends StopMoveStep command to TH");
+        case 7: {
+            LogStep(7, "DUT sends StopMoveStep command to TH");
             VerifyOrDo(!ShouldSkip("CC.C.C47.Tx"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
             return WaitCommand(GetEndpoint(1), ColorControl::Id, ColorControl::Commands::StopMoveStep::Id);
         }
-        case 20: {
-            LogStep(20, "DUT reads CurrentX attribute from TH(potentially multiple times)");
-            VerifyOrDo(!ShouldSkip("CC.C.C47.Tx && CC.C.A0003 && CC.C.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentX::Id);
-        }
-        case 21: {
-            LogStep(21, "DUT reads CurrentY attribute from TH(potentially multiple times)");
-            VerifyOrDo(!ShouldSkip("CC.C.C47.Tx && CC.C.A0004 && CC.C.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentY::Id);
-        }
-        case 22: {
-            LogStep(22, "Wait for ConfigTransitionTime");
+        case 8: {
+            LogStep(8, "Wait for ConfigTransitionTime");
             ListFreer listFreer;
             chip::app::Clusters::DelayCommands::Commands::WaitForMs::Type value;
             value.ms = mConfigTransitionTime.HasValue() ? mConfigTransitionTime.Value() : 3000UL;
             return WaitForMs(kIdentityAlpha, value);
-        }
-        case 23: {
-            LogStep(23, "DUT reads CurrentX attribute from TH(potentially multiple times)");
-            VerifyOrDo(!ShouldSkip("CC.C.C47.Tx && CC.C.A0003 && CC.C.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentX::Id);
-        }
-        case 24: {
-            LogStep(
-                24,
-                "DUT reads CurrentY attribute from ConfiguredTime: type: int16u defaultValue: 30000TH(potentially multiple times)");
-            VerifyOrDo(!ShouldSkip("CC.C.C47.Tx && CC.C.A0004 && CC.C.F03"), return ContinueOnChipMainThread(CHIP_NO_ERROR));
-            return WaitAttribute(GetEndpoint(1), ColorControl::Id, ColorControl::Attributes::CurrentY::Id);
         }
         }
         return CHIP_NO_ERROR;

@@ -55,21 +55,40 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0006" name="On/Off" revision="5">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0006" name="On/Off" revision="6">
   <revisionHistory>
     <revision revision="1" summary="Global mandatory ClusterRevision attribute added; CCB 1555"/>
     <revision revision="2" summary="ZLO 1.0: StartUpOnOff"/>
     <revision revision="3" summary="FeatureMap global attribute support with Level Control and Lighting feature"/>
     <revision revision="4" summary="New data model format and notation"/>
     <revision revision="5" summary="Addition of Dead Front behavior and associated FeatureMap entry"/>
+    <revision revision="6" summary="Addition of OffOnly feature and associated FeatureMap entry"/>
   </revisionHistory>
   <classification hierarchy="base" role="application" picsCode="OO" scope="Endpoint"/>
   <features>
     <feature bit="0" code="LT" name="Lighting" summary="Behavior that supports lighting applications.">
-      <optionalConform/>
+      <optionalConform>
+        <notTerm>
+          <feature name="OFFONLY"/>
+        </notTerm>
+      </optionalConform>
     </feature>
     <feature bit="1" code="DF" name="DeadFrontBehaviour" summary="Device has DeadFrontBehaviour Feature">
-      <optionalConform/>
+      <optionalConform>
+        <notTerm>
+          <feature name="OFFONLY"/>
+        </notTerm>
+      </optionalConform>
+    </feature>
+    <feature bit="2" code="OFFONLY" name="OffOnly" summary="Device supports the OffOnly Feature feature">
+      <optionalConform>
+        <notTerm>
+          <orTerm>
+            <feature name="LT"/>
+            <feature name="DF"/>
+          </orTerm>
+        </notTerm>
+      </optionalConform>
     </feature>
   </features>
   <dataTypes>
@@ -158,11 +177,19 @@ Davis, CA 95616, USA
     </command>
     <command id="0x01" name="On" response="Y">
       <access invokePrivilege="operate"/>
-      <mandatoryConform/>
+      <mandatoryConform>
+        <notTerm>
+          <feature name="OFFONLY"/>
+        </notTerm>
+      </mandatoryConform>
     </command>
     <command id="0x02" name="Toggle" response="Y">
       <access invokePrivilege="operate"/>
-      <mandatoryConform/>
+      <mandatoryConform>
+        <notTerm>
+          <feature name="OFFONLY"/>
+        </notTerm>
+      </mandatoryConform>
     </command>
     <command id="0x40" name="OffWithEffect" response="Y">
       <access invokePrivilege="operate"/>

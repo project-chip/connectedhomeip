@@ -1,0 +1,9 @@
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+matter_clusters_sources = [
+{%- for cluster in clientClusters | sort(attribute='name') %}
+{%- set typeLookup = idl | createLookupContext(cluster) %}
+  "${chip_root}/src/controller/java/generated/java/matter/devicecontroller/cluster/clusters/{{cluster.name}}Cluster.kt",
+{%- endfor %}
+]

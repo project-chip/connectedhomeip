@@ -21,7 +21,10 @@
 #include "../JNIDACProvider.h"
 #include "../support/ErrorConverter-JNI.h"
 #include "../support/RotatingDeviceIdUniqueIdProvider-JNI.h"
-#include "core/CastingApp.h" // from tv-casting-common
+
+// from tv-casting-common
+#include "core/CastingApp.h"
+#include "support/ChipDeviceEventHandler.h"
 
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/server/Server.h>
@@ -79,20 +82,25 @@ JNI_METHOD(jobject, finishStartup)(JNIEnv *, jobject)
 {
     chip::DeviceLayer::StackLock lock;
     ChipLogProgress(AppServer, "JNI_METHOD CastingAppJNI.finishStartup called");
-    auto & server = chip::Server::GetInstance();
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    auto & server  = chip::Server::GetInstance();
 
     // TODO: Set AppDelegate
     // &server.GetCommissioningWindowManager().SetAppDelegate(??);
 
     // Initialize binding handlers
-    chip::BindingManager::GetInstance().Init(
+    err = chip::BindingManager::GetInstance().Init(
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() });
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, support::createJMatterError(err),
+                        ChipLogError(AppServer, "Failed to init BindingManager %" CHIP_ERROR_FORMAT, err.Format()));
 
     // TODO: Set FabricDelegate
     // chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&mPersistenceManager);
 
-    // TODO: Add DeviceEvent Handler
-    // ReturnErrorOnFailure(DeviceLayer::PlatformMgrImpl().AddEventHandler(DeviceEventCallback, 0));
+    err = chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(support::ChipDeviceEventHandler::Handle, 0);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, support::createJMatterError(err),
+                        ChipLogError(AppServer, "Failed to register ChipDeviceEventHandler %" CHIP_ERROR_FORMAT, err.Format()));
 
     return support::createJMatterError(CHIP_NO_ERROR);
 }

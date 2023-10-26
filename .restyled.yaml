@@ -76,6 +76,7 @@ exclude:
     - "examples/platform/nxp/k32w/k32w0/scripts/demo_generated_certs/**/*"
     - "integrations/cloudbuild/*.yaml" # uglier long command line content
     - "scripts/run_codegen_targets.sh" # shellharden breaks for loops over command outputs
+    - "scripts/tagging/tag_new_release.sh" # shellharden breaks parameter passing
     - "src/darwin/Framework/CHIP/zap-generated/*" # already clang-formatted by our zap tooling
     - "zzz_generated/**/*" # already clang-formatted by our zap tooling
     - "src/controller/java/generated/java/**/*" # not formatted: generated files

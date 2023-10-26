@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include "simple-app-helper.h"
+
 #include "core/CastingPlayer.h"
 #include "core/CastingPlayerDiscovery.h"
 #include "core/Types.h"
@@ -30,6 +32,12 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
+
+#if defined(ENABLE_CHIP_SHELL)
+#include <lib/shell/Engine.h> // nogncheck
+#include <thread>
+using chip::Shell::Engine;
+#endif
 
 using namespace matter::casting::core;
 using namespace matter::casting::support;
@@ -77,33 +85,6 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
     return provider.Init(options.spake2pVerifier, options.spake2pSalt, spake2pIterationCount, setupPasscode,
                          options.payload.discriminator.GetLongValue());
 }
-
-/**
- * @brief React to discovery results
- */
-class DiscoveryDelegateImpl : public DiscoveryDelegate
-{
-private:
-    int commissionersCount = 0;
-
-public:
-    void HandleOnAdded(matter::casting::memory::Strong<CastingPlayer> player) override
-    {
-        if (commissionersCount == 0)
-        {
-            ChipLogProgress(AppServer, "Select discovered CastingPlayer to request commissioning");
-
-            ChipLogProgress(AppServer, "Example: cast request 0");
-        }
-        ++commissionersCount;
-        ChipLogProgress(AppServer, "Discovered CastingPlayer #%d", commissionersCount);
-        player->LogDetail();
-    }
-    void HandleOnUpdated(matter::casting::memory::Strong<CastingPlayer> player) override
-    {
-        ChipLogProgress(AppServer, "Updated CastingPlayer with ID: %s", player->GetId());
-    }
-};
 
 /**
  * @brief Provides the unique ID that is used by the SDK to generate the Rotating Device ID.
@@ -177,14 +158,18 @@ int main(int argc, char * argv[])
     VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
                         ChipLogError(AppServer, "CastingApp::Start failed %" CHIP_ERROR_FORMAT, err.Format()));
 
-    DiscoveryDelegateImpl delegate;
-    CastingPlayerDiscovery::GetInstance()->SetDelegate(&delegate);
+#if defined(ENABLE_CHIP_SHELL)
+    chip::Shell::Engine::Root().Init();
+    std::thread shellThread([]() { chip::Shell::Engine::Root().RunMainLoop(); });
+    RegisterCommands();
+#endif
+
+    CastingPlayerDiscovery::GetInstance()->SetDelegate(DiscoveryDelegateImpl::GetInstance());
     VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
                         ChipLogError(AppServer, "CastingPlayerDiscovery::SetDelegate failed %" CHIP_ERROR_FORMAT, err.Format()));
 
     // Discover CastingPlayers
-    const uint64_t kTargetPlayerDeviceType = 35; // 35 represents device type of Matter Video Player
-    err                                    = CastingPlayerDiscovery::GetInstance()->StartDiscovery(kTargetPlayerDeviceType);
+    err = CastingPlayerDiscovery::GetInstance()->StartDiscovery(kTargetPlayerDeviceType);
     VerifyOrReturnValue(err == CHIP_NO_ERROR, 0,
                         ChipLogError(AppServer, "CastingPlayerDiscovery::StartDiscovery failed %" CHIP_ERROR_FORMAT, err.Format()));
 
