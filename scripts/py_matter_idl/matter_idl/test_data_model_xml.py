@@ -15,7 +15,7 @@
 
 import io
 import unittest
-from difflib import ndiff
+from difflib import unified_diff
 from typing import List, Union
 
 try:
@@ -87,9 +87,12 @@ class TestXmlParser(unittest.TestCase):
         a_txt = RenderAsIdlTxt(a)
         b_txt = RenderAsIdlTxt(b)
 
-        delta = ndiff(a_txt.splitlines(keepends=True),
-                      b_txt.splitlines(keepends=True))
-        self.assertEqual(a, b, ''.join(delta))
+        delta = unified_diff(a_txt.splitlines(keepends=True),
+                             b_txt.splitlines(keepends=True),
+                             fromfile='actual.matter',
+                             tofile='expected.matter',
+                             )
+        self.assertEqual(a, b, '\n' + ''.join(delta))
 
     def testBasicInput(self):
 
