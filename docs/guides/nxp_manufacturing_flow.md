@@ -57,7 +57,7 @@ export PAA_KEY=path/certs/Chip-PAA-NXP-Key.pem
 ### a. Certificates
 
 ```
-./scripts/tools/nxp/generate_cert.sh ./src/tools/chip-cert/out/chip-cert
+./scripts/tools/nxp/generate_cert.sh ./out/chip-cert
 ```
 
 The output of the script is the **DAC**, **PAI** and **PAA** certificates. If
@@ -71,7 +71,7 @@ via the **DCL** rather than through the generated **PAA** certificate. The
 ### b. Certification declaration (CD)
 
 ```
-./src/tools/chip-cert/out/chip-cert gen-cd --key ./credentials/test/certification-declaration/Chip-Test-CD-Signing-Key.pem --cert ./credentials/test/certification-declaration/Chip-Test-CD-Signing-Cert.pem --out $FACTORY_DATA_DEST/Chip-Test-CD-$VID-$PID.der --format-version 1 --vendor-id "0x$VID" --product-id "0x$PID" --device-type-id "0x$DEVICE_TYPE" --certificate-id "ZIG20142ZB330003-24" --security-level 0 --security-info 0 --version-number 9876 --certification-type 1
+./out/chip-cert gen-cd --key ./credentials/test/certification-declaration/Chip-Test-CD-Signing-Key.pem --cert ./credentials/test/certification-declaration/Chip-Test-CD-Signing-Cert.pem --out $FACTORY_DATA_DEST/Chip-Test-CD-$VID-$PID.der --format-version 1 --vendor-id "0x$VID" --product-id "0x$PID" --device-type-id "0x$DEVICE_TYPE" --certificate-id "ZIG20142ZB330003-24" --security-level 0 --security-info 0 --version-number 9876 --certification-type 1
 ```
 
 The command above is extracted from `./credentials/test/gen-test-cds.sh` script.
@@ -90,13 +90,13 @@ Generate new provisioning data and convert all the data to a binary (unencrypted
 data):
 
 ```
-python3 ./scripts/tools/nxp/factory_data_generator/generate.py -i 10000 -s UXKLzwHdN3DZZLBaL2iVGhQi/OoQwIwJRQV4rpEalbA= -p 14014 -d 1000 --vid "0x$VID" --pid "0x$PID" --vendor_name "NXP Semiconductors" --product_name "Lighting app" --serial_num "12345678" --date "$DATE" --hw_version 1 --hw_version_str "1.0" --cert_declaration $FACTORY_DATA_DEST/Chip-Test-CD-$VID-$PID.der --dac_cert $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Cert.der --dac_key $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Key.der --pai_cert $FACTORY_DATA_DEST/Chip-PAI-NXP-$VID-$PID-Cert.der --spake2p_path ./src/tools/spake2p/out/spake2p --unique_id "00112233445566778899aabbccddeeff" --out $FACTORY_DATA_DEST/factory_data.bin
+python3 ./scripts/tools/nxp/factory_data_generator/generate.py -i 10000 -s UXKLzwHdN3DZZLBaL2iVGhQi/OoQwIwJRQV4rpEalbA= -p 14014 -d 1000 --vid "0x$VID" --pid "0x$PID" --vendor_name "NXP Semiconductors" --product_name "Lighting app" --serial_num "12345678" --date "$DATE" --hw_version 1 --hw_version_str "1.0" --cert_declaration $FACTORY_DATA_DEST/Chip-Test-CD-$VID-$PID.der --dac_cert $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Cert.der --dac_key $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Key.der --pai_cert $FACTORY_DATA_DEST/Chip-PAI-NXP-$VID-$PID-Cert.der --spake2p_path ./out/spake2p --unique_id "00112233445566778899aabbccddeeff" --out $FACTORY_DATA_DEST/factory_data.bin
 ```
 
 Same example as above, but with an already generated verifier passed as input:
 
 ```
-python3 ./scripts/tools/nxp/factory_data_generator/generate.py -i 10000 -s UXKLzwHdN3DZZLBaL2iVGhQi/OoQwIwJRQV4rpEalbA= -p 14014 -d 1000 --vid "0x$VID" --pid "0x$PID" --vendor_name "NXP Semiconductors" --product_name "Lighting app" --serial_num "12345678" --date "$DATE" --hw_version 1 --hw_version_str "1.0" --cert_declaration $FACTORY_DATA_DEST/Chip-Test-CD-$VID-$PID.der --dac_cert $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Cert.der --dac_key $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Key.der --pai_cert $FACTORY_DATA_DEST/Chip-PAI-NXP-$VID-$PID-Cert.der --spake2p_path ./src/tools/spake2p/out/spake2p --spake2p_verifier ivD5n3L2t5+zeFt6SjW7BhHRF30gFXWZVvvXgDxgCNcE+BGuTA5AUaVm3qDZBcMMKn1a6CakI4SxyPUnJr0CpJ4pwpr0DvpTlkQKqaRvkOQfAQ1XDyf55DuavM5KVGdDrg== --unique_id "00112233445566778899aabbccddeeff" --out $FACTORY_DATA_DEST/factory_data.bin
+python3 ./scripts/tools/nxp/factory_data_generator/generate.py -i 10000 -s UXKLzwHdN3DZZLBaL2iVGhQi/OoQwIwJRQV4rpEalbA= -p 14014 -d 1000 --vid "0x$VID" --pid "0x$PID" --vendor_name "NXP Semiconductors" --product_name "Lighting app" --serial_num "12345678" --date "$DATE" --hw_version 1 --hw_version_str "1.0" --cert_declaration $FACTORY_DATA_DEST/Chip-Test-CD-$VID-$PID.der --dac_cert $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Cert.der --dac_key $FACTORY_DATA_DEST/Chip-DAC-NXP-$VID-$PID-Key.der --pai_cert $FACTORY_DATA_DEST/Chip-PAI-NXP-$VID-$PID-Cert.der --spake2p_path ./out/spake2p --spake2p_verifier ivD5n3L2t5+zeFt6SjW7BhHRF30gFXWZVvvXgDxgCNcE+BGuTA5AUaVm3qDZBcMMKn1a6CakI4SxyPUnJr0CpJ4pwpr0DvpTlkQKqaRvkOQfAQ1XDyf55DuavM5KVGdDrg== --unique_id "00112233445566778899aabbccddeeff" --out $FACTORY_DATA_DEST/factory_data.bin
 ```
 
 Generate new provisioning data and convert all the data to a binary (encrypted
@@ -123,7 +123,7 @@ Here is the interpretation of the **required** parameters:
 --dac_cert         -> path to the DAC (der format) location
 --dac_key          -> path to the DAC key (der format) location
 --pai_cert         -> path to the PAI (der format) location
---spake2p_path     -> path to the spake2p tool (compile it from ./src/tools/spake2p)
+--spake2p_path     -> path to the spake2p tool
 --out              -> name of the binary that will be used for storing all the generated data
 
 
