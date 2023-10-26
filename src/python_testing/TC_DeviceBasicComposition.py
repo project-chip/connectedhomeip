@@ -608,6 +608,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
                 else:
                     allowed_generated_commands = []
 
+                # Compare the set of commands in the standard range that the DUT says it accepts vs. the commands we know about.
                 unexpected_accepted_commands = sorted(list(set(standard_accepted_commands) - set(allowed_accepted_commands)))
                 unexpected_generated_commands = sorted(list(set(standard_generated_commands) - set(allowed_generated_commands)))
 
@@ -737,7 +738,7 @@ class TC_DeviceBasicComposition(MatterBaseTest):
 
         if not success:
             self.fail_current_test(
-                "At least one cluster has failed the global attribute range and support checks")
+                "At least one cluster has failed the range and support checks for its listed attributes, commands or features")
 
     def test_IDM_11_1(self):
         success = True
