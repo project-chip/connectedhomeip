@@ -141,7 +141,7 @@ PyChipError pychip_DeviceController_UnpairDevice(chip::Controller::DeviceCommiss
                                                  DeviceUnpairingCompleteFunct callback);
 PyChipError pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size);
 PyChipError pychip_DeviceController_SetWiFiCredentials(const char * ssid, const char * credentials);
-PyChipError pychip_DeviceController_SetTimeZone(int32_t offset, uint64_t validAt, const char* name);
+PyChipError pychip_DeviceController_SetTimeZone(int32_t offset, uint64_t validAt, const char * name);
 PyChipError pychip_DeviceController_SetDSTOffset(int32_t offset, uint64_t validStarting, uint64_t validUntil);
 PyChipError pychip_DeviceController_SetDefaultNtp(const char * defaultNTP);
 PyChipError pychip_DeviceController_SetTrustedTimeSource(chip::NodeId nodeId, chip::EndpointId endpoint);
@@ -510,14 +510,17 @@ PyChipError pychip_DeviceController_SetWiFiCredentials(const char * ssid, const 
     return ToPyChipError(CHIP_NO_ERROR);
 }
 
-PyChipError pychip_DeviceController_SetTimeZone(int32_t offset, uint64_t validAt, const char* name)
+PyChipError pychip_DeviceController_SetTimeZone(int32_t offset, uint64_t validAt, const char * name)
 {
     sTimeZoneBuf.offset  = offset;
     sTimeZoneBuf.validAt = validAt;
-    if (strcmp(name, "") == 0) {
+    if (strcmp(name, "") == 0)
+    {
         sTimeZoneNameBuf.Free();
         sTimeZoneBuf.name = NullOptional;
-    } else {
+    }
+    else
+    {
         size_t len = strlen(name);
         ReturnErrorCodeIf(!sTimeZoneNameBuf.Alloc(len), ToPyChipError(CHIP_ERROR_NO_MEMORY));
         memcpy(sTimeZoneNameBuf.Get(), name, len);

@@ -198,23 +198,28 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         for (size_t i = 0; i < size; ++i)
         {
             mTimeZoneBuf[i] = params.GetTimeZone().Value()[i];
-            if (params.GetTimeZone().Value()[i].name.HasValue() && params.GetTimeZone().Value()[i].name.Value().size() <= kMaxTimeZoneNameLen)
+            if (params.GetTimeZone().Value()[i].name.HasValue() &&
+                params.GetTimeZone().Value()[i].name.Value().size() <= kMaxTimeZoneNameLen)
             {
                 auto span = MutableCharSpan(mTimeZoneNames[i], kMaxTimeZoneNameLen);
                 // This buffer is statically allocated and if of size kMaxSupportedTimeZones, so this should never fail
                 CopyCharSpanToMutableCharSpan(params.GetTimeZone().Value()[i].name.Value(), span);
                 mTimeZoneBuf[i].name.SetValue(span);
-            } else {
+            }
+            else
+            {
                 mTimeZoneBuf[i].name = NullOptional;
             }
         }
         auto list = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>(mTimeZoneBuf, size);
         mParams.SetTimeZone(list);
     }
-    if (params.GetDefaultNTP().HasValue()) {
+    if (params.GetDefaultNTP().HasValue())
+    {
         ChipLogProgress(Controller, "Setting Default NTP from parameters");
         // This parameter is an optional nullable, so we need to go two levels deep here.
-        if (!params.GetDefaultNTP().Value().IsNull() && params.GetDefaultNTP().Value().Value().size() <= kMaxDefaultNtpSize) {
+        if (!params.GetDefaultNTP().Value().IsNull() && params.GetDefaultNTP().Value().Value().size() <= kMaxDefaultNtpSize)
+        {
             // This buffer is statically allocated and is of size kMaxDefaultNtpSize.
             auto span = MutableCharSpan(mDefaultNtp, kMaxDefaultNtpSize);
             CopyCharSpanToMutableCharSpan(params.GetDefaultNTP().Value().Value(), span);
