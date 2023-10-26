@@ -19,6 +19,7 @@ from matter_idl.generators.cpp.application import CppApplicationGenerator
 from matter_idl.generators.cpp.tlvmeta import TLVMetaDataGenerator
 from matter_idl.generators.idl import IdlGenerator
 from matter_idl.generators.java import JavaClassGenerator, JavaJNIGenerator
+from matter_idl.generators.kotlin import KotlinClassGenerator
 
 
 class CodeGenerator(enum.Enum):
@@ -29,6 +30,7 @@ class CodeGenerator(enum.Enum):
     """
     JAVA_JNI = enum.auto()
     JAVA_CLASS = enum.auto()
+    KOTLIN_CLASS = enum.auto()
     CPP_APPLICATION = enum.auto()
     CPP_TLVMETA = enum.auto()
     IDL = enum.auto()
@@ -39,6 +41,8 @@ class CodeGenerator(enum.Enum):
             return JavaJNIGenerator(*args, **kargs)
         elif self == CodeGenerator.JAVA_CLASS:
             return JavaClassGenerator(*args, **kargs)
+        elif self == CodeGenerator.KOTLIN_CLASS:
+            return KotlinClassGenerator(*args, **kargs)
         elif self == CodeGenerator.CPP_APPLICATION:
             return CppApplicationGenerator(*args, **kargs)
         elif self == CodeGenerator.CPP_TLVMETA:
@@ -72,6 +76,7 @@ class CodeGenerator(enum.Enum):
 GENERATORS = {
     'java-jni': CodeGenerator.JAVA_JNI,
     'java-class': CodeGenerator.JAVA_CLASS,
+    'kotlin-class': CodeGenerator.KOTLIN_CLASS,
     'cpp-app': CodeGenerator.CPP_APPLICATION,
     'cpp-tlvmeta': CodeGenerator.CPP_TLVMETA,
     'idl': CodeGenerator.IDL,

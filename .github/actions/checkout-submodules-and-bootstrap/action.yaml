@@ -26,17 +26,10 @@ runs:
       uses: ./.github/actions/bootstrap-cache
     - name: Bootstrap
       uses: ./.github/actions/bootstrap
+      env:
+        PW_NO_CIPD_CACHE_DIR: Y
       with:
         platform: ${{ inputs.platform }}
-    - name: Remove CIPD cache directory
-      # If there is a bootstrap-cache miss, and bootstrap installs CIPD itself,
-      # there is roughly 1.4GB that remains in this cache that is useless from
-      # this point onwards.
-      shell: bash
-      continue-on-error: true
-      run: |
-        du -sh $HOME/.cipd-cache-dir/
-        rm -rf $HOME/.cipd-cache-dir/ || echo "Removing cipd cache dir failed"
     - name: Dump disk info after checkout submodule & Bootstrap
       shell: bash
       run: scripts/dump_diskspace_info.sh
