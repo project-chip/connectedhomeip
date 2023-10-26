@@ -174,7 +174,7 @@ def AttributesToBitFieldConstantEntry(attrs) -> ConstantEntry:
     """
     assert "name" in attrs
 
-    if not 'bit' in attrs:
+    if 'bit' not in attrs:
         # TODO: multi-bit fields not supported in XML currently. Be lenient here to have some
         #       diff
         # Issue: https://github.com/csa-data-model/projects/issues/347

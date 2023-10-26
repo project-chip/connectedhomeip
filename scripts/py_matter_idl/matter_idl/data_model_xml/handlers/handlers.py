@@ -21,7 +21,7 @@ from matter_idl.matter_idl_types import (ApiMaturity, Attribute, AttributeQualit
                                          CommandQuality, ConstantEntry, DataType, Enum, Field, FieldQuality, Idl, Struct, StructTag)
 
 from .base import BaseHandler, HandledDepth
-from .context import Context, IdlPostProcessor
+from .context import Context
 from .derivation import AddBaseInfoPostProcessor
 from .parsing import (ApplyConstraint, AttributesToAttribute, AttributesToBitFieldConstantEntry, AttributesToCommand,
                       AttributesToEvent, AttributesToField, NormalizeDataType, NormalizeName, ParseInt, StringToAccessPrivilege)
@@ -36,7 +36,7 @@ def is_unused_name(attrs: AttributesImpl):
 
        https://github.com/csa-data-model/projects/issues/363
     """
-    if not 'name' in attrs:
+    if 'name' not in attrs:
         return False
 
     return attrs['name'] in {'base reserved', 'derived reserved'}
