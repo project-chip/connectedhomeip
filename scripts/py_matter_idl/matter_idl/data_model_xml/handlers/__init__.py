@@ -18,6 +18,10 @@ from .base import BaseHandler
 from .context import Context
 from .handlers import ClusterHandler
 
+def contains_valid_cluster_id(attrs) -> bool:
+    # Does not check numeric format ... assuming scraper is smart enough for that
+    return 'id' in attrs and len(attrs['id']) > 0
+
 
 class DataModelXmlHandler(BaseHandler):
     """Handles the top level (/) of a data model xml file
@@ -29,6 +33,9 @@ class DataModelXmlHandler(BaseHandler):
 
     def GetNextProcessor(self, name, attrs):
         if name.lower() == 'cluster':
-            return ClusterHandler(self.context, self._idl, attrs)
+            if contains_valid_cluster_id(attrs):
+               return ClusterHandler.ForAttributes(self.context, self._idl, attrs)
+
+            return self.context.AddBaseCluster(attrs['name'], self.context.GetCurrentLocationMeta())
         else:
             return BaseHandler(self.context)

@@ -483,19 +483,27 @@ class DataTypesHandler(BaseHandler):
 class ClusterHandler(BaseHandler):
     """ Handling /cluster elements."""
 
-    def __init__(self, context: Context, idl: Idl, attrs):
-        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
-        self._idl = idl
-
+    @staticmethod
+    def ForAttributes(context: Context, idl: Idl, attrs):
         assert ("name" in attrs)
         assert ("id" in attrs)
 
-        self._cluster = Cluster(
+        return ClusterHandler(context, idl,
+          Cluster(
             side=ClusterSide.CLIENT,
             name=NormalizeName(attrs["name"]),
             code=ParseInt(attrs["id"]),
             parse_meta=context.GetCurrentLocationMeta()
-        )
+        ))
+
+    @staticmethod
+    def IntoCluster(context: Context, idl: Idl, cluster: Cluster):
+        return ClusterHandler(context, idl, cluster)
+
+    def __init__(self, context: Context, idl: Idl, cluster: Cluster):
+        super().__init__(context, handled=HandledDepth.SINGLE_TAG)
+        self._idl = idl
+        self._cluster = cluster
 
     def EndProcessing(self):
         # Global things MUST be available everywhere
