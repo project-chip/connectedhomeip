@@ -2005,7 +2005,7 @@ static void TestPubkey_x509Extraction(nlTestSuite * inSuite, void * inContext)
 
     for (size_t i = 0; i < gNumTestCerts; i++)
     {
-        uint8_t certType = TestCerts::gTestCerts[i];
+        TestCert certType = TestCerts::gTestCerts[i];
 
         err = GetTestCert(certType, TestCertLoadFlags::kDERForm, cert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -2193,7 +2193,7 @@ static void TestSKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
 
     for (size_t i = 0; i < gNumTestCerts; i++)
     {
-        uint8_t certType = gTestCerts[i];
+        TestCert certType = gTestCerts[i];
 
         err = GetTestCert(certType, TestCertLoadFlags::kDERForm, cert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -2220,7 +2220,7 @@ static void TestAKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
 
     for (size_t i = 0; i < gNumTestCerts; i++)
     {
-        uint8_t certType = gTestCerts[i];
+        TestCert certType = gTestCerts[i];
 
         err = GetTestCert(certType, TestCertLoadFlags::kDERForm, cert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -2360,7 +2360,7 @@ static void TestSerialNumber_x509Extraction(nlTestSuite * inSuite, void * inCont
 
     struct SerialNumberTestCase
     {
-        uint8_t Cert;
+        TestCert Cert;
         ByteSpan mExpectedResult;
     };
 
@@ -2401,7 +2401,7 @@ static void TestSubject_x509Extraction(nlTestSuite * inSuite, void * inContext)
 
     struct TestCase
     {
-        uint8_t Cert;
+        TestCert Cert;
         ChipDN mExpectedDN;
     };
 
@@ -2475,7 +2475,7 @@ static void TestIssuer_x509Extraction(nlTestSuite * inSuite, void * inContext)
 
     struct TestCase
     {
-        uint8_t Cert;
+        TestCert Cert;
         ChipDN mExpectedDN;
     };
 
