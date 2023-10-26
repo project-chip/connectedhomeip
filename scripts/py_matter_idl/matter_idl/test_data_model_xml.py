@@ -16,7 +16,7 @@
 import io
 import unittest
 from difflib import unified_diff
-from typing import List, Union, Optional
+from typing import List, Optional, Union
 
 try:
     from matter_idl.data_model_xml import ParseSource, ParseXmls
