@@ -176,7 +176,7 @@ Setup:
   - All supported Unify devices should now be available for control in both Google Home application as well as the Google Nest Hub
     - On the Nest Hub, swipe down from the top of the display or select "Home Control" to access the devices
 
-### Toggle an OnOff device
+## Toggle an OnOff device
 
 To send an OnOff cluster Toggle command to a bridged endpoint with id 2, via
 Matter Fabric Node ID 1:
@@ -308,7 +308,48 @@ e.g. Identify. Where you might want to run chip-tool tests on those endpoints
 
 For further information on chip-tool tests, refer to the [test suite's README](https://github.com/SiliconLabs/matter/blob/latest/src/app/tests/suites/README.md)
 
-### Troubleshooting
+## Controlling a doorlock device using the chip-tool
+
+To operate a DoorLock device that is mapped to a bridged endpoint with id 2
+via Matter Fabric Node ID 1 using the chip-tool, perform the following operations.
+
+### Reading an Attribute
+
+```bash
+chip-tool doorlock read <attribute name> 1 2
+```
+
+### Executing a Command
+
+As Doorlock commands are timed interactions, we also need to provide a timeout value.
+
+```bash
+chip-tool doorlock lock-door 1 2 --timedInteractionTimeoutMs 5000
+```
+
+Note: For the DoorLock cluster, Commands need responses from the device. If the response is not received by chip-tool within the determined time, it will throw a TIMEOUT error.
+
+### Reading and Subscribing to an Event
+
+DoorLock support Events, which will be triggered based on the DoorState and LockOperations.
+
+To read an event:
+
+```bash
+chip-tool doorlock read-event lock-operation 1 2 
+```
+
+To subscribe to an event, first we need to start an interactive session from chip-tool
+and then use the below command.
+
+```bash
+chip-tool doorlock subscribe-event lock-operation <min-interval> <max-interval> 1 2
+```
+
+For more information on how to use the `chip-tool` see
+[chip-tool manual](../../docs/guides/chip_tool_guide.md) on the Matter website.
+
+## Troubleshooting
 
 - Time sensitive chip-tool tests might fail because of the latencies in Unify Matter Bridge. The '` --delayInMs <number of milliseconds>`' command line option to chip-tool can be helpful in such cases.
 

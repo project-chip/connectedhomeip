@@ -75,6 +75,7 @@ types.
 | Group                         |✅|✅|
 | Color Control                 |✅|✅|
 | Occupancy Sensing             |✅|✅|
+| DoorLock                      |✅|✅|
 | Temperature Measurement       |❌|✅|
 | Illuminance Measurement       |❌|✅|
 | Pressure Measurement          |❌|✅|
@@ -88,6 +89,7 @@ types.
 -   [Running the Matter Bridge](./readme_user.md#running-the-matter-bridge)
 -   [Controlling a Z-Wave OnOff device](./readme_user.md#toggle-an-onoff-device)
 -   [Toggling a group of OnOff devices](./readme_user.md#toggle-a-group-of-onoff-devices)
+-   [Controlling a DoorLock device using Chip-tool](./readme_user.md#Controlling-a-doorlock-device-using-the-chip-tool)
 
 For more information about the Unify SDK see
 [Unify Host SDK Documentation](https://siliconlabs.github.io/UnifySDK/doc/UnifySDK.html)
