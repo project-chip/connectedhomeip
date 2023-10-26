@@ -148,9 +148,18 @@ def FieldName(name: str) -> str:
 def AttributesToField(attrs) -> Field:
     assert "name" in attrs
     assert "id" in attrs
-    assert "type" in attrs
 
-    t = ParseType(attrs["type"])
+    if "type" in attrs:
+        attr_type = NormalizeDataType(attrs["type"])
+    else:
+        # TODO: Generally we should not have this, however current implementation
+        #       for derived clusters for example want to add things (like conformance
+        #       specifically) WITHOUT re-stating things like types
+        #
+        # https://github.com/csa-data-model/projects/issues/365
+        LOGGER.error(f"Attribute {attrs['name']} has no type")
+        attr_type = "sint32"
+    t = ParseType(attr_type)
 
     return Field(
         name=FieldName(attrs["name"]),
