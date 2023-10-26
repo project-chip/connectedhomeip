@@ -31,8 +31,7 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label:
-          "Step 2: TH reads AttributeList attribute"
+    - label: "Step 2: TH reads AttributeList attribute"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
