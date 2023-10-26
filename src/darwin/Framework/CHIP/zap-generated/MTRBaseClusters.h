@@ -4985,14 +4985,6 @@ MTR_PROVISIONALLY_AVAILABLE
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeCurrentModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeStartUpModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeStartUpModeWithValue:(NSNumber * _Nullable)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeStartUpModeWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeStartUpModeWithParams:(MTRSubscribeParams *)params
-                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeStartUpModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-
 - (void)readAttributeOnModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeOnModeWithValue:(NSNumber * _Nullable)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeOnModeWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
@@ -5077,14 +5069,6 @@ MTR_PROVISIONALLY_AVAILABLE
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeCurrentModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-
-- (void)readAttributeStartUpModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeStartUpModeWithValue:(NSNumber * _Nullable)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeStartUpModeWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeStartUpModeWithParams:(MTRSubscribeParams *)params
-                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeStartUpModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeOnModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeOnModeWithValue:(NSNumber * _Nullable)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
@@ -15117,7 +15101,10 @@ typedef NS_OPTIONS(uint32_t, MTRPumpConfigurationAndControlPumpFeature) {
 
 typedef NS_OPTIONS(uint16_t, MTRPumpConfigurationAndControlPumpStatusBitmap) {
     MTRPumpConfigurationAndControlPumpStatusBitmapDeviceFault MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x1,
-    MTRPumpConfigurationAndControlPumpStatusBitmapSupplyfault MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x2,
+    MTRPumpConfigurationAndControlPumpStatusBitmapSupplyFault MTR_NEWLY_AVAILABLE = 0x2,
+    MTRPumpConfigurationAndControlPumpStatusBitmapSupplyfault MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5))
+        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapSupplyFault")
+    = 0x2,
     MTRPumpConfigurationAndControlPumpStatusBitmapSpeedLow MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x4,
     MTRPumpConfigurationAndControlPumpStatusBitmapSpeedHigh MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x8,
     MTRPumpConfigurationAndControlPumpStatusBitmapLocalOverride MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x10,
@@ -15129,7 +15116,7 @@ typedef NS_OPTIONS(uint16_t, MTRPumpConfigurationAndControlPumpStatusBitmap) {
 
 typedef NS_OPTIONS(uint16_t, MTRPumpConfigurationAndControlPumpStatus) {
     MTRPumpConfigurationAndControlPumpStatusDeviceFault MTR_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapDeviceFault", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5)) = 0x1,
-    MTRPumpConfigurationAndControlPumpStatusSupplyfault MTR_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapSupplyfault", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5)) = 0x2,
+    MTRPumpConfigurationAndControlPumpStatusSupplyfault MTR_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapSupplyFault", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5)) = 0x2,
     MTRPumpConfigurationAndControlPumpStatusSpeedLow MTR_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapSpeedLow", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5)) = 0x4,
     MTRPumpConfigurationAndControlPumpStatusSpeedHigh MTR_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapSpeedHigh", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5)) = 0x8,
     MTRPumpConfigurationAndControlPumpStatusLocalOverride MTR_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapLocalOverride", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5)) = 0x10,

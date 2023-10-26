@@ -69,14 +69,14 @@ _TYPE_REMAP = {
     "uint48": "int48u",
     "uint52": "int52u",
     "uint64": "int64u",
-    # signed
-    "sint8": "int8s",
-    "sint16": "int16s",
-    "sint24": "int24s",
-    "sint32": "int32s",
-    "sint48": "int48s",
-    "sint52": "int52s",
-    "sint64": "int64s",
+    # signed (map to what zapxml/matter currently has)
+    "int8": "int8s",
+    "int16": "int16s",
+    "int24": "int24s",
+    "int32": "int32s",
+    "int48": "int48s",
+    "int52": "int52s",
+    "int64": "int64s",
     # other
     "bool": "boolean",
     "string": "char_string",

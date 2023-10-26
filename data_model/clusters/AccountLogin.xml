@@ -62,7 +62,7 @@ Davis, CA 95616, USA
   <classification hierarchy="base" role="application" picsCode="ALOGIN" scope="Endpoint"/>
   <commands>
     <command id="0x00" name="GetSetupPIN" response="GetSetupPINResponse">
-      <access invokePrivilege="admin" timed="true"/>
+      <access invokePrivilege="admin" fabricScoped="true" timed="true"/>
       <mandatoryConform/>
       <field id="0" name="TempAccountIdentifier" type="string">
         <mandatoryConform/>
@@ -70,7 +70,7 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x01" name="GetSetupPINResponse" direction="responseFromServer">
-      <access invokePrivilege="operate"/>
+      <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="SetupPIN" type="string">
         <quality nullable="true"/>
@@ -79,7 +79,7 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x02" name="Login" response="Y">
-      <access invokePrivilege="admin" timed="true"/>
+      <access invokePrivilege="admin" fabricScoped="true" timed="true"/>
       <mandatoryConform/>
       <field id="0" name="TempAccountIdentifier" type="string">
         <mandatoryConform/>
@@ -91,7 +91,7 @@ Davis, CA 95616, USA
       </field>
     </command>
     <command id="0x03" name="Logout" response="Y">
-      <access invokePrivilege="operate" timed="true"/>
+      <access invokePrivilege="operate" fabricScoped="true" timed="true"/>
       <mandatoryConform/>
     </command>
   </commands>

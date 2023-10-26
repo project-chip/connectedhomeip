@@ -2662,7 +2662,7 @@ server cluster PumpConfigurationAndControl = 512 {
 
   bitmap PumpStatusBitmap : bitmap16 {
     kDeviceFault = 0x1;
-    kSupplyfault = 0x2;
+    kSupplyFault = 0x2;
     kSpeedLow = 0x4;
     kSpeedHigh = 0x8;
     kLocalOverride = 0x10;
@@ -5022,7 +5022,7 @@ endpoint 2 {
   }
 }
 endpoint 65534 {
-  device type ma_secondary_network_commissioning = 61442, version 1;
+  device type ma_secondary_network_commissioning = 4293984258, version 1;
 
 
   server cluster Descriptor {
@@ -5030,6 +5030,10 @@ endpoint 65534 {
     callback attribute serverList;
     callback attribute clientList;
     callback attribute partsList;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
   }
@@ -5043,6 +5047,10 @@ endpoint 65534 {
     callback attribute lastNetworkingStatus;
     callback attribute lastNetworkID;
     callback attribute lastConnectErrorValue;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     callback attribute featureMap default = 0;
     callback attribute clusterRevision default = 1;
 

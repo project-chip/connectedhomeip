@@ -16051,7 +16051,6 @@ class RvcRunMode(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000000, Type=typing.List[RvcRunMode.Structs.ModeOptionStruct]),
                 ClusterObjectFieldDescriptor(Label="currentMode", Tag=0x00000001, Type=uint),
-                ClusterObjectFieldDescriptor(Label="startUpMode", Tag=0x00000002, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="onMode", Tag=0x00000003, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -16063,7 +16062,6 @@ class RvcRunMode(Cluster):
 
     supportedModes: 'typing.List[RvcRunMode.Structs.ModeOptionStruct]' = None
     currentMode: 'uint' = None
-    startUpMode: 'typing.Union[None, Nullable, uint]' = None
     onMode: 'typing.Union[None, Nullable, uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
@@ -16199,22 +16197,6 @@ class RvcRunMode(Cluster):
             value: 'uint' = 0
 
         @dataclass
-        class StartUpMode(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000054
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000002
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
-
-            value: 'typing.Union[None, Nullable, uint]' = None
-
-        @dataclass
         class OnMode(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -16337,7 +16319,6 @@ class RvcCleanMode(Cluster):
             Fields=[
                 ClusterObjectFieldDescriptor(Label="supportedModes", Tag=0x00000000, Type=typing.List[RvcCleanMode.Structs.ModeOptionStruct]),
                 ClusterObjectFieldDescriptor(Label="currentMode", Tag=0x00000001, Type=uint),
-                ClusterObjectFieldDescriptor(Label="startUpMode", Tag=0x00000002, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="onMode", Tag=0x00000003, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
@@ -16349,7 +16330,6 @@ class RvcCleanMode(Cluster):
 
     supportedModes: 'typing.List[RvcCleanMode.Structs.ModeOptionStruct]' = None
     currentMode: 'uint' = None
-    startUpMode: 'typing.Union[None, Nullable, uint]' = None
     onMode: 'typing.Union[None, Nullable, uint]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
@@ -16477,22 +16457,6 @@ class RvcCleanMode(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: 'uint' = 0
-
-        @dataclass
-        class StartUpMode(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x00000055
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000002
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
-
-            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class OnMode(ClusterAttributeDescriptor):
@@ -22799,7 +22763,7 @@ class PumpConfigurationAndControl(Cluster):
 
         class PumpStatusBitmap(IntFlag):
             kDeviceFault = 0x1
-            kSupplyfault = 0x2
+            kSupplyFault = 0x2
             kSpeedLow = 0x4
             kSpeedHigh = 0x8
             kLocalOverride = 0x10

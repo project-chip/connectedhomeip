@@ -21,7 +21,7 @@ limitations under the License.
         <domain>CHIP</domain>
         <typeName>Matter Orphan Clusters</typeName>
         <profileId editable="false">0x0103</profileId>
-        <deviceId editable="false">0xF001</deviceId>
+        <deviceId editable="false">0xFFF10001</deviceId>
         <clusters lockOthers="true">
             <include cluster="Proxy Configuration" client="false" server="true" clientLocked="true" serverLocked="true"/>
             <include cluster="Proxy Discovery" client="false" server="true" clientLocked="true" serverLocked="true"/>
@@ -1475,7 +1475,7 @@ limitations under the License.
     </deviceType>
     <deviceType>
         <name>MA-heatcool</name>
-        <domain>XCHIP</domain>
+        <domain>CHIP</domain>
         <typeName>Matter Heating/Cooling Unit</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0300</deviceId>
@@ -1539,7 +1539,7 @@ limitations under the License.
     </deviceType>
     <deviceType>
         <name>MA-thermostat</name>
-        <domain>HA</domain>
+        <domain>CHIP</domain>
         <typeName>Matter Thermostat</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0301</deviceId>
@@ -2036,7 +2036,7 @@ limitations under the License.
         <domain>CHIP</domain>
         <typeName>Matter All-clusters-app Server Example</typeName>
         <profileId editable="false">0x0103</profileId>
-        <deviceId editable="false">0x0000</deviceId>
+        <deviceId editable="false">0xFFF10003</deviceId>
         <clusters lockOthers="true">
             <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>IDENTIFY_TIME</requireAttribute>
@@ -2197,7 +2197,7 @@ limitations under the License.
         <domain>CHIP</domain>
         <typeName>Matter Secondary Network Commissioning Device Type</typeName>
         <profileId editable="false">0x0103</profileId>
-        <deviceId editable="false">0xF002</deviceId>
+        <deviceId editable="false">0xFFF10002</deviceId>
         <clusters lockOthers="true">
             <include cluster="Network Commissioning" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">

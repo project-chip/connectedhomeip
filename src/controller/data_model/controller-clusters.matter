@@ -2961,7 +2961,6 @@ client cluster RvcRunMode = 84 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
   attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -3013,7 +3012,6 @@ client cluster RvcCleanMode = 85 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
   attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -4393,7 +4391,7 @@ client cluster PumpConfigurationAndControl = 512 {
 
   bitmap PumpStatusBitmap : bitmap16 {
     kDeviceFault = 0x1;
-    kSupplyfault = 0x2;
+    kSupplyFault = 0x2;
     kSpeedLow = 0x4;
     kSpeedHigh = 0x8;
     kLocalOverride = 0x10;

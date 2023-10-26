@@ -133,6 +133,11 @@
             "path": "MTRCommandTimedCheck-src.zapt",
             "name": "Function to check if command needs timed invoke",
             "output": "src/darwin/Framework/CHIP/zap-generated/MTRCommandTimedCheck.mm"
+        },
+        {
+            "path": "MTRDeviceTypeMetadata-src.zapt",
+            "name": "Functions to ask for information about device types",
+            "output": "src/darwin/Framework/CHIP/zap-generated/MTRDeviceTypeMetadata.mm"
         }
     ]
 }

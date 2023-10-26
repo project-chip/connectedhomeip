@@ -32,7 +32,7 @@ namespace chip {
 namespace TestCerts {
 
 // clang-format off
-extern const uint8_t gTestCerts[] = {
+extern const TestCert gTestCerts[] = {
     TestCert::kRoot01,
     TestCert::kRoot02,
     TestCert::kRoot03,
@@ -55,7 +55,7 @@ extern const uint8_t gTestCerts[] = {
 
 extern const size_t gNumTestCerts = ArraySize(gTestCerts);
 
-CHIP_ERROR GetTestCert(uint8_t certType, BitFlags<TestCertLoadFlags> certLoadFlags, ByteSpan & cert)
+CHIP_ERROR GetTestCert(TestCert certType, BitFlags<TestCertLoadFlags> certLoadFlags, ByteSpan & cert)
 {
     CHIP_ERROR err;
     bool derForm = certLoadFlags.Has(TestCertLoadFlags::kDERForm);
@@ -96,7 +96,7 @@ exit:
     return err;
 }
 
-const char * GetTestCertName(uint8_t certType)
+const char * GetTestCertName(TestCert certType)
 {
 #define NAME_CERT(NAME)                                                                                                            \
     do                                                                                                                             \
@@ -129,7 +129,7 @@ const char * GetTestCertName(uint8_t certType)
     return nullptr;
 }
 
-CHIP_ERROR GetTestCertPubkey(uint8_t certType, ByteSpan & pubkey)
+CHIP_ERROR GetTestCertPubkey(TestCert certType, ByteSpan & pubkey)
 {
     CHIP_ERROR err;
 
@@ -169,7 +169,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR GetTestCertSKID(uint8_t certType, ByteSpan & skid)
+CHIP_ERROR GetTestCertSKID(TestCert certType, ByteSpan & skid)
 {
     CHIP_ERROR err;
 
@@ -209,7 +209,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR GetTestCertAKID(uint8_t certType, ByteSpan & akid)
+CHIP_ERROR GetTestCertAKID(TestCert certType, ByteSpan & akid)
 {
     CHIP_ERROR err;
 
@@ -249,7 +249,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR LoadTestCert(ChipCertificateSet & certSet, uint8_t certType, BitFlags<TestCertLoadFlags> certLoadFlags,
+CHIP_ERROR LoadTestCert(ChipCertificateSet & certSet, TestCert certType, BitFlags<TestCertLoadFlags> certLoadFlags,
                         BitFlags<CertDecodeFlags> decodeFlags)
 {
     CHIP_ERROR err;

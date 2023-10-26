@@ -55,7 +55,7 @@ jobs:
                           --enable-flashbundle \
                           --target tizen-arm-all-clusters \
                           --target tizen-arm-chip-tool-ubsan \
-                          --target tizen-arm-light \
+                          --target tizen-arm-light-with-ui \
                           build \
                           --copy-artifacts-to out/artifacts \
                       "
