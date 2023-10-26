@@ -3321,6 +3321,23 @@ client cluster DishwasherAlarm = 93 {
   command ModifyEnabledAlarms(ModifyEnabledAlarmsRequest): DefaultSuccess = 1;
 }
 
+/** Attributes and commands for selecting a mode from a list of supported options. */
+client cluster MicrowaveOvenMode = 94 {
+  enum ModeTag : enum16 {
+    kNormal = 16384;
+    kDefrost = 16385;
+  }
+
+  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly attribute int8u currentMode = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+}
+
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of any device where a state machine is a part of the operation. */
 client cluster OperationalState = 96 {
   enum ErrorStateEnum : enum8 {

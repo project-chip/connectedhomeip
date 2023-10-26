@@ -138,6 +138,7 @@ typedef NS_ENUM(uint32_t, MTRClusterIDType) {
     MTRClusterIDTypeAirQualityID MTR_PROVISIONALLY_AVAILABLE = 0x0000005B,
     MTRClusterIDTypeSmokeCOAlarmID MTR_PROVISIONALLY_AVAILABLE = 0x0000005C,
     MTRClusterIDTypeDishwasherAlarmID MTR_PROVISIONALLY_AVAILABLE = 0x0000005D,
+    MTRClusterIDTypeMicrowaveOvenModeID MTR_PROVISIONALLY_AVAILABLE = 0x0000005E,
     MTRClusterIDTypeOperationalStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000060,
     MTRClusterIDTypeRVCOperationalStateID MTR_PROVISIONALLY_AVAILABLE = 0x00000061,
     MTRClusterIDTypeHEPAFilterMonitoringID MTR_PROVISIONALLY_AVAILABLE = 0x00000071,
@@ -2432,6 +2433,16 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterDishwasherAlarmAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
     MTRAttributeIDTypeClusterDishwasherAlarmAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
     MTRAttributeIDTypeClusterDishwasherAlarmAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
+
+    // Cluster MicrowaveOvenMode attributes
+    MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeSupportedModesID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeCurrentModeID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
+    MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
+    MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeEventListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeEventListID,
+    MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
+    MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeFeatureMapID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeFeatureMapID,
+    MTRAttributeIDTypeClusterMicrowaveOvenModeAttributeClusterRevisionID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster OperationalState attributes
     MTRAttributeIDTypeClusterOperationalStateAttributePhaseListID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,

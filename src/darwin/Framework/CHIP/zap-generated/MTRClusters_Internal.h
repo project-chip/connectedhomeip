@@ -221,6 +221,10 @@
 @property (nonatomic, readonly) MTRDevice * device;
 @end
 
+@interface MTRClusterMicrowaveOvenMode ()
+@property (nonatomic, readonly) MTRDevice * device;
+@end
+
 @interface MTRClusterOperationalState ()
 @property (nonatomic, readonly) MTRDevice * device;
 @end
