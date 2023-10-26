@@ -70,6 +70,9 @@ class Bash:
         if self.command_is_running():
             if "sudo" in self.command:
                 self.logger.warning(f"Killing command with sudo {self.command}")
+                for child_proc in psutil.Process(self.proc.pid).children(recursive=True):
+                    # TODO: still zombie tpcd proc on macOS
+                    Bash(f"sudo kill -9 {child_proc.pid}", sync=True)
                 Bash(f"sudo kill -9 {self.proc.pid}", sync=True)
                 return
             if soft:
