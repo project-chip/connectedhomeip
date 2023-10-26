@@ -15,8 +15,8 @@
 
 import io
 import unittest
-from typing import List, Union
 from difflib import ndiff
+from typing import List, Union
 
 try:
     from matter_idl.data_model_xml import ParseSource, ParseXmls
@@ -28,10 +28,11 @@ except ImportError:
         os.path.join(os.path.dirname(__file__), '..')))
     from matter_idl.data_model_xml import ParseSource, ParseXmls
 
-from matter_idl.matter_idl_parser import CreateParser
-from matter_idl.matter_idl_types import Idl
 from matter_idl.generators import GeneratorStorage
 from matter_idl.generators.idl import IdlGenerator
+from matter_idl.matter_idl_parser import CreateParser
+from matter_idl.matter_idl_types import Idl
+
 
 class GeneratorContentStorage(GeneratorStorage):
     def __init__(self):
@@ -44,7 +45,8 @@ class GeneratorContentStorage(GeneratorStorage):
 
     def write_new_data(self, relative_path: str, content: str):
         if self.content:
-            raise Exception("Unexpected extra data: single file generation expected")
+            raise Exception(
+                "Unexpected extra data: single file generation expected")
         self.content = content
 
 
@@ -76,7 +78,6 @@ class TestXmlParser(unittest.TestCase):
         super().__init__(*args, **kargs)
         self.maxDiff = None
 
-
     def assertIdlEqual(self, a: Idl, b: Idl):
         if a == b:
             # seems the same
@@ -86,10 +87,9 @@ class TestXmlParser(unittest.TestCase):
         a_txt = RenderAsIdlTxt(a)
         b_txt = RenderAsIdlTxt(b)
 
-        delta = ndiff(a_txt.splitlines(keepends=True), b_txt.splitlines(keepends=True))
+        delta = ndiff(a_txt.splitlines(keepends=True),
+                      b_txt.splitlines(keepends=True))
         self.assertEqual(a, b, ''.join(delta))
-
-
 
     def testBasicInput(self):
 
@@ -115,7 +115,7 @@ class TestXmlParser(unittest.TestCase):
 
         xml_idl = XmlToIdl([
             # base ...
-        '''
+            '''
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Mode Base" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial version"/>
@@ -168,7 +168,7 @@ class TestXmlParser(unittest.TestCase):
 </cluster>
         ''',
             # derived ...
-        '''
+            '''
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0059" name="Dishwasher Mode" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial Release"/>
@@ -223,7 +223,6 @@ class TestXmlParser(unittest.TestCase):
         ''')
 
         self.assertIdlEqual(xml_idl, expected_idl)
-
 
     def testSignedTypes(self):
 
