@@ -112,6 +112,7 @@ enum class CertType : uint8_t
                                   firmware image signing is manufacturer-specific. The CHIP
                                   certificate format supports encoding of firmware signing
                                   certificates if chosen by the manufacturer to use them. */
+    kNetworkIdentity = 0x05, /**< A CHIP Network (Client) Identity. */
 };
 
 /** X.509 Certificate Key Purpose Flags
@@ -428,7 +429,7 @@ struct ChipCertificateData
     void Clear();
     bool IsEqual(const ChipCertificateData & other) const;
 
-    ByteSpan mCertificate;                      /**< Original raw buffer data. */
+    ByteSpan mSerialNumber;                     /**< Certificate Serial Number. */
     ChipDN mSubjectDN;                          /**< Certificate Subject DN. */
     ChipDN mIssuerDN;                           /**< Certificate Issuer DN. */
     CertificateKeyId mSubjectKeyId;             /**< Certificate Subject public key identifier. */
@@ -528,6 +529,14 @@ CHIP_ERROR VerifyCertSignature(const ChipCertificateData & cert, const ChipCerti
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  */
 CHIP_ERROR ValidateChipRCAC(const ByteSpan & rcac);
+
+/**
+ * Validates a Network (Client) Identity in TLV-encoded form.
+ *
+ * This function parses the certificate, ensures the rigid fields have the values mandated by the
+ * specification, and validates the certificate signature.
+ */
+CHIP_ERROR ValidateChipNI(const ByteSpan & ni);
 
 struct FutureExtension
 {

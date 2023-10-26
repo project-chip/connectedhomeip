@@ -1187,7 +1187,7 @@ static void TestChipCert_CertUsage(nlTestSuite * inSuite, void * inContext)
 static void TestChipCert_CertType(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
-    ChipCertificateSet certSet;
+    ChipCertificateData certData;
 
     struct TestCase
     {
@@ -1209,31 +1209,27 @@ static void TestChipCert_CertType(nlTestSuite * inSuite, void * inContext)
         {  TestCert::kNode01_02,       CertType::kNode            },
         {  TestCert::kNode02_01,       CertType::kNode            },
         {  TestCert::kNode02_02,       CertType::kNode            },
+        {  TestCert::kPDCID01,         CertType::kNetworkIdentity },
     };
     // clang-format on
     for (const auto & testCase : sTestCases)
     {
         CertType certType;
 
-        err = certSet.Init(1);
+        err = DecodeTestCert(certData, testCase.Cert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = LoadTestCert(certSet, testCase.Cert, sNullLoadFlag, sNullDecodeFlag);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-        err = certSet.GetCertSet()->mSubjectDN.GetCertType(certType);
+        err = certData.mSubjectDN.GetCertType(certType);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         NL_TEST_ASSERT(inSuite, certType == testCase.ExpectedCertType);
-        certSet.Release();
     }
 }
 
 static void TestChipCert_CertId(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
-    ChipCertificateSet certSet;
-    ChipCertificateData certData[1];
+    ChipCertificateData certData;
 
     struct TestCase
     {
@@ -1255,23 +1251,26 @@ static void TestChipCert_CertId(nlTestSuite * inSuite, void * inContext)
         {  TestCert::kNode01_02,       0xDEDEDEDE00010002 },
         {  TestCert::kNode02_01,       0xDEDEDEDE00020001 },
         {  TestCert::kNode02_02,       0xDEDEDEDE00020002 },
+        {  TestCert::kPDCID01,         0 },
     };
     // clang-format on
     for (const auto & testCase : sTestCases)
     {
         uint64_t chipId;
 
-        err = certSet.Init(certData, 1);
+        err = DecodeTestCert(certData, testCase.Cert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = LoadTestCert(certSet, testCase.Cert, sNullLoadFlag, sNullDecodeFlag);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-        err = certSet.GetCertSet()->mSubjectDN.GetCertChipId(chipId);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-        NL_TEST_ASSERT(inSuite, chipId == testCase.ExpectedCertId);
-        certSet.Release();
+        err = certData.mSubjectDN.GetCertChipId(chipId);
+        if (testCase.ExpectedCertId != 0)
+        {
+            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, chipId == testCase.ExpectedCertId);
+        }
+        else
+        {
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_CERT_DN);
+        }
     }
 }
 
@@ -2052,6 +2051,7 @@ static void TestChipCert_ExtractSubjectDNFromChipCert(nlTestSuite * inSuite, voi
         {  TestCert::kICA02,     expectedSubjectDN_ICA02     },
         {  TestCert::kNode01_01, expectedSubjectDN_Node01_01 },
         {  TestCert::kNode02_03, expectedSubjectDN_Node02_03 },
+        {  TestCert::kPDCID01,   {}                          },
     };
     // clang-format on
 
@@ -2065,7 +2065,11 @@ static void TestChipCert_ExtractSubjectDNFromChipCert(nlTestSuite * inSuite, voi
         ChipDN subjectDN;
         err = ExtractSubjectDNFromChipCert(cert, subjectDN);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, subjectDN.IsEqual(testCase.ExpectedSubjectDN));
+
+        if (!testCase.ExpectedSubjectDN.IsEmpty())
+        {
+            NL_TEST_ASSERT(inSuite, subjectDN.IsEqual(testCase.ExpectedSubjectDN));
+        }
     }
 
     // Test extraction from the X509 ByteSpan form.
@@ -2078,7 +2082,11 @@ static void TestChipCert_ExtractSubjectDNFromChipCert(nlTestSuite * inSuite, voi
         ChipDN subjectDN;
         err = ExtractSubjectDNFromX509Cert(cert, subjectDN);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, subjectDN.IsEqual(testCase.ExpectedSubjectDN));
+
+        if (!testCase.ExpectedSubjectDN.IsEmpty())
+        {
+            NL_TEST_ASSERT(inSuite, subjectDN.IsEqual(testCase.ExpectedSubjectDN));
+        }
     }
 }
 
@@ -2110,6 +2118,7 @@ static void TestChipCert_ExtractPublicKeyAndSKID(nlTestSuite * inSuite, void * i
         {  TestCert::kNode02_06, sTestCert_Node02_06_PublicKey, sTestCert_Node02_06_SubjectKeyId },
         {  TestCert::kNode02_07, sTestCert_Node02_07_PublicKey, sTestCert_Node02_07_SubjectKeyId },
         {  TestCert::kNode02_08, sTestCert_Node02_08_PublicKey, sTestCert_Node02_08_SubjectKeyId },
+        {  TestCert::kPDCID01,   sTestCert_PDCID01_PublicKey,   ByteSpan() },
     };
     // clang-format on
 
@@ -2126,9 +2135,24 @@ static void TestChipCert_ExtractPublicKeyAndSKID(nlTestSuite * inSuite, void * i
 
         CertificateKeyId skid;
         err = ExtractSKIDFromChipCert(cert, skid);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, skid.data_equal(testCase.ExpectedSKID));
+        if (!testCase.ExpectedSKID.empty())
+        {
+            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, skid.data_equal(testCase.ExpectedSKID));
+        }
+        else
+        {
+            NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NOT_FOUND);
+        }
     }
+}
+
+static void TestChipCert_PDCIdentityValidation(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err;
+
+    err = ValidateChipNI(sTestCert_PDCID01_Chip);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
 /**
@@ -2189,6 +2213,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test extracting and validating CASE Authenticated Tags from NOC", TestChipCert_ExtractAndValidateCATsFromOpCert),
     NL_TEST_DEF("Test extracting Subject DN from chip certificate", TestChipCert_ExtractSubjectDNFromChipCert),
     NL_TEST_DEF("Test extracting PublicKey and SKID from chip certificate", TestChipCert_ExtractPublicKeyAndSKID),
+    NL_TEST_DEF("Test PDC Identity Validation", TestChipCert_PDCIdentityValidation),
     NL_TEST_SENTINEL()
 };
 // clang-format on
