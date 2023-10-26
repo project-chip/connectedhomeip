@@ -16,27 +16,33 @@
 import logging
 from typing import Optional
 
-from matter_idl.matter_idl_types import Cluster, Idl, Enum, Bitmap, Event, Attribute, Struct, Command
+from matter_idl.matter_idl_types import Attribute, Bitmap, Cluster, Command, Enum, Event, Idl, Struct
 
 from .context import Context, IdlPostProcessor
 from .parsing import NormalizeName
 
 LOGGER = logging.getLogger('data-model-xml-data-parsing')
 
+
 def merge_enum_into(e: Enum, cluster: Cluster):
     LOGGER.error("TODO: need to implement merge of %r", e)
+
 
 def merge_bitmap_into(b: Bitmap, cluster: Cluster):
     LOGGER.error("TODO: need to implement merge of %r", b)
 
+
 def merge_event_into(e: Event, cluster: Cluster):
     LOGGER.error("TODO: need to implement merge of %r", e)
+
 
 def merge_attribute_into(a: Attribute, cluster: Cluster):
     LOGGER.error("TODO: need to implement merge of %r", a)
 
+
 def merge_struct_into(s: Struct, cluster: Cluster):
     LOGGER.error("TODO: need to implement merge of %r", s)
+
 
 def merge_command_into(c: Command, cluster: Cluster):
     LOGGER.error("TODO: need to implement merge of %r", c)
@@ -68,7 +74,6 @@ class AddBaseInfoPostProcessor(IdlPostProcessor):
         self.source_name = NormalizeName(source_cluster_name)
         self.context = context
 
-
     def FinalizeProcessing(self, idl: Idl):
         # attempt to find the base. It may be in the "names without ID" however it may also be inside
         # existing clusters (e.g. Basic Information)
@@ -82,10 +87,10 @@ class AddBaseInfoPostProcessor(IdlPostProcessor):
                     break
 
         if not base:
-            LOGGER.error("Could not find the base cluster named '%s'", self.source_name)
+            LOGGER.error(
+                "Could not find the base cluster named '%s'", self.source_name)
             return
 
-        LOGGER.info("Copying base data from '%s' into '%s'", base.name, self.destination.name)
+        LOGGER.info("Copying base data from '%s' into '%s'",
+                    base.name, self.destination.name)
         inherit_cluster_data(from_cluster=base, into_cluster=self.destination)
-
-
