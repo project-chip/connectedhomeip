@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
-enable_foyer_probers = True
+# TODO: Re-enable
+enable_foyer_probers = False
 test_error_init = False
 test_error_execution = False

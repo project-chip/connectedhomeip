@@ -17,9 +17,9 @@
 
 import shlex
 import subprocess
+import psutil
 
 import log
-from mobly.utils import stop_standing_subprocess
 
 logger = log.get_logger(__file__)
 
@@ -76,7 +76,27 @@ class Bash:
                     self.proc.stderr.close()
                 self.proc.wait()
             else:
-                stop_standing_subprocess(self.proc)
+                psutil_proc = psutil.Process(self.proc.pid)
+                for child_proc in psutil_proc.children(recursive=True):
+                    try:
+                        child_proc.terminate()
+                        child_proc.wait(3)
+                    except subprocess.TimeoutExpired:
+                        try:
+                            child_proc.kill()
+                            child_proc.wait(3)
+                        except subprocess.TimeoutExpired:
+                            self.logger.error(f"Could not kill pid {child_proc.pid}")
+                try:
+                    psutil_proc.terminate()
+                    psutil_proc.wait(3)
+                except subprocess.TimeoutExpired:
+                    try:
+                        psutil_proc.kill()
+                        psutil_proc.wait(3)
+                    except subprocess.TimeoutExpired:
+                        self.logger.error(f"Could not kill pid {psutil_proc.pid}")
+
         else:
             self.logger.warning(f'{self.command} stop requested while not running')
         self.proc = None

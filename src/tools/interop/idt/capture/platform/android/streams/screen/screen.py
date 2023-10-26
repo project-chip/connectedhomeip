@@ -76,6 +76,7 @@ class ScreenRecorder(AndroidStream):
         await self.prepare_screen_recording()
         if self.check_screen() and not self.screen_pull:
             # TODO: Make screen recording run on loop, replace removed multiproc solution with async
+            self.screen_pull = True
             self.update_commands()
             self.logger.info(f"New screen recording file started {self.screen_phone_out_path} {self.screen_artifact}")
             self.screen_proc = self.platform.get_adb_background_command(self.screen_command)
@@ -91,7 +92,6 @@ class ScreenRecorder(AndroidStream):
             self.screen_pull = False
 
     async def stop(self):
-        # TODO: Broken on macOS
         self.logger.info("Stopping screen proc")
         self.screen_proc.stop_command()
         await self.pull_screen_recording()
