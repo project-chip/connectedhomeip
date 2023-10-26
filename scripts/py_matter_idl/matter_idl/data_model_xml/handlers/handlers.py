@@ -58,7 +58,7 @@ class FeaturesHandler(BaseHandler):
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "feature":
             if is_unused_name(attrs):
-                LOGGER.warn(
+                LOGGER.warning(
                     f"Ignoring feature constant data for {attrs['name']}")
                 return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
 
@@ -372,7 +372,7 @@ class AttributesHandler(BaseHandler):
     def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "attribute":
             if is_unused_name(attrs):
-                LOGGER.warn(f"Ignoring attribute data for {attrs['name']}")
+                LOGGER.warning(f"Ignoring attribute data for {attrs['name']}")
                 return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
             return AttributeHandler(self.context, self._cluster, attrs)
         else:
@@ -409,8 +409,8 @@ class CommandHandler(BaseHandler):
         elif ("direction" in attrs) and attrs["direction"] == "responseFromServer":
             is_command = False  # response
         else:
-            LOGGER.warn("Could not clearly determine command direction: %s" %
-                        [item for item in attrs.items()])
+            LOGGER.warning("Could not clearly determine command direction: %s" %
+                           [item for item in attrs.items()])
             # Do a best-guess. However we should NOT need to guess once
             # we have a good data set
             is_command = not attrs["name"].endswith("Response")
@@ -452,7 +452,7 @@ class CommandHandler(BaseHandler):
                     self._command.invokeacl = StringToAccessPrivilege(
                         attrs["invokePrivilege"])
                 else:
-                    LOGGER.warn(
+                    LOGGER.warning(
                         f"Ignoring invoke privilege for {self._struct.name}")
 
             if self._command:
@@ -479,7 +479,7 @@ class CommandsHandler(BaseHandler):
     def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "command":
             if is_unused_name(attrs):
-                LOGGER.warn(f"Ignoring command data for {attrs['name']}")
+                LOGGER.warning(f"Ignoring command data for {attrs['name']}")
                 return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
 
             if 'id' not in attrs:
