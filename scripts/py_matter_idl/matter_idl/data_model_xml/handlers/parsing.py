@@ -163,8 +163,18 @@ def AttributesToField(attrs) -> Field:
 def AttributesToBitFieldConstantEntry(attrs) -> ConstantEntry:
     """Creates a constant entry appropriate for bitmaps.
     """
-    assert ("name" in attrs)
-    assert ("bit" in attrs)
+    assert "name" in attrs
+
+    if not 'bit' in attrs:
+        # TODO: multi-bit fields not supported in XML currently. Be lenient here to have some
+        #       diff
+        # Issue: https://github.com/csa-data-model/projects/issues/347
+
+        LOGGER.error(
+            f"Constant {attrs['name']} has no bit value (may be multibit)")
+        return ConstantEntry(name="k" + NormalizeName(attrs["name"]), code=0)
+
+    assert "bit" in attrs
 
     return ConstantEntry(name="k" + NormalizeName(attrs["name"]), code=1 << ParseInt(attrs["bit"]))
 

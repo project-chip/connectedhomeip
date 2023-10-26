@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import enum
 import logging
 from typing import Optional
+from xml.sax.xmlreader import AttributesImpl
 
 from matter_idl.matter_idl_types import (Attribute, AttributeQuality, Bitmap, Cluster, ClusterSide, Command, CommandQuality,
                                          ConstantEntry, DataType, Enum, Field, FieldQuality, Idl, Struct, StructTag)
@@ -24,6 +26,19 @@ from .parsing import (ApplyConstraint, AttributesToAttribute, AttributesToBitFie
                       AttributesToEvent, AttributesToField, NormalizeDataType, NormalizeName, ParseInt, StringToAccessPrivilege)
 
 LOGGER = logging.getLogger('data-model-xml-parser')
+
+
+def is_unused_name(attrs):
+    """Existing XML adds various entries for base/derived reserved items.
+
+       Those items seem to have no actual meaning.
+
+       https://github.com/csa-data-model/projects/issues/363
+    """
+    if not 'name' in attrs:
+        return False
+
+    return attrs['name'] in {'base reserved', 'derived reserved'}
 
 
 class FeaturesHandler(BaseHandler):
@@ -41,6 +56,11 @@ class FeaturesHandler(BaseHandler):
         if name in {"section", "optionalConform"}:
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "feature":
+            if is_unused_name(attrs):
+                LOGGER.warn(
+                    f"Ignoring feature constant data for {attrs['name']}")
+                return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+
             self._bitmap.entries.append(
                 AttributesToBitFieldConstantEntry(attrs))
             # assume everything handled. Sub-item is only section
@@ -344,6 +364,9 @@ class AttributesHandler(BaseHandler):
 
     def GetNextProcessor(self, name: str, attrs):
         if name == "attribute":
+            if is_unused_name(attrs):
+                LOGGER.warn(f"Ignoring attribute data for {attrs['name']}")
+                return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
             return AttributeHandler(self.context, self._cluster, attrs)
         else:
             return BaseHandler(self.context)
@@ -446,8 +469,20 @@ class CommandsHandler(BaseHandler):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._cluster = cluster
 
-    def GetNextProcessor(self, name: str, attrs):
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "command":
+            if is_unused_name(attrs):
+                LOGGER.warn(f"Ignoring command data for {attrs['name']}")
+                return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+
+            if 'id' not in attrs:
+                LOGGER.error(
+                    f"Could not process command {attrs['name']}: no id")
+                # TODO: skip over these without failing the processing
+                #
+                # https://github.com/csa-data-model/projects/issues/364
+                return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+
             return CommandHandler(self.context, self._cluster, attrs)
         elif name in {"mandatoryConform", "optionalConform"}:
             # Nothing to tag conformance
@@ -461,7 +496,7 @@ class DataTypesHandler(BaseHandler):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._cluster = cluster
 
-    def GetNextProcessor(self, name: str, attrs):
+    def GetNextProcessor(self, name: str, attrs: AttributesImpl):
         if name == "section":
             # Documentation data, skipped
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
@@ -480,6 +515,11 @@ class DataTypesHandler(BaseHandler):
             return BaseHandler(self.context)
 
 
+class ClusterHandlerPostProcessing(enum.Enum):
+    FINALIZE_AND_ADD_TO_IDL = enum.auto()
+    NO_POST_PROCESSING = enum.auto()
+
+
 class ClusterHandler(BaseHandler):
     """ Handling /cluster elements."""
 
@@ -494,18 +534,24 @@ class ClusterHandler(BaseHandler):
                                   name=NormalizeName(attrs["name"]),
                                   code=ParseInt(attrs["id"]),
                                   parse_meta=context.GetCurrentLocationMeta()
-                              ))
+                              ), ClusterHandlerPostProcessing.FINALIZE_AND_ADD_TO_IDL)
 
     @staticmethod
     def IntoCluster(context: Context, idl: Idl, cluster: Cluster):
-        return ClusterHandler(context, idl, cluster)
+        return ClusterHandler(context, idl, cluster, ClusterHandlerPostProcessing.NO_POST_PROCESSING)
 
-    def __init__(self, context: Context, idl: Idl, cluster: Cluster):
+    def __init__(self, context: Context, idl: Idl, cluster: Cluster, post_process: ClusterHandlerPostProcessing):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._idl = idl
         self._cluster = cluster
+        self._post_processing = post_process
 
     def EndProcessing(self):
+        if self._post_processing == ClusterHandlerPostProcessing.NO_POST_PROCESSING:
+            return
+
+        assert self._post_processing == ClusterHandlerPostProcessing.FINALIZE_AND_ADD_TO_IDL
+
         # Global things MUST be available everywhere
         to_add = [
             # type, code, name, is_list
