@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+import multiprocessing
 import shlex
 import subprocess
 import psutil
@@ -66,44 +67,48 @@ class Bash:
         else:
             self.logger.warning(f'{self.command} start requested while running')
 
-    def stop_command(self, soft: bool = False) -> None:
-        if self.command_is_running():
-            if "sudo" in self.command:
-                self.logger.warning(f"Killing command with sudo {self.command}")
-                for child_proc in psutil.Process(self.proc.pid).children(recursive=True):
-                    # TODO: still zombie tpcd proc on macOS
-                    Bash(f"sudo kill -9 {child_proc.pid}", sync=True)
-                Bash(f"sudo kill -9 {self.proc.pid}", sync=True)
-                return
-            if soft:
-                self.proc.terminate()
-                if self.proc.stdout:
-                    self.proc.stdout.close()
-                if self.proc.stderr:
-                    self.proc.stderr.close()
-                self.proc.wait()
-            else:
-                psutil_proc = psutil.Process(self.proc.pid)
-                for child_proc in psutil_proc.children(recursive=True):
-                    try:
-                        child_proc.terminate()
-                        child_proc.wait(3)
-                    except subprocess.TimeoutExpired:
-                        try:
-                            child_proc.kill()
-                            child_proc.wait(3)
-                        except subprocess.TimeoutExpired:
-                            self.logger.error(f"Could not kill pid {child_proc.pid}")
-                try:
-                    psutil_proc.terminate()
-                    psutil_proc.wait(3)
-                except subprocess.TimeoutExpired:
-                    try:
-                        psutil_proc.kill()
-                        psutil_proc.wait(3)
-                    except subprocess.TimeoutExpired:
-                        self.logger.error(f"Could not kill pid {psutil_proc.pid}")
+    def term_with_sudo(self, proc: multiprocessing.Process) -> None:
+        Bash(f"sudo kill {proc.pid}").start_command()
 
+    def kill_with_sudo(self):
+        Bash(f"sudo kill -9 {self.proc.pid}").start_command()
+
+    def term(self, proc: multiprocessing.Process) -> None:
+        if "sudo" in self.command:
+            self.term_with_sudo(proc)
+        else:
+            proc.terminate()
+
+    def kill(self, proc: multiprocessing.Process) -> None:
+        if "sudo" in self.command:
+            self.kill_with_sudo(proc)
+        else:
+            proc.kill()
+
+    def stop_single_proc(self, proc: multiprocessing.Process) -> None:
+        self.logger.debug(f"Killing process {proc.pid}")
+        try:
+            self.logger.debug("Sending SIGTERM")
+            self.term(proc)
+            proc.wait(3)
+        except subprocess.TimeoutExpired:
+            self.logger.debug("SIGTERM timeout expired")
+            try:
+                self.logger.debug("Sending SIGKILL")
+                self.kill(proc)
+                proc.wait(3)
+            except subprocess.TimeoutExpired:
+                self.logger.debug(f"SIGKILL timeout expired, could not kill pid {proc.pid}")
+
+    def stop_command(self) -> None:
+        if self.command_is_running():
+            psutil_proc = psutil.Process(self.proc.pid)
+            suffix = f"{psutil_proc.pid} for command {self.command}"
+            self.logger.debug(f"Stopping children of {suffix}")
+            for child_proc in psutil_proc.children(recursive=True):
+                self.stop_single_proc(child_proc)
+            self.logger.debug(f"Killing root proc {suffix}")
+            self.stop_single_proc(psutil_proc)
         else:
             self.logger.warning(f'{self.command} stop requested while not running')
         self.proc = None

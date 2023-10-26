@@ -17,4 +17,5 @@
 import logging
 
 enable_color = True
-log_level = logging.INFO
+# TODO: Disable
+log_level = logging.DEBUG

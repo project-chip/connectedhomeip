@@ -55,6 +55,7 @@ class AndroidPcap(AndroidStream):
             self.pcap_pull = False
 
     async def start(self):
+        # TODO: Build on macOS, no wget, check root
         if self.platform.capabilities.c_has_tcpdump:
             self.logger.info("tcpdump already available; using!")
             self.pcap_proc.start_command()
