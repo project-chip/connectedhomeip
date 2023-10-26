@@ -231,7 +231,7 @@ protected:
     static bool blekw_stop_connection_internal(BLE_CONNECTION_OBJECT conId);
 
 public:
-    virtual CHIP_ERROR InitHostController(ble_generic_cb_fp cb_fp) = 0;
+    virtual CHIP_ERROR InitHostController(BLECallbackDelegate::GapGenericCallback cb_fp) = 0;
     virtual BLEManagerCommon * GetImplInstance()                   = 0;
     void DoBleProcessing(void);
 
