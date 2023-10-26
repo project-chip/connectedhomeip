@@ -2,7 +2,7 @@
 
 This Project CHIP Open Source Code of Conduct applies to all those contributing
 to, participating in, or maintaining the Project CHIP open source project,
-including CSA members and non-members.
+including Connectivity Standards Alliance members and non-members.
 
 
 # Contributor Covenant Code of Conduct
