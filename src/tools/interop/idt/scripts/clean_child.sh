@@ -15,5 +15,5 @@
 #    limitations under the License.
 #
 
-# TODO: Platform independent
-sudo ps -axf | grep -E "(tcpd|adb)"
+sudo killall tcpdump
+sudo killall adb

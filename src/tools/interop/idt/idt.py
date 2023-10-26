@@ -179,7 +179,6 @@ class InteropDebuggingTool:
         border_print(f'Output zip: {output_zip}')
 
     def command_capture(self, args: argparse.Namespace) -> None:
-
         pcap = args.pcap == 't'
         pcap_runner = None if not pcap else PacketCaptureRunner(
             self.pcap_artifact_dir, args.interface)
@@ -192,10 +191,7 @@ class InteropDebuggingTool:
                                                      args.ecosystem,
                                                      self.artifact_dir))
         asyncio.run(EcosystemController.start())
-        EcosystemController.analyze()
-
-        border_print("Press enter three times to stop streaming", important=True)
-        input("")
+        asyncio.run(EcosystemController.run_analyzers())
 
         if pcap:
             border_print("Stopping pcap")
@@ -205,7 +201,6 @@ class InteropDebuggingTool:
 
         asyncio.run(EcosystemController.probe())
 
-        # TODO: Write error traces to artifacts
         if EcosystemController.has_errors():
             border_print("Errors seen this run:")
             EcosystemController.error_report(self.artifact_dir)

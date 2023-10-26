@@ -89,10 +89,10 @@ class EcosystemCapture(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def analyze_capture(self) -> None:
+    async def analyze_capture(self) -> None:
         """
         Parse the capture and create + display helpful analysis artifacts that are unique to the ecosystem
-        IMPORTANT: This function will be run as a separate process to allow real time analysis!!!
+        Must be async aware and not interact with stdin
         """
         raise NotImplementedError
 

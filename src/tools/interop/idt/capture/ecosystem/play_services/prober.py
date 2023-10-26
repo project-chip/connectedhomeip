@@ -26,6 +26,7 @@ logger = log.get_logger(__file__)
 class PlayServicesProber:
 
     def __init__(self, platform):
+        # TODO: Platform independent traceroute
         self.platform = platform
         self.artifact_dir = self.platform.artifact_dir
         self.logger = logger

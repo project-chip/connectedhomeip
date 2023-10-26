@@ -17,11 +17,10 @@
 
 import asyncio
 import copy
-import multiprocessing
 import os
+import sys
 import traceback
 import typing
-from multiprocessing import Process
 
 import capture
 import log
@@ -33,7 +32,6 @@ from log import border_print
 _PLATFORM_MAP: typing.Dict[str, PlatformLogStreamer] = {}
 _ECOSYSTEM_MAP: typing.Dict[str, PlatformLogStreamer] = {}
 _ERROR_REPORT: typing.Dict[str, list[(str, str, str)]] = {}
-_ANALYSIS_MAP: typing.Dict[str, Process] = {}
 
 logger = log.get_logger(__file__)
 
@@ -138,21 +136,25 @@ class EcosystemController:
 
     @staticmethod
     async def stop():
-        for ecosystem_name, ecosystem in _ANALYSIS_MAP.items():
-            border_print(f"Stopping analysis proc for {ecosystem_name}")
-            ecosystem.kill()
         for platform_name, platform, in _PLATFORM_MAP.items():
             border_print(f"Stopping streaming for platform {platform_name}")
             await platform.stop_streaming()
         await EcosystemController.handle_capture("stop")
 
     @staticmethod
-    def analyze():
+    async def run_analyzers():
+        border_print("Starting real time analysis, press enter to stop!", important=True)
+        tasks = []
         for ecosystem_name, ecosystem in _ECOSYSTEM_MAP.items():
-            border_print(f"Starting analyze subproc for {ecosystem_name}")
-            proc = multiprocessing.Process(target=ecosystem.analyze_capture)
-            _ANALYSIS_MAP[ecosystem_name] = proc
-            proc.start()
+            logger.info(f"Creating analysis task for {ecosystem_name}")
+            tasks.append(asyncio.create_task(ecosystem.analyze_capture()))
+        logger.info("Done creating analysis tasks")
+        await asyncio.get_event_loop().run_in_executor(
+            None, sys.stdin.readline)
+        border_print("Cancelling analysis tasks")
+        for task in tasks:
+            task.cancel()
+        logger.info("Done cancelling analysis tasks")
 
     @staticmethod
     async def probe():

@@ -81,6 +81,7 @@ class AndroidPcap(AndroidStream):
         self.pcap_pull = True
 
     async def stop(self):
+        # TODO: Broken on macOS
         self.logger.info("Stopping android pcap proc")
         self.pcap_proc.stop_command()
         await self.pull_packet_capture()

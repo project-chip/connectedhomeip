@@ -44,7 +44,7 @@ class CaptureImplsLoader:
         return os.path.exists(init_path)
 
     def verify_coroutines(self, subclass) -> bool:
-        # ABC does not verify coroutines on subclass instantiation, it merely checks the presence of instance methods
+        # ABC does not verify coroutines on subclass instantiation, it merely checks the presence of methods
         for item in dir(self.search_type):
             item_attr = getattr(self.search_type, item)
             if inspect.iscoroutinefunction(item_attr):

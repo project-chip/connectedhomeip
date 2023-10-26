@@ -84,11 +84,7 @@ class PlayServicesAnalysis:
             self.sigma_logs += line
 
     def show_analysis(self) -> None:
-        # TODO: Because the realtime proc is forked, have to do this again for now...
         self.real_time = False
-        with open(self.platform.streams["LogcatStreamer"].logcat_artifact, mode='r') as logcat_file:
-            for line in logcat_file:
-                self.process_line(line)
         analysis_file = open(self.analysis_file_name, mode="w+")
         print_and_write(add_border('Matter commissioner logs'), analysis_file)
         print_and_write(self.matter_commissioner_logs, analysis_file)

@@ -141,6 +141,7 @@ class Android(PlatformLogStreamer):
         self._log_adb_devices()
         temp_device_id = input('').strip()
         self._check_connect_wireless_adb(temp_device_id)
+        self.get_adb_devices()
         if self._only_one_device_connected():
             self._set_device_if_only_one_connected()
         elif temp_device_id not in self.adb_devices:

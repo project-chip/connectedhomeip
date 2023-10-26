@@ -15,9 +15,9 @@
 #    limitations under the License.
 #
 
+import asyncio
 import json
 import os
-import time
 from typing import Dict
 
 import log
@@ -26,7 +26,7 @@ from capture.platform.android import Android
 from capture.utils.artifact import create_standard_log_name
 
 from . import config
-from .analysis import PlayServicesAnalysis
+from .play_services_analysis import PlayServicesAnalysis
 from .command_map import dumpsys, getprop
 from .prober import PlayServicesProber
 
@@ -39,6 +39,7 @@ class PlayServices(EcosystemCapture):
     """
 
     def __init__(self, platform: Android, artifact_dir: str) -> None:
+        self.logcat_fd = None
         self.logger = logger
         self.artifact_dir = artifact_dir
 
@@ -103,13 +104,14 @@ class PlayServices(EcosystemCapture):
 
     async def stop_capture(self) -> None:
         self.analysis.show_analysis()
+        if self.logcat_fd is not None:
+            self.logcat_fd.close()
 
-    def analyze_capture(self):
-        fd = open(self.platform.streams["LogcatStreamer"].logcat_artifact, "r")
+    async def analyze_capture(self):
+        self.logcat_fd = open(self.platform.streams["LogcatStreamer"].logcat_artifact, "r")
         while True:
-            self.analysis.do_analysis(fd.readlines())
-            time.sleep(4)
-        fd.close()
+            self.analysis.do_analysis(self.logcat_fd.readlines())
+            await asyncio.sleep(0)
 
     async def probe_capture(self) -> None:
         if config.enable_foyer_probers:

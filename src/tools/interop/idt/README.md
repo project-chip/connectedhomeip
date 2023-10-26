@@ -292,8 +292,7 @@ usage: idt capture [-h] [--platform {Android}] [--ecosystem {DemoExtEcosystem...
 ```
 
 > **IMPORTANT:** Note the following runtime expectations of ecosystems:  
-> `analyze_capture` will be run as a target of `multiprocessing.Process`, \
-> meaning the ecosystem object will be copied into a forked process at this time.
+> `analyze_capture` must be async aware and not interact with stdin
 
 The platform loader functions the same as `capture/ecosystem`.
 
@@ -335,13 +334,6 @@ For discovery:
 -   When needed, execute builds in a folder called `BUILD` within the source
     tree.
     -   `idt_clean_all` deletes all `BUILD` dirs and `BUILD` is in `.gitignore`.
--   Although many things are marked as co routines, almost all real concurrency
-    in the current implementation comes from multiprocessing.
-    -   A general direction should be decided for the project in the next
-        iteration.
-    -   Multiprocessing allows for easier implementation where ecosystems are
-        less likely to block each other
-    -   Async allows for better shared states and flexibility
 
 ## Troubleshooting
 

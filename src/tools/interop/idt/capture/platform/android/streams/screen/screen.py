@@ -55,7 +55,7 @@ class ScreenRecorder(AndroidStream):
     async def prepare_screen_recording(self) -> None:
         screen_on = self.check_screen()
         while not screen_on:
-            await asyncio.sleep(4)
+            await asyncio.sleep(3)
             screen_on = self.check_screen()
             if not screen_on:
                 self.logger.error("Please turn the screen on so screen recording can start or check connection!")
@@ -72,19 +72,14 @@ class ScreenRecorder(AndroidStream):
             manifest.write(screen_pull_command)
         self.file_counter += 1
 
-    def run_recorder(self) -> None:
-        while True:
-            asyncio.run(self.prepare_screen_recording())
-            self.update_commands()
-            self.logger.info(f"New screen recording file started {self.screen_phone_out_path} {self.screen_artifact}")
-            self.platform.run_adb_command(self.screen_command)
-
     async def start(self):
         await self.prepare_screen_recording()
         if self.check_screen() and not self.screen_pull:
-            self.screen_pull = True
-            self.screen_proc = multiprocessing.Process(target=self.run_recorder)
-            self.screen_proc.start()
+            # TODO: Make screen recording run on loop, replace removed multiproc solution with async
+            self.update_commands()
+            self.logger.info(f"New screen recording file started {self.screen_phone_out_path} {self.screen_artifact}")
+            self.screen_proc = self.platform.get_adb_background_command(self.screen_command)
+            self.screen_proc.start_command()
 
     async def pull_screen_recording(self) -> None:
         if self.screen_pull:
@@ -96,8 +91,7 @@ class ScreenRecorder(AndroidStream):
             self.screen_pull = False
 
     async def stop(self):
+        # TODO: Broken on macOS
         self.logger.info("Stopping screen proc")
-        if self.screen_proc is not None:
-            self.screen_proc.kill()
-            self.screen_proc.join()
+        self.screen_proc.stop_command()
         await self.pull_screen_recording()

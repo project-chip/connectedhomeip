@@ -60,5 +60,6 @@ class PacketCaptureRunner:
             self.logger.info(f"Pcap output path {self.output_path}")
 
     def stop_pcap(self) -> None:
+        # TODO: Broken on macOS
         self.logger.info("Stopping pcap proc")
         self.pcap_proc.stop_command(soft=True)

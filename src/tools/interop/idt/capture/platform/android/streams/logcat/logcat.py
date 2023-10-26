@@ -15,12 +15,10 @@
 #    limitations under the License.
 #
 
-import multiprocessing
-import time
 from typing import TYPE_CHECKING
 
 import log
-from capture.utils.artifact import create_standard_log_name, get_observer_proc
+from capture.utils.artifact import create_standard_log_name
 
 from ..base import AndroidStream
 
@@ -38,29 +36,15 @@ class LogcatStreamer(AndroidStream):
         self.logcat_artifact = create_standard_log_name("logcat", "txt", parent=platform.artifact_dir)
         self.logcat_command = f"logcat -T 1 >> {self.logcat_artifact}"
         self.logcat_proc = platform.get_adb_background_command(self.logcat_command)
-        self.observer_proc = get_observer_proc(self.logcat_artifact)
-        self.runner_proc = multiprocessing.Process(target=self.restart_logcat_as_needed)
         self.was_ever_running = False
 
-    def restart_logcat_as_needed(self) -> None:
-        while True:
-            if not self.logcat_proc.command_is_running():
-                self.logcat_proc = self.platform.get_adb_background_command(self.logcat_command)
-                self.logcat_proc.start_command()
-                if self.was_ever_running:
-                    self.logger.critical("Had to start logcat again!!!")
-                else:
-                    self.was_ever_running = True
-            time.sleep(10)
+    async def start_observer(self):
+        # TODO: async restart logcat as needed
+        # TODO: async warn if file not growing as needed
+        pass
 
     async def start(self):
-        if not self.runner_proc.is_alive():
-            self.runner_proc.start()
-        if not self.observer_proc.is_alive():
-            self.observer_proc.start()
+        self.logcat_proc.start_command()
 
     async def stop(self):
-        self.runner_proc.kill()
-        self.observer_proc.kill()
-        self.runner_proc.join()
-        self.observer_proc.join()
+        self.logcat_proc.stop_command()
