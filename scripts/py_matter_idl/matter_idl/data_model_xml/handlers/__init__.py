@@ -19,6 +19,7 @@ from matter_idl.matter_idl_types import Idl
 from .base import BaseHandler
 from .context import Context
 from .handlers import ClusterHandler
+from .parsing import NormalizeName
 
 LOGGER = logging.getLogger('data-model-xml-data-parsing')
 
@@ -43,6 +44,6 @@ class DataModelXmlHandler(BaseHandler):
 
             LOGGER.info("Found a base cluster (no id): '%s'", attrs['name'])
 
-            return ClusterHandler.IntoCluster(self.context, self._idl, self.context.AddBaseCluster(attrs['name'], self.context.GetCurrentLocationMeta()))
+            return ClusterHandler.IntoCluster(self.context, self._idl, self.context.AddBaseCluster(NormalizeName(attrs['name']), self.context.GetCurrentLocationMeta()))
         else:
             return BaseHandler(self.context)

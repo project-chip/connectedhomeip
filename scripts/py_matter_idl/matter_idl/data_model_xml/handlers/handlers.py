@@ -22,6 +22,7 @@ from matter_idl.matter_idl_types import (Attribute, AttributeQuality, Bitmap, Cl
 
 from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
+from .derivation import AddBaseInfoPostProcessor
 from .parsing import (ApplyConstraint, AttributesToAttribute, AttributesToBitFieldConstantEntry, AttributesToCommand,
                       AttributesToEvent, AttributesToField, NormalizeDataType, NormalizeName, ParseInt, StringToAccessPrivilege)
 
@@ -39,18 +40,6 @@ def is_unused_name(attrs):
         return False
 
     return attrs['name'] in {'base reserved', 'derived reserved'}
-
-
-class AddBaseInfoPostProcessor(IdlPostProcessor):
-    def __init__(self, destination_cluster: Cluster, source_cluster_name: str, context: Context):
-        self.destination = destination_cluster
-        self.source_name = NormalizeName(source_cluster_name)
-        self.context = context
-
-    def FinalizeProcessing(self, idl: Idl):
-        # FIXME implement
-        LOGGER.error(
-            f"NOT YET IMPLEMENTED: attach {self.source_name} to {self.destination.name}")
 
 
 class FeaturesHandler(BaseHandler):
@@ -599,9 +588,6 @@ class ClusterHandler(BaseHandler):
             if attrs['hierarchy'] == 'derived':
                 # This is a derived cluster. We have to add everything from the
                 # base cluster
-                #
-                # TODO: how about deriving a cluster that already has an ID?
-                #
                 self.context.AddIdlPostProcessor(AddBaseInfoPostProcessor(
                     destination_cluster=self._cluster,
                     source_cluster_name=attrs['baseCluster'],
