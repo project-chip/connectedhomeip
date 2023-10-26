@@ -147,6 +147,8 @@ idt_push
 
 ## Single host installation (no Raspberry Pi)
 
+TODO: Update
+
 Follow the steps below to execute capture and discovery without a Raspberry Pi.
 
 ### Linux installation

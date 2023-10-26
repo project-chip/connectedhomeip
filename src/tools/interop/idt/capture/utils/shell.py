@@ -68,10 +68,12 @@ class Bash:
             self.logger.warning(f'{self.command} start requested while running')
 
     def term_with_sudo(self, proc: multiprocessing.Process) -> None:
+        self.logger.debug(f"SIGTERM {proc.pid} with sudo")
         Bash(f"sudo kill {proc.pid}").start_command()
 
-    def kill_with_sudo(self):
-        Bash(f"sudo kill -9 {self.proc.pid}").start_command()
+    def kill_with_sudo(self, proc: multiprocessing.Process) -> None:
+        self.logger.debug(f"SIGKILL {proc.pid} with sudo")
+        Bash(f"sudo kill -9 {proc.pid}").start_command()
 
     def term(self, proc: multiprocessing.Process) -> None:
         if "sudo" in self.command:
