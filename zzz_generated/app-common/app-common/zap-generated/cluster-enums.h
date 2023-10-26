@@ -917,6 +917,16 @@ enum class Feature : uint32_t
     kEthernetNetworkInterface = 0x4,
 };
 
+// Bitmap for ThreadCapabilitiesBitmap
+enum class ThreadCapabilitiesBitmap : uint16_t
+{
+    kIsBorderRouterCapable                = 0x1,
+    kIsRouterCapable                      = 0x2,
+    kIsSleepyEndDeviceCapable             = 0x4,
+    kIsFullThreadDevice                   = 0x8,
+    kIsSynchronizedSleepyEndDeviceCapable = 0x10,
+};
+
 // Bitmap for WiFiSecurityBitmap
 enum class WiFiSecurityBitmap : uint8_t
 {
@@ -1395,6 +1405,12 @@ enum class StatusCode : uint8_t
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
     kUnknownEnumValue = 0,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kBasic = 0x1,
 };
 } // namespace AdministratorCommissioning
 
@@ -2666,7 +2682,7 @@ enum class Feature : uint32_t
 enum class PumpStatusBitmap : uint16_t
 {
     kDeviceFault       = 0x1,
-    kSupplyfault       = 0x2,
+    kSupplyFault       = 0x2,
     kSpeedLow          = 0x4,
     kSpeedHigh         = 0x8,
     kLocalOverride     = 0x10,

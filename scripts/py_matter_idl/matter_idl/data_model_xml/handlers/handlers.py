@@ -64,19 +64,24 @@ class BitmapHandler(BaseHandler):
 
         # try to find the best size that fits
         # TODO: this is a pure heuristic. XML containing this would be better.
-        acceptable = {8, 16, 32}
+        #       https://github.com/csa-data-model/projects/issues/345
+        acceptable = {8, 16, 32, 64}
         for entry in self._bitmap.entries:
-            if entry.code > 0xFF:
+            if entry.code > 0xFF and 8 in acceptable:
                 acceptable.remove(8)
-            if entry.code > 0xFFFF:
+            if entry.code > 0xFFFF and 16 in acceptable:
                 acceptable.remove(16)
+            if entry.code > 0xFFFFFFFF and 32 in acceptable:
+                acceptable.remove(32)
 
         if 8 in acceptable:
             self._bitmap.base_type = "bitmap8"
         elif 16 in acceptable:
             self._bitmap.base_type = "bitmap16"
-        else:
+        elif 32 in acceptable:
             self._bitmap.base_type = "bitmap32"
+        else:
+            self._bitmap.base_type = "bitmap64"
 
         self._cluster.bitmaps.append(self._bitmap)
 
@@ -93,7 +98,7 @@ class BitmapHandler(BaseHandler):
             return BaseHandler(self.context)
 
 
-class MandatoryConfirmFieldHandler(BaseHandler):
+class MandatoryConformFieldHandler(BaseHandler):
     def __init__(self, context: Context, field: Field):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._field = field
@@ -120,7 +125,7 @@ class FieldHandler(BaseHandler):
             ApplyConstraint(attrs, self._field)
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         elif name == "mandatoryConform":
-            return MandatoryConfirmFieldHandler(self.context, self._field)
+            return MandatoryConformFieldHandler(self.context, self._field)
         elif name == "optionalConform":
             self._field.qualities |= FieldQuality.OPTIONAL
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
@@ -221,19 +226,16 @@ class EnumHandler(BaseHandler):
 
         # try to find the best enum size that fits out of enum8, enum32 and enum32
         # TODO: this is a pure heuristic. XML containing this would be better.
-        acceptable = {8, 16, 32}
+        #       https://github.com/csa-data-model/projects/issues/345
+        acceptable = {8, 16}
         for entry in self._enum.entries:
-            if entry.code > 0xFF:
+            if entry.code > 0xFF and 8 in acceptable:
                 acceptable.remove(8)
-            if entry.code > 0xFFFF:
-                acceptable.remove(16)
 
         if 8 in acceptable:
             self._enum.base_type = "enum8"
-        elif 16 in acceptable:
-            self._enum.base_type = "enum16"
         else:
-            self._enum.base_type = "enum32"
+            self._enum.base_type = "enum16"
 
         self._cluster.enums.append(self._enum)
 
@@ -323,8 +325,11 @@ class AttributeHandler(BaseHandler):
         elif name == "optionalConform":
             self._attribute.definition.qualities |= FieldQuality.OPTIONAL
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        elif name == "otherwiseConform":
+            self._attribute.definition.qualities |= FieldQuality.OPTIONAL
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         elif name == "mandatoryConform":
-            return MandatoryConfirmFieldHandler(self.context, self._attribute.definition)
+            return MandatoryConformFieldHandler(self.context, self._attribute.definition)
         elif name == "deprecateConform":
             self._deprecated = True
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)

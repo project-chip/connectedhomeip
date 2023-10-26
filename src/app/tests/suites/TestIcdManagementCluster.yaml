@@ -28,15 +28,15 @@ tests:
               - name: "nodeId"
                 value: nodeId
 
-    - label: "Read IdleModeInterval"
+    - label: "Read IdleModeDuration"
       command: "readAttribute"
-      attribute: "IdleModeInterval"
+      attribute: "IdleModeDuration"
       response:
           value: 2
 
-    - label: "Read ActiveModeInterval"
+    - label: "Read ActiveModeDuration"
       command: "readAttribute"
-      attribute: "ActiveModeInterval"
+      attribute: "ActiveModeDuration"
       response:
           value: 300
 

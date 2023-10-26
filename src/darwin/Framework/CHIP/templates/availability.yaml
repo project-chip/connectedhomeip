@@ -7728,3 +7728,18 @@
 
 - release: "Future"
   versions: "future"
+  introduced:
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpStatusBitmap:
+                  - SupplyFault
+  deprecated:
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpStatusBitmap:
+                  - Supplyfault
+  renames:
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpStatusBitmap:
+                  SupplyFault: Supplyfault

@@ -1425,6 +1425,14 @@ server cluster NetworkCommissioning = 49 {
     kEthernetNetworkInterface = 0x4;
   }
 
+  bitmap ThreadCapabilitiesBitmap : bitmap16 {
+    kIsBorderRouterCapable = 0x1;
+    kIsRouterCapable = 0x2;
+    kIsSleepyEndDeviceCapable = 0x4;
+    kIsFullThreadDevice = 0x8;
+    kIsSynchronizedSleepyEndDeviceCapable = 0x10;
+  }
+
   bitmap WiFiSecurityBitmap : bitmap8 {
     kUnencrypted = 0x1;
     kWEP = 0x2;
@@ -2312,9 +2320,13 @@ server cluster AdministratorCommissioning = 60 {
     kWindowNotOpen = 4;
   }
 
+  bitmap Feature : bitmap32 {
+    kBasic = 0x1;
+  }
+
   readonly attribute CommissioningWindowStatusEnum windowStatus = 0;
   readonly attribute nullable fabric_idx adminFabricIndex = 1;
-  readonly attribute nullable int16u adminVendorId = 2;
+  readonly attribute nullable vendor_id adminVendorId = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -2327,7 +2339,7 @@ server cluster AdministratorCommissioning = 60 {
     octet_string PAKEPasscodeVerifier = 1;
     int16u discriminator = 2;
     int32u iterations = 3;
-    octet_string salt = 4;
+    octet_string<32> salt = 4;
   }
 
   request struct OpenBasicCommissioningWindowRequest {
@@ -4080,7 +4092,7 @@ server cluster PumpConfigurationAndControl = 512 {
 
   bitmap PumpStatusBitmap : bitmap16 {
     kDeviceFault = 0x1;
-    kSupplyfault = 0x2;
+    kSupplyFault = 0x2;
     kSpeedLow = 0x4;
     kSpeedHigh = 0x8;
     kLocalOverride = 0x10;
@@ -6175,11 +6187,11 @@ client cluster AudioOutput = 1291 {
   struct OutputInfoStruct {
     int8u index = 0;
     OutputTypeEnum outputType = 1;
-    char_string<32> name = 2;
+    char_string name = 2;
   }
 
   readonly attribute OutputInfoStruct outputList[] = 0;
-  readonly attribute optional int8u currentOutput = 1;
+  readonly attribute int8u currentOutput = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -6199,7 +6211,7 @@ client cluster AudioOutput = 1291 {
   /** Upon receipt, this SHALL change the output on the media device to the output at a specific index in the Output List. */
   command SelectOutput(SelectOutputRequest): DefaultSuccess = 0;
   /** Upon receipt, this SHALL rename the output at a specific index in the Output List. Updates to the output name SHALL appear in the TV settings menus. */
-  command RenameOutput(RenameOutputRequest): DefaultSuccess = 1;
+  command access(invoke: manage) RenameOutput(RenameOutputRequest): DefaultSuccess = 1;
 }
 
 /** This cluster provides an interface for controlling the Output on a media device such as a TV. */
@@ -6220,7 +6232,7 @@ server cluster AudioOutput = 1291 {
   struct OutputInfoStruct {
     int8u index = 0;
     OutputTypeEnum outputType = 1;
-    char_string<32> name = 2;
+    char_string name = 2;
   }
 
   readonly attribute OutputInfoStruct outputList[] = 0;
@@ -6242,7 +6254,7 @@ server cluster AudioOutput = 1291 {
   }
 
   command SelectOutput(SelectOutputRequest): DefaultSuccess = 0;
-  command RenameOutput(RenameOutputRequest): DefaultSuccess = 1;
+  command access(invoke: manage) RenameOutput(RenameOutputRequest): DefaultSuccess = 1;
 }
 
 /** This cluster provides an interface for launching content on a media player device such as a TV or Speaker. */
@@ -6350,12 +6362,12 @@ client cluster ApplicationBasic = 1293 {
 
   readonly attribute optional char_string<32> vendorName = 0;
   readonly attribute optional vendor_id vendorID = 1;
-  readonly attribute char_string<32> applicationName = 2;
+  readonly attribute long_char_string<256> applicationName = 2;
   readonly attribute optional int16u productID = 3;
   readonly attribute ApplicationStruct application = 4;
   readonly attribute ApplicationStatusEnum status = 5;
   readonly attribute char_string<32> applicationVersion = 6;
-  readonly attribute vendor_id allowedVendorList[] = 7;
+  readonly attribute access(read: administer) vendor_id allowedVendorList[] = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -6380,12 +6392,12 @@ server cluster ApplicationBasic = 1293 {
 
   readonly attribute char_string<32> vendorName = 0;
   readonly attribute vendor_id vendorID = 1;
-  readonly attribute char_string<32> applicationName = 2;
+  readonly attribute long_char_string<256> applicationName = 2;
   readonly attribute int16u productID = 3;
   readonly attribute ApplicationStruct application = 4;
   readonly attribute ApplicationStatusEnum status = 5;
   readonly attribute char_string<32> applicationVersion = 6;
-  readonly attribute vendor_id allowedVendorList[] = 7;
+  readonly attribute access(read: administer) vendor_id allowedVendorList[] = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;

@@ -36,7 +36,7 @@ static const uint16_t kExpectedDiscoveredDevicesCount = 2;
 static MTRDeviceController * sController = nil;
 
 @interface DeviceScannerDelegate : NSObject <MTRCommissionableBrowserDelegate>
-@property (nonatomic) XCTestExpectation * expectation;
+@property (nonatomic, nullable) XCTestExpectation * expectation;
 @property (nonatomic) NSNumber * resultsCount;
 
 - (instancetype)initWithExpectation:(XCTestExpectation *)expectation;
@@ -56,8 +56,26 @@ static MTRDeviceController * sController = nil;
     return self;
 }
 
+- (instancetype)init
+{
+    if (!(self = [super init])) {
+        return nil;
+    }
+
+    _resultsCount = 0;
+    _expectation = nil;
+    return self;
+}
+
 - (void)controller:(MTRDeviceController *)controller didFindCommissionableDevice:(MTRCommissionableBrowserResult *)device
 {
+    if (self.expectation == nil) {
+        // We are not actually supposed to be looking at results; don't do it,
+        // because we may be starting/stopping browse multiple times and seeing
+        // odd numbers of results.
+        return;
+    }
+
     _resultsCount = @(_resultsCount.unsignedLongValue + 1);
     if ([_resultsCount isEqual:@(kExpectedDiscoveredDevicesCount)]) {
         [self.expectation fulfill];

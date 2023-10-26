@@ -51,8 +51,8 @@ public:
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
-    CHIP_ERROR ReadIdleModeInterval(EndpointId endpoint, AttributeValueEncoder & encoder);
-    CHIP_ERROR ReadActiveModeInterval(EndpointId endpoint, AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadIdleModeDuration(EndpointId endpoint, AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadActiveModeDuration(EndpointId endpoint, AttributeValueEncoder & encoder);
     CHIP_ERROR ReadActiveModeThreshold(EndpointId endpoint, AttributeValueEncoder & encoder);
     CHIP_ERROR ReadRegisteredClients(EndpointId endpoint, AttributeValueEncoder & encoder);
     CHIP_ERROR ReadICDCounter(EndpointId endpoint, AttributeValueEncoder & encoder);
@@ -65,11 +65,11 @@ CHIP_ERROR IcdManagementAttributeAccess::Read(const ConcreteReadAttributePath & 
 
     switch (aPath.mAttributeId)
     {
-    case IcdManagement::Attributes::IdleModeInterval::Id:
-        return ReadIdleModeInterval(aPath.mEndpointId, aEncoder);
+    case IcdManagement::Attributes::IdleModeDuration::Id:
+        return ReadIdleModeDuration(aPath.mEndpointId, aEncoder);
 
-    case IcdManagement::Attributes::ActiveModeInterval::Id:
-        return ReadActiveModeInterval(aPath.mEndpointId, aEncoder);
+    case IcdManagement::Attributes::ActiveModeDuration::Id:
+        return ReadActiveModeDuration(aPath.mEndpointId, aEncoder);
 
     case IcdManagement::Attributes::ActiveModeThreshold::Id:
         return ReadActiveModeThreshold(aPath.mEndpointId, aEncoder);
@@ -87,14 +87,14 @@ CHIP_ERROR IcdManagementAttributeAccess::Read(const ConcreteReadAttributePath & 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR IcdManagementAttributeAccess::ReadIdleModeInterval(EndpointId endpoint, AttributeValueEncoder & encoder)
+CHIP_ERROR IcdManagementAttributeAccess::ReadIdleModeDuration(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
-    return encoder.Encode(ICDManagementServer::GetInstance().GetIdleModeIntervalSec());
+    return encoder.Encode(ICDManagementServer::GetInstance().GetIdleModeDurationSec());
 }
 
-CHIP_ERROR IcdManagementAttributeAccess::ReadActiveModeInterval(EndpointId endpoint, AttributeValueEncoder & encoder)
+CHIP_ERROR IcdManagementAttributeAccess::ReadActiveModeDuration(EndpointId endpoint, AttributeValueEncoder & encoder)
 {
-    return encoder.Encode(ICDManagementServer::GetInstance().GetActiveModeIntervalMs());
+    return encoder.Encode(ICDManagementServer::GetInstance().GetActiveModeDurationMs());
 }
 
 CHIP_ERROR IcdManagementAttributeAccess::ReadActiveModeThreshold(EndpointId endpoint, AttributeValueEncoder & encoder)
