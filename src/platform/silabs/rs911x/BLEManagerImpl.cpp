@@ -975,7 +975,7 @@ CHIP_ERROR BLEManagerImpl::EncodeAdditionalDataTlv()
 
     err = DeviceLayer::GetDeviceInstanceInfoProvider()->GetRotatingDeviceIdUniqueId(rotatingDeviceIdUniqueIdSpan);
     SuccessOrExit(err);
-    err = ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceIdLifetimeCounter);
+    err = ConfigurationMgr().GetLifetimeCounter(additionalDataPayloadParams.rotatingDeviceI dLifetimeCounter);
     SuccessOrExit(err);
     additionalDataPayloadParams.rotatingDeviceIdUniqueId = rotatingDeviceIdUniqueIdSpan;
     additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
@@ -983,8 +983,6 @@ CHIP_ERROR BLEManagerImpl::EncodeAdditionalDataTlv()
 
     err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(additionalDataPayloadParams, c3AdditionalDataBufferHandle,
                                                                          additionalDataFields);
-
-exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to generate TLV encoded Additional Data (%s)", __func__);
