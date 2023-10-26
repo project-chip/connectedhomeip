@@ -4706,7 +4706,7 @@ static id _Nullable DecodeAttributeValueForAdministratorCommissioningCluster(Att
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+            value = [NSNumber numberWithUnsignedShort:chip::to_underlying(cppValue.Value())];
         }
         return value;
     }
