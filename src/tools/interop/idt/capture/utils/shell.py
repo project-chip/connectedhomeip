@@ -68,6 +68,10 @@ class Bash:
 
     def stop_command(self, soft: bool = False) -> None:
         if self.command_is_running():
+            if "sudo" in self.command:
+                self.logger.warning(f"Killing command with sudo {self.command}")
+                Bash(f"sudo kill -9 {self.proc.pid}", sync=True)
+                return
             if soft:
                 self.proc.terminate()
                 if self.proc.stdout:

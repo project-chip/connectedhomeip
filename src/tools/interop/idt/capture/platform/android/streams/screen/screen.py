@@ -83,8 +83,7 @@ class ScreenRecorder(AndroidStream):
     async def run_observer(self) -> None:
         while True:
             if not self.screen_proc.command_is_running():
-                self.logger.error(f"Screen recording proc not running for {self.platform.device_id}, check connection!")
-
+                self.logger.warning(f"Screen recording proc needs restart (may be normal) {self.platform.device_id}")
                 await self.start()
             await asyncio.sleep(4)
 
