@@ -399,18 +399,14 @@ static void wfx_rsi_save_ap_info() // translation
     }
     wfx_rsi.dev_state |= WFX_RSI_ST_SCANSTARTED;
     sl_status_t status = SL_STATUS_OK;
-#ifndef EXP_BOARD // TODO: this changes will be reverted back after the SDK team fix the scan API
     sl_wifi_scan_configuration_t wifi_scan_configuration = { 0 };
     wifi_scan_configuration                              = default_wifi_scan_configuration;
-#endif
     sl_wifi_ssid_t ssid_arg;
     ssid_arg.length = strlen(wfx_rsi.sec.ssid);
     memcpy(ssid_arg.value, (int8_t *) &wfx_rsi.sec.ssid[0], ssid_arg.length);
     sl_wifi_set_scan_callback(scan_callback_handler, NULL);
-#ifndef EXP_BOARD
-    // TODO: this changes will be reverted back after the SDK team fix the scan API
+    scan_results_complete = false;
     status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, &ssid_arg, &wifi_scan_configuration);
-#endif
     if (SL_STATUS_IN_PROGRESS == status)
     {
         const uint32_t start = osKernelGetTickCount();
@@ -695,6 +691,7 @@ void wfx_rsi_task(void * arg)
                 }
                 sl_wifi_set_scan_callback(bg_scan_callback_handler, NULL);
                 wfx_rsi.dev_state |= WFX_RSI_ST_SCANSTARTED;
+                bg_scan_results_complete = false;
                 status = sl_wifi_start_scan(SL_WIFI_CLIENT_2_4GHZ_INTERFACE, NULL, &wifi_scan_configuration);
                 if (SL_STATUS_IN_PROGRESS == status)
                 {
