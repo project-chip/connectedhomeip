@@ -171,7 +171,7 @@ static void TestChipCert_ChipToX509(nlTestSuite * inSuite, void * inContext)
 
     for (size_t i = 0; i < gNumTestCerts; i++)
     {
-        uint8_t certType = gTestCerts[i];
+        TestCert certType = gTestCerts[i];
 
         err = GetTestCert(certType, sNullLoadFlag, inCert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -267,7 +267,7 @@ static void TestChipCert_X509ToChip(nlTestSuite * inSuite, void * inContext)
 
     for (size_t i = 0; i < gNumTestCerts; i++)
     {
-        uint8_t certType = gTestCerts[i];
+        TestCert certType = gTestCerts[i];
 
         err = GetTestCert(certType, sDerFormFlag, inCert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -368,7 +368,7 @@ static void TestChipCert_CertValidation(nlTestSuite * inSuite, void * inContext)
         int mExpectedTrustAnchorIndex;
         struct
         {
-            uint8_t Type;
+            TestCert Type;
             BitFlags<CertDecodeFlags> DecodeFlags;
             BitFlags<TestCertLoadFlags> LoadFlags;
         } InputCerts[kMaxCertsPerTestCase];
@@ -832,7 +832,7 @@ static void TestChipCert_ValidateChipRCAC(nlTestSuite * inSuite, void * inContex
 {
     struct RCACTestCase
     {
-        uint8_t Cert;
+        TestCert Cert;
         CHIP_ERROR mExpectedResult;
     };
 
@@ -1191,7 +1191,7 @@ static void TestChipCert_CertType(nlTestSuite * inSuite, void * inContext)
 
     struct TestCase
     {
-        uint8_t Cert;
+        TestCert Cert;
         CertType ExpectedCertType;
     };
 
@@ -1237,7 +1237,7 @@ static void TestChipCert_CertId(nlTestSuite * inSuite, void * inContext)
 
     struct TestCase
     {
-        uint8_t Cert;
+        TestCert Cert;
         uint64_t ExpectedCertId;
     };
 
@@ -1728,8 +1728,8 @@ static void TestChipCert_ExtractNodeIdFabricId(nlTestSuite * inSuite, void * inC
 {
     struct TestCase
     {
-        uint8_t Cert;
-        uint8_t ICACert;
+        TestCert Cert;
+        TestCert ICACert;
         uint64_t ExpectedNodeId;
         uint64_t ExpectedFabricId;
     };
@@ -1844,8 +1844,8 @@ static void TestChipCert_ExtractOperationalDiscoveryId(nlTestSuite * inSuite, vo
 {
     struct TestCase
     {
-        uint8_t Noc;
-        uint8_t Rcac;
+        TestCert Noc;
+        TestCert Rcac;
         uint64_t ExpectedNodeId;
         uint64_t ExpectedFabricId;
         uint64_t ExpectedCompressedFabricId;
@@ -1900,7 +1900,7 @@ static void TestChipCert_ExtractAndValidateCATsFromOpCert(nlTestSuite * inSuite,
 {
     struct TestCase
     {
-        uint8_t Cert;
+        TestCert Cert;
         CATValues ExpectedCATs;
     };
 
@@ -1986,7 +1986,7 @@ static void TestChipCert_ExtractSubjectDNFromChipCert(nlTestSuite * inSuite, voi
 {
     struct TestCase
     {
-        uint8_t Cert;
+        TestCert Cert;
         ChipDN ExpectedSubjectDN;
     };
 
@@ -2058,7 +2058,7 @@ static void TestChipCert_ExtractPublicKeyAndSKID(nlTestSuite * inSuite, void * i
 {
     struct TestCase
     {
-        uint8_t Cert;
+        TestCert Cert;
         ByteSpan ExpectedPublicKey;
         ByteSpan ExpectedSKID;
     };

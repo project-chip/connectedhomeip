@@ -36,7 +36,7 @@ USE_GIT_SHA_FOR_VERSION=true
 USE_SLC=false
 GN_PATH=gn
 GN_PATH_PROVIDED=false
-
+USE_BOOTLOADER=false
 DOTFILE=".gn"
 
 SILABS_THREAD_TARGET=\""../silabs:ot-efr32-cert"\"
@@ -138,6 +138,9 @@ if [ "$#" == "0" ]; then
             Generate files with SLC for current board and options Requires an SLC-CLI installation or running in Docker.
         --slc_reuse_files
             Use generated files without running slc again.
+        --bootloader
+            Add bootloader to the generated image.
+
 
     "
 elif [ "$#" -lt "2" ]; then
@@ -216,6 +219,10 @@ else
             #    ;;
             --release)
                 optArgs+="is_debug=false disable_lcd=true chip_build_libshell=false enable_openthread_cli=false use_external_flash=false chip_logging=false silabs_log_enabled=false "
+                shift
+                ;;
+            --bootloader)
+                USE_BOOTLOADER=true
                 shift
                 ;;
             --docker)
@@ -327,4 +334,44 @@ else
     #print stats
     arm-none-eabi-size -A "$BUILD_DIR"/*.out
 
+    # add bootloader to generated image
+    if [ "$USE_BOOTLOADER" == true ]; then
+
+        binName=""
+        InternalBootloaderBoards=("BRD4337A" "BRD2704A" "BRD2703A" "BRD4319A")
+        bootloaderPath=""
+        commanderPath=""
+        # find the matter root folder
+        if [ -z "$MATTER_ROOT" ]; then
+            MATTER_ROOT="$CHIP_ROOT"
+        fi
+
+        # set commander path
+        if [ -z "$COMMANDER_PATH" ]; then
+            commanderPath="commander"
+        else
+            commanderPath="$COMMANDER_PATH"
+        fi
+
+        # search bootloader directory for the respective bootloaders for the input board
+        bootloaderFiles=("$(find "$MATTER_ROOT/third_party/silabs/matter_support/matter/efr32/bootloader_binaries/" -maxdepth 1 -name "*$SILABS_BOARD*" | tr '\n' ' ')")
+
+        if [ "${#bootloaderFiles[@]}" -gt 1 ]; then
+            for i in "${!bootloaderFiles[@]}"; do
+                # if a variant of the bootloader that uses external flash exists, use that one.
+                if [[ "${bootloaderFiles[$i]}" =~ .*"spiflash".* ]]; then
+                    bootloaderPath="${bootloaderFiles[$i]}"
+                    break
+                fi
+            done
+        elif [ "${#bootloaderFiles[@]}" -eq 0 ]; then
+            echo "A bootloader for the $SILABS_BOARD currently doesn't exist!"
+        else
+            bootloaderPath="${bootloaderFiles[0]}"
+        fi
+        echo "$bootloaderPath"
+        binName="$(find "$BUILD_DIR" -type f -name "*.s37")"
+        echo "$binName"
+        "$commanderPath" convert "$binName" "$bootloaderPath" -o "$binName"
+    fi
 fi

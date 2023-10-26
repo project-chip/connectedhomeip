@@ -100,7 +100,7 @@ defined:
 2. Activate the build environment:
 
     ```bash
-    $ source ./scripts/activate.sh
+    $ source ./scripts/activate.sh -p all,telink
     ```
 
 3. In the example dir run (replace _<build_target>_ with your board name, for

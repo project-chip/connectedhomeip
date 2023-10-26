@@ -6,13 +6,13 @@
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
 server cluster AccessControl = 31 {
-  enum AccessControlEntryAuthModeEnum : ENUM8 {
+  enum AccessControlEntryAuthModeEnum : enum8 {
     kPASE = 1;
     kCASE = 2;
     kGroup = 3;
   }
 
-  enum AccessControlEntryPrivilegeEnum : ENUM8 {
+  enum AccessControlEntryPrivilegeEnum : enum8 {
     kView = 1;
     kProxyView = 2;
     kOperate = 3;
@@ -20,7 +20,7 @@ server cluster AccessControl = 31 {
     kAdminister = 5;
   }
 
-  enum ChangeTypeEnum : ENUM8 {
+  enum ChangeTypeEnum : enum8 {
     kChanged = 0;
     kAdded = 1;
     kRemoved = 2;
@@ -76,7 +76,7 @@ server cluster AccessControl = 31 {
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 server cluster GeneralCommissioning = 48 {
-  enum CommissioningErrorEnum : ENUM8 {
+  enum CommissioningErrorEnum : enum8 {
     kOK = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
@@ -84,7 +84,7 @@ server cluster GeneralCommissioning = 48 {
     kBusyWithOtherAdmin = 4;
   }
 
-  enum RegulatoryLocationTypeEnum : ENUM8 {
+  enum RegulatoryLocationTypeEnum : enum8 {
     kIndoor = 0;
     kOutdoor = 1;
     kIndoorOutdoor = 2;
@@ -138,7 +138,7 @@ server cluster GeneralCommissioning = 48 {
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 server cluster NetworkCommissioning = 49 {
-  enum NetworkCommissioningStatusEnum : ENUM8 {
+  enum NetworkCommissioningStatusEnum : enum8 {
     kSuccess = 0;
     kOutOfRange = 1;
     kBoundsExceeded = 2;
@@ -154,7 +154,7 @@ server cluster NetworkCommissioning = 49 {
     kUnknownError = 12;
   }
 
-  enum WiFiBandEnum : ENUM8 {
+  enum WiFiBandEnum : enum8 {
     k2G4 = 0;
     k3G65 = 1;
     k5G = 2;
@@ -163,13 +163,21 @@ server cluster NetworkCommissioning = 49 {
     k1G = 5;
   }
 
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kWiFiNetworkInterface = 0x1;
     kThreadNetworkInterface = 0x2;
     kEthernetNetworkInterface = 0x4;
   }
 
-  bitmap WiFiSecurityBitmap : BITMAP8 {
+  bitmap ThreadCapabilitiesBitmap : bitmap16 {
+    kIsBorderRouterCapable = 0x1;
+    kIsRouterCapable = 0x2;
+    kIsSleepyEndDeviceCapable = 0x4;
+    kIsFullThreadDevice = 0x8;
+    kIsSynchronizedSleepyEndDeviceCapable = 0x10;
+  }
+
+  bitmap WiFiSecurityBitmap : bitmap8 {
     kUnencrypted = 0x1;
     kWEP = 0x2;
     kWPAPersonal = 0x4;
@@ -270,13 +278,13 @@ server cluster NetworkCommissioning = 49 {
 
 /** The cluster provides commands for retrieving unstructured diagnostic logs from a Node that may be used to aid in diagnostics. */
 server cluster DiagnosticLogs = 50 {
-  enum IntentEnum : ENUM8 {
+  enum IntentEnum : enum8 {
     kEndUserSupport = 0;
     kNetworkDiag = 1;
     kCrashLogs = 2;
   }
 
-  enum StatusEnum : ENUM8 {
+  enum StatusEnum : enum8 {
     kSuccess = 0;
     kExhausted = 1;
     kNoLogs = 2;
@@ -284,7 +292,7 @@ server cluster DiagnosticLogs = 50 {
     kDenied = 4;
   }
 
-  enum TransferProtocolEnum : ENUM8 {
+  enum TransferProtocolEnum : enum8 {
     kResponsePayload = 0;
     kBDX = 1;
   }
@@ -314,12 +322,12 @@ server cluster DiagnosticLogs = 50 {
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 server cluster OperationalCredentials = 62 {
-  enum CertificateChainTypeEnum : ENUM8 {
+  enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
     kPAICertificate = 2;
   }
 
-  enum NodeOperationalCertStatusEnum : ENUM8 {
+  enum NodeOperationalCertStatusEnum : enum8 {
     kOK = 0;
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
@@ -421,7 +429,7 @@ server cluster OperationalCredentials = 62 {
 }
 
 endpoint 0 {
-  device type ma_all_clusters_app = 0, version 1;
+  device type ma_all_clusters_app = 4293984259, version 1;
 
 
   server cluster AccessControl {

@@ -2776,6 +2776,7 @@
           "define": "FAN_CONTROL_CLUSTER",
           "side": "server",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "attributes": [
             {
               "name": "FanMode",
@@ -7773,7 +7774,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "5",
+              "defaultValue": "6",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -7827,6 +7828,5 @@
       "endpointId": 5,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

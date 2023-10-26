@@ -26,6 +26,8 @@ runs:
       uses: ./.github/actions/bootstrap-cache
     - name: Bootstrap
       uses: ./.github/actions/bootstrap
+      env:
+        PW_NO_CIPD_CACHE_DIR: Y
       with:
         platform: ${{ inputs.platform }}
     - name: Dump disk info after checkout submodule & Bootstrap

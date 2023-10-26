@@ -3499,6 +3499,7 @@
           "define": "FAN_CONTROL_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "attributes": [
             {
               "name": "FeatureMap",
@@ -3800,6 +3801,5 @@
       "endpointId": 1,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

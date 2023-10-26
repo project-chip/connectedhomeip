@@ -505,6 +505,21 @@ CHIP_ERROR ConvertX509CertToChipCert(const ByteSpan x509Cert, MutableByteSpan & 
 CHIP_ERROR ConvertChipCertToX509Cert(const ByteSpan chipCert, MutableByteSpan & x509Cert);
 
 /**
+ * @brief Verifies the signature of a certificate.
+ *
+ * @param cert    The certificate to be verified.
+ * @param signer  The certificate containing the public key used to verify the signature.
+ *
+ * @return Returns a CHIP_ERROR on validation or other error, CHIP_NO_ERROR otherwise
+ *
+ * The certificate to be verified must have been decoded with TBS hash calculation enabled.
+ *
+ * Note that this function performs ONLY signature verification. No Subject and Issuer DN
+ * comparison, Key Usage extension checks or similar validation is performed.
+ **/
+CHIP_ERROR VerifyCertSignature(const ChipCertificateData & cert, const ChipCertificateData & signer);
+
+/**
  * Validate CHIP Root CA Certificate (RCAC) in ByteSpan TLV-encoded form.
  * This function performs RCAC parsing, checks SubjectDN validity, verifies that SubjectDN
  * and IssuerDN are equal, verifies that SKID and AKID are equal, validates certificate signature.

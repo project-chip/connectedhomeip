@@ -17,9 +17,6 @@
  */
 package com.matter.controller.commands.pairing
 
-import chip.tlv.AnonymousTag
-import chip.tlv.ContextSpecificTag
-import chip.tlv.TlvWriter
 import com.matter.controller.commands.common.CredentialsIssuer
 import java.time.Duration
 import java.util.logging.Level
@@ -29,6 +26,9 @@ import matter.controller.InvokeRequest
 import matter.controller.InvokeResponse
 import matter.controller.MatterController
 import matter.controller.model.CommandPath
+import matter.tlv.AnonymousTag
+import matter.tlv.ContextSpecificTag
+import matter.tlv.TlvWriter
 
 class PairOnNetworkLongImInvokeCommand(
   controller: MatterController,

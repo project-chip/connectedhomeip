@@ -97,6 +97,8 @@ class AndroidApp(Enum):
             gn_args["chip_config_network_layer_ble"] = False
         elif self == AndroidApp.VIRTUAL_DEVICE_APP:
             gn_args["chip_config_network_layer_ble"] = True
+        elif self == AndroidApp.CHIP_TOOL:
+            gn_args["chip_build_controller_dynamic_server"] = True
         return gn_args
 
     def ExampleName(self):
@@ -354,7 +356,7 @@ class AndroidBuilder(Builder):
 
             args_str = ""
             for key, value in gn_args.items():
-                if type(value) == bool:
+                if type(value) is bool:
                     if value:
                         args_str += "%s=true " % (key)
                     else:

@@ -76,13 +76,14 @@ exclude:
     - "examples/platform/nxp/k32w/k32w0/scripts/demo_generated_certs/**/*"
     - "integrations/cloudbuild/*.yaml" # uglier long command line content
     - "scripts/run_codegen_targets.sh" # shellharden breaks for loops over command outputs
+    - "scripts/tagging/tag_new_release.sh" # shellharden breaks parameter passing
     - "src/darwin/Framework/CHIP/zap-generated/*" # already clang-formatted by our zap tooling
     - "zzz_generated/**/*" # already clang-formatted by our zap tooling
     - "src/controller/java/generated/java/**/*" # not formatted: generated files
     - "src/controller/java/zap-generated/**/*" # not formatted: generated files
     - "scripts/setup/bootstrap.sh" # tries to quote loop variable
     - "integrations/docker/build-all.sh" # tries to quote loop variable
-    - "pigweed.json" # TODO(#29547). This file is temporary copy from pigweed repo that has minor edits. No restyle help in diff.
+    - "scripts/setup/pigweed.json" # TODO(#29547). This file is temporary copy from pigweed repo that has minor edits. No restyle help in diff.
 
 changed_paths:
     maximum: 100000

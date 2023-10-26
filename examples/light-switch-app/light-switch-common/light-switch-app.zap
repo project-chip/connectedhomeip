@@ -4448,7 +4448,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "IdleModeInterval",
+              "name": "IdleModeDuration",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -4464,7 +4464,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ActiveModeInterval",
+              "name": "ActiveModeDuration",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -4839,6 +4839,7 @@
           "define": "SCENES_CLUSTER",
           "side": "client",
           "enabled": 1,
+          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "AddScene",
@@ -5831,6 +5832,5 @@
       "endpointId": 2,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

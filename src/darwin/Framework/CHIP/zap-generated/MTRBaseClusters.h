@@ -2474,6 +2474,24 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                             reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 + (void)readAttributeLastConnectErrorValueWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 
+- (void)readAttributeSupportedWiFiBandsWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeSupportedWiFiBandsWithParams:(MTRSubscribeParams *)params
+                               subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeSupportedWiFiBandsWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeSupportedThreadFeaturesWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeSupportedThreadFeaturesWithParams:(MTRSubscribeParams *)params
+                                    subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                              reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeSupportedThreadFeaturesWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeThreadVersionWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeThreadVersionWithParams:(MTRSubscribeParams *)params
+                          subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeThreadVersionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -4479,17 +4497,17 @@ MTR_PROVISIONALLY_AVAILABLE
 - (void)stayActiveRequestWithCompletion:(MTRStatusCompletion)completion
     MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeIdleModeIntervalWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeIdleModeIntervalWithParams:(MTRSubscribeParams *)params
+- (void)readAttributeIdleModeDurationWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeIdleModeDurationWithParams:(MTRSubscribeParams *)params
                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeIdleModeIntervalWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeIdleModeDurationWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeActiveModeIntervalWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeActiveModeIntervalWithParams:(MTRSubscribeParams *)params
+- (void)readAttributeActiveModeDurationWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeActiveModeDurationWithParams:(MTRSubscribeParams *)params
                                subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                          reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeActiveModeIntervalWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeActiveModeDurationWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeActiveModeThresholdWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeActiveModeThresholdWithParams:(MTRSubscribeParams *)params
@@ -4967,14 +4985,6 @@ MTR_PROVISIONALLY_AVAILABLE
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeCurrentModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)readAttributeStartUpModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeStartUpModeWithValue:(NSNumber * _Nullable)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeStartUpModeWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeStartUpModeWithParams:(MTRSubscribeParams *)params
-                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeStartUpModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-
 - (void)readAttributeOnModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeOnModeWithValue:(NSNumber * _Nullable)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeOnModeWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
@@ -5059,14 +5069,6 @@ MTR_PROVISIONALLY_AVAILABLE
                         subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
                                   reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeCurrentModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-
-- (void)readAttributeStartUpModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeStartUpModeWithValue:(NSNumber * _Nullable)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)writeAttributeStartUpModeWithValue:(NSNumber * _Nullable)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)subscribeAttributeStartUpModeWithParams:(MTRSubscribeParams *)params
-                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
-+ (void)readAttributeStartUpModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeOnModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeOnModeWithValue:(NSNumber * _Nullable)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
@@ -13278,22 +13280,16 @@ typedef NS_OPTIONS(uint8_t, MTRScenesCopyMode) {
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTROnOffDelayedAllOffEffectVariant) {
-    MTROnOffDelayedAllOffEffectVariantDelayedOffFastFade MTR_NEWLY_AVAILABLE = 0x00,
-    MTROnOffDelayedAllOffEffectVariantFadeToOffIn0p8Seconds MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTROnOffDelayedAllOffEffectVariantDelayedOffFastFade")
-    = 0x00,
+    MTROnOffDelayedAllOffEffectVariantDelayedOffFastFade MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x00,
+    MTROnOffDelayedAllOffEffectVariantFadeToOffIn0p8Seconds MTR_DEPRECATED("Please use MTROnOffDelayedAllOffEffectVariantDelayedOffFastFade", ios(16.1, 17.2), macos(13.0, 14.2), watchos(9.1, 10.2), tvos(16.1, 17.2)) = 0x00,
     MTROnOffDelayedAllOffEffectVariantNoFade MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTROnOffDelayedAllOffEffectVariantDelayedOffSlowFade MTR_NEWLY_AVAILABLE = 0x02,
-    MTROnOffDelayedAllOffEffectVariant50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTROnOffDelayedAllOffEffectVariantDelayedOffSlowFade")
-    = 0x02,
+    MTROnOffDelayedAllOffEffectVariantDelayedOffSlowFade MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x02,
+    MTROnOffDelayedAllOffEffectVariant50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds MTR_DEPRECATED("Please use MTROnOffDelayedAllOffEffectVariantDelayedOffSlowFade", ios(16.1, 17.2), macos(13.0, 14.2), watchos(9.1, 10.2), tvos(16.1, 17.2)) = 0x02,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTROnOffDyingLightEffectVariant) {
-    MTROnOffDyingLightEffectVariantDyingLightFadeOff MTR_NEWLY_AVAILABLE = 0x00,
-    MTROnOffDyingLightEffectVariant20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTROnOffDyingLightEffectVariantDyingLightFadeOff")
-    = 0x00,
+    MTROnOffDyingLightEffectVariantDyingLightFadeOff MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x00,
+    MTROnOffDyingLightEffectVariant20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second MTR_DEPRECATED("Please use MTROnOffDyingLightEffectVariantDyingLightFadeOff", ios(16.1, 17.2), macos(13.0, 14.2), watchos(9.1, 10.2), tvos(16.1, 17.2)) = 0x00,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTROnOffEffectIdentifier) {
@@ -13304,30 +13300,23 @@ typedef NS_ENUM(uint8_t, MTROnOffEffectIdentifier) {
 typedef NS_ENUM(uint8_t, MTROnOffStartUpOnOff) {
     MTROnOffStartUpOnOffOff MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
     MTROnOffStartUpOnOffOn MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTROnOffStartUpOnOffToggle MTR_NEWLY_AVAILABLE = 0x02,
-    MTROnOffStartUpOnOffTogglePreviousOnOff MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTROnOffStartUpOnOffToggle")
-    = 0x02,
+    MTROnOffStartUpOnOffToggle MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x02,
+    MTROnOffStartUpOnOffTogglePreviousOnOff MTR_DEPRECATED("Please use MTROnOffStartUpOnOffToggle", ios(16.1, 17.2), macos(13.0, 14.2), watchos(9.1, 10.2), tvos(16.1, 17.2)) = 0x02,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTROnOffFeature) {
     MTROnOffFeatureLighting MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
-    MTROnOffFeatureDeadFrontBehavior MTR_NEWLY_AVAILABLE = 0x2,
-    MTROnOffFeatureDeadFront MTR_AVAILABLE(ios(17.1), macos(14.1), watchos(10.1), tvos(17.1))
-        MTR_NEWLY_DEPRECATED("Please use MTROnOffFeatureDeadFrontBehavior")
-    = 0x2,
+    MTROnOffFeatureDeadFrontBehavior MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x2,
+    MTROnOffFeatureDeadFront MTR_DEPRECATED("Please use MTROnOffFeatureDeadFrontBehavior", ios(17.1, 17.2), macos(14.1, 14.2), watchos(10.1, 10.2), tvos(17.1, 17.2)) = 0x2,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint8_t, MTROnOffControlBitmap) {
-    MTROnOffControlBitmapAcceptOnlyWhenOn MTR_NEWLY_AVAILABLE = 0x1,
-} MTR_NEWLY_AVAILABLE;
+    MTROnOffControlBitmapAcceptOnlyWhenOn MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x1,
+} MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2));
 
 typedef NS_OPTIONS(uint8_t, MTROnOffControl) {
-    MTROnOffControlAcceptOnlyWhenOn MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-        MTR_NEWLY_DEPRECATED("Please use MTROnOffControlBitmapAcceptOnlyWhenOn")
-    = 0x1,
-} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
-    MTR_NEWLY_DEPRECATED("Please use MTROnOffControlBitmap");
+    MTROnOffControlAcceptOnlyWhenOn MTR_DEPRECATED("Please use MTROnOffControlBitmapAcceptOnlyWhenOn", ios(16.1, 17.2), macos(13.0, 14.2), watchos(9.1, 10.2), tvos(16.1, 17.2)) = 0x1,
+} MTR_DEPRECATED("Please use MTROnOffControlBitmap", ios(16.1, 17.2), macos(13.0, 14.2), watchos(9.1, 10.2), tvos(16.1, 17.2));
 
 typedef NS_ENUM(uint8_t, MTRLevelControlMoveMode) {
     MTRLevelControlMoveModeUp MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
@@ -13465,10 +13454,10 @@ typedef NS_ENUM(uint8_t, MTRBasicInformationProductFinish) {
 } MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0));
 
 typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateProviderApplyUpdateAction) {
-    MTROTASoftwareUpdateProviderApplyUpdateActionProceed MTR_NEWLY_AVAILABLE = 0x00,
-    MTROTASoftwareUpdateProviderApplyUpdateActionAwaitNextAction MTR_NEWLY_AVAILABLE = 0x01,
-    MTROTASoftwareUpdateProviderApplyUpdateActionDiscontinue MTR_NEWLY_AVAILABLE = 0x02,
-} MTR_NEWLY_AVAILABLE;
+    MTROTASoftwareUpdateProviderApplyUpdateActionProceed MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x00,
+    MTROTASoftwareUpdateProviderApplyUpdateActionAwaitNextAction MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x01,
+    MTROTASoftwareUpdateProviderApplyUpdateActionDiscontinue MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x02,
+} MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2));
 
 typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateProviderOTAApplyUpdateAction) {
     MTROtaSoftwareUpdateProviderOTAApplyUpdateActionProceed MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderApplyUpdateActionProceed", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x00,
@@ -13477,11 +13466,11 @@ typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateProviderOTAApplyUpdateAction) {
 } MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderApplyUpdateAction", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateProviderDownloadProtocol) {
-    MTROTASoftwareUpdateProviderDownloadProtocolBDXSynchronous MTR_NEWLY_AVAILABLE = 0x00,
-    MTROTASoftwareUpdateProviderDownloadProtocolBDXAsynchronous MTR_NEWLY_AVAILABLE = 0x01,
-    MTROTASoftwareUpdateProviderDownloadProtocolHTTPS MTR_NEWLY_AVAILABLE = 0x02,
-    MTROTASoftwareUpdateProviderDownloadProtocolVendorSpecific MTR_NEWLY_AVAILABLE = 0x03,
-} MTR_NEWLY_AVAILABLE;
+    MTROTASoftwareUpdateProviderDownloadProtocolBDXSynchronous MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x00,
+    MTROTASoftwareUpdateProviderDownloadProtocolBDXAsynchronous MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x01,
+    MTROTASoftwareUpdateProviderDownloadProtocolHTTPS MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x02,
+    MTROTASoftwareUpdateProviderDownloadProtocolVendorSpecific MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x03,
+} MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2));
 
 typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateProviderOTADownloadProtocol) {
     MTROtaSoftwareUpdateProviderOTADownloadProtocolBDXSynchronous MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderDownloadProtocolBDXSynchronous", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x00,
@@ -13491,11 +13480,11 @@ typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateProviderOTADownloadProtocol) {
 } MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderDownloadProtocol", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateProviderStatus) {
-    MTROTASoftwareUpdateProviderStatusUpdateAvailable MTR_NEWLY_AVAILABLE = 0x00,
-    MTROTASoftwareUpdateProviderStatusBusy MTR_NEWLY_AVAILABLE = 0x01,
-    MTROTASoftwareUpdateProviderStatusNotAvailable MTR_NEWLY_AVAILABLE = 0x02,
-    MTROTASoftwareUpdateProviderStatusDownloadProtocolNotSupported MTR_NEWLY_AVAILABLE = 0x03,
-} MTR_NEWLY_AVAILABLE;
+    MTROTASoftwareUpdateProviderStatusUpdateAvailable MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x00,
+    MTROTASoftwareUpdateProviderStatusBusy MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x01,
+    MTROTASoftwareUpdateProviderStatusNotAvailable MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x02,
+    MTROTASoftwareUpdateProviderStatusDownloadProtocolNotSupported MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x03,
+} MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2));
 
 typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateProviderOTAQueryStatus) {
     MTROtaSoftwareUpdateProviderOTAQueryStatusUpdateAvailable MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderStatusUpdateAvailable", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x00,
@@ -13505,10 +13494,10 @@ typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateProviderOTAQueryStatus) {
 } MTR_DEPRECATED("Please use MTROTASoftwareUpdateProviderStatus", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateRequestorAnnouncementReason) {
-    MTROTASoftwareUpdateRequestorAnnouncementReasonSimpleAnnouncement MTR_NEWLY_AVAILABLE = 0x00,
-    MTROTASoftwareUpdateRequestorAnnouncementReasonUpdateAvailable MTR_NEWLY_AVAILABLE = 0x01,
-    MTROTASoftwareUpdateRequestorAnnouncementReasonUrgentUpdateAvailable MTR_NEWLY_AVAILABLE = 0x02,
-} MTR_NEWLY_AVAILABLE;
+    MTROTASoftwareUpdateRequestorAnnouncementReasonSimpleAnnouncement MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x00,
+    MTROTASoftwareUpdateRequestorAnnouncementReasonUpdateAvailable MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x01,
+    MTROTASoftwareUpdateRequestorAnnouncementReasonUrgentUpdateAvailable MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x02,
+} MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2));
 
 typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateRequestorOTAAnnouncementReason) {
     MTROtaSoftwareUpdateRequestorOTAAnnouncementReasonSimpleAnnouncement MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorAnnouncementReasonSimpleAnnouncement", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x00,
@@ -13517,12 +13506,12 @@ typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateRequestorOTAAnnouncementReason) {
 } MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorAnnouncementReason", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateRequestorChangeReason) {
-    MTROTASoftwareUpdateRequestorChangeReasonUnknown MTR_NEWLY_AVAILABLE = 0x00,
-    MTROTASoftwareUpdateRequestorChangeReasonSuccess MTR_NEWLY_AVAILABLE = 0x01,
-    MTROTASoftwareUpdateRequestorChangeReasonFailure MTR_NEWLY_AVAILABLE = 0x02,
-    MTROTASoftwareUpdateRequestorChangeReasonTimeOut MTR_NEWLY_AVAILABLE = 0x03,
-    MTROTASoftwareUpdateRequestorChangeReasonDelayByProvider MTR_NEWLY_AVAILABLE = 0x04,
-} MTR_NEWLY_AVAILABLE;
+    MTROTASoftwareUpdateRequestorChangeReasonUnknown MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x00,
+    MTROTASoftwareUpdateRequestorChangeReasonSuccess MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x01,
+    MTROTASoftwareUpdateRequestorChangeReasonFailure MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x02,
+    MTROTASoftwareUpdateRequestorChangeReasonTimeOut MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x03,
+    MTROTASoftwareUpdateRequestorChangeReasonDelayByProvider MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x04,
+} MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2));
 
 typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateRequestorOTAChangeReason) {
     MTROtaSoftwareUpdateRequestorOTAChangeReasonUnknown MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorChangeReasonUnknown", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x00,
@@ -13533,16 +13522,16 @@ typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateRequestorOTAChangeReason) {
 } MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorChangeReason", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 typedef NS_ENUM(uint8_t, MTROTASoftwareUpdateRequestorUpdateState) {
-    MTROTASoftwareUpdateRequestorUpdateStateUnknown MTR_NEWLY_AVAILABLE = 0x00,
-    MTROTASoftwareUpdateRequestorUpdateStateIdle MTR_NEWLY_AVAILABLE = 0x01,
-    MTROTASoftwareUpdateRequestorUpdateStateQuerying MTR_NEWLY_AVAILABLE = 0x02,
-    MTROTASoftwareUpdateRequestorUpdateStateDelayedOnQuery MTR_NEWLY_AVAILABLE = 0x03,
-    MTROTASoftwareUpdateRequestorUpdateStateDownloading MTR_NEWLY_AVAILABLE = 0x04,
-    MTROTASoftwareUpdateRequestorUpdateStateApplying MTR_NEWLY_AVAILABLE = 0x05,
-    MTROTASoftwareUpdateRequestorUpdateStateDelayedOnApply MTR_NEWLY_AVAILABLE = 0x06,
-    MTROTASoftwareUpdateRequestorUpdateStateRollingBack MTR_NEWLY_AVAILABLE = 0x07,
-    MTROTASoftwareUpdateRequestorUpdateStateDelayedOnUserConsent MTR_NEWLY_AVAILABLE = 0x08,
-} MTR_NEWLY_AVAILABLE;
+    MTROTASoftwareUpdateRequestorUpdateStateUnknown MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x00,
+    MTROTASoftwareUpdateRequestorUpdateStateIdle MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x01,
+    MTROTASoftwareUpdateRequestorUpdateStateQuerying MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x02,
+    MTROTASoftwareUpdateRequestorUpdateStateDelayedOnQuery MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x03,
+    MTROTASoftwareUpdateRequestorUpdateStateDownloading MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x04,
+    MTROTASoftwareUpdateRequestorUpdateStateApplying MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x05,
+    MTROTASoftwareUpdateRequestorUpdateStateDelayedOnApply MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x06,
+    MTROTASoftwareUpdateRequestorUpdateStateRollingBack MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x07,
+    MTROTASoftwareUpdateRequestorUpdateStateDelayedOnUserConsent MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2)) = 0x08,
+} MTR_AVAILABLE(ios(17.2), macos(14.2), watchos(10.2), tvos(17.2));
 
 typedef NS_ENUM(uint8_t, MTROtaSoftwareUpdateRequestorOTAUpdateState) {
     MTROtaSoftwareUpdateRequestorOTAUpdateStateUnknown MTR_DEPRECATED("Please use MTROTASoftwareUpdateRequestorUpdateStateUnknown", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x00,
@@ -13825,6 +13814,14 @@ typedef NS_OPTIONS(uint32_t, MTRNetworkCommissioningFeature) {
     MTRNetworkCommissioningFeatureThreadNetworkInterface MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x2,
     MTRNetworkCommissioningFeatureEthernetNetworkInterface MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x4,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+typedef NS_OPTIONS(uint16_t, MTRNetworkCommissioningThreadCapabilitiesBitmap) {
+    MTRNetworkCommissioningThreadCapabilitiesBitmapIsBorderRouterCapable MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRNetworkCommissioningThreadCapabilitiesBitmapIsRouterCapable MTR_PROVISIONALLY_AVAILABLE = 0x2,
+    MTRNetworkCommissioningThreadCapabilitiesBitmapIsSleepyEndDeviceCapable MTR_PROVISIONALLY_AVAILABLE = 0x4,
+    MTRNetworkCommissioningThreadCapabilitiesBitmapIsFullThreadDevice MTR_PROVISIONALLY_AVAILABLE = 0x8,
+    MTRNetworkCommissioningThreadCapabilitiesBitmapIsSynchronizedSleepyEndDeviceCapable MTR_PROVISIONALLY_AVAILABLE = 0x10,
+} MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint8_t, MTRNetworkCommissioningWiFiSecurityBitmap) {
     MTRNetworkCommissioningWiFiSecurityBitmapUnencrypted MTR_AVAILABLE(ios(17.0), macos(14.0), watchos(10.0), tvos(17.0)) = 0x1,
@@ -14209,6 +14206,10 @@ typedef NS_ENUM(uint8_t, MTRAdministratorCommissioningStatusCode) {
     MTRAdministratorCommissioningStatusCodeWindowNotOpen MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x04,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
+typedef NS_OPTIONS(uint32_t, MTRAdministratorCommissioningFeature) {
+    MTRAdministratorCommissioningFeatureBasic MTR_PROVISIONALLY_AVAILABLE = 0x1,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTROperationalCredentialsCertificateChainType) {
     MTROperationalCredentialsCertificateChainTypeDACCertificate MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x01,
     MTROperationalCredentialsCertificateChainTypePAICertificate MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x02,
@@ -14251,6 +14252,8 @@ typedef NS_OPTIONS(uint32_t, MTRGroupKeyManagementFeature) {
 
 typedef NS_OPTIONS(uint32_t, MTRICDManagementFeature) {
     MTRICDManagementFeatureCheckInProtocolSupport MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRICDManagementFeatureUserActiveModeTrigger MTR_PROVISIONALLY_AVAILABLE = 0x2,
+    MTRICDManagementFeatureLongIdleTimeSupport MTR_PROVISIONALLY_AVAILABLE = 0x4,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRModeSelectFeature) {
@@ -15102,7 +15105,10 @@ typedef NS_OPTIONS(uint32_t, MTRPumpConfigurationAndControlPumpFeature) {
 
 typedef NS_OPTIONS(uint16_t, MTRPumpConfigurationAndControlPumpStatusBitmap) {
     MTRPumpConfigurationAndControlPumpStatusBitmapDeviceFault MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x1,
-    MTRPumpConfigurationAndControlPumpStatusBitmapSupplyfault MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x2,
+    MTRPumpConfigurationAndControlPumpStatusBitmapSupplyFault MTR_NEWLY_AVAILABLE = 0x2,
+    MTRPumpConfigurationAndControlPumpStatusBitmapSupplyfault MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5))
+        MTR_NEWLY_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapSupplyFault")
+    = 0x2,
     MTRPumpConfigurationAndControlPumpStatusBitmapSpeedLow MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x4,
     MTRPumpConfigurationAndControlPumpStatusBitmapSpeedHigh MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x8,
     MTRPumpConfigurationAndControlPumpStatusBitmapLocalOverride MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5)) = 0x10,
@@ -15114,7 +15120,7 @@ typedef NS_OPTIONS(uint16_t, MTRPumpConfigurationAndControlPumpStatusBitmap) {
 
 typedef NS_OPTIONS(uint16_t, MTRPumpConfigurationAndControlPumpStatus) {
     MTRPumpConfigurationAndControlPumpStatusDeviceFault MTR_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapDeviceFault", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5)) = 0x1,
-    MTRPumpConfigurationAndControlPumpStatusSupplyfault MTR_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapSupplyfault", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5)) = 0x2,
+    MTRPumpConfigurationAndControlPumpStatusSupplyfault MTR_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapSupplyFault", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5)) = 0x2,
     MTRPumpConfigurationAndControlPumpStatusSpeedLow MTR_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapSpeedLow", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5)) = 0x4,
     MTRPumpConfigurationAndControlPumpStatusSpeedHigh MTR_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapSpeedHigh", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5)) = 0x8,
     MTRPumpConfigurationAndControlPumpStatusLocalOverride MTR_DEPRECATED("Please use MTRPumpConfigurationAndControlPumpStatusBitmapLocalOverride", ios(16.1, 16.5), macos(13.0, 13.4), watchos(9.1, 9.5), tvos(16.1, 16.5)) = 0x10,

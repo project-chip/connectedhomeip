@@ -39,7 +39,12 @@ Status ICDManagementServer::RegisterClient(PersistentStorageDelegate & storage, 
     // Save
     entry.checkInNodeID    = node_id;
     entry.monitoredSubject = monitored_subject;
-    err                    = entry.SetKey(key);
+    if (entry.keyHandleValid)
+    {
+        entry.DeleteKey();
+    }
+
+    err = entry.SetKey(key);
     VerifyOrReturnError(CHIP_ERROR_INVALID_ARGUMENT != err, InteractionModel::Status::ConstraintError);
     VerifyOrReturnError(CHIP_NO_ERROR == err, InteractionModel::Status::Failure);
     err = table.Set(entry.index, entry);

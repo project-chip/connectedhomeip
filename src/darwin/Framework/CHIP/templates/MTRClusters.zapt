@@ -34,6 +34,11 @@ NS_ASSUME_NONNULL_BEGIN
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER {{availability (asUpperCamelCase name preserveAcronyms=true) minimalRelease="First major API revamp"}};
 
+/**
+ * The device this cluster object is associated with.
+ */
+@property (nonatomic, readonly) MTRDevice * device {{availability (asUpperCamelCase name preserveAcronyms=true) minimalRelease="Future"}};
+
 {{#zcl_commands}}
 {{#if (is_str_equal source 'client')}}
 {{! Takes two arguments: cluster name and command name, plus the ambient state where the command is "this" }}

@@ -3,7 +3,7 @@
 
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 server cluster Identify = 3 {
-  enum EffectIdentifierEnum : ENUM8 {
+  enum EffectIdentifierEnum : enum8 {
     kBlink = 0;
     kBreathe = 1;
     kOkay = 2;
@@ -12,11 +12,11 @@ server cluster Identify = 3 {
     kStopEffect = 255;
   }
 
-  enum EffectVariantEnum : ENUM8 {
+  enum EffectVariantEnum : enum8 {
     kDefault = 0;
   }
 
-  enum IdentifyTypeEnum : ENUM8 {
+  enum IdentifyTypeEnum : enum8 {
     kNone = 0;
     kLightOutput = 1;
     kVisibleIndicator = 2;
@@ -43,7 +43,7 @@ server cluster Identify = 3 {
 
 /** The Descriptor Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for describing a node, its endpoints and clusters. */
 server cluster Descriptor = 29 {
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kTagList = 0x1;
   }
 
@@ -76,13 +76,13 @@ server cluster Descriptor = 29 {
       and enforce Access Control for the Node's endpoints and their associated
       cluster instances. */
 server cluster AccessControl = 31 {
-  enum AccessControlEntryAuthModeEnum : ENUM8 {
+  enum AccessControlEntryAuthModeEnum : enum8 {
     kPASE = 1;
     kCASE = 2;
     kGroup = 3;
   }
 
-  enum AccessControlEntryPrivilegeEnum : ENUM8 {
+  enum AccessControlEntryPrivilegeEnum : enum8 {
     kView = 1;
     kProxyView = 2;
     kOperate = 3;
@@ -90,7 +90,7 @@ server cluster AccessControl = 31 {
     kAdminister = 5;
   }
 
-  enum ChangeTypeEnum : ENUM8 {
+  enum ChangeTypeEnum : enum8 {
     kChanged = 0;
     kAdded = 1;
     kRemoved = 2;
@@ -148,7 +148,7 @@ server cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 server cluster BasicInformation = 40 {
-  enum ColorEnum : ENUM8 {
+  enum ColorEnum : enum8 {
     kBlack = 0;
     kNavy = 1;
     kGreen = 2;
@@ -172,7 +172,7 @@ server cluster BasicInformation = 40 {
     kGold = 20;
   }
 
-  enum ProductFinishEnum : ENUM8 {
+  enum ProductFinishEnum : enum8 {
     kOther = 0;
     kMatte = 1;
     kSatin = 2;
@@ -235,20 +235,20 @@ server cluster BasicInformation = 40 {
 
 /** Provides an interface for providing OTA software updates */
 client cluster OtaSoftwareUpdateProvider = 41 {
-  enum ApplyUpdateActionEnum : ENUM8 {
+  enum ApplyUpdateActionEnum : enum8 {
     kProceed = 0;
     kAwaitNextAction = 1;
     kDiscontinue = 2;
   }
 
-  enum DownloadProtocolEnum : ENUM8 {
+  enum DownloadProtocolEnum : enum8 {
     kBDXSynchronous = 0;
     kBDXAsynchronous = 1;
     kHTTPS = 2;
     kVendorSpecific = 3;
   }
 
-  enum StatusEnum : ENUM8 {
+  enum StatusEnum : enum8 {
     kUpdateAvailable = 0;
     kBusy = 1;
     kNotAvailable = 2;
@@ -309,13 +309,13 @@ client cluster OtaSoftwareUpdateProvider = 41 {
 
 /** Provides an interface for downloading and applying OTA software updates */
 server cluster OtaSoftwareUpdateRequestor = 42 {
-  enum AnnouncementReasonEnum : ENUM8 {
+  enum AnnouncementReasonEnum : enum8 {
     kSimpleAnnouncement = 0;
     kUpdateAvailable = 1;
     kUrgentUpdateAvailable = 2;
   }
 
-  enum ChangeReasonEnum : ENUM8 {
+  enum ChangeReasonEnum : enum8 {
     kUnknown = 0;
     kSuccess = 1;
     kFailure = 2;
@@ -323,7 +323,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
     kDelayByProvider = 4;
   }
 
-  enum UpdateStateEnum : ENUM8 {
+  enum UpdateStateEnum : enum8 {
     kUnknown = 0;
     kIdle = 1;
     kQuerying = 2;
@@ -384,7 +384,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
 
 /** This cluster is used to manage global aspects of the Commissioning flow. */
 server cluster GeneralCommissioning = 48 {
-  enum CommissioningErrorEnum : ENUM8 {
+  enum CommissioningErrorEnum : enum8 {
     kOK = 0;
     kValueOutsideRange = 1;
     kInvalidAuthentication = 2;
@@ -392,7 +392,7 @@ server cluster GeneralCommissioning = 48 {
     kBusyWithOtherAdmin = 4;
   }
 
-  enum RegulatoryLocationTypeEnum : ENUM8 {
+  enum RegulatoryLocationTypeEnum : enum8 {
     kIndoor = 0;
     kOutdoor = 1;
     kIndoorOutdoor = 2;
@@ -448,7 +448,7 @@ server cluster GeneralCommissioning = 48 {
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 server cluster NetworkCommissioning = 49 {
-  enum NetworkCommissioningStatusEnum : ENUM8 {
+  enum NetworkCommissioningStatusEnum : enum8 {
     kSuccess = 0;
     kOutOfRange = 1;
     kBoundsExceeded = 2;
@@ -464,7 +464,7 @@ server cluster NetworkCommissioning = 49 {
     kUnknownError = 12;
   }
 
-  enum WiFiBandEnum : ENUM8 {
+  enum WiFiBandEnum : enum8 {
     k2G4 = 0;
     k3G65 = 1;
     k5G = 2;
@@ -473,13 +473,21 @@ server cluster NetworkCommissioning = 49 {
     k1G = 5;
   }
 
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kWiFiNetworkInterface = 0x1;
     kThreadNetworkInterface = 0x2;
     kEthernetNetworkInterface = 0x4;
   }
 
-  bitmap WiFiSecurityBitmap : BITMAP8 {
+  bitmap ThreadCapabilitiesBitmap : bitmap16 {
+    kIsBorderRouterCapable = 0x1;
+    kIsRouterCapable = 0x2;
+    kIsSleepyEndDeviceCapable = 0x4;
+    kIsFullThreadDevice = 0x8;
+    kIsSynchronizedSleepyEndDeviceCapable = 0x10;
+  }
+
+  bitmap WiFiSecurityBitmap : bitmap8 {
     kUnencrypted = 0x1;
     kWEP = 0x2;
     kWPAPersonal = 0x4;
@@ -588,7 +596,7 @@ server cluster NetworkCommissioning = 49 {
 
 /** The General Diagnostics Cluster, along with other diagnostics clusters, provide a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster GeneralDiagnostics = 51 {
-  enum BootReasonEnum : ENUM8 {
+  enum BootReasonEnum : enum8 {
     kUnspecified = 0;
     kPowerOnReboot = 1;
     kBrownOutReset = 2;
@@ -598,7 +606,7 @@ server cluster GeneralDiagnostics = 51 {
     kSoftwareReset = 6;
   }
 
-  enum HardwareFaultEnum : ENUM8 {
+  enum HardwareFaultEnum : enum8 {
     kUnspecified = 0;
     kRadio = 1;
     kSensor = 2;
@@ -612,7 +620,7 @@ server cluster GeneralDiagnostics = 51 {
     kTamperDetected = 10;
   }
 
-  enum InterfaceTypeEnum : ENUM8 {
+  enum InterfaceTypeEnum : enum8 {
     kUnspecified = 0;
     kWiFi = 1;
     kEthernet = 2;
@@ -620,14 +628,14 @@ server cluster GeneralDiagnostics = 51 {
     kThread = 4;
   }
 
-  enum NetworkFaultEnum : ENUM8 {
+  enum NetworkFaultEnum : enum8 {
     kUnspecified = 0;
     kHardwareFailure = 1;
     kNetworkJammed = 2;
     kConnectionFailed = 3;
   }
 
-  enum RadioFaultEnum : ENUM8 {
+  enum RadioFaultEnum : enum8 {
     kUnspecified = 0;
     kWiFiFault = 1;
     kCellularFault = 2;
@@ -693,7 +701,7 @@ server cluster GeneralDiagnostics = 51 {
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster SoftwareDiagnostics = 52 {
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kWaterMarks = 0x1;
   }
 
@@ -727,19 +735,19 @@ server cluster SoftwareDiagnostics = 52 {
 
 /** The Thread Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems */
 server cluster ThreadNetworkDiagnostics = 53 {
-  enum ConnectionStatusEnum : ENUM8 {
+  enum ConnectionStatusEnum : enum8 {
     kConnected = 0;
     kNotConnected = 1;
   }
 
-  enum NetworkFaultEnum : ENUM8 {
+  enum NetworkFaultEnum : enum8 {
     kUnspecified = 0;
     kLinkDown = 1;
     kHardwareFailure = 2;
     kNetworkJammed = 3;
   }
 
-  enum RoutingRoleEnum : ENUM8 {
+  enum RoutingRoleEnum : enum8 {
     kUnspecified = 0;
     kUnassigned = 1;
     kSleepyEndDevice = 2;
@@ -749,7 +757,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
     kLeader = 6;
   }
 
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kPacketCounts = 0x1;
     kErrorCounts = 0x2;
     kMLECounts = 0x4;
@@ -890,19 +898,19 @@ server cluster ThreadNetworkDiagnostics = 53 {
 
 /** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster WiFiNetworkDiagnostics = 54 {
-  enum AssociationFailureCauseEnum : ENUM8 {
+  enum AssociationFailureCauseEnum : enum8 {
     kUnknown = 0;
     kAssociationFailed = 1;
     kAuthenticationFailed = 2;
     kSsidNotFound = 3;
   }
 
-  enum ConnectionStatusEnum : ENUM8 {
+  enum ConnectionStatusEnum : enum8 {
     kConnected = 0;
     kNotConnected = 1;
   }
 
-  enum SecurityTypeEnum : ENUM8 {
+  enum SecurityTypeEnum : enum8 {
     kUnspecified = 0;
     kNone = 1;
     kWEP = 2;
@@ -911,7 +919,7 @@ server cluster WiFiNetworkDiagnostics = 54 {
     kWPA3 = 5;
   }
 
-  enum WiFiVersionEnum : ENUM8 {
+  enum WiFiVersionEnum : enum8 {
     kA = 0;
     kB = 1;
     kG = 2;
@@ -921,7 +929,7 @@ server cluster WiFiNetworkDiagnostics = 54 {
     kAh = 6;
   }
 
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kPacketCounts = 0x1;
     kErrorCounts = 0x2;
   }
@@ -964,7 +972,7 @@ server cluster WiFiNetworkDiagnostics = 54 {
 
 /** The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 server cluster EthernetNetworkDiagnostics = 55 {
-  enum PHYRateEnum : ENUM8 {
+  enum PHYRateEnum : enum8 {
     kRate10M = 0;
     kRate100M = 1;
     kRate1G = 2;
@@ -977,7 +985,7 @@ server cluster EthernetNetworkDiagnostics = 55 {
     kRate400G = 9;
   }
 
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kPacketCounts = 0x1;
     kErrorCounts = 0x2;
   }
@@ -1003,21 +1011,25 @@ server cluster EthernetNetworkDiagnostics = 55 {
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
 server cluster AdministratorCommissioning = 60 {
-  enum CommissioningWindowStatusEnum : ENUM8 {
+  enum CommissioningWindowStatusEnum : enum8 {
     kWindowNotOpen = 0;
     kEnhancedWindowOpen = 1;
     kBasicWindowOpen = 2;
   }
 
-  enum StatusCode : ENUM8 {
+  enum StatusCode : enum8 {
     kBusy = 2;
     kPAKEParameterError = 3;
     kWindowNotOpen = 4;
   }
 
+  bitmap Feature : bitmap32 {
+    kBasic = 0x1;
+  }
+
   readonly attribute CommissioningWindowStatusEnum windowStatus = 0;
   readonly attribute nullable fabric_idx adminFabricIndex = 1;
-  readonly attribute nullable int16u adminVendorId = 2;
+  readonly attribute nullable vendor_id adminVendorId = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1030,7 +1042,7 @@ server cluster AdministratorCommissioning = 60 {
     octet_string PAKEPasscodeVerifier = 1;
     int16u discriminator = 2;
     int32u iterations = 3;
-    octet_string salt = 4;
+    octet_string<32> salt = 4;
   }
 
   request struct OpenBasicCommissioningWindowRequest {
@@ -1044,12 +1056,12 @@ server cluster AdministratorCommissioning = 60 {
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 server cluster OperationalCredentials = 62 {
-  enum CertificateChainTypeEnum : ENUM8 {
+  enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
     kPAICertificate = 2;
   }
 
-  enum NodeOperationalCertStatusEnum : ENUM8 {
+  enum NodeOperationalCertStatusEnum : enum8 {
     kOK = 0;
     kInvalidPublicKey = 1;
     kInvalidNodeOpId = 2;
@@ -1160,12 +1172,12 @@ server cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 server cluster GroupKeyManagement = 63 {
-  enum GroupKeySecurityPolicyEnum : ENUM8 {
+  enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
     kCacheAndSync = 1;
   }
 
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kCacheAndSync = 0x1;
   }
 
@@ -1232,7 +1244,7 @@ server cluster GroupKeyManagement = 63 {
 
 /** Attributes for reporting air quality classification */
 server cluster AirQuality = 91 {
-  enum AirQualityEnum : ENUM8 {
+  enum AirQualityEnum : enum8 {
     kUnknown = 0;
     kGood = 1;
     kFair = 2;
@@ -1242,7 +1254,7 @@ server cluster AirQuality = 91 {
     kExtremelyPoor = 6;
   }
 
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kFair = 0x1;
     kModerate = 0x2;
     kVeryPoor = 0x4;
@@ -1286,7 +1298,7 @@ server cluster RelativeHumidityMeasurement = 1029 {
 
 /** Attributes for reporting carbon monoxide concentration measurements */
 server cluster CarbonMonoxideConcentrationMeasurement = 1036 {
-  enum LevelValueEnum : ENUM8 {
+  enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -1294,13 +1306,13 @@ server cluster CarbonMonoxideConcentrationMeasurement = 1036 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : ENUM8 {
+  enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : ENUM8 {
+  enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -1311,7 +1323,7 @@ server cluster CarbonMonoxideConcentrationMeasurement = 1036 {
     kBQM3 = 7;
   }
 
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -1333,7 +1345,7 @@ server cluster CarbonMonoxideConcentrationMeasurement = 1036 {
 
 /** Attributes for reporting carbon dioxide concentration measurements */
 server cluster CarbonDioxideConcentrationMeasurement = 1037 {
-  enum LevelValueEnum : ENUM8 {
+  enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -1341,13 +1353,13 @@ server cluster CarbonDioxideConcentrationMeasurement = 1037 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : ENUM8 {
+  enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : ENUM8 {
+  enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -1358,7 +1370,7 @@ server cluster CarbonDioxideConcentrationMeasurement = 1037 {
     kBQM3 = 7;
   }
 
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -1380,7 +1392,7 @@ server cluster CarbonDioxideConcentrationMeasurement = 1037 {
 
 /** Attributes for reporting nitrogen dioxide concentration measurements */
 server cluster NitrogenDioxideConcentrationMeasurement = 1043 {
-  enum LevelValueEnum : ENUM8 {
+  enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -1388,13 +1400,13 @@ server cluster NitrogenDioxideConcentrationMeasurement = 1043 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : ENUM8 {
+  enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : ENUM8 {
+  enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -1405,7 +1417,7 @@ server cluster NitrogenDioxideConcentrationMeasurement = 1043 {
     kBQM3 = 7;
   }
 
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -1427,7 +1439,7 @@ server cluster NitrogenDioxideConcentrationMeasurement = 1043 {
 
 /** Attributes for reporting ozone concentration measurements */
 server cluster OzoneConcentrationMeasurement = 1045 {
-  enum LevelValueEnum : ENUM8 {
+  enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -1435,13 +1447,13 @@ server cluster OzoneConcentrationMeasurement = 1045 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : ENUM8 {
+  enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : ENUM8 {
+  enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -1452,7 +1464,7 @@ server cluster OzoneConcentrationMeasurement = 1045 {
     kBQM3 = 7;
   }
 
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -1474,7 +1486,7 @@ server cluster OzoneConcentrationMeasurement = 1045 {
 
 /** Attributes for reporting PM2.5 concentration measurements */
 server cluster Pm25ConcentrationMeasurement = 1066 {
-  enum LevelValueEnum : ENUM8 {
+  enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -1482,13 +1494,13 @@ server cluster Pm25ConcentrationMeasurement = 1066 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : ENUM8 {
+  enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : ENUM8 {
+  enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -1499,7 +1511,7 @@ server cluster Pm25ConcentrationMeasurement = 1066 {
     kBQM3 = 7;
   }
 
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -1521,7 +1533,7 @@ server cluster Pm25ConcentrationMeasurement = 1066 {
 
 /** Attributes for reporting formaldehyde concentration measurements */
 server cluster FormaldehydeConcentrationMeasurement = 1067 {
-  enum LevelValueEnum : ENUM8 {
+  enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -1529,13 +1541,13 @@ server cluster FormaldehydeConcentrationMeasurement = 1067 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : ENUM8 {
+  enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : ENUM8 {
+  enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -1546,7 +1558,7 @@ server cluster FormaldehydeConcentrationMeasurement = 1067 {
     kBQM3 = 7;
   }
 
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -1568,7 +1580,7 @@ server cluster FormaldehydeConcentrationMeasurement = 1067 {
 
 /** Attributes for reporting PM1 concentration measurements */
 server cluster Pm1ConcentrationMeasurement = 1068 {
-  enum LevelValueEnum : ENUM8 {
+  enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -1576,13 +1588,13 @@ server cluster Pm1ConcentrationMeasurement = 1068 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : ENUM8 {
+  enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : ENUM8 {
+  enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -1593,7 +1605,7 @@ server cluster Pm1ConcentrationMeasurement = 1068 {
     kBQM3 = 7;
   }
 
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -1615,7 +1627,7 @@ server cluster Pm1ConcentrationMeasurement = 1068 {
 
 /** Attributes for reporting PM10 concentration measurements */
 server cluster Pm10ConcentrationMeasurement = 1069 {
-  enum LevelValueEnum : ENUM8 {
+  enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -1623,13 +1635,13 @@ server cluster Pm10ConcentrationMeasurement = 1069 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : ENUM8 {
+  enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : ENUM8 {
+  enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -1640,7 +1652,7 @@ server cluster Pm10ConcentrationMeasurement = 1069 {
     kBQM3 = 7;
   }
 
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -1662,7 +1674,7 @@ server cluster Pm10ConcentrationMeasurement = 1069 {
 
 /** Attributes for reporting total volatile organic compounds concentration measurements */
 server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
-  enum LevelValueEnum : ENUM8 {
+  enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -1670,13 +1682,13 @@ server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : ENUM8 {
+  enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : ENUM8 {
+  enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -1687,7 +1699,7 @@ server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
     kBQM3 = 7;
   }
 
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;
@@ -1709,7 +1721,7 @@ server cluster TotalVolatileOrganicCompoundsConcentrationMeasurement = 1070 {
 
 /** Attributes for reporting radon concentration measurements */
 server cluster RadonConcentrationMeasurement = 1071 {
-  enum LevelValueEnum : ENUM8 {
+  enum LevelValueEnum : enum8 {
     kUnknown = 0;
     kLow = 1;
     kMedium = 2;
@@ -1717,13 +1729,13 @@ server cluster RadonConcentrationMeasurement = 1071 {
     kCritical = 4;
   }
 
-  enum MeasurementMediumEnum : ENUM8 {
+  enum MeasurementMediumEnum : enum8 {
     kAir = 0;
     kWater = 1;
     kSoil = 2;
   }
 
-  enum MeasurementUnitEnum : ENUM8 {
+  enum MeasurementUnitEnum : enum8 {
     kPPM = 0;
     kPPB = 1;
     kPPT = 2;
@@ -1734,7 +1746,7 @@ server cluster RadonConcentrationMeasurement = 1071 {
     kBQM3 = 7;
   }
 
-  bitmap Feature : BITMAP32 {
+  bitmap Feature : bitmap32 {
     kNumericMeasurement = 0x1;
     kLevelIndication = 0x2;
     kMediumLevel = 0x4;

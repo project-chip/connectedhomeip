@@ -542,7 +542,6 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         if (payloadHeader.NeedsAck())
         {
             // An acknowledgment needs to be sent back to the peer for this message on this exchange,
-
             HandleNeedsAck(messageCounter, msgFlags);
         }
     }
@@ -589,6 +588,9 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
     // message received
     app::ICDNotifier::GetInstance().BroadcastNetworkActivityNotification();
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
+    // Set kFlagReceivedAtLeastOneMessage to true since we have received at least one new application level message
+    SetHasReceivedAtLeastOneMessage(true);
 
     if (IsResponseExpected())
     {

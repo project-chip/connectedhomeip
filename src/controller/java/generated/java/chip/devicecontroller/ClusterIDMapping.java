@@ -3411,6 +3411,9 @@ public class ClusterIDMapping {
             LastNetworkingStatus(5L),
             LastNetworkID(6L),
             LastConnectErrorValue(7L),
+            SupportedWiFiBands(8L),
+            SupportedThreadFeatures(9L),
+            ThreadVersion(10L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),
@@ -5959,8 +5962,8 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            IdleModeInterval(0L),
-            ActiveModeInterval(1L),
+            IdleModeDuration(0L),
+            ActiveModeDuration(1L),
             ActiveModeThreshold(2L),
             RegisteredClients(3L),
             ICDCounter(4L),
@@ -6576,7 +6579,6 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedModes(0L),
             CurrentMode(1L),
-            StartUpMode(2L),
             OnMode(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
@@ -6698,7 +6700,6 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedModes(0L),
             CurrentMode(1L),
-            StartUpMode(2L),
             OnMode(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),

@@ -141,5 +141,11 @@ static_library("inet") {
     public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
   }
 
+  if (current_os == "android") {
+    public_deps += [ "${chip_root}/src/platform/android:inet" ]
+  } else {
+    sources += [ "InetInterfaceImplDefault.cpp" ]
+  }
+
   cflags = [ "-Wconversion" ]
 }

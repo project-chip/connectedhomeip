@@ -136,8 +136,8 @@ CHIP_ERROR ScenesServer::Init()
             ChipLogDetail(Zcl, "ERR: getting the scenes FeatureMap on Endpoint %hu Status: %x", endpoint, status);
         }
 
-        // Explicit AttributeValuePairs is mandatory for matter so we force it here
-        featureMap |= to_underlying(Feature::kExplicit);
+        // Explicit AttributeValuePairs and TableSize features are mandatory for matter so we force-set them here
+        featureMap |= (to_underlying(Feature::kExplicit) | to_underlying(Feature::kTableSize));
         status = Attributes::FeatureMap::Set(endpoint, featureMap);
         if (EMBER_ZCL_STATUS_SUCCESS != status)
         {

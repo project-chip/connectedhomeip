@@ -239,11 +239,6 @@ CHIP_ERROR BaseApplication::Init()
     SILABS_LOG("Current Software Version String: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
     SILABS_LOG("Current Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
 
-#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
-    LEDWidget::InitGpio();
-    sStatusLED.Init(SYSTEM_STATE_LED);
-#endif // ENABLE_WSTK_LEDS
-
 #ifdef DIC_ENABLE
     chip::DeviceLayer::PlatformMgr().AddEventHandler(AppSpecificConnectivityEventCallback, reinterpret_cast<intptr_t>(nullptr));
 #endif // DIC_ENABLE
@@ -251,6 +246,10 @@ CHIP_ERROR BaseApplication::Init()
     ConfigurationMgr().LogDeviceConfig();
 
     OutputQrCode(true /*refreshLCD at init*/);
+#if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT) || defined(SIWX_917)))
+    LEDWidget::InitGpio();
+    sStatusLED.Init(SYSTEM_STATE_LED);
+#endif // ENABLE_WSTK_LEDS
 
 #ifdef PERFORMANCE_TEST_ENABLED
     RegisterPerfTestCommands();

@@ -247,7 +247,7 @@ To use this script, complete the following steps:
     b. Add output file path:
 
     ```
-    -o <output_dir>
+    -o <path_to_output_json_file>
     ```
 
     c. Generate SPAKE2 verifier using one of the following methods:
@@ -357,7 +357,7 @@ $ python scripts/tools/nrfconnect/generate_nrfconnect_chip_factory_data.py \
 --passcode 20202021 \
 --product_finish "matte" \
 --product_color "black" \
---out "build.json"' \
+--out "build.json" \
 --schema "scripts/tools/nrfconnect/nrfconnect_factory_data.schema"
 ```
 

@@ -284,20 +284,29 @@ CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const Cer
 
 CHIP_ERROR ChipCertificateSet::VerifySignature(const ChipCertificateData * cert, const ChipCertificateData * caCert)
 {
+    VerifyOrReturnError((cert != nullptr) && (caCert != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+    return VerifyCertSignature(*cert, *caCert);
+}
+
+CHIP_ERROR VerifyCertSignature(const ChipCertificateData & cert, const ChipCertificateData & signer)
+{
+    VerifyOrReturnError(cert.mCertFlags.Has(CertFlags::kTBSHashPresent), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(cert.mSigAlgoOID == kOID_SigAlgo_ECDSAWithSHA256, CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE);
+
 #ifdef ENABLE_HSM_ECDSA_VERIFY
-    P256PublicKeyHSM caPublicKey;
+    P256PublicKeyHSM signerPublicKey;
 #else
-    P256PublicKey caPublicKey;
+    P256PublicKey signerPublicKey;
 #endif
     P256ECDSASignature signature;
 
-    VerifyOrReturnError((cert != nullptr) && (caCert != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
-    ReturnErrorOnFailure(signature.SetLength(cert->mSignature.size()));
-    memcpy(signature.Bytes(), cert->mSignature.data(), cert->mSignature.size());
+    ReturnErrorOnFailure(signature.SetLength(cert.mSignature.size()));
+    memcpy(signature.Bytes(), cert.mSignature.data(), cert.mSignature.size());
 
-    memcpy(caPublicKey, caCert->mPublicKey.data(), caCert->mPublicKey.size());
+    memcpy(signerPublicKey, signer.mPublicKey.data(), signer.mPublicKey.size());
 
-    ReturnErrorOnFailure(caPublicKey.ECDSA_validate_hash_signature(cert->mTBSHash, chip::Crypto::kSHA256_Hash_Length, signature));
+    ReturnErrorOnFailure(
+        signerPublicKey.ECDSA_validate_hash_signature(cert.mTBSHash, chip::Crypto::kSHA256_Hash_Length, signature));
 
     return CHIP_NO_ERROR;
 }
@@ -454,10 +463,6 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
     // recursion in such a case.
     VerifyOrExit(depth < mCertCount, err = CHIP_ERROR_CERT_PATH_TOO_LONG);
 
-    // Verify that a hash of the 'to-be-signed' portion of the certificate has been computed. We will need this to
-    // verify the cert's signature below.
-    VerifyOrExit(cert->mCertFlags.Has(CertFlags::kTBSHashPresent), err = CHIP_ERROR_INVALID_ARGUMENT);
-
     // Search for a valid CA certificate that matches the Issuer DN and Authority Key Id of the current certificate.
     // Fail if no acceptable certificate is found.
     err = FindValidCert(cert->mIssuerDN, cert->mAuthKeyId, context, static_cast<uint8_t>(depth + 1), &caCert);
@@ -468,7 +473,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
 
     // Verify signature of the current certificate against public key of the CA certificate. If signature verification
     // succeeds, the current certificate is valid.
-    err = VerifySignature(cert, caCert);
+    err = VerifyCertSignature(*cert, *caCert);
     SuccessOrExit(err);
 
 exit:
@@ -1166,7 +1171,7 @@ CHIP_ERROR ValidateChipRCAC(const ByteSpan & rcac)
 
     VerifyOrReturnError(certData.mKeyUsageFlags.Has(KeyUsageFlags::kKeyCertSign), CHIP_ERROR_CERT_USAGE_NOT_ALLOWED);
 
-    return ChipCertificateSet::VerifySignature(&certData, &certData);
+    return VerifyCertSignature(certData, certData);
 }
 
 CHIP_ERROR ConvertIntegerDERToRaw(ByteSpan derInt, uint8_t * rawInt, const uint16_t rawIntLen)
