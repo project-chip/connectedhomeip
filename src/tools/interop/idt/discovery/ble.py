@@ -15,7 +15,6 @@
 #    limitations under the License.
 #
 
-import asyncio
 import datetime
 import os
 import time
@@ -93,14 +92,14 @@ class MatterBleScanner:
                     name, bin_data, ble_device, ad_data.rssi)
         self.handle_device_states()
 
-    def browse_interactive(self) -> None:
+    async def browse_interactive(self) -> None:
         scanner = BleakScanner()
         self.logger.warning(
             "Scanning BLE\nDCL Lookup: https://webui.dcl.csa-iot.org/")
         while True:
             try:
                 time.sleep(self.throttle_seconds)
-                asyncio.run(self.browse(scanner))
+                await self.browse(scanner)
             except BleakDBusError as e:
                 self.logger.critical(e)
                 time.sleep(self.error_seconds)

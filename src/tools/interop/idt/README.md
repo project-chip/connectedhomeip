@@ -184,6 +184,8 @@ Follow the steps below to execute capture and discovery without a Raspberry Pi.
 
 ### macOS installation
 
+TODO: Need to do this https://github.com/hbldh/bleak/issues/438#issuecomment-787125189
+
 Most features other than BLE should work on macOS.
 
 Follow the Linux installation steps above, but do not use Docker.

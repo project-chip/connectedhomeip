@@ -165,7 +165,8 @@ class InteropDebuggingTool:
     def command_discover(self, args: argparse.Namespace) -> None:
         if args.type[0] == "b":
             safe_mkdir(self.ble_artifact_dir)
-            MatterBleScanner(self.ble_artifact_dir).browse_interactive()
+            scanner = MatterBleScanner(self.ble_artifact_dir)
+            asyncio.run(scanner.browse_interactive())
         else:
             safe_mkdir(self.dnssd_artifact_dir)
             MatterDnssdListener(self.dnssd_artifact_dir).browse_interactive()
