@@ -80,8 +80,9 @@ class TestXmlParser(unittest.TestCase):
 
     def assertIdlEqual(self, a: Idl, b: Idl):
         if a == b:
-            # seems the same
+            # seems the same. This will just pass
             self.assertEqual(a, b)
+            return
 
         # Not the same. Try to make a human readable diff:
         a_txt = RenderAsIdlTxt(a)
