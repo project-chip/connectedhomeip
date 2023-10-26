@@ -22,6 +22,7 @@ from .parsing import NormalizeName
 
 LOGGER = logging.getLogger('data-model-xml-data-parsing')
 
+
 class AddBaseInfoPostProcessor(IdlPostProcessor):
     def __init__(self, destination_cluster: Cluster, source_cluster_name: str, context: Context):
         self.destination = destination_cluster
@@ -32,4 +33,3 @@ class AddBaseInfoPostProcessor(IdlPostProcessor):
         # FIXME implement
         LOGGER.error(
             f"NOT YET IMPLEMENTED: attach {self.source_name} to {self.destination.name}")
-
