@@ -14,7 +14,7 @@
 #    limitations under the License.
 #
 import logging
-from typing import Optional
+from typing import Iterable, Optional, Protocol, TypeVar
 
 from matter_idl.matter_idl_types import Attribute, Bitmap, Cluster, Command, Enum, Event, Idl, Struct
 
@@ -23,29 +23,106 @@ from .parsing import NormalizeName
 
 LOGGER = logging.getLogger('data-model-xml-data-parsing')
 
+T = TypeVar("T")
+
+
+class HasName(Protocol):
+    name: str
+
+
+NAMED = TypeVar('NAMED', bound=HasName)
+
+
+def get_item_with_name(items: Iterable[NAMED], name: str) -> Optional[NAMED]:
+    """Find an item with the given name.
+
+    Returns none if that item does not exist
+    """
+    for item in items:
+        if item.name == name:
+            return item
+    return None
+
 
 def merge_enum_into(e: Enum, cluster: Cluster):
-    LOGGER.error("TODO: need to implement merge of %r", e)
+    existing = get_item_with_name(cluster.enums, e.name)
+
+    if existing:
+        # Remove existing but merge constants into e
+        cluster.enums.remove(existing)
+        for value in existing.entries:
+            if not get_item_with_name(e.entries, value.name):
+                e.entries.append(value)
+
+    cluster.enums.append(e)
 
 
 def merge_bitmap_into(b: Bitmap, cluster: Cluster):
-    LOGGER.error("TODO: need to implement merge of %r", b)
+    existing = get_item_with_name(cluster.bitmaps, b.name)
+
+    if existing:
+        # Remove existing but merge constants into e
+        cluster.bitmaps.remove(existing)
+        for value in existing.entries:
+            if not get_item_with_name(b.entries, value.name):
+                b.entries.append(value)
+
+    cluster.bitmaps.append(b)
 
 
 def merge_event_into(e: Event, cluster: Cluster):
-    LOGGER.error("TODO: need to implement merge of %r", e)
+    existing = get_item_with_name(cluster.events, e.name)
+    if existing:
+        LOGGER.error("TODO: Do not know how to merge event for %s::%s",
+                     cluster.name, existing.name)
+        cluster.events.remove(existing)
+
+    cluster.events.append(e)
 
 
 def merge_attribute_into(a: Attribute, cluster: Cluster):
-    LOGGER.error("TODO: need to implement merge of %r", a)
+    existing: Optional[Attribute] = None
+    for existing_a in cluster.attributes:
+        if existing_a.definition.name == a.definition.name:
+            existing = existing_a
+            break
+
+    if existing:
+        # Do not provide merging as it seems only conformance is changed from
+        # the base cluster
+        #
+        # This should fix the correct types
+        #
+        # LOGGER.error("TODO: Do not know how to merge attribute for %s::%s", cluster.name, existing.definition.name)
+        cluster.attributes.remove(existing)
+
+    cluster.attributes.append(a)
 
 
 def merge_struct_into(s: Struct, cluster: Cluster):
-    LOGGER.error("TODO: need to implement merge of %r", s)
+    existing = get_item_with_name(cluster.structs, s.name)
+    if existing:
+        # Do not provide merging as it seems XML only adds
+        # constraints and conformance to struct elements
+        #
+        # TODO: at  some point we may be able to merge some things,
+        #       if we find that derived clusters actually add useful things here
+        #
+        # LOGGER.error("TODO: Do not know how to merge structs for %s::%s", cluster.name, existing.name)
+        cluster.structs.remove(existing)
+
+    cluster.structs.append(s)
 
 
 def merge_command_into(c: Command, cluster: Cluster):
-    LOGGER.error("TODO: need to implement merge of %r", c)
+    existing = get_item_with_name(cluster.commands, c.name)
+
+    if existing:
+        LOGGER.error("TODO: Do not know how to merge command for %s::%s",
+                     cluster.name, existing.name)
+        cluster.commands.remove(existing)
+
+    cluster.commands.append(c)
 
 
 def inherit_cluster_data(from_cluster: Cluster, into_cluster: Cluster):
