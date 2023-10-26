@@ -5512,7 +5512,7 @@ endpoint 0 {
     ram      attribute timeZoneDatabase default = 0;
     callback attribute timeZoneListMaxSize default = 3;
     callback attribute DSTOffsetListMaxSize;
-    ram      attribute supportsDNSResolve default = false;
+    ram      attribute supportsDNSResolve default = true;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

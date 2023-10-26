@@ -1341,10 +1341,10 @@ class ChipDeviceControllerBase():
                 c_char_p, c_char_p]
             self._dmLib.pychip_DeviceController_SetWiFiCredentials.restype = PyChipError
 
-            # Currently only supports 1 list item, no name
+            # Currently only supports 1 list item
             self._dmLib.pychip_DeviceController_SetTimeZone.restype = PyChipError
             self._dmLib.pychip_DeviceController_SetTimeZone.argtypes = [
-                c_int32, c_uint64]
+                c_int32, c_uint64, c_char_p]
 
             # Currently only supports 1 list item
             self._dmLib.pychip_DeviceController_SetDSTOffset.restype = PyChipError
@@ -1654,10 +1654,10 @@ class ChipDeviceController(ChipDeviceControllerBase):
             lambda: self._dmLib.pychip_DeviceController_ResetCommissioningParameters()
         ).raise_on_error()
 
-    def SetTimeZone(self, offset: int, validAt: int):
+    def SetTimeZone(self, offset: int, validAt: int, name: str = ""):
         self.CheckIsActive()
         self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_SetTimeZone(offset, validAt)
+            lambda: self._dmLib.pychip_DeviceController_SetTimeZone(offset, validAt, name.encode("utf-8"))
         ).raise_on_error()
 
     def SetDSTOffset(self, offset: int, validStarting: int, validUntil: int):

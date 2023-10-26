@@ -513,6 +513,7 @@ public:
         mDAC.ClearValue();
         mTimeZone.ClearValue();
         mDSTOffsets.ClearValue();
+        mDefaultNTP.ClearValue();
     }
 
 private:
