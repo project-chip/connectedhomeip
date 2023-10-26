@@ -16,7 +16,7 @@ import logging
 import xml.sax.xmlreader
 from typing import List, Optional
 
-from matter_idl.matter_idl_types import Idl, ParseMetaData, Cluster
+from matter_idl.matter_idl_types import Cluster, ClusterSide, Idl, ParseMetaData
 
 
 class IdlPostProcessor:
@@ -88,9 +88,10 @@ class Context:
         """Creates a new cluster entry for the given name in the list of known
            base clusters.
         """
-        assert name not in self.base_clusters # be unique
+        assert name not in self.base_clusters  # be unique
 
-        cluster = Cluster(side=ClusterSide.Client, name=name, code=-1, parse_meta=parse_meta)
+        cluster = Cluster(side=ClusterSide.CLIENT, name=name,
+                          code=-1, parse_meta=parse_meta)
         self.base_clusters = cluster
 
         return cluster

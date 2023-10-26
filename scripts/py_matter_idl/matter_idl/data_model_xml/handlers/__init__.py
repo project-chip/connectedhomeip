@@ -12,11 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
 from matter_idl.matter_idl_types import Idl
 
 from .base import BaseHandler
 from .context import Context
 from .handlers import ClusterHandler
+
+LOGGER = logging.getLogger('data-model-xml-data-parsing')
+
 
 def contains_valid_cluster_id(attrs) -> bool:
     # Does not check numeric format ... assuming scraper is smart enough for that
@@ -34,8 +39,10 @@ class DataModelXmlHandler(BaseHandler):
     def GetNextProcessor(self, name, attrs):
         if name.lower() == 'cluster':
             if contains_valid_cluster_id(attrs):
-               return ClusterHandler.ForAttributes(self.context, self._idl, attrs)
+                return ClusterHandler.ForAttributes(self.context, self._idl, attrs)
 
-            return self.context.AddBaseCluster(attrs['name'], self.context.GetCurrentLocationMeta())
+            LOGGER.info("Found a base cluster (no id): '%s'", attrs['name'])
+
+            return ClusterHandler.IntoCluster(self.context, self._idl, self.context.AddBaseCluster(attrs['name'], self.context.GetCurrentLocationMeta()))
         else:
             return BaseHandler(self.context)

@@ -489,12 +489,12 @@ class ClusterHandler(BaseHandler):
         assert ("id" in attrs)
 
         return ClusterHandler(context, idl,
-          Cluster(
-            side=ClusterSide.CLIENT,
-            name=NormalizeName(attrs["name"]),
-            code=ParseInt(attrs["id"]),
-            parse_meta=context.GetCurrentLocationMeta()
-        ))
+                              Cluster(
+                                  side=ClusterSide.CLIENT,
+                                  name=NormalizeName(attrs["name"]),
+                                  code=ParseInt(attrs["id"]),
+                                  parse_meta=context.GetCurrentLocationMeta()
+                              ))
 
     @staticmethod
     def IntoCluster(context: Context, idl: Idl, cluster: Cluster):
