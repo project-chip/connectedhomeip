@@ -2085,9 +2085,6 @@ static BOOL AttributeIsSpecifiedInRVCRunModeCluster(AttributeId aAttributeId)
     case Attributes::CurrentMode::Id: {
         return YES;
     }
-    case Attributes::StartUpMode::Id: {
-        return YES;
-    }
     case Attributes::OnMode::Id: {
         return YES;
     }
@@ -2122,9 +2119,6 @@ static BOOL AttributeIsSpecifiedInRVCCleanModeCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::CurrentMode::Id: {
-        return YES;
-    }
-    case Attributes::StartUpMode::Id: {
         return YES;
     }
     case Attributes::OnMode::Id: {

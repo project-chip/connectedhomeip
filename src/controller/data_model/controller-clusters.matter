@@ -2961,7 +2961,6 @@ client cluster RvcRunMode = 84 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
   attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -3013,7 +3012,6 @@ client cluster RvcCleanMode = 85 {
 
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
   attribute optional nullable int8u onMode = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;

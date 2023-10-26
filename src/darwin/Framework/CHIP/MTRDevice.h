@@ -78,6 +78,17 @@ typedef NS_ENUM(NSUInteger, MTRDeviceState) {
     NSDate * estimatedStartTime MTR_AVAILABLE(ios(16.5), macos(13.4), watchos(9.5), tvos(16.5));
 
 /**
+ * The controller this device was created for.  May return nil if that
+ * controller has been shut down.
+ */
+@property (nonatomic, readonly, nullable) MTRDeviceController * deviceController MTR_NEWLY_AVAILABLE;
+
+/**
+ * The node ID of the node this device corresponds to.
+ */
+@property (nonatomic, readonly, copy) NSNumber * nodeID NS_REFINED_FOR_SWIFT MTR_NEWLY_AVAILABLE;
+
+/**
  * Set the delegate to receive asynchronous callbacks about the device.
  *
  * The delegate will be called on the provided queue, for attribute reports, event reports, and device state changes.
