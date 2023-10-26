@@ -75,7 +75,8 @@ tests:
               type: list
               contains: [0, 1, 2, 65528, 65529, 65531, 65532, 65533]
 
-    - label: "Step 4b: Read the optional attribute(RegisteredClients) in
+    - label:
+          "Step 4b: Read the optional attribute(RegisteredClients) in
           AttributeList"
       PICS: ICDM.S.A0003
       command: "readAttribute"
@@ -94,7 +95,8 @@ tests:
               type: list
               contains: [4]
 
-    - label: "Step 4d: Read the optional attribute(ClientsSupportedPerFabric) in
+    - label:
+          "Step 4d: Read the optional attribute(ClientsSupportedPerFabric) in
           AttributeList"
       PICS: ICDM.S.A0005
       command: "readAttribute"
@@ -122,7 +124,8 @@ tests:
           constraints:
               type: list
 
-    - label: "Step 6b: TH reads AcceptedCommandList attribute from DUT if
+    - label:
+          "Step 6b: TH reads AcceptedCommandList attribute from DUT if
           ICDM.S.F00 is true"
       PICS: ICDM.S.F00
       command: "readAttribute"
@@ -132,7 +135,8 @@ tests:
               type: list
               contains: [0, 2]
 
-    - label: "Step 6c: Read the optional command (StayActiveRequest) in
+    - label:
+          "Step 6c: Read the optional command (StayActiveRequest) in
           AttributeList"
       PICS: ICDM.S.C03.Rsp
       command: "readAttribute"
