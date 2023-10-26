@@ -114,6 +114,8 @@ if (current_os == "android" || matter_enable_java_compilation) {
       "jni/DishwasherAlarmClient-ReadImpl.cpp",
       "jni/DishwasherModeClient-InvokeSubscribeImpl.cpp",
       "jni/DishwasherModeClient-ReadImpl.cpp",
+      "jni/MicrowaveOvenModeClient-InvokeSubscribeImpl.cpp",
+      "jni/MicrowaveOvenModeClient-ReadImpl.cpp",
       "jni/DoorLockClient-InvokeSubscribeImpl.cpp",
       "jni/DoorLockClient-ReadImpl.cpp",
       "jni/ElectricalMeasurementClient-InvokeSubscribeImpl.cpp",
