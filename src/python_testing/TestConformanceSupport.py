@@ -85,6 +85,14 @@ class TestConformanceSupport(MatterBaseTest):
             asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.PROVISIONAL)
 
     @async_test_body
+    async def test_conformance_zigbee(self):
+        xml = '<condition name="Zigbee"/>'
+        et = ElementTree.fromstring(xml)
+        xml_callable = parse_callable_from_xml(et, self.params)
+        for f in self.feature_maps:
+            asserts.assert_equal(xml_callable(f, [], []), ConformanceDecision.NOT_APPLICABLE)
+
+    @async_test_body
     async def test_conformance_mandatory_on_condition(self):
         xml = ('<mandatoryConform>'
                '<feature name="AB" />'
