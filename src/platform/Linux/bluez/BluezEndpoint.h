@@ -52,6 +52,7 @@
 
 #include <ble/CHIPBleServiceData.h>
 #include <lib/core/CHIPError.h>
+#include <platform/Linux/dbus/bluez/DbusBluez.h>
 
 #include "BluezConnection.h"
 #include "Types.h"
@@ -85,7 +86,7 @@ private:
         uint16_t mNumRetries = 0;
     };
 
-    static CHIP_ERROR StartupEndpointBindings(BluezEndpoint * endpoint);
+    static CHIP_ERROR StartupEndpointBindings(BluezEndpoint * self);
 
     void SetupAdapter();
     void SetupGattServer(GDBusConnection * aConn);
@@ -96,21 +97,32 @@ private:
 
     void HandleNewDevice(BluezDevice1 * aDevice);
     void UpdateConnectionTable(BluezDevice1 * aDevice);
+    BluezConnection * GetBluezConnectionViaDevice();
 
-    static void BluezSignalOnObjectAdded(GDBusObjectManager * aManager, GDBusObject * aObject, BluezEndpoint * endpoint);
-    static void BluezSignalOnObjectRemoved(GDBusObjectManager * aManager, GDBusObject * aObject, BluezEndpoint * endpoint);
+    static gboolean BluezAdvertisingRelease(BluezLEAdvertisement1 * aAdv, GDBusMethodInvocation * aInvocation,
+                                            BluezEndpoint * self);
+
+    static gboolean BluezCharacteristicReadValue(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
+                                                 GVariant * aOptions, BluezEndpoint * self);
+    static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
+                                                    GVariant * aOptions, BluezEndpoint * self);
+    static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
+                                                     GVariant * aOptions, BluezEndpoint * self);
+    static gboolean BluezCharacteristicConfirm(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
+                                               BluezEndpoint * self);
+
+    static void BluezSignalOnObjectAdded(GDBusObjectManager * aManager, GDBusObject * aObject, BluezEndpoint * self);
+    static void BluezSignalOnObjectRemoved(GDBusObjectManager * aManager, GDBusObject * aObject, BluezEndpoint * self);
     static void BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClient * aManager, GDBusObjectProxy * aObject,
                                                       GDBusProxy * aInterface, GVariant * aChangedProperties,
-                                                      const char * const * aInvalidatedProps, BluezEndpoint * endpoint);
+                                                      const char * const * aInvalidatedProps, BluezEndpoint * self);
 
-    static CHIP_ERROR RegisterGattApplicationImpl(BluezEndpoint * endpoint);
+    static CHIP_ERROR RegisterGattApplicationImpl(BluezEndpoint * self);
 
     static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer apParams);
     static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams);
 
 public:
-    BluezConnection * GetBluezConnectionViaDevice();
-
     // Bus owning name
     char * mpOwningName = nullptr;
 
