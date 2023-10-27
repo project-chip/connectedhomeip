@@ -3283,8 +3283,8 @@ server cluster MediaInput = 1287 {
   struct InputInfoStruct {
     int8u index = 0;
     InputTypeEnum inputType = 1;
-    char_string<32> name = 2;
-    char_string<32> description = 3;
+    char_string name = 2;
+    char_string description = 3;
   }
 
   readonly attribute InputInfoStruct inputList[] = 0;

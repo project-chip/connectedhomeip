@@ -1560,8 +1560,8 @@ client cluster MediaInput = 1287 {
   struct InputInfoStruct {
     int8u index = 0;
     InputTypeEnum inputType = 1;
-    char_string<32> name = 2;
-    char_string<32> description = 3;
+    char_string name = 2;
+    char_string description = 3;
   }
 
   readonly attribute InputInfoStruct inputList[] = 0;
@@ -1589,7 +1589,7 @@ client cluster MediaInput = 1287 {
   /** Upon receipt, this SHALL hide the input list from the screen. */
   command HideInputStatus(): DefaultSuccess = 2;
   /** Upon receipt, this SHALL rename the input at a specific index in the Input List. Updates to the input name SHALL appear in the TV settings menus. */
-  command RenameInput(RenameInputRequest): DefaultSuccess = 3;
+  command access(invoke: manage) RenameInput(RenameInputRequest): DefaultSuccess = 3;
 }
 
 /** This cluster provides an interface for managing low power mode on a device. */

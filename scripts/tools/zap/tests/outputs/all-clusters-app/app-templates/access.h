@@ -437,6 +437,7 @@
     0x00000101, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
     0x00000101, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     0x00000101, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
+    0x00000507, /* Cluster: Media Input, Command: RenameInput, Privilege: manage */ \
     0xFFF1FC06, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     0xFFF1FC06, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }
@@ -490,6 +491,7 @@
     0x00000022, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
     0x00000024, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     0x00000026, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
+    0x00000003, /* Cluster: Media Input, Command: RenameInput, Privilege: manage */ \
     0x00000000, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     0x00000001, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }
@@ -543,6 +545,7 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Media Input, Command: RenameInput, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }
