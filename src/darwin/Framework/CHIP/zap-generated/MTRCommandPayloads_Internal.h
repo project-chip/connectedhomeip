@@ -1468,6 +1468,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRMicrowaveOvenControlClusterSetCookingParametersParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRMicrowaveOvenControlClusterAddMoreTimeParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRElectricalMeasurementClusterGetProfileInfoResponseCommandParams (InternalMethods)
 
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ElectricalMeasurement::Commands::GetProfileInfoResponseCommand::DecodableType &)decodableStruct;

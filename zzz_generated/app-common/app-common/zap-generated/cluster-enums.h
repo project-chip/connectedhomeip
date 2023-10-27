@@ -4072,6 +4072,8 @@ enum class ApplicationStatusEnum : uint8_t
 
 namespace AccountLogin {} // namespace AccountLogin
 
+namespace MicrowaveOvenControl {} // namespace MicrowaveOvenControl
+
 namespace ElectricalMeasurement {} // namespace ElectricalMeasurement
 
 namespace UnitTesting {

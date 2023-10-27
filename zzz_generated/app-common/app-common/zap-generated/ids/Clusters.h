@@ -307,6 +307,9 @@ static constexpr ClusterId Id = 0x0000050D;
 namespace AccountLogin {
 static constexpr ClusterId Id = 0x0000050E;
 } // namespace AccountLogin
+namespace MicrowaveOvenControl {
+static constexpr ClusterId Id = 0x0000050F;
+} // namespace MicrowaveOvenControl
 namespace ElectricalMeasurement {
 static constexpr ClusterId Id = 0x00000B04;
 } // namespace ElectricalMeasurement

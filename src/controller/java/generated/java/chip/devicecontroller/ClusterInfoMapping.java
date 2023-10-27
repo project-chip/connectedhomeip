@@ -15272,6 +15272,90 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedMicrowaveOvenControlClusterGeneratedCommandListAttributeCallback implements ChipClusters.MicrowaveOvenControlCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMicrowaveOvenControlClusterAcceptedCommandListAttributeCallback implements ChipClusters.MicrowaveOvenControlCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMicrowaveOvenControlClusterEventListAttributeCallback implements ChipClusters.MicrowaveOvenControlCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMicrowaveOvenControlClusterAttributeListAttributeCallback implements ChipClusters.MicrowaveOvenControlCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedElectricalMeasurementClusterGeneratedCommandListAttributeCallback implements ChipClusters.ElectricalMeasurementCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -17205,6 +17289,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.AccountLoginCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("accountLogin", accountLoginClusterInfo);
 
+    ClusterInfo microwaveOvenControlClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.MicrowaveOvenControlCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("microwaveOvenControl", microwaveOvenControlClusterInfo);
+
     ClusterInfo electricalMeasurementClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.ElectricalMeasurementCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("electricalMeasurement", electricalMeasurementClusterInfo);
@@ -17319,6 +17407,7 @@ public class ClusterInfoMapping {
     destination.get("applicationLauncher").combineCommands(source.get("applicationLauncher"));
     destination.get("applicationBasic").combineCommands(source.get("applicationBasic"));
     destination.get("accountLogin").combineCommands(source.get("accountLogin"));
+    destination.get("microwaveOvenControl").combineCommands(source.get("microwaveOvenControl"));
     destination.get("electricalMeasurement").combineCommands(source.get("electricalMeasurement"));
     destination.get("unitTesting").combineCommands(source.get("unitTesting"));
     destination.get("faultInjection").combineCommands(source.get("faultInjection"));
@@ -21950,6 +22039,54 @@ public class ClusterInfoMapping {
     accountLoginClusterInteractionInfoMap.put("logout", accountLoginlogoutInteractionInfo);
 
     commandMap.put("accountLogin", accountLoginClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> microwaveOvenControlClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    Map<String, CommandParameterInfo> microwaveOvenControlsetCookingParametersCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo microwaveOvenControlsetCookingParameterscookModeCommandParameterInfo = new CommandParameterInfo("cookMode", Optional.class, Integer.class);
+    microwaveOvenControlsetCookingParametersCommandParams.put("cookMode",microwaveOvenControlsetCookingParameterscookModeCommandParameterInfo);
+
+    CommandParameterInfo microwaveOvenControlsetCookingParameterscookTimeCommandParameterInfo = new CommandParameterInfo("cookTime", Optional.class, Long.class);
+    microwaveOvenControlsetCookingParametersCommandParams.put("cookTime",microwaveOvenControlsetCookingParameterscookTimeCommandParameterInfo);
+
+    CommandParameterInfo microwaveOvenControlsetCookingParameterspowerSettingCommandParameterInfo = new CommandParameterInfo("powerSetting", Optional.class, Integer.class);
+    microwaveOvenControlsetCookingParametersCommandParams.put("powerSetting",microwaveOvenControlsetCookingParameterspowerSettingCommandParameterInfo);
+    InteractionInfo microwaveOvenControlsetCookingParametersInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.MicrowaveOvenControlCluster) cluster)
+        .setCookingParameters((DefaultClusterCallback) callback
+        , (Optional<Integer>)
+        commandArguments.get("cookMode")
+        , (Optional<Long>)
+        commandArguments.get("cookTime")
+        , (Optional<Integer>)
+        commandArguments.get("powerSetting")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        microwaveOvenControlsetCookingParametersCommandParams
+    );
+    microwaveOvenControlClusterInteractionInfoMap.put("setCookingParameters", microwaveOvenControlsetCookingParametersInteractionInfo);
+
+    Map<String, CommandParameterInfo> microwaveOvenControladdMoreTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo microwaveOvenControladdMoreTimetimeToAddCommandParameterInfo = new CommandParameterInfo("timeToAdd", Long.class, Long.class);
+    microwaveOvenControladdMoreTimeCommandParams.put("timeToAdd",microwaveOvenControladdMoreTimetimeToAddCommandParameterInfo);
+    InteractionInfo microwaveOvenControladdMoreTimeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.MicrowaveOvenControlCluster) cluster)
+        .addMoreTime((DefaultClusterCallback) callback
+        , (Long)
+        commandArguments.get("timeToAdd")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        microwaveOvenControladdMoreTimeCommandParams
+    );
+    microwaveOvenControlClusterInteractionInfoMap.put("addMoreTime", microwaveOvenControladdMoreTimeInteractionInfo);
+
+    commandMap.put("microwaveOvenControl", microwaveOvenControlClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> electricalMeasurementClusterInteractionInfoMap = new LinkedHashMap<>();
 

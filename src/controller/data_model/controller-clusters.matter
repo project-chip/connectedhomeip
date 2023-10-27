@@ -6421,6 +6421,36 @@ client cluster AccountLogin = 1294 {
   timed command Logout(): DefaultSuccess = 3;
 }
 
+/** Attributes and commands for configuring the microwave oven control, and reporting cooking stats. */
+client cluster MicrowaveOvenControl = 1295 {
+  readonly attribute elapsed_s cookTime = 1;
+  readonly attribute int8u powerSetting = 2;
+  readonly attribute optional int8u minPower = 3;
+  readonly attribute optional int8u maxPower = 4;
+  readonly attribute optional int8u powerStep = 5;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute event_id eventList[] = 65530;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct SetCookingParametersRequest {
+    optional int8u cookMode = 0;
+    optional elapsed_s cookTime = 1;
+    optional int8u powerSetting = 2;
+  }
+
+  request struct AddMoreTimeRequest {
+    elapsed_s timeToAdd = 0;
+  }
+
+  /** Set Cooking Parameters */
+  command SetCookingParameters(SetCookingParametersRequest): DefaultSuccess = 0;
+  /** Add More Cooking Time */
+  command AddMoreTime(AddMoreTimeRequest): DefaultSuccess = 1;
+}
+
 /** Attributes related to the electrical properties of a device. This cluster is used by power outlets and other devices that need to provide instantaneous data as opposed to metrology data which should be retrieved from the metering cluster.. */
 client cluster ElectricalMeasurement = 2820 {
   readonly attribute optional bitmap32 measurementType = 0;

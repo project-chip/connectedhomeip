@@ -37,6 +37,7 @@
         "diagnostic-logs-cluster.xml",
         "dishwasher-alarm-cluster.xml",
         "dishwasher-mode-cluster.xml",
+        "microwave-oven-control-cluster.xml",
         "door-lock-cluster.xml",
         "electrical-measurement-cluster.xml",
         "ethernet-network-diagnostics-cluster.xml",
@@ -323,6 +324,7 @@
             "OnMode",
             "FeatureMap"
         ],
+        "Microwave Oven Control": ["CookTime","PowerSetting","MinPower","MaxPower","PowerStep","FeatureMap"],
         "Laundry Washer Mode": [
             "SupportedModes",
             "CurrentMode",

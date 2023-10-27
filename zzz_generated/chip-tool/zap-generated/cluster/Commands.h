@@ -128,6 +128,7 @@
 | ApplicationLauncher                                                 | 0x050C |
 | ApplicationBasic                                                    | 0x050D |
 | AccountLogin                                                        | 0x050E |
+| MicrowaveOvenControl                                                | 0x050F |
 | ElectricalMeasurement                                               | 0x0B04 |
 | UnitTesting                                                         | 0xFFF1FC05|
 | FaultInjection                                                      | 0xFFF1FC06|
@@ -10054,6 +10055,107 @@ public:
 
 private:
     chip::app::Clusters::AccountLogin::Commands::Logout::Type mRequest;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster MicrowaveOvenControl                                        | 0x050F |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * SetCookingParameters                                              |   0x00 |
+| * AddMoreTime                                                       |   0x01 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * CookTime                                                          | 0x0001 |
+| * PowerSetting                                                      | 0x0002 |
+| * MinPower                                                          | 0x0003 |
+| * MaxPower                                                          | 0x0004 |
+| * PowerStep                                                         | 0x0005 |
+| * GeneratedCommandList                                              | 0xFFF8 |
+| * AcceptedCommandList                                               | 0xFFF9 |
+| * EventList                                                         | 0xFFFA |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+|------------------------------------------------------------------------------|
+| Events:                                                             |        |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command SetCookingParameters
+ */
+class MicrowaveOvenControlSetCookingParameters : public ClusterCommand
+{
+public:
+    MicrowaveOvenControlSetCookingParameters(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("set-cooking-parameters", credsIssuerConfig)
+    {
+        AddArgument("CookMode", 0, UINT8_MAX, &mRequest.cookMode);
+        AddArgument("CookTime", 0, UINT32_MAX, &mRequest.cookTime);
+        AddArgument("PowerSetting", 0, UINT8_MAX, &mRequest.powerSetting);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MicrowaveOvenControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MicrowaveOvenControl::Commands::SetCookingParameters::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MicrowaveOvenControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MicrowaveOvenControl::Commands::SetCookingParameters::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::MicrowaveOvenControl::Commands::SetCookingParameters::Type mRequest;
+};
+
+/*
+ * Command AddMoreTime
+ */
+class MicrowaveOvenControlAddMoreTime : public ClusterCommand
+{
+public:
+    MicrowaveOvenControlAddMoreTime(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("add-more-time", credsIssuerConfig)
+    {
+        AddArgument("TimeToAdd", 0, UINT32_MAX, &mRequest.timeToAdd);
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MicrowaveOvenControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MicrowaveOvenControl::Commands::AddMoreTime::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::MicrowaveOvenControl::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::MicrowaveOvenControl::Commands::AddMoreTime::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::MicrowaveOvenControl::Commands::AddMoreTime::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -20273,6 +20375,79 @@ void registerClusterAccountLogin(Commands & commands, CredentialIssuerCommands *
 
     commands.RegisterCluster(clusterName, clusterCommands);
 }
+void registerClusterMicrowaveOvenControl(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
+{
+    using namespace chip::app::Clusters::MicrowaveOvenControl;
+
+    const char * clusterName = "MicrowaveOvenControl";
+
+    commands_list clusterCommands = {
+        //
+        // Commands
+        //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                       //
+        make_unique<MicrowaveOvenControlSetCookingParameters>(credsIssuerConfig), //
+        make_unique<MicrowaveOvenControlAddMoreTime>(credsIssuerConfig),          //
+        //
+        // Attributes
+        //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<ReadAttribute>(Id, "cook-time", Attributes::CookTime::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "power-setting", Attributes::PowerSetting::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "min-power", Attributes::MinPower::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "max-power", Attributes::MaxPower::Id, credsIssuerConfig),                          //
+        make_unique<ReadAttribute>(Id, "power-step", Attributes::PowerStep::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
+        make_unique<WriteAttribute<uint32_t>>(Id, "cook-time", 0, UINT32_MAX, Attributes::CookTime::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "power-setting", 0, UINT8_MAX, Attributes::PowerSetting::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "min-power", 0, UINT8_MAX, Attributes::MinPower::Id, WriteCommandType::kForceWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "max-power", 0, UINT8_MAX, Attributes::MaxPower::Id, WriteCommandType::kForceWrite,
+                                             credsIssuerConfig), //
+        make_unique<WriteAttribute<uint8_t>>(Id, "power-step", 0, UINT8_MAX, Attributes::PowerStep::Id,
+                                             WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
+            Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::EventId>>>(
+            Id, "event-list", Attributes::EventList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::AttributeId>>>(
+            Id, "attribute-list", Attributes::AttributeList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
+        make_unique<SubscribeAttribute>(Id, "cook-time", Attributes::CookTime::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "power-setting", Attributes::PowerSetting::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "min-power", Attributes::MinPower::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "max-power", Attributes::MaxPower::Id, credsIssuerConfig),                          //
+        make_unique<SubscribeAttribute>(Id, "power-step", Attributes::PowerStep::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "event-list", Attributes::EventList::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+        //
+        // Events
+        //
+        make_unique<ReadEvent>(Id, credsIssuerConfig),      //
+        make_unique<SubscribeEvent>(Id, credsIssuerConfig), //
+    };
+
+    commands.RegisterCluster(clusterName, clusterCommands);
+}
 void registerClusterElectricalMeasurement(Commands & commands, CredentialIssuerCommands * credsIssuerConfig)
 {
     using namespace chip::app::Clusters::ElectricalMeasurement;
@@ -21643,6 +21818,7 @@ void registerClusters(Commands & commands, CredentialIssuerCommands * credsIssue
     registerClusterApplicationLauncher(commands, credsIssuerConfig);
     registerClusterApplicationBasic(commands, credsIssuerConfig);
     registerClusterAccountLogin(commands, credsIssuerConfig);
+    registerClusterMicrowaveOvenControl(commands, credsIssuerConfig);
     registerClusterElectricalMeasurement(commands, credsIssuerConfig);
     registerClusterUnitTesting(commands, credsIssuerConfig);
     registerClusterFaultInjection(commands, credsIssuerConfig);
