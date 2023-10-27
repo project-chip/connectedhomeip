@@ -16,6 +16,7 @@
 #
 
 import glob
+import logging
 import os
 import xml.etree.ElementTree as ElementTree
 from copy import deepcopy
@@ -25,7 +26,7 @@ from typing import Callable
 
 from chip.tlv import uint
 from conformance_support import (DEPRECATE_CONFORM, DISALLOW_CONFORM, MANDATORY_CONFORM, OPTIONAL_CONFORM, OTHERWISE_CONFORM,
-                                 PROVISIONAL_CONFORM, ConformanceDecision, ConformanceParseParameters, or_operation,
+                                 PROVISIONAL_CONFORM, ConformanceDecision, ConformanceException, ConformanceParseParameters, or_operation,
                                  parse_callable_from_xml)
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, EventPathLocation,
                                     FeaturePathLocation, ProblemNotice, ProblemSeverity)
@@ -188,12 +189,25 @@ class ClusterParser:
             commands[element.attrib['name']] = int(element.attrib['id'], 0)
         return commands
 
+    def parse_conformance(self, conformance_xml: ElementTree.Element) -> Callable:
+        try:
+            return parse_callable_from_xml(conformance_xml, self.params)
+        except ConformanceException as ex:
+            # Just point to the general cluster, because something is mismatched, but it's not clear what
+            location = ClusterPathLocation(endpoint_id=0, cluster_id=self._cluster_id)
+            self._problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
+                                                severity=ProblemSeverity.WARNING, problem=str(ex)))
+            return None
+
     def parse_features(self) -> dict[uint, XmlFeature]:
         features = {}
-        for element, conformance in self.feature_elements:
+        for element, conformance_xml in self.feature_elements:
             mask = 1 << int(element.attrib['bit'], 0)
+            conformance = self.parse_conformance(conformance_xml)
+            if conformance is None:
+                continue
             features[mask] = XmlFeature(code=element.attrib['code'], name=element.attrib['name'],
-                                        conformance=parse_callable_from_xml(conformance, self.params))
+                                        conformance=conformance)
         return features
 
     def parse_attributes(self) -> dict[uint, XmlAttribute]:
@@ -205,7 +219,9 @@ class ClusterParser:
                 datatype = element.attrib['type']
             except KeyError:
                 datatype = 'UNKNOWN'
-            conformance = parse_callable_from_xml(conformance_xml, self.params)
+            conformance = self.parse_conformance(conformance_xml)
+            if conformance is None:
+                continue
             if code in attributes:
                 # This is one of those fun ones where two different rows have the same id and name, but differ in conformance and ranges
                 # I don't have a good way to relate the ranges to the conformance, but they're both acceptable, so let's just or them.
@@ -227,7 +243,9 @@ class ClusterParser:
             if dir != command_type:
                 continue
             code = int(element.attrib['id'], 0)
-            conformance = parse_callable_from_xml(conformance_xml, self.params)
+            conformance = self.parse_conformance(conformance_xml)
+            if conformance is None:
+                continue
             if code in commands:
                 conformance = or_operation([conformance, commands[code].conformance])
             commands[code] = XmlCommand(name=element.attrib['name'], conformance=conformance)
@@ -237,7 +255,9 @@ class ClusterParser:
         events = {}
         for element, conformance_xml in self.event_elements:
             code = int(element.attrib['id'], 0)
-            conformance = parse_callable_from_xml(conformance_xml, self.params)
+            conformance = self.parse_conformance(conformance_xml)
+            if conformance is None:
+                continue
             if code in events:
                 conformance = or_operation([conformance, events[code].conformance])
             events[code] = XmlEvent(name=element.attrib['name'], conformance=conformance)
@@ -264,6 +284,7 @@ def build_xml_clusters() -> tuple[list[XmlCluster], list[ProblemNotice]]:
     ids_by_name = {}
     problems = []
     for xml in glob.glob(f"{dir}/*.xml"):
+        logging.info(f'Parsing file {xml}')
         tree = ElementTree.parse(f'{xml}')
         root = tree.getroot()
         cluster = root.iter('cluster')

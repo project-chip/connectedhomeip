@@ -215,14 +215,19 @@ def parse_callable_from_xml(element: ElementTree.Element, params: ConformancePar
         elif element.tag == DISALLOW_CONFORM:
             return disallowed
         elif element.tag == FEATURE_TAG:
-            return feature(params.feature_map[element.get('name')])
+            try:
+                return feature(params.feature_map[element.get('name')])
+            except KeyError:
+                raise ConformanceException(f'Conformance specifies feature not in feature table: {element.get("name")}')
         elif element.tag == ATTRIBUTE_TAG:
             # Some command conformance tags are marked as attribute, so if this key isn't in attribute, try command
             name = element.get('name')
             if name in params.attribute_map:
                 return attribute(params.attribute_map[name])
-            else:
+            elif name in params.command_map:
                 return command(params.command_map[name])
+            else:
+                raise ConformanceException(f'Conformance specifies attribute or command not in table: {name}')
         elif element.tag == COMMAND_TAG:
             return command(params.command_map[element.get('name')])
         else:
