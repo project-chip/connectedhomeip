@@ -1275,6 +1275,34 @@ static void TestChipCert_CertId(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+static void TestChipCert_DecodingOptions(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err;
+    ByteSpan cert;
+    ChipCertificateData certData;
+
+    err = GetTestCert(TestCert::kRoot01, sNullLoadFlag, cert);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Decode with default (null) options
+    err = DecodeChipCert(cert, certData);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, !certData.mCertFlags.Has(CertFlags::kIsTrustAnchor));
+
+    // Decode as trust anchor
+    err = DecodeChipCert(cert, certData, CertDecodeFlags::kIsTrustAnchor);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, certData.mCertFlags.Has(CertFlags::kIsTrustAnchor));
+
+    // Decode with TBS Hash calculation
+    err = DecodeChipCert(cert, certData, CertDecodeFlags::kGenerateTBSHash);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, certData.mCertFlags.Has(CertFlags::kTBSHashPresent));
+    // When the TBS hash is available signature verification should work
+    err = VerifyCertSignature(certData, certData); // test cert is a self-signed root
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+}
+
 static void TestChipCert_LoadDuplicateCerts(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
@@ -2147,6 +2175,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test CHIP Certificate Usage", TestChipCert_CertUsage),
     NL_TEST_DEF("Test CHIP Certificate Type", TestChipCert_CertType),
     NL_TEST_DEF("Test CHIP Certificate ID", TestChipCert_CertId),
+    NL_TEST_DEF("Test CHIP Certificate Decoding Options", TestChipCert_DecodingOptions),
     NL_TEST_DEF("Test Loading Duplicate Certificates", TestChipCert_LoadDuplicateCerts),
     NL_TEST_DEF("Test CHIP Generate Root Certificate", TestChipCert_GenerateRootCert),
     NL_TEST_DEF("Test CHIP Generate Root Certificate with Fabric", TestChipCert_GenerateRootFabCert),
