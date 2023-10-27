@@ -23,6 +23,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -71,9 +72,11 @@ PowerSourceServer gPowerSourceServer;
 PowerSourceAttrAccess gAttrAccess;
 
 #ifdef ZCL_USING_POWER_SOURCE_CLUSTER_SERVER
+static constexpr uint16_t kNumStaticEndpoints = EMBER_AF_POWER_SOURCE_CLUSTER_SERVER_ENDPOINT_COUNT;
 #define POWER_SERVER_NUM_SUPPORTED_ENDPOINTS                                                                                       \
     (EMBER_AF_POWER_SOURCE_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
 #else
+static constexpr uint16_t kNumStaticEndpoints    = 0;
 #define POWER_SERVER_NUM_SUPPORTED_ENDPOINTS CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
 #endif
 static constexpr size_t kNumSupportedEndpoints = POWER_SERVER_NUM_SUPPORTED_ENDPOINTS;
@@ -146,13 +149,8 @@ CHIP_ERROR PowerSourceServer::SetEndpointList(EndpointId powerSourceClusterEndpo
 {
     // TODO: should check here that the power source cluster exists on the endpoint, but for now let's take the caller's word
     // for it
-
-    size_t idx = PowerSourceClusterEndpointIndex(powerSourceClusterEndpoint);
-    if (idx >= kNumSupportedEndpoints)
-    {
-        idx = NextEmptyIndex();
-    }
-    if (idx >= kNumSupportedEndpoints)
+    uint16_t idx = emberAfGetClusterServerEndpointIndex(powerSourceClusterEndpoint, Clusters::PowerSource::Id, kNumStaticEndpoints);
+    if (idx == kEmberInvalidEndpointIndex)
     {
         return CHIP_ERROR_NO_MEMORY;
     }
@@ -171,8 +169,8 @@ CHIP_ERROR PowerSourceServer::SetEndpointList(EndpointId powerSourceClusterEndpo
 }
 const Span<EndpointId> * PowerSourceServer::GetEndpointList(EndpointId powerSourceClusterEndpoint) const
 {
-    size_t idx = PowerSourceClusterEndpointIndex(powerSourceClusterEndpoint);
-    if (idx != std::numeric_limits<size_t>::max())
+    uint16_t idx = emberAfGetClusterServerEndpointIndex(powerSourceClusterEndpoint, Clusters::PowerSource::Id, kNumStaticEndpoints);
+    if (idx != kEmberInvalidEndpointIndex && sPowerSourceClusterInfo[idx].mEndpointList.size() > 0)
     {
         return &sPowerSourceClusterInfo[idx].mEndpointList;
     }
@@ -181,39 +179,17 @@ const Span<EndpointId> * PowerSourceServer::GetEndpointList(EndpointId powerSour
 
 void PowerSourceServer::Shutdown()
 {
+#if POWER_SERVER_NUM_SUPPORTED_ENDPOINTS > 0
     for (size_t i = 0; i < kNumSupportedEndpoints; ++i)
     {
         sPowerSourceClusterInfo[i].Clear();
     }
+#endif
 }
 
 size_t PowerSourceServer::GetNumSupportedEndpointLists() const
 {
     return kNumSupportedEndpoints;
-}
-
-size_t PowerSourceServer::PowerSourceClusterEndpointIndex(EndpointId endpointId) const
-{
-    for (size_t i = 0; i < kNumSupportedEndpoints; ++i)
-    {
-        if (sPowerSourceClusterInfo[i].mClusterEndpoint == endpointId)
-        {
-            return i;
-        }
-    }
-    return std::numeric_limits<size_t>::max();
-}
-
-size_t PowerSourceServer::NextEmptyIndex() const
-{
-    for (size_t i = 0; i < kNumSupportedEndpoints; ++i)
-    {
-        if (sPowerSourceClusterInfo[i].mClusterEndpoint == kInvalidEndpointId)
-        {
-            return i;
-        }
-    }
-    return std::numeric_limits<size_t>::max();
 }
 
 } // namespace Clusters
