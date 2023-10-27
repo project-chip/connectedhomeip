@@ -70,6 +70,8 @@ public:
     CHIP_ERROR Init(const char * apBleAddr, const char * apBleName);
     void Shutdown();
 
+    BluezAdapter1 * GetAdapter() const { return mpAdapter; }
+
     CHIP_ERROR RegisterGattApplication();
 
     CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice);
@@ -122,7 +124,6 @@ private:
     static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer apParams);
     static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams);
 
-public:
     // Bus owning name
     char * mpOwningName = nullptr;
 
@@ -153,6 +154,9 @@ public:
     bool mIsCentral                     = false;
     char * mpPeerDevicePath             = nullptr;
     GCancellable * mpConnectCancellable = nullptr;
+
+    // Allow BluezConnection to access our private members
+    friend class BluezConnection;
 };
 
 } // namespace Internal

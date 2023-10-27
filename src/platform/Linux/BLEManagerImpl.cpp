@@ -660,7 +660,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
         return;
     }
 
-    if (mEndpoint->mpAdapter == nullptr)
+    if (mEndpoint->GetAdapter() == nullptr)
     {
         BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
         ChipLogError(Ble, "No adapter available for new connection establishment");
@@ -669,7 +669,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
 
     mBLEScanConfig.mBleScanState = scanType;
 
-    CHIP_ERROR err = mDeviceScanner.Init(mEndpoint->mpAdapter, this);
+    CHIP_ERROR err = mDeviceScanner.Init(mEndpoint->GetAdapter(), this);
     if (err != CHIP_NO_ERROR)
     {
         mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
