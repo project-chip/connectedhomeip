@@ -2073,7 +2073,7 @@ limitations under the License.
         <clusters lockOthers="true">
             <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Boolean State" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Boolean State Configuration" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Boolean Sensor Configuration" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>TAG_LIST</requireAttribute>
             </include>
