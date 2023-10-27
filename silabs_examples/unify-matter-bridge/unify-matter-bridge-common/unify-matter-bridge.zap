@@ -3663,6 +3663,14 @@
               "isEnabled": 1
             },
             {
+              "name": "SetTrustedTimeSource",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
               "name": "SetTimeZone",
               "code": 2,
               "mfgCode": null,
@@ -3681,6 +3689,14 @@
             {
               "name": "SetDSTOffset",
               "code": 4,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "SetDefaultNTP",
+              "code": 5,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
@@ -3715,6 +3731,38 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "TrustedTimeSource",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "type": "TrustedTimeSourceStruct",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "DefaultNTP",
+              "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "type": "char_string",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3817,6 +3865,22 @@
               "reportableChange": 0
             },
             {
+              "name": "SupportsDNSResolve",
+              "code": 12,
+              "mfgCode": null,
+              "side": "server",
+              "type": "boolean",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "false",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "GeneratedCommandList",
               "code": 65528,
               "mfgCode": null,
@@ -3890,7 +3954,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "11",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3938,6 +4002,13 @@
             {
               "name": "TimeFailure",
               "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "MissingTrustedTimeSource",
+              "code": 4,
               "mfgCode": null,
               "side": "server",
               "included": 1

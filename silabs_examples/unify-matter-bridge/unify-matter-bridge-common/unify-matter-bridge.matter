@@ -1111,12 +1111,15 @@ server cluster TimeSynchronization = 56 {
 
   readonly attribute nullable epoch_us UTCTime = 0;
   readonly attribute GranularityEnum granularity = 1;
+  readonly attribute nullable TrustedTimeSourceStruct trustedTimeSource = 3;
+  readonly attribute nullable char_string<128> defaultNTP = 4;
   readonly attribute TimeZoneStruct timeZone[] = 5;
   readonly attribute DSTOffsetStruct DSTOffset[] = 6;
   readonly attribute nullable epoch_us localTime = 7;
   readonly attribute TimeZoneDatabaseEnum timeZoneDatabase = 8;
   readonly attribute int8u timeZoneListMaxSize = 10;
   readonly attribute int8u DSTOffsetListMaxSize = 11;
+  readonly attribute boolean supportsDNSResolve = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -1130,6 +1133,10 @@ server cluster TimeSynchronization = 56 {
     optional TimeSourceEnum timeSource = 2;
   }
 
+  request struct SetTrustedTimeSourceRequest {
+    nullable FabricScopedTrustedTimeSourceStruct trustedTimeSource = 0;
+  }
+
   request struct SetTimeZoneRequest {
     TimeZoneStruct timeZone[] = 0;
   }
@@ -1138,13 +1145,19 @@ server cluster TimeSynchronization = 56 {
     DSTOffsetStruct DSTOffset[] = 0;
   }
 
+  request struct SetDefaultNTPRequest {
+    nullable char_string<128> defaultNTP = 0;
+  }
+
   response struct SetTimeZoneResponse = 3 {
     boolean DSTOffsetRequired = 0;
   }
 
   command access(invoke: administer) SetUTCTime(SetUTCTimeRequest): DefaultSuccess = 0;
+  fabric command access(invoke: administer) SetTrustedTimeSource(SetTrustedTimeSourceRequest): DefaultSuccess = 1;
   command access(invoke: manage) SetTimeZone(SetTimeZoneRequest): SetTimeZoneResponse = 2;
   command access(invoke: manage) SetDSTOffset(SetDSTOffsetRequest): DefaultSuccess = 4;
+  command access(invoke: administer) SetDefaultNTP(SetDefaultNTPRequest): DefaultSuccess = 5;
 }
 
 /** Commands to trigger a Node to allow a new Administrator to commission it. */
@@ -1628,25 +1641,31 @@ endpoint 0 {
     emits event DSTStatus;
     emits event TimeZoneStatus;
     emits event TimeFailure;
+    emits event MissingTrustedTimeSource;
     callback attribute UTCTime;
     callback attribute granularity default = 0x00;
+    callback attribute trustedTimeSource;
+    callback attribute defaultNTP;
     callback attribute timeZone;
     callback attribute DSTOffset;
     callback attribute localTime default = 0xFFFFFFFFFFFFFFFF;
     ram      attribute timeZoneDatabase default = 2;
     callback attribute timeZoneListMaxSize;
     callback attribute DSTOffsetListMaxSize;
+    ram      attribute supportsDNSResolve default = false;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute eventList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    ram      attribute featureMap default = 11;
     ram      attribute clusterRevision default = 2;
 
     handle command SetUTCTime;
+    handle command SetTrustedTimeSource;
     handle command SetTimeZone;
     handle command SetTimeZoneResponse;
     handle command SetDSTOffset;
+    handle command SetDefaultNTP;
   }
 
   server cluster AdministratorCommissioning {
