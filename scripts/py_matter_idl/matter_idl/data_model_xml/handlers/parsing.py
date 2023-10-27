@@ -90,19 +90,35 @@ def NormalizeDataType(t: str) -> str:
     return _TYPE_REMAP.get(t.lower(), t.replace("-", "_"))
 
 
+# Handle oddities in current data model XML schema for nicer diffs
+_REF_NAME_MAPPING = {
+    "<<ref_DataTypeString>>": "char_string",
+    "<<ref_DataTypeOctstr>>": "octet_string",
+    "<<ref_DataTypeVendorId>>": "vendor_id",
+    "<<ref_DataTypeEndpointNumber>>": "endpoint_no",
+}
+
+
 def ParseType(t: str) -> ParsedType:
     """Parse a data type entry.
 
     Specifically parses a name like "list[Foo Type]".
     """
+
     # very rough matcher ...
     is_list = False
     if t.startswith("list[") and t.endswith("]"):
         is_list = True
         t = t[5:-1]
+    elif t.startswith("<<ref_DataTypeList>>[") and t.endswith("]"):
+        is_list = True
+        t = t[21:-1]
 
     if t.endswith(" Type"):
         t = t[:-5]
+
+    if t in _REF_NAME_MAPPING:
+        t = _REF_NAME_MAPPING[t]
 
     return ParsedType(name=NormalizeDataType(t), is_list=is_list)
 
@@ -140,9 +156,20 @@ def NormalizeName(name: str) -> str:
     return name
 
 
-def FieldName(name: str) -> str:
+def FieldName(input_name: str) -> str:
     """Normalized name with the first letter lowercase. """
-    name = NormalizeName(name)
+    name = NormalizeName(input_name)
+
+    # Some exception handling for nicer diffs
+    if name == "ID":
+        return "id"
+
+    # If the name starts with a all-uppercase thing, keep it that
+    # way. This is typical for "NOC", "IPK", "CSR" and such
+    if len(input_name) > 1:
+        if input_name[0].isupper() and input_name[1].isupper():
+            return name
+
     return name[0].lower() + name[1:]
 
 
