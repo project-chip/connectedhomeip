@@ -1099,8 +1099,8 @@ server cluster TimeSynchronization = 56 {
   }
 
   info event TimeZoneStatus = 2 {
-    INT32S offset = 0;
-    optional CHAR_STRING name = 1;
+    int32s offset = 0;
+    optional char_string name = 1;
   }
 
   info event TimeFailure = 3 {
@@ -1605,16 +1605,22 @@ endpoint 0 {
 
   server cluster EthernetNetworkDiagnostics {
     callback attribute PHYRate;
-    callback attribute fullDuplex;
-    callback attribute packetRxCount;
-    callback attribute packetTxCount;
-    callback attribute txErrCount;
-    callback attribute collisionCount;
-    callback attribute overrunCount;
-    callback attribute carrierDetect;
-    callback attribute timeSinceReset;
+    callback attribute fullDuplex default = 0x00;
+    callback attribute packetRxCount default = 0x0000000000000000;
+    callback attribute packetTxCount default = 0x0000000000000000;
+    callback attribute txErrCount default = 0x0000000000000000;
+    callback attribute collisionCount default = 0x0000000000000000;
+    callback attribute overrunCount default = 0x0000000000000000;
+    callback attribute carrierDetect default = 0x00;
+    callback attribute timeSinceReset default = 0x0000000000000000;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute eventList;
+    callback attribute attributeList;
     ram      attribute featureMap default = 3;
     ram      attribute clusterRevision default = 1;
+
+    handle command ResetCounts;
   }
 
   server cluster TimeSynchronization {
@@ -1636,6 +1642,11 @@ endpoint 0 {
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 2;
+
+    handle command SetUTCTime;
+    handle command SetTimeZone;
+    handle command SetTimeZoneResponse;
+    handle command SetDSTOffset;
   }
 
   server cluster AdministratorCommissioning {
