@@ -117,7 +117,7 @@ def ParseType(t: str) -> ParsedType:
         t = t[:-5]
 
     if t in _REF_NAME_MAPPING:
-       t = _REF_NAME_MAPPING[t]
+        t = _REF_NAME_MAPPING[t]
 
     return ParsedType(name=NormalizeDataType(t), is_list=is_list)
 
