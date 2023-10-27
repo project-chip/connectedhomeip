@@ -26,8 +26,8 @@ from typing import Callable
 
 from chip.tlv import uint
 from conformance_support import (DEPRECATE_CONFORM, DISALLOW_CONFORM, MANDATORY_CONFORM, OPTIONAL_CONFORM, OTHERWISE_CONFORM,
-                                 PROVISIONAL_CONFORM, ConformanceDecision, ConformanceException, ConformanceParseParameters, or_operation,
-                                 parse_callable_from_xml)
+                                 PROVISIONAL_CONFORM, ConformanceDecision, ConformanceException, ConformanceParseParameters,
+                                 or_operation, parse_callable_from_xml)
 from matter_testing_support import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, EventPathLocation,
                                     FeaturePathLocation, ProblemNotice, ProblemSeverity)
 
