@@ -62,7 +62,6 @@ RUN mkdir -p /opt/sdk/sdks/ \
     $ANDROID_HOME `# allow licenses to be accepted` \
     $AMEBA_PATH `# AmebaD requires access to change build_info.h` \
     $IMX_SDK_ROOT \
-    $OPENOCD_PATH \
     && :
 
 # Fix Tizen SDK paths for new user
