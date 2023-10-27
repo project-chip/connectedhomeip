@@ -324,11 +324,7 @@
             "OnMode",
             "FeatureMap"
         ],
-        "Microwave Oven Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "FeatureMap"
-        ],
+        "Microwave Oven Mode": ["SupportedModes", "CurrentMode", "FeatureMap"],
         "Laundry Washer Mode": [
             "SupportedModes",
             "CurrentMode",
