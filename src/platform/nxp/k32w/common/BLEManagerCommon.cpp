@@ -172,10 +172,10 @@ CHIP_ERROR BLEManagerCommon::_Init()
         xTimerCreate("bleTimeoutTmr", pdMS_TO_TICKS(CHIP_BLE_KW_CONN_TIMEOUT), pdFALSE, (void *) 0, blekw_connection_timeout_cb);
     VerifyOrExit(connectionTimeout != NULL, err = CHIP_ERROR_INCORRECT_STATE);
 
+    sImplInstance = GetImplInstance();
+
     /* BLE platform code initialization */
     SuccessOrExit(err = InitHostController(&blekw_generic_cb));
-
-    sImplInstance = GetImplInstance();
 
     /* Register the GATT server callback */
     VerifyOrExit(GattServer_RegisterCallback(blekw_gatt_server_cb) == gBleSuccess_c, err = CHIP_ERROR_INCORRECT_STATE);
