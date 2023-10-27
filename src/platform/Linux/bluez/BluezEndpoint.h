@@ -113,6 +113,7 @@ private:
                                                GDBusProxy * aInterface, GVariant * aChangedProperties,
                                                const char * const * aInvalidatedProps);
 
+    void RegisterGattApplicationDone(GObject * aObject, GAsyncResult * aResult);
     CHIP_ERROR RegisterGattApplicationImpl();
 
     static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer apParams);

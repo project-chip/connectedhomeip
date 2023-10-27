@@ -254,7 +254,7 @@ BluezGattCharacteristic1 * BluezEndpoint::CreateGattCharacteristic(BluezGattServ
     return characteristic;
 }
 
-static void BluezPeripheralRegisterAppDone(GObject * aObject, GAsyncResult * aResult, gpointer apClosure)
+void BluezEndpoint::RegisterGattApplicationDone(GObject * aObject, GAsyncResult * aResult)
 {
     GAutoPtr<GError> error;
     BluezGattManager1 * gattMgr = BLUEZ_GATT_MANAGER1(aObject);
@@ -289,7 +289,12 @@ CHIP_ERROR BluezEndpoint::RegisterGattApplicationImpl()
     g_variant_builder_init(&optionsBuilder, G_VARIANT_TYPE("a{sv}"));
     options = g_variant_builder_end(&optionsBuilder);
 
-    bluez_gatt_manager1_call_register_application(gattMgr, mpRootPath, options, nullptr, BluezPeripheralRegisterAppDone, nullptr);
+    bluez_gatt_manager1_call_register_application(
+        gattMgr, mpRootPath, options, nullptr,
+        +[](GObject * aObj, GAsyncResult * aResult, void * self) {
+            reinterpret_cast<BluezEndpoint *>(self)->RegisterGattApplicationDone(aObj, aResult);
+        },
+        this);
 
 exit:
     return CHIP_NO_ERROR;
