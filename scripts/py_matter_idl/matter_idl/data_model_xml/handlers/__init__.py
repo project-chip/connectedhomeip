@@ -43,8 +43,9 @@ class DataModelXmlHandler(BaseHandler):
             if contains_valid_cluster_id(attrs):
                 return ClusterHandler.ForAttributes(self.context, self._idl, attrs)
 
-            LOGGER.info("Found a base cluster (no id): '%s'", attrs['name'])
+            LOGGER.info(
+                "Found an abstract base cluster (no id): '%s'", attrs['name'])
 
-            return ClusterHandler.IntoCluster(self.context, self._idl, self.context.AddBaseCluster(NormalizeName(attrs['name']), self.context.GetCurrentLocationMeta()))
+            return ClusterHandler.IntoCluster(self.context, self._idl, self.context.AddAbstractBaseCluster(NormalizeName(attrs['name']), self.context.GetCurrentLocationMeta()))
         else:
             return BaseHandler(self.context)

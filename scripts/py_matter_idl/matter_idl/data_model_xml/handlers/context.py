@@ -84,7 +84,7 @@ class Context:
         self._idl_post_processors: list[IdlPostProcessor] = []
         self.base_clusters: dict[str, Cluster] = {}
 
-    def AddBaseCluster(self, name: str, parse_meta: Optional[ParseMetaData] = None) -> Cluster:
+    def AddAbstractBaseCluster(self, name: str, parse_meta: Optional[ParseMetaData] = None) -> Cluster:
         """Creates a new cluster entry for the given name in the list of known
            base clusters.
         """
