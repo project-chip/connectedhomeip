@@ -90,6 +90,11 @@ def SetupPkgDir(pkgDir, pkgName, desc, pkgBin, debConf):
 
 # function fills in the ControlFile of debian package with meta data
 def updateControlFile(pkgDir, pkgName, desc, ver, unifyVer, arch='arm64', deps=['libunify'], priority='optional', section='devel'):
+  # If the architecture is specified as "x64", change it to "amd64"
+  # to ensure compatibility with unify package.
+  if arch == "x64":
+    arch = "amd64"
+
   # create DEBIAN file within tmp root for package if doesn't already exist
   os.makedirs(pkgDir + '/DEBIAN', exist_ok=True)
 

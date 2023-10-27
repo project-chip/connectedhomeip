@@ -1,0 +1,17 @@
+Template: uic-mb/kvs
+Type: string
+Default: /var/lib/uic-mb/umb.kvs
+Description: key value store file
+ (default: /var/lib/uic-mb/umb.kvs)
+
+Template: uic-mb/pin
+Type: string
+Default: 2021
+Description: passcode
+ (default: 2021)
+
+Template: uic-mb/interface
+Type: string
+Default: eth0
+Description: UMB interface
+ (default: eth0)

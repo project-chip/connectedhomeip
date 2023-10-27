@@ -34,10 +34,10 @@ configuration options. A full list of command-line parameters is provided in the
 
     Specify the network interface on which the Matter Fabric runs. In a regular
     RPi4 setup it would be `wlan0` for WiFi and `eth0` for ethernet. Specify
-    this with the '`--interface`' argument, as such:
+    this with the '`--umb.interface`' argument, as such:
 
     ```bash
-    ./unify-matter-bridge --interface eth0
+    ./unify-matter-bridge --umb.interface eth0
     ```
 
 -   #### Key-Value store (KVS)
@@ -50,7 +50,7 @@ configuration options. A full list of command-line parameters is provided in the
     been commissioned.
 
     ```bash
-    ./unify-matter-bridge --kvs ./matter-bridge.kvs
+    ./unify-matter-bridge --umb.kvs ./matter-bridge.kvs
     ```
 
 -   #### MQTT Host
@@ -71,7 +71,7 @@ configuration options. A full list of command-line parameters is provided in the
     need to set a specific VID and PID for the Matter Bridge.
 
     ```bash
-    ./unify-matter-bridge --vendor fff1 --product 8001
+    ./unify-matter-bridge --umb.vendor fff1 --umb.product 8001
     ```
 
 ### Starting the Matter Bridge
@@ -80,7 +80,7 @@ Once the configuration parameters are set it is time to start the bridge
 application.
 
 ```bash
-./unify-matter-bridge --interface eth0 --kvs ./matter-bridge.kvs --mqtt.host localhost --mqtt.port 1337
+./unify-matter-bridge --umb.interface eth0 --umb.kvs ./matter-bridge.kvs --mqtt.host localhost --mqtt.port 1337
 ```
 
 ## Commissioning the Bridge to a Network
@@ -233,7 +233,7 @@ Controller Language protocol to the Matter protocol that complies with the
 Matter specification. You can run the bridge with the command line argument
 
 ```shell
-./unify-matter-bridge --strict_device_mapping true
+./unify-matter-bridge --umb.strict_device_mapping true
 ```
 
 ## Command Line Arguments
@@ -263,11 +263,11 @@ the command line take precedence over the options and values in the config file.
  --log.tag_level arg                   Tag-based log level
                                        Format: <tag>:<severity>,
                                        <tag>:<severity>, ...
- --interface arg (=en0)                Ethernet interface to use
- --kvs arg (=/var/chip_unify_bridge.kvs)
+ --umb.interface arg (=en0)            Ethernet interface to use
+ --umb.kvs arg (=/var/chip_unify_bridge.kvs)
                                        Matter key value store path
- --vendor arg (=65521)                 Vendor ID
- --product arg (=32769)                Product ID
+ --umb.vendor arg (=65521)             Vendor ID
+ --umb.product arg (=32769)            Product ID
  --mqtt.host arg (=localhost)          MQTT broker hostname or IP
  --mqtt.port arg (=1883)               MQTT broker port
  --mqtt.cafile arg                     Path to file containing the PEM-encoded

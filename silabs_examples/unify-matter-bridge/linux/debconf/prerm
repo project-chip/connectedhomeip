@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if type "systemctl" > /dev/null; then
+    systemctl stop uic-mb.service
+    systemctl disable uic-mb.service
+    rm -rf /var/lib/uic-mb/*
+fi

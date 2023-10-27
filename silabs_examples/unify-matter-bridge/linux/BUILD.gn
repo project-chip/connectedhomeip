@@ -103,8 +103,19 @@ executable("unify-matter-bridge") {
   deps = [ ":unify-matter-bridge-lib" ]
 }
 
+action("debian") {
+  # create_package.py <pkg cfg file> <pkg name> <pkg bin> <pkg dir> --output-dir <out dir> <arch>
+  deps = [":unify-matter-bridge"]
+  script = "../../unify-matter-common/scripts/create_package.py"
+  sources = ["package.cfg"]
+  outputs = ["$root_out_dir/packages/*.deb"]
+  args = rebase_path(sources, root_build_dir) + ["uic-mb", rebase_path(target_out_dir + "/bin/unify-matter-bridge",
+          root_build_dir), rebase_path(target_gen_dir + "/uic-mb", root_build_dir), rebase_path("debconf", root_build_dir), "--output-dir",
+          rebase_path(root_out_dir + "/packages", root_build_dir), target_cpu]
+}
+
 group("linux") {
-  deps = [ ":unify-matter-bridge" ]
+  deps = [ ":debian" ]
 }
 
 if (chip_build_tests) {

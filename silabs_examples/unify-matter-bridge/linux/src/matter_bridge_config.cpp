@@ -28,15 +28,13 @@
 #define LOG_TAG "matter_bridge_config"
 
 // List of default settings
-#define CONFIG_KEY_INTERFACE "interface"
-#define CONFIG_KEY_KVS_PATH "kvs"
-#define CONFIG_KEY_VENDOR_ID "vendor"
-#define CONFIG_KEY_PRODUCT_ID "product"
-#define CONFIG_KEY_INTERFACE "interface"
-#define CONFIG_KEY_DISCRIMINATOR_ID "discriminator"
-#define CONFIG_KEY_PIN_ID "pin"
-#define CONFIG_KEY_INTERFACE "interface"
-#define CONFIG_KEY_STRICT_DEVICE_MAPPING "strict_device_mapping"
+#define CONFIG_KEY_INTERFACE "umb.interface"
+#define CONFIG_KEY_KVS_PATH "umb.kvs"
+#define CONFIG_KEY_VENDOR_ID "umb.vendor"
+#define CONFIG_KEY_PRODUCT_ID "umb.product"
+#define CONFIG_KEY_DISCRIMINATOR_ID "umb.discriminator"
+#define CONFIG_KEY_PIN_ID "umb.pin"
+#define CONFIG_KEY_STRICT_DEVICE_MAPPING "umb.strict_device_mapping"
 
 #ifdef __APPLE__
 #define DEFAULT_INTERFACE "en0"
