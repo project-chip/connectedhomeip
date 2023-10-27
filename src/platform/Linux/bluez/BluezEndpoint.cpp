@@ -274,16 +274,16 @@ static void BluezPeripheralRegisterAppDone(GObject * aObject, GAsyncResult * aRe
     ChipLogDetail(DeviceLayer, "BluezPeripheralRegisterAppDone done");
 }
 
-CHIP_ERROR BluezEndpoint::RegisterGattApplicationImpl(BluezEndpoint * self)
+CHIP_ERROR BluezEndpoint::RegisterGattApplicationImpl()
 {
     GDBusObject * adapter;
     BluezGattManager1 * gattMgr;
     GVariantBuilder optionsBuilder;
     GVariant * options;
 
-    VerifyOrExit(self->mpAdapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mpAdapter in %s", __func__));
+    VerifyOrExit(mpAdapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL mpAdapter in %s", __func__));
 
-    adapter = g_dbus_interface_get_object(G_DBUS_INTERFACE(self->mpAdapter));
+    adapter = g_dbus_interface_get_object(G_DBUS_INTERFACE(mpAdapter));
     VerifyOrExit(adapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adapter in %s", __func__));
 
     gattMgr = bluez_object_get_gatt_manager1(BLUEZ_OBJECT(adapter));
@@ -292,8 +292,7 @@ CHIP_ERROR BluezEndpoint::RegisterGattApplicationImpl(BluezEndpoint * self)
     g_variant_builder_init(&optionsBuilder, G_VARIANT_TYPE("a{sv}"));
     options = g_variant_builder_end(&optionsBuilder);
 
-    bluez_gatt_manager1_call_register_application(gattMgr, self->mpRootPath, options, nullptr, BluezPeripheralRegisterAppDone,
-                                                  nullptr);
+    bluez_gatt_manager1_call_register_application(gattMgr, mpRootPath, options, nullptr, BluezPeripheralRegisterAppDone, nullptr);
 
 exit:
     return CHIP_NO_ERROR;
@@ -575,20 +574,20 @@ void BluezEndpoint::SetupGattServer(GDBusConnection * aConn)
     g_dbus_object_manager_server_set_connection(mpRoot, aConn);
 }
 
-CHIP_ERROR BluezEndpoint::StartupEndpointBindings(BluezEndpoint * self)
+CHIP_ERROR BluezEndpoint::StartupEndpointBindings()
 {
     GAutoPtr<GError> err;
     GAutoPtr<GDBusConnection> conn(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &MakeUniquePointerReceiver(err).Get()));
     VerifyOrReturnError(conn != nullptr, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "FAIL: get bus sync in %s, error: %s", __func__, err->message));
 
-    if (self->mpAdapterName != nullptr)
-        self->mpOwningName = g_strdup_printf("%s", self->mpAdapterName);
+    if (mpAdapterName != nullptr)
+        mpOwningName = g_strdup_printf("%s", mpAdapterName);
     else
-        self->mpOwningName = g_strdup_printf("C-%04x", getpid() & 0xffff);
-    ChipLogDetail(DeviceLayer, "TRACE: Bus acquired for name %s", self->mpOwningName);
+        mpOwningName = g_strdup_printf("C-%04x", getpid() & 0xffff);
+    ChipLogDetail(DeviceLayer, "TRACE: Bus acquired for name %s", mpOwningName);
 
-    self->SetupGattServer(conn.get());
+    SetupGattServer(conn.get());
 
     GDBusObjectManager * manager = g_dbus_object_manager_client_new_sync(
         conn.get(), G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/", bluez_object_manager_client_get_proxy_type,
@@ -597,12 +596,12 @@ CHIP_ERROR BluezEndpoint::StartupEndpointBindings(BluezEndpoint * self)
     VerifyOrReturnError(manager != nullptr, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "FAIL: Error getting object manager client: %s", err->message));
 
-    self->mpObjMgr = manager;
-    self->SetupAdapter();
+    mpObjMgr = manager;
+    SetupAdapter();
 
-    g_signal_connect(manager, "object-added", G_CALLBACK(BluezSignalOnObjectAdded), self);
-    g_signal_connect(manager, "object-removed", G_CALLBACK(BluezSignalOnObjectRemoved), self);
-    g_signal_connect(manager, "interface-proxy-properties-changed", G_CALLBACK(BluezSignalInterfacePropertiesChanged), self);
+    g_signal_connect(manager, "object-added", G_CALLBACK(BluezSignalOnObjectAdded), this);
+    g_signal_connect(manager, "object-removed", G_CALLBACK(BluezSignalOnObjectRemoved), this);
+    g_signal_connect(manager, "interface-proxy-properties-changed", G_CALLBACK(BluezSignalInterfacePropertiesChanged), this);
 
     return CHIP_NO_ERROR;
 }
@@ -629,7 +628,8 @@ BluezEndpoint::~BluezEndpoint()
 
 CHIP_ERROR BluezEndpoint::RegisterGattApplication()
 {
-    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(RegisterGattApplicationImpl, this);
+    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](BluezEndpoint * self) { return self->RegisterGattApplicationImpl(); }, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(Ble, "Failed to schedule RegisterGattApplication() on CHIPoBluez thread"));
     return err;
@@ -651,7 +651,8 @@ CHIP_ERROR BluezEndpoint::Init(const char * apBleAddr, const char * apBleName)
         mpConnectCancellable = g_cancellable_new();
     }
 
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(StartupEndpointBindings, this);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](BluezEndpoint * self) { return self->StartupEndpointBindings(); }, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err, ChipLogError(DeviceLayer, "Failed to schedule endpoint initialization"));
 
     ChipLogDetail(DeviceLayer, "PlatformBlueZInit init success");

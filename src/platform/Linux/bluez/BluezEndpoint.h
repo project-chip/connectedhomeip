@@ -86,7 +86,7 @@ private:
         uint16_t mNumRetries = 0;
     };
 
-    static CHIP_ERROR StartupEndpointBindings(BluezEndpoint * self);
+    CHIP_ERROR StartupEndpointBindings();
 
     void SetupAdapter();
     void SetupGattServer(GDBusConnection * aConn);
@@ -117,7 +117,7 @@ private:
                                                       GDBusProxy * aInterface, GVariant * aChangedProperties,
                                                       const char * const * aInvalidatedProps, BluezEndpoint * self);
 
-    static CHIP_ERROR RegisterGattApplicationImpl(BluezEndpoint * self);
+    CHIP_ERROR RegisterGattApplicationImpl();
 
     static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer apParams);
     static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams);
