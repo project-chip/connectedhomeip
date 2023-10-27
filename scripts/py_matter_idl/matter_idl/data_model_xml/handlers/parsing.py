@@ -154,13 +154,19 @@ def NormalizeName(name: str) -> str:
     return name
 
 
-def FieldName(name: str) -> str:
+def FieldName(input_name: str) -> str:
     """Normalized name with the first letter lowercase. """
-    name = NormalizeName(name)
+    name = NormalizeName(input_name)
 
     # Some exception handling for nicer diffs
     if name == "ID":
         return "id"
+
+    # If the name starts with a all-uppercase thing, keep it that
+    # way. This is typical for "NOC", "IPK", "CSR" and such
+    if len(input_name) > 1:
+        if input_name[0].isupper() and input_name[1].isupper():
+            return name
 
     return name[0].lower() + name[1:]
 
