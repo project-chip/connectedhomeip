@@ -48,7 +48,7 @@ limitations under the License.
       </description>
       <access op="invoke" role="manage"/>
       <arg name="GroupID" type="group_id"/>
-      <arg name="GroupName" type="char_string"/>
+      <arg name="GroupName" length="16" type="char_string"/>
     </command>
 
     <command source="client" code="0x01" name="ViewGroup" response="ViewGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups view">
@@ -86,7 +86,7 @@ limitations under the License.
       </description>
       <access op="invoke" role="manage"/>
       <arg name="GroupID" type="group_id"/>
-      <arg name="GroupName" type="char_string"/>
+      <arg name="GroupName" length="16" type="char_string"/>
     </command>
 
     <command source="server" code="0x00" name="AddGroupResponse" optional="false" disableDefaultResponse="true">
@@ -103,7 +103,7 @@ limitations under the License.
       </description>
       <arg name="Status" type="enum8"/>
       <arg name="GroupID" type="group_id"/>
-      <arg name="GroupName" type="char_string"/>
+      <arg name="GroupName" length="16" type="char_string"/>
     </command>
 
     <command source="server" code="0x02" name="GetGroupMembershipResponse" optional="false" disableDefaultResponse="true">
