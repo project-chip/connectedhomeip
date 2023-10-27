@@ -16,6 +16,7 @@ import logging
 import re
 from dataclasses import dataclass
 from typing import Optional
+from xml.sax.xmlreader import AttributesImpl
 
 from matter_idl.generators.types import GetDataTypeSizeInBits, IsSignedDataType
 from matter_idl.matter_idl_types import AccessPrivilege, Attribute, Command, ConstantEntry, DataType, Event, EventPriority, Field
@@ -172,12 +173,21 @@ def FieldName(input_name: str) -> str:
     return name[0].lower() + name[1:]
 
 
-def AttributesToField(attrs) -> Field:
+def AttributesToField(attrs: AttributesImpl) -> Field:
     assert "name" in attrs
     assert "id" in attrs
-    assert "type" in attrs
 
-    t = ParseType(attrs["type"])
+    if "type" in attrs:
+        attr_type = NormalizeDataType(attrs["type"])
+    else:
+        # TODO: Generally we should not have this, however current implementation
+        #       for derived clusters for example want to add things (like conformance
+        #       specifically) WITHOUT re-stating things like types
+        #
+        # https://github.com/csa-data-model/projects/issues/365
+        LOGGER.error(f"Attribute {attrs['name']} has no type")
+        attr_type = "sint32"
+    t = ParseType(attr_type)
 
     return Field(
         name=FieldName(attrs["name"]),
@@ -187,16 +197,26 @@ def AttributesToField(attrs) -> Field:
     )
 
 
-def AttributesToBitFieldConstantEntry(attrs) -> ConstantEntry:
+def AttributesToBitFieldConstantEntry(attrs: AttributesImpl) -> ConstantEntry:
     """Creates a constant entry appropriate for bitmaps.
     """
-    assert ("name" in attrs)
-    assert ("bit" in attrs)
+    assert "name" in attrs
+
+    if 'bit' not in attrs:
+        # TODO: multi-bit fields not supported in XML currently. Be lenient here to have some
+        #       diff
+        # Issue: https://github.com/csa-data-model/projects/issues/347
+
+        LOGGER.error(
+            f"Constant {attrs['name']} has no bit value (may be multibit)")
+        return ConstantEntry(name="k" + NormalizeName(attrs["name"]), code=0)
+
+    assert "bit" in attrs
 
     return ConstantEntry(name="k" + NormalizeName(attrs["name"]), code=1 << ParseInt(attrs["bit"]))
 
 
-def AttributesToAttribute(attrs) -> Attribute:
+def AttributesToAttribute(attrs: AttributesImpl) -> Attribute:
     assert "name" in attrs
     assert "id" in attrs
 
@@ -220,7 +240,7 @@ def AttributesToAttribute(attrs) -> Attribute:
     )
 
 
-def AttributesToEvent(attrs) -> Event:
+def AttributesToEvent(attrs: AttributesImpl) -> Event:
     assert "name" in attrs
     assert "id" in attrs
     assert "priority" in attrs
@@ -258,7 +278,7 @@ def StringToAccessPrivilege(value: str) -> AccessPrivilege:
         raise Exception("UNKNOWN privilege level: %r" % value)
 
 
-def AttributesToCommand(attrs) -> Command:
+def AttributesToCommand(attrs: AttributesImpl) -> Command:
     assert "id" in attrs
     assert "name" in attrs
 
