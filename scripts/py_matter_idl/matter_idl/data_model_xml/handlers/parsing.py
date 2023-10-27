@@ -93,6 +93,7 @@ def NormalizeDataType(t: str) -> str:
 _REF_NAME_MAPPING = {
     "<<ref_DataTypeString>>": "char_string",
     "<<ref_DataTypeOctstr>>": "octet_string",
+    "<<ref_DataTypeVendorId>>": "vendor_id",
 }
 
 
@@ -101,9 +102,6 @@ def ParseType(t: str) -> ParsedType:
 
     Specifically parses a name like "list[Foo Type]".
     """
-
-    if t in _REF_NAME_MAPPING:
-        return ParsedType(_REF_NAME_MAPPING[t], is_list=False)
 
     # very rough matcher ...
     is_list = False
@@ -116,6 +114,9 @@ def ParseType(t: str) -> ParsedType:
 
     if t.endswith(" Type"):
         t = t[:-5]
+
+    if t in _REF_NAME_MAPPING:
+       t = _REF_NAME_MAPPING[t]
 
     return ParsedType(name=NormalizeDataType(t), is_list=is_list)
 
