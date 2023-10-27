@@ -17,22 +17,22 @@
  */
 
 #include "AppMain.h"
-#include "AppOptions.h"
-#include "binding-handler.h"
+#include <app-common/zap-generated/ids/Clusters.h>
 
-// Network commissioning
-namespace {
-constexpr chip::EndpointId kNetworkCommissioningEndpointSecondary = 0xFFFE;
-} // anonymous namespace
+using namespace chip;
+using namespace chip::app;
+
+void ApplicationShutdown() {}
 
 int main(int argc, char * argv[])
 {
-    VerifyOrDie(
-        ChipLinuxAppInit(argc, argv, AppOptions::GetOptions(), chip::MakeOptional(kNetworkCommissioningEndpointSecondary)) == 0);
-    VerifyOrDie(InitBindingHandlers() == CHIP_NO_ERROR);
-
-    LinuxDeviceOptions::GetInstance().dacProvider = AppOptions::GetDACProvider();
-
+    VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
     ChipLinuxAppMainLoop();
     return 0;
+}
+
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
+                                       uint8_t * value)
+{
+    // TODO: Watch ICDM Cluster changes
 }
