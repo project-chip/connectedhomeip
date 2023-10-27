@@ -155,8 +155,8 @@ class AddBaseInfoPostProcessor(IdlPostProcessor):
         # attempt to find the base. It may be in the "names without ID" however it may also be inside
         # existing clusters (e.g. Basic Information)
         base: Optional[Cluster] = None
-        if self.source_name in self.context.base_clusters:
-            base = self.context.base_clusters[self.source_name]
+        if self.source_name in self.context.abstract_base_clusters:
+            base = self.context.abstract_base_clusters[self.source_name]
         else:
             for c in idl.clusters:
                 if c.name == self.source_name:
