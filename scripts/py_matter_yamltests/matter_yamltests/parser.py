@@ -922,7 +922,7 @@ class TestStep:
     def _response_values_validation(self, expected_response, received_response, result):
         check_type = PostProcessCheckType.RESPONSE_VALIDATION
         error_success = 'The test expectation "{name} == {value}" is true'
-        error_failure = 'The test expectation "{name} == {value}" is false'
+        error_failure = 'The test expectation "{name} ({actual}) == {value}" is false'
         error_name_does_not_exist = 'The test expects a value named "{name}" but it does not exists in the response."'
         error_value_does_not_exist = 'The test expects a value but it does not exists in the response."'
 
@@ -953,7 +953,7 @@ class TestStep:
                     name=expected_name, value=expected_value))
             else:
                 result.error(check_type, error_failure.format(
-                    name=expected_name, value=expected_value))
+                    name=expected_name, actual=received_value, value=expected_value))
 
     def _response_value_validation(self, expected_value, received_value):
         if isinstance(expected_value, list):
