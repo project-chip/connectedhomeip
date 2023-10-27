@@ -15827,7 +15827,7 @@ CHIPAdministratorCommissioningAdminVendorIdAttributeCallback::~CHIPAdministrator
 }
 
 void CHIPAdministratorCommissioningAdminVendorIdAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
+    void * context, const chip::app::DataModel::Nullable<chip::VendorId> & value)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
