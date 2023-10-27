@@ -251,7 +251,11 @@ class TestXmlParser(unittest.TestCase):
                     <access read="true" write="true"/>
                     <mandatoryConform/>
                   </field>
-                  <field id="0" name="items" type="&lt;&lt;ref_DataTypeList&gt;&gt;[uint8]">
+                  <field id="1" name="items" type="&lt;&lt;ref_DataTypeList&gt;&gt;[uint8]">
+                    <access read="true" write="true"/>
+                    <mandatoryConform/>
+                  </field>
+                  <field id="2" name="endpoints" type="&lt;&lt;ref_DataTypeList&gt;&gt;[&lt;&lt;ref_DataTypeEndpointNumber&gt;&gt; Type]">
                     <access read="true" write="true"/>
                     <mandatoryConform/>
                   </field>
@@ -282,6 +286,7 @@ class TestXmlParser(unittest.TestCase):
                struct OutputInfoStruct {
                   char_string id = 0;
                   int8u items[] = 1;
+                  endpoint_no endpoints[] = 2;
                }
 
                readonly attribute OutputInfoStruct outputList[] = 0;
