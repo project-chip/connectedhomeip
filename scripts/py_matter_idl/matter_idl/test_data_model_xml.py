@@ -397,7 +397,7 @@ class TestXmlParser(unittest.TestCase):
 
     def testXmlNameWorkarounds(self):
         # Validate an attribute with a type list
-        # This is a very stripped down version from the original AudioOutput.xml
+        # This is a manually-edited copy of an attribute test (not real data)
 
         xml_idl = XmlToIdl('''
             <cluster id="123" name="Test" revision="1">
@@ -457,7 +457,7 @@ class TestXmlParser(unittest.TestCase):
            }
         ''')
 
-        self.assertEqual(xml_idl, expected_idl)
+        self.assertIdlEqual(xml_idl, expected_idl)
 
     def testComplexInput(self):
         # This parses a known copy of Switch.xml which happens to be fully
