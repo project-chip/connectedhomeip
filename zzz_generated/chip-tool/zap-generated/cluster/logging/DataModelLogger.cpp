@@ -7998,6 +7998,16 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClientsSupportedPerFabric", 1, value);
         }
+        case IcdManagement::Attributes::UserActiveModeTriggerHint::Id: {
+            chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UserActiveModeTriggerHint", 1, value);
+        }
+        case IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UserActiveModeTriggerInstruction", 1, value);
+        }
         case IcdManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
