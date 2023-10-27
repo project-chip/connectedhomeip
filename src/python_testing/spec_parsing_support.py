@@ -126,11 +126,11 @@ class ClusterParser:
         if element.tag == 'feature':
             location = FeaturePathLocation(endpoint_id=0, cluster_id=self._cluster_id, feature_code=element.attrib['code'])
         elif element.tag == 'command':
-            location = CommandPathLocation(endpoint_id=0, cluster_id=self._cluster_id, command_id=element.attrib['id'])
+            location = CommandPathLocation(endpoint_id=0, cluster_id=self._cluster_id, command_id=int(element.attrib['id'], 0))
         elif element.tag == 'attribute':
-            location = AttributePathLocation(endpoint_id=0, cluster_id=self._cluster_id, attribute_id=element.attrib['id'])
+            location = AttributePathLocation(endpoint_id=0, cluster_id=self._cluster_id, attribute_id=int(lement.attrib['id'], 0))
         elif element.tag == 'event':
-            location = EventPathLocation(endpoint_id=0, cluster_id=self._cluster_id, event_id=element.attrib['id'])
+            location = EventPathLocation(endpoint_id=0, cluster_id=self._cluster_id, event_id=int(element.attrib['id'], 0))
         else:
             location = ClusterPathLocation(endpoing_id=0, cluster_id=self._cluster_id)
         self._problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,

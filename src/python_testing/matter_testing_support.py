@@ -301,6 +301,26 @@ class ClusterMapper:
 
 
 @dataclass
+class ID:
+    id: int
+
+    def __str__(self):
+        return f'{self.id} (0x{self.id:02x})'
+
+
+@dataclass
+class ClusterID:
+    id: int
+
+    def __str__(self):
+        if self.id in Clusters.ClusterObjects.ALL_CLUSTERS.keys():
+            s = Clusters.ClusterObjects.ALL_CLUSTERS[self.id].__name__
+        else:
+            s = "Unknown cluster"
+        return f'{str(ID(self.id))} {s}'
+
+
+@dataclass
 class AttributePathLocation:
     endpoint_id: int
     cluster_id: Optional[int] = None
@@ -319,12 +339,22 @@ class AttributePathLocation:
 
         return desc
 
+    def __str__(self):
+        return (f'\n        Endpoint: {self.endpoint_id},'
+                f'\n        Cluster:  {str(ClusterID(self.cluster_id))},'
+                f'\n        Attribute:{str(ID(self.attribute_id))}')
+
 
 @dataclass
 class EventPathLocation:
     endpoint_id: int
     cluster_id: int
     event_id: int
+
+    def __str__(self):
+        return (f'\n        Endpoint: {self.endpoint_id},'
+                f'\n        Cluster:  {str(ClusterID(self.cluster_id))},'
+                f'\n        Event:    {str(ID(self.event_id))}')
 
 
 @dataclass
@@ -333,11 +363,20 @@ class CommandPathLocation:
     cluster_id: int
     command_id: int
 
+    def __str__(self):
+        return (f'\n        Endpoint: {self.endpoint_id},'
+                f'\n        Cluster:  {str(ClusterID(self.cluster_id))},'
+                f'\n        Command:  {str(ID(self.command_id))}')
+
 
 @dataclass
 class ClusterPathLocation:
     endpoint_id: int
     cluster_id: int
+
+    def __str__(self):
+        return (f'\n       Endpoint: {self.endpoint_id},'
+                f'\n       Cluster:  {str(ClusterID(self.cluster_id))}')
 
 
 @dataclass
@@ -345,6 +384,11 @@ class FeaturePathLocation:
     endpoint_id: int
     cluster_id: int
     feature_code: str
+
+    def __str__(self):
+        return (f'\n        Endpoint: {self.endpoint_id},'
+                f'\n        Cluster:  {str(ClusterID(self.cluster_id))},'
+                f'\n        Feature:  {self.feature_code}')
 
 # ProblemSeverity is not using StrEnum, but rather Enum, since StrEnum only
 # appeared in 3.11. To make it JSON serializable easily, multiple inheritance
@@ -364,6 +408,9 @@ class ProblemNotice:
     severity: ProblemSeverity
     problem: str
     spec_location: str = ""
+
+    def __str__(self):
+        return f'\nProblem: {str(self.severity)}\n    test_name: {self.test_name}\n    location: {str(self.location)}\n    problem: {self.problem}\n    spec_location: {self.spec_location}\n'
 
 
 @dataclass
@@ -498,7 +545,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         logging.info("Problems found:")
         logging.info("===============")
         for problem in self.problems:
-            logging.info(f"- {json.dumps(dataclass_asdict(problem))}")
+            logging.info(str(problem))
         logging.info("###########################################################")
 
         super().teardown_class()
