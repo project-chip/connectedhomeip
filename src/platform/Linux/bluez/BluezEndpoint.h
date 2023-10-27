@@ -102,23 +102,16 @@ private:
     void UpdateConnectionTable(BluezDevice1 * aDevice);
     BluezConnection * GetBluezConnectionViaDevice();
 
-    static gboolean BluezAdvertisementRelease(BluezLEAdvertisement1 * aAdv, GDBusMethodInvocation * aInvocation,
-                                              BluezEndpoint * self);
+    gboolean BluezCharacteristicReadValue(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOptions);
+    gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOptions);
+    gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOptions);
+    gboolean BluezCharacteristicConfirm(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv);
 
-    static gboolean BluezCharacteristicReadValue(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
-                                                 GVariant * aOptions, BluezEndpoint * self);
-    static gboolean BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
-                                                    GVariant * aOptions, BluezEndpoint * self);
-    static gboolean BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
-                                                     GVariant * aOptions, BluezEndpoint * self);
-    static gboolean BluezCharacteristicConfirm(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
-                                               BluezEndpoint * self);
-
-    static void BluezSignalOnObjectAdded(GDBusObjectManager * aManager, GDBusObject * aObject, BluezEndpoint * self);
-    static void BluezSignalOnObjectRemoved(GDBusObjectManager * aManager, GDBusObject * aObject, BluezEndpoint * self);
-    static void BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClient * aManager, GDBusObjectProxy * aObject,
-                                                      GDBusProxy * aInterface, GVariant * aChangedProperties,
-                                                      const char * const * aInvalidatedProps, BluezEndpoint * self);
+    void BluezSignalOnObjectAdded(GDBusObjectManager * aManager, GDBusObject * aObject);
+    void BluezSignalOnObjectRemoved(GDBusObjectManager * aManager, GDBusObject * aObject);
+    void BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClient * aManager, GDBusObjectProxy * aObject,
+                                               GDBusProxy * aInterface, GVariant * aChangedProperties,
+                                               const char * const * aInvalidatedProps);
 
     CHIP_ERROR RegisterGattApplicationImpl();
 
