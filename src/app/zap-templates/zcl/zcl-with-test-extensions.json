@@ -324,7 +324,14 @@
             "OnMode",
             "FeatureMap"
         ],
-        "Microwave Oven Control": ["CookTime","PowerSetting","MinPower","MaxPower","PowerStep","FeatureMap"],
+        "Microwave Oven Control": [
+            "CookTime",
+            "PowerSetting",
+            "MinPower",
+            "MaxPower",
+            "PowerStep",
+            "FeatureMap"
+        ],
         "Laundry Washer Mode": [
             "SupportedModes",
             "CurrentMode",

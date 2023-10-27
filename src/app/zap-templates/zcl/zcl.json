@@ -315,7 +315,14 @@
             "DSTOffsetListMaxSize"
         ],
         "Temperature Control": ["SupportedTemperatureLevels"],
-        "Microwave Oven Control": ["CookTime","PowerSetting","MinPower","MaxPower","PowerStep","FeatureMap"],
+        "Microwave Oven Control": [
+            "CookTime",
+            "PowerSetting",
+            "MinPower",
+            "MaxPower",
+            "PowerStep",
+            "FeatureMap"
+        ],
         "Dishwasher Mode": [
             "SupportedModes",
             "CurrentMode",
