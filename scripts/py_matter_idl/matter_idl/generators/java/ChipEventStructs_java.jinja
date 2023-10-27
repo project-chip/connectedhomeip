@@ -35,6 +35,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
+import static chip.devicecontroller.ChipTLVType.*;
+
 public class ChipEventStructs {
 {%- for cluster in clientClusters | sort(attribute='code') -%}
 {%- set typeLookup = idl | createLookupContext(cluster) %}
@@ -56,6 +58,14 @@ public static class {{cluster.name}}Cluster{{event.name}}Event {
     {%- set encodable = field | asEncodable(typeLookup) %}
     this.{{field.name}} = {{field.name}};
     {%- endfor %}
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static {{cluster.name}}Cluster{{event.name}}Event decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override

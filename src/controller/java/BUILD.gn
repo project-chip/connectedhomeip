@@ -483,6 +483,7 @@ android_library("java") {
       "src/chip/clusterinfo/CommandResponseInfo.java",
       "src/chip/clusterinfo/DelegatedClusterCallback.java",
       "src/chip/clusterinfo/InteractionInfo.java",
+      "src/chip/devicecontroller/ChipTLVType.java",
     ]
   }
 

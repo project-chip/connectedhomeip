@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
+import static chip.devicecontroller.ChipTLVType.*;
+
 public class ChipStructs {
 public static class ScenesClusterAttributeValuePair {
   public Long attributeID;
@@ -31,6 +33,14 @@ public static class ScenesClusterAttributeValuePair {
   ) {
     this.attributeID = attributeID;
     this.attributeValue = attributeValue;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ScenesClusterAttributeValuePair decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -58,6 +68,14 @@ public static class ScenesClusterExtensionFieldSet {
     this.attributeValueList = attributeValueList;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ScenesClusterExtensionFieldSet decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -81,6 +99,14 @@ public static class DescriptorClusterDeviceTypeStruct {
   ) {
     this.deviceType = deviceType;
     this.revision = revision;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static DescriptorClusterDeviceTypeStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -112,6 +138,14 @@ public static class DescriptorClusterSemanticTagStruct {
     this.namespaceID = namespaceID;
     this.tag = tag;
     this.label = label;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static DescriptorClusterSemanticTagStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -154,6 +188,14 @@ public static class BindingClusterTargetStruct {
     this.fabricIndex = fabricIndex;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static BindingClusterTargetStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -189,6 +231,14 @@ public static class AccessControlClusterAccessControlTargetStruct {
     this.cluster = cluster;
     this.endpoint = endpoint;
     this.deviceType = deviceType;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static AccessControlClusterAccessControlTargetStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -228,6 +278,14 @@ public static class AccessControlClusterAccessControlEntryStruct {
     this.fabricIndex = fabricIndex;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static AccessControlClusterAccessControlEntryStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -260,6 +318,14 @@ public static class AccessControlClusterAccessControlExtensionStruct {
   ) {
     this.data = data;
     this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static AccessControlClusterAccessControlExtensionStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -297,6 +363,14 @@ public static class ActionsClusterActionStruct {
     this.endpointListID = endpointListID;
     this.supportedCommands = supportedCommands;
     this.state = state;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ActionsClusterActionStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -342,6 +416,14 @@ public static class ActionsClusterEndpointListStruct {
     this.endpoints = endpoints;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ActionsClusterEndpointListStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -373,6 +455,14 @@ public static class BasicInformationClusterCapabilityMinimaStruct {
     this.subscriptionsPerFabric = subscriptionsPerFabric;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static BasicInformationClusterCapabilityMinimaStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -396,6 +486,14 @@ public static class BasicInformationClusterProductAppearanceStruct {
   ) {
     this.finish = finish;
     this.primaryColor = primaryColor;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static BasicInformationClusterProductAppearanceStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -426,6 +524,14 @@ public static class OtaSoftwareUpdateRequestorClusterProviderLocation {
     this.fabricIndex = fabricIndex;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static OtaSoftwareUpdateRequestorClusterProviderLocation decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -454,6 +560,14 @@ public static class PowerSourceClusterBatChargeFaultChangeType {
     this.previous = previous;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static PowerSourceClusterBatChargeFaultChangeType decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -477,6 +591,14 @@ public static class PowerSourceClusterBatFaultChangeType {
   ) {
     this.current = current;
     this.previous = previous;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static PowerSourceClusterBatFaultChangeType decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -504,6 +626,14 @@ public static class PowerSourceClusterWiredFaultChangeType {
     this.previous = previous;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static PowerSourceClusterWiredFaultChangeType decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -529,6 +659,14 @@ public static class GeneralCommissioningClusterBasicCommissioningInfo {
     this.maxCumulativeFailsafeSeconds = maxCumulativeFailsafeSeconds;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static GeneralCommissioningClusterBasicCommissioningInfo decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -552,6 +690,14 @@ public static class NetworkCommissioningClusterNetworkInfoStruct {
   ) {
     this.networkID = networkID;
     this.connected = connected;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static NetworkCommissioningClusterNetworkInfoStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -595,6 +741,14 @@ public static class NetworkCommissioningClusterThreadInterfaceScanResultStruct {
     this.extendedAddress = extendedAddress;
     this.rssi = rssi;
     this.lqi = lqi;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static NetworkCommissioningClusterThreadInterfaceScanResultStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -652,6 +806,14 @@ public static class NetworkCommissioningClusterWiFiInterfaceScanResultStruct {
     this.rssi = rssi;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static NetworkCommissioningClusterWiFiInterfaceScanResultStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -707,6 +869,14 @@ public static class GeneralDiagnosticsClusterNetworkInterface {
     this.type = type;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static GeneralDiagnosticsClusterNetworkInterface decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -757,6 +927,14 @@ public static class SoftwareDiagnosticsClusterThreadMetricsStruct {
     this.stackFreeCurrent = stackFreeCurrent;
     this.stackFreeMinimum = stackFreeMinimum;
     this.stackSize = stackSize;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static SoftwareDiagnosticsClusterThreadMetricsStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -827,6 +1005,14 @@ public static class ThreadNetworkDiagnosticsClusterNeighborTableStruct {
     this.fullThreadDevice = fullThreadDevice;
     this.fullNetworkData = fullNetworkData;
     this.isChild = isChild;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ThreadNetworkDiagnosticsClusterNeighborTableStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -920,6 +1106,14 @@ public static class ThreadNetworkDiagnosticsClusterOperationalDatasetComponents 
     this.channelMaskPresent = channelMaskPresent;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ThreadNetworkDiagnosticsClusterOperationalDatasetComponents decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -999,6 +1193,14 @@ public static class ThreadNetworkDiagnosticsClusterRouteTableStruct {
     this.linkEstablished = linkEstablished;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ThreadNetworkDiagnosticsClusterRouteTableStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -1048,6 +1250,14 @@ public static class ThreadNetworkDiagnosticsClusterSecurityPolicy {
     this.flags = flags;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ThreadNetworkDiagnosticsClusterSecurityPolicy decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -1074,6 +1284,14 @@ public static class TimeSynchronizationClusterDSTOffsetStruct {
     this.offset = offset;
     this.validStarting = validStarting;
     this.validUntil = validUntil;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static TimeSynchronizationClusterDSTOffsetStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -1104,6 +1322,14 @@ public static class TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruc
     this.endpoint = endpoint;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -1130,6 +1356,14 @@ public static class TimeSynchronizationClusterTimeZoneStruct {
     this.offset = offset;
     this.validAt = validAt;
     this.name = name;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static TimeSynchronizationClusterTimeZoneStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -1163,6 +1397,14 @@ public static class TimeSynchronizationClusterTrustedTimeSourceStruct {
     this.endpoint = endpoint;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static TimeSynchronizationClusterTrustedTimeSourceStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -1189,6 +1431,14 @@ public static class BridgedDeviceBasicInformationClusterProductAppearanceStruct 
   ) {
     this.finish = finish;
     this.primaryColor = primaryColor;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static BridgedDeviceBasicInformationClusterProductAppearanceStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -1226,6 +1476,14 @@ public static class OperationalCredentialsClusterFabricDescriptorStruct {
     this.nodeID = nodeID;
     this.label = label;
     this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static OperationalCredentialsClusterFabricDescriptorStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -1268,6 +1526,14 @@ public static class OperationalCredentialsClusterNOCStruct {
     this.fabricIndex = fabricIndex;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static OperationalCredentialsClusterNOCStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -1302,6 +1568,14 @@ public static class GroupKeyManagementClusterGroupInfoMapStruct {
     this.fabricIndex = fabricIndex;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static GroupKeyManagementClusterGroupInfoMapStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -1334,6 +1608,14 @@ public static class GroupKeyManagementClusterGroupKeyMapStruct {
     this.groupId = groupId;
     this.groupKeySetID = groupKeySetID;
     this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static GroupKeyManagementClusterGroupKeyMapStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -1382,6 +1664,14 @@ public static class GroupKeyManagementClusterGroupKeySetStruct {
     this.epochStartTime2 = epochStartTime2;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static GroupKeyManagementClusterGroupKeySetStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -1425,6 +1715,14 @@ public static class FixedLabelClusterLabelStruct {
     this.value = value;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static FixedLabelClusterLabelStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -1448,6 +1746,14 @@ public static class UserLabelClusterLabelStruct {
   ) {
     this.label = label;
     this.value = value;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static UserLabelClusterLabelStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -1478,6 +1784,14 @@ public static class IcdManagementClusterMonitoringRegistrationStruct {
     this.fabricIndex = fabricIndex;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static IcdManagementClusterMonitoringRegistrationStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -1504,6 +1818,14 @@ public static class ModeSelectClusterSemanticTagStruct {
   ) {
     this.mfgCode = mfgCode;
     this.value = value;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ModeSelectClusterSemanticTagStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -1534,6 +1856,14 @@ public static class ModeSelectClusterModeOptionStruct {
     this.semanticTags = semanticTags;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ModeSelectClusterModeOptionStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -1560,6 +1890,14 @@ public static class LaundryWasherModeClusterModeTagStruct {
   ) {
     this.mfgCode = mfgCode;
     this.value = value;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static LaundryWasherModeClusterModeTagStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -1590,6 +1928,14 @@ public static class LaundryWasherModeClusterModeOptionStruct {
     this.modeTags = modeTags;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static LaundryWasherModeClusterModeOptionStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -1616,6 +1962,14 @@ public static class RefrigeratorAndTemperatureControlledCabinetModeClusterModeTa
   ) {
     this.mfgCode = mfgCode;
     this.value = value;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static RefrigeratorAndTemperatureControlledCabinetModeClusterModeTagStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -1646,6 +2000,14 @@ public static class RefrigeratorAndTemperatureControlledCabinetModeClusterModeOp
     this.modeTags = modeTags;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static RefrigeratorAndTemperatureControlledCabinetModeClusterModeOptionStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -1672,6 +2034,14 @@ public static class RvcRunModeClusterModeTagStruct {
   ) {
     this.mfgCode = mfgCode;
     this.value = value;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static RvcRunModeClusterModeTagStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -1702,6 +2072,14 @@ public static class RvcRunModeClusterModeOptionStruct {
     this.modeTags = modeTags;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static RvcRunModeClusterModeOptionStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -1728,6 +2106,14 @@ public static class RvcCleanModeClusterModeTagStruct {
   ) {
     this.mfgCode = mfgCode;
     this.value = value;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static RvcCleanModeClusterModeTagStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -1758,6 +2144,14 @@ public static class RvcCleanModeClusterModeOptionStruct {
     this.modeTags = modeTags;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static RvcCleanModeClusterModeOptionStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -1786,6 +2180,14 @@ public static class DishwasherModeClusterModeTagStruct {
     this.value = value;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static DishwasherModeClusterModeTagStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -1812,6 +2214,14 @@ public static class DishwasherModeClusterModeOptionStruct {
     this.label = label;
     this.mode = mode;
     this.modeTags = modeTags;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static DishwasherModeClusterModeOptionStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -1845,6 +2255,14 @@ public static class OperationalStateClusterErrorStateStruct {
     this.errorStateDetails = errorStateDetails;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static OperationalStateClusterErrorStateStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -1871,6 +2289,14 @@ public static class OperationalStateClusterOperationalStateStruct {
   ) {
     this.operationalStateID = operationalStateID;
     this.operationalStateLabel = operationalStateLabel;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static OperationalStateClusterOperationalStateStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -1901,6 +2327,14 @@ public static class RvcOperationalStateClusterErrorStateStruct {
     this.errorStateDetails = errorStateDetails;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static RvcOperationalStateClusterErrorStateStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -1929,6 +2363,14 @@ public static class RvcOperationalStateClusterOperationalStateStruct {
     this.operationalStateLabel = operationalStateLabel;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static RvcOperationalStateClusterOperationalStateStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -1952,6 +2394,14 @@ public static class HepaFilterMonitoringClusterReplacementProductStruct {
   ) {
     this.productIdentifierType = productIdentifierType;
     this.productIdentifierValue = productIdentifierValue;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static HepaFilterMonitoringClusterReplacementProductStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -1979,6 +2429,14 @@ public static class ActivatedCarbonFilterMonitoringClusterReplacementProductStru
     this.productIdentifierValue = productIdentifierValue;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ActivatedCarbonFilterMonitoringClusterReplacementProductStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -2002,6 +2460,14 @@ public static class DoorLockClusterCredentialStruct {
   ) {
     this.credentialType = credentialType;
     this.credentialIndex = credentialIndex;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static DoorLockClusterCredentialStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -2030,6 +2496,14 @@ public static class ThermostatClusterThermostatScheduleTransition {
     this.transitionTime = transitionTime;
     this.heatSetpoint = heatSetpoint;
     this.coolSetpoint = coolSetpoint;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ThermostatClusterThermostatScheduleTransition decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -2067,6 +2541,14 @@ public static class ChannelClusterChannelInfoStruct {
     this.name = name;
     this.callSign = callSign;
     this.affiliateCallSign = affiliateCallSign;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ChannelClusterChannelInfoStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -2109,6 +2591,14 @@ public static class ChannelClusterLineupInfoStruct {
     this.lineupInfoType = lineupInfoType;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ChannelClusterLineupInfoStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -2140,6 +2630,14 @@ public static class TargetNavigatorClusterTargetInfoStruct {
     this.name = name;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static TargetNavigatorClusterTargetInfoStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -2163,6 +2661,14 @@ public static class MediaPlaybackClusterPlaybackPositionStruct {
   ) {
     this.updatedAt = updatedAt;
     this.position = position;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static MediaPlaybackClusterPlaybackPositionStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -2194,6 +2700,14 @@ public static class MediaInputClusterInputInfoStruct {
     this.inputType = inputType;
     this.name = name;
     this.description = description;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static MediaInputClusterInputInfoStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -2230,6 +2744,14 @@ public static class ContentLauncherClusterDimensionStruct {
     this.metric = metric;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ContentLauncherClusterDimensionStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -2256,6 +2778,14 @@ public static class ContentLauncherClusterAdditionalInfoStruct {
   ) {
     this.name = name;
     this.value = value;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ContentLauncherClusterAdditionalInfoStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -2286,6 +2816,14 @@ public static class ContentLauncherClusterParameterStruct {
     this.externalIDList = externalIDList;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ContentLauncherClusterParameterStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -2311,6 +2849,14 @@ public static class ContentLauncherClusterContentSearchStruct {
     this.parameterList = parameterList;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ContentLauncherClusterContentSearchStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -2334,6 +2880,14 @@ public static class ContentLauncherClusterStyleInformationStruct {
     this.imageURL = imageURL;
     this.color = color;
     this.size = size;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ContentLauncherClusterStyleInformationStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -2376,6 +2930,14 @@ public static class ContentLauncherClusterBrandingInformationStruct {
     this.waterMark = waterMark;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ContentLauncherClusterBrandingInformationStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -2416,6 +2978,14 @@ public static class AudioOutputClusterOutputInfoStruct {
     this.name = name;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static AudioOutputClusterOutputInfoStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -2444,6 +3014,14 @@ public static class ApplicationLauncherClusterApplicationStruct {
     this.applicationID = applicationID;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ApplicationLauncherClusterApplicationStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -2469,6 +3047,14 @@ public static class ApplicationLauncherClusterApplicationEPStruct {
     this.endpoint = endpoint;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ApplicationLauncherClusterApplicationEPStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -2492,6 +3078,14 @@ public static class ApplicationBasicClusterApplicationStruct {
   ) {
     this.catalogVendorID = catalogVendorID;
     this.applicationID = applicationID;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static ApplicationBasicClusterApplicationStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -2535,6 +3129,14 @@ public static class UnitTestingClusterSimpleStruct {
     this.f = f;
     this.g = g;
     this.h = h;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static UnitTestingClusterSimpleStruct decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -2596,6 +3198,14 @@ public static class UnitTestingClusterTestFabricScoped {
     this.fabricSensitiveStruct = fabricSensitiveStruct;
     this.fabricSensitiveInt8uList = fabricSensitiveInt8uList;
     this.fabricIndex = fabricIndex;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static UnitTestingClusterTestFabricScoped decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
@@ -2671,6 +3281,14 @@ public static class UnitTestingClusterNullablesAndOptionalsStruct {
     this.nullableOptionalList = nullableOptionalList;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static UnitTestingClusterNullablesAndOptionalsStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -2729,6 +3347,14 @@ public static class UnitTestingClusterNestedStruct {
     this.c = c;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static UnitTestingClusterNestedStruct decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -2772,6 +3398,14 @@ public static class UnitTestingClusterNestedStructList {
     this.g = g;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static UnitTestingClusterNestedStructList decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -2809,6 +3443,14 @@ public static class UnitTestingClusterDoubleNestedStructList {
     this.a = a;
   }
 
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static UnitTestingClusterDoubleNestedStructList decodeTlv(BaseTLVType value) {
+    return null;
+  }
+
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
@@ -2829,6 +3471,14 @@ public static class UnitTestingClusterTestListStructOctet {
   ) {
     this.member1 = member1;
     this.member2 = member2;
+  }
+
+  public StructType encodeTlv() {
+    return null;
+  }
+
+  public static UnitTestingClusterTestListStructOctet decodeTlv(BaseTLVType value) {
+    return null;
   }
 
   @Override
