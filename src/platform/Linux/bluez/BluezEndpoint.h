@@ -54,6 +54,7 @@
 #include <lib/core/CHIPError.h>
 #include <platform/Linux/dbus/bluez/DbusBluez.h>
 
+#include "BluezAdvertisement.h"
 #include "BluezConnection.h"
 #include "Types.h"
 
@@ -101,8 +102,8 @@ private:
     void UpdateConnectionTable(BluezDevice1 * aDevice);
     BluezConnection * GetBluezConnectionViaDevice();
 
-    static gboolean BluezAdvertisingRelease(BluezLEAdvertisement1 * aAdv, GDBusMethodInvocation * aInvocation,
-                                            BluezEndpoint * self);
+    static gboolean BluezAdvertisementRelease(BluezLEAdvertisement1 * aAdv, GDBusMethodInvocation * aInvocation,
+                                              BluezEndpoint * self);
 
     static gboolean BluezCharacteristicReadValue(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
                                                  GVariant * aOptions, BluezEndpoint * self);
@@ -155,7 +156,9 @@ private:
     char * mpPeerDevicePath             = nullptr;
     GCancellable * mpConnectCancellable = nullptr;
 
-    // Allow BluezConnection to access our private members
+    // Allow BluezAdvertisement and BluezConnection to access our private members
+    // TODO: Fix this tight coupling
+    friend class BluezAdvertisement;
     friend class BluezConnection;
 };
 

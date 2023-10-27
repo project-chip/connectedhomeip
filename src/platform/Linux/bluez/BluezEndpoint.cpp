@@ -112,7 +112,7 @@ gboolean BluezEndpoint::BluezCharacteristicAcquireWrite(BluezGattCharacteristic1
     conn = self->GetBluezConnectionViaDevice();
     VerifyOrReturnValue(
         conn != nullptr, FALSE,
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No Chipoble connection"));
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No CHIPoBLE connection"));
 
     ChipLogDetail(DeviceLayer, "BluezCharacteristicAcquireWrite is called, conn: %p", conn);
 
@@ -174,7 +174,7 @@ gboolean BluezEndpoint::BluezCharacteristicAcquireNotify(BluezGattCharacteristic
     conn = self->GetBluezConnectionViaDevice();
     VerifyOrReturnValue(
         conn != nullptr, FALSE,
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No Chipoble connection"));
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No CHIPoBLE connection"));
 
     VerifyOrReturnValue(
         g_variant_lookup(aOptions, "mtu", "q", &mtu), FALSE, ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);

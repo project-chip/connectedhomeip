@@ -33,7 +33,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-struct BluezEndpoint;
+class BluezEndpoint;
 
 class BluezAdvertisement
 {
