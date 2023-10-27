@@ -93,7 +93,15 @@ private:
 
     BluezGattService1 * CreateGattService(const char * aUUID);
     BluezGattCharacteristic1 * CreateGattCharacteristic(BluezGattService1 * aService, const char * aCharName, const char * aUUID);
-    BluezLEAdvertisement1 * CreateLEAdvertisement();
+
+    void HandleNewDevice(BluezDevice1 * aDevice);
+    void UpdateConnectionTable(BluezDevice1 * aDevice);
+
+    static void BluezSignalOnObjectAdded(GDBusObjectManager * aManager, GDBusObject * aObject, BluezEndpoint * endpoint);
+    static void BluezSignalOnObjectRemoved(GDBusObjectManager * aManager, GDBusObject * aObject, BluezEndpoint * endpoint);
+    static void BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClient * aManager, GDBusObjectProxy * aObject,
+                                                      GDBusProxy * aInterface, GVariant * aChangedProperties,
+                                                      const char * const * aInvalidatedProps, BluezEndpoint * endpoint);
 
     static CHIP_ERROR RegisterGattApplicationImpl(BluezEndpoint * endpoint);
 
