@@ -60,9 +60,6 @@ enum ValidWiFiCredentialLength
 
 } // namespace
 
-// Store information for NonConcurrent use
-static ByteSpan nonConcurrentNetworkID;
-
 CHIP_ERROR Instance::Init()
 {
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
@@ -461,22 +458,19 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
     mCurrentOperationBreadcrumb = req.breadcrumb;
     
     // In Non-concurrent mode postpone the final execution of ConnectNetwork until the operational
-    // network has been fully brought up and kWiFiDeviceAvailable is delivered. 
+    // network has been fully brought up and kWiFiDeviceAvailable is delivered.
+    // mConnectingNetworkIDLen and mConnectingNetworkID contains the received SSID
     bool supportsConcurrentConnection = CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION;
     if (supportsConcurrentConnection)
     {
          mpWirelessDriver->ConnectNetwork(req.networkID, this);
-    } 
-    else
-    {
-        // Non-concurrent mode
-        nonConcurrentNetworkID = req.networkID;
     }
 }
 
 void Instance::HandleNonConcurrentConnectNetwork()
 {
-    ChipLogProgress(NetworkProvisioning, "HandleNonConcurrentConnectNetwork()");    
+    ByteSpan nonConcurrentNetworkID = ByteSpan(mConnectingNetworkID, mConnectingNetworkIDLen);
+    ChipLogProgress(NetworkProvisioning, "HandleNonConcurrentConnectNetwork() SSID=%s", mConnectingNetworkID);
     mpWirelessDriver->ConnectNetwork(nonConcurrentNetworkID, this);
 }
 
