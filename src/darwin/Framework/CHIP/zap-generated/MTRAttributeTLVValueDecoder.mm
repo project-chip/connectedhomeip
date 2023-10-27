@@ -1830,7 +1830,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceConfigurationCluster(Attri
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
                 NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
