@@ -300,24 +300,16 @@ class ClusterMapper:
                 return f"Attribute {attribute_name} ({attribute_id}, 0x{attribute_id:04X})"
 
 
-@dataclass
-class ID:
-    id: int
-
-    def __str__(self):
-        return f'{self.id} (0x{self.id:02x})'
+def id_str(id):
+    return f'{id} (0x{id:02x})'
 
 
-@dataclass
-class ClusterID:
-    id: int
-
-    def __str__(self):
-        if self.id in Clusters.ClusterObjects.ALL_CLUSTERS.keys():
-            s = Clusters.ClusterObjects.ALL_CLUSTERS[self.id].__name__
-        else:
-            s = "Unknown cluster"
-        return f'{str(ID(self.id))} {s}'
+def cluster_id_str(id):
+    if id in Clusters.ClusterObjects.ALL_CLUSTERS.keys():
+        s = Clusters.ClusterObjects.ALL_CLUSTERS[id].__name__
+    else:
+        s = "Unknown cluster"
+    return f'{id_str(id)} {s}'
 
 
 @dataclass
@@ -341,8 +333,8 @@ class AttributePathLocation:
 
     def __str__(self):
         return (f'\n        Endpoint: {self.endpoint_id},'
-                f'\n        Cluster:  {str(ClusterID(self.cluster_id))},'
-                f'\n        Attribute:{str(ID(self.attribute_id))}')
+                f'\n        Cluster:  {cluster_id_str(self.cluster_id)},'
+                f'\n        Attribute:{id_str(self.attribute_id)}')
 
 
 @dataclass
@@ -353,8 +345,8 @@ class EventPathLocation:
 
     def __str__(self):
         return (f'\n        Endpoint: {self.endpoint_id},'
-                f'\n        Cluster:  {str(ClusterID(self.cluster_id))},'
-                f'\n        Event:    {str(ID(self.event_id))}')
+                f'\n        Cluster:  {cluster_id_str(self.cluster_id)},'
+                f'\n        Event:    {id_str(self.event_id)}')
 
 
 @dataclass
@@ -365,8 +357,8 @@ class CommandPathLocation:
 
     def __str__(self):
         return (f'\n        Endpoint: {self.endpoint_id},'
-                f'\n        Cluster:  {str(ClusterID(self.cluster_id))},'
-                f'\n        Command:  {str(ID(self.command_id))}')
+                f'\n        Cluster:  {cluster_id_str(self.cluster_id)},'
+                f'\n        Command:  {id_str(self.command_id)}')
 
 
 @dataclass
@@ -376,7 +368,7 @@ class ClusterPathLocation:
 
     def __str__(self):
         return (f'\n       Endpoint: {self.endpoint_id},'
-                f'\n       Cluster:  {str(ClusterID(self.cluster_id))}')
+                f'\n       Cluster:  {cluster_id_str(self.cluster_id)}')
 
 
 @dataclass
@@ -387,7 +379,7 @@ class FeaturePathLocation:
 
     def __str__(self):
         return (f'\n        Endpoint: {self.endpoint_id},'
-                f'\n        Cluster:  {str(ClusterID(self.cluster_id))},'
+                f'\n        Cluster:  {cluster_id_str(self.cluster_id)},'
                 f'\n        Feature:  {self.feature_code}')
 
 # ProblemSeverity is not using StrEnum, but rather Enum, since StrEnum only

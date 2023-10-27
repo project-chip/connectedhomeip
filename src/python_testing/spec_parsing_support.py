@@ -128,7 +128,7 @@ class ClusterParser:
         elif element.tag == 'command':
             location = CommandPathLocation(endpoint_id=0, cluster_id=self._cluster_id, command_id=int(element.attrib['id'], 0))
         elif element.tag == 'attribute':
-            location = AttributePathLocation(endpoint_id=0, cluster_id=self._cluster_id, attribute_id=int(lement.attrib['id'], 0))
+            location = AttributePathLocation(endpoint_id=0, cluster_id=self._cluster_id, attribute_id=int(element.attrib['id'], 0))
         elif element.tag == 'event':
             location = EventPathLocation(endpoint_id=0, cluster_id=self._cluster_id, event_id=int(element.attrib['id'], 0))
         else:
