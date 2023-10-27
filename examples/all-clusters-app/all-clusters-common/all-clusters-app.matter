@@ -2463,7 +2463,7 @@ server cluster IcdManagement = 70 {
     kLongIdleTimeSupport = 0x4;
   }
 
-  bitmap UserActiveModeTriggerBitmanp : bitmap32 {
+  bitmap UserActiveModeTriggerBitmap : bitmap32 {
     kPowerCycle = 0x1;
     kSettingsMenu = 0x2;
     kCustomInstruction = 0x4;

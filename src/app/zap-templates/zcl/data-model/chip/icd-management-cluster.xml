@@ -25,7 +25,7 @@ limitations under the License.
         <field name="LongIdleTimeSupport" mask="0x4"/>
     </bitmap>
 
-    <bitmap name="UserActiveModeTriggerBitmanp" type="bitmap32">
+    <bitmap name="UserActiveModeTriggerBitmap" type="bitmap32">
         <cluster code="0x0046"/>
         <field name="PowerCycle" mask="0x1"/>
         <field name="SettingsMenu" mask="0x2"/>
@@ -77,8 +77,8 @@ limitations under the License.
             <access op="read" privilege="administer"/>
         </attribute>
         <attribute side="server" code="0x05" define="CLIENTS_SUPPORTED_PER_FABRIC" type="int16u" min="1" default="1" writable="false" optional="true" isNullable="false">ClientsSupportedPerFabric</attribute>
-        <attribute side="server" code="0x06" define="USER_ACTIVE_MODE_TRIGGER_HINT" type="UserActiveModeTriggerBitmanp" writable="false" optional="true" isNullable="false">UserActiveModeTriggerHint</attribute>
-        <attribute side="server" code="0x06" define="USER_ACTIVE_MODE_TRIGGER_INSTRUCTION" type="string" length="128" writable="false" optional="true" isNullable="false">UserActiveModeTriggerInstruction</attribute>
+        <attribute side="server" code="0x06" define="USER_ACTIVE_MODE_TRIGGER_HINT" type="UserActiveModeTriggerBitmap" writable="false" optional="true" isNullable="false">UserActiveModeTriggerHint</attribute>
+        <attribute side="server" code="0x07" define="USER_ACTIVE_MODE_TRIGGER_INSTRUCTION" type="char_string" length="128" writable="false" optional="true" isNullable="false">UserActiveModeTriggerInstruction</attribute>
 
         <command source="client" code="0x00" name="RegisterClient" response="RegisterClientResponse" isFabricScoped="true" optional="true">
             <description> Register a client to the end device </description>

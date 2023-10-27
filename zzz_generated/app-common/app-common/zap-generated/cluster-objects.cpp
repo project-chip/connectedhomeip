@@ -10437,6 +10437,10 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, ICDCounter);
     case Attributes::ClientsSupportedPerFabric::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, clientsSupportedPerFabric);
+    case Attributes::UserActiveModeTriggerHint::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, userActiveModeTriggerHint);
+    case Attributes::UserActiveModeTriggerInstruction::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, userActiveModeTriggerInstruction);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
