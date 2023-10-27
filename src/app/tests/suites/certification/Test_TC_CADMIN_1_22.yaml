@@ -23,6 +23,9 @@ config:
     nodeId: 0x12344321
     timeout: 950
     endpoint: 0
+    payload:
+        type: char_string
+        defaultValue: "MT:-24J0AFN00KA0648G00"
     discriminator:
         type: int16u
         defaultValue: 3840
@@ -50,6 +53,17 @@ tests:
                 value: "y"
 
     - label: "Step 1: TH_CR1 starts a commissioning process with DUT_CE"
+      cluster: "CommissionerCommands"
+      command: "PairWithCode"
+      PICS: CADMIN.S
+      arguments:
+          values:
+              - name: "nodeId"
+                value: nodeId
+              - name: "payload"
+                value: payload
+
+    - label: "Step 1: TH_CR1 commissioned with DUT_CE"
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
       PICS: CADMIN.S.C00.Rsp
@@ -110,6 +124,7 @@ tests:
                 value: "SPAKE2P Key Salt"
 
     - label: "Step 3: Wait for commissioning Window to 901 seconds"
+      PICS: CADMIN.S.C00.Rsp
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:

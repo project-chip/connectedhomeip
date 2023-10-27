@@ -53,6 +53,8 @@ extern "C" {
 #include <hal_boot2.h>
 #if CHIP_DEVICE_LAYER_TARGET_BL602
 #include <wifi_mgmr_ext.h>
+#elif CHIP_DEVICE_LAYER_TARGET_BL702L
+#include <bl_flash.h>
 #endif
 
 #if CHIP_DEVICE_LAYER_TARGET_BL702L
@@ -373,9 +375,10 @@ extern "C" void app_init(void)
     bl_sys_early_init();
 
 #if CHIP_DEVICE_LAYER_TARGET_BL702L
+    bl_flash_init();
+
     rom_freertos_init(256, 400);
     rom_hal_init();
-    rom_lmac154_hook_init();
 #endif
 
     hosal_uart_init(&uart_stdio);

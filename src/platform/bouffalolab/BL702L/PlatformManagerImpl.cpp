@@ -36,7 +36,7 @@ namespace chip {
 namespace DeviceLayer {
 
 extern "C" void (*ot_otrNotifyEvent_ptr)(ot_system_event_t sevent);
-extern "C" void bl_rand_stream(unsigned char *, int);
+extern "C" int bl_rand_stream(unsigned char *, int);
 extern "C" void otrNotifyEvent(ot_system_event_t sevent);
 
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)

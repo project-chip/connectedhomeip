@@ -351,9 +351,11 @@ void AppTaskCommon::ButtonEventHandler(ButtonId_t btnId, bool btnPressed)
 
     switch (btnId)
     {
+#if APP_USE_EXAMPLE_START_BUTTON
     case kButtonId_ExampleAction:
         ExampleActionButtonEventHandler();
         break;
+#endif
     case kButtonId_FactoryReset:
         FactoryResetButtonEventHandler();
         break;

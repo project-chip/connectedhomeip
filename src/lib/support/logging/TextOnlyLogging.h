@@ -79,16 +79,8 @@ namespace chip {
 
 namespace Logging {
 
-// Get the module name associated with a LogModule, or "-" on invalid value.
-const char * GetModuleName(LogModule module);
-
 // Log redirection
 using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, const char * msg, va_list args);
-DLL_EXPORT void SetLogRedirectCallback(LogRedirectCallback_t callback);
-
-// Log filtering (no-op unless CHIP_LOG_FILTERING is enabled)
-DLL_EXPORT uint8_t GetLogFilter();
-DLL_EXPORT void SetLogFilter(uint8_t category);
 
 #if CHIP_ERROR_LOGGING
 /**
@@ -323,18 +315,34 @@ DLL_EXPORT void SetLogFilter(uint8_t category);
 #define _CHIP_USE_LOGGING 0
 #endif // CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING || CHIP_AUTOMATION_LOGGING
 
-#if _CHIP_USE_LOGGING
-
-static constexpr uint16_t kMaxModuleNameLen = 3;
-
-#if CHIP_LOG_FILTERING
+// Log filtering (no-op unless CHIP_LOG_FILTERING is enabled)
+#if _CHIP_USE_LOGGING && CHIP_LOG_FILTERING
+DLL_EXPORT uint8_t GetLogFilter();
+DLL_EXPORT void SetLogFilter(uint8_t category);
 bool IsCategoryEnabled(uint8_t category);
-#else  // CHIP_LOG_FILTERING
+#else  // _CHIP_USE_LOGGING && CHIP_LOG_FILTERING
+inline uint8_t GetLogFilter()
+{
+    return kLogCategory_Max;
+}
+
+inline void SetLogFilter(uint8_t category) {}
+
 inline bool IsCategoryEnabled(uint8_t category)
 {
     return true;
 }
-#endif // CHIP_LOG_FILTERING
+#endif // _CHIP_USE_LOGGING && CHIP_LOG_FILTERING
+
+#if _CHIP_USE_LOGGING
+
+// Get the module name associated with a LogModule, or "-" on invalid value.
+const char * GetModuleName(LogModule module);
+
+// Log redirection
+DLL_EXPORT void SetLogRedirectCallback(LogRedirectCallback_t callback);
+
+static constexpr uint16_t kMaxModuleNameLen = 3;
 
 /* Internal macros mapping upper case definitions to camel case category constants*/
 #define CHIP_LOG_CATEGORY_DETAIL chip::Logging::kLogCategory_Detail
@@ -426,6 +434,10 @@ void HandleTokenizedLog(uint32_t levels, pw_tokenizer_Token token, pw_tokenizer_
         }                                                                                                                          \
     } while (0)
 #endif // CHIP_PW_TOKENIZER_LOGGING
+
+#else // _CHIP_USE_LOGGING
+
+inline void SetLogRedirectCallback(LogRedirectCallback_t callback) {}
 
 #endif // _CHIP_USE_LOGGING
 

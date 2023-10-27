@@ -35,10 +35,16 @@ AsNumber(chip::Optional<T> optional)
     return (optional.HasValue()) ? @(optional.Value()) : nil;
 }
 
-inline NSDate * ChipEpochSecondsAsDate(uint32_t chipEpochSeconds)
+inline NSDate * MatterEpochSecondsAsDate(uint32_t matterEpochSeconds)
 {
-    return [NSDate dateWithTimeIntervalSince1970:(chip::kChipEpochSecondsSinceUnixEpoch + (NSTimeInterval) chipEpochSeconds)];
+    return [NSDate dateWithTimeIntervalSince1970:(chip::kChipEpochSecondsSinceUnixEpoch + (NSTimeInterval) matterEpochSeconds)];
 }
+
+/**
+ * Returns whether the conversion could be performed.  Will return false if the
+ * passed-in date is our of the range representable as a Matter epoch-s value.
+ */
+bool DateToMatterEpochSeconds(NSDate * date, uint32_t & epoch);
 
 /**
  * Utilities for converting between NSSet<NSNumber *> and chip::CATValues.

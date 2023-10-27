@@ -159,7 +159,7 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="FQ"/>
       </mandatoryConform>
-      <constraint type="between" from="MinFrequency" to="max"/>
+      <constraint type="min" value="MinFrequency"/>
     </attribute>
     <attribute id="0x000f" name="Options" type="OptionsBitmap" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>

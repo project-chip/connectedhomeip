@@ -223,24 +223,20 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStopScan(ChipDeviceScanner * self)
 
 void ChipDeviceScanner::SignalObjectAdded(GDBusObjectManager * manager, GDBusObject * object, ChipDeviceScanner * self)
 {
-    BluezDevice1 * device = bluez_object_get_device1(BLUEZ_OBJECT(object));
-    VerifyOrReturn(device != nullptr);
+    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(BLUEZ_OBJECT(object)));
+    VerifyOrReturn(device.get() != nullptr);
 
-    self->ReportDevice(*device);
-
-    g_object_unref(device);
+    self->ReportDevice(*device.get());
 }
 
 void ChipDeviceScanner::SignalInterfaceChanged(GDBusObjectManagerClient * manager, GDBusObjectProxy * object,
                                                GDBusProxy * aInterface, GVariant * aChangedProperties,
                                                const gchar * const * aInvalidatedProps, ChipDeviceScanner * self)
 {
-    BluezDevice1 * device = bluez_object_get_device1(BLUEZ_OBJECT(object));
-    VerifyOrReturn(device != nullptr);
+    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(BLUEZ_OBJECT(object)));
+    VerifyOrReturn(device.get() != nullptr);
 
-    self->ReportDevice(*device);
-
-    g_object_unref(device);
+    self->ReportDevice(*device.get());
 }
 
 void ChipDeviceScanner::ReportDevice(BluezDevice1 & device)
@@ -295,11 +291,10 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
     ChipLogProgress(Ble, "BLE removing known devices.");
     for (BluezObject & object : BluezObjectList(self->mManager))
     {
-        BluezDevice1 * device = bluez_object_get_device1(&object);
-        if (device != nullptr)
+        GAutoPtr<BluezDevice1> device(bluez_object_get_device1(&object));
+        if (device.get() != nullptr)
         {
-            self->RemoveDevice(*device);
-            g_object_unref(device);
+            self->RemoveDevice(*device.get());
         }
     }
 

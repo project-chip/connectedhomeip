@@ -63,7 +63,6 @@ shared_library("jni") {
   ]
 
   deps = [
-    "${chip_root}/src/controller/data_model",
     "${chip_root}/src/credentials:default_attestation_verifier",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib",
@@ -91,11 +90,15 @@ shared_library("jni") {
       "zap-generated/CHIPReadCallbacks.cpp",
     ]
 
-    deps += [ "${chip_root}/src/controller/data_model:java-jni-sources" ]
+    deps += [
+      "${chip_root}/src/controller/data_model",
+      "${chip_root}/src/controller/data_model:java-jni-sources",
+    ]
   }
 
   if (chip_build_controller_dynamic_server) {
     defines += [ "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER" ]
+    deps += [ "${chip_root}/src/controller:nodatamodel" ]
   }
 
   if (matter_enable_java_compilation) {
@@ -471,6 +474,10 @@ android_library("java") {
 
   if (matter_enable_java_generated_api) {
     sources += [
+      "generated/java/chip/devicecontroller/ChipClusters.java",
+      "generated/java/chip/devicecontroller/ChipEventStructs.java",
+      "generated/java/chip/devicecontroller/ChipStructs.java",
+      "generated/java/chip/devicecontroller/ClusterInfoMapping.java",
       "generated/java/chip/devicecontroller/ClusterReadMapping.java",
       "generated/java/chip/devicecontroller/ClusterWriteMapping.java",
       "src/chip/clusterinfo/ClusterCommandCallback.java",
@@ -479,10 +486,6 @@ android_library("java") {
       "src/chip/clusterinfo/CommandResponseInfo.java",
       "src/chip/clusterinfo/DelegatedClusterCallback.java",
       "src/chip/clusterinfo/InteractionInfo.java",
-      "zap-generated/chip/devicecontroller/ChipClusters.java",
-      "zap-generated/chip/devicecontroller/ChipEventStructs.java",
-      "zap-generated/chip/devicecontroller/ChipStructs.java",
-      "zap-generated/chip/devicecontroller/ClusterInfoMapping.java",
     ]
   }
 
