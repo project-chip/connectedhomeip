@@ -47,7 +47,7 @@ limitations under the License.
       </description>
       <access op="invoke" role="manage"/>
       <arg name="GroupID" type="group_id"/>
-      <arg name="GroupName" length="16" type="char_string"/>
+      <arg name="GroupName" type="char_string" length="16"/>
     </command>
 
     <command source="client" code="0x01" name="ViewGroup" response="ViewGroupResponse" isFabricScoped="true" optional="false" cli="zcl groups view">
