@@ -580,7 +580,7 @@ void BLEManagerImpl::DriveBLEState()
     // Register the CHIPoBLE application with the Bluez BLE layer if needed.
     if (!mIsCentral && mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kAppRegistered))
     {
-        SuccessOrExit(err = mEndpoint->BluezGattAppRegister());
+        SuccessOrExit(err = mEndpoint->RegisterGattApplication());
         mFlags.Set(Flags::kControlOpInProgress);
         ExitNow();
     }

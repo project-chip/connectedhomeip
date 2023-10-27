@@ -69,7 +69,7 @@ public:
     CHIP_ERROR Init(const char * apBleAddr, const char * apBleName);
     void Shutdown();
 
-    CHIP_ERROR BluezGattAppRegister();
+    CHIP_ERROR RegisterGattApplication();
 
     CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice);
     void CancelConnect();
@@ -86,16 +86,16 @@ private:
     };
 
     static CHIP_ERROR StartupEndpointBindings(BluezEndpoint * endpoint);
-    void BluezOnBusAcquired(GDBusConnection * aConn, const char * aName);
 
     void SetupAdapter();
+    void SetupGattServer(GDBusConnection * aConn);
     void SetupGattService();
 
     BluezGattService1 * CreateGattService(const char * aUUID);
     BluezGattCharacteristic1 * CreateGattCharacteristic(BluezGattService1 * aService, const char * aCharName, const char * aUUID);
     BluezLEAdvertisement1 * CreateLEAdvertisement();
 
-    static CHIP_ERROR BluezGattAppRegisterImpl(BluezEndpoint * endpoint);
+    static CHIP_ERROR RegisterGattApplicationImpl(BluezEndpoint * endpoint);
 
     static void ConnectDeviceDone(GObject * aObject, GAsyncResult * aResult, gpointer apParams);
     static CHIP_ERROR ConnectDeviceImpl(ConnectParams * apParams);

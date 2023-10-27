@@ -282,7 +282,7 @@ static void BluezPeripheralRegisterAppDone(GObject * aObject, GAsyncResult * aRe
     ChipLogDetail(DeviceLayer, "BluezPeripheralRegisterAppDone done");
 }
 
-CHIP_ERROR BluezEndpoint::BluezGattAppRegisterImpl(BluezEndpoint * endpoint)
+CHIP_ERROR BluezEndpoint::RegisterGattApplicationImpl(BluezEndpoint * endpoint)
 {
     GDBusObject * adapter;
     BluezGattManager1 * gattMgr;
@@ -573,16 +573,18 @@ void BluezEndpoint::SetupGattService()
 #endif
 }
 
-void BluezEndpoint::BluezOnBusAcquired(GDBusConnection * aConn, const char * aName)
+void BluezEndpoint::SetupGattServer(GDBusConnection * aConn)
 {
-    ChipLogDetail(DeviceLayer, "TRACE: Bus acquired for name %s", aName);
-    VerifyOrReturn(!mIsCentral, );
+    VerifyOrReturn(!mIsCentral);
 
     mpRootPath = g_strdup_printf("/chipoble/%04x", getpid() & 0xffff);
     mpRoot     = g_dbus_object_manager_server_new(mpRootPath);
-    g_dbus_object_manager_server_set_connection(mpRoot, aConn);
 
     SetupGattService();
+
+    // Set connection after the service is set up in order to reduce the number
+    // of signals sent on the bus.
+    g_dbus_object_manager_server_set_connection(mpRoot, aConn);
 }
 
 CHIP_ERROR BluezEndpoint::StartupEndpointBindings(BluezEndpoint * endpoint)
@@ -596,8 +598,9 @@ CHIP_ERROR BluezEndpoint::StartupEndpointBindings(BluezEndpoint * endpoint)
         endpoint->mpOwningName = g_strdup_printf("%s", endpoint->mpAdapterName);
     else
         endpoint->mpOwningName = g_strdup_printf("C-%04x", getpid() & 0xffff);
+    ChipLogDetail(DeviceLayer, "TRACE: Bus acquired for name %s", endpoint->mpOwningName);
 
-    endpoint->BluezOnBusAcquired(conn.get(), endpoint->mpOwningName);
+    endpoint->SetupGattServer(conn.get());
 
     GDBusObjectManager * manager = g_dbus_object_manager_client_new_sync(
         conn.get(), G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/", bluez_object_manager_client_get_proxy_type,
@@ -636,11 +639,11 @@ BluezEndpoint::~BluezEndpoint()
         g_object_unref(mpConnectCancellable);
 }
 
-CHIP_ERROR BluezEndpoint::BluezGattAppRegister()
+CHIP_ERROR BluezEndpoint::RegisterGattApplication()
 {
-    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(BluezGattAppRegisterImpl, this);
+    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(RegisterGattApplicationImpl, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE,
-                        ChipLogError(Ble, "Failed to schedule BluezGattAppRegister() on CHIPoBluez thread"));
+                        ChipLogError(Ble, "Failed to schedule RegisterGattApplication() on CHIPoBluez thread"));
     return err;
 }
 
