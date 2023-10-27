@@ -94,6 +94,7 @@ _REF_NAME_MAPPING = {
     "<<ref_DataTypeString>>": "char_string",
     "<<ref_DataTypeOctstr>>": "octet_string",
     "<<ref_DataTypeVendorId>>": "vendor_id",
+    "<<ref_DataTypeEndpointNumber>>": "endpoint_no",
 }
 
 
