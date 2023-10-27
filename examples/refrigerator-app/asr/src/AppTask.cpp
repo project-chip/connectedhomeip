@@ -32,7 +32,7 @@
 #include <platform/ASR/NetworkCommissioningDriver.h>
 
 #include "init_Matter.h"
-#if CONFIG_ENABLE_CHIP_SHELL
+#ifdef CONFIG_ENABLE_CHIP_SHELL
 #include "matter_shell.h"
 #endif
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -70,7 +70,7 @@ constexpr const uint8_t kTagFreezer                                             
 const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type refrigeratorTagList[] = { { .namespaceID = kNamespaceRefrigerator,
                                                                                               .tag         = kTagRefrigerator } };
 const app::Clusters::Descriptor::Structs::SemanticTagStruct::Type freezerTagList[]      = { { .namespaceID = kNamespaceRefrigerator,
-                                                                                         .tag         = kTagFreezer } };
+                                                                                              .tag         = kTagFreezer } };
 } // namespace
 
 void NetWorkCommissioningInstInit()

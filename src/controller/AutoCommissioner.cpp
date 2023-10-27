@@ -85,7 +85,9 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
          IsUnsafeSpan(params.GetIcac(), mParams.GetIcac()) || IsUnsafeSpan(params.GetIpk(), mParams.GetIpk()) ||
          IsUnsafeSpan(params.GetAttestationElements(), mParams.GetAttestationElements()) ||
          IsUnsafeSpan(params.GetAttestationSignature(), mParams.GetAttestationSignature()) ||
-         IsUnsafeSpan(params.GetPAI(), mParams.GetPAI()) || IsUnsafeSpan(params.GetDAC(), mParams.GetDAC()));
+         IsUnsafeSpan(params.GetPAI(), mParams.GetPAI()) || IsUnsafeSpan(params.GetDAC(), mParams.GetDAC()) ||
+         IsUnsafeSpan(params.GetTimeZone(), mParams.GetTimeZone()) ||
+         IsUnsafeSpan(params.GetDSTOffsets(), mParams.GetDSTOffsets()));
 
     mParams = params;
 
@@ -173,6 +175,35 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce));
     }
     mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
+
+    if (params.GetDSTOffsets().HasValue())
+    {
+        ChipLogProgress(Controller, "Setting DST offsets from parameters");
+        size_t size = std::min(params.GetDSTOffsets().Value().size(), kMaxSupportedDstStructs);
+        for (size_t i = 0; i < size; ++i)
+        {
+            mDstOffsetsBuf[i] = params.GetDSTOffsets().Value()[i];
+        }
+        auto list = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>(mDstOffsetsBuf, size);
+        mParams.SetDSTOffsets(list);
+    }
+    if (params.GetTimeZone().HasValue())
+    {
+        ChipLogProgress(Controller, "Setting Time Zone from parameters");
+        size_t size = std::min(params.GetTimeZone().Value().size(), kMaxSupportedTimeZones);
+        for (size_t i = 0; i < size; ++i)
+        {
+            mTimeZoneBuf[i] = params.GetTimeZone().Value()[i];
+            if (mTimeZoneBuf[i].name.HasValue())
+            {
+                auto span = MutableCharSpan(mTimeZoneNames[i], kMaxTimeZoneNameLen);
+                CopyCharSpanToMutableCharSpan(mTimeZoneBuf[i].name.Value(), span);
+                mTimeZoneBuf[i].name.SetValue(span);
+            }
+        }
+        auto list = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>(mTimeZoneBuf, size);
+        mParams.SetTimeZone(list);
+    }
 
     return CHIP_NO_ERROR;
 }

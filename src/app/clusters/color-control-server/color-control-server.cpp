@@ -1171,7 +1171,7 @@ bool ColorControlServer::computeNewHueValue(ColorControlServer::ColorHueTransiti
 }
 
 /**
- * @brief Configures EnventControl callback when using HSV colors
+ * @brief Configures EventControl callback when using HSV colors
  *
  * @param endpoint
  */
@@ -2101,7 +2101,7 @@ uint16_t ColorControlServer::findNewColorValueFromStep(uint16_t oldValue, int16_
 }
 
 /**
- * @brief Configures EnventControl callback when using XY colors
+ * @brief Configures EventControl callback when using XY colors
  *
  * @param endpoint
  */
@@ -2486,7 +2486,7 @@ uint16_t ColorControlServer::getTemperatureCoupleToLevelMin(EndpointId endpoint)
 }
 
 /**
- * @brief Configures EnventControl callback when using Temp colors
+ * @brief Configures EventControl callback when using Temp colors
  *
  * @param endpoint
  */
@@ -2505,7 +2505,7 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
 {
     // 07-5123-07 (i.e. ZCL 7) 5.2.2.2.1.22 StartUpColorTemperatureMireds Attribute
     // The StartUpColorTemperatureMireds attribute SHALL define the desired startup color
-    // temperature values a lamp SHAL use when it is supplied with power and this value SHALL
+    // temperature values a lamp SHALL use when it is supplied with power and this value SHALL
     // be reflected in the ColorTemperatureMireds attribute. In addition, the ColorMode and
     // EnhancedColorMode attributes SHALL be set to 0x02 (color temperature). The values of
     // the StartUpColorTemperatureMireds attribute are listed in the table below.

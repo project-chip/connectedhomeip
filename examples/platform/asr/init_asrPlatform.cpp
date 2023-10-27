@@ -140,6 +140,9 @@ void init_asrPlatform(void)
     // ota roll back,just for flash_remapping
     ota_roll_back_pro();
 
+    // disable wdg
+    ota_wdg_disable();
+
     // register uart for printf log, the used uart should be init before.
     printf_uart_register(LEGA_UART1_INDEX);
     // register uart for at log, the used uart should be init before.
@@ -161,12 +164,17 @@ void init_asrPlatform(void)
 #if defined CFG_PLF_RV32 || defined CFG_PLF_DUET
     lega_wlan_efuse_read();
 
+#ifdef CFG_PLF_DUET
+    // set certifacation type before rf init, param 0x00 is old srrc, 0x10 is new srrc
+    lega_wlan_set_cert_type(0x00);
+#endif
+
     lega_sram_rf_pta_init();
 
     lega_recovery_phy_fsm_config();
 #endif
     asr_security_engine_init();
-#if !CONFIG_ENABLE_CHIP_SHELL
+#ifndef CONFIG_ENABLE_CHIP_SHELL
     lega_at_init();
 #endif
     lega_at_cmd_register_all();

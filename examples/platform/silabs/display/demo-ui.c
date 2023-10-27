@@ -23,11 +23,11 @@
 #include "dmd/dmd.h"
 #include "em_types.h"
 #include "glib.h"
+#if SL_WIFI && !SIWX_917
+#include "spi_multiplex.h"
+#endif // SL_WIFI && !SIWX_917
 #include <stdio.h>
 #include <string.h>
-#if (defined(EFR32MG24) && defined(SL_WIFI))
-#include "spi_multiplex.h"
-#endif
 
 // Main Logo and App image
 #define SILICONLABS_X_POSITION ((glibContext.pDisplayGeometry->xSize - SILICONLABS_BITMAP_WIDTH) / 2)
@@ -102,13 +102,13 @@ void demoUIInit(GLIB_Context_t * context)
 
 sl_status_t updateDisplay(void)
 {
-#if (defined(EFR32MG24) && defined(SL_WIFI))
+#if SL_LCDCTRL_MUX
     sl_wfx_host_pre_lcd_spi_transfer();
-#endif
+#endif // SL_LCDCTRL_MUX
     sl_status_t status = DMD_updateDisplay();
-#if (defined(EFR32MG24) && defined(SL_WIFI))
+#if SL_LCDCTRL_MUX
     sl_wfx_host_post_lcd_spi_transfer();
-#endif
+#endif // SL_LCDCTRL_MUX
     if (status != DMD_OK)
         return SL_STATUS_FAIL;
     return SL_STATUS_OK;

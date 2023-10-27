@@ -23,9 +23,6 @@
 namespace chip {
 namespace TestCerts {
 
-// Root CA certs for chip::Credentials::GetTestAttestationTrustStore()
-extern const Span<const ByteSpan> kTestAttestationTrustStoreRoots;
-
 extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_Cert;
 extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_SKID;
 extern const ByteSpan sTestCert_DAC_FFF1_8000_0000_2CDPs_PublicKey;
@@ -316,7 +313,7 @@ extern const ByteSpan sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_SKID;
 extern const ByteSpan sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_PublicKey;
 extern const ByteSpan sTestCert_DAC_FFF2_8006_0035_Val1SecBefore_PrivateKey;
 
-extern const ByteSpan sTestCert_PAA_FFF1_Cert;
+// Cert is provided in the PAA store file as it is used in the default verifier.
 extern const ByteSpan sTestCert_PAA_FFF1_SKID;
 extern const ByteSpan sTestCert_PAA_FFF1_PublicKey;
 extern const ByteSpan sTestCert_PAA_FFF1_PrivateKey;
@@ -331,7 +328,7 @@ extern const ByteSpan sTestCert_PAA_FFF2_ValInPast_SKID;
 extern const ByteSpan sTestCert_PAA_FFF2_ValInPast_PublicKey;
 extern const ByteSpan sTestCert_PAA_FFF2_ValInPast_PrivateKey;
 
-extern const ByteSpan sTestCert_PAA_NoVID_Cert;
+// Cert is provided in the PAA store file as it is used in the default verifier.
 extern const ByteSpan sTestCert_PAA_NoVID_SKID;
 extern const ByteSpan sTestCert_PAA_NoVID_PublicKey;
 extern const ByteSpan sTestCert_PAA_NoVID_PrivateKey;

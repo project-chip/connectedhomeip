@@ -75,6 +75,9 @@ config SYSTEM_WORKQUEUE_STACK_SIZE
 config HEAP_MEM_POOL_SIZE
     default 128 if PM
 
+config COMMON_LIBC_MALLOC_ARENA_SIZE 
+    default 12288
+
 config NET_IPV6_MLD
     default n
 
@@ -142,6 +145,10 @@ config B9X_BLE_CTRL_MASTER_MAX_NUM
 
 config B9X_BLE_CTRL_SLAVE_MAX_NUM
     default 1
+
+config B9X_BLE_CTRL_RF_POWER
+    default 3 if PM 
+    default 9
 
 choice B9X_BLE_CTRL_MAC_TYPE
     default B9X_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
@@ -220,6 +227,10 @@ config OPENTHREAD_SLAAC
 config OPENTHREAD_MANUAL_START
     default y
 
+config OPENTHREAD_DEFAULT_TX_POWER
+    default 3 if PM
+    default 9
+
 config NET_TX_STACK_SIZE
     default 554 if PM
 
@@ -247,18 +258,50 @@ config MBEDTLS_USER_CONFIG_ENABLE
 config MBEDTLS_USER_CONFIG_FILE
     default "telink-mbedtls-config.h"
 
-config MBEDTLS_ENABLE_HEAP
-    default y
-
-# TBD: Something wrong with this heap. Need to be investigated. Cirrently just set minimal size
-config MBEDTLS_HEAP_SIZE
-    default 0
-
-config OPENTHREAD_EXTERNAL_HEAP
-    default y
 
 # getopt version
 config GETOPT_LONG
     default y
+
+# Disable not used shell modules
+
+config SHELL_WILDCARD
+    default n
+
+config SHELL_VT100_COLORS
+    default n
+
+config SHELL_STATS
+    default n
+
+config KERNEL_SHELL
+    default n
+
+config SENSOR_SHELL
+    default n
+
+config DEVICE_SHELL
+    default n
+
+config DATE_SHELL
+    default n
+
+config DEVMEM_SHELL
+    default n
+
+config MCUBOOT_SHELL
+    default n
+
+config FLASH_SHELL
+    default n
+
+config HWINFO_SHELL
+    default n
+
+config PWM_SHELL
+    default n
+
+config OPENTHREAD_SHELL
+    default n
 
 endif

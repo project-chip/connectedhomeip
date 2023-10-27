@@ -170,7 +170,7 @@ void ASRWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callbac
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
     ChipLogProgress(NetworkProvisioning, "ASR NetworkCommissioningDelegate: SSID: %s", StringOrNullMarker(mStagingNetwork.ssid));
     err               = ConnectWiFiNetwork(reinterpret_cast<const char *>(mStagingNetwork.ssid), mStagingNetwork.ssidLen,
-                             reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);
+                                           reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);
     mpConnectCallback = callback;
 exit:
     if (err != CHIP_NO_ERROR)
@@ -185,30 +185,9 @@ exit:
     }
 }
 
-CHIP_ERROR ASRWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
+void ASRWiFiDriver::OnScanWiFiNetworkDone()
 {
-    if (ASRUtils::EnableStationMode() != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(DeviceLayer, "Start Scan WiFi Networks Failed");
-        return CHIP_ERROR_INTERNAL;
-    }
-
-    if (!ssid.empty()) // ssid is given, only scan this network
-    {
-        char cSsid[DeviceLayer::Internal::kMaxWiFiSSIDLength] = {};
-        memcpy(cSsid, ssid.data(), ssid.size());
-        lega_wlan_start_scan_active(cSsid, 0);
-    }
-    else // scan all networks
-    {
-        lega_wlan_start_scan();
-    }
-    return CHIP_NO_ERROR;
-}
-
-void ASRWiFiDriver::OnScanWiFiNetworkDone(lega_wlan_scan_result_t * ScanResult)
-{
-    uint8_t ap_num = ScanResult->ap_num;
+    uint8_t ap_num = chip::DeviceLayer::Internal::ASRUtils::GetScanApNum();
     if (!ap_num)
     {
         ChipLogProgress(DeviceLayer, "No AP found");
@@ -219,6 +198,8 @@ void ASRWiFiDriver::OnScanWiFiNetworkDone(lega_wlan_scan_result_t * ScanResult)
         }
         return;
     }
+
+    lega_wlan_scan_ap_record_t * ScanResult = chip::DeviceLayer::Internal::ASRUtils::GetScanResults();
 
     if (ScanResult)
     {
@@ -254,7 +235,7 @@ void ASRWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callb
     if (callback != nullptr)
     {
         mpScanCallback = callback;
-        if (StartScanWiFiNetworks(ssid) != CHIP_NO_ERROR)
+        if (chip::DeviceLayer::Internal::ASRUtils::StartScanWiFiNetworks(ssid) != CHIP_NO_ERROR)
         {
             mpScanCallback = nullptr;
             callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);

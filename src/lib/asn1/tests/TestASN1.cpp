@@ -143,7 +143,10 @@ static CHIP_ERROR EncodeASN1TestData(ASN1Writer & writer)
             ASN1_START_SEQUENCE
             {
                 ASN1_ENCODE_OBJECT_ID(kTestVal_23_OID);
-                ASN1_START_BIT_STRING_ENCAPSULATED { ASN1_ENCODE_INTEGER(kTestVal_24_Int); }
+                ASN1_START_BIT_STRING_ENCAPSULATED
+                {
+                    ASN1_ENCODE_INTEGER(kTestVal_24_Int);
+                }
                 ASN1_END_ENCAPSULATED;
             }
             ASN1_END_SEQUENCE;

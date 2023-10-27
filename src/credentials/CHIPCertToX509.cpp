@@ -454,7 +454,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR DecodeECDSASignature(TLVReader & reader, ChipCertificateData & certData)
+static CHIP_ERROR DecodeECDSASignature(TLVReader & reader, ChipCertificateData & certData)
 {
     ReturnErrorOnFailure(reader.Next(kTLVType_ByteString, ContextTag(kTag_ECDSASignature)));
     ReturnErrorOnFailure(reader.Get(certData.mSignature));
@@ -467,9 +467,15 @@ static CHIP_ERROR DecodeConvertECDSASignature(TLVReader & reader, ASN1Writer & w
 
     ReturnErrorOnFailure(DecodeECDSASignature(reader, certData));
 
+    // Converting the signature is a bit of work, so explicitly check if we have a null writer
+    ReturnErrorCodeIf(writer.IsNullWriter(), CHIP_NO_ERROR);
+
     // signatureValue BIT STRING
     // Per RFC3279, the ECDSA signature value is encoded in DER encapsulated in the signatureValue BIT STRING.
-    ASN1_START_BIT_STRING_ENCAPSULATED { ReturnErrorOnFailure(ConvertECDSASignatureRawToDER(certData.mSignature, writer)); }
+    ASN1_START_BIT_STRING_ENCAPSULATED
+    {
+        ReturnErrorOnFailure(ConvertECDSASignatureRawToDER(certData.mSignature, writer));
+    }
     ASN1_END_ENCAPSULATED;
 
 exit:
@@ -489,7 +495,7 @@ exit:
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR DecodeConvertTBSCert(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData)
+static CHIP_ERROR DecodeConvertTBSCert(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData)
 {
     CHIP_ERROR err;
 
@@ -547,7 +553,18 @@ exit:
     return err;
 }
 
-static CHIP_ERROR DecodeConvertCert(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData)
+/**
+ * Decode a CHIP TLV certificate and convert it to X.509 DER form.
+ *
+ * This helper function takes separate ASN1Writers for the whole Certificate
+ * and the TBSCertificate, to allow the caller to control which part (if any)
+ * to capture.
+ *
+ * If `writer` is NOT a null writer, then `tbsWriter` MUST be a reference
+ * to the same writer, otherwise the overall Certificate written will not be
+ * valid.
+ */
+static CHIP_ERROR DecodeConvertCert(TLVReader & reader, ASN1Writer & writer, ASN1Writer & tbsWriter, ChipCertificateData & certData)
 {
     CHIP_ERROR err;
     TLVType containerType;
@@ -565,11 +582,14 @@ static CHIP_ERROR DecodeConvertCert(TLVReader & reader, ASN1Writer & writer, Chi
     ASN1_START_SEQUENCE
     {
         // tbsCertificate TBSCertificate,
-        ReturnErrorOnFailure(DecodeConvertTBSCert(reader, writer, certData));
+        ReturnErrorOnFailure(DecodeConvertTBSCert(reader, tbsWriter, certData));
 
         // signatureAlgorithm   AlgorithmIdentifier
         // AlgorithmIdentifier ::= SEQUENCE
-        ASN1_START_SEQUENCE { ASN1_ENCODE_OBJECT_ID(static_cast<OID>(certData.mSigAlgoOID)); }
+        ASN1_START_SEQUENCE
+        {
+            ASN1_ENCODE_OBJECT_ID(static_cast<OID>(certData.mSigAlgoOID));
+        }
         ASN1_END_SEQUENCE;
 
         // signatureValue BIT STRING
@@ -597,31 +617,56 @@ DLL_EXPORT CHIP_ERROR ConvertChipCertToX509Cert(const ByteSpan chipCert, Mutable
 
     certData.Clear();
 
-    ReturnErrorOnFailure(DecodeConvertCert(reader, writer, certData));
+    ReturnErrorOnFailure(DecodeConvertCert(reader, writer, writer, certData));
 
     x509Cert.reduce_size(writer.GetLengthWritten());
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DecodeChipCert(const ByteSpan chipCert, ChipCertificateData & certData)
+CHIP_ERROR DecodeChipCert(const ByteSpan chipCert, ChipCertificateData & certData, BitFlags<CertDecodeFlags> decodeFlags)
 {
     TLVReader reader;
 
     reader.Init(chipCert);
-
-    return DecodeChipCert(reader, certData);
+    return DecodeChipCert(reader, certData, decodeFlags);
 }
 
-CHIP_ERROR DecodeChipCert(TLVReader & reader, ChipCertificateData & certData)
+CHIP_ERROR DecodeChipCert(TLVReader & reader, ChipCertificateData & certData, BitFlags<CertDecodeFlags> decodeFlags)
 {
-    ASN1Writer writer;
-
-    writer.InitNullWriter();
+    ASN1Writer nullWriter;
+    nullWriter.InitNullWriter();
 
     certData.Clear();
 
-    return DecodeConvertCert(reader, writer, certData);
+    if (decodeFlags.Has(CertDecodeFlags::kGenerateTBSHash))
+    {
+        // Create a buffer and writer to capture the TBS (to-be-signed) portion of the certificate
+        // when we decode (and convert) the certificate, so we can hash it to create the TBSHash.
+        chip::Platform::ScopedMemoryBuffer<uint8_t> asn1TBSBuf;
+        VerifyOrReturnError(asn1TBSBuf.Alloc(kMaxCHIPCertDecodeBufLength), CHIP_ERROR_NO_MEMORY);
+        ASN1Writer tbsWriter;
+        tbsWriter.Init(asn1TBSBuf.Get(), kMaxCHIPCertDecodeBufLength);
+
+        ReturnErrorOnFailure(DecodeConvertCert(reader, nullWriter, tbsWriter, certData));
+
+        // Hash the encoded TBS certificate. Only SHA256 is supported.
+        VerifyOrReturnError(certData.mSigAlgoOID == kOID_SigAlgo_ECDSAWithSHA256, CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE);
+        chip::Crypto::Hash_SHA256(asn1TBSBuf.Get(), tbsWriter.GetLengthWritten(), certData.mTBSHash);
+        certData.mCertFlags.Set(CertFlags::kTBSHashPresent);
+    }
+    else
+    {
+        ReturnErrorOnFailure(DecodeConvertCert(reader, nullWriter, nullWriter, certData));
+    }
+
+    // If requested by the caller, mark the certificate as trusted.
+    if (decodeFlags.Has(CertDecodeFlags::kIsTrustAnchor))
+    {
+        certData.mCertFlags.Set(CertFlags::kIsTrustAnchor);
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DecodeChipDN(TLVReader & reader, ChipDN & dn)

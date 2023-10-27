@@ -58,8 +58,8 @@ public:
     ChipDeviceScanner(LSHandle * handle, ChipDeviceScannerDelegate * delegate);
     ChipDeviceScanner(ChipDeviceScannerDelegate * delegate);
 
-    ChipDeviceScanner(ChipDeviceScanner &&)      = default;
-    ChipDeviceScanner(const ChipDeviceScanner &) = delete;
+    ChipDeviceScanner(ChipDeviceScanner &&)                  = default;
+    ChipDeviceScanner(const ChipDeviceScanner &)             = delete;
     ChipDeviceScanner & operator=(const ChipDeviceScanner &) = delete;
 
     ~ChipDeviceScanner();

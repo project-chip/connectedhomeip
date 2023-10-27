@@ -73,8 +73,11 @@ static_library("Linux") {
     "SystemTimeSupport.cpp",
   ]
 
+  deps = [ "${chip_root}/src/setup_payload" ]
+
   if (!chip_use_external_logging) {
     sources += [ "Logging.cpp" ]
+    deps += [ "${chip_root}/src/platform/logging:headers" ]
   }
 
   if (chip_enable_openthread) {
@@ -88,15 +91,15 @@ static_library("Linux") {
       "BlePlatformConfig.h",
       "bluez/AdapterIterator.cpp",
       "bluez/AdapterIterator.h",
+      "bluez/BluezConnection.cpp",
+      "bluez/BluezConnection.h",
+      "bluez/BluezEndpoint.cpp",
+      "bluez/BluezEndpoint.h",
       "bluez/ChipDeviceScanner.cpp",
       "bluez/ChipDeviceScanner.h",
-      "bluez/Helper.cpp",
-      "bluez/Helper.h",
       "bluez/Types.h",
     ]
   }
-
-  deps = [ "${chip_root}/src/setup_payload" ]
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",

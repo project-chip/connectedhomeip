@@ -143,12 +143,15 @@ public class NsdResolveListener implements NsdManager.ResolveListener {
 
   private void addCommissioningInfo(DiscoveredNodeData discoveredNodeData) {
     if (preCommissionedVideoPlayers != null) {
+      long currentUnixTimeMS = System.currentTimeMillis();
       for (VideoPlayer videoPlayer : preCommissionedVideoPlayers) {
         if (videoPlayer.isSameAs(discoveredNodeData)) {
           Log.d(
               TAG,
               "Matching Video Player with the following information found for DiscoveredNodeData"
                   + videoPlayer);
+          Log.d(TAG, "Updating discovery timestamp for VideoPlayer to " + currentUnixTimeMS);
+          videoPlayer.setLastDiscoveredMs(currentUnixTimeMS);
           discoveredNodeData.setConnectableVideoPlayer(videoPlayer);
           return;
         }

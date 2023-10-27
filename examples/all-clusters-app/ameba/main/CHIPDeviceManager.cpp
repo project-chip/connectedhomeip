@@ -28,12 +28,12 @@
 #include "CHIPDeviceManager.h"
 #include <app/ConcreteAttributePath.h>
 #include <app/util/basic-types.h>
+#include <core/ErrorStr.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <platform/Ameba/FactoryDataProvider.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
-#include <support/ErrorStr.h>
 
 using namespace ::chip;
 using namespace ::chip::Credentials;
@@ -93,6 +93,12 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 exit:
     return err;
 }
+
+void CHIPDeviceManager::Shutdown()
+{
+    PlatformMgr().Shutdown();
+}
+
 } // namespace DeviceManager
 } // namespace chip
 

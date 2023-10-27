@@ -42,9 +42,9 @@
 #include <controller/java/GroupDeviceProxy.h>
 #include <credentials/CHIPCert.h>
 #include <jni.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ErrorStr.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/jsontlv/JsonToTlv.h>
@@ -917,7 +917,7 @@ JNI_METHOD(jbyteArray, createRootCertificate)
     if (fabricId != nullptr)
     {
         jlong jfabricId = chip::JniReferences::GetInstance().LongToPrimitive(fabricId);
-        fabric = MakeOptional(static_cast<FabricId>(jfabricId));
+        fabric          = MakeOptional(static_cast<FabricId>(jfabricId));
     }
 
     {
@@ -980,7 +980,7 @@ JNI_METHOD(jbyteArray, createIntermediateCertificate)
     if (fabricId != nullptr)
     {
         jlong jfabricId = chip::JniReferences::GetInstance().LongToPrimitive(fabricId);
-        fabric = MakeOptional(static_cast<FabricId>(jfabricId));
+        fabric          = MakeOptional(static_cast<FabricId>(jfabricId));
     }
 
     {
@@ -1960,7 +1960,7 @@ JNI_METHOD(void, shutdownCommissioning)
     StopIOThread();
 
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
-    wrapper->Controller()->Shutdown();
+    wrapper->Shutdown();
 }
 
 JNI_METHOD(jbyteArray, getAttestationChallenge)

@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <enum name="LevelStatus" type="ENUM8">
-  <enum name="PowerProfileState" type="ENUM8">
+  <enum name="LevelStatus" type="enum8">
+  <enum name="PowerProfileState" type="enum8">
     <item name="PowerProfileWaitingToStart" value="0x01"/>
     <item name="PowerProfileStarted" value="0x02"/>
     <item name="EnergyPhaseRunning" value="0x03"/>
@@ -27,7 +27,7 @@ limitations under the License.
     <item name="PowerProfileScheduled" value="0x09"/>
   </enum>
 
-  <bitmap name="EnergyFormatting" type="BITMAP8">
+  <bitmap name="EnergyFormatting" type="bitmap8">
     <field name="NumberOfDigitsToTheRightOfTheDecimalPoint" mask="0x07"/>
     <field name="NumberOfDigitsToTheLeftOfTheDecimalPoint" mask="0x78"/>
     <field name="SuppressLeadingZeros" mask="0x80"/>

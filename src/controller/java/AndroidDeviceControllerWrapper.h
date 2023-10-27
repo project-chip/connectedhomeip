@@ -173,6 +173,8 @@ public:
                 uint16_t failsafeTimerSeconds, bool attemptNetworkScanWiFi, bool attemptNetworkScanThread,
                 bool skipCommissioningComplete, CHIP_ERROR * errInfoOnFailure);
 
+    void Shutdown();
+
 #ifdef JAVA_MATTER_CONTROLLER_TEST
     chip::Controller::ExampleOperationalCredentialsIssuer * GetAndroidOperationalCredentialsIssuer()
 #else

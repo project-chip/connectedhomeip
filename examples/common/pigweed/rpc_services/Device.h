@@ -217,7 +217,7 @@ public:
         return pw::OkStatus();
     }
 
-    virtual pw::Status Reboot(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
+    virtual pw::Status Reboot(const chip_rpc_RebootRequest & request, pw_protobuf_Empty & response)
     {
         return pw::Status::Unimplemented();
     }

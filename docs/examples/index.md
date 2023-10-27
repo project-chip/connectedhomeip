@@ -87,6 +87,15 @@ darwin-framework-tool/README
 java-matter-controller/README
 ```
 
+## Kotlin matter controller example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+kotlin-matter-controller/README
+```
+
 ## Virtual Device App example
 
 ```{toctree}
@@ -294,11 +303,20 @@ window-app/**/README
 resource-monitoring-app/**/README
 ```
 
-## Air Quality Sensor example
+## RVC example
 
 ```{toctree}
 :glob:
 :maxdepth: 1
 
 rvc-app/README
+```
+
+## Air Purifier Example
+
+```{toctree}
+:glob:
+:maxdepth: 1
+
+air-purifier-app/**/README
 ```

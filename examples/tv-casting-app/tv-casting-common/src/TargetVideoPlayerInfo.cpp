@@ -27,16 +27,19 @@ CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIn
                                              std::function<void(TargetVideoPlayerInfo *)> onConnectionSuccess,
                                              std::function<void(CHIP_ERROR)> onConnectionFailure, uint16_t vendorId,
                                              uint16_t productId, chip::DeviceTypeId deviceType, const char * deviceName,
-                                             const char * hostName, size_t numIPs, chip::Inet::IPAddress * ipAddress)
+                                             const char * hostName, size_t numIPs, chip::Inet::IPAddress * ipAddress, uint16_t port,
+                                             const char * instanceName, chip::System::Clock::Timestamp lastDiscovered)
 {
     ChipLogProgress(NotSpecified, "TargetVideoPlayerInfo nodeId=0x" ChipLogFormatX64 " fabricIndex=%d", ChipLogValueX64(nodeId),
                     fabricIndex);
-    mNodeId      = nodeId;
-    mFabricIndex = fabricIndex;
-    mVendorId    = vendorId;
-    mProductId   = productId;
-    mDeviceType  = deviceType;
-    mNumIPs      = numIPs;
+    mNodeId         = nodeId;
+    mFabricIndex    = fabricIndex;
+    mVendorId       = vendorId;
+    mProductId      = productId;
+    mDeviceType     = deviceType;
+    mNumIPs         = numIPs;
+    mPort           = port;
+    mLastDiscovered = lastDiscovered;
     for (size_t i = 0; i < numIPs && i < chip::Dnssd::CommonResolutionData::kMaxIPAddresses; i++)
     {
         mIpAddress[i] = ipAddress[i];
@@ -52,6 +55,12 @@ CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIn
     if (hostName != nullptr)
     {
         chip::Platform::CopyString(mHostName, chip::Dnssd::kHostNameMaxLength, hostName);
+    }
+
+    memset(mInstanceName, '\0', sizeof(mInstanceName));
+    if (instanceName != nullptr)
+    {
+        chip::Platform::CopyString(mInstanceName, chip::Dnssd::Commission::kInstanceNameMaxLength + 1, instanceName);
     }
 
     for (auto & endpointInfo : mEndpoints)
@@ -71,12 +80,13 @@ CHIP_ERROR TargetVideoPlayerInfo::Initialize(NodeId nodeId, FabricIndex fabricIn
 void TargetVideoPlayerInfo::Reset()
 {
     ChipLogProgress(NotSpecified, "TargetVideoPlayerInfo Reset() called");
-    mInitialized = false;
-    mNodeId      = 0;
-    mFabricIndex = 0;
-    mVendorId    = 0;
-    mProductId   = 0;
-    mDeviceType  = 0;
+    mInitialized    = false;
+    mNodeId         = 0;
+    mFabricIndex    = 0;
+    mVendorId       = 0;
+    mProductId      = 0;
+    mDeviceType     = 0;
+    mLastDiscovered = chip::System::Clock::kZero;
     memset(mDeviceName, '\0', sizeof(mDeviceName));
     memset(mHostName, '\0', sizeof(mHostName));
     mDeviceProxy = nullptr;
@@ -156,6 +166,11 @@ void TargetVideoPlayerInfo::PrintInfo()
 {
     ChipLogProgress(NotSpecified, " TargetVideoPlayerInfo deviceName=%s nodeId=0x" ChipLogFormatX64 " fabric index=%d", mDeviceName,
                     ChipLogValueX64(mNodeId), mFabricIndex);
+    if (mMACAddress.size() > 0)
+    {
+        ChipLogProgress(NotSpecified, "  MACAddress=%.*s", static_cast<int>(mMACAddress.size()), mMACAddress.data());
+    }
+
     for (auto & endpointInfo : mEndpoints)
     {
         if (endpointInfo.IsInitialized())

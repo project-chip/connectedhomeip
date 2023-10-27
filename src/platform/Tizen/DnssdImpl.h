@@ -120,7 +120,7 @@ struct ResolveContext : public GenericContext
 class DnssdTizen
 {
 public:
-    DnssdTizen(const DnssdTizen &) = delete;
+    DnssdTizen(const DnssdTizen &)             = delete;
     DnssdTizen & operator=(const DnssdTizen &) = delete;
 
     CHIP_ERROR Init(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context);

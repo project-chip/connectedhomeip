@@ -183,6 +183,7 @@ void WindowManager::DispatchEventAttributeChange(chip::EndpointId endpoint, chip
     /* ============= Positions for Position Aware ============= */
     case Attributes::CurrentPositionLiftPercent100ths::Id:
     case Attributes::CurrentPositionTiltPercent100ths::Id:
+        UpdateLEDs();
         UpdateLCD();
         break;
     default:
@@ -656,30 +657,6 @@ void WindowManager::UpdateLEDs()
     }
     else
     {
-        if (mState.isWinking)
-        {
-            mStatusLED.Blink(200, 200);
-        }
-        else
-#if CHIP_ENABLE_OPENTHREAD
-            if (mState.isThreadProvisioned && mState.isThreadEnabled)
-#else
-            if (mState.isWiFiProvisioned && mState.isWiFiEnabled)
-#endif
-
-        {
-
-            mStatusLED.Blink(950, 50);
-        }
-        else if (mState.haveBLEConnections)
-        {
-            mStatusLED.Blink(100, 100);
-        }
-        else
-        {
-            mStatusLED.Blink(50, 950);
-        }
-
         // Action LED
         NPercent100ths current;
         LimitStatus liftLimit = LimitStatus::Intermediate;
@@ -724,7 +701,7 @@ void WindowManager::UpdateLCD()
 #if CHIP_ENABLE_OPENTHREAD
     if (mState.isThreadProvisioned)
 #else
-    if (mState.isWiFiProvisioned)
+    if (BaseApplication::getWifiProvisionStatus())
 #endif // CHIP_ENABLE_OPENTHREAD
     {
         Cover & cover = GetCover();
@@ -738,12 +715,10 @@ void WindowManager::UpdateLCD()
         Attributes::CurrentPositionTilt::Get(cover.mEndpoint, tilt);
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-#ifdef DISPLAY_ENABLED
         if (!tilt.IsNull() && !lift.IsNull())
         {
             LcdPainter::Paint(slLCD, type, lift.Value(), tilt.Value(), mIcon);
         }
-#endif
     }
 #endif // DISPLAY_ENABLED
 }

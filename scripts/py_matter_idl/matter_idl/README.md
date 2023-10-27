@@ -130,6 +130,23 @@ server cluster AccessControl = 31 {
 
   // commands may have multiple attributes
   fabric timed command RequiresTimedInvoke(): DefaultSuccess = 7;
+
+  // Items may have a prefix about api stability.
+  //   - "provisional" are generally subject to change
+  //   - "internal" are for internal SDK development/usage/testing
+
+  provisional critical event StartUp = 0 {
+       INT32U softwareVersion = 0;
+  }
+  internal struct SomeInternalStruct {}
+
+  struct StructThatIsBeingChanged {
+    CHAR_STRING debugText = 1;
+    provisional INT32S errorValue = 2;
+  }
+
+  provisional timedwrite attribute int16u attributeInDevelopment = 10;
+  internal command FactoryReset(): DefaultSuccess = 10;
 }
 
 // A client cluster represents something that is used by an app
@@ -150,6 +167,10 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     ///.... content removed: it is very similar to a server cluster
 }
 
+// Clusters may be provisional or internal as well
+provisional client cluster SomeClusterInDevelopment = 1234 {
+  /// ... content removed
+}
 
 // On every endpoint number (non-dynamic)
 // a series of clusters can be exposed

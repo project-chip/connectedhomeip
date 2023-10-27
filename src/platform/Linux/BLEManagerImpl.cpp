@@ -42,7 +42,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 
-#include "bluez/Helper.h"
+#include "bluez/BluezEndpoint.h"
 
 using namespace ::nl;
 using namespace ::chip::Ble;
@@ -344,21 +344,26 @@ exit:
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {
-    BluezConnection * connection = static_cast<BluezConnection *>(conId);
-    return (connection != nullptr) ? connection->mMtu : 0;
+    uint16_t mtu = 0;
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
+    mtu = conId->GetMTU();
+exit:
+    return mtu;
 }
 
 bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     bool result = false;
 
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
     VerifyOrExit(Ble::UUIDsMatch(svcId, &CHIP_BLE_SVC_ID),
                  ChipLogError(DeviceLayer, "SubscribeCharacteristic() called with invalid service ID"));
     VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_TX),
                  ChipLogError(DeviceLayer, "SubscribeCharacteristic() called with invalid characteristic ID"));
 
-    VerifyOrExit(BluezSubscribeCharacteristic(conId) == CHIP_NO_ERROR,
-                 ChipLogError(DeviceLayer, "BluezSubscribeCharacteristic() failed"));
+    VerifyOrExit(conId->SubscribeCharacteristic() == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "SubscribeCharacteristic() failed"));
     result = true;
 
 exit:
@@ -369,13 +374,15 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
 {
     bool result = false;
 
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
     VerifyOrExit(Ble::UUIDsMatch(svcId, &CHIP_BLE_SVC_ID),
                  ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() called with invalid service ID"));
     VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_TX),
                  ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() called with invalid characteristic ID"));
 
-    VerifyOrExit(BluezUnsubscribeCharacteristic(conId) == CHIP_NO_ERROR,
-                 ChipLogError(DeviceLayer, "BluezUnsubscribeCharacteristic() failed"));
+    VerifyOrExit(conId->UnsubscribeCharacteristic() == CHIP_NO_ERROR,
+                 ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() failed"));
     result = true;
 
 exit:
@@ -386,9 +393,11 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
     bool result = false;
 
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
     ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (con %p)", conId);
 
-    VerifyOrExit(CloseBluezConnection(conId) == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "CloseBluezConnection() failed"));
+    VerifyOrExit(conId->CloseConnection() == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "CloseConnection() failed"));
     result = true;
 
 exit:
@@ -400,8 +409,9 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 {
     bool result = false;
 
-    VerifyOrExit(SendBluezIndication(conId, std::move(pBuf)) == CHIP_NO_ERROR,
-                 ChipLogError(DeviceLayer, "SendBluezIndication() failed"));
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
+    VerifyOrExit(conId->SendIndication(std::move(pBuf)) == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "SendIndication() failed"));
     result = true;
 
 exit:
@@ -413,13 +423,14 @@ bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::Ch
 {
     bool result = false;
 
+    VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED,
+                 ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
     VerifyOrExit(Ble::UUIDsMatch(svcId, &CHIP_BLE_SVC_ID),
                  ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid service ID"));
     VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_RX),
                  ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid characteristic ID"));
 
-    VerifyOrExit(BluezSendWriteRequest(conId, std::move(pBuf)) == CHIP_NO_ERROR,
-                 ChipLogError(DeviceLayer, "BluezSendWriteRequest() failed"));
+    VerifyOrExit(conId->SendWriteRequest(std::move(pBuf)) == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "SendWriteRequest() failed"));
     result = true;
 
 exit:
@@ -541,30 +552,18 @@ void BLEManagerImpl::CHIPoBluez_ConnectionClosed(BLE_CONNECTION_OBJECT conId)
 
 void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    BluezConnection * connection = static_cast<BluezConnection *>(conId);
-
-    VerifyOrExit(connection != nullptr, ChipLogError(DeviceLayer, "Connection is NULL in HandleTXCharCCCDWrite"));
-    VerifyOrExit(connection->mpC2 != nullptr, ChipLogError(DeviceLayer, "C2 is NULL in HandleTXCharCCCDWrite"));
+    VerifyOrReturn(conId != BLE_CONNECTION_UNINITIALIZED,
+                   ChipLogError(DeviceLayer, "BLE connection is not initialized in %s", __func__));
 
     // Post an event to the Chip queue to process either a CHIPoBLE Subscribe or Unsubscribe based on
     // whether the client is enabling or disabling indications.
-    {
-        ChipDeviceEvent event;
-        event.Type = connection->mIsNotify ? DeviceEventType::kCHIPoBLESubscribe : DeviceEventType::kCHIPoBLEUnsubscribe;
-        event.CHIPoBLESubscribe.ConId = connection;
-        PlatformMgr().PostEventOrDie(&event);
-    }
+    ChipDeviceEvent event;
+    event.Type = conId->IsNotifyAcquired() ? DeviceEventType::kCHIPoBLESubscribe : DeviceEventType::kCHIPoBLEUnsubscribe;
+    event.CHIPoBLESubscribe.ConId = conId;
+    PlatformMgr().PostEventOrDie(&event);
 
-    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received", connection->mIsNotify ? "subscribe" : "unsubscribe");
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %s", ErrorStr(err));
-        // TODO: fail connection
-    }
+    ChipLogProgress(DeviceLayer, "CHIPoBLE %s received",
+                    (event.Type == DeviceEventType::kCHIPoBLESubscribe) ? "subscribe" : "unsubscribe");
 }
 
 void BLEManagerImpl::HandleTXComplete(BLE_CONNECTION_OBJECT conId)

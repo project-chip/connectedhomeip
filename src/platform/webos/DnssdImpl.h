@@ -101,7 +101,7 @@ private:
 class MdnsAvahi
 {
 public:
-    MdnsAvahi(const MdnsAvahi &) = delete;
+    MdnsAvahi(const MdnsAvahi &)             = delete;
     MdnsAvahi & operator=(const MdnsAvahi &) = delete;
 
     CHIP_ERROR Init(DnssdAsyncReturnCallback initCallback, DnssdAsyncReturnCallback errorCallback, void * context);

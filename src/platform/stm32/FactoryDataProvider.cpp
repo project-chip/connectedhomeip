@@ -24,8 +24,7 @@
 #include <platform/CHIPDeviceConfig.h>
 
 namespace chip {
-namespace {
-} // namespace
+namespace {} // namespace
 
 namespace DeviceLayer {
 

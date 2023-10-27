@@ -304,9 +304,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(BasicInformation::Produ
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateProvider::OTAApplyUpdateAction val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateProvider::ApplyUpdateActionEnum val)
 {
-    using EnumType = OtaSoftwareUpdateProvider::OTAApplyUpdateAction;
+    using EnumType = OtaSoftwareUpdateProvider::ApplyUpdateActionEnum;
     switch (val)
     {
     case EnumType::kProceed:
@@ -317,9 +317,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateProvid
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateProvider::OTADownloadProtocol val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateProvider::DownloadProtocolEnum val)
 {
-    using EnumType = OtaSoftwareUpdateProvider::OTADownloadProtocol;
+    using EnumType = OtaSoftwareUpdateProvider::DownloadProtocolEnum;
     switch (val)
     {
     case EnumType::kBDXSynchronous:
@@ -331,9 +331,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateProvid
         return static_cast<EnumType>(4);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateProvider::OTAQueryStatus val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateProvider::StatusEnum val)
 {
-    using EnumType = OtaSoftwareUpdateProvider::OTAQueryStatus;
+    using EnumType = OtaSoftwareUpdateProvider::StatusEnum;
     switch (val)
     {
     case EnumType::kUpdateAvailable:
@@ -346,9 +346,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateProvid
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateRequestor::OTAAnnouncementReason val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateRequestor::AnnouncementReasonEnum val)
 {
-    using EnumType = OtaSoftwareUpdateRequestor::OTAAnnouncementReason;
+    using EnumType = OtaSoftwareUpdateRequestor::AnnouncementReasonEnum;
     switch (val)
     {
     case EnumType::kSimpleAnnouncement:
@@ -359,9 +359,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateReques
         return static_cast<EnumType>(3);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateRequestor::OTAChangeReasonEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateRequestor::ChangeReasonEnum val)
 {
-    using EnumType = OtaSoftwareUpdateRequestor::OTAChangeReasonEnum;
+    using EnumType = OtaSoftwareUpdateRequestor::ChangeReasonEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -374,9 +374,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateReques
         return static_cast<EnumType>(5);
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateRequestor::OTAUpdateStateEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(OtaSoftwareUpdateRequestor::UpdateStateEnum val)
 {
-    using EnumType = OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
+    using EnumType = OtaSoftwareUpdateRequestor::UpdateStateEnum;
     switch (val)
     {
     case EnumType::kUnknown:
@@ -845,21 +845,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::Int
     using EnumType = GeneralDiagnostics::InterfaceTypeEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kUnspecified:
     case EnumType::kWiFi:
     case EnumType::kEthernet:
     case EnumType::kCellular:
     case EnumType::kThread:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_INTERFACE_TYPE_ENUM_UNSPECIFIED:
-    case EMBER_ZCL_INTERFACE_TYPE_ENUM_WI_FI:
-    case EMBER_ZCL_INTERFACE_TYPE_ENUM_ETHERNET:
-    case EMBER_ZCL_INTERFACE_TYPE_ENUM_CELLULAR:
-    case EMBER_ZCL_INTERFACE_TYPE_ENUM_THREAD:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(5);
@@ -884,9 +874,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::Rad
     using EnumType = GeneralDiagnostics::RadioFaultEnum;
     switch (val)
     {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
     case EnumType::kUnspecified:
     case EnumType::kWiFiFault:
     case EnumType::kCellularFault:
@@ -894,15 +881,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GeneralDiagnostics::Rad
     case EnumType::kNFCFault:
     case EnumType::kBLEFault:
     case EnumType::kEthernetFault:
-#else  // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-    case EMBER_ZCL_RADIO_FAULT_ENUM_UNSPECIFIED:
-    case EMBER_ZCL_RADIO_FAULT_ENUM_WI_FI_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_ENUM_CELLULAR_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_ENUM_THREAD_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_ENUM_NFC_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_ENUM_BLE_FAULT:
-    case EMBER_ZCL_RADIO_FAULT_ENUM_ETHERNET_FAULT:
-#endif // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
         return val;
     default:
         return static_cast<EnumType>(7);
@@ -1237,34 +1215,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(GroupKeyManagement::Gro
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryWasherMode::ModeTag val)
-{
-    using EnumType = LaundryWasherMode::ModeTag;
-    switch (val)
-    {
-    case EnumType::kNormal:
-    case EnumType::kDelicate:
-    case EnumType::kHeavy:
-    case EnumType::kWhites:
-        return val;
-    default:
-        return static_cast<EnumType>(0);
-    }
-}
-
-static auto __attribute__((unused)) EnsureKnownEnumValue(RefrigeratorAndTemperatureControlledCabinetMode::ModeTag val)
-{
-    using EnumType = RefrigeratorAndTemperatureControlledCabinetMode::ModeTag;
-    switch (val)
-    {
-    case EnumType::kRapidCool:
-    case EnumType::kRapidFreeze:
-        return val;
-    default:
-        return static_cast<EnumType>(0);
-    }
-}
-
 static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryWasherControls::NumberOfRinsesEnum val)
 {
     using EnumType = LaundryWasherControls::NumberOfRinsesEnum;
@@ -1277,76 +1227,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(LaundryWasherControls::
         return val;
     default:
         return static_cast<EnumType>(4);
-    }
-}
-
-static auto __attribute__((unused)) EnsureKnownEnumValue(RvcRunMode::ModeTag val)
-{
-    using EnumType = RvcRunMode::ModeTag;
-    switch (val)
-    {
-    case EnumType::kIdle:
-    case EnumType::kCleaning:
-        return val;
-    default:
-        return static_cast<EnumType>(0);
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(RvcRunMode::StatusCode val)
-{
-    using EnumType = RvcRunMode::StatusCode;
-    switch (val)
-    {
-    case EnumType::kStuck:
-    case EnumType::kDustBinMissing:
-    case EnumType::kDustBinFull:
-    case EnumType::kWaterTankEmpty:
-    case EnumType::kWaterTankMissing:
-    case EnumType::kWaterTankLidOpen:
-    case EnumType::kMopCleaningPadMissing:
-    case EnumType::kBatteryLow:
-        return val;
-    default:
-        return static_cast<EnumType>(0);
-    }
-}
-
-static auto __attribute__((unused)) EnsureKnownEnumValue(RvcCleanMode::ModeTag val)
-{
-    using EnumType = RvcCleanMode::ModeTag;
-    switch (val)
-    {
-    case EnumType::kDeepClean:
-    case EnumType::kVacuum:
-    case EnumType::kMop:
-        return val;
-    default:
-        return static_cast<EnumType>(0);
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(RvcCleanMode::StatusCode val)
-{
-    using EnumType = RvcCleanMode::StatusCode;
-    switch (val)
-    {
-    case EnumType::kCleaningInProgress:
-        return val;
-    default:
-        return static_cast<EnumType>(0);
-    }
-}
-
-static auto __attribute__((unused)) EnsureKnownEnumValue(DishwasherMode::ModeTag val)
-{
-    using EnumType = DishwasherMode::ModeTag;
-    switch (val)
-    {
-    case EnumType::kNormal:
-    case EnumType::kHeavy:
-    case EnumType::kLight:
-        return val;
-    default:
-        return static_cast<EnumType>(0);
     }
 }
 
@@ -1478,38 +1358,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(OperationalState::Opera
         return val;
     default:
         return static_cast<EnumType>(4);
-    }
-}
-
-static auto __attribute__((unused)) EnsureKnownEnumValue(RvcOperationalState::ErrorStateEnum val)
-{
-    using EnumType = RvcOperationalState::ErrorStateEnum;
-    switch (val)
-    {
-    case EnumType::kFailedToFindChargingDock:
-    case EnumType::kStuck:
-    case EnumType::kDustBinMissing:
-    case EnumType::kDustBinFull:
-    case EnumType::kWaterTankEmpty:
-    case EnumType::kWaterTankMissing:
-    case EnumType::kWaterTankLidOpen:
-    case EnumType::kMopCleaningPadMissing:
-        return val;
-    default:
-        return static_cast<EnumType>(0);
-    }
-}
-static auto __attribute__((unused)) EnsureKnownEnumValue(RvcOperationalState::OperationalStateEnum val)
-{
-    using EnumType = RvcOperationalState::OperationalStateEnum;
-    switch (val)
-    {
-    case EnumType::kSeekingCharger:
-    case EnumType::kCharging:
-    case EnumType::kDocked:
-        return val;
-    default:
-        return static_cast<EnumType>(0);
     }
 }
 

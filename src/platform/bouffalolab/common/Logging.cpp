@@ -16,13 +16,14 @@
  */
 #include <stdio.h>
 
+#include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/logging/LogV.h>
 
 #include <CHIPDevicePlatformConfig.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/logging/Constants.h>
 
-#ifdef PW_RPC_ENABLED
+#if PW_RPC_ENABLED
 #include "PigweedLogger.h"
 #endif
 
@@ -39,7 +40,7 @@ namespace Platform {
 static char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
-#ifndef PW_RPC_ENABLED
+#if !PW_RPC_ENABLED
     int lmsg = 0;
 
     vsnprintf(formattedMsg, sizeof(formattedMsg), msg, v);
@@ -128,3 +129,20 @@ extern "C" void otPlatLog(int aLogLevel, int aLogRegion, const char * aFormat, .
     va_end(v);
 }
 #endif
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+/**
+ * LwIP log output function.
+ */
+extern "C" void LwIPLog(const char * msg, ...)
+{
+    va_list v;
+    uint8_t category = chip::Logging::kLogCategory_Error;
+
+    va_start(v, msg);
+
+    chip::Logging::Platform::LogV("LWIP", category, msg, v);
+
+    va_end(v);
+}
+#endif // #if CHIP_SYSTEM_CONFIG_USE_LWIP

@@ -1,4 +1,5 @@
 /*
+ *
  *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
@@ -21,30 +22,30 @@
 #error "Tracing macros seem to be double defined"
 #endif
 
+#include <tracing/registry.h>
+
+// This gets forwarded to the multiplexed instance
+#define MATTER_TRACE_BEGIN(label, group) ::chip::Tracing::Internal::Begin(label, group)
+#define MATTER_TRACE_END(label, group) ::chip::Tracing::Internal::End(label, group)
+#define MATTER_TRACE_INSTANT(label, group) ::chip::Tracing::Internal::Instant(label, group)
+
+namespace chip {
+namespace Tracing {
 namespace Insights {
-class ESP32Backend
+class Scoped
 {
 public:
-    ESP32Backend(const char * str, ...);
-    ~ESP32Backend();
+    inline Scoped(const char * label, const char * group) : mLabel(label), mGroup(group) { MATTER_TRACE_BEGIN(label, group); }
+    inline ~Scoped() { MATTER_TRACE_END(mLabel, mGroup); }
 
 private:
-    const char * mlabel;
-    const char * mgroup;
+    const char * mLabel;
+    const char * mGroup;
 };
 } // namespace Insights
+} // namespace Tracing
+} // namespace chip
+#define _CONCAT_IMPL(a, b) a##b
+#define _MACRO_CONCAT(a, b) _CONCAT_IMPL(a, b)
 
-#define MATTER_TRACE_SCOPE(...)                                                                                                    \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        Insights::ESP32Backend backend(__VA_ARGS__);                                                                               \
-    } while (0)
-
-#define _MATTER_TRACE_DISABLE(...)                                                                                                 \
-    do                                                                                                                             \
-    {                                                                                                                              \
-    } while (false)
-
-#define MATTER_TRACE_BEGIN(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-#define MATTER_TRACE_END(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
-#define MATTER_TRACE_INSTANT(...) _MATTER_TRACE_DISABLE(__VA_ARGS__)
+#define MATTER_TRACE_SCOPE(label, group) ::chip::Tracing::Insights::Scoped _MACRO_CONCAT(_trace_scope, __COUNTER__)(label, group)

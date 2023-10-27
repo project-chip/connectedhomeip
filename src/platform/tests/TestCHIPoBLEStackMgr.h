@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <platform/CHIPDeviceConfig.h>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 int TestCHIPoBLEStackManager();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

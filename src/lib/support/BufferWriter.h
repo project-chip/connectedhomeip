@@ -37,7 +37,7 @@ public:
         }
     }
     BufferWriter(MutableByteSpan buf) : BufferWriter(buf.data(), buf.size()) {}
-    BufferWriter(const BufferWriter & other) = default;
+    BufferWriter(const BufferWriter & other)             = default;
     BufferWriter & operator=(const BufferWriter & other) = default;
 
     /// Append a null terminated string, exclude the null terminator
@@ -141,7 +141,7 @@ public:
 protected:
     EndianBufferWriterBase(uint8_t * buf, size_t len) : BufferWriter(buf, len) {}
     EndianBufferWriterBase(MutableByteSpan buf) : BufferWriter(buf.data(), buf.size()) {}
-    EndianBufferWriterBase(const EndianBufferWriterBase & other) = default;
+    EndianBufferWriterBase(const EndianBufferWriterBase & other)             = default;
     EndianBufferWriterBase & operator=(const EndianBufferWriterBase & other) = default;
 };
 
@@ -155,7 +155,7 @@ public:
         static_assert((-1 & 3) == 3, "LittleEndian::BufferWriter only works with 2's complement architectures.");
     }
     BufferWriter(MutableByteSpan buf) : EndianBufferWriterBase<BufferWriter>(buf) {}
-    BufferWriter(const BufferWriter & other) = default;
+    BufferWriter(const BufferWriter & other)             = default;
     BufferWriter & operator=(const BufferWriter & other) = default;
     BufferWriter & EndianPut(uint64_t x, size_t size);
     BufferWriter & EndianPutSigned(int64_t x, size_t size);
@@ -173,7 +173,7 @@ public:
         static_assert((-1 & 3) == 3, "BigEndian::BufferWriter only works with 2's complement architectures.");
     }
     BufferWriter(MutableByteSpan buf) : EndianBufferWriterBase<BufferWriter>(buf) {}
-    BufferWriter(const BufferWriter & other) = default;
+    BufferWriter(const BufferWriter & other)             = default;
     BufferWriter & operator=(const BufferWriter & other) = default;
     BufferWriter & EndianPut(uint64_t x, size_t size);
     BufferWriter & EndianPutSigned(int64_t x, size_t size);

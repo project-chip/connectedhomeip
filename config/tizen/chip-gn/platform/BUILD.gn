@@ -20,6 +20,10 @@ import("${chip_root}/config/tizen/chip-gn/args.gni")
 import("${build_root}/config/linux/pkg_config.gni")
 import("${chip_root}/src/platform/device.gni")
 
+pkg_config("capi-system-peripheral-io") {
+  packages = [ "capi-system-peripheral-io" ]
+}
+
 pkg_config("dlog") {
   packages = [ "dlog" ]
 }
@@ -69,6 +73,7 @@ source_set("tizen") {
     ":glib",
     ":capi-appfw-preference",
     ":capi-system-info",
+    ":capi-system-peripheral-io",
   ]
 
   if (chip_mdns == "platform") {

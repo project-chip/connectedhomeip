@@ -209,12 +209,12 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
 
 CHIP_ERROR ChipDeviceScanner::MainLoopStopScan(ChipDeviceScanner * self)
 {
-    GError * error = nullptr;
+    GAutoPtr<GError> error;
 
-    if (!bluez_adapter1_call_stop_discovery_sync(self->mAdapter, nullptr /* not cancellable */, &error))
+    if (!bluez_adapter1_call_stop_discovery_sync(self->mAdapter, nullptr /* not cancellable */,
+                                                 &MakeUniquePointerReceiver(error).Get()))
     {
         ChipLogError(Ble, "Failed to stop discovery %s", error->message);
-        g_error_free(error);
     }
     self->mIsScanning = false;
 
@@ -223,24 +223,20 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStopScan(ChipDeviceScanner * self)
 
 void ChipDeviceScanner::SignalObjectAdded(GDBusObjectManager * manager, GDBusObject * object, ChipDeviceScanner * self)
 {
-    BluezDevice1 * device = bluez_object_get_device1(BLUEZ_OBJECT(object));
-    VerifyOrReturn(device != nullptr);
+    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(BLUEZ_OBJECT(object)));
+    VerifyOrReturn(device.get() != nullptr);
 
-    self->ReportDevice(*device);
-
-    g_object_unref(device);
+    self->ReportDevice(*device.get());
 }
 
 void ChipDeviceScanner::SignalInterfaceChanged(GDBusObjectManagerClient * manager, GDBusObjectProxy * object,
                                                GDBusProxy * aInterface, GVariant * aChangedProperties,
                                                const gchar * const * aInvalidatedProps, ChipDeviceScanner * self)
 {
-    BluezDevice1 * device = bluez_object_get_device1(BLUEZ_OBJECT(object));
-    VerifyOrReturn(device != nullptr);
+    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(BLUEZ_OBJECT(object)));
+    VerifyOrReturn(device.get() != nullptr);
 
-    self->ReportDevice(*device);
-
-    g_object_unref(device);
+    self->ReportDevice(*device.get());
 }
 
 void ChipDeviceScanner::ReportDevice(BluezDevice1 & device)
@@ -276,18 +272,17 @@ void ChipDeviceScanner::RemoveDevice(BluezDevice1 & device)
     }
 
     const auto devicePath = g_dbus_proxy_get_object_path(G_DBUS_PROXY(&device));
-    GError * error        = nullptr;
+    GAutoPtr<GError> error;
 
-    if (!bluez_adapter1_call_remove_device_sync(mAdapter, devicePath, nullptr, &error))
+    if (!bluez_adapter1_call_remove_device_sync(mAdapter, devicePath, nullptr, &MakeUniquePointerReceiver(error).Get()))
     {
         ChipLogDetail(Ble, "Failed to remove device %s: %s", StringOrNullMarker(devicePath), error->message);
-        g_error_free(error);
     }
 }
 
 CHIP_ERROR ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
 {
-    GError * error = nullptr;
+    GAutoPtr<GError> error;
 
     self->mObjectAddedSignal = g_signal_connect(self->mManager, "object-added", G_CALLBACK(SignalObjectAdded), self);
     self->mInterfaceChangedSignal =
@@ -296,11 +291,10 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
     ChipLogProgress(Ble, "BLE removing known devices.");
     for (BluezObject & object : BluezObjectList(self->mManager))
     {
-        BluezDevice1 * device = bluez_object_get_device1(&object);
-        if (device != nullptr)
+        GAutoPtr<BluezDevice1> device(bluez_object_get_device1(&object));
+        if (device.get() != nullptr)
         {
-            self->RemoveDevice(*device);
-            g_object_unref(device);
+            self->RemoveDevice(*device.get());
         }
     }
 
@@ -315,18 +309,18 @@ CHIP_ERROR ChipDeviceScanner::MainLoopStartScan(ChipDeviceScanner * self)
     g_variant_builder_add(&filterBuilder, "{sv}", "Transport", g_variant_new_string("le"));
     GVariant * filter = g_variant_builder_end(&filterBuilder);
 
-    if (!bluez_adapter1_call_set_discovery_filter_sync(self->mAdapter, filter, self->mCancellable, &error))
+    if (!bluez_adapter1_call_set_discovery_filter_sync(self->mAdapter, filter, self->mCancellable,
+                                                       &MakeUniquePointerReceiver(error).Get()))
     {
         // Not critical: ignore if fails
         ChipLogError(Ble, "Failed to set discovery filters: %s", error->message);
-        g_clear_error(&error);
+        g_clear_error(&MakeUniquePointerReceiver(error).Get());
     }
 
     ChipLogProgress(Ble, "BLE initiating scan.");
-    if (!bluez_adapter1_call_start_discovery_sync(self->mAdapter, self->mCancellable, &error))
+    if (!bluez_adapter1_call_start_discovery_sync(self->mAdapter, self->mCancellable, &MakeUniquePointerReceiver(error).Get()))
     {
         ChipLogError(Ble, "Failed to start discovery: %s", error->message);
-        g_error_free(error);
 
         self->mIsScanning = false;
         self->mDelegate->OnScanComplete();

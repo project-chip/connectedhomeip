@@ -22,16 +22,19 @@
 #include "DeviceCallbacks.h"
 #include "Globals.h"
 #include "LEDWidget.h"
+#include "ManualOperationCommand.h"
 #include "chip_porting.h"
 #include <DeviceInfoProviderImpl.h>
 #include <lwip_netconf.h>
 
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
-#include <lib/support/ErrorStr.h>
+#include <laundry-washer-controls-delegate-impl.h>
+#include <lib/core/ErrorStr.h>
 #include <platform/Ameba/AmebaConfig.h>
 #include <platform/Ameba/NetworkCommissioningDriver.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -39,6 +42,9 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <static-supported-temperature-levels.h>
 #include <support/CHIPMem.h>
+#if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
+#include <test_event_trigger/AmebaTestEventTriggerDelegate.h>
+#endif
 
 #if CONFIG_ENABLE_PW_RPC
 #include <Rpc.h>
@@ -123,11 +129,23 @@ Identify gIdentify1 = {
 static DeviceCallbacks EchoCallbacks;
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
+#if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
+uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+                                                                                   0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+#endif
+
 static void InitServer(intptr_t context)
 {
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
+
+#if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
+    static AmebaTestEventTriggerDelegate testEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    initParams.testEventTriggerDelegate = &testEventTriggerDelegate;
+#endif
+
     initParams.InitializeStaticResourcesBeforeServerInit();
+
     chip::Server::GetInstance().Init(initParams);
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     // TODO: Use our own DeviceInfoProvider
@@ -143,6 +161,7 @@ static void InitServer(intptr_t context)
 
 #if CONFIG_ENABLE_CHIP_SHELL
     InitBindingHandler();
+    InitManualOperation();
 #endif
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
 }
@@ -175,7 +194,20 @@ extern "C" void ChipTest(void)
 #endif
 }
 
+extern "C" void ChipTestShutdown(void)
+{
+    ChipLogProgress(DeviceLayer, "All Clusters Demo! Shutdown Now!");
+    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
+    deviceMgr.Shutdown();
+}
+
 bool lowPowerClusterSleep()
 {
     return true;
+}
+
+using namespace chip::app::Clusters::LaundryWasherControls;
+void emberAfLaundryWasherControlsClusterInitCallback(EndpointId endpoint)
+{
+    LaundryWasherControlsServer::SetDefaultDelegate(endpoint, &LaundryWasherControlDelegate::getLaundryWasherControlDelegate());
 }

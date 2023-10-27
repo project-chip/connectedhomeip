@@ -10,14 +10,18 @@ NS_ASSUME_NONNULL_BEGIN
 {{#*inline "completeDecl"}}
 {{#if (isSupported cluster command=command isForCommandPayload=true)}}
 
-{{availability cluster command=command isForCommandPayload=true deprecationMessage="This command has been removed"}}
-@interface MTR{{cluster}}Cluster{{command}}Params : NSObject <NSCopying>
+{{availability cluster command=command isForCommandPayload=true deprecationMessage=deprecationMessage}}
+@interface MTR{{cluster}}Cluster{{command}}Params : {{base}}
 {{#zcl_command_arguments}}
 
+{{#if (isSupported ../cluster command=../command commandField=(asStructPropertyName label))}}
 {{> struct_field_decl cluster=parent.parent.name type=type label=label}} {{availability ../cluster command=../command commandField=(asStructPropertyName label) deprecationMessage=(concat "The " (asStructPropertyName label) " field will be removed")}};
+{{/if}}
 {{#*inline "oldNameFieldDecl"}}
 
+{{#if (isSupported ../cluster command=../command commandField=commandField)}}
 {{> struct_field_decl cluster=parent.parent.name type=type label=commandField}} {{availability ../cluster command=../command commandField=commandField deprecationMessage=(concat "Please use " (asStructPropertyName label))}};
+{{/if}}
 {{/inline}}
 {{#if (and includeRenamedProperties
            (hasOldName ../cluster command=../command commandField=(asStructPropertyName label)))}}
@@ -68,7 +72,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, copy, nullable) NSNumber * timedInvokeTimeoutMs {{availability "" api="Timed Invoke for server to client commands" deprecationMessage="Timed invoke does not make sense for server to client commands"}};
 {{/if}}
-{{#if (isStrEqual source "server")}}
+{{#if (and (isStrEqual source "server")
+           includeInitWithResponseValue)}}
 
 /**
  * Initialize an MTR{{cluster}}Cluster{{command}}Params with a response-value dictionary
@@ -88,15 +93,21 @@ NS_ASSUME_NONNULL_BEGIN
 {{/inline}}
 {{#*inline "oldNameDecl"}}
 
-{{availability cluster command=command deprecationMessage=(concat "Please use MTR" (asUpperCamelCase parent.name preserveAcronyms=true) "Cluster" (asUpperCamelCase name preserveAcronyms=true) "Params")}}
-@interface MTR{{cluster}}Cluster{{command}}Params : MTR{{asUpperCamelCase parent.name preserveAcronyms=true}}Cluster{{asUpperCamelCase name}}Params
-@end
+{{> completeDecl cluster=cluster
+                 command=command
+                 includeRenamedProperties=true
+                 deprecationMessage=(concat "Please use MTR" (asUpperCamelCase parent.name preserveAcronyms=true) "Cluster" (asUpperCamelCase name preserveAcronyms=true) "Params")
+                 base=(concat "MTR" (asUpperCamelCase parent.name preserveAcronyms=true) "Cluster" (asUpperCamelCase name preserveAcronyms=true) "Params")
+                 includeInitWithResponseValue=false}}
 
 {{/inline}}
 {{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true))}}
 {{> completeDecl cluster=(asUpperCamelCase parent.name preserveAcronyms=true)
                  command=(asUpperCamelCase name preserveAcronyms=true)
-                 includeRenamedProperties=false}}
+                 includeRenamedProperties=false
+                 deprecationMessage="This command has been removed"
+                 base="NSObject <NSCopying>"
+                 includeInitWithResponseValue=true}}
 {{#if (or (not (isStrEqual (asUpperCamelCase parent.name preserveAcronyms=true) (compatClusterNameRemapping parent.name)))
           (not (isStrEqual (asUpperCamelCase name preserveAcronyms=true) (compatCommandNameRemapping parent.name name))))}}
 {{> oldNameDecl cluster=(compatClusterNameRemapping parent.name)
@@ -123,7 +134,10 @@ NS_ASSUME_NONNULL_BEGIN
 {{else}}
 {{> completeDecl cluster=(compatClusterNameRemapping parent.name)
                  command=(compatCommandNameRemapping parent.name name)
-                 includeRenamedProperties=true}}
+                 includeRenamedProperties=true
+                 deprecationMessage="This command has been removed"
+                 base="NSObject <NSCopying>"
+                 includeInitWithResponseValue=true}}
 {{/if}}
 {{/zcl_commands}}
 {{/zcl_clusters}}

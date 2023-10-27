@@ -18,10 +18,11 @@ except ModuleNotFoundError:
 
     from matter_idl.matter_idl_types import AccessPrivilege
 
-from matter_idl.matter_idl_types import (Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality, AttributeStorage,
-                                         Bitmap, Cluster, ClusterSide, Command, CommandQuality, ConstantEntry, DataType, DeviceType,
-                                         Endpoint, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl,
-                                         ParseMetaData, ServerClusterInstantiation, Struct, StructQuality, StructTag)
+from matter_idl.matter_idl_types import (ApiMaturity, Attribute, AttributeInstantiation, AttributeOperation, AttributeQuality,
+                                         AttributeStorage, Bitmap, Cluster, ClusterSide, Command, CommandInstantiation,
+                                         CommandQuality, ConstantEntry, DataType, DeviceType, Endpoint, Enum, Event, EventPriority,
+                                         EventQuality, Field, FieldQuality, Idl, ParseMetaData, ServerClusterInstantiation, Struct,
+                                         StructQuality, StructTag)
 
 
 def UnionOfAllFlags(flags_list):
@@ -42,6 +43,14 @@ class PrefixCppDocComment:
             return
 
         actual_pos = self.start_pos + self.value_len
+        while content[actual_pos] in ' \t\n\r':
+            actual_pos += 1
+
+        # Allow to skip api maturity flags
+        for maturity in ["provisional", "internal", "stable", "deprecated"]:
+            if content[actual_pos:].startswith(maturity):
+                actual_pos += len(maturity)
+
         while content[actual_pos] in ' \t\n\r':
             actual_pos += 1
 
@@ -157,6 +166,18 @@ class MatterIdlTransformer(Transformer):
     def bool_default_false(self, _):
         return False
 
+    def provisional_api_maturity(self, _):
+        return ApiMaturity.PROVISIONAL
+
+    def internal_api_maturity(self, _):
+        return ApiMaturity.INTERNAL
+
+    def deprecated_api_maturity(self, _):
+        return ApiMaturity.DEPRECATED
+
+    def stable_api_maturity(self, _):
+        return ApiMaturity.STABLE
+
     def id(self, tokens):
         """An id is a string containing an identifier
         """
@@ -181,8 +202,10 @@ class MatterIdlTransformer(Transformer):
             raise Exception("Unexpected size for data type")
 
     @v_args(inline=True)
-    def constant_entry(self, id, number):
-        return ConstantEntry(name=id, code=number)
+    def constant_entry(self, api_maturity, id, number):
+        if api_maturity is None:
+            api_maturity = ApiMaturity.STABLE
+        return ConstantEntry(name=id, code=number, api_maturity=api_maturity)
 
     @v_args(inline=True)
     def enum(self, id, type, *entries):
@@ -254,7 +277,9 @@ class MatterIdlTransformer(Transformer):
         # Last argument is the named_member, the rest
         # are qualities
         field = args[-1]
-        field.qualities = UnionOfAllFlags(args[:-1]) or FieldQuality.NONE
+        field.qualities = UnionOfAllFlags(args[1:-1]) or FieldQuality.NONE
+        if args[0] is not None:
+            field.api_maturity = args[0]
         return field
 
     @v_args(meta=True)
@@ -285,10 +310,10 @@ class MatterIdlTransformer(Transformer):
     # NOTE: awkward inline because the order of 'meta, children' vs 'children, meta' was flipped
     #       between lark versions in https://github.com/lark-parser/lark/pull/993
     @v_args(meta=True, inline=True)
-    def command(self, meta, *args):
+    def command(self, meta, *tuple_args):
         # The command takes 4 arguments if no input argument, 5 if input
         # argument is provided
-        args = list(args)  # convert from tuple
+        args = list(tuple_args)  # convert from tuple
         if len(args) != 5:
             args.insert(2, None)
 
@@ -379,6 +404,11 @@ class MatterIdlTransformer(Transformer):
         return AttributeInstantiation(parse_meta=meta, name=id, storage=storage, default=default)
 
     @v_args(meta=True, inline=True)
+    def endpoint_command_instantiation(self, meta, id):
+        meta = None if self.skip_meta else ParseMetaData(meta)
+        return CommandInstantiation(parse_meta=meta, name=id)
+
+    @v_args(meta=True, inline=True)
     def endpoint_emitted_event(self, meta, id):
         meta = None if self.skip_meta else ParseMetaData(meta)
         return id
@@ -435,38 +465,51 @@ class MatterIdlTransformer(Transformer):
         meta = None if self.skip_meta else ParseMetaData(meta)
 
         attributes = []
+        commands = []
         events = set()
 
         for item in content:
             if isinstance(item, AttributeInstantiation):
                 attributes.append(item)
+            elif isinstance(item, CommandInstantiation):
+                commands.append(item)
             else:
                 events.add(item)
         return AddServerClusterToEndpointTransform(
-            ServerClusterInstantiation(parse_meta=meta, name=id, attributes=attributes, events_emitted=events))
+            ServerClusterInstantiation(parse_meta=meta, name=id, attributes=attributes, events_emitted=events, commands=commands))
+
+    @v_args(inline=True)
+    def cluster_content(self, api_maturity, element):
+        if api_maturity is not None:
+            element.api_maturity = api_maturity
+        return element
 
     @v_args(inline=True, meta=True)
-    def cluster(self, meta, side, name, code, *content):
+    def cluster(self, meta, api_maturity, side, name, code, *content):
         meta = None if self.skip_meta else ParseMetaData(meta)
 
         # shift actual starting position where the doc comment would start
         if meta and self._cluster_start_pos:
             meta.start_pos = self._cluster_start_pos
 
-        result = Cluster(parse_meta=meta, side=side, name=name, code=code)
+        if api_maturity is None:
+            api_maturity = ApiMaturity.STABLE
+
+        result = Cluster(parse_meta=meta, side=side, name=name,
+                         code=code, api_maturity=api_maturity)
 
         for item in content:
-            if type(item) == Enum:
+            if isinstance(item, Enum):
                 result.enums.append(item)
-            elif type(item) == Bitmap:
+            elif isinstance(item, Bitmap):
                 result.bitmaps.append(item)
-            elif type(item) == Event:
+            elif isinstance(item, Event):
                 result.events.append(item)
-            elif type(item) == Attribute:
+            elif isinstance(item, Attribute):
                 result.attributes.append(item)
-            elif type(item) == Struct:
+            elif isinstance(item, Struct):
                 result.structs.append(item)
-            elif type(item) == Command:
+            elif isinstance(item, Command):
                 result.commands.append(item)
             else:
                 raise Exception("UNKNOWN cluster content item: %r" % item)
@@ -474,21 +517,18 @@ class MatterIdlTransformer(Transformer):
         return result
 
     def idl(self, items):
-        idl = Idl()
+        clusters = []
+        endpoints = []
 
         for item in items:
-            if type(item) == Enum:
-                idl.enums.append(item)
-            elif type(item) == Struct:
-                idl.structs.append(item)
-            elif type(item) == Cluster:
-                idl.clusters.append(item)
-            elif type(item) == Endpoint:
-                idl.endpoints.append(item)
+            if isinstance(item, Cluster):
+                clusters.append(item)
+            elif isinstance(item, Endpoint):
+                endpoints.append(item)
             else:
                 raise Exception("UNKNOWN idl content item: %r" % item)
 
-        return idl
+        return Idl(clusters=clusters, endpoints=endpoints)
 
     def prefix_doc_comment(self):
         print("TODO: prefix")
@@ -511,6 +551,7 @@ class ParserWithLines:
         # For this reason, every attempt should be made to make the grammar context free
         self.parser = Lark.open(
             'matter_grammar.lark', rel_to=__file__, start='idl', parser='lalr', propagate_positions=True,
+            maybe_placeholders=True,
             # separate callbacks to ignore from regular parsing (no tokens)
             # while still getting notified about them
             lexer_callbacks={

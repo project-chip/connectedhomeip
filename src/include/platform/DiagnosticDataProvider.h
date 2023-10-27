@@ -241,8 +241,8 @@ private:
     WiFiDiagnosticsDelegate * mWiFiDiagnosticsDelegate = nullptr;
 
     // No copy, move or assignment.
-    DiagnosticDataProvider(const DiagnosticDataProvider &)  = delete;
-    DiagnosticDataProvider(const DiagnosticDataProvider &&) = delete;
+    DiagnosticDataProvider(const DiagnosticDataProvider &)             = delete;
+    DiagnosticDataProvider(const DiagnosticDataProvider &&)            = delete;
     DiagnosticDataProvider & operator=(const DiagnosticDataProvider &) = delete;
 };
 

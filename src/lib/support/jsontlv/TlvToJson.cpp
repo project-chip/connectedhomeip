@@ -362,21 +362,4 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, std::string & jsonString)
     jsonString = writer.write(jsonObject);
     return CHIP_NO_ERROR;
 }
-
-std::string PrettyPrintJsonString(const std::string & jsonString)
-{
-    Json::Reader reader;
-    Json::Value jsonObject;
-    reader.parse(jsonString, jsonObject);
-    Json::StyledWriter writer;
-    return writer.write(jsonObject);
-}
-
-std::string MakeJsonSingleLine(const std::string & jsonString)
-{
-    std::string str = PrettyPrintJsonString(jsonString);
-    str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end());
-    return str;
-}
-
 } // namespace chip
