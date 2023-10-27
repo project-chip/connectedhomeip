@@ -16,6 +16,7 @@ import logging
 import re
 from dataclasses import dataclass
 from typing import Optional
+from xml.sax.xmlreader import AttributesImpl
 
 from matter_idl.generators.types import GetDataTypeSizeInBits, IsSignedDataType
 from matter_idl.matter_idl_types import AccessPrivilege, Attribute, Command, ConstantEntry, DataType, Event, EventPriority, Field
@@ -145,7 +146,7 @@ def FieldName(name: str) -> str:
     return name[0].lower() + name[1:]
 
 
-def AttributesToField(attrs) -> Field:
+def AttributesToField(attrs: AttributesImpl) -> Field:
     assert "name" in attrs
     assert "id" in attrs
 
@@ -169,7 +170,7 @@ def AttributesToField(attrs) -> Field:
     )
 
 
-def AttributesToBitFieldConstantEntry(attrs) -> ConstantEntry:
+def AttributesToBitFieldConstantEntry(attrs: AttributesImpl) -> ConstantEntry:
     """Creates a constant entry appropriate for bitmaps.
     """
     assert "name" in attrs
@@ -188,7 +189,7 @@ def AttributesToBitFieldConstantEntry(attrs) -> ConstantEntry:
     return ConstantEntry(name="k" + NormalizeName(attrs["name"]), code=1 << ParseInt(attrs["bit"]))
 
 
-def AttributesToAttribute(attrs) -> Attribute:
+def AttributesToAttribute(attrs: AttributesImpl) -> Attribute:
     assert "name" in attrs
     assert "id" in attrs
 
@@ -212,7 +213,7 @@ def AttributesToAttribute(attrs) -> Attribute:
     )
 
 
-def AttributesToEvent(attrs) -> Event:
+def AttributesToEvent(attrs: AttributesImpl) -> Event:
     assert "name" in attrs
     assert "id" in attrs
     assert "priority" in attrs
@@ -250,7 +251,7 @@ def StringToAccessPrivilege(value: str) -> AccessPrivilege:
         raise Exception("UNKNOWN privilege level: %r" % value)
 
 
-def AttributesToCommand(attrs) -> Command:
+def AttributesToCommand(attrs: AttributesImpl) -> Command:
     assert "id" in attrs
     assert "name" in attrs
 

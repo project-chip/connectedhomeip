@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import logging
+from xml.sax.xmlreader import AttributesImpl
 
 from matter_idl.matter_idl_types import Idl
 
@@ -24,7 +25,7 @@ from .parsing import NormalizeName
 LOGGER = logging.getLogger('data-model-xml-data-parsing')
 
 
-def contains_valid_cluster_id(attrs) -> bool:
+def contains_valid_cluster_id(attrs: AttributesImpl) -> bool:
     # Does not check numeric format ... assuming scraper is smart enough for that
     return 'id' in attrs and len(attrs['id']) > 0
 
@@ -37,7 +38,7 @@ class DataModelXmlHandler(BaseHandler):
         super().__init__(context)
         self._idl = idl
 
-    def GetNextProcessor(self, name, attrs):
+    def GetNextProcessor(self, name, attrs: AttributesImpl):
         if name.lower() == 'cluster':
             if contains_valid_cluster_id(attrs):
                 return ClusterHandler.ForAttributes(self.context, self._idl, attrs)
