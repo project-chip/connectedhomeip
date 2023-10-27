@@ -21,6 +21,7 @@
 
 #include "UnifyBridgeContext.h"
 #include <optional>
+#include <app/reporting/tests/MockReportScheduler.h>
 
 // Chip components
 #include <app/ConcreteAttributePath.h>
@@ -43,6 +44,12 @@ struct is_nullable<chip::app::DataModel::Nullable<T>> : std::true_type {
 
 namespace unify::matter_bridge {
 namespace Test {
+
+static uint8_t gDebugEventBuffer[120];
+static uint8_t gInfoEventBuffer[120];
+static uint8_t gCritEventBuffer[120];
+static chip::app::CircularEventBuffer gCircularEventBuffer[3];
+auto * engine = chip::app::InteractionModelEngine::GetInstance();
 
 /** @brief Poor man's Result<T, CHIP_ERROR>. */
 template <class T>
@@ -77,16 +84,18 @@ class ClusterContext : public UnifyBridgeContext
 public:
     static const uint16_t kEndpointId = 2;
     static const std::string kNodeId;
+    chip::MonotonicallyIncreasingCounter<chip::EventNumber> mEventCounter;
 
     /**
      * @brief
      *   It's necessary to call this function as a part of your initial setup of the
      *   entire test suite.
      *
-     * @param[inout]  inContext   A pointer to test suite-specific context
+     * @param[in]  Context   A pointer to test suite-specific context
      *                            provided by the test suite driver.
+     * @param[in]  enableEvents Boolean to enable event handling for the test suite
      */
-    static int Initialize(void * context)
+    static int Initialize(void * context, bool enableEvents)
     {
         auto * ctx = static_cast<ClusterContext *>(context);
         
@@ -100,8 +109,36 @@ public:
             ctx->mAttributeHandler.emplace(ctx->mNodeStateMonitor, ctx->mMqttHandler, ctx->mDeviceTranslator);
 
         if (!ctx->mCommandHandler)
-            ctx->mCommandHandler.emplace(ctx->mNodeStateMonitor, ctx->mMqttHandler, ctx->mGroupTranslator, ctx->mDeviceTranslator);
+            ctx->mCommandHandler.emplace(ctx->mNodeStateMonitor, ctx->mMqttHandler,
+                                            ctx->mGroupTranslator, ctx->mDeviceTranslator);
 
+        if (enableEvents)
+        {
+            if (ctx->mEventCounter.Init(0) != CHIP_NO_ERROR)
+            {
+                return FAILURE;
+            }
+
+            chip::app::LogStorageResources logStorageResources[] = {
+                { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
+                { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
+                { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
+            };
+
+            chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(),
+                ArraySize(logStorageResources), gCircularEventBuffer, logStorageResources, &ctx->mEventCounter);
+    
+            engine->Init(&ctx->GetExchangeManager(), &ctx->GetFabricTable(),
+                            chip::app::reporting::GetDefaultReportScheduler());
+        }
+        return SUCCESS;
+    }
+
+    static int Initialize(void * context)
+    {
+        if (Initialize(context, false) != SUCCESS)
+            return FAILURE;
+ 
         return SUCCESS;
     }
     
@@ -124,6 +161,42 @@ public:
 
         return SUCCESS;
     }
+
+    /**
+     * @brief
+     *   It's necessary to call this function as a part of your cleanup of the
+     *   entire test suite.
+     *
+     * @param[in]  Context   A pointer to test suite-specific context
+     *                            provided by the test suite driver.
+     * @param[in]  enableEvents Boolean to enable event handling for the test suite
+     */
+    static int Finalize(void * context, bool enableEvents)
+    {
+        if(enableEvents)
+        {
+            chip::app::EventManagement::DestroyEventManagement();
+            engine->Shutdown();
+        }
+
+        if (UnifyBridgeContext::Finalize(context) != SUCCESS)
+        {
+            return FAILURE;
+        }
+
+        return SUCCESS;
+    }
+
+    static int Finalize(void * context)
+    {
+        if (Finalize(context, false) != SUCCESS)
+        {
+            return FAILURE;
+        }
+
+        return SUCCESS;
+    }
+    
 
     /**
      * @brief
@@ -155,6 +228,12 @@ public:
             return FAILURE;
 
         return SUCCESS;
+    }
+
+    
+    void  mqtt_subscribeCb(const std::string & topic, const std::string & json_payload)
+    {
+        mMqttHandler.subscribeCB(topic.c_str(), json_payload.c_str(), json_payload.length(), &mCommandHandler.value());
     }
 
     template <typename T>
