@@ -446,10 +446,13 @@ void ConnectivityManagerImpl::DriveAPState()
                 // Compute the amount of idle time before the AP should be deactivated and
                 // arm a timer to fire at that time.
                 System::Clock::Timeout apTimeout = (mLastAPDemandTime + mWiFiAPIdleTimeout) - now;
-                err                              = DeviceLayer::SystemLayer().StartTimer(apTimeout, DriveAPState, nullptr);
-                SuccessOrExit(err);
                 ChipLogProgress(DeviceLayer, "Next WiFi AP timeout in %" PRIu32 " ms",
                                 System::Clock::Milliseconds32(apTimeout).count());
+                SystemLayer().ScheduleLambda([apTimeout, this] {
+                    CHIP_ERROR ret = CHIP_NO_ERROR;
+                    ret            = DeviceLayer::SystemLayer().StartTimer(apTimeout, DriveAPState, this);
+                    VerifyOrReturn(ret == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "StartTimer failed %s: ", chip::ErrorStr(ret)));
+                });
             }
             else
             {
@@ -605,9 +608,11 @@ void ConnectivityManagerImpl::DriveStationState()
                 System::Clock::Timeout timeToNextConnect = (mLastStationConnectFailTime + mWiFiStationReconnectInterval) - now;
                 ChipLogProgress(DeviceLayer, "Next WiFi station reconnect in %" PRIu32 " ms ",
                                 System::Clock::Milliseconds32(timeToNextConnect).count());
-
-                err = DeviceLayer::SystemLayer().StartTimer(timeToNextConnect, DriveStationState, NULL);
-                SuccessOrExit(err);
+                SystemLayer().ScheduleLambda([timeToNextConnect, this] {
+                    CHIP_ERROR ret = CHIP_NO_ERROR;
+                    ret            = DeviceLayer::SystemLayer().StartTimer(timeToNextConnect, DriveStationState, this);
+                    VerifyOrReturn(ret == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "StartTimer failed %s: ", chip::ErrorStr(ret)));
+                });
             }
         }
     }
