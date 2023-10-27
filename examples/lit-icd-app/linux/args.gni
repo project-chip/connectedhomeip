@@ -24,3 +24,7 @@ chip_project_config_include_dirs =
     [ "${chip_root}/examples/lit-icd-app/linux/include" ]
 chip_project_config_include_dirs += [ "${chip_root}/config/standalone" ]
 matter_enable_tracing_support = true
+
+# ICD configurations
+chip_enable_icd_server = true
+chip_subscription_timeout_resumption = false
