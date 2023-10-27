@@ -7568,7 +7568,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AdminFabricIndex", 1, value);
         }
         case AdministratorCommissioning::Attributes::AdminVendorId::Id: {
-            chip::app::DataModel::Nullable<uint16_t> value;
+            chip::app::DataModel::Nullable<chip::VendorId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AdminVendorId", 1, value);
         }
