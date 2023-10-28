@@ -25,7 +25,7 @@
 
 namespace chip {
 
-/// Unchecked is disambiguation tag that can be used to provide and select a variant of a
+/// Unchecked is a disambiguation tag that can be used to provide and select a variant of a
 /// constructor or other method that omits the runtime checks performed by the default variant.
 struct UncheckedType
 {

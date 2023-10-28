@@ -168,6 +168,14 @@ public:
     bool operator==(const Span<U> & other) const = delete;
 
     // Creates a Span without checking whether databuf is a null pointer.
+    //
+    // Note: The normal (checked) constructor should be used for general use;
+    // this overload exists for special use cases where databuf is guaranteed
+    // to be valid (not null) and a constexpr constructor is required.
+    //
+    // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61648 prevents making
+    // operator""_span a friend (and this constructor private).
+
     constexpr Span(UncheckedType tag, pointer databuf, size_t datalen) : mDataBuf(databuf), mDataLen(datalen) {}
 
 private:
@@ -177,9 +185,9 @@ private:
 
 inline namespace literals {
 
-inline constexpr Span<char const> operator"" _span(char const * literal, size_t size)
+inline constexpr Span<const char> operator"" _span(const char * literal, size_t size)
 {
-    return Span<char const>(Unchecked, literal, size);
+    return Span<const char>(Unchecked, literal, size);
 }
 
 } // namespace literals
