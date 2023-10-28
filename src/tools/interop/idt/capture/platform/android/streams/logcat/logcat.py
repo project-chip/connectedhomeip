@@ -49,7 +49,7 @@ class LogcatStreamer(AndroidStream):
             try:
                 new_size = os.path.getsize(self.logcat_artifact)
                 if not (new_size > last_size):
-                    self.logger.error(f"Logcat file not growing for {self.platform.device_id}, check connection!")
+                    self.logger.warning(f"Logcat file not growing for {self.platform.device_id}, check connection!")
                 last_size = new_size
             except OSError:
                 self.logger.error(f"Logcat file does not exist for {self.platfrom.device_id}, check connection!")

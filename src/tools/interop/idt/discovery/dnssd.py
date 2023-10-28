@@ -86,6 +86,6 @@ class MatterDnssdListener(ServiceListener):
         zc = Zeroconf()
         ServiceBrowser(zc, list(_MDNS_TYPES.keys()), self)
         try:
-            input("Browsing Matter mDNS, press enter to stop\n")
+            input("Browsing Matter DNS-SD, press enter to stop\n")
         finally:
             zc.close()

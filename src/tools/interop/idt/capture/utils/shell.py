@@ -60,20 +60,24 @@ class Bash:
 
     def start_command(self) -> None:
         if self.sync:
+            # Sync commands share stdin and out
             self.proc = subprocess.run(self.args, capture_output=self.capture_output, cwd=self.cwd)
             return
         if not self.command_is_running():
-            self.proc = subprocess.Popen(self.args, cwd=self.cwd)
+            # Background commands cannot access stdin, but share stdout
+            self.proc = subprocess.Popen(self.args, cwd=self.cwd, stdin=subprocess.PIPE)
         else:
             self.logger.warning(f'{self.command} start requested while running')
 
     def term_with_sudo(self, proc: multiprocessing.Process) -> None:
         self.logger.debug(f"SIGTERM {proc.pid} with sudo")
-        Bash(f"sudo kill {proc.pid}").start_command()
+        # These have to be sync in case another prompt for sudo is needed
+        Bash(f"sudo kill {proc.pid}", sync=True).start_command()
 
     def kill_with_sudo(self, proc: multiprocessing.Process) -> None:
         self.logger.debug(f"SIGKILL {proc.pid} with sudo")
-        Bash(f"sudo kill -9 {proc.pid}").start_command()
+        # These have to be sync in case another prompt for sudo is needed
+        Bash(f"sudo kill -9 {proc.pid}", sync=True).start_command()
 
     def term(self, proc: multiprocessing.Process) -> None:
         if "sudo" in self.command:
@@ -93,14 +97,14 @@ class Bash:
             self.logger.debug("Sending SIGTERM")
             self.term(proc)
             proc.wait(3)
-        except subprocess.TimeoutExpired:
-            self.logger.debug("SIGTERM timeout expired")
+        except psutil.TimeoutExpired:
+            self.logger.error("SIGTERM timeout expired")
             try:
                 self.logger.debug("Sending SIGKILL")
                 self.kill(proc)
                 proc.wait(3)
-            except subprocess.TimeoutExpired:
-                self.logger.debug(f"SIGKILL timeout expired, could not kill pid {proc.pid}")
+            except psutil.TimeoutExpired:
+                self.logger.critical(f"SIGKILL timeout expired, could not kill pid  {proc.pid}")
 
     def stop_command(self) -> None:
         if self.command_is_running():

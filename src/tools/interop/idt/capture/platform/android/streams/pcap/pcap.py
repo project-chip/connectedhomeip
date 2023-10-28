@@ -17,6 +17,7 @@
 
 import asyncio
 import os
+import platform as host_platform
 from typing import TYPE_CHECKING
 
 from capture.utils.artifact import create_standard_log_name, safe_mkdir
@@ -45,7 +46,7 @@ class AndroidPcap(AndroidStream):
         self.pcap_proc = platform.get_adb_background_command(self.pcap_command)
         self.pcap_pull = False
         self.pcap_pull_command = f"pull {self.pcap_phone_out_path} {self.pcap_artifact}"
-        self.build_dir = os.path.join(os.path.dirname(__file__), "../BUILD")
+        self.build_dir = os.path.join(os.path.dirname(__file__), "BUILD")
 
     async def pull_packet_capture(self) -> None:
         if self.pcap_pull:
@@ -55,7 +56,9 @@ class AndroidPcap(AndroidStream):
             self.pcap_pull = False
 
     async def start(self):
-        # TODO: Build on macOS, no wget, check root
+        if not self.platform.capabilities.c_has_root:
+            self.logger.warning("Phone is not rooted, cannot take pcap!")
+            return
         if self.platform.capabilities.c_has_tcpdump:
             self.logger.info("tcpdump already available; using!")
             self.pcap_proc.start_command()
@@ -65,8 +68,12 @@ class AndroidPcap(AndroidStream):
             self.logger.critical("Android TCP Dump build and push disabled in configs!")
             return
         if not os.path.exists(os.path.join(self.build_dir, "tcpdump")):
-            safe_mkdir(self.build_dir)
             self.logger.warning("tcpdump bin not found, attempting to build, please wait a few moments!")
+            p = host_platform.platform().lower()
+            if "darwin" in p or "mac" in p:
+                self.logger.critical("Build Android tcpdump on macOS not supported!")
+                return
+            safe_mkdir(self.build_dir)
             build_script = os.path.join(os.path.dirname(__file__), "build_tcpdump_64.sh")
             Bash(f"{build_script} 2>&1 >> BUILD_LOG.txt", sync=True, cwd=self.build_dir).start_command()
         else:

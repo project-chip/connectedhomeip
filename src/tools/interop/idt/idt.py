@@ -24,6 +24,7 @@ from pathlib import Path
 
 from capture import EcosystemController, EcosystemFactory, PacketCaptureRunner, PlatformFactory
 from capture.utils.artifact import create_file_timestamp, safe_mkdir
+from capture.utils.shell import Bash
 from discovery import MatterBleScanner, MatterDnssdListener
 from log import border_print
 
@@ -93,7 +94,25 @@ class InteropDebuggingTool:
 
         self.process_args()
 
+    @staticmethod
+    def command_is_available(cmd_name) -> bool:
+        cmd = Bash(f"which {cmd_name}", sync=True, capture_output=True)
+        cmd.start_command()
+        return cmd.finished_success()
+
+    def verify_host_dependencies(self) -> None:
+        deps = ["tcpdump", "adb"]
+        missing_deps = []
+        for dep in deps:
+            if not self.command_is_available(dep):
+                missing_deps.append(dep)
+        if len(missing_deps) > 0:
+            for missing_dep in missing_deps:
+                border_print(f"Missing dependency, please install {missing_dep}!")
+            sys.exit(1)
+
     def process_args(self) -> None:
+        self.verify_host_dependencies()  # TODO: host dependency should be checked *per feature*
         parser = argparse.ArgumentParser(
             prog="idt",
             description="Interop Debugging Tool for Matter")

@@ -29,7 +29,24 @@ issue uncovered via the manual test. Each ecosystem may implement an analysis
 that analyzes capture data, displays info to the user, probes the local
 environment and generates additional artifacts.
 
-## Getting started
+## Single host installation (no Raspberry Pi)
+
+All features of `idt` are available on macOS and Linux (tested with Debian based systems).  
+If you would prefer to execute capture and discovery from a Raspberry Pi, read the next section instead.  
+
+The machine running `idt` should be connected to the same Wi-Fi network used for testing.  
+Follow the steps below to execute capture and discovery without a Raspberry Pi:  
+
+-   From the parent directory of `idt`, run `source idt/scripts/alias.sh`.
+-   Optionally, run `source idt/scripts/setup_shell.sh` to install aliases
+    permanently.
+-   After `idt` aliases are available in your environment, calling any `idt`
+    command will automatically create a new virtual environment and install
+    python dependencies. 
+    - If you're missing non Python dependencies, you'll be prompted to install them until they're available. 
+-   Bluetooth discovery on macOS will require granting the program where `idt` is run, e.g. terminal emulator or IDE 
+    permission to access bluetooth in macOS settings. 
+    - Failure to do so will result in errors / `abort` upon ble discovery execution.
 
 ## Raspberry Pi installation
 
@@ -137,60 +154,13 @@ idt_clean
 ```
 
 NOTE the idt artifacts directory is contained in idt, so running this will
-delete any artifacts ([TODO] change).
+delete any artifacts.
 
 Then from the admin computer:
 
 ```
 idt_push
 ```
-
-## Single host installation (no Raspberry Pi)
-
-TODO: Update
-
-Follow the steps below to execute capture and discovery without a Raspberry Pi.
-
-### Linux installation
-
-#### Requirements
-
--   This package should work on most Debian (/based) systems.
--   `idt` is currently tested on `Python 3.11`.
--   `adb` and `tcpdump` are required.
--   The machine running `idt` should be connected to the same Wi-Fi network used
-    for testing.
-
-#### Setup
-
--   From the parent directory of `idt`, run `source idt/scripts/alias.sh`.
--   Optionally, run `source idt/scripts/setup_shell.sh` to install aliases
-    permanently.
-
-> You may use `idt` in a Python virtual environment OR using a container from
-> the idt image.
-
-#### Python virtual environment
-
--   After `idt` aliases are available in your environment, calling any `idt`
-    command will automatically create a new virtual environment and install
-    dependencies.
-
-#### Docker
-
--   Run `idt_build` and `idt_activate` to enter the `idt` container.
-
-[TODO] Podman
-
-### macOS installation
-
-TODO: Need to do this https://github.com/hbldh/bleak/issues/438#issuecomment-787125189
-
-Most features other than BLE should work on macOS.
-
-Follow the Linux installation steps above, but do not use Docker.
-
-[TODO] macOS BLE support
 
 ## User guide
 
@@ -313,10 +283,10 @@ This module must contain a single class which is a subclass of
 
 For capture:
 
--   `base.py` contains the base classes for ecosystems and platforms.
--   `factory.py` contains the ecosystem and platform producer and controller
--   `loader` is a generic class loader that dynamically imports all classes
-    matching a given super class.
+-   `base` contains the base classes for ecosystems and platforms.
+-   `factory` contains the ecosystem and platform producer and controller
+-   `loader` is a generic class loader that dynamically imports classes
+    matching a given super class from a given directory.
 -   `utils/shell` contains a simple helper class for background and foreground
     Bash commands.
 -   `utils/artifact` contains helper functions for managing artifacts.
@@ -343,8 +313,6 @@ For discovery:
 
 -   Change log level from `INFO` to `DEBUG` in `config.py` for additional
     logging.
--   It is expected that this script will be run on a system with `bash`,
-    `tcpdump`, and `adb` already available.
 -   Compiling `tcpdump` for android may require additional dependencies.
     -   If the build script fails for you, try
         `idt_go && source idt/scripts/compilers.sh`.

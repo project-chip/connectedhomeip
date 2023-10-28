@@ -25,10 +25,9 @@ logger = log.get_logger(__file__)
 
 class PlayServicesProber:
 
-    def __init__(self, platform):
-        # TODO: Platform independent traceroute
+    def __init__(self, platform, artifact_dir):
         self.platform = platform
-        self.artifact_dir = self.platform.artifact_dir
+        self.artifact_dir = artifact_dir
         self.logger = logger
         self.probe_artifact = os.path.join(self.artifact_dir, "net_probes.txt")
         self.command_suffix = f" 2>&1  | tee -a {self.probe_artifact}"
@@ -39,10 +38,12 @@ class PlayServicesProber:
         Bash(f"traceroute {self.target} {self.command_suffix}", sync=True).start_command()
 
     async def _probe_tracert_udp_foyer(self) -> None:
+        # TODO: Does not work on macOS
         self.logger.info(f"udp traceroute to {self.target}")
         Bash(f"traceroute -U -p 443 {self.target} {self.command_suffix}", sync=True).start_command()
 
     async def _probe_tracert_tcp_foyer(self) -> None:
+        # TODO: Does not work on macOS
         self.logger.info(f"tcp traceroute to {self.target}")
         Bash(f"traceroute -T -p 443 {self.target} {self.command_suffix}", sync=True).start_command()
 

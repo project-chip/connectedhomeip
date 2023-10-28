@@ -16,6 +16,5 @@
 #
 
 enable_build_push_tcpdump = True
-# TODO: Re-enable before un-draft
-enable_bug_report = False
+enable_bug_report = True
 hci_log_level = "full"
