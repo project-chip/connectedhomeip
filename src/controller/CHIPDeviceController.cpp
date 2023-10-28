@@ -2543,7 +2543,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         else
         {
             // Default to "XX", for lack of anything better.
-            countryCode = CharSpan::fromCharString("XX");
+            countryCode = "XX"_span;
         }
 
         GeneralCommissioning::Commands::SetRegulatoryConfig::Type request;
