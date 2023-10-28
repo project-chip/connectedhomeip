@@ -571,8 +571,7 @@ void BLEManagerImpl::DriveBLEState()
     // Initializes the Bluez BLE layer if needed.
     if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled && !mFlags.Has(Flags::kBluezBLELayerInitialized))
     {
-        mEndpoint = Platform::MakeUnique<BluezEndpoint>(mAdapterId, mIsCentral);
-        VerifyOrExit(mEndpoint, ChipLogError(DeviceLayer, "FAIL: memory allocation in %s", __func__));
+        VerifyOrExit((mEndpoint = Platform::MakeUnique<BluezEndpoint>(mAdapterId, mIsCentral)), err = CHIP_ERROR_NO_MEMORY);
         SuccessOrExit(err = mEndpoint->Init(nullptr, mDeviceName));
         mFlags.Set(Flags::kBluezBLELayerInitialized);
     }
@@ -653,7 +652,7 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
         return;
     }
 
-    if (!mEndpoint)
+    if (!mFlags.Has(Flags::kBluezBLELayerInitialized))
     {
         BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, CHIP_ERROR_INCORRECT_STATE);
         ChipLogError(Ble, "BLE Layer is not yet initialized");

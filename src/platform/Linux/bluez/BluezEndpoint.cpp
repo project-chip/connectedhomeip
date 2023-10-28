@@ -162,7 +162,7 @@ gboolean BluezEndpoint::BluezCharacteristicAcquireNotify(BluezGattCharacteristic
     uint16_t mtu;
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    isAdditionalAdvertising = (aChar == self->mpC3);
+    isAdditionalAdvertising = (aChar == mpC3);
 #endif
 
     if (bluez_gatt_characteristic1_get_notifying(aChar))
