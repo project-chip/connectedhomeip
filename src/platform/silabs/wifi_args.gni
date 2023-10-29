@@ -49,7 +49,7 @@ chip_enable_openthread = false
 
 chip_inet_config_enable_ipv4 = false
 chip_inet_config_enable_dns_resolver = false
-chip_inet_config_enable_tcp_endpoint = true
+chip_inet_config_enable_tcp_endpoint = false
 
 chip_build_tests = false
 chip_config_memory_management = "platform"
