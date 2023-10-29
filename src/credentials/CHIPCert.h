@@ -458,7 +458,7 @@ struct ChipCertificateData
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR DecodeChipCert(const ByteSpan chipCert, ChipCertificateData & certData);
+CHIP_ERROR DecodeChipCert(const ByteSpan chipCert, ChipCertificateData & certData, BitFlags<CertDecodeFlags> decodeFlags = {});
 
 /**
  * @brief Decode CHIP certificate.
@@ -470,7 +470,8 @@ CHIP_ERROR DecodeChipCert(const ByteSpan chipCert, ChipCertificateData & certDat
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR DecodeChipCert(chip::TLV::TLVReader & reader, ChipCertificateData & certData);
+CHIP_ERROR DecodeChipCert(chip::TLV::TLVReader & reader, ChipCertificateData & certData,
+                          BitFlags<CertDecodeFlags> decodeFlags = {});
 
 /**
  * @brief Decode CHIP Distinguished Name (DN).
