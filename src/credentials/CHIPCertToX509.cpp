@@ -574,9 +574,7 @@ static CHIP_ERROR DecodeConvertCert(TLVReader & reader, ASN1Writer & writer, ASN
     {
         ReturnErrorOnFailure(reader.Next());
     }
-    VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
-    VerifyOrReturnError(reader.GetTag() == AnonymousTag(), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
-
+    ReturnErrorOnFailure(reader.Expect(kTLVType_Structure, AnonymousTag()));
     ReturnErrorOnFailure(reader.EnterContainer(containerType));
 
     // Certificate ::= SEQUENCE
