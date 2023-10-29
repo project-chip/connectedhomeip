@@ -18,63 +18,63 @@ limitations under the License.
 <configurator>
   <domain name="Energy Management"/>
 
-  <enum name="EvseStateEnum" type="ENUM8">
+  <enum name="EvseStateEnum" type="enum8">
     <cluster code="0x0099"/>
-    <item name="NotPluggedIn"         value="0x00"  optional="false"/>
-    <item name="PluggedInNoDemand"    value="0x01"  optional="false"/>
-    <item name="PluggedInDemand"      value="0x02"  optional="false"/>
-    <item name="PluggedInCharging"    value="0x03"  optional="false"/>
-    <item name="PluggedInDischarging" value="0x04"  optional="false"/>
-    <item name="SessionEnding"        value="0x05"  optional="false"/>
-    <item name="Fault"                value="0x06"  optional="false"/>
+    <item name="NotPluggedIn"         value="0"/>
+    <item name="PluggedInNoDemand"    value="1"/>
+    <item name="PluggedInDemand"      value="2"/>
+    <item name="PluggedInCharging"    value="3"/>
+    <item name="PluggedInDischarging" value="4"/>
+    <item name="SessionEnding"        value="5"/>
+    <item name="Fault"                value="6"/>
   </enum>
 
-  <enum name="SupplyStateEnum" type="ENUM8">
+  <enum name="SupplyStateEnum" type="enum8">
     <cluster code="0x0099"/>
-    <item name="Disabled"              value="0x00"  optional="false"/>
-    <item name="ChargingEnabled"       value="0x01"  optional="false"/>
-    <item name="DischargingEnabled"    value="0x02"  optional="true" />
-    <item name="DisabledError"         value="0x03"  optional="false"/>
-    <item name="DisabledDiagnostics"   value="0x04"  optional="false"/>
+    <item name="Disabled"              value="0"/>
+    <item name="ChargingEnabled"       value="1"/>
+    <item name="DischargingEnabled"    value="2"/>
+    <item name="DisabledError"         value="3"/>
+    <item name="DisabledDiagnostics"   value="4"/>
   </enum>
 
-  <enum name="FaultStateEnum" type="ENUM8">
+  <enum name="FaultStateEnum" type="enum8">
     <cluster code="0x0099"/>
-    <item name="NoError"            value="0x00"  optional="false"/>
-    <item name="EvseMeterFailure"   value="0x01"  optional="false"/>
-    <item name="OverVoltage"        value="0x02"  optional="false" />
-    <item name="UnderVoltage"       value="0x03"  optional="false"/>
-    <item name="OverCurrent"        value="0x04"  optional="false"/>
-    <item name="ContactWetFailure"  value="0x05"  optional="false"/>
-    <item name="ContactDryFailure"  value="0x06"  optional="false"/>
-    <item name="GroundFault"        value="0x07"  optional="false"/>
-    <item name="PowerLoss"          value="0x08"  optional="false"/>
-    <item name="PowerQuality"       value="0x09"  optional="false"/>
-    <item name="PilotShortCircuit"  value="0x0A"  optional="false"/>
-    <item name="EmergencyStop"      value="0x0B"  optional="false"/>
-    <item name="EvDisconnected"     value="0x0C"  optional="false"/>
-    <item name="WrongPowerSupply"   value="0x0D"  optional="false"/>
-    <item name="LiveNeutralSwap"    value="0x0E"  optional="false"/>
-    <item name="OverTemperature"    value="0x0F"  optional="false"/>
-    <item name="Other"              value="0xFF"  optional="false"/>
+    <item name="NoError"            value="0"/>
+    <item name="EvseMeterFailure"   value="1"/>
+    <item name="OverVoltage"        value="2"/>
+    <item name="UnderVoltage"       value="3"/>
+    <item name="OverCurrent"        value="4"/>
+    <item name="ContactWetFailure"  value="5"/>
+    <item name="ContactDryFailure"  value="6"/>
+    <item name="GroundFault"        value="7"/>
+    <item name="PowerLoss"          value="8"/>
+    <item name="PowerQuality"       value="9"/>
+    <item name="PilotShortCircuit"  value="10"/>
+    <item name="EmergencyStop"      value="11"/>
+    <item name="EvDisconnected"     value="12"/>
+    <item name="WrongPowerSupply"   value="13"/>
+    <item name="LiveNeutralSwap"    value="14"/>
+    <item name="OverTemperature"    value="15"/>
+    <item name="Other"              value="255"/>
   </enum>
 
-  <enum name="EnergyTransferStoppedReasonEnum" type="ENUM8">
+  <enum name="EnergyTransferStoppedReasonEnum" type="enum8">
     <cluster code="0x0099"/>
-    <item name="EvStopped"    value="0x00"  optional="false"/>
-    <item name="EvseStopped"  value="0x01"  optional="false"/>
-    <item name="Other"        value="0x03"  optional="false"/>
+    <item name="EvStopped"    value="0"/>
+    <item name="EvseStopped"  value="1"/>
+    <item name="Other"        value="2"/>
   </enum>
 
-  <bitmap name="TargetDayOfWeekBitmap" type="BITMAP8">
+  <bitmap name="TargetDayOfWeekBitmap" type="bitmap8">
     <cluster code="0x0099"/>
-    <field name="Sunday" mask="0x01"/>
-    <field name="Monday" mask="0x02"/>
-    <field name="Tuesday" mask="0x04"/>
+    <field name="Sunday"    mask="0x01"/>
+    <field name="Monday"    mask="0x02"/>
+    <field name="Tuesday"   mask="0x04"/>
     <field name="Wednesday" mask="0x08"/>
-    <field name="Thursday" mask="0x10"/>
-    <field name="Friday" mask="0x20"/>
-    <field name="Saturday" mask="0x40"/>
+    <field name="Thursday"  mask="0x10"/>
+    <field name="Friday"    mask="0x20"/>
+    <field name="Saturday"  mask="0x40"/>
   </bitmap>
 
    <struct name="ChargingTargetStruct">
@@ -84,7 +84,7 @@ limitations under the License.
     <item name="AddedEnergy"  type="INT32S"  optional="true"/>
   </struct>
 
-  <cluster>
+  <cluster apiMaturity="provisional">
     <name>Energy EVSE</name>
     <domain>Energy Management</domain>
     <description>This cluster provides an interface for the management of Electric Vehicle Supply Equipment (EVSE).</description>
