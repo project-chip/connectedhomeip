@@ -3665,7 +3665,7 @@
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "type": "int16u",
+              "type": "vendor_id",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -7340,7 +7340,7 @@
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "type": "char_string",
+              "type": "long_char_string",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -7621,5 +7621,6 @@
       "endpointId": 3,
       "networkId": 0
     }
-  ]
+  ],
+  "log": []
 }
