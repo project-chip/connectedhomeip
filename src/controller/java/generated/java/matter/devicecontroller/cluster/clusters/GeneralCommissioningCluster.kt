@@ -38,44 +38,42 @@ class GeneralCommissioningCluster(private val endpointId: UShort) {
 
   class AttributeListAttribute(val value: ArrayList<UInt>)
 
-  suspend fun armFailSafe(expiryLengthSeconds: UShort, breadcrumb: ULong): ArmFailSafeResponse {
-    // Implementation needs to be added here
-  }
-
   suspend fun armFailSafe(
     expiryLengthSeconds: UShort,
     breadcrumb: ULong,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): ArmFailSafeResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun setRegulatoryConfig(
-    newRegulatoryConfig: UInt,
-    countryCode: String,
-    breadcrumb: ULong
-  ): SetRegulatoryConfigResponse {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun setRegulatoryConfig(
     newRegulatoryConfig: UInt,
     countryCode: String,
     breadcrumb: ULong,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): SetRegulatoryConfigResponse {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun commissioningComplete(): CommissioningCompleteResponse {
-    // Implementation needs to be added here
+  suspend fun commissioningComplete(
+    timedInvokeTimeoutMs: Int? = null
+  ): CommissioningCompleteResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun commissioningComplete(timedInvokeTimeoutMs: Int): CommissioningCompleteResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun readBreadcrumbAttribute(): Long {
+  suspend fun readBreadcrumbAttribute(): ULong {
     // Implementation needs to be added here
   }
 
@@ -87,7 +85,7 @@ class GeneralCommissioningCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBreadcrumbAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeBreadcrumbAttribute(minInterval: Int, maxInterval: Int): ULong {
     // Implementation needs to be added here
   }
 
@@ -102,19 +100,19 @@ class GeneralCommissioningCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readRegulatoryConfigAttribute(): Integer {
+  suspend fun readRegulatoryConfigAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRegulatoryConfigAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeRegulatoryConfigAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readLocationCapabilityAttribute(): Integer {
+  suspend fun readLocationCapabilityAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLocationCapabilityAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeLocationCapabilityAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -170,19 +168,19 @@ class GeneralCommissioningCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

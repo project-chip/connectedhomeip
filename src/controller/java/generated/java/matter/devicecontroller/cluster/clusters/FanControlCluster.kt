@@ -32,20 +32,20 @@ class FanControlCluster(private val endpointId: UShort) {
 
   class AttributeListAttribute(val value: ArrayList<UInt>)
 
-  suspend fun step(direction: UInt, wrap: Boolean?, lowestOff: Boolean?) {
-    // Implementation needs to be added here
-  }
-
   suspend fun step(
     direction: UInt,
     wrap: Boolean?,
     lowestOff: Boolean?,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun readFanModeAttribute(): Integer {
+  suspend fun readFanModeAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -57,11 +57,11 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFanModeAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeFanModeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readFanModeSequenceAttribute(): Integer {
+  suspend fun readFanModeSequenceAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -73,7 +73,7 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFanModeSequenceAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeFanModeSequenceAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -96,19 +96,19 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readPercentCurrentAttribute(): Integer {
+  suspend fun readPercentCurrentAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePercentCurrentAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribePercentCurrentAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readSpeedMaxAttribute(): Integer {
+  suspend fun readSpeedMaxAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSpeedMaxAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeSpeedMaxAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -131,23 +131,23 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readSpeedCurrentAttribute(): Integer {
+  suspend fun readSpeedCurrentAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSpeedCurrentAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeSpeedCurrentAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readRockSupportAttribute(): Integer {
+  suspend fun readRockSupportAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRockSupportAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeRockSupportAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readRockSettingAttribute(): Integer {
+  suspend fun readRockSettingAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -159,19 +159,19 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRockSettingAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeRockSettingAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readWindSupportAttribute(): Integer {
+  suspend fun readWindSupportAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeWindSupportAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeWindSupportAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readWindSettingAttribute(): Integer {
+  suspend fun readWindSettingAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -183,11 +183,11 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeWindSettingAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeWindSettingAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readAirflowDirectionAttribute(): Integer {
+  suspend fun readAirflowDirectionAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -199,7 +199,7 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAirflowDirectionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeAirflowDirectionAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -244,19 +244,19 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

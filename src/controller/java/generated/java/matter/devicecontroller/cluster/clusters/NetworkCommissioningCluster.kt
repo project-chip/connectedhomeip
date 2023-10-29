@@ -61,96 +61,85 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
 
   class AttributeListAttribute(val value: ArrayList<UInt>)
 
-  suspend fun scanNetworks(ssid: ByteArray?, breadcrumb: ULong?): ScanNetworksResponse {
-    // Implementation needs to be added here
-  }
-
   suspend fun scanNetworks(
     ssid: ByteArray?,
     breadcrumb: ULong?,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): ScanNetworksResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun addOrUpdateWiFiNetwork(
-    ssid: ByteArray,
-    credentials: ByteArray,
-    breadcrumb: ULong?
-  ): NetworkConfigResponse {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun addOrUpdateWiFiNetwork(
     ssid: ByteArray,
     credentials: ByteArray,
     breadcrumb: ULong?,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): NetworkConfigResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun addOrUpdateThreadNetwork(
-    operationalDataset: ByteArray,
-    breadcrumb: ULong?
-  ): NetworkConfigResponse {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun addOrUpdateThreadNetwork(
     operationalDataset: ByteArray,
     breadcrumb: ULong?,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): NetworkConfigResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun removeNetwork(networkID: ByteArray, breadcrumb: ULong?): NetworkConfigResponse {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun removeNetwork(
     networkID: ByteArray,
     breadcrumb: ULong?,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): NetworkConfigResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun connectNetwork(networkID: ByteArray, breadcrumb: ULong?): ConnectNetworkResponse {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun connectNetwork(
     networkID: ByteArray,
     breadcrumb: ULong?,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): ConnectNetworkResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun reorderNetwork(
-    networkID: ByteArray,
-    networkIndex: UByte,
-    breadcrumb: ULong?
-  ): NetworkConfigResponse {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun reorderNetwork(
     networkID: ByteArray,
     networkIndex: UByte,
     breadcrumb: ULong?,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): NetworkConfigResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun readMaxNetworksAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readMaxNetworksAttribute(): Integer {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribeMaxNetworksAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeMaxNetworksAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -162,19 +151,19 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readScanMaxTimeSecondsAttribute(): Integer {
+  suspend fun readScanMaxTimeSecondsAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeScanMaxTimeSecondsAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeScanMaxTimeSecondsAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readConnectMaxTimeSecondsAttribute(): Integer {
+  suspend fun readConnectMaxTimeSecondsAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeConnectMaxTimeSecondsAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeConnectMaxTimeSecondsAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -238,22 +227,22 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readSupportedThreadFeaturesAttribute(): Integer {
+  suspend fun readSupportedThreadFeaturesAttribute(): UShort {
     // Implementation needs to be added here
   }
 
   suspend fun subscribeSupportedThreadFeaturesAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Integer {
+  ): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readThreadVersionAttribute(): Integer {
+  suspend fun readThreadVersionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeThreadVersionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeThreadVersionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -298,19 +287,19 @@ class NetworkCommissioningCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

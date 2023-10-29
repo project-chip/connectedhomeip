@@ -44,89 +44,95 @@ class WindowCoveringCluster(private val endpointId: UShort) {
 
   class AttributeListAttribute(val value: ArrayList<UInt>)
 
-  suspend fun upOrOpen() {
+  suspend fun upOrOpen(timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun downOrClose(timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun stopMotion(timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun goToLiftValue(liftValue: UShort, timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun goToLiftPercentage(
+    liftPercent100thsValue: UShort,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun goToTiltValue(tiltValue: UShort, timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun goToTiltPercentage(
+    tiltPercent100thsValue: UShort,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun readTypeAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun upOrOpen(timedInvokeTimeoutMs: Int) {
+  suspend fun subscribeTypeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun downOrClose() {
-    // Implementation needs to be added here
-  }
-
-  suspend fun downOrClose(timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun stopMotion() {
-    // Implementation needs to be added here
-  }
-
-  suspend fun stopMotion(timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun goToLiftValue(liftValue: UShort) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun goToLiftValue(liftValue: UShort, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun goToLiftPercentage(liftPercent100thsValue: UShort) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun goToLiftPercentage(liftPercent100thsValue: UShort, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun goToTiltValue(tiltValue: UShort) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun goToTiltValue(tiltValue: UShort, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun goToTiltPercentage(tiltPercent100thsValue: UShort) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun goToTiltPercentage(tiltPercent100thsValue: UShort, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun readTypeAttribute(): Integer {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribeTypeAttribute(minInterval: Int, maxInterval: Int): Integer {
-    // Implementation needs to be added here
-  }
-
-  suspend fun readPhysicalClosedLimitLiftAttribute(): Integer {
+  suspend fun readPhysicalClosedLimitLiftAttribute(): UShort {
     // Implementation needs to be added here
   }
 
   suspend fun subscribePhysicalClosedLimitLiftAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Integer {
+  ): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readPhysicalClosedLimitTiltAttribute(): Integer {
+  suspend fun readPhysicalClosedLimitTiltAttribute(): UShort {
     // Implementation needs to be added here
   }
 
   suspend fun subscribePhysicalClosedLimitTiltAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Integer {
+  ): UShort {
     // Implementation needs to be added here
   }
 
@@ -152,33 +158,27 @@ class WindowCoveringCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readNumberOfActuationsLiftAttribute(): Integer {
+  suspend fun readNumberOfActuationsLiftAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeNumberOfActuationsLiftAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Integer {
+  suspend fun subscribeNumberOfActuationsLiftAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readNumberOfActuationsTiltAttribute(): Integer {
+  suspend fun readNumberOfActuationsTiltAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeNumberOfActuationsTiltAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Integer {
+  suspend fun subscribeNumberOfActuationsTiltAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readConfigStatusAttribute(): Integer {
+  suspend fun readConfigStatusAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeConfigStatusAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeConfigStatusAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -204,11 +204,11 @@ class WindowCoveringCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readOperationalStatusAttribute(): Integer {
+  suspend fun readOperationalStatusAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOperationalStatusAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeOperationalStatusAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -236,11 +236,11 @@ class WindowCoveringCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readEndProductTypeAttribute(): Integer {
+  suspend fun readEndProductTypeAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEndProductTypeAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeEndProductTypeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -268,51 +268,45 @@ class WindowCoveringCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readInstalledOpenLimitLiftAttribute(): Integer {
+  suspend fun readInstalledOpenLimitLiftAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInstalledOpenLimitLiftAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Integer {
+  suspend fun subscribeInstalledOpenLimitLiftAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readInstalledClosedLimitLiftAttribute(): Integer {
+  suspend fun readInstalledClosedLimitLiftAttribute(): UShort {
     // Implementation needs to be added here
   }
 
   suspend fun subscribeInstalledClosedLimitLiftAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Integer {
+  ): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readInstalledOpenLimitTiltAttribute(): Integer {
+  suspend fun readInstalledOpenLimitTiltAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInstalledOpenLimitTiltAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Integer {
+  suspend fun subscribeInstalledOpenLimitTiltAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readInstalledClosedLimitTiltAttribute(): Integer {
+  suspend fun readInstalledClosedLimitTiltAttribute(): UShort {
     // Implementation needs to be added here
   }
 
   suspend fun subscribeInstalledClosedLimitTiltAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Integer {
+  ): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readModeAttribute(): Integer {
+  suspend fun readModeAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -324,15 +318,15 @@ class WindowCoveringCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeModeAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeModeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readSafetyStatusAttribute(): Integer {
+  suspend fun readSafetyStatusAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSafetyStatusAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeSafetyStatusAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -377,19 +371,19 @@ class WindowCoveringCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

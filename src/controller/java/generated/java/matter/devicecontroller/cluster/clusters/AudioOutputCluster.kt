@@ -30,20 +30,20 @@ class AudioOutputCluster(private val endpointId: UShort) {
 
   class AttributeListAttribute(val value: ArrayList<UInt>)
 
-  suspend fun selectOutput(index: UByte) {
-    // Implementation needs to be added here
+  suspend fun selectOutput(index: UByte, timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun selectOutput(index: UByte, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun renameOutput(index: UByte, name: String) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun renameOutput(index: UByte, name: String, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun renameOutput(index: UByte, name: String, timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun readOutputListAttribute(): OutputListAttribute {
@@ -57,11 +57,11 @@ class AudioOutputCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readCurrentOutputAttribute(): Integer {
+  suspend fun readCurrentOutputAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCurrentOutputAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeCurrentOutputAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -106,19 +106,19 @@ class AudioOutputCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

@@ -69,11 +69,11 @@ class IlluminanceMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readToleranceAttribute(): Integer {
+  suspend fun readToleranceAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeToleranceAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeToleranceAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -129,19 +129,19 @@ class IlluminanceMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

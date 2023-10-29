@@ -47,48 +47,38 @@ class OperationalCredentialsCluster(private val endpointId: UShort) {
 
   class AttributeListAttribute(val value: ArrayList<UInt>)
 
-  suspend fun attestationRequest(attestationNonce: ByteArray): AttestationResponse {
-    // Implementation needs to be added here
-  }
-
   suspend fun attestationRequest(
     attestationNonce: ByteArray,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): AttestationResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun certificateChainRequest(certificateType: UInt): CertificateChainResponse {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun certificateChainRequest(
     certificateType: UInt,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): CertificateChainResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun CSRRequest(CSRNonce: ByteArray, isForUpdateNOC: Boolean?): CSRResponse {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun CSRRequest(
     CSRNonce: ByteArray,
     isForUpdateNOC: Boolean?,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): CSRResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun addNOC(
-    NOCValue: ByteArray,
-    ICACValue: ByteArray?,
-    IPKValue: ByteArray,
-    caseAdminSubject: ULong,
-    adminVendorId: UShort
-  ): NOCResponse {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun addNOC(
@@ -97,45 +87,52 @@ class OperationalCredentialsCluster(private val endpointId: UShort) {
     IPKValue: ByteArray,
     caseAdminSubject: ULong,
     adminVendorId: UShort,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): NOCResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun updateNOC(NOCValue: ByteArray, ICACValue: ByteArray?): NOCResponse {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun updateNOC(
     NOCValue: ByteArray,
     ICACValue: ByteArray?,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): NOCResponse {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun updateFabricLabel(label: String): NOCResponse {
-    // Implementation needs to be added here
+  suspend fun updateFabricLabel(label: String, timedInvokeTimeoutMs: Int? = null): NOCResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun updateFabricLabel(label: String, timedInvokeTimeoutMs: Int): NOCResponse {
-    // Implementation needs to be added here
+  suspend fun removeFabric(fabricIndex: UByte, timedInvokeTimeoutMs: Int? = null): NOCResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun removeFabric(fabricIndex: UByte): NOCResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun removeFabric(fabricIndex: UByte, timedInvokeTimeoutMs: Int): NOCResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun addTrustedRootCertificate(rootCACertificate: ByteArray) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun addTrustedRootCertificate(rootCACertificate: ByteArray, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun addTrustedRootCertificate(
+    rootCACertificate: ByteArray,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun readNOCsAttribute(): NOCsAttribute {
@@ -162,19 +159,19 @@ class OperationalCredentialsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readSupportedFabricsAttribute(): Integer {
+  suspend fun readSupportedFabricsAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSupportedFabricsAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeSupportedFabricsAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readCommissionedFabricsAttribute(): Integer {
+  suspend fun readCommissionedFabricsAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCommissionedFabricsAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeCommissionedFabricsAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -189,11 +186,11 @@ class OperationalCredentialsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readCurrentFabricIndexAttribute(): Integer {
+  suspend fun readCurrentFabricIndexAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCurrentFabricIndexAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeCurrentFabricIndexAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -238,19 +235,19 @@ class OperationalCredentialsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

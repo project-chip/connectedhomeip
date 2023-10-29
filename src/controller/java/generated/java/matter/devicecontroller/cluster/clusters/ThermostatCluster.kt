@@ -57,21 +57,12 @@ class ThermostatCluster(private val endpointId: UShort) {
 
   class AttributeListAttribute(val value: ArrayList<UInt>)
 
-  suspend fun setpointRaiseLower(mode: UInt, amount: Byte) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun setpointRaiseLower(mode: UInt, amount: Byte, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun setWeeklySchedule(
-    numberOfTransitionsForSequence: UByte,
-    dayOfWeekForSequence: UInt,
-    modeForSequence: UInt,
-    transitions: ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransition>
-  ) {
-    // Implementation needs to be added here
+  suspend fun setpointRaiseLower(mode: UInt, amount: Byte, timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun setWeeklySchedule(
@@ -79,29 +70,33 @@ class ThermostatCluster(private val endpointId: UShort) {
     dayOfWeekForSequence: UInt,
     modeForSequence: UInt,
     transitions: ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransition>,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun getWeeklySchedule(daysToReturn: UInt, modeToReturn: UInt): GetWeeklyScheduleResponse {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun getWeeklySchedule(
     daysToReturn: UInt,
     modeToReturn: UInt,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): GetWeeklyScheduleResponse {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun clearWeeklySchedule() {
-    // Implementation needs to be added here
-  }
-
-  suspend fun clearWeeklySchedule(timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun clearWeeklySchedule(timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun readLocalTemperatureAttribute(): LocalTemperatureAttribute {
@@ -126,75 +121,63 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readOccupancyAttribute(): Integer {
+  suspend fun readOccupancyAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOccupancyAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeOccupancyAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readAbsMinHeatSetpointLimitAttribute(): Integer {
+  suspend fun readAbsMinHeatSetpointLimitAttribute(): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAbsMinHeatSetpointLimitAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Integer {
+  suspend fun subscribeAbsMinHeatSetpointLimitAttribute(minInterval: Int, maxInterval: Int): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun readAbsMaxHeatSetpointLimitAttribute(): Integer {
+  suspend fun readAbsMaxHeatSetpointLimitAttribute(): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAbsMaxHeatSetpointLimitAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Integer {
+  suspend fun subscribeAbsMaxHeatSetpointLimitAttribute(minInterval: Int, maxInterval: Int): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun readAbsMinCoolSetpointLimitAttribute(): Integer {
+  suspend fun readAbsMinCoolSetpointLimitAttribute(): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAbsMinCoolSetpointLimitAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Integer {
+  suspend fun subscribeAbsMinCoolSetpointLimitAttribute(minInterval: Int, maxInterval: Int): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun readAbsMaxCoolSetpointLimitAttribute(): Integer {
+  suspend fun readAbsMaxCoolSetpointLimitAttribute(): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAbsMaxCoolSetpointLimitAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Integer {
+  suspend fun subscribeAbsMaxCoolSetpointLimitAttribute(minInterval: Int, maxInterval: Int): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun readPICoolingDemandAttribute(): Integer {
+  suspend fun readPICoolingDemandAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePICoolingDemandAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribePICoolingDemandAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readPIHeatingDemandAttribute(): Integer {
+  suspend fun readPIHeatingDemandAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePIHeatingDemandAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribePIHeatingDemandAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readHVACSystemTypeConfigurationAttribute(): Integer {
+  suspend fun readHVACSystemTypeConfigurationAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -209,11 +192,11 @@ class ThermostatCluster(private val endpointId: UShort) {
   suspend fun subscribeHVACSystemTypeConfigurationAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Integer {
+  ): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readLocalTemperatureCalibrationAttribute(): Integer {
+  suspend fun readLocalTemperatureCalibrationAttribute(): Byte {
     // Implementation needs to be added here
   }
 
@@ -228,11 +211,11 @@ class ThermostatCluster(private val endpointId: UShort) {
   suspend fun subscribeLocalTemperatureCalibrationAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Integer {
+  ): Byte {
     // Implementation needs to be added here
   }
 
-  suspend fun readOccupiedCoolingSetpointAttribute(): Integer {
+  suspend fun readOccupiedCoolingSetpointAttribute(): Short {
     // Implementation needs to be added here
   }
 
@@ -244,14 +227,11 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOccupiedCoolingSetpointAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Integer {
+  suspend fun subscribeOccupiedCoolingSetpointAttribute(minInterval: Int, maxInterval: Int): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun readOccupiedHeatingSetpointAttribute(): Integer {
+  suspend fun readOccupiedHeatingSetpointAttribute(): Short {
     // Implementation needs to be added here
   }
 
@@ -263,14 +243,11 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOccupiedHeatingSetpointAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Integer {
+  suspend fun subscribeOccupiedHeatingSetpointAttribute(minInterval: Int, maxInterval: Int): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun readUnoccupiedCoolingSetpointAttribute(): Integer {
+  suspend fun readUnoccupiedCoolingSetpointAttribute(): Short {
     // Implementation needs to be added here
   }
 
@@ -285,11 +262,11 @@ class ThermostatCluster(private val endpointId: UShort) {
   suspend fun subscribeUnoccupiedCoolingSetpointAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Integer {
+  ): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun readUnoccupiedHeatingSetpointAttribute(): Integer {
+  suspend fun readUnoccupiedHeatingSetpointAttribute(): Short {
     // Implementation needs to be added here
   }
 
@@ -304,11 +281,11 @@ class ThermostatCluster(private val endpointId: UShort) {
   suspend fun subscribeUnoccupiedHeatingSetpointAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Integer {
+  ): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun readMinHeatSetpointLimitAttribute(): Integer {
+  suspend fun readMinHeatSetpointLimitAttribute(): Short {
     // Implementation needs to be added here
   }
 
@@ -320,11 +297,11 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMinHeatSetpointLimitAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeMinHeatSetpointLimitAttribute(minInterval: Int, maxInterval: Int): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun readMaxHeatSetpointLimitAttribute(): Integer {
+  suspend fun readMaxHeatSetpointLimitAttribute(): Short {
     // Implementation needs to be added here
   }
 
@@ -336,11 +313,11 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMaxHeatSetpointLimitAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeMaxHeatSetpointLimitAttribute(minInterval: Int, maxInterval: Int): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun readMinCoolSetpointLimitAttribute(): Integer {
+  suspend fun readMinCoolSetpointLimitAttribute(): Short {
     // Implementation needs to be added here
   }
 
@@ -352,11 +329,11 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMinCoolSetpointLimitAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeMinCoolSetpointLimitAttribute(minInterval: Int, maxInterval: Int): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun readMaxCoolSetpointLimitAttribute(): Integer {
+  suspend fun readMaxCoolSetpointLimitAttribute(): Short {
     // Implementation needs to be added here
   }
 
@@ -368,11 +345,11 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMaxCoolSetpointLimitAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeMaxCoolSetpointLimitAttribute(minInterval: Int, maxInterval: Int): Short {
     // Implementation needs to be added here
   }
 
-  suspend fun readMinSetpointDeadBandAttribute(): Integer {
+  suspend fun readMinSetpointDeadBandAttribute(): Byte {
     // Implementation needs to be added here
   }
 
@@ -384,11 +361,11 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMinSetpointDeadBandAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeMinSetpointDeadBandAttribute(minInterval: Int, maxInterval: Int): Byte {
     // Implementation needs to be added here
   }
 
-  suspend fun readRemoteSensingAttribute(): Integer {
+  suspend fun readRemoteSensingAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -400,11 +377,11 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRemoteSensingAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeRemoteSensingAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readControlSequenceOfOperationAttribute(): Integer {
+  suspend fun readControlSequenceOfOperationAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -419,11 +396,11 @@ class ThermostatCluster(private val endpointId: UShort) {
   suspend fun subscribeControlSequenceOfOperationAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Integer {
+  ): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readSystemModeAttribute(): Integer {
+  suspend fun readSystemModeAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -435,49 +412,49 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSystemModeAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeSystemModeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readThermostatRunningModeAttribute(): Integer {
+  suspend fun readThermostatRunningModeAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeThermostatRunningModeAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeThermostatRunningModeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readStartOfWeekAttribute(): Integer {
+  suspend fun readStartOfWeekAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeStartOfWeekAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeStartOfWeekAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readNumberOfWeeklyTransitionsAttribute(): Integer {
+  suspend fun readNumberOfWeeklyTransitionsAttribute(): UByte {
     // Implementation needs to be added here
   }
 
   suspend fun subscribeNumberOfWeeklyTransitionsAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Integer {
+  ): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readNumberOfDailyTransitionsAttribute(): Integer {
+  suspend fun readNumberOfDailyTransitionsAttribute(): UByte {
     // Implementation needs to be added here
   }
 
   suspend fun subscribeNumberOfDailyTransitionsAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Integer {
+  ): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readTemperatureSetpointHoldAttribute(): Integer {
+  suspend fun readTemperatureSetpointHoldAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -489,10 +466,7 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTemperatureSetpointHoldAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Integer {
+  suspend fun subscribeTemperatureSetpointHoldAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -519,7 +493,7 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readThermostatProgrammingOperationModeAttribute(): Integer {
+  suspend fun readThermostatProgrammingOperationModeAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -537,26 +511,23 @@ class ThermostatCluster(private val endpointId: UShort) {
   suspend fun subscribeThermostatProgrammingOperationModeAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Integer {
+  ): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readThermostatRunningStateAttribute(): Integer {
+  suspend fun readThermostatRunningStateAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeThermostatRunningStateAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Integer {
+  suspend fun subscribeThermostatRunningStateAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readSetpointChangeSourceAttribute(): Integer {
+  suspend fun readSetpointChangeSourceAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSetpointChangeSourceAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeSetpointChangeSourceAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -571,14 +542,14 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readSetpointChangeSourceTimestampAttribute(): Long {
+  suspend fun readSetpointChangeSourceTimestampAttribute(): UInt {
     // Implementation needs to be added here
   }
 
   suspend fun subscribeSetpointChangeSourceTimestampAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Long {
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -664,7 +635,7 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readEmergencyHeatDeltaAttribute(): Integer {
+  suspend fun readEmergencyHeatDeltaAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -676,11 +647,11 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEmergencyHeatDeltaAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeEmergencyHeatDeltaAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readACTypeAttribute(): Integer {
+  suspend fun readACTypeAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -692,11 +663,11 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeACTypeAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeACTypeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readACCapacityAttribute(): Integer {
+  suspend fun readACCapacityAttribute(): UShort {
     // Implementation needs to be added here
   }
 
@@ -708,11 +679,11 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeACCapacityAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeACCapacityAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readACRefrigerantTypeAttribute(): Integer {
+  suspend fun readACRefrigerantTypeAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -724,11 +695,11 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeACRefrigerantTypeAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeACRefrigerantTypeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readACCompressorTypeAttribute(): Integer {
+  suspend fun readACCompressorTypeAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -740,11 +711,11 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeACCompressorTypeAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeACCompressorTypeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readACErrorCodeAttribute(): Long {
+  suspend fun readACErrorCodeAttribute(): UInt {
     // Implementation needs to be added here
   }
 
@@ -756,11 +727,11 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeACErrorCodeAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeACErrorCodeAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readACLouverPositionAttribute(): Integer {
+  suspend fun readACLouverPositionAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -772,7 +743,7 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeACLouverPositionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeACLouverPositionAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -787,7 +758,7 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readACCapacityformatAttribute(): Integer {
+  suspend fun readACCapacityformatAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -799,7 +770,7 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeACCapacityformatAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeACCapacityformatAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -844,19 +815,19 @@ class ThermostatCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
