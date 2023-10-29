@@ -11,7 +11,7 @@
     {%- set struct = encodable.get_underlying_struct() -%}
     ChipStructs.{{source.name}}Cluster{{struct.name}}
   {%- else -%}
-    {{encodable.boxed_java_type}}
+    {{encodable.kotlin_type}}
   {%- endif -%}
 {%- endmacro -%}
 
@@ -24,7 +24,7 @@
     {%- set struct = encodable.get_underlying_struct() -%}
     ChipStructs.{{source.name}}Cluster{{struct.name}}
   {%- else -%}
-    {{encodable.boxed_java_type}}
+    {{encodable.kotlin_type}}
   {%- endif -%}
 {%- endmacro -%}
 
@@ -35,7 +35,7 @@
     {%- set struct = encodable.get_underlying_struct() -%}
     ChipStructs.{{source.name}}Cluster{{struct.name}}
   {%- else -%}
-    {{encodable.boxed_java_type}}
+    {{encodable.kotlin_type}}
   {%- endif -%}
 {%- endmacro -%}
 
@@ -67,7 +67,7 @@ class {{cluster.name}}Cluster(private val endpointId: UShort) {
 {% for command in cluster.commands | sort(attribute='code') -%}
 {%- set callbackName = command | javaCommandCallbackName() -%}
 {%- if not command.is_timed_invoke %}
-  fun {{command.name | lowfirst_except_acronym}}(callback: {{callbackName}}Callback
+  suspend fun {{command.name | lowfirst_except_acronym}}(callback: {{callbackName}}Callback
 {%- if command.input_param -%}
 {%- for field in (cluster.structs | named(command.input_param)).fields -%}
   , {{field.name | lowfirst_except_acronym}}: {{encode_value(cluster, field | asEncodable(typeLookup), 0)}}
@@ -78,7 +78,7 @@ class {{cluster.name}}Cluster(private val endpointId: UShort) {
   }
 {%- endif %}
 
-  fun {{command.name | lowfirst_except_acronym}}(callback: {{callbackName}}Callback
+  suspend fun {{command.name | lowfirst_except_acronym}}(callback: {{callbackName}}Callback
 {%- if command.input_param -%}
 {%- for field in (cluster.structs | named(command.input_param)).fields -%}
   , {{field.name | lowfirst_except_acronym}}: {{encode_value(cluster, field | asEncodable(typeLookup), 0)}}
