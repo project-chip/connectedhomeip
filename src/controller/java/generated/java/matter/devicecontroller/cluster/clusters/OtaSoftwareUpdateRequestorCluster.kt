@@ -39,20 +39,14 @@ class OtaSoftwareUpdateRequestorCluster(private val endpointId: UShort) {
     vendorID: UShort,
     announcementReason: UInt,
     metadataForNode: ByteArray?,
-    endpoint: UShort
-  ) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun announceOTAProvider(
-    providerNodeID: ULong,
-    vendorID: UShort,
-    announcementReason: UInt,
-    metadataForNode: ByteArray?,
     endpoint: UShort,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun readDefaultOTAProvidersAttribute(): DefaultOTAProvidersAttribute {
@@ -93,11 +87,11 @@ class OtaSoftwareUpdateRequestorCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readUpdateStateAttribute(): Integer {
+  suspend fun readUpdateStateAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeUpdateStateAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeUpdateStateAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -153,19 +147,19 @@ class OtaSoftwareUpdateRequestorCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

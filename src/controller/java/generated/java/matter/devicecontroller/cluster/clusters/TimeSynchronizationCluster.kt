@@ -48,64 +48,58 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
 
   class AttributeListAttribute(val value: ArrayList<UInt>)
 
-  suspend fun setUTCTime(UTCTime: ULong, granularity: UInt, timeSource: UInt?) {
-    // Implementation needs to be added here
-  }
-
   suspend fun setUTCTime(
     UTCTime: ULong,
     granularity: UInt,
     timeSource: UInt?,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun setTrustedTimeSource(
-    trustedTimeSource: ChipStructs.TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct?
-  ) {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun setTrustedTimeSource(
     trustedTimeSource: ChipStructs.TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct?,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun setTimeZone(
-    timeZone: ArrayList<ChipStructs.TimeSynchronizationClusterTimeZoneStruct>
-  ): SetTimeZoneResponse {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun setTimeZone(
     timeZone: ArrayList<ChipStructs.TimeSynchronizationClusterTimeZoneStruct>,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): SetTimeZoneResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun setDSTOffset(
-    DSTOffset: ArrayList<ChipStructs.TimeSynchronizationClusterDSTOffsetStruct>
-  ) {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun setDSTOffset(
     DSTOffset: ArrayList<ChipStructs.TimeSynchronizationClusterDSTOffsetStruct>,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun setDefaultNTP(defaultNTP: String?) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun setDefaultNTP(defaultNTP: String?, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun setDefaultNTP(defaultNTP: String?, timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun readUTCTimeAttribute(): UTCTimeAttribute {
@@ -116,19 +110,19 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readGranularityAttribute(): Integer {
+  suspend fun readGranularityAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeGranularityAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeGranularityAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readTimeSourceAttribute(): Integer {
+  suspend fun readTimeSourceAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTimeSourceAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeTimeSourceAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -178,11 +172,11 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readTimeZoneDatabaseAttribute(): Integer {
+  suspend fun readTimeZoneDatabaseAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTimeZoneDatabaseAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeTimeZoneDatabaseAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -194,19 +188,19 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readTimeZoneListMaxSizeAttribute(): Integer {
+  suspend fun readTimeZoneListMaxSizeAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTimeZoneListMaxSizeAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeTimeZoneListMaxSizeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readDSTOffsetListMaxSizeAttribute(): Integer {
+  suspend fun readDSTOffsetListMaxSizeAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDSTOffsetListMaxSizeAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeDSTOffsetListMaxSizeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -259,19 +253,19 @@ class TimeSynchronizationCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

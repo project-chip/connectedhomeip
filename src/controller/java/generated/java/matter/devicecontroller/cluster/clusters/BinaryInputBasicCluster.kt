@@ -92,11 +92,11 @@ class BinaryInputBasicCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readPolarityAttribute(): Integer {
+  suspend fun readPolarityAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePolarityAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribePolarityAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -116,7 +116,7 @@ class BinaryInputBasicCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readReliabilityAttribute(): Integer {
+  suspend fun readReliabilityAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -128,23 +128,23 @@ class BinaryInputBasicCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeReliabilityAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeReliabilityAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readStatusFlagsAttribute(): Integer {
+  suspend fun readStatusFlagsAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeStatusFlagsAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeStatusFlagsAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readApplicationTypeAttribute(): Long {
+  suspend fun readApplicationTypeAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeApplicationTypeAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeApplicationTypeAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -189,19 +189,19 @@ class BinaryInputBasicCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

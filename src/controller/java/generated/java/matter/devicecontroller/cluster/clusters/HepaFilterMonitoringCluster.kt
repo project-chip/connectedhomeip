@@ -34,35 +34,35 @@ class HepaFilterMonitoringCluster(private val endpointId: UShort) {
 
   class AttributeListAttribute(val value: ArrayList<UInt>)
 
-  suspend fun resetCondition() {
+  suspend fun resetCondition(timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun readConditionAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun resetCondition(timedInvokeTimeoutMs: Int) {
+  suspend fun subscribeConditionAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readConditionAttribute(): Integer {
+  suspend fun readDegradationDirectionAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeConditionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeDegradationDirectionAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readDegradationDirectionAttribute(): Integer {
+  suspend fun readChangeIndicationAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDegradationDirectionAttribute(minInterval: Int, maxInterval: Int): Integer {
-    // Implementation needs to be added here
-  }
-
-  suspend fun readChangeIndicationAttribute(): Integer {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribeChangeIndicationAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeChangeIndicationAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -145,19 +145,19 @@ class HepaFilterMonitoringCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

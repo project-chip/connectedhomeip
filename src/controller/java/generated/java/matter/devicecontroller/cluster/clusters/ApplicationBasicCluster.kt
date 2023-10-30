@@ -40,11 +40,11 @@ class ApplicationBasicCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readVendorIDAttribute(): Integer {
+  suspend fun readVendorIDAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeVendorIDAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeVendorIDAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -56,11 +56,11 @@ class ApplicationBasicCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readProductIDAttribute(): Integer {
+  suspend fun readProductIDAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeProductIDAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeProductIDAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -75,11 +75,11 @@ class ApplicationBasicCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readStatusAttribute(): Integer {
+  suspend fun readStatusAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeStatusAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeStatusAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -143,19 +143,19 @@ class ApplicationBasicCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

@@ -38,16 +38,16 @@ class GeneralDiagnosticsCluster(private val endpointId: UShort) {
 
   class AttributeListAttribute(val value: ArrayList<UInt>)
 
-  suspend fun testEventTrigger(enableKey: ByteArray, eventTrigger: ULong) {
-    // Implementation needs to be added here
-  }
-
   suspend fun testEventTrigger(
     enableKey: ByteArray,
     eventTrigger: ULong,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun readNetworkInterfacesAttribute(): NetworkInterfacesAttribute {
@@ -61,35 +61,35 @@ class GeneralDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readRebootCountAttribute(): Integer {
+  suspend fun readRebootCountAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRebootCountAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeRebootCountAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readUpTimeAttribute(): Long {
+  suspend fun readUpTimeAttribute(): ULong {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeUpTimeAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeUpTimeAttribute(minInterval: Int, maxInterval: Int): ULong {
     // Implementation needs to be added here
   }
 
-  suspend fun readTotalOperationalHoursAttribute(): Long {
+  suspend fun readTotalOperationalHoursAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTotalOperationalHoursAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeTotalOperationalHoursAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readBootReasonAttribute(): Integer {
+  suspend fun readBootReasonAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBootReasonAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeBootReasonAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -137,11 +137,11 @@ class GeneralDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readAverageWearCountAttribute(): Long {
+  suspend fun readAverageWearCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAverageWearCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeAverageWearCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -186,19 +186,19 @@ class GeneralDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

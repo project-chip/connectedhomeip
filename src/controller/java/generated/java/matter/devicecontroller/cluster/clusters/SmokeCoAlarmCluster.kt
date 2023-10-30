@@ -28,51 +28,51 @@ class SmokeCoAlarmCluster(private val endpointId: UShort) {
 
   class AttributeListAttribute(val value: ArrayList<UInt>)
 
-  suspend fun selfTestRequest() {
+  suspend fun selfTestRequest(timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun readExpressedStateAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun selfTestRequest(timedInvokeTimeoutMs: Int) {
+  suspend fun subscribeExpressedStateAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readExpressedStateAttribute(): Integer {
+  suspend fun readSmokeStateAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeExpressedStateAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeSmokeStateAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readSmokeStateAttribute(): Integer {
+  suspend fun readCOStateAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSmokeStateAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeCOStateAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readCOStateAttribute(): Integer {
+  suspend fun readBatteryAlertAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeCOStateAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeBatteryAlertAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readBatteryAlertAttribute(): Integer {
+  suspend fun readDeviceMutedAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBatteryAlertAttribute(minInterval: Int, maxInterval: Int): Integer {
-    // Implementation needs to be added here
-  }
-
-  suspend fun readDeviceMutedAttribute(): Integer {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribeDeviceMutedAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeDeviceMutedAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -92,42 +92,39 @@ class SmokeCoAlarmCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readEndOfServiceAlertAttribute(): Integer {
+  suspend fun readEndOfServiceAlertAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEndOfServiceAlertAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeEndOfServiceAlertAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readInterconnectSmokeAlarmAttribute(): Integer {
+  suspend fun readInterconnectSmokeAlarmAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInterconnectSmokeAlarmAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Integer {
+  suspend fun subscribeInterconnectSmokeAlarmAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readInterconnectCOAlarmAttribute(): Integer {
+  suspend fun readInterconnectCOAlarmAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeInterconnectCOAlarmAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeInterconnectCOAlarmAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readContaminationStateAttribute(): Integer {
+  suspend fun readContaminationStateAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeContaminationStateAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeContaminationStateAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readSmokeSensitivityLevelAttribute(): Integer {
+  suspend fun readSmokeSensitivityLevelAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -139,15 +136,15 @@ class SmokeCoAlarmCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeSmokeSensitivityLevelAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeSmokeSensitivityLevelAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readExpiryDateAttribute(): Long {
+  suspend fun readExpiryDateAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeExpiryDateAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeExpiryDateAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -192,19 +189,19 @@ class SmokeCoAlarmCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

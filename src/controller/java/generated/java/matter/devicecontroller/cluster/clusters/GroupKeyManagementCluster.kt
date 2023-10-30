@@ -40,39 +40,44 @@ class GroupKeyManagementCluster(private val endpointId: UShort) {
 
   class AttributeListAttribute(val value: ArrayList<UInt>)
 
-  suspend fun keySetWrite(groupKeySet: ChipStructs.GroupKeyManagementClusterGroupKeySetStruct) {
-    // Implementation needs to be added here
-  }
-
   suspend fun keySetWrite(
     groupKeySet: ChipStructs.GroupKeyManagementClusterGroupKeySetStruct,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun keySetRead(groupKeySetID: UShort): KeySetReadResponse {
-    // Implementation needs to be added here
+  suspend fun keySetRead(
+    groupKeySetID: UShort,
+    timedInvokeTimeoutMs: Int? = null
+  ): KeySetReadResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun keySetRead(groupKeySetID: UShort, timedInvokeTimeoutMs: Int): KeySetReadResponse {
-    // Implementation needs to be added here
+  suspend fun keySetRemove(groupKeySetID: UShort, timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun keySetRemove(groupKeySetID: UShort) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun keySetRemove(groupKeySetID: UShort, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  suspend fun keySetReadAllIndices(): KeySetReadAllIndicesResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun keySetReadAllIndices(timedInvokeTimeoutMs: Int): KeySetReadAllIndicesResponse {
-    // Implementation needs to be added here
+  suspend fun keySetReadAllIndices(
+    timedInvokeTimeoutMs: Int? = null
+  ): KeySetReadAllIndicesResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun readGroupKeyMapAttribute(): GroupKeyMapAttribute {
@@ -122,19 +127,19 @@ class GroupKeyManagementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readMaxGroupsPerFabricAttribute(): Integer {
+  suspend fun readMaxGroupsPerFabricAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMaxGroupsPerFabricAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeMaxGroupsPerFabricAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readMaxGroupKeysPerFabricAttribute(): Integer {
+  suspend fun readMaxGroupKeysPerFabricAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMaxGroupKeysPerFabricAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeMaxGroupKeysPerFabricAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
@@ -179,19 +184,19 @@ class GroupKeyManagementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

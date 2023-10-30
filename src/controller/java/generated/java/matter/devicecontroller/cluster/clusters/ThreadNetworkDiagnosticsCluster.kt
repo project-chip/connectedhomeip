@@ -76,12 +76,12 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
 
   class AttributeListAttribute(val value: ArrayList<UInt>)
 
-  suspend fun resetCounts() {
-    // Implementation needs to be added here
-  }
-
-  suspend fun resetCounts(timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
+  suspend fun resetCounts(timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun readChannelAttribute(): ChannelAttribute {
@@ -144,11 +144,11 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readOverrunCountAttribute(): Long {
+  suspend fun readOverrunCountAttribute(): ULong {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOverrunCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeOverrunCountAttribute(minInterval: Int, maxInterval: Int): ULong {
     // Implementation needs to be added here
   }
 
@@ -226,354 +226,351 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readDetachedRoleCountAttribute(): Integer {
+  suspend fun readDetachedRoleCountAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeDetachedRoleCountAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeDetachedRoleCountAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readChildRoleCountAttribute(): Integer {
+  suspend fun readChildRoleCountAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeChildRoleCountAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeChildRoleCountAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readRouterRoleCountAttribute(): Integer {
+  suspend fun readRouterRoleCountAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRouterRoleCountAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeRouterRoleCountAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readLeaderRoleCountAttribute(): Integer {
+  suspend fun readLeaderRoleCountAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLeaderRoleCountAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeLeaderRoleCountAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readAttachAttemptCountAttribute(): Integer {
+  suspend fun readAttachAttemptCountAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeAttachAttemptCountAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeAttachAttemptCountAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readPartitionIdChangeCountAttribute(): Integer {
+  suspend fun readPartitionIdChangeCountAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePartitionIdChangeCountAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Integer {
+  suspend fun subscribePartitionIdChangeCountAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readBetterPartitionAttachAttemptCountAttribute(): Integer {
+  suspend fun readBetterPartitionAttachAttemptCountAttribute(): UShort {
     // Implementation needs to be added here
   }
 
   suspend fun subscribeBetterPartitionAttachAttemptCountAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Integer {
+  ): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readParentChangeCountAttribute(): Integer {
+  suspend fun readParentChangeCountAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeParentChangeCountAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeParentChangeCountAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readTxTotalCountAttribute(): Long {
+  suspend fun readTxTotalCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxTotalCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeTxTotalCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readTxUnicastCountAttribute(): Long {
+  suspend fun readTxUnicastCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxUnicastCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeTxUnicastCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readTxBroadcastCountAttribute(): Long {
+  suspend fun readTxBroadcastCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxBroadcastCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeTxBroadcastCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readTxAckRequestedCountAttribute(): Long {
+  suspend fun readTxAckRequestedCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxAckRequestedCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeTxAckRequestedCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readTxAckedCountAttribute(): Long {
+  suspend fun readTxAckedCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxAckedCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeTxAckedCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readTxNoAckRequestedCountAttribute(): Long {
+  suspend fun readTxNoAckRequestedCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxNoAckRequestedCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeTxNoAckRequestedCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readTxDataCountAttribute(): Long {
+  suspend fun readTxDataCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxDataCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeTxDataCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readTxDataPollCountAttribute(): Long {
+  suspend fun readTxDataPollCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxDataPollCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeTxDataPollCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readTxBeaconCountAttribute(): Long {
+  suspend fun readTxBeaconCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxBeaconCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeTxBeaconCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readTxBeaconRequestCountAttribute(): Long {
+  suspend fun readTxBeaconRequestCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxBeaconRequestCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeTxBeaconRequestCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readTxOtherCountAttribute(): Long {
+  suspend fun readTxOtherCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxOtherCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeTxOtherCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readTxRetryCountAttribute(): Long {
+  suspend fun readTxRetryCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxRetryCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeTxRetryCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readTxDirectMaxRetryExpiryCountAttribute(): Long {
+  suspend fun readTxDirectMaxRetryExpiryCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
   suspend fun subscribeTxDirectMaxRetryExpiryCountAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Long {
+  ): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readTxIndirectMaxRetryExpiryCountAttribute(): Long {
+  suspend fun readTxIndirectMaxRetryExpiryCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
   suspend fun subscribeTxIndirectMaxRetryExpiryCountAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Long {
+  ): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readTxErrCcaCountAttribute(): Long {
+  suspend fun readTxErrCcaCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxErrCcaCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeTxErrCcaCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readTxErrAbortCountAttribute(): Long {
+  suspend fun readTxErrAbortCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxErrAbortCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeTxErrAbortCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readTxErrBusyChannelCountAttribute(): Long {
+  suspend fun readTxErrBusyChannelCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeTxErrBusyChannelCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeTxErrBusyChannelCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readRxTotalCountAttribute(): Long {
+  suspend fun readRxTotalCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxTotalCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeRxTotalCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readRxUnicastCountAttribute(): Long {
+  suspend fun readRxUnicastCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxUnicastCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeRxUnicastCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readRxBroadcastCountAttribute(): Long {
+  suspend fun readRxBroadcastCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxBroadcastCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeRxBroadcastCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readRxDataCountAttribute(): Long {
+  suspend fun readRxDataCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxDataCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeRxDataCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readRxDataPollCountAttribute(): Long {
+  suspend fun readRxDataPollCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxDataPollCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeRxDataPollCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readRxBeaconCountAttribute(): Long {
+  suspend fun readRxBeaconCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxBeaconCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeRxBeaconCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readRxBeaconRequestCountAttribute(): Long {
+  suspend fun readRxBeaconRequestCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxBeaconRequestCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeRxBeaconRequestCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readRxOtherCountAttribute(): Long {
+  suspend fun readRxOtherCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxOtherCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeRxOtherCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readRxAddressFilteredCountAttribute(): Long {
+  suspend fun readRxAddressFilteredCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxAddressFilteredCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeRxAddressFilteredCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readRxDestAddrFilteredCountAttribute(): Long {
+  suspend fun readRxDestAddrFilteredCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxDestAddrFilteredCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeRxDestAddrFilteredCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readRxDuplicatedCountAttribute(): Long {
+  suspend fun readRxDuplicatedCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxDuplicatedCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeRxDuplicatedCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readRxErrNoFrameCountAttribute(): Long {
+  suspend fun readRxErrNoFrameCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxErrNoFrameCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeRxErrNoFrameCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readRxErrUnknownNeighborCountAttribute(): Long {
+  suspend fun readRxErrUnknownNeighborCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
   suspend fun subscribeRxErrUnknownNeighborCountAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Long {
+  ): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readRxErrInvalidSrcAddrCountAttribute(): Long {
+  suspend fun readRxErrInvalidSrcAddrCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxErrInvalidSrcAddrCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeRxErrInvalidSrcAddrCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readRxErrSecCountAttribute(): Long {
+  suspend fun readRxErrSecCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxErrSecCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeRxErrSecCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readRxErrFcsCountAttribute(): Long {
+  suspend fun readRxErrFcsCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxErrFcsCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeRxErrFcsCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readRxErrOtherCountAttribute(): Long {
+  suspend fun readRxErrOtherCountAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeRxErrOtherCountAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeRxErrOtherCountAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -692,19 +689,19 @@ class ThreadNetworkDiagnosticsCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
