@@ -1446,7 +1446,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 /**
  * @ def CHIP_CONFIG_MAX_SCENES_TABLE_SIZE
  *
- * @brief This defines how many scenes a single endpoint is allowed to allocate in flash memory. This value MUST be greater than 16
+ * @brief This defines how many scenes a single endpoint is allowed to allocate in flash memory. This value MUST at least 16
  * per spec and MUST be increased to allow for configuring a greater scene table size from Zap.
  */
 #ifndef CHIP_CONFIG_SCENES_TABLE_SIZE
