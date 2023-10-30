@@ -7729,16 +7729,31 @@
 - release: "Future"
   versions: "future"
   introduced:
+      bitmaps:
+          Scenes:
+              - CopyModeBitmap
+              - NameSupportBitmap
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
                   - SupplyFault
+          Scenes:
+              CopyModeBitmap:
+                  - CopyAllScenes
+              NameSupportBitmap:
+                  - SceneNames
   deprecated:
+      bitmaps:
+          Scenes:
+              - ScenesCopyMode
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
                   - Supplyfault
   renames:
+      bitmaps:
+          Scenes:
+              CopyModeBitmap: ScenesCopyMode
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
