@@ -2039,6 +2039,18 @@ static id _Nullable DecodeEventPayloadForDishwasherAlarmCluster(EventId aEventId
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForMicrowaveOvenControlCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::MicrowaveOvenControl;
+    switch (aEventId) {
+    default: {
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForOperationalStateCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::OperationalState;
@@ -3148,18 +3160,6 @@ static id _Nullable DecodeEventPayloadForAccountLoginCluster(EventId aEventId, T
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
-static id _Nullable DecodeEventPayloadForMicrowaveOvenControlCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
-{
-    using namespace Clusters::MicrowaveOvenControl;
-    switch (aEventId) {
-    default: {
-        break;
-    }
-    }
-
-    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
-    return nil;
-}
 static id _Nullable DecodeEventPayloadForElectricalMeasurementCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::ElectricalMeasurement;
@@ -3465,6 +3465,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     case Clusters::DishwasherAlarm::Id: {
         return DecodeEventPayloadForDishwasherAlarmCluster(aPath.mEventId, aReader, aError);
     }
+    case Clusters::MicrowaveOvenControl::Id: {
+        return DecodeEventPayloadForMicrowaveOvenControlCluster(aPath.mEventId, aReader, aError);
+    }
     case Clusters::OperationalState::Id: {
         return DecodeEventPayloadForOperationalStateCluster(aPath.mEventId, aReader, aError);
     }
@@ -3587,9 +3590,6 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::AccountLogin::Id: {
         return DecodeEventPayloadForAccountLoginCluster(aPath.mEventId, aReader, aError);
-    }
-    case Clusters::MicrowaveOvenControl::Id: {
-        return DecodeEventPayloadForMicrowaveOvenControlCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::ElectricalMeasurement::Id: {
         return DecodeEventPayloadForElectricalMeasurementCluster(aPath.mEventId, aReader, aError);

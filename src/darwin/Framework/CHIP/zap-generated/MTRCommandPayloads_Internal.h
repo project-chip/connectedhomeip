@@ -814,6 +814,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRMicrowaveOvenControlClusterSetCookingParametersParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRMicrowaveOvenControlClusterAddMoreTimeParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTROperationalStateClusterPauseParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -1463,18 +1475,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRAccountLoginClusterLogoutParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRMicrowaveOvenControlClusterSetCookingParametersParams (InternalMethods)
-
-- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
-
-@end
-
-@interface MTRMicrowaveOvenControlClusterAddMoreTimeParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 

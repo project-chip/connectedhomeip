@@ -7453,6 +7453,131 @@ public class ClusterReadMapping {
      
        return result;
     }
+    private static Map<String, InteractionInfo> readMicrowaveOvenControlInteractionInfo() {
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readMicrowaveOvenControlCookTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMicrowaveOvenControlCookTimeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MicrowaveOvenControlCluster) cluster).readCookTimeAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readMicrowaveOvenControlCookTimeCommandParams
+        );
+        result.put("readCookTimeAttribute", readMicrowaveOvenControlCookTimeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMicrowaveOvenControlPowerSettingCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMicrowaveOvenControlPowerSettingAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MicrowaveOvenControlCluster) cluster).readPowerSettingAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readMicrowaveOvenControlPowerSettingCommandParams
+        );
+        result.put("readPowerSettingAttribute", readMicrowaveOvenControlPowerSettingAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMicrowaveOvenControlMinPowerCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMicrowaveOvenControlMinPowerAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MicrowaveOvenControlCluster) cluster).readMinPowerAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readMicrowaveOvenControlMinPowerCommandParams
+        );
+        result.put("readMinPowerAttribute", readMicrowaveOvenControlMinPowerAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMicrowaveOvenControlMaxPowerCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMicrowaveOvenControlMaxPowerAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MicrowaveOvenControlCluster) cluster).readMaxPowerAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readMicrowaveOvenControlMaxPowerCommandParams
+        );
+        result.put("readMaxPowerAttribute", readMicrowaveOvenControlMaxPowerAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMicrowaveOvenControlPowerStepCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMicrowaveOvenControlPowerStepAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MicrowaveOvenControlCluster) cluster).readPowerStepAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readMicrowaveOvenControlPowerStepCommandParams
+        );
+        result.put("readPowerStepAttribute", readMicrowaveOvenControlPowerStepAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMicrowaveOvenControlGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMicrowaveOvenControlGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MicrowaveOvenControlCluster) cluster).readGeneratedCommandListAttribute(
+              (ChipClusters.MicrowaveOvenControlCluster.GeneratedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedMicrowaveOvenControlClusterGeneratedCommandListAttributeCallback(),
+          readMicrowaveOvenControlGeneratedCommandListCommandParams
+        );
+        result.put("readGeneratedCommandListAttribute", readMicrowaveOvenControlGeneratedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMicrowaveOvenControlAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMicrowaveOvenControlAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MicrowaveOvenControlCluster) cluster).readAcceptedCommandListAttribute(
+              (ChipClusters.MicrowaveOvenControlCluster.AcceptedCommandListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedMicrowaveOvenControlClusterAcceptedCommandListAttributeCallback(),
+          readMicrowaveOvenControlAcceptedCommandListCommandParams
+        );
+        result.put("readAcceptedCommandListAttribute", readMicrowaveOvenControlAcceptedCommandListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMicrowaveOvenControlEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMicrowaveOvenControlEventListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MicrowaveOvenControlCluster) cluster).readEventListAttribute(
+              (ChipClusters.MicrowaveOvenControlCluster.EventListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedMicrowaveOvenControlClusterEventListAttributeCallback(),
+          readMicrowaveOvenControlEventListCommandParams
+        );
+        result.put("readEventListAttribute", readMicrowaveOvenControlEventListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMicrowaveOvenControlAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMicrowaveOvenControlAttributeListAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MicrowaveOvenControlCluster) cluster).readAttributeListAttribute(
+              (ChipClusters.MicrowaveOvenControlCluster.AttributeListAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedMicrowaveOvenControlClusterAttributeListAttributeCallback(),
+          readMicrowaveOvenControlAttributeListCommandParams
+        );
+        result.put("readAttributeListAttribute", readMicrowaveOvenControlAttributeListAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMicrowaveOvenControlFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMicrowaveOvenControlFeatureMapAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MicrowaveOvenControlCluster) cluster).readFeatureMapAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readMicrowaveOvenControlFeatureMapCommandParams
+        );
+        result.put("readFeatureMapAttribute", readMicrowaveOvenControlFeatureMapAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readMicrowaveOvenControlClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readMicrowaveOvenControlClusterRevisionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.MicrowaveOvenControlCluster) cluster).readClusterRevisionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readMicrowaveOvenControlClusterRevisionCommandParams
+        );
+        result.put("readClusterRevisionAttribute", readMicrowaveOvenControlClusterRevisionAttributeInteractionInfo);
+     
+       return result;
+    }
     private static Map<String, InteractionInfo> readOperationalStateInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readOperationalStatePhaseListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readOperationalStatePhaseListAttributeInteractionInfo = new InteractionInfo(
@@ -14888,131 +15013,6 @@ public class ClusterReadMapping {
      
        return result;
     }
-    private static Map<String, InteractionInfo> readMicrowaveOvenControlInteractionInfo() {
-       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readMicrowaveOvenControlCookTimeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readMicrowaveOvenControlCookTimeAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.MicrowaveOvenControlCluster) cluster).readCookTimeAttribute(
-              (ChipClusters.LongAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-          readMicrowaveOvenControlCookTimeCommandParams
-        );
-        result.put("readCookTimeAttribute", readMicrowaveOvenControlCookTimeAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readMicrowaveOvenControlPowerSettingCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readMicrowaveOvenControlPowerSettingAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.MicrowaveOvenControlCluster) cluster).readPowerSettingAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readMicrowaveOvenControlPowerSettingCommandParams
-        );
-        result.put("readPowerSettingAttribute", readMicrowaveOvenControlPowerSettingAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readMicrowaveOvenControlMinPowerCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readMicrowaveOvenControlMinPowerAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.MicrowaveOvenControlCluster) cluster).readMinPowerAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readMicrowaveOvenControlMinPowerCommandParams
-        );
-        result.put("readMinPowerAttribute", readMicrowaveOvenControlMinPowerAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readMicrowaveOvenControlMaxPowerCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readMicrowaveOvenControlMaxPowerAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.MicrowaveOvenControlCluster) cluster).readMaxPowerAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readMicrowaveOvenControlMaxPowerCommandParams
-        );
-        result.put("readMaxPowerAttribute", readMicrowaveOvenControlMaxPowerAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readMicrowaveOvenControlPowerStepCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readMicrowaveOvenControlPowerStepAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.MicrowaveOvenControlCluster) cluster).readPowerStepAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readMicrowaveOvenControlPowerStepCommandParams
-        );
-        result.put("readPowerStepAttribute", readMicrowaveOvenControlPowerStepAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readMicrowaveOvenControlGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readMicrowaveOvenControlGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.MicrowaveOvenControlCluster) cluster).readGeneratedCommandListAttribute(
-              (ChipClusters.MicrowaveOvenControlCluster.GeneratedCommandListAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedMicrowaveOvenControlClusterGeneratedCommandListAttributeCallback(),
-          readMicrowaveOvenControlGeneratedCommandListCommandParams
-        );
-        result.put("readGeneratedCommandListAttribute", readMicrowaveOvenControlGeneratedCommandListAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readMicrowaveOvenControlAcceptedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readMicrowaveOvenControlAcceptedCommandListAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.MicrowaveOvenControlCluster) cluster).readAcceptedCommandListAttribute(
-              (ChipClusters.MicrowaveOvenControlCluster.AcceptedCommandListAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedMicrowaveOvenControlClusterAcceptedCommandListAttributeCallback(),
-          readMicrowaveOvenControlAcceptedCommandListCommandParams
-        );
-        result.put("readAcceptedCommandListAttribute", readMicrowaveOvenControlAcceptedCommandListAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readMicrowaveOvenControlEventListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readMicrowaveOvenControlEventListAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.MicrowaveOvenControlCluster) cluster).readEventListAttribute(
-              (ChipClusters.MicrowaveOvenControlCluster.EventListAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedMicrowaveOvenControlClusterEventListAttributeCallback(),
-          readMicrowaveOvenControlEventListCommandParams
-        );
-        result.put("readEventListAttribute", readMicrowaveOvenControlEventListAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readMicrowaveOvenControlAttributeListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readMicrowaveOvenControlAttributeListAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.MicrowaveOvenControlCluster) cluster).readAttributeListAttribute(
-              (ChipClusters.MicrowaveOvenControlCluster.AttributeListAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedMicrowaveOvenControlClusterAttributeListAttributeCallback(),
-          readMicrowaveOvenControlAttributeListCommandParams
-        );
-        result.put("readAttributeListAttribute", readMicrowaveOvenControlAttributeListAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readMicrowaveOvenControlFeatureMapCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readMicrowaveOvenControlFeatureMapAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.MicrowaveOvenControlCluster) cluster).readFeatureMapAttribute(
-              (ChipClusters.LongAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-          readMicrowaveOvenControlFeatureMapCommandParams
-        );
-        result.put("readFeatureMapAttribute", readMicrowaveOvenControlFeatureMapAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readMicrowaveOvenControlClusterRevisionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readMicrowaveOvenControlClusterRevisionAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.MicrowaveOvenControlCluster) cluster).readClusterRevisionAttribute(
-              (ChipClusters.IntegerAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-          readMicrowaveOvenControlClusterRevisionCommandParams
-        );
-        result.put("readClusterRevisionAttribute", readMicrowaveOvenControlClusterRevisionAttributeInteractionInfo);
-     
-       return result;
-    }
     private static Map<String, InteractionInfo> readElectricalMeasurementInteractionInfo() {
        Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readElectricalMeasurementMeasurementTypeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readElectricalMeasurementMeasurementTypeAttributeInteractionInfo = new InteractionInfo(
@@ -17649,6 +17649,7 @@ public class ClusterReadMapping {
             put("airQuality", readAirQualityInteractionInfo());
             put("smokeCoAlarm", readSmokeCoAlarmInteractionInfo());
             put("dishwasherAlarm", readDishwasherAlarmInteractionInfo());
+            put("microwaveOvenControl", readMicrowaveOvenControlInteractionInfo());
             put("operationalState", readOperationalStateInteractionInfo());
             put("rvcOperationalState", readRvcOperationalStateInteractionInfo());
             put("hepaFilterMonitoring", readHepaFilterMonitoringInteractionInfo());
@@ -17690,7 +17691,6 @@ public class ClusterReadMapping {
             put("applicationLauncher", readApplicationLauncherInteractionInfo());
             put("applicationBasic", readApplicationBasicInteractionInfo());
             put("accountLogin", readAccountLoginInteractionInfo());
-            put("microwaveOvenControl", readMicrowaveOvenControlInteractionInfo());
             put("electricalMeasurement", readElectricalMeasurementInteractionInfo());
             put("unitTesting", readUnitTestingInteractionInfo());
             put("faultInjection", readFaultInjectionInteractionInfo());

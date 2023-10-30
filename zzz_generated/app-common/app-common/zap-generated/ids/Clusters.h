@@ -184,6 +184,9 @@ static constexpr ClusterId Id = 0x0000005C;
 namespace DishwasherAlarm {
 static constexpr ClusterId Id = 0x0000005D;
 } // namespace DishwasherAlarm
+namespace MicrowaveOvenControl {
+static constexpr ClusterId Id = 0x0000005F;
+} // namespace MicrowaveOvenControl
 namespace OperationalState {
 static constexpr ClusterId Id = 0x00000060;
 } // namespace OperationalState
@@ -307,9 +310,6 @@ static constexpr ClusterId Id = 0x0000050D;
 namespace AccountLogin {
 static constexpr ClusterId Id = 0x0000050E;
 } // namespace AccountLogin
-namespace MicrowaveOvenControl {
-static constexpr ClusterId Id = 0x0000050F;
-} // namespace MicrowaveOvenControl
 namespace ElectricalMeasurement {
 static constexpr ClusterId Id = 0x00000B04;
 } // namespace ElectricalMeasurement

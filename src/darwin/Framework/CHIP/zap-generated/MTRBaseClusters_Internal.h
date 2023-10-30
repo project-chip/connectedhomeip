@@ -220,6 +220,10 @@
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @end
 
+@interface MTRBaseClusterMicrowaveOvenControl ()
+@property (nonatomic, strong, readonly) MTRBaseDevice * device;
+@end
+
 @interface MTRBaseClusterOperationalState ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @end
@@ -381,10 +385,6 @@
 @end
 
 @interface MTRBaseClusterAccountLogin ()
-@property (nonatomic, strong, readonly) MTRBaseDevice * device;
-@end
-
-@interface MTRBaseClusterMicrowaveOvenControl ()
 @property (nonatomic, strong, readonly) MTRBaseDevice * device;
 @end
 

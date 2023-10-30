@@ -1848,6 +1848,8 @@ enum class Feature : uint32_t
 };
 } // namespace DishwasherAlarm
 
+namespace MicrowaveOvenControl {} // namespace MicrowaveOvenControl
+
 namespace OperationalState {
 
 // Enum for ErrorStateEnum
@@ -4093,8 +4095,6 @@ enum class ApplicationStatusEnum : uint8_t
 } // namespace ApplicationBasic
 
 namespace AccountLogin {} // namespace AccountLogin
-
-namespace MicrowaveOvenControl {} // namespace MicrowaveOvenControl
 
 namespace ElectricalMeasurement {} // namespace ElectricalMeasurement
 

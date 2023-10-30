@@ -1034,6 +1034,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("smokeCoAlarm", writeSmokeCoAlarmInteractionInfo);
     Map<String, InteractionInfo> writeDishwasherAlarmInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("dishwasherAlarm", writeDishwasherAlarmInteractionInfo);
+    Map<String, InteractionInfo> writeMicrowaveOvenControlInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("microwaveOvenControl", writeMicrowaveOvenControlInteractionInfo);
     Map<String, InteractionInfo> writeOperationalStateInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("operationalState", writeOperationalStateInteractionInfo);
     Map<String, InteractionInfo> writeRvcOperationalStateInteractionInfo = new LinkedHashMap<>();
@@ -3338,8 +3340,6 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("applicationBasic", writeApplicationBasicInteractionInfo);
     Map<String, InteractionInfo> writeAccountLoginInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("accountLogin", writeAccountLoginInteractionInfo);
-    Map<String, InteractionInfo> writeMicrowaveOvenControlInteractionInfo = new LinkedHashMap<>();
-    writeAttributeMap.put("microwaveOvenControl", writeMicrowaveOvenControlInteractionInfo);
     Map<String, InteractionInfo> writeElectricalMeasurementInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeElectricalMeasurementAverageRmsVoltageMeasurementPeriodCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo electricalMeasurementaverageRmsVoltageMeasurementPeriodCommandParameterInfo =

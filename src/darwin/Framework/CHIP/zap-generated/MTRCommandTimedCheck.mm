@@ -482,6 +482,15 @@ static BOOL CommandNeedsTimedInvokeInDishwasherAlarmCluster(AttributeId aAttribu
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInMicrowaveOvenControlCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::MicrowaveOvenControl;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInOperationalStateCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::OperationalState;
@@ -884,15 +893,6 @@ static BOOL CommandNeedsTimedInvokeInAccountLoginCluster(AttributeId aAttributeI
     }
     }
 }
-static BOOL CommandNeedsTimedInvokeInMicrowaveOvenControlCluster(AttributeId aAttributeId)
-{
-    using namespace Clusters::MicrowaveOvenControl;
-    switch (aAttributeId) {
-    default: {
-        return NO;
-    }
-    }
-}
 static BOOL CommandNeedsTimedInvokeInElectricalMeasurementCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ElectricalMeasurement;
@@ -1080,6 +1080,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::DishwasherAlarm::Id: {
         return CommandNeedsTimedInvokeInDishwasherAlarmCluster(commandID);
     }
+    case Clusters::MicrowaveOvenControl::Id: {
+        return CommandNeedsTimedInvokeInMicrowaveOvenControlCluster(commandID);
+    }
     case Clusters::OperationalState::Id: {
         return CommandNeedsTimedInvokeInOperationalStateCluster(commandID);
     }
@@ -1202,9 +1205,6 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::AccountLogin::Id: {
         return CommandNeedsTimedInvokeInAccountLoginCluster(commandID);
-    }
-    case Clusters::MicrowaveOvenControl::Id: {
-        return CommandNeedsTimedInvokeInMicrowaveOvenControlCluster(commandID);
     }
     case Clusters::ElectricalMeasurement::Id: {
         return CommandNeedsTimedInvokeInElectricalMeasurementCluster(commandID);

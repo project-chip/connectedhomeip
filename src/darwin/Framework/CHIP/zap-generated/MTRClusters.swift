@@ -369,6 +369,13 @@ extension MTRClusterDishwasherAlarm {
 }
 
 @available(iOS, unavailable) @available(macOS, unavailable) @available(tvOS, unavailable) @available(watchOS, unavailable)
+extension MTRClusterMicrowaveOvenControl {
+    public convenience init(device : MTRDevice, endpointID: UInt) {
+        self.init(device: device, endpointID: endpointID as NSNumber, queue: clusterQueue)!
+    }
+}
+
+@available(iOS, unavailable) @available(macOS, unavailable) @available(tvOS, unavailable) @available(watchOS, unavailable)
 extension MTRClusterOperationalState {
     public convenience init(device : MTRDevice, endpointID: UInt) {
         self.init(device: device, endpointID: endpointID as NSNumber, queue: clusterQueue)!
@@ -650,13 +657,6 @@ extension MTRClusterApplicationBasic {
 
 @available(iOS 17.2, macOS 14.2, watchOS 10.2, tvOS 17.2, *)
 extension MTRClusterAccountLogin {
-    public convenience init(device : MTRDevice, endpointID: UInt) {
-        self.init(device: device, endpointID: endpointID as NSNumber, queue: clusterQueue)!
-    }
-}
-
-@available(iOS, unavailable) @available(macOS, unavailable) @available(tvOS, unavailable) @available(watchOS, unavailable)
-extension MTRClusterMicrowaveOvenControl {
     public convenience init(device : MTRDevice, endpointID: UInt) {
         self.init(device: device, endpointID: endpointID as NSNumber, queue: clusterQueue)!
     }
