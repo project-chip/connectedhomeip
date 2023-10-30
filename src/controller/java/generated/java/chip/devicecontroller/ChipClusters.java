@@ -6075,7 +6075,7 @@ public class ChipClusters {
     private native void timeSnapshot(long chipClusterPtr, TimeSnapshotResponseCallback callback, @Nullable Integer timedInvokeTimeoutMs);
 
     public interface TimeSnapshotResponseCallback {
-      void onSuccess(Long systemTimeUs, Long UTCTimeUs);
+      void onSuccess(Long systemTimeUs, @Nullable Long UTCTimeUs);
       void onError(Exception error);
     }
 

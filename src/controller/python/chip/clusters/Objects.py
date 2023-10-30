@@ -8371,11 +8371,11 @@ class GeneralDiagnostics(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="systemTimeUs", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="UTCTimeUs", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="UTCTimeUs", Tag=1, Type=typing.Union[Nullable, uint]),
                     ])
 
             systemTimeUs: 'uint' = 0
-            UTCTimeUs: 'uint' = 0
+            UTCTimeUs: 'typing.Union[Nullable, uint]' = NullValue
 
     class Attributes:
         @dataclass

@@ -1797,7 +1797,7 @@ client cluster GeneralDiagnostics = 51 {
 
   response struct TimeSnapshotResponse = 2 {
     systime_us systemTimeUs = 0;
-    epoch_us UTCTimeUs = 1;
+    nullable epoch_us UTCTimeUs = 1;
   }
 
   /** Provide a means for certification tests to trigger some test-plan-specific events */

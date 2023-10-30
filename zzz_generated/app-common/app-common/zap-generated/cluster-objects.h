@@ -8267,7 +8267,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
     uint64_t systemTimeUs = static_cast<uint64_t>(0);
-    uint64_t UTCTimeUs    = static_cast<uint64_t>(0);
+    DataModel::Nullable<uint64_t> UTCTimeUs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -8283,7 +8283,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
 
     uint64_t systemTimeUs = static_cast<uint64_t>(0);
-    uint64_t UTCTimeUs    = static_cast<uint64_t>(0);
+    DataModel::Nullable<uint64_t> UTCTimeUs;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TimeSnapshotResponse

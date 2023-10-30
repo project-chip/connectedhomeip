@@ -8609,7 +8609,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _systemTimeUs = @(0);
 
-        _utcTimeUs = @(0);
+        _utcTimeUs = nil;
     }
     return self;
 }
@@ -8680,7 +8680,11 @@ NS_ASSUME_NONNULL_BEGIN
         self.systemTimeUs = [NSNumber numberWithUnsignedLongLong:decodableStruct.systemTimeUs];
     }
     {
-        self.utcTimeUs = [NSNumber numberWithUnsignedLongLong:decodableStruct.UTCTimeUs];
+        if (decodableStruct.UTCTimeUs.IsNull()) {
+            self.utcTimeUs = nil;
+        } else {
+            self.utcTimeUs = [NSNumber numberWithUnsignedLongLong:decodableStruct.UTCTimeUs.Value()];
+        }
     }
     return CHIP_NO_ERROR;
 }

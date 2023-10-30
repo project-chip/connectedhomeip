@@ -2262,11 +2262,18 @@ void CHIPGeneralDiagnosticsClusterTimeSnapshotResponseCallback::CallbackFn(
     chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(SystemTimeUsClassName.c_str(), SystemTimeUsCtorSignature.c_str(),
                                                                 jniSystemTimeUs, SystemTimeUs);
     jobject UTCTimeUs;
-    std::string UTCTimeUsClassName     = "java/lang/Long";
-    std::string UTCTimeUsCtorSignature = "(J)V";
-    jlong jniUTCTimeUs                 = static_cast<jlong>(dataResponse.UTCTimeUs);
-    chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(UTCTimeUsClassName.c_str(), UTCTimeUsCtorSignature.c_str(),
-                                                                jniUTCTimeUs, UTCTimeUs);
+    if (dataResponse.UTCTimeUs.IsNull())
+    {
+        UTCTimeUs = nullptr;
+    }
+    else
+    {
+        std::string UTCTimeUsClassName     = "java/lang/Long";
+        std::string UTCTimeUsCtorSignature = "(J)V";
+        jlong jniUTCTimeUs                 = static_cast<jlong>(dataResponse.UTCTimeUs.Value());
+        chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(UTCTimeUsClassName.c_str(), UTCTimeUsCtorSignature.c_str(),
+                                                                    jniUTCTimeUs, UTCTimeUs);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, SystemTimeUs, UTCTimeUs);
 }

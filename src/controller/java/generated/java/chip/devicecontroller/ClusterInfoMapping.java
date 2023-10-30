@@ -3647,7 +3647,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Long systemTimeUs, Long UTCTimeUs) {
+    public void onSuccess(Long systemTimeUs, @Nullable Long UTCTimeUs) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo systemTimeUsResponseValue = new CommandResponseInfo("systemTimeUs", "Long");
