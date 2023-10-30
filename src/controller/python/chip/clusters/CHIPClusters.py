@@ -6037,7 +6037,7 @@ class ChipClusters:
         "commands": {
             0x00000000: {
                 "commandId": 0x00000000,
-                "commandName": "SupressRequest",
+                "commandName": "SuppressRequest",
                 "args": {
                     "alarmsToSuppress": "int",
                 },

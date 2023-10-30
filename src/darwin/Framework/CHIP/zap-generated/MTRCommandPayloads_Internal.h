@@ -964,7 +964,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRBooleanSensorConfigurationClusterSupressRequestParams (InternalMethods)
+@interface MTRBooleanSensorConfigurationClusterSuppressRequestParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 

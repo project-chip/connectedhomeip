@@ -3252,7 +3252,12 @@ MTR_PROVISIONALLY_AVAILABLE
                               endpointID:(NSNumber *)endpointID
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_PROVISIONALLY_AVAILABLE;
 
-- (void)supressRequestWithParams:(MTRBooleanSensorConfigurationClusterSupressRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+/**
+ * The device this cluster object is associated with.
+ */
+@property (nonatomic, readonly) MTRDevice * device MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)suppressRequestWithParams:(MTRBooleanSensorConfigurationClusterSuppressRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedDataValueDictionaries expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSensitivityLevelWithParams:(MTRReadParams * _Nullable)params MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeSensitivityLevelWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs MTR_PROVISIONALLY_AVAILABLE;

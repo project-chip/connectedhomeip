@@ -890,9 +890,9 @@ static constexpr CommandId Id = 0x00000000;
 namespace BooleanSensorConfiguration {
 namespace Commands {
 
-namespace SupressRequest {
+namespace SuppressRequest {
 static constexpr CommandId Id = 0x00000000;
-} // namespace SupressRequest
+} // namespace SuppressRequest
 
 } // namespace Commands
 } // namespace BooleanSensorConfiguration

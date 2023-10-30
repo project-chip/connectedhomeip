@@ -21137,12 +21137,12 @@ class BooleanSensorConfiguration(Cluster):
         class Feature(IntFlag):
             kVisual = 0x1
             kAudible = 0x2
-            kAlarmSupress = 0x4
+            kAlarmSuppress = 0x4
             kSensitivityLevel = 0x8
 
     class Commands:
         @dataclass
-        class SupressRequest(ClusterCommand):
+        class SuppressRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000080
             command_id: typing.ClassVar[int] = 0x00000000
             is_client: typing.ClassVar[bool] = True
@@ -21334,7 +21334,7 @@ class BooleanSensorConfiguration(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="alarmsActive", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="alarmsSuppressed", Tag=0, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="alarmsSuppressed", Tag=1, Type=typing.Optional[uint]),
                     ])
 
             alarmsActive: 'uint' = 0
@@ -21418,7 +21418,7 @@ class ValveConfigurationAndControl(Cluster):
         class ValveFaultBitmap(IntFlag):
             kGeneralFault = 0x1
             kBlocked = 0x2
-            kLeak = 0x4
+            kLeaking = 0x4
 
     class Commands:
         @dataclass

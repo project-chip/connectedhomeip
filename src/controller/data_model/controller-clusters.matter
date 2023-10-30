@@ -3944,13 +3944,13 @@ provisional client cluster BooleanSensorConfiguration = 128 {
   bitmap Feature : bitmap32 {
     kVisual = 0x1;
     kAudible = 0x2;
-    kAlarmSupress = 0x4;
+    kAlarmSuppress = 0x4;
     kSensitivityLevel = 0x8;
   }
 
   info event AlarmsStateChanged = 0 {
     AlarmModeBitmap alarmsActive = 0;
-    optional AlarmModeBitmap alarmsSuppressed = 0;
+    optional AlarmModeBitmap alarmsSuppressed = 1;
   }
 
   info event SensorFault = 1 {
@@ -3967,12 +3967,12 @@ provisional client cluster BooleanSensorConfiguration = 128 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  request struct SupressRequestRequest {
+  request struct SuppressRequestRequest {
     AlarmModeBitmap alarmsToSuppress = 0;
   }
 
   /** This command is used to suppress the specified alarm. */
-  command SupressRequest(SupressRequestRequest): DefaultSuccess = 0;
+  command SuppressRequest(SuppressRequestRequest): DefaultSuccess = 0;
 }
 
 /** This cluster is used to configure a valve. */
@@ -3990,7 +3990,7 @@ provisional client cluster ValveConfigurationAndControl = 129 {
   bitmap ValveFaultBitmap : bitmap16 {
     kGeneralFault = 0x1;
     kBlocked = 0x2;
-    kLeak = 0x4;
+    kLeaking = 0x4;
   }
 
   info event ValveStateChanged = 0 {

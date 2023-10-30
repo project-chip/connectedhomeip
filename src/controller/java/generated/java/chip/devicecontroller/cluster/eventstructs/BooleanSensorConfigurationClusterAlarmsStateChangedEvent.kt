@@ -48,7 +48,7 @@ class BooleanSensorConfigurationClusterAlarmsStateChangedEvent(
 
   companion object {
     private const val TAG_ALARMS_ACTIVE = 0
-    private const val TAG_ALARMS_SUPPRESSED = 0
+    private const val TAG_ALARMS_SUPPRESSED = 1
 
     fun fromTlv(
       tlvTag: Tag,

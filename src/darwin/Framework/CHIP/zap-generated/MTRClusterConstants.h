@@ -6114,7 +6114,7 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterActivatedCarbonFilterMonitoringCommandResetConditionID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
 
     // Cluster BooleanSensorConfiguration commands
-    MTRCommandIDTypeClusterBooleanSensorConfigurationCommandSupressRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRCommandIDTypeClusterBooleanSensorConfigurationCommandSuppressRequestID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
 
     // Cluster ValveConfigurationAndControl commands
     MTRCommandIDTypeClusterValveConfigurationAndControlCommandOpenID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,

@@ -2119,7 +2119,7 @@ enum class Feature : uint32_t
 {
     kVisual           = 0x1,
     kAudible          = 0x2,
-    kAlarmSupress     = 0x4,
+    kAlarmSuppress    = 0x4,
     kSensitivityLevel = 0x8,
 };
 } // namespace BooleanSensorConfiguration
@@ -2150,7 +2150,7 @@ enum class ValveFaultBitmap : uint16_t
 {
     kGeneralFault = 0x1,
     kBlocked      = 0x2,
-    kLeak         = 0x4,
+    kLeaking      = 0x4,
 };
 } // namespace ValveConfigurationAndControl
 

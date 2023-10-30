@@ -14992,7 +14992,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation MTRBooleanSensorConfigurationClusterSupressRequestParams
+@implementation MTRBooleanSensorConfigurationClusterSuppressRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -15006,7 +15006,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone;
 {
-    auto other = [[MTRBooleanSensorConfigurationClusterSupressRequestParams alloc] init];
+    auto other = [[MTRBooleanSensorConfigurationClusterSuppressRequestParams alloc] init];
 
     other.alarmsToSuppress = self.alarmsToSuppress;
     other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
@@ -15023,11 +15023,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRBooleanSensorConfigurationClusterSupressRequestParams (InternalMethods)
+@implementation MTRBooleanSensorConfigurationClusterSuppressRequestParams (InternalMethods)
 
 - (CHIP_ERROR)_encodeToTLVReader:(chip::System::PacketBufferTLVReader &)reader
 {
-    chip::app::Clusters::BooleanSensorConfiguration::Commands::SupressRequest::Type encodableStruct;
+    chip::app::Clusters::BooleanSensorConfiguration::Commands::SuppressRequest::Type encodableStruct;
     ListFreer listFreer;
     {
         encodableStruct.alarmsToSuppress = static_cast<std::remove_reference_t<decltype(encodableStruct.alarmsToSuppress)>>(self.alarmsToSuppress.unsignedCharValue);

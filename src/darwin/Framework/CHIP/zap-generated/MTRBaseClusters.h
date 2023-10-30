@@ -6859,11 +6859,11 @@ MTR_PROVISIONALLY_AVAILABLE
                                    queue:(dispatch_queue_t)queue NS_DESIGNATED_INITIALIZER MTR_PROVISIONALLY_AVAILABLE;
 
 /**
- * Command SupressRequest
+ * Command SuppressRequest
  *
  * This command is used to suppress the specified alarm.
  */
-- (void)supressRequestWithParams:(MTRBooleanSensorConfigurationClusterSupressRequestParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)suppressRequestWithParams:(MTRBooleanSensorConfigurationClusterSuppressRequestParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeSensitivityLevelWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)writeAttributeSensitivityLevelWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
@@ -16110,7 +16110,7 @@ typedef NS_OPTIONS(uint8_t, MTRBooleanSensorConfigurationAlarmModeBitmap) {
 typedef NS_OPTIONS(uint32_t, MTRBooleanSensorConfigurationFeature) {
     MTRBooleanSensorConfigurationFeatureVisual MTR_PROVISIONALLY_AVAILABLE = 0x1,
     MTRBooleanSensorConfigurationFeatureAudible MTR_PROVISIONALLY_AVAILABLE = 0x2,
-    MTRBooleanSensorConfigurationFeatureAlarmSupress MTR_PROVISIONALLY_AVAILABLE = 0x4,
+    MTRBooleanSensorConfigurationFeatureAlarmSuppress MTR_PROVISIONALLY_AVAILABLE = 0x4,
     MTRBooleanSensorConfigurationFeatureSensitivityLevel MTR_PROVISIONALLY_AVAILABLE = 0x8,
 } MTR_PROVISIONALLY_AVAILABLE;
 
@@ -16127,7 +16127,7 @@ typedef NS_OPTIONS(uint32_t, MTRValveConfigurationAndControlFeature) {
 typedef NS_OPTIONS(uint16_t, MTRValveConfigurationAndControlValveFaultBitmap) {
     MTRValveConfigurationAndControlValveFaultBitmapGeneralFault MTR_PROVISIONALLY_AVAILABLE = 0x1,
     MTRValveConfigurationAndControlValveFaultBitmapBlocked MTR_PROVISIONALLY_AVAILABLE = 0x2,
-    MTRValveConfigurationAndControlValveFaultBitmapLeak MTR_PROVISIONALLY_AVAILABLE = 0x4,
+    MTRValveConfigurationAndControlValveFaultBitmapLeaking MTR_PROVISIONALLY_AVAILABLE = 0x4,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTRDoorLockAlarmCode) {
