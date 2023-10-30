@@ -123,7 +123,7 @@ CHIP_ERROR ScenesServer::Init()
             BitMask<NameSupportBitmap> nameSupport = (featureMap & to_underlying(Feature::kSceneNames))
                 ? BitMask<NameSupportBitmap>(NameSupportBitmap::kSceneNames)
                 : BitMask<NameSupportBitmap>();
-            status                                 = Attributes::NameSupport::Set(endpoint, nameSupport.Raw());
+            status                                 = Attributes::NameSupport::Set(endpoint, nameSupport);
             if (EMBER_ZCL_STATUS_SUCCESS != status)
             {
                 ChipLogDetail(Zcl, "ERR: setting NameSupport on Endpoint %hu Status: %x", endpoint, status);
