@@ -23047,6 +23047,12 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
     case Clusters::AccountLogin::Id: {
         switch (aCommand)
         {
+        case Clusters::AccountLogin::Commands::GetSetupPIN::Id:
+            return true;
+        case Clusters::AccountLogin::Commands::Login::Id:
+            return true;
+        case Clusters::AccountLogin::Commands::Logout::Id:
+            return true;
         default:
             return false;
         }
