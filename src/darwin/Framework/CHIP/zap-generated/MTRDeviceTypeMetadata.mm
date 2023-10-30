@@ -57,6 +57,7 @@ constexpr DeviceTypeData knownDeviceTypes[] = {
     { 0x00000070, DeviceTypeClass::Simple, "Matter Refrigerator" },
     { 0x00000071, DeviceTypeClass::Simple, "Matter Temperature Controlled Cabinet" },
     { 0x00000072, DeviceTypeClass::Simple, "Matter Room Air Conditioner" },
+    { 0x00000073, DeviceTypeClass::Simple, "Matter Laundry Dryer" },
     { 0x00000073, DeviceTypeClass::Simple, "Matter Laundry Washer" },
     { 0x00000074, DeviceTypeClass::Simple, "Matter Robotic Vacuum Cleaner" },
     { 0x00000075, DeviceTypeClass::Simple, "Matter Dishwasher" },

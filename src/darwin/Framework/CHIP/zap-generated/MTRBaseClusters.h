@@ -14363,46 +14363,6 @@ typedef NS_OPTIONS(uint32_t, MTRICDManagementUserActiveModeTriggerBitmap) {
     MTRICDManagementUserActiveModeTriggerBitmapAppDefinedButton MTR_PROVISIONALLY_AVAILABLE = 0x10000,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_OPTIONS(uint32_t, MTRICDManagementUserActiveModeTriggerBitmap) {
-    MTRICDManagementUserActiveModeTriggerBitmapPowerCycle MTR_PROVISIONALLY_AVAILABLE = 0x1,
-    MTRICDManagementUserActiveModeTriggerBitmapSettingsMenu MTR_PROVISIONALLY_AVAILABLE = 0x2,
-    MTRICDManagementUserActiveModeTriggerBitmapCustomInstruction MTR_PROVISIONALLY_AVAILABLE = 0x4,
-    MTRICDManagementUserActiveModeTriggerBitmapDeviceManual MTR_PROVISIONALLY_AVAILABLE = 0x8,
-    MTRICDManagementUserActiveModeTriggerBitmapActuateSensor MTR_PROVISIONALLY_AVAILABLE = 0x10,
-    MTRICDManagementUserActiveModeTriggerBitmapActuateSensorSeconds MTR_PROVISIONALLY_AVAILABLE = 0x20,
-    MTRICDManagementUserActiveModeTriggerBitmapActuateSensorTimes MTR_PROVISIONALLY_AVAILABLE = 0x40,
-    MTRICDManagementUserActiveModeTriggerBitmapActuateSensorLightsBlink MTR_PROVISIONALLY_AVAILABLE = 0x80,
-    MTRICDManagementUserActiveModeTriggerBitmapResetButton MTR_PROVISIONALLY_AVAILABLE = 0x100,
-    MTRICDManagementUserActiveModeTriggerBitmapResetButtonLightsBlink MTR_PROVISIONALLY_AVAILABLE = 0x200,
-    MTRICDManagementUserActiveModeTriggerBitmapResetButtonSeconds MTR_PROVISIONALLY_AVAILABLE = 0x400,
-    MTRICDManagementUserActiveModeTriggerBitmapResetButtonTimes MTR_PROVISIONALLY_AVAILABLE = 0x800,
-    MTRICDManagementUserActiveModeTriggerBitmapSetupButton MTR_PROVISIONALLY_AVAILABLE = 0x1000,
-    MTRICDManagementUserActiveModeTriggerBitmapSetupButtonSeconds MTR_PROVISIONALLY_AVAILABLE = 0x2000,
-    MTRICDManagementUserActiveModeTriggerBitmapSetupButtonLightsBlink MTR_PROVISIONALLY_AVAILABLE = 0x4000,
-    MTRICDManagementUserActiveModeTriggerBitmapSetupButtonTimes MTR_PROVISIONALLY_AVAILABLE = 0x8000,
-    MTRICDManagementUserActiveModeTriggerBitmapAppDefinedButton MTR_PROVISIONALLY_AVAILABLE = 0x10000,
-} MTR_PROVISIONALLY_AVAILABLE;
-
-typedef NS_OPTIONS(uint32_t, MTRICDManagementUserActiveModeTriggerBitmap) {
-    MTRICDManagementUserActiveModeTriggerBitmapPowerCycle MTR_PROVISIONALLY_AVAILABLE = 0x1,
-    MTRICDManagementUserActiveModeTriggerBitmapSettingsMenu MTR_PROVISIONALLY_AVAILABLE = 0x2,
-    MTRICDManagementUserActiveModeTriggerBitmapCustomInstruction MTR_PROVISIONALLY_AVAILABLE = 0x4,
-    MTRICDManagementUserActiveModeTriggerBitmapDeviceManual MTR_PROVISIONALLY_AVAILABLE = 0x8,
-    MTRICDManagementUserActiveModeTriggerBitmapActuateSensor MTR_PROVISIONALLY_AVAILABLE = 0x10,
-    MTRICDManagementUserActiveModeTriggerBitmapActuateSensorSeconds MTR_PROVISIONALLY_AVAILABLE = 0x20,
-    MTRICDManagementUserActiveModeTriggerBitmapActuateSensorTimes MTR_PROVISIONALLY_AVAILABLE = 0x40,
-    MTRICDManagementUserActiveModeTriggerBitmapActuateSensorLightsBlink MTR_PROVISIONALLY_AVAILABLE = 0x80,
-    MTRICDManagementUserActiveModeTriggerBitmapResetButton MTR_PROVISIONALLY_AVAILABLE = 0x100,
-    MTRICDManagementUserActiveModeTriggerBitmapResetButtonLightsBlink MTR_PROVISIONALLY_AVAILABLE = 0x200,
-    MTRICDManagementUserActiveModeTriggerBitmapResetButtonSeconds MTR_PROVISIONALLY_AVAILABLE = 0x400,
-    MTRICDManagementUserActiveModeTriggerBitmapResetButtonTimes MTR_PROVISIONALLY_AVAILABLE = 0x800,
-    MTRICDManagementUserActiveModeTriggerBitmapSetupButton MTR_PROVISIONALLY_AVAILABLE = 0x1000,
-    MTRICDManagementUserActiveModeTriggerBitmapSetupButtonSeconds MTR_PROVISIONALLY_AVAILABLE = 0x2000,
-    MTRICDManagementUserActiveModeTriggerBitmapSetupButtonLightsBlink MTR_PROVISIONALLY_AVAILABLE = 0x4000,
-    MTRICDManagementUserActiveModeTriggerBitmapSetupButtonTimes MTR_PROVISIONALLY_AVAILABLE = 0x8000,
-    MTRICDManagementUserActiveModeTriggerBitmapAppDefinedButton MTR_PROVISIONALLY_AVAILABLE = 0x10000,
-} MTR_PROVISIONALLY_AVAILABLE;
-
 typedef NS_ENUM(uint8_t, MTRLaundryDryerControlsDrynessLevel) {
     MTRLaundryDryerControlsDrynessLevelLow MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTRLaundryDryerControlsDrynessLevelNormal MTR_PROVISIONALLY_AVAILABLE = 0x01,
