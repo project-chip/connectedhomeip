@@ -384,8 +384,8 @@ bool emberAfGeneralDiagnosticsClusterTestEventTriggerCallback(CommandHandler * c
     return true;
 }
 
-bool emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(CommandHandler* commandObj, ConcreteCommandPath const& commandPath,
-                                                          Commands::TimeSnapshot::DecodableType const& commandData)
+bool emberAfGeneralDiagnosticsClusterTimeSnapshotCallback(CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
+                                                          Commands::TimeSnapshot::DecodableType const & commandData)
 {
     // TODO(#30096): Command needs to be implemented.
     ChipLogError(Zcl, "TimeSnapshot not yet supported!");
