@@ -8720,7 +8720,7 @@ class SoftwareDiagnostics(Cluster):
 
     class Bitmaps:
         class Feature(IntFlag):
-            kWaterMarks = 0x1
+            kWatermarks = 0x1
 
     class Structs:
         @dataclass
