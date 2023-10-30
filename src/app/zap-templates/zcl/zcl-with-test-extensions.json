@@ -203,7 +203,9 @@
             "ActiveModeThreshold",
             "RegisteredClients",
             "ICDCounter",
-            "ClientsSupportedPerFabric"
+            "ClientsSupportedPerFabric",
+            "UserActiveModeTriggerHint",
+            "UserActiveModeTriggerInstruction"
         ],
         "Operational Credentials": [
             "SupportedFabrics",

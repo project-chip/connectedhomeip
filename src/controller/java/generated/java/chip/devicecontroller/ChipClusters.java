@@ -10938,6 +10938,26 @@ public class ChipClusters {
         subscribeClientsSupportedPerFabricAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
+    public void readUserActiveModeTriggerHintAttribute(
+        LongAttributeCallback callback) {
+        readUserActiveModeTriggerHintAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUserActiveModeTriggerHintAttribute(
+        LongAttributeCallback callback, int minInterval, int maxInterval) {
+        subscribeUserActiveModeTriggerHintAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUserActiveModeTriggerInstructionAttribute(
+        CharStringAttributeCallback callback) {
+        readUserActiveModeTriggerInstructionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUserActiveModeTriggerInstructionAttribute(
+        CharStringAttributeCallback callback, int minInterval, int maxInterval) {
+        subscribeUserActiveModeTriggerInstructionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
     public void readGeneratedCommandListAttribute(
         GeneratedCommandListAttributeCallback callback) {
         readGeneratedCommandListAttribute(chipClusterPtr, callback);
@@ -11021,6 +11041,14 @@ public class ChipClusters {
     private native void readClientsSupportedPerFabricAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void subscribeClientsSupportedPerFabricAttribute(long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUserActiveModeTriggerHintAttribute(long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void subscribeUserActiveModeTriggerHintAttribute(long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUserActiveModeTriggerInstructionAttribute(long chipClusterPtr, CharStringAttributeCallback callback);
+
+    private native void subscribeUserActiveModeTriggerInstructionAttribute(long chipClusterPtr, CharStringAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readGeneratedCommandListAttribute(long chipClusterPtr, GeneratedCommandListAttributeCallback callback);
 

@@ -1827,7 +1827,7 @@ EmberAfStatus DoorLockServer::createUser(chip::EndpointId endpointId, chip::Fabr
         return static_cast<EmberAfStatus>(DlStatus::kOccupied);
     }
 
-    const auto & newUserName                = !userName.IsNull() ? userName.Value() : chip::CharSpan::fromCharString("");
+    const auto & newUserName                = !userName.IsNull() ? userName.Value() : ""_span;
     auto newUserUniqueId                    = userUniqueId.IsNull() ? 0xFFFFFFFF : userUniqueId.Value();
     auto newUserStatus                      = userStatus.IsNull() ? UserStatusEnum::kOccupiedEnabled : userStatus.Value();
     auto newUserType                        = userType.IsNull() ? UserTypeEnum::kUnrestrictedUser : userType.Value();

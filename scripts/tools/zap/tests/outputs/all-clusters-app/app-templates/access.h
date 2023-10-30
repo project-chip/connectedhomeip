@@ -410,6 +410,8 @@
     0x00000031, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
     0x00000033, /* Cluster: General Diagnostics, Command: TestEventTrigger, Privilege: manage */ \
+    0x00000034, /* Cluster: Software Diagnostics, Command: ResetWatermarks, Privilege: manage */ \
+    0x00000037, /* Cluster: Ethernet Network Diagnostics, Command: ResetCounts, Privilege: manage */ \
     0x0000003C, /* Cluster: Administrator Commissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
     0x0000003C, /* Cluster: Administrator Commissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
     0x0000003C, /* Cluster: Administrator Commissioning, Command: RevokeCommissioning, Privilege: administer */ \
@@ -436,6 +438,7 @@
     0x00000101, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
     0x00000101, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     0x00000101, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
+    0x00000507, /* Cluster: Media Input, Command: RenameInput, Privilege: manage */ \
     0xFFF1FC06, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     0xFFF1FC06, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }
@@ -462,6 +465,8 @@
     0x00000006, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
     0x00000008, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
     0x00000000, /* Cluster: General Diagnostics, Command: TestEventTrigger, Privilege: manage */ \
+    0x00000000, /* Cluster: Software Diagnostics, Command: ResetWatermarks, Privilege: manage */ \
+    0x00000000, /* Cluster: Ethernet Network Diagnostics, Command: ResetCounts, Privilege: manage */ \
     0x00000000, /* Cluster: Administrator Commissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
     0x00000001, /* Cluster: Administrator Commissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
     0x00000002, /* Cluster: Administrator Commissioning, Command: RevokeCommissioning, Privilege: administer */ \
@@ -488,6 +493,7 @@
     0x00000022, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
     0x00000024, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     0x00000026, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
+    0x00000003, /* Cluster: Media Input, Command: RenameInput, Privilege: manage */ \
     0x00000000, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     0x00000001, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }
@@ -514,6 +520,8 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
     kMatterAccessPrivilegeManage, /* Cluster: General Diagnostics, Command: TestEventTrigger, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Software Diagnostics, Command: ResetWatermarks, Privilege: manage */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Ethernet Network Diagnostics, Command: ResetCounts, Privilege: manage */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Administrator Commissioning, Command: OpenCommissioningWindow, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Administrator Commissioning, Command: OpenBasicCommissioningWindow, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Administrator Commissioning, Command: RevokeCommissioning, Privilege: administer */ \
@@ -540,6 +548,7 @@
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: SetCredential, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: GetCredentialStatus, Privilege: administer */ \
     kMatterAccessPrivilegeAdminister, /* Cluster: Door Lock, Command: ClearCredential, Privilege: administer */ \
+    kMatterAccessPrivilegeManage, /* Cluster: Media Input, Command: RenameInput, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     kMatterAccessPrivilegeManage, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
 }
