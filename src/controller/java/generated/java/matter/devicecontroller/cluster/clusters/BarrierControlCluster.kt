@@ -28,47 +28,47 @@ class BarrierControlCluster(private val endpointId: UShort) {
 
   class AttributeListAttribute(val value: ArrayList<UInt>)
 
-  suspend fun barrierControlGoToPercent(percentOpen: UByte) {
+  suspend fun barrierControlGoToPercent(percentOpen: UByte, timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun barrierControlStop(timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun readBarrierMovingStateAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun barrierControlGoToPercent(percentOpen: UByte, timedInvokeTimeoutMs: Int) {
+  suspend fun subscribeBarrierMovingStateAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun barrierControlStop() {
+  suspend fun readBarrierSafetyStatusAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun barrierControlStop(timedInvokeTimeoutMs: Int) {
+  suspend fun subscribeBarrierSafetyStatusAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readBarrierMovingStateAttribute(): Integer {
+  suspend fun readBarrierCapabilitiesAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBarrierMovingStateAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeBarrierCapabilitiesAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readBarrierSafetyStatusAttribute(): Integer {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribeBarrierSafetyStatusAttribute(minInterval: Int, maxInterval: Int): Integer {
-    // Implementation needs to be added here
-  }
-
-  suspend fun readBarrierCapabilitiesAttribute(): Integer {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribeBarrierCapabilitiesAttribute(minInterval: Int, maxInterval: Int): Integer {
-    // Implementation needs to be added here
-  }
-
-  suspend fun readBarrierOpenEventsAttribute(): Integer {
+  suspend fun readBarrierOpenEventsAttribute(): UShort {
     // Implementation needs to be added here
   }
 
@@ -80,11 +80,11 @@ class BarrierControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBarrierOpenEventsAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeBarrierOpenEventsAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readBarrierCloseEventsAttribute(): Integer {
+  suspend fun readBarrierCloseEventsAttribute(): UShort {
     // Implementation needs to be added here
   }
 
@@ -96,11 +96,11 @@ class BarrierControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBarrierCloseEventsAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeBarrierCloseEventsAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readBarrierCommandOpenEventsAttribute(): Integer {
+  suspend fun readBarrierCommandOpenEventsAttribute(): UShort {
     // Implementation needs to be added here
   }
 
@@ -115,11 +115,11 @@ class BarrierControlCluster(private val endpointId: UShort) {
   suspend fun subscribeBarrierCommandOpenEventsAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Integer {
+  ): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readBarrierCommandCloseEventsAttribute(): Integer {
+  suspend fun readBarrierCommandCloseEventsAttribute(): UShort {
     // Implementation needs to be added here
   }
 
@@ -134,11 +134,11 @@ class BarrierControlCluster(private val endpointId: UShort) {
   suspend fun subscribeBarrierCommandCloseEventsAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Integer {
+  ): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readBarrierOpenPeriodAttribute(): Integer {
+  suspend fun readBarrierOpenPeriodAttribute(): UShort {
     // Implementation needs to be added here
   }
 
@@ -150,11 +150,11 @@ class BarrierControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBarrierOpenPeriodAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeBarrierOpenPeriodAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readBarrierClosePeriodAttribute(): Integer {
+  suspend fun readBarrierClosePeriodAttribute(): UShort {
     // Implementation needs to be added here
   }
 
@@ -166,15 +166,15 @@ class BarrierControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBarrierClosePeriodAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeBarrierClosePeriodAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readBarrierPositionAttribute(): Integer {
+  suspend fun readBarrierPositionAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeBarrierPositionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeBarrierPositionAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -219,19 +219,19 @@ class BarrierControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

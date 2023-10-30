@@ -49,47 +49,38 @@ class OtaSoftwareUpdateProviderCluster(private val endpointId: UShort) {
     hardwareVersion: UShort?,
     location: String?,
     requestorCanConsent: Boolean?,
-    metadataForProvider: ByteArray?
-  ): QueryImageResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun queryImage(
-    vendorID: UShort,
-    productID: UShort,
-    softwareVersion: UInt,
-    protocolsSupported: ArrayList<UInt>,
-    hardwareVersion: UShort?,
-    location: String?,
-    requestorCanConsent: Boolean?,
     metadataForProvider: ByteArray?,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): QueryImageResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun applyUpdateRequest(updateToken: ByteArray, newVersion: UInt): ApplyUpdateResponse {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun applyUpdateRequest(
     updateToken: ByteArray,
     newVersion: UInt,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): ApplyUpdateResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun notifyUpdateApplied(updateToken: ByteArray, softwareVersion: UInt) {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun notifyUpdateApplied(
     updateToken: ByteArray,
     softwareVersion: UInt,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ) {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
@@ -133,19 +124,19 @@ class OtaSoftwareUpdateProviderCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

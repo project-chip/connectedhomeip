@@ -42,105 +42,105 @@ class MediaPlaybackCluster(private val endpointId: UShort) {
 
   class AttributeListAttribute(val value: ArrayList<UInt>)
 
-  suspend fun play(): PlaybackResponse {
-    // Implementation needs to be added here
+  suspend fun play(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun play(timedInvokeTimeoutMs: Int): PlaybackResponse {
-    // Implementation needs to be added here
+  suspend fun pause(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun pause(): PlaybackResponse {
-    // Implementation needs to be added here
+  suspend fun stop(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun pause(timedInvokeTimeoutMs: Int): PlaybackResponse {
-    // Implementation needs to be added here
+  suspend fun startOver(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun stop(): PlaybackResponse {
-    // Implementation needs to be added here
+  suspend fun previous(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun stop(timedInvokeTimeoutMs: Int): PlaybackResponse {
-    // Implementation needs to be added here
+  suspend fun next(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun startOver(): PlaybackResponse {
-    // Implementation needs to be added here
+  suspend fun rewind(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
-  suspend fun startOver(timedInvokeTimeoutMs: Int): PlaybackResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun previous(): PlaybackResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun previous(timedInvokeTimeoutMs: Int): PlaybackResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun next(): PlaybackResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun next(timedInvokeTimeoutMs: Int): PlaybackResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun rewind(): PlaybackResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun rewind(timedInvokeTimeoutMs: Int): PlaybackResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun fastForward(): PlaybackResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun fastForward(timedInvokeTimeoutMs: Int): PlaybackResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun skipForward(deltaPositionMilliseconds: ULong): PlaybackResponse {
-    // Implementation needs to be added here
+  suspend fun fastForward(timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun skipForward(
     deltaPositionMilliseconds: ULong,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): PlaybackResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun skipBackward(deltaPositionMilliseconds: ULong): PlaybackResponse {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun skipBackward(
     deltaPositionMilliseconds: ULong,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): PlaybackResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun seek(position: ULong, timedInvokeTimeoutMs: Int? = null): PlaybackResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun readCurrentStateAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun seek(position: ULong): PlaybackResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun seek(position: ULong, timedInvokeTimeoutMs: Int): PlaybackResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun readCurrentStateAttribute(): Integer {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribeCurrentStateAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeCurrentStateAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -242,19 +242,19 @@ class MediaPlaybackCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

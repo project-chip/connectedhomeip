@@ -36,43 +36,36 @@ class ApplicationLauncherCluster(private val endpointId: UShort) {
 
   suspend fun launchApp(
     application: ChipStructs.ApplicationLauncherClusterApplicationStruct?,
-    data: ByteArray?
-  ): LauncherResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun launchApp(
-    application: ChipStructs.ApplicationLauncherClusterApplicationStruct?,
     data: ByteArray?,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): LauncherResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun stopApp(
-    application: ChipStructs.ApplicationLauncherClusterApplicationStruct?
-  ): LauncherResponse {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun stopApp(
     application: ChipStructs.ApplicationLauncherClusterApplicationStruct?,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): LauncherResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun hideApp(
-    application: ChipStructs.ApplicationLauncherClusterApplicationStruct?
-  ): LauncherResponse {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun hideApp(
     application: ChipStructs.ApplicationLauncherClusterApplicationStruct?,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): LauncherResponse {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun readCatalogListAttribute(): CatalogListAttribute {
@@ -151,19 +144,19 @@ class ApplicationLauncherCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

@@ -82,11 +82,11 @@ class RadonConcentrationMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readPeakMeasuredValueWindowAttribute(): Long {
+  suspend fun readPeakMeasuredValueWindowAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePeakMeasuredValueWindowAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribePeakMeasuredValueWindowAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -101,14 +101,14 @@ class RadonConcentrationMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readAverageMeasuredValueWindowAttribute(): Long {
+  suspend fun readAverageMeasuredValueWindowAttribute(): UInt {
     // Implementation needs to be added here
   }
 
   suspend fun subscribeAverageMeasuredValueWindowAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Long {
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -120,27 +120,27 @@ class RadonConcentrationMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readMeasurementUnitAttribute(): Integer {
+  suspend fun readMeasurementUnitAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMeasurementUnitAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeMeasurementUnitAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readMeasurementMediumAttribute(): Integer {
+  suspend fun readMeasurementMediumAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMeasurementMediumAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeMeasurementMediumAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readLevelValueAttribute(): Integer {
+  suspend fun readLevelValueAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLevelValueAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeLevelValueAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -185,19 +185,19 @@ class RadonConcentrationMeasurementCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

@@ -93,40 +93,27 @@ class {{cluster.name}}Cluster(private val endpointId: UShort) {
 {%- endif -%}
 {% endfor -%}
 
-{%- for command in cluster.commands | sort(attribute='code') -%}
-{%- set callbackName = command | javaCommandCallbackName() -%}
-{%- if not command.is_timed_invoke %}
-  suspend fun {{command.name | lowfirst_except_acronym}}(
-{%- if command.input_param -%}
-{%- for field in (cluster.structs | named(command.input_param)).fields -%}
-  {{field.name | lowfirst_except_acronym}}: {{encode_value(cluster, field | asEncodable(typeLookup), 0)}}
-{%- if not loop.last -%}, {% endif %}
-{%- endfor -%}
-{%- endif -%}
-  )
-{%- if command | hasResponse -%}
-    : {{callbackName}} {
-{%- else %} {
-{%- endif %}  
-    // Implementation needs to be added here
-  }
-{%- endif %}
-
+{% for command in cluster.commands | sort(attribute='code') -%}
+{%- set callbackName = command | javaCommandCallbackName() %}
   suspend fun {{command.name | lowfirst_except_acronym}}(
 {%- if command.input_param -%}
 {%- for field in (cluster.structs | named(command.input_param)).fields -%}
   {{field.name | lowfirst_except_acronym}}: {{encode_value(cluster, field | asEncodable(typeLookup), 0)}}
 {%- if not loop.last -%}, {% endif %}  
 {%- endfor -%}
-  , timedInvokeTimeoutMs: Int)
+  , timedInvokeTimeoutMs: Int? = null)
 {%- else -%}
-  timedInvokeTimeoutMs: Int)
+  timedInvokeTimeoutMs: Int? = null)
 {%- endif -%}
 {%- if command | hasResponse -%}
     : {{callbackName}} {
 {%- else %} {
 {%- endif %}  
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 {% endfor -%}
 

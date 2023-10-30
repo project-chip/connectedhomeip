@@ -201,30 +201,27 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readPumpStatusAttribute(): Integer {
+  suspend fun readPumpStatusAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribePumpStatusAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribePumpStatusAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun readEffectiveOperationModeAttribute(): Integer {
+  suspend fun readEffectiveOperationModeAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEffectiveOperationModeAttribute(
-    minInterval: Int,
-    maxInterval: Int
-  ): Integer {
+  suspend fun subscribeEffectiveOperationModeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readEffectiveControlModeAttribute(): Integer {
+  suspend fun readEffectiveControlModeAttribute(): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeEffectiveControlModeAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeEffectiveControlModeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -290,7 +287,7 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readOperationModeAttribute(): Integer {
+  suspend fun readOperationModeAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -302,11 +299,11 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeOperationModeAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeOperationModeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
-  suspend fun readControlModeAttribute(): Integer {
+  suspend fun readControlModeAttribute(): UByte {
     // Implementation needs to be added here
   }
 
@@ -318,7 +315,7 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeControlModeAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeControlModeAttribute(minInterval: Int, maxInterval: Int): UByte {
     // Implementation needs to be added here
   }
 
@@ -363,19 +360,19 @@ class PumpConfigurationAndControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

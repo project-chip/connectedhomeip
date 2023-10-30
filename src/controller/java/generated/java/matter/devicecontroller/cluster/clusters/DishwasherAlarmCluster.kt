@@ -28,51 +28,51 @@ class DishwasherAlarmCluster(private val endpointId: UShort) {
 
   class AttributeListAttribute(val value: ArrayList<UInt>)
 
-  suspend fun reset(alarms: ULong) {
+  suspend fun reset(alarms: ULong, timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun modifyEnabledAlarms(mask: ULong, timedInvokeTimeoutMs: Int? = null) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun readMaskAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun reset(alarms: ULong, timedInvokeTimeoutMs: Int) {
+  suspend fun subscribeMaskAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun modifyEnabledAlarms(mask: ULong) {
+  suspend fun readLatchAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun modifyEnabledAlarms(mask: ULong, timedInvokeTimeoutMs: Int) {
+  suspend fun subscribeLatchAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readMaskAttribute(): Long {
+  suspend fun readStateAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeMaskAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeStateAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readLatchAttribute(): Long {
+  suspend fun readSupportedAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeLatchAttribute(minInterval: Int, maxInterval: Int): Long {
-    // Implementation needs to be added here
-  }
-
-  suspend fun readStateAttribute(): Long {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribeStateAttribute(minInterval: Int, maxInterval: Int): Long {
-    // Implementation needs to be added here
-  }
-
-  suspend fun readSupportedAttribute(): Long {
-    // Implementation needs to be added here
-  }
-
-  suspend fun subscribeSupportedAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeSupportedAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
@@ -117,19 +117,19 @@ class DishwasherAlarmCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 

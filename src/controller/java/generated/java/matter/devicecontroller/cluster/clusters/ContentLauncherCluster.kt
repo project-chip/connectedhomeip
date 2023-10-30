@@ -35,35 +35,27 @@ class ContentLauncherCluster(private val endpointId: UShort) {
   suspend fun launchContent(
     search: ChipStructs.ContentLauncherClusterContentSearchStruct,
     autoPlay: Boolean,
-    data: String?
-  ): LauncherResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun launchContent(
-    search: ChipStructs.ContentLauncherClusterContentSearchStruct,
-    autoPlay: Boolean,
     data: String?,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): LauncherResponse {
-    // Implementation needs to be added here
-  }
-
-  suspend fun launchURL(
-    contentURL: String,
-    displayString: String?,
-    brandingInformation: ChipStructs.ContentLauncherClusterBrandingInformationStruct?
-  ): LauncherResponse {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun launchURL(
     contentURL: String,
     displayString: String?,
     brandingInformation: ChipStructs.ContentLauncherClusterBrandingInformationStruct?,
-    timedInvokeTimeoutMs: Int
+    timedInvokeTimeoutMs: Int? = null
   ): LauncherResponse {
-    // Implementation needs to be added here
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
   }
 
   suspend fun readAcceptHeaderAttribute(): AcceptHeaderAttribute {
@@ -77,7 +69,7 @@ class ContentLauncherCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readSupportedStreamingProtocolsAttribute(): Long {
+  suspend fun readSupportedStreamingProtocolsAttribute(): UInt {
     // Implementation needs to be added here
   }
 
@@ -92,7 +84,7 @@ class ContentLauncherCluster(private val endpointId: UShort) {
   suspend fun subscribeSupportedStreamingProtocolsAttribute(
     minInterval: Int,
     maxInterval: Int
-  ): Long {
+  ): UInt {
     // Implementation needs to be added here
   }
 
@@ -137,19 +129,19 @@ class ContentLauncherCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  suspend fun readFeatureMapAttribute(): Long {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  suspend fun readClusterRevisionAttribute(): Integer {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
