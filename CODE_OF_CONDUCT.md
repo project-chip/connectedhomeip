@@ -43,7 +43,7 @@ Examples of unacceptable behavior include:
   without their explicit permission
 * Other conduct which could reasonably be considered inappropriate in a
   professional setting
-* Disclosing private information, unreleased products, or unreleased specification information
+* Disclosing private information, unreleased product information, or unreleased specification information
 
 ## Enforcement Responsibilities
 
