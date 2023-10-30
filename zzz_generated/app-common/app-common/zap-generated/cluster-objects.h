@@ -12178,9 +12178,9 @@ struct TypeInfo
 namespace AdminVendorId {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
+    using Type             = chip::app::DataModel::Nullable<chip::VendorId>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::VendorId>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::VendorId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AdminVendorId::Id; }
@@ -14116,6 +14116,31 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClientsSupportedPerFabric
+namespace UserActiveModeTriggerHint {
+struct TypeInfo
+{
+    using Type             = chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UserActiveModeTriggerHint::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace UserActiveModeTriggerHint
+namespace UserActiveModeTriggerInstruction {
+struct TypeInfo
+{
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UserActiveModeTriggerInstruction::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 128; }
+};
+} // namespace UserActiveModeTriggerInstruction
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -14167,6 +14192,9 @@ struct TypeInfo
         Attributes::RegisteredClients::TypeInfo::DecodableType registeredClients;
         Attributes::ICDCounter::TypeInfo::DecodableType ICDCounter                               = static_cast<uint32_t>(0);
         Attributes::ClientsSupportedPerFabric::TypeInfo::DecodableType clientsSupportedPerFabric = static_cast<uint16_t>(0);
+        Attributes::UserActiveModeTriggerHint::TypeInfo::DecodableType userActiveModeTriggerHint =
+            static_cast<chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap>>(0);
+        Attributes::UserActiveModeTriggerInstruction::TypeInfo::DecodableType userActiveModeTriggerInstruction;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

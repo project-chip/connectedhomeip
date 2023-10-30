@@ -7568,7 +7568,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("AdminFabricIndex", 1, value);
         }
         case AdministratorCommissioning::Attributes::AdminVendorId::Id: {
-            chip::app::DataModel::Nullable<uint16_t> value;
+            chip::app::DataModel::Nullable<chip::VendorId> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AdminVendorId", 1, value);
         }
@@ -7997,6 +7997,16 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             uint16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ClientsSupportedPerFabric", 1, value);
+        }
+        case IcdManagement::Attributes::UserActiveModeTriggerHint::Id: {
+            chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UserActiveModeTriggerHint", 1, value);
+        }
+        case IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id: {
+            chip::CharSpan value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UserActiveModeTriggerInstruction", 1, value);
         }
         case IcdManagement::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;

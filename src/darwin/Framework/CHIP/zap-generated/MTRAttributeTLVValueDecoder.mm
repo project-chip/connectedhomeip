@@ -4706,7 +4706,7 @@ static id _Nullable DecodeAttributeValueForAdministratorCommissioningCluster(Att
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
+            value = [NSNumber numberWithUnsignedShort:chip::to_underlying(cppValue.Value())];
         }
         return value;
     }
@@ -5196,6 +5196,37 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(AttributeId aAtt
         }
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedShort:cppValue];
+        return value;
+    }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+    case Attributes::UserActiveModeTriggerHint::Id: {
+        using TypeInfo = Attributes::UserActiveModeTriggerHint::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+        return value;
+    }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+    case Attributes::UserActiveModeTriggerInstruction::Id: {
+        using TypeInfo = Attributes::UserActiveModeTriggerInstruction::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSString * _Nonnull value;
+        value = AsString(cppValue);
+        if (value == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            *aError = err;
+            return nil;
+        }
         return value;
     }
 #endif // MTR_ENABLE_PROVISIONAL

@@ -1890,6 +1890,12 @@ static BOOL AttributeIsSpecifiedInICDManagementCluster(AttributeId aAttributeId)
     case Attributes::ClientsSupportedPerFabric::Id: {
         return YES;
     }
+    case Attributes::UserActiveModeTriggerHint::Id: {
+        return YES;
+    }
+    case Attributes::UserActiveModeTriggerInstruction::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

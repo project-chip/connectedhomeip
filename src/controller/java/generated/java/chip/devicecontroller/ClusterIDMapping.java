@@ -5968,6 +5968,8 @@ public class ClusterIDMapping {
             RegisteredClients(3L),
             ICDCounter(4L),
             ClientsSupportedPerFabric(5L),
+            UserActiveModeTriggerHint(6L),
+            UserActiveModeTriggerInstruction(7L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),

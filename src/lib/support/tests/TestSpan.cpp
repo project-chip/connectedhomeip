@@ -291,6 +291,14 @@ static void TestFromCharString(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, s1.data_equal(CharSpan(str, 3)));
 }
 
+static void TestLiteral(nlTestSuite * inSuite, void * inContext)
+{
+    constexpr CharSpan literal = "HI!"_span;
+    NL_TEST_ASSERT(inSuite, literal.size() == 3);
+    NL_TEST_ASSERT(inSuite, literal.data_equal(CharSpan::fromCharString("HI!")));
+    NL_TEST_ASSERT(inSuite, ""_span.size() == 0);
+}
+
 static void TestConversionConstructors(nlTestSuite * inSuite, void * inContext)
 {
     struct Foo
@@ -330,6 +338,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF_FN(TestSubSpan),
     NL_TEST_DEF_FN(TestFromZclString),
     NL_TEST_DEF_FN(TestFromCharString),
+    NL_TEST_DEF_FN(TestLiteral),
     NL_TEST_DEF_FN(TestConversionConstructors),
     NL_TEST_SENTINEL(),
 };

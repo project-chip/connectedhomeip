@@ -15,7 +15,8 @@
 
 import io
 import unittest
-from typing import List, Union
+from difflib import unified_diff
+from typing import List, Optional, Union
 
 try:
     from matter_idl.data_model_xml import ParseSource, ParseXmls
@@ -27,8 +28,32 @@ except ImportError:
         os.path.join(os.path.dirname(__file__), '..')))
     from matter_idl.data_model_xml import ParseSource, ParseXmls
 
+from matter_idl.generators import GeneratorStorage
+from matter_idl.generators.idl import IdlGenerator
 from matter_idl.matter_idl_parser import CreateParser
 from matter_idl.matter_idl_types import Idl
+
+
+class GeneratorContentStorage(GeneratorStorage):
+    def __init__(self):
+        super().__init__()
+        self.content: Optional[str] = None
+
+    def get_existing_data(self, relative_path: str):
+        # Force re-generation each time
+        return None
+
+    def write_new_data(self, relative_path: str, content: str):
+        if self.content:
+            raise Exception(
+                "Unexpected extra data: single file generation expected")
+        self.content = content
+
+
+def RenderAsIdlTxt(idl: Idl) -> str:
+    storage = GeneratorContentStorage()
+    IdlGenerator(storage=storage, idl=idl).render(dry_run=False)
+    return storage.content or ""
 
 
 def XmlToIdl(what: Union[str, List[str]]) -> Idl:
@@ -53,6 +78,23 @@ class TestXmlParser(unittest.TestCase):
         super().__init__(*args, **kargs)
         self.maxDiff = None
 
+    def assertIdlEqual(self, a: Idl, b: Idl):
+        if a == b:
+            # seems the same. This will just pass
+            self.assertEqual(a, b)
+            return
+
+        # Not the same. Try to make a human readable diff:
+        a_txt = RenderAsIdlTxt(a)
+        b_txt = RenderAsIdlTxt(b)
+
+        delta = unified_diff(a_txt.splitlines(keepends=True),
+                             b_txt.splitlines(keepends=True),
+                             fromfile='actual.matter',
+                             tofile='expected.matter',
+                             )
+        self.assertEqual(a, b, '\n' + ''.join(delta))
+
     def testBasicInput(self):
 
         xml_idl = XmlToIdl('''
@@ -70,7 +112,121 @@ class TestXmlParser(unittest.TestCase):
            }
         ''')
 
-        self.assertEqual(xml_idl, expected_idl)
+        self.assertIdlEqual(xml_idl, expected_idl)
+
+    def testClusterDerivation(self):
+        # This test is based on a subset of ModeBase and Mode_Dishwasher original xml files
+
+        xml_idl = XmlToIdl([
+            # base ...
+            '''
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="" name="Mode Base" revision="2">
+  <revisionHistory>
+    <revision revision="1" summary="Initial version"/>
+    <revision revision="2" summary="ChangeToModeResponse command: StatusText must be provided for InvalidInMode status"/>
+  </revisionHistory>
+  <classification hierarchy="base" role="application" picsCode="MODB" scope="Endpoint"/>
+  <features>
+    <feature name="base reserved" summary="This range of bits is reserved for this base cluster">
+      <optionalConform/>
+    </feature>
+    <feature name="derived reserved" summary="This range of bits is reserved for derived clusters">
+      <optionalConform/>
+    </feature>
+    <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <struct name="ModeOptionStruct">
+      <field id="0" name="Label" type="string" default="MS">
+        <access read="true"/>
+        <mandatoryConform/>
+        <constraint type="maxLength" value="64"/>
+      </field>
+      <field id="1" name="Mode" type="uint8" default="MS">
+        <access read="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="ModeTags" type="list[ModeTagStruct Type]" default="MS">
+        <access read="true"/>
+        <mandatoryConform/>
+        <constraint type="max" value="8"/>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute name="base reserved">
+      <mandatoryConform/>
+    </attribute>
+    <attribute name="derived reserved">
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0000" name="SupportedModes" type="list[ModeOptionStruct Type]" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="false" nullable="false" scene="false" persistence="fixed" reportable="false"/>
+      <mandatoryConform/>
+      <constraint type="between" from="2" to="255"/>
+    </attribute>
+  </attributes>
+</cluster>
+        ''',
+            # derived ...
+            '''
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0059" name="Dishwasher Mode" revision="2">
+  <revisionHistory>
+    <revision revision="1" summary="Initial Release"/>
+    <revision revision="2" summary="ChangeToModeResponse command: StatusText must be provided for InvalidInMode status"/>
+  </revisionHistory>
+  <classification hierarchy="derived" baseCluster="Mode Base" role="application" picsCode="DISHM" scope="Endpoint"/>
+  <dataTypes>
+    <struct name="ModeOptionStruct">
+      <field id="0" name="Label">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Mode">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="ModeTags">
+        <mandatoryConform/>
+        <constraint type="between" from="1" to="8"/>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="SupportedModes">
+      <mandatoryConform/>
+    </attribute>
+  </attributes>
+</cluster>
+        ''',
+        ])
+
+        expected_idl = IdlTextToIdl('''
+            client cluster DishwasherMode = 89 {
+               bitmap Feature: bitmap32 {
+                   kOnOff = 0x1;
+               }
+
+               struct ModeOptionStruct {
+                  char_string<64> label = 0;
+                  int8u mode = 1;
+                  ModeTagStruct modeTags[] = 2;
+               }
+
+               readonly attribute attrib_id attributeList[] = 65531;
+               readonly attribute event_id eventList[] = 65530;
+               readonly attribute command_id acceptedCommandList[] = 65529;
+               readonly attribute command_id generatedCommandList[] = 65528;
+               readonly attribute bitmap32 featureMap = 65532;
+               readonly attribute int16u clusterRevision = 65533;
+
+               // baseline inserted after, so to pass the test add this at the end
+               readonly attribute ModeOptionStruct supportedModes[] = 0;
+           }
+        ''')
+
+        self.assertIdlEqual(xml_idl, expected_idl)
 
     def testSignedTypes(self):
 
@@ -108,7 +264,7 @@ class TestXmlParser(unittest.TestCase):
            }
         ''')
 
-        self.assertEqual(xml_idl, expected_idl)
+        self.assertIdlEqual(xml_idl, expected_idl)
 
     def testEnumRange(self):
         # Check heuristic for enum ranges
@@ -183,7 +339,7 @@ class TestXmlParser(unittest.TestCase):
            }
         ''')
 
-        self.assertEqual(xml_idl, expected_idl)
+        self.assertIdlEqual(xml_idl, expected_idl)
 
     def testAttributes(self):
         # Validate an attribute with a type list
@@ -204,6 +360,17 @@ class TestXmlParser(unittest.TestCase):
                   <access read="true" readPrivilege="view"/>
                   <mandatoryConform/>
                 </attribute>
+                <attribute id="0x0001" name="TestConform" type="enum8">
+                  <access read="true" readPrivilege="view"/>
+                  <otherwiseConform>
+                    <mandatoryConform>
+                      <feature name="PRSCONST"/>
+                    </mandatoryConform>
+                    <optionalConform>
+                      <feature name="AUTO"/>
+                    </optionalConform>
+                  </otherwiseConform>
+                </attribute>
               </attributes>
             </cluster>
         ''')
@@ -215,6 +382,7 @@ class TestXmlParser(unittest.TestCase):
                }
 
                readonly attribute OutputInfoStruct outputList[] = 0;
+               readonly attribute optional enum8 testConform = 1;
 
                readonly attribute attrib_id attributeList[] = 65531;
                readonly attribute event_id eventList[] = 65530;
@@ -225,7 +393,71 @@ class TestXmlParser(unittest.TestCase):
            }
         ''')
 
-        self.assertEqual(xml_idl, expected_idl)
+        self.assertIdlEqual(xml_idl, expected_idl)
+
+    def testXmlNameWorkarounds(self):
+        # Validate an attribute with a type list
+        # This is a manually-edited copy of an attribute test (not real data)
+
+        xml_idl = XmlToIdl('''
+            <cluster id="123" name="Test" revision="1">
+              <dataTypes>
+                <struct name="OutputInfoStruct">
+                  <field id="0" name="ID" type="&lt;&lt;ref_DataTypeString&gt;&gt;">
+                    <access read="true" write="true"/>
+                    <mandatoryConform/>
+                  </field>
+                  <field id="1" name="items" type="&lt;&lt;ref_DataTypeList&gt;&gt;[uint8]">
+                    <access read="true" write="true"/>
+                    <mandatoryConform/>
+                  </field>
+                  <field id="2" name="endpoints" type="&lt;&lt;ref_DataTypeList&gt;&gt;[&lt;&lt;ref_DataTypeEndpointNumber&gt;&gt; Type]">
+                    <access read="true" write="true"/>
+                    <mandatoryConform/>
+                  </field>
+                </struct>
+              </dataTypes>
+              <attributes>
+                <attribute id="0x0000" name="OutputList" type="list[OutputInfoStruct Type]">
+                  <access read="true" readPrivilege="view"/>
+                  <mandatoryConform/>
+                </attribute>
+                <attribute id="0x0001" name="TestConform" type="enum8">
+                  <access read="true" readPrivilege="view"/>
+                  <otherwiseConform>
+                    <mandatoryConform>
+                      <feature name="PRSCONST"/>
+                    </mandatoryConform>
+                    <optionalConform>
+                      <feature name="AUTO"/>
+                    </optionalConform>
+                  </otherwiseConform>
+                </attribute>
+              </attributes>
+            </cluster>
+        ''')
+
+        expected_idl = IdlTextToIdl('''
+            client cluster Test = 123 {
+               struct OutputInfoStruct {
+                  char_string id = 0;
+                  int8u items[] = 1;
+                  endpoint_no endpoints[] = 2;
+               }
+
+               readonly attribute OutputInfoStruct outputList[] = 0;
+               readonly attribute optional enum8 testConform = 1;
+
+               readonly attribute attrib_id attributeList[] = 65531;
+               readonly attribute event_id eventList[] = 65530;
+               readonly attribute command_id acceptedCommandList[] = 65529;
+               readonly attribute command_id generatedCommandList[] = 65528;
+               readonly attribute bitmap32 featureMap = 65532;
+               readonly attribute int16u clusterRevision = 65533;
+           }
+        ''')
+
+        self.assertIdlEqual(xml_idl, expected_idl)
 
     def testComplexInput(self):
         # This parses a known copy of Switch.xml which happens to be fully
@@ -422,7 +654,7 @@ class TestXmlParser(unittest.TestCase):
             }
             ''')
 
-        self.assertEqual(xml_idl, expected_idl)
+        self.assertIdlEqual(xml_idl, expected_idl)
 
 
 if __name__ == '__main__':
