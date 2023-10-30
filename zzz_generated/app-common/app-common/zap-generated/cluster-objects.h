@@ -24992,9 +24992,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -25049,7 +25049,7 @@ struct TypeInfo
         Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
-        Attributes::Tolerance::TypeInfo::DecodableType tolerance = static_cast<uint16_t>(0);
+        Attributes::Tolerance::TypeInfo::DecodableType tolerance = static_cast<int16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
