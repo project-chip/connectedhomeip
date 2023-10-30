@@ -96,7 +96,8 @@ private:
     void SetupGattService();
 
     BluezGattService1 * CreateGattService(const char * aUUID);
-    BluezGattCharacteristic1 * CreateGattCharacteristic(BluezGattService1 * aService, const char * aCharName, const char * aUUID);
+    BluezGattCharacteristic1 * CreateGattCharacteristic(BluezGattService1 * aService, const char * aCharName, const char * aUUID,
+                                                        const char * const * aFlags);
 
     void HandleNewDevice(BluezDevice1 * aDevice);
     void UpdateConnectionTable(BluezDevice1 * aDevice);

@@ -232,7 +232,7 @@ static gboolean BluezIsDeviceOnAdapter(BluezDevice1 * aDevice, BluezAdapter1 * a
 }
 
 BluezGattCharacteristic1 * BluezEndpoint::CreateGattCharacteristic(BluezGattService1 * aService, const char * aCharName,
-                                                                   const char * aUUID)
+                                                                   const char * aUUID, const char * const * aFlags)
 {
     const char * servicePath = g_dbus_object_get_object_path(g_dbus_interface_get_object(G_DBUS_INTERFACE(aService)));
     GAutoPtr<char> charPath(g_strdup_printf("%s/%s", servicePath, aCharName));
@@ -244,7 +244,12 @@ BluezGattCharacteristic1 * BluezEndpoint::CreateGattCharacteristic(BluezGattServ
 
     characteristic = bluez_gatt_characteristic1_skeleton_new();
     bluez_gatt_characteristic1_set_uuid(characteristic, aUUID);
+    bluez_gatt_characteristic1_set_flags(characteristic, aFlags);
     bluez_gatt_characteristic1_set_service(characteristic, servicePath);
+
+    // Initialize value to empty array, so it can be read without prior write from the client side.
+    auto value = g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, nullptr, 0, sizeof(uint8_t));
+    bluez_gatt_characteristic1_set_value(characteristic, value);
 
     bluez_object_skeleton_set_gatt_characteristic1(object, characteristic);
     g_dbus_object_manager_server_export(mpRoot, G_DBUS_OBJECT_SKELETON(object));
@@ -526,8 +531,7 @@ void BluezEndpoint::SetupGattService()
     mpService = CreateGattService(CHIP_BLE_UUID_SERVICE_SHORT_STRING);
 
     // C1 characteristic
-    mpC1 = CreateGattCharacteristic(mpService, "c1", CHIP_PLAT_BLE_UUID_C1_STRING);
-    bluez_gatt_characteristic1_set_flags(mpC1, c1_flags);
+    mpC1 = CreateGattCharacteristic(mpService, "c1", CHIP_PLAT_BLE_UUID_C1_STRING, c1_flags);
     g_signal_connect(mpC1, "handle-read-value",
                      G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOpt,
                                     BluezEndpoint * self) { return self->BluezCharacteristicReadValue(aChar, aInv, aOpt); }),
@@ -540,8 +544,7 @@ void BluezEndpoint::SetupGattService()
     g_signal_connect(mpC1, "handle-confirm", G_CALLBACK(BluezCharacteristicConfirmError), nullptr);
 
     // C2 characteristic
-    mpC2 = CreateGattCharacteristic(mpService, "c2", CHIP_PLAT_BLE_UUID_C2_STRING);
-    bluez_gatt_characteristic1_set_flags(mpC2, c2_flags);
+    mpC2 = CreateGattCharacteristic(mpService, "c2", CHIP_PLAT_BLE_UUID_C2_STRING, c2_flags);
     g_signal_connect(mpC2, "handle-read-value",
                      G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOpt,
                                     BluezEndpoint * self) { return self->BluezCharacteristicReadValue(aChar, aInv, aOpt); }),
@@ -563,8 +566,7 @@ void BluezEndpoint::SetupGattService()
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     ChipLogDetail(DeviceLayer, "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING is TRUE");
     // Additional data characteristics
-    mpC3 = CreateGattCharacteristic(mpService, "c3", CHIP_PLAT_BLE_UUID_C3_STRING);
-    bluez_gatt_characteristic1_set_flags(mpC3, c3_flags);
+    mpC3 = CreateGattCharacteristic(mpService, "c3", CHIP_PLAT_BLE_UUID_C3_STRING, c3_flags);
     g_signal_connect(mpC3, "handle-read-value",
                      G_CALLBACK(+[](BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInv, GVariant * aOpt,
                                     BluezEndpoint * self) { return self->BluezCharacteristicReadValue(aChar, aInv, aOpt); }),
