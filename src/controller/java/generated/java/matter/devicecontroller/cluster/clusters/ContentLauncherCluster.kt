@@ -20,199 +20,140 @@ package matter.devicecontroller.cluster.clusters
 import java.util.ArrayList
 
 class ContentLauncherCluster(private val endpointId: UShort) {
-  companion object {
-    const val CLUSTER_ID: UInt = 1290u
-  }
+  class LauncherResponse(val status: UInt, val data: String?)
 
-  fun launchContent(
-    callback: LauncherResponseCallback,
+  class AcceptHeaderAttribute(val value: ArrayList<String>?)
+
+  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class EventListAttribute(val value: ArrayList<UInt>)
+
+  class AttributeListAttribute(val value: ArrayList<UInt>)
+
+  suspend fun launchContent(
     search: ChipStructs.ContentLauncherClusterContentSearchStruct,
     autoPlay: Boolean,
     data: String?
-  ) {
+  ): LauncherResponse {
     // Implementation needs to be added here
   }
 
-  fun launchContent(
-    callback: LauncherResponseCallback,
+  suspend fun launchContent(
     search: ChipStructs.ContentLauncherClusterContentSearchStruct,
     autoPlay: Boolean,
     data: String?,
     timedInvokeTimeoutMs: Int
-  ) {
+  ): LauncherResponse {
     // Implementation needs to be added here
   }
 
-  fun launchURL(
-    callback: LauncherResponseCallback,
+  suspend fun launchURL(
     contentURL: String,
     displayString: String?,
     brandingInformation: ChipStructs.ContentLauncherClusterBrandingInformationStruct?
-  ) {
+  ): LauncherResponse {
     // Implementation needs to be added here
   }
 
-  fun launchURL(
-    callback: LauncherResponseCallback,
+  suspend fun launchURL(
     contentURL: String,
     displayString: String?,
     brandingInformation: ChipStructs.ContentLauncherClusterBrandingInformationStruct?,
     timedInvokeTimeoutMs: Int
-  ) {
+  ): LauncherResponse {
     // Implementation needs to be added here
   }
 
-  interface LauncherResponseCallback {
-    fun onSuccess(status: Integer, data: String?)
-
-    fun onError(error: Exception)
-  }
-
-  interface AcceptHeaderAttributeCallback {
-    fun onSuccess(value: ArrayList<String>?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readAcceptHeaderAttribute(callback: AcceptHeaderAttributeCallback) {
+  suspend fun readAcceptHeaderAttribute(): AcceptHeaderAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcceptHeaderAttribute(
-    callback: AcceptHeaderAttributeCallback,
+  suspend fun subscribeAcceptHeaderAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AcceptHeaderAttribute {
     // Implementation needs to be added here
   }
 
-  fun readSupportedStreamingProtocolsAttribute(callback: LongAttributeCallback) {
+  suspend fun readSupportedStreamingProtocolsAttribute(): Long {
     // Implementation needs to be added here
   }
 
-  fun writeSupportedStreamingProtocolsAttribute(callback: DefaultClusterCallback, value: Long) {
+  suspend fun writeSupportedStreamingProtocolsAttribute(value: ULong) {
     // Implementation needs to be added here
   }
 
-  fun writeSupportedStreamingProtocolsAttribute(
-    callback: DefaultClusterCallback,
-    value: Long,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeSupportedStreamingProtocolsAttribute(value: ULong, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  fun subscribeSupportedStreamingProtocolsAttribute(
-    callback: LongAttributeCallback,
+  suspend fun subscribeSupportedStreamingProtocolsAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Long {
     // Implementation needs to be added here
   }
 
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
+  suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
+  suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
+  suspend fun readEventListAttribute(): EventListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AttributeListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
+  suspend fun readFeatureMapAttribute(): Long {
     // Implementation needs to be added here
   }
 
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
     // Implementation needs to be added here
   }
 
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
+  suspend fun readClusterRevisionAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
+  companion object {
+    const val CLUSTER_ID: UInt = 1290u
   }
 }

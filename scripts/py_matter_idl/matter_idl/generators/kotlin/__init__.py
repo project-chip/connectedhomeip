@@ -212,9 +212,9 @@ def JavaAttributeCallbackName(attr: Attribute, context: TypeLookupContext) -> st
     global_name = FieldToGlobalName(attr.definition, context)
 
     if global_name:
-        return '{}AttributeCallback'.format(GlobalNameToJavaName(global_name))
+        return '{}'.format(GlobalNameToJavaName(global_name))
 
-    return '{}AttributeCallback'.format(capitalcase(attr.definition.name))
+    return '{}Attribute'.format(capitalcase(attr.definition.name))
 
 
 def IsFieldGlobalName(field: Field, context: TypeLookupContext) -> bool:
@@ -583,6 +583,11 @@ def IsFabricScopedList(attr: Attribute, lookup: TypeLookupContext) -> bool:
     return struct and struct.qualities == StructQuality.FABRIC_SCOPED
 
 
+def CommandHasResponse(command: Command) -> bool:
+    """Returns true if a command has a specific response."""
+    return command.output_param != "DefaultSuccess"
+
+
 def IsResponseStruct(s: Struct) -> bool:
     return s.tag == StructTag.RESPONSE
 
@@ -617,6 +622,7 @@ class __KotlinCodeGenerator(CodeGenerator):
         self.jinja_env.filters['createLookupContext'] = CreateLookupContext
         self.jinja_env.filters['canGenerateSubscribe'] = CanGenerateSubscribe
         self.jinja_env.filters['isFabricScopedList'] = IsFabricScopedList
+        self.jinja_env.filters['hasResponse'] = CommandHasResponse
 
         self.jinja_env.tests['is_response_struct'] = IsResponseStruct
         self.jinja_env.tests['is_using_global_callback'] = _IsUsingGlobalCallback

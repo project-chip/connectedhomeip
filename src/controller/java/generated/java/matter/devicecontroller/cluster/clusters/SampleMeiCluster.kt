@@ -20,162 +20,110 @@ package matter.devicecontroller.cluster.clusters
 import java.util.ArrayList
 
 class SampleMeiCluster(private val endpointId: UShort) {
+  class AddArgumentsResponse(val returnValue: UByte)
+
+  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class EventListAttribute(val value: ArrayList<UInt>)
+
+  class AttributeListAttribute(val value: ArrayList<UInt>)
+
+  suspend fun ping() {
+    // Implementation needs to be added here
+  }
+
+  suspend fun ping(timedInvokeTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun addArguments(arg1: UByte, arg2: UByte): AddArgumentsResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun addArguments(
+    arg1: UByte,
+    arg2: UByte,
+    timedInvokeTimeoutMs: Int
+  ): AddArgumentsResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFlipFlopAttribute(): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeFlipFlopAttribute(value: Boolean) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeFlipFlopAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFlipFlopAttribute(minInterval: Int, maxInterval: Int): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEventListAttribute(): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFeatureMapAttribute(): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readClusterRevisionAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
   companion object {
     const val CLUSTER_ID: UInt = 4294048800u
-  }
-
-  fun ping(callback: DefaultClusterCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun ping(callback: DefaultClusterCallback, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  fun addArguments(callback: AddArgumentsResponseCallback, arg1: Integer, arg2: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun addArguments(
-    callback: AddArgumentsResponseCallback,
-    arg1: Integer,
-    arg2: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  interface AddArgumentsResponseCallback {
-    fun onSuccess(returnValue: Integer)
-
-    fun onError(error: Exception)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readFlipFlopAttribute(callback: BooleanAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeFlipFlopAttribute(callback: DefaultClusterCallback, value: Boolean) {
-    // Implementation needs to be added here
-  }
-
-  fun writeFlipFlopAttribute(
-    callback: DefaultClusterCallback,
-    value: Boolean,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFlipFlopAttribute(
-    callback: BooleanAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
   }
 }

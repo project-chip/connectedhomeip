@@ -20,153 +20,97 @@ package matter.devicecontroller.cluster.clusters
 import java.util.ArrayList
 
 class BindingCluster(private val endpointId: UShort) {
-  companion object {
-    const val CLUSTER_ID: UInt = 30u
-  }
+  class BindingAttribute(val value: ArrayList<ChipStructs.BindingClusterTargetStruct>)
 
-  interface BindingAttributeCallback {
-    fun onSuccess(value: ArrayList<ChipStructs.BindingClusterTargetStruct>)
+  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
 
-    fun onError(ex: Exception)
+  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
 
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
+  class EventListAttribute(val value: ArrayList<UInt>)
 
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
+  class AttributeListAttribute(val value: ArrayList<UInt>)
 
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readBindingAttribute(callback: BindingAttributeCallback) {
+  suspend fun readBindingAttribute(): BindingAttribute {
     // Implementation needs to be added here
   }
 
-  fun readBindingAttributeWithFabricFilter(
-    callback: BindingAttributeCallback,
-    isFabricFiltered: Boolean
-  ) {
+  suspend fun readBindingAttributeWithFabricFilter(isFabricFiltered: Boolean): BindingAttribute {
     // Implementation needs to be added here
   }
 
-  fun writeBindingAttribute(
-    callback: DefaultClusterCallback,
-    value: ArrayList<ChipStructs.BindingClusterTargetStruct>
-  ) {
+  suspend fun writeBindingAttribute(value: ArrayList<ChipStructs.BindingClusterTargetStruct>) {
     // Implementation needs to be added here
   }
 
-  fun writeBindingAttribute(
-    callback: DefaultClusterCallback,
+  suspend fun writeBindingAttribute(
     value: ArrayList<ChipStructs.BindingClusterTargetStruct>,
     timedWriteTimeoutMs: Int
   ) {
     // Implementation needs to be added here
   }
 
-  fun subscribeBindingAttribute(
-    callback: BindingAttributeCallback,
+  suspend fun subscribeBindingAttribute(minInterval: Int, maxInterval: Int): BindingAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
+  suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
+  suspend fun readEventListAttribute(): EventListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AttributeListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
+  suspend fun readFeatureMapAttribute(): Long {
     // Implementation needs to be added here
   }
 
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
     // Implementation needs to be added here
   }
 
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
+  suspend fun readClusterRevisionAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
+  companion object {
+    const val CLUSTER_ID: UInt = 30u
   }
 }

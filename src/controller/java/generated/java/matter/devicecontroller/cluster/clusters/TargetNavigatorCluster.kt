@@ -20,162 +20,109 @@ package matter.devicecontroller.cluster.clusters
 import java.util.ArrayList
 
 class TargetNavigatorCluster(private val endpointId: UShort) {
-  companion object {
-    const val CLUSTER_ID: UInt = 1285u
-  }
+  class NavigateTargetResponse(val status: UInt, val data: String?)
 
-  fun navigateTarget(callback: NavigateTargetResponseCallback, target: Integer, data: String?) {
+  class TargetListAttribute(
+    val value: ArrayList<ChipStructs.TargetNavigatorClusterTargetInfoStruct>
+  )
+
+  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class EventListAttribute(val value: ArrayList<UInt>)
+
+  class AttributeListAttribute(val value: ArrayList<UInt>)
+
+  suspend fun navigateTarget(target: UByte, data: String?): NavigateTargetResponse {
     // Implementation needs to be added here
   }
 
-  fun navigateTarget(
-    callback: NavigateTargetResponseCallback,
-    target: Integer,
+  suspend fun navigateTarget(
+    target: UByte,
     data: String?,
     timedInvokeTimeoutMs: Int
-  ) {
+  ): NavigateTargetResponse {
     // Implementation needs to be added here
   }
 
-  interface NavigateTargetResponseCallback {
-    fun onSuccess(status: Integer, data: String?)
-
-    fun onError(error: Exception)
-  }
-
-  interface TargetListAttributeCallback {
-    fun onSuccess(value: ArrayList<ChipStructs.TargetNavigatorClusterTargetInfoStruct>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readTargetListAttribute(callback: TargetListAttributeCallback) {
+  suspend fun readTargetListAttribute(): TargetListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeTargetListAttribute(
-    callback: TargetListAttributeCallback,
+  suspend fun subscribeTargetListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): TargetListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readCurrentTargetAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readCurrentTargetAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeCurrentTargetAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeCurrentTargetAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
+  suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
+  suspend fun readEventListAttribute(): EventListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AttributeListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
+  suspend fun readFeatureMapAttribute(): Long {
     // Implementation needs to be added here
   }
 
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
     // Implementation needs to be added here
   }
 
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
+  suspend fun readClusterRevisionAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
+  companion object {
+    const val CLUSTER_ID: UInt = 1285u
   }
 }

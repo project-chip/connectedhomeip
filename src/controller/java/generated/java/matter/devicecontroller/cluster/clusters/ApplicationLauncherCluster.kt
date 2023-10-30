@@ -20,219 +20,154 @@ package matter.devicecontroller.cluster.clusters
 import java.util.ArrayList
 
 class ApplicationLauncherCluster(private val endpointId: UShort) {
-  companion object {
-    const val CLUSTER_ID: UInt = 1292u
-  }
+  class LauncherResponse(val status: UInt, val data: ByteArray?)
 
-  fun launchApp(
-    callback: LauncherResponseCallback,
+  class CatalogListAttribute(val value: ArrayList<UShort>?)
+
+  class CurrentAppAttribute(val value: ChipStructs.ApplicationLauncherClusterApplicationEPStruct?)
+
+  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class EventListAttribute(val value: ArrayList<UInt>)
+
+  class AttributeListAttribute(val value: ArrayList<UInt>)
+
+  suspend fun launchApp(
     application: ChipStructs.ApplicationLauncherClusterApplicationStruct?,
     data: ByteArray?
-  ) {
+  ): LauncherResponse {
     // Implementation needs to be added here
   }
 
-  fun launchApp(
-    callback: LauncherResponseCallback,
+  suspend fun launchApp(
     application: ChipStructs.ApplicationLauncherClusterApplicationStruct?,
     data: ByteArray?,
     timedInvokeTimeoutMs: Int
-  ) {
+  ): LauncherResponse {
     // Implementation needs to be added here
   }
 
-  fun stopApp(
-    callback: LauncherResponseCallback,
+  suspend fun stopApp(
     application: ChipStructs.ApplicationLauncherClusterApplicationStruct?
-  ) {
+  ): LauncherResponse {
     // Implementation needs to be added here
   }
 
-  fun stopApp(
-    callback: LauncherResponseCallback,
+  suspend fun stopApp(
     application: ChipStructs.ApplicationLauncherClusterApplicationStruct?,
     timedInvokeTimeoutMs: Int
-  ) {
+  ): LauncherResponse {
     // Implementation needs to be added here
   }
 
-  fun hideApp(
-    callback: LauncherResponseCallback,
+  suspend fun hideApp(
     application: ChipStructs.ApplicationLauncherClusterApplicationStruct?
-  ) {
+  ): LauncherResponse {
     // Implementation needs to be added here
   }
 
-  fun hideApp(
-    callback: LauncherResponseCallback,
+  suspend fun hideApp(
     application: ChipStructs.ApplicationLauncherClusterApplicationStruct?,
     timedInvokeTimeoutMs: Int
-  ) {
+  ): LauncherResponse {
     // Implementation needs to be added here
   }
 
-  interface LauncherResponseCallback {
-    fun onSuccess(status: Integer, data: ByteArray?)
-
-    fun onError(error: Exception)
-  }
-
-  interface CatalogListAttributeCallback {
-    fun onSuccess(value: ArrayList<Integer>?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface CurrentAppAttributeCallback {
-    fun onSuccess(value: ChipStructs.ApplicationLauncherClusterApplicationEPStruct?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readCatalogListAttribute(callback: CatalogListAttributeCallback) {
+  suspend fun readCatalogListAttribute(): CatalogListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeCatalogListAttribute(
-    callback: CatalogListAttributeCallback,
+  suspend fun subscribeCatalogListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): CatalogListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readCurrentAppAttribute(callback: CurrentAppAttributeCallback) {
+  suspend fun readCurrentAppAttribute(): CurrentAppAttribute {
     // Implementation needs to be added here
   }
 
-  fun writeCurrentAppAttribute(
-    callback: DefaultClusterCallback,
+  suspend fun writeCurrentAppAttribute(
     value: ChipStructs.ApplicationLauncherClusterApplicationEPStruct
   ) {
     // Implementation needs to be added here
   }
 
-  fun writeCurrentAppAttribute(
-    callback: DefaultClusterCallback,
+  suspend fun writeCurrentAppAttribute(
     value: ChipStructs.ApplicationLauncherClusterApplicationEPStruct,
     timedWriteTimeoutMs: Int
   ) {
     // Implementation needs to be added here
   }
 
-  fun subscribeCurrentAppAttribute(
-    callback: CurrentAppAttributeCallback,
+  suspend fun subscribeCurrentAppAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): CurrentAppAttribute {
     // Implementation needs to be added here
   }
 
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
+  suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
+  suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
+  suspend fun readEventListAttribute(): EventListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AttributeListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
+  suspend fun readFeatureMapAttribute(): Long {
     // Implementation needs to be added here
   }
 
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
     // Implementation needs to be added here
   }
 
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
+  suspend fun readClusterRevisionAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
+  companion object {
+    const val CLUSTER_ID: UInt = 1292u
   }
 }

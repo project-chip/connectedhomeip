@@ -20,337 +20,245 @@ package matter.devicecontroller.cluster.clusters
 import java.util.ArrayList
 
 class MediaPlaybackCluster(private val endpointId: UShort) {
+  class PlaybackResponse(val status: UInt, val data: String?)
+
+  class StartTimeAttribute(val value: ULong?)
+
+  class DurationAttribute(val value: ULong?)
+
+  class SampledPositionAttribute(
+    val value: ChipStructs.MediaPlaybackClusterPlaybackPositionStruct?
+  )
+
+  class SeekRangeEndAttribute(val value: ULong?)
+
+  class SeekRangeStartAttribute(val value: ULong?)
+
+  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class EventListAttribute(val value: ArrayList<UInt>)
+
+  class AttributeListAttribute(val value: ArrayList<UInt>)
+
+  suspend fun play(): PlaybackResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun play(timedInvokeTimeoutMs: Int): PlaybackResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun pause(): PlaybackResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun pause(timedInvokeTimeoutMs: Int): PlaybackResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun stop(): PlaybackResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun stop(timedInvokeTimeoutMs: Int): PlaybackResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun startOver(): PlaybackResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun startOver(timedInvokeTimeoutMs: Int): PlaybackResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun previous(): PlaybackResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun previous(timedInvokeTimeoutMs: Int): PlaybackResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun next(): PlaybackResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun next(timedInvokeTimeoutMs: Int): PlaybackResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun rewind(): PlaybackResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun rewind(timedInvokeTimeoutMs: Int): PlaybackResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun fastForward(): PlaybackResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun fastForward(timedInvokeTimeoutMs: Int): PlaybackResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun skipForward(deltaPositionMilliseconds: ULong): PlaybackResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun skipForward(
+    deltaPositionMilliseconds: ULong,
+    timedInvokeTimeoutMs: Int
+  ): PlaybackResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun skipBackward(deltaPositionMilliseconds: ULong): PlaybackResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun skipBackward(
+    deltaPositionMilliseconds: ULong,
+    timedInvokeTimeoutMs: Int
+  ): PlaybackResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun seek(position: ULong): PlaybackResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun seek(position: ULong, timedInvokeTimeoutMs: Int): PlaybackResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readCurrentStateAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeCurrentStateAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readStartTimeAttribute(): StartTimeAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeStartTimeAttribute(minInterval: Int, maxInterval: Int): StartTimeAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDurationAttribute(): DurationAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDurationAttribute(minInterval: Int, maxInterval: Int): DurationAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSampledPositionAttribute(): SampledPositionAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSampledPositionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): SampledPositionAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPlaybackSpeedAttribute(): Float {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePlaybackSpeedAttribute(minInterval: Int, maxInterval: Int): Float {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSeekRangeEndAttribute(): SeekRangeEndAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSeekRangeEndAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): SeekRangeEndAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSeekRangeStartAttribute(): SeekRangeStartAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSeekRangeStartAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): SeekRangeStartAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEventListAttribute(): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFeatureMapAttribute(): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readClusterRevisionAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
   companion object {
     const val CLUSTER_ID: UInt = 1286u
-  }
-
-  fun play(callback: PlaybackResponseCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun play(callback: PlaybackResponseCallback, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  fun pause(callback: PlaybackResponseCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun pause(callback: PlaybackResponseCallback, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  fun stop(callback: PlaybackResponseCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun stop(callback: PlaybackResponseCallback, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  fun startOver(callback: PlaybackResponseCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun startOver(callback: PlaybackResponseCallback, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  fun previous(callback: PlaybackResponseCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun previous(callback: PlaybackResponseCallback, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  fun next(callback: PlaybackResponseCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun next(callback: PlaybackResponseCallback, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  fun rewind(callback: PlaybackResponseCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun rewind(callback: PlaybackResponseCallback, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  fun fastForward(callback: PlaybackResponseCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun fastForward(callback: PlaybackResponseCallback, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  fun skipForward(callback: PlaybackResponseCallback, deltaPositionMilliseconds: Long) {
-    // Implementation needs to be added here
-  }
-
-  fun skipForward(
-    callback: PlaybackResponseCallback,
-    deltaPositionMilliseconds: Long,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun skipBackward(callback: PlaybackResponseCallback, deltaPositionMilliseconds: Long) {
-    // Implementation needs to be added here
-  }
-
-  fun skipBackward(
-    callback: PlaybackResponseCallback,
-    deltaPositionMilliseconds: Long,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun seek(callback: PlaybackResponseCallback, position: Long) {
-    // Implementation needs to be added here
-  }
-
-  fun seek(callback: PlaybackResponseCallback, position: Long, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  interface PlaybackResponseCallback {
-    fun onSuccess(status: Integer, data: String?)
-
-    fun onError(error: Exception)
-  }
-
-  interface StartTimeAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface DurationAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface SampledPositionAttributeCallback {
-    fun onSuccess(value: ChipStructs.MediaPlaybackClusterPlaybackPositionStruct?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface SeekRangeEndAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface SeekRangeStartAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readCurrentStateAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeCurrentStateAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readStartTimeAttribute(callback: StartTimeAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeStartTimeAttribute(
-    callback: StartTimeAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readDurationAttribute(callback: DurationAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeDurationAttribute(
-    callback: DurationAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readSampledPositionAttribute(callback: SampledPositionAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSampledPositionAttribute(
-    callback: SampledPositionAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPlaybackSpeedAttribute(callback: FloatAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePlaybackSpeedAttribute(
-    callback: FloatAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readSeekRangeEndAttribute(callback: SeekRangeEndAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSeekRangeEndAttribute(
-    callback: SeekRangeEndAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readSeekRangeStartAttribute(callback: SeekRangeStartAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSeekRangeStartAttribute(
-    callback: SeekRangeStartAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
   }
 }

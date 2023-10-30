@@ -20,397 +20,262 @@ package matter.devicecontroller.cluster.clusters
 import java.util.ArrayList
 
 class TimeSynchronizationCluster(private val endpointId: UShort) {
-  companion object {
-    const val CLUSTER_ID: UInt = 56u
-  }
+  class SetTimeZoneResponse(val DSTOffsetRequired: Boolean)
 
-  fun setUTCTime(
-    callback: DefaultClusterCallback,
-    UTCTime: Long,
-    granularity: Integer,
-    timeSource: Integer?
-  ) {
+  class UTCTimeAttribute(val value: ULong?)
+
+  class TrustedTimeSourceAttribute(
+    val value: ChipStructs.TimeSynchronizationClusterTrustedTimeSourceStruct?
+  )
+
+  class DefaultNTPAttribute(val value: String?)
+
+  class TimeZoneAttribute(
+    val value: ArrayList<ChipStructs.TimeSynchronizationClusterTimeZoneStruct>?
+  )
+
+  class DSTOffsetAttribute(
+    val value: ArrayList<ChipStructs.TimeSynchronizationClusterDSTOffsetStruct>?
+  )
+
+  class LocalTimeAttribute(val value: ULong?)
+
+  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class EventListAttribute(val value: ArrayList<UInt>)
+
+  class AttributeListAttribute(val value: ArrayList<UInt>)
+
+  suspend fun setUTCTime(UTCTime: ULong, granularity: UInt, timeSource: UInt?) {
     // Implementation needs to be added here
   }
 
-  fun setUTCTime(
-    callback: DefaultClusterCallback,
-    UTCTime: Long,
-    granularity: Integer,
-    timeSource: Integer?,
+  suspend fun setUTCTime(
+    UTCTime: ULong,
+    granularity: UInt,
+    timeSource: UInt?,
     timedInvokeTimeoutMs: Int
   ) {
     // Implementation needs to be added here
   }
 
-  fun setTrustedTimeSource(
-    callback: DefaultClusterCallback,
+  suspend fun setTrustedTimeSource(
     trustedTimeSource: ChipStructs.TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct?
   ) {
     // Implementation needs to be added here
   }
 
-  fun setTrustedTimeSource(
-    callback: DefaultClusterCallback,
+  suspend fun setTrustedTimeSource(
     trustedTimeSource: ChipStructs.TimeSynchronizationClusterFabricScopedTrustedTimeSourceStruct?,
     timedInvokeTimeoutMs: Int
   ) {
     // Implementation needs to be added here
   }
 
-  fun setTimeZone(
-    callback: SetTimeZoneResponseCallback,
+  suspend fun setTimeZone(
     timeZone: ArrayList<ChipStructs.TimeSynchronizationClusterTimeZoneStruct>
-  ) {
+  ): SetTimeZoneResponse {
     // Implementation needs to be added here
   }
 
-  fun setTimeZone(
-    callback: SetTimeZoneResponseCallback,
+  suspend fun setTimeZone(
     timeZone: ArrayList<ChipStructs.TimeSynchronizationClusterTimeZoneStruct>,
     timedInvokeTimeoutMs: Int
-  ) {
+  ): SetTimeZoneResponse {
     // Implementation needs to be added here
   }
 
-  fun setDSTOffset(
-    callback: DefaultClusterCallback,
+  suspend fun setDSTOffset(
     DSTOffset: ArrayList<ChipStructs.TimeSynchronizationClusterDSTOffsetStruct>
   ) {
     // Implementation needs to be added here
   }
 
-  fun setDSTOffset(
-    callback: DefaultClusterCallback,
+  suspend fun setDSTOffset(
     DSTOffset: ArrayList<ChipStructs.TimeSynchronizationClusterDSTOffsetStruct>,
     timedInvokeTimeoutMs: Int
   ) {
     // Implementation needs to be added here
   }
 
-  fun setDefaultNTP(callback: DefaultClusterCallback, defaultNTP: String?) {
+  suspend fun setDefaultNTP(defaultNTP: String?) {
     // Implementation needs to be added here
   }
 
-  fun setDefaultNTP(
-    callback: DefaultClusterCallback,
-    defaultNTP: String?,
-    timedInvokeTimeoutMs: Int
-  ) {
+  suspend fun setDefaultNTP(defaultNTP: String?, timedInvokeTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  interface SetTimeZoneResponseCallback {
-    fun onSuccess(DSTOffsetRequired: Boolean)
-
-    fun onError(error: Exception)
-  }
-
-  interface UTCTimeAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface TrustedTimeSourceAttributeCallback {
-    fun onSuccess(value: ChipStructs.TimeSynchronizationClusterTrustedTimeSourceStruct?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface DefaultNTPAttributeCallback {
-    fun onSuccess(value: String?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface TimeZoneAttributeCallback {
-    fun onSuccess(value: ArrayList<ChipStructs.TimeSynchronizationClusterTimeZoneStruct>?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface DSTOffsetAttributeCallback {
-    fun onSuccess(value: ArrayList<ChipStructs.TimeSynchronizationClusterDSTOffsetStruct>?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface LocalTimeAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readUTCTimeAttribute(callback: UTCTimeAttributeCallback) {
+  suspend fun readUTCTimeAttribute(): UTCTimeAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeUTCTimeAttribute(
-    callback: UTCTimeAttributeCallback,
+  suspend fun subscribeUTCTimeAttribute(minInterval: Int, maxInterval: Int): UTCTimeAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGranularityAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGranularityAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTimeSourceAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTimeSourceAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTrustedTimeSourceAttribute(): TrustedTimeSourceAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTrustedTimeSourceAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): TrustedTimeSourceAttribute {
     // Implementation needs to be added here
   }
 
-  fun readGranularityAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readDefaultNTPAttribute(): DefaultNTPAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeGranularityAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeDefaultNTPAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): DefaultNTPAttribute {
     // Implementation needs to be added here
   }
 
-  fun readTimeSourceAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readTimeZoneAttribute(): TimeZoneAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeTimeSourceAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeTimeZoneAttribute(minInterval: Int, maxInterval: Int): TimeZoneAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDSTOffsetAttribute(): DSTOffsetAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDSTOffsetAttribute(minInterval: Int, maxInterval: Int): DSTOffsetAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readLocalTimeAttribute(): LocalTimeAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeLocalTimeAttribute(minInterval: Int, maxInterval: Int): LocalTimeAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTimeZoneDatabaseAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTimeZoneDatabaseAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readNTPServerAvailableAttribute(): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeNTPServerAvailableAttribute(minInterval: Int, maxInterval: Int): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTimeZoneListMaxSizeAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTimeZoneListMaxSizeAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDSTOffsetListMaxSizeAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDSTOffsetListMaxSizeAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSupportsDNSResolveAttribute(): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSupportsDNSResolveAttribute(minInterval: Int, maxInterval: Int): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readTrustedTimeSourceAttribute(callback: TrustedTimeSourceAttributeCallback) {
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeTrustedTimeSourceAttribute(
-    callback: TrustedTimeSourceAttributeCallback,
+  suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readDefaultNTPAttribute(callback: DefaultNTPAttributeCallback) {
+  suspend fun readEventListAttribute(): EventListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeDefaultNTPAttribute(
-    callback: DefaultNTPAttributeCallback,
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AttributeListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readTimeZoneAttribute(callback: TimeZoneAttributeCallback) {
+  suspend fun readFeatureMapAttribute(): Long {
     // Implementation needs to be added here
   }
 
-  fun subscribeTimeZoneAttribute(
-    callback: TimeZoneAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
     // Implementation needs to be added here
   }
 
-  fun readDSTOffsetAttribute(callback: DSTOffsetAttributeCallback) {
+  suspend fun readClusterRevisionAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeDSTOffsetAttribute(
-    callback: DSTOffsetAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readLocalTimeAttribute(callback: LocalTimeAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeLocalTimeAttribute(
-    callback: LocalTimeAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTimeZoneDatabaseAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTimeZoneDatabaseAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readNTPServerAvailableAttribute(callback: BooleanAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeNTPServerAvailableAttribute(
-    callback: BooleanAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTimeZoneListMaxSizeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTimeZoneListMaxSizeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readDSTOffsetListMaxSizeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeDSTOffsetListMaxSizeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readSupportsDNSResolveAttribute(callback: BooleanAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSupportsDNSResolveAttribute(
-    callback: BooleanAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
+  companion object {
+    const val CLUSTER_ID: UInt = 56u
   }
 }
