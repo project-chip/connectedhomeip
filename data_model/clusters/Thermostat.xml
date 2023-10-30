@@ -85,8 +85,13 @@ Davis, CA 95616, USA
     <feature bit="2" code="OCC" name="Occupancy" summary="Supports Occupied and Unoccupied setpoints">
       <optionalConform/>
     </feature>
-    <feature bit="3" code="SCH" name="Schedule Configuration" summary="Supports remote configuration of a weekly schedule of setpoint transitions">
-      <optionalConform/>
+    <feature bit="3" code="SCH" name="Zigbee Schedule Configuration" summary="Supports remote configuration of a weekly schedule of setpoint transitions">
+      <otherwiseConform>
+        <deprecateConform/>
+        <mandatoryConform>
+          <condition name="Zigbee"/>
+        </mandatoryConform>
+      </otherwiseConform>
     </feature>
     <feature bit="4" code="SB" name="Setback" summary="Supports configurable setback (or span)">
       <optionalConform/>
@@ -430,6 +435,14 @@ Davis, CA 95616, USA
             <feature name="COOL"/>
           </orTerm>
         </mandatoryConform>
+      </bitfield>
+    </bitmap>
+    <bitmap name="TemperatureSetpointHoldPolicy">
+      <bitfield name="HoldDurationElapsed" bit="0" summary="Hold will be cleared when the hold duration has elapsed">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="HoldDurationElapsedOrPresetChanged" bit="1" summary="Hold will be cleared when either the hold duration has elapsed or the preset changes">
+        <mandatoryConform/>
       </bitfield>
     </bitmap>
     <struct name="ThermostatScheduleTransition">

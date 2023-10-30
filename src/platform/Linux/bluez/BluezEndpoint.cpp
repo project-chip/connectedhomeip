@@ -71,6 +71,7 @@
 #include <system/SystemPacketBuffer.h>
 
 #include "BluezConnection.h"
+#include "Types.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -691,18 +692,14 @@ static void BluezSignalOnObjectAdded(GDBusObjectManager * aManager, GDBusObject 
 {
     // TODO: right now we do not handle addition/removal of adapters
     // Primary focus here is to handle addition of a device
-    BluezDevice1 * device = bluez_object_get_device1(BLUEZ_OBJECT(aObject));
-    if (device == nullptr)
-    {
-        return;
-    }
+    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(BLUEZ_OBJECT(aObject)));
 
-    if (BluezIsDeviceOnAdapter(device, endpoint->mpAdapter) == TRUE)
-    {
-        BluezHandleNewDevice(device, endpoint);
-    }
+    VerifyOrReturn(device.get() != nullptr);
 
-    g_object_unref(device);
+    if (BluezIsDeviceOnAdapter(device.get(), endpoint->mpAdapter) == TRUE)
+    {
+        BluezHandleNewDevice(device.get(), endpoint);
+    }
 }
 
 static void BluezSignalOnObjectRemoved(GDBusObjectManager * aManager, GDBusObject * aObject, gpointer apClosure)

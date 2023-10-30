@@ -8548,10 +8548,10 @@ PICS:
     #
     # Server Attribute
     #
-    - label: "Does the device implement the IdleModeInterval attribute?"
+    - label: "Does the device implement the IdleModeDuration attribute?"
       id: ICDM.S.A0000
 
-    - label: "Does the device implement the ActiveModeInterval attribute?"
+    - label: "Does the device implement the ActiveModeDuration attribute?"
       id: ICDM.S.A0001
 
     - label: "Does the device implement the ActiveModeThreshold attribute?"
@@ -8570,10 +8570,10 @@ PICS:
     #
     # Client Attribute
     #
-    - label: "Does the device implement the IdleModeInterval attribute?"
+    - label: "Does the device implement the IdleModeDuration attribute?"
       id: ICDM.C.A0000
 
-    - label: "Does the device implement the ActiveModeInterval attribute?"
+    - label: "Does the device implement the ActiveModeDuration attribute?"
       id: ICDM.C.A0001
 
     - label: "Does the device implement the ActiveModeThreshold attribute?"

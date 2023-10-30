@@ -2915,6 +2915,39 @@ public class ClusterReadMapping {
           readNetworkCommissioningLastConnectErrorValueCommandParams
         );
         result.put("readLastConnectErrorValueAttribute", readNetworkCommissioningLastConnectErrorValueAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readNetworkCommissioningSupportedWiFiBandsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readNetworkCommissioningSupportedWiFiBandsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.NetworkCommissioningCluster) cluster).readSupportedWiFiBandsAttribute(
+              (ChipClusters.NetworkCommissioningCluster.SupportedWiFiBandsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedNetworkCommissioningClusterSupportedWiFiBandsAttributeCallback(),
+          readNetworkCommissioningSupportedWiFiBandsCommandParams
+        );
+        result.put("readSupportedWiFiBandsAttribute", readNetworkCommissioningSupportedWiFiBandsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readNetworkCommissioningSupportedThreadFeaturesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readNetworkCommissioningSupportedThreadFeaturesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.NetworkCommissioningCluster) cluster).readSupportedThreadFeaturesAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readNetworkCommissioningSupportedThreadFeaturesCommandParams
+        );
+        result.put("readSupportedThreadFeaturesAttribute", readNetworkCommissioningSupportedThreadFeaturesAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readNetworkCommissioningThreadVersionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readNetworkCommissioningThreadVersionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.NetworkCommissioningCluster) cluster).readThreadVersionAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readNetworkCommissioningThreadVersionCommandParams
+        );
+        result.put("readThreadVersionAttribute", readNetworkCommissioningThreadVersionAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readNetworkCommissioningGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readNetworkCommissioningGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -5818,28 +5851,28 @@ public class ClusterReadMapping {
        return result;
     }
     private static Map<String, InteractionInfo> readIcdManagementInteractionInfo() {
-       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readIcdManagementIdleModeIntervalCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readIcdManagementIdleModeIntervalAttributeInteractionInfo = new InteractionInfo(
+       Map<String, InteractionInfo> result = new LinkedHashMap<>();Map<String, CommandParameterInfo> readIcdManagementIdleModeDurationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readIcdManagementIdleModeDurationAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.IcdManagementCluster) cluster).readIdleModeIntervalAttribute(
+            ((ChipClusters.IcdManagementCluster) cluster).readIdleModeDurationAttribute(
               (ChipClusters.LongAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-          readIcdManagementIdleModeIntervalCommandParams
+          readIcdManagementIdleModeDurationCommandParams
         );
-        result.put("readIdleModeIntervalAttribute", readIcdManagementIdleModeIntervalAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readIcdManagementActiveModeIntervalCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readIcdManagementActiveModeIntervalAttributeInteractionInfo = new InteractionInfo(
+        result.put("readIdleModeDurationAttribute", readIcdManagementIdleModeDurationAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readIcdManagementActiveModeDurationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readIcdManagementActiveModeDurationAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.IcdManagementCluster) cluster).readActiveModeIntervalAttribute(
+            ((ChipClusters.IcdManagementCluster) cluster).readActiveModeDurationAttribute(
               (ChipClusters.LongAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
-          readIcdManagementActiveModeIntervalCommandParams
+          readIcdManagementActiveModeDurationCommandParams
         );
-        result.put("readActiveModeIntervalAttribute", readIcdManagementActiveModeIntervalAttributeInteractionInfo);
+        result.put("readActiveModeDurationAttribute", readIcdManagementActiveModeDurationAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readIcdManagementActiveModeThresholdCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readIcdManagementActiveModeThresholdAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -5884,6 +5917,28 @@ public class ClusterReadMapping {
           readIcdManagementClientsSupportedPerFabricCommandParams
         );
         result.put("readClientsSupportedPerFabricAttribute", readIcdManagementClientsSupportedPerFabricAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readIcdManagementUserActiveModeTriggerHintCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readIcdManagementUserActiveModeTriggerHintAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.IcdManagementCluster) cluster).readUserActiveModeTriggerHintAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readIcdManagementUserActiveModeTriggerHintCommandParams
+        );
+        result.put("readUserActiveModeTriggerHintAttribute", readIcdManagementUserActiveModeTriggerHintAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readIcdManagementUserActiveModeTriggerInstructionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readIcdManagementUserActiveModeTriggerInstructionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.IcdManagementCluster) cluster).readUserActiveModeTriggerInstructionAttribute(
+              (ChipClusters.CharStringAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
+          readIcdManagementUserActiveModeTriggerInstructionCommandParams
+        );
+        result.put("readUserActiveModeTriggerInstructionAttribute", readIcdManagementUserActiveModeTriggerInstructionAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readIcdManagementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readIcdManagementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -6454,17 +6509,6 @@ public class ClusterReadMapping {
           readRvcRunModeCurrentModeCommandParams
         );
         result.put("readCurrentModeAttribute", readRvcRunModeCurrentModeAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readRvcRunModeStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readRvcRunModeStartUpModeAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.RvcRunModeCluster) cluster).readStartUpModeAttribute(
-              (ChipClusters.RvcRunModeCluster.StartUpModeAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedRvcRunModeClusterStartUpModeAttributeCallback(),
-          readRvcRunModeStartUpModeCommandParams
-        );
-        result.put("readStartUpModeAttribute", readRvcRunModeStartUpModeAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readRvcRunModeOnModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readRvcRunModeOnModeAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -6568,17 +6612,6 @@ public class ClusterReadMapping {
           readRvcCleanModeCurrentModeCommandParams
         );
         result.put("readCurrentModeAttribute", readRvcCleanModeCurrentModeAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readRvcCleanModeStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readRvcCleanModeStartUpModeAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.RvcCleanModeCluster) cluster).readStartUpModeAttribute(
-              (ChipClusters.RvcCleanModeCluster.StartUpModeAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedRvcCleanModeClusterStartUpModeAttributeCallback(),
-          readRvcCleanModeStartUpModeCommandParams
-        );
-        result.put("readStartUpModeAttribute", readRvcCleanModeStartUpModeAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readRvcCleanModeOnModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readRvcCleanModeOnModeAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

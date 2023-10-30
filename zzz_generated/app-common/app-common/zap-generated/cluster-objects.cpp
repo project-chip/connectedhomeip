@@ -6191,6 +6191,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, lastNetworkID);
     case Attributes::LastConnectErrorValue::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, lastConnectErrorValue);
+    case Attributes::SupportedWiFiBands::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, supportedWiFiBands);
+    case Attributes::SupportedThreadFeatures::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, supportedThreadFeatures);
+    case Attributes::ThreadVersion::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, threadVersion);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
@@ -10419,10 +10425,10 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::IdleModeInterval::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, idleModeInterval);
-    case Attributes::ActiveModeInterval::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeModeInterval);
+    case Attributes::IdleModeDuration::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, idleModeDuration);
+    case Attributes::ActiveModeDuration::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, activeModeDuration);
     case Attributes::ActiveModeThreshold::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, activeModeThreshold);
     case Attributes::RegisteredClients::TypeInfo::GetAttributeId():
@@ -10431,6 +10437,10 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, ICDCounter);
     case Attributes::ClientsSupportedPerFabric::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, clientsSupportedPerFabric);
+    case Attributes::UserActiveModeTriggerHint::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, userActiveModeTriggerHint);
+    case Attributes::UserActiveModeTriggerInstruction::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, userActiveModeTriggerInstruction);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
@@ -10970,8 +10980,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, supportedModes);
     case Attributes::CurrentMode::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, currentMode);
-    case Attributes::StartUpMode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, startUpMode);
     case Attributes::OnMode::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, onMode);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
@@ -11083,8 +11091,6 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, supportedModes);
     case Attributes::CurrentMode::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, currentMode);
-    case Attributes::StartUpMode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, startUpMode);
     case Attributes::OnMode::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, onMode);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():

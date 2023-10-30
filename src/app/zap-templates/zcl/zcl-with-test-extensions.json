@@ -197,12 +197,14 @@
             "FeatureMap"
         ],
         "ICD Management": [
-            "IdleModeInterval",
-            "ActiveModeInterval",
+            "IdleModeDuration",
+            "ActiveModeDuration",
             "ActiveModeThreshold",
             "RegisteredClients",
             "ICDCounter",
-            "ClientsSupportedPerFabric"
+            "ClientsSupportedPerFabric",
+            "UserActiveModeTriggerHint",
+            "UserActiveModeTriggerInstruction"
         ],
         "Operational Credentials": [
             "SupportedFabrics",
@@ -340,14 +342,12 @@
         "RVC Clean Mode": [
             "SupportedModes",
             "CurrentMode",
-            "StartUpMode",
             "OnMode",
             "FeatureMap"
         ],
         "RVC Run Mode": [
             "SupportedModes",
             "CurrentMode",
-            "StartUpMode",
             "OnMode",
             "FeatureMap"
         ],

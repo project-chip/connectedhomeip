@@ -1216,6 +1216,18 @@ namespace LastConnectErrorValue {
 static constexpr AttributeId Id = 0x00000007;
 } // namespace LastConnectErrorValue
 
+namespace SupportedWiFiBands {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace SupportedWiFiBands
+
+namespace SupportedThreadFeatures {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace SupportedThreadFeatures
+
+namespace ThreadVersion {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace ThreadVersion
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -2374,13 +2386,13 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace IcdManagement {
 namespace Attributes {
 
-namespace IdleModeInterval {
+namespace IdleModeDuration {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace IdleModeInterval
+} // namespace IdleModeDuration
 
-namespace ActiveModeInterval {
+namespace ActiveModeDuration {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace ActiveModeInterval
+} // namespace ActiveModeDuration
 
 namespace ActiveModeThreshold {
 static constexpr AttributeId Id = 0x00000002;
@@ -2397,6 +2409,14 @@ static constexpr AttributeId Id = 0x00000004;
 namespace ClientsSupportedPerFabric {
 static constexpr AttributeId Id = 0x00000005;
 } // namespace ClientsSupportedPerFabric
+
+namespace UserActiveModeTriggerHint {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace UserActiveModeTriggerHint
+
+namespace UserActiveModeTriggerInstruction {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace UserActiveModeTriggerInstruction
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -2628,10 +2648,6 @@ namespace CurrentMode {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentMode
 
-namespace StartUpMode {
-static constexpr AttributeId Id = 0x00000002;
-} // namespace StartUpMode
-
 namespace OnMode {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace OnMode
@@ -2673,10 +2689,6 @@ static constexpr AttributeId Id = 0x00000000;
 namespace CurrentMode {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentMode
-
-namespace StartUpMode {
-static constexpr AttributeId Id = 0x00000002;
-} // namespace StartUpMode
 
 namespace OnMode {
 static constexpr AttributeId Id = 0x00000003;

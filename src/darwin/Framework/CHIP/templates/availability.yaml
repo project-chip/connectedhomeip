@@ -7728,3 +7728,27 @@
 
 - release: "Future"
   versions: "future"
+  introduced:
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpStatusBitmap:
+                  - SupplyFault
+          SoftwareDiagnostics:
+              Feature:
+                  - Watermarks
+  deprecated:
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpStatusBitmap:
+                  - Supplyfault
+          SoftwareDiagnostics:
+              Feature:
+                  - WaterMarks
+  renames:
+      bitmap values:
+          PumpConfigurationAndControl:
+              PumpStatusBitmap:
+                  SupplyFault: Supplyfault
+          SoftwareDiagnostics:
+              Feature:
+                  Watermarks: WaterMarks
