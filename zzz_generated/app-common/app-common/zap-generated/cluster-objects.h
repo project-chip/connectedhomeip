@@ -6128,9 +6128,9 @@ namespace Attributes {
 namespace Sources {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const uint8_t>;
-    using DecodableType    = chip::app::DataModel::DecodableList<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<uint8_t> &;
+    using Type             = chip::app::DataModel::List<const chip::EndpointId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::EndpointId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::EndpointId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSourceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Sources::Id; }
