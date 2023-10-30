@@ -45,7 +45,6 @@
 
 #include "BluezEndpoint.h"
 
-#include <cassert>
 #include <cstring>
 #include <errno.h>
 #include <memory>
@@ -618,31 +617,30 @@ CHIP_ERROR BluezEndpoint::StartupEndpointBindings()
 
     SetupGattServer(conn.get());
 
-    GDBusObjectManager * manager = g_dbus_object_manager_client_new_sync(
+    mpObjMgr = g_dbus_object_manager_client_new_sync(
         conn.get(), G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_INTERFACE, "/", bluez_object_manager_client_get_proxy_type,
         nullptr /* unused user data in the Proxy Type Func */, nullptr /*destroy notify */, nullptr /* cancellable */,
         &MakeUniquePointerReceiver(err).Get());
-    VerifyOrReturnError(manager != nullptr, CHIP_ERROR_INTERNAL,
+    VerifyOrReturnError(mpObjMgr != nullptr, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "FAIL: Error getting object manager client: %s", err->message));
 
-    mpObjMgr = manager;
-    SetupAdapter();
-
-    g_signal_connect(manager, "object-added", G_CALLBACK(+[](GDBusObjectManager * aMgr, GDBusObject * aObj, BluezEndpoint * self) {
+    g_signal_connect(mpObjMgr, "object-added", G_CALLBACK(+[](GDBusObjectManager * aMgr, GDBusObject * aObj, BluezEndpoint * self) {
                          return self->BluezSignalOnObjectAdded(aMgr, aObj);
                      }),
                      this);
-    g_signal_connect(manager, "object-removed",
+    g_signal_connect(mpObjMgr, "object-removed",
                      G_CALLBACK(+[](GDBusObjectManager * aMgr, GDBusObject * aObj, BluezEndpoint * self) {
                          return self->BluezSignalOnObjectRemoved(aMgr, aObj);
                      }),
                      this);
-    g_signal_connect(manager, "interface-proxy-properties-changed",
+    g_signal_connect(mpObjMgr, "interface-proxy-properties-changed",
                      G_CALLBACK(+[](GDBusObjectManagerClient * aMgr, GDBusObjectProxy * aObj, GDBusProxy * aIface,
                                     GVariant * aChangedProps, const char * const * aInvalidatedProps, BluezEndpoint * self) {
                          return self->BluezSignalInterfacePropertiesChanged(aMgr, aObj, aIface, aChangedProps, aInvalidatedProps);
                      }),
                      this);
+
+    SetupAdapter();
 
     return CHIP_NO_ERROR;
 }
@@ -790,7 +788,7 @@ CHIP_ERROR BluezEndpoint::ConnectDevice(BluezDevice1 & aDevice)
 
 void BluezEndpoint::CancelConnect()
 {
-    assert(mpConnectCancellable != nullptr);
+    VerifyOrDie(mpConnectCancellable != nullptr);
     g_cancellable_cancel(mpConnectCancellable);
 }
 
