@@ -20,256 +20,173 @@ package matter.devicecontroller.cluster.clusters
 import java.util.ArrayList
 
 class GeneralCommissioningCluster(private val endpointId: UShort) {
+  class ArmFailSafeResponse(val errorCode: UInt, val debugText: String)
+
+  class SetRegulatoryConfigResponse(val errorCode: UInt, val debugText: String)
+
+  class CommissioningCompleteResponse(val errorCode: UInt, val debugText: String)
+
+  class BasicCommissioningInfoAttribute(
+    val value: ChipStructs.GeneralCommissioningClusterBasicCommissioningInfo
+  )
+
+  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class EventListAttribute(val value: ArrayList<UInt>)
+
+  class AttributeListAttribute(val value: ArrayList<UInt>)
+
+  suspend fun armFailSafe(expiryLengthSeconds: UShort, breadcrumb: ULong): ArmFailSafeResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun armFailSafe(
+    expiryLengthSeconds: UShort,
+    breadcrumb: ULong,
+    timedInvokeTimeoutMs: Int
+  ): ArmFailSafeResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun setRegulatoryConfig(
+    newRegulatoryConfig: UInt,
+    countryCode: String,
+    breadcrumb: ULong
+  ): SetRegulatoryConfigResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun setRegulatoryConfig(
+    newRegulatoryConfig: UInt,
+    countryCode: String,
+    breadcrumb: ULong,
+    timedInvokeTimeoutMs: Int
+  ): SetRegulatoryConfigResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun commissioningComplete(): CommissioningCompleteResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun commissioningComplete(timedInvokeTimeoutMs: Int): CommissioningCompleteResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBreadcrumbAttribute(): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeBreadcrumbAttribute(value: ULong) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeBreadcrumbAttribute(value: ULong, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBreadcrumbAttribute(minInterval: Int, maxInterval: Int): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBasicCommissioningInfoAttribute(): BasicCommissioningInfoAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBasicCommissioningInfoAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): BasicCommissioningInfoAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRegulatoryConfigAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRegulatoryConfigAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readLocationCapabilityAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeLocationCapabilityAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSupportsConcurrentConnectionAttribute(): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSupportsConcurrentConnectionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEventListAttribute(): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFeatureMapAttribute(): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readClusterRevisionAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
   companion object {
     const val CLUSTER_ID: UInt = 48u
-  }
-
-  fun armFailSafe(
-    callback: ArmFailSafeResponseCallback,
-    expiryLengthSeconds: Integer,
-    breadcrumb: Long
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun armFailSafe(
-    callback: ArmFailSafeResponseCallback,
-    expiryLengthSeconds: Integer,
-    breadcrumb: Long,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun setRegulatoryConfig(
-    callback: SetRegulatoryConfigResponseCallback,
-    newRegulatoryConfig: Integer,
-    countryCode: String,
-    breadcrumb: Long
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun setRegulatoryConfig(
-    callback: SetRegulatoryConfigResponseCallback,
-    newRegulatoryConfig: Integer,
-    countryCode: String,
-    breadcrumb: Long,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun commissioningComplete(callback: CommissioningCompleteResponseCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun commissioningComplete(
-    callback: CommissioningCompleteResponseCallback,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  interface ArmFailSafeResponseCallback {
-    fun onSuccess(errorCode: Integer, debugText: String)
-
-    fun onError(error: Exception)
-  }
-
-  interface SetRegulatoryConfigResponseCallback {
-    fun onSuccess(errorCode: Integer, debugText: String)
-
-    fun onError(error: Exception)
-  }
-
-  interface CommissioningCompleteResponseCallback {
-    fun onSuccess(errorCode: Integer, debugText: String)
-
-    fun onError(error: Exception)
-  }
-
-  interface BasicCommissioningInfoAttributeCallback {
-    fun onSuccess(value: ChipStructs.GeneralCommissioningClusterBasicCommissioningInfo)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readBreadcrumbAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeBreadcrumbAttribute(callback: DefaultClusterCallback, value: Long) {
-    // Implementation needs to be added here
-  }
-
-  fun writeBreadcrumbAttribute(
-    callback: DefaultClusterCallback,
-    value: Long,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBreadcrumbAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readBasicCommissioningInfoAttribute(callback: BasicCommissioningInfoAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBasicCommissioningInfoAttribute(
-    callback: BasicCommissioningInfoAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRegulatoryConfigAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRegulatoryConfigAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readLocationCapabilityAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeLocationCapabilityAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readSupportsConcurrentConnectionAttribute(callback: BooleanAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSupportsConcurrentConnectionAttribute(
-    callback: BooleanAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
   }
 }

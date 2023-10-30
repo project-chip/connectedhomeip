@@ -20,210 +20,140 @@ package matter.devicecontroller.cluster.clusters
 import java.util.ArrayList
 
 class TemperatureControlCluster(private val endpointId: UShort) {
-  companion object {
-    const val CLUSTER_ID: UInt = 86u
-  }
+  class SupportedTemperatureLevelsAttribute(val value: ArrayList<String>?)
 
-  fun setTemperature(
-    callback: DefaultClusterCallback,
-    targetTemperature: Integer?,
-    targetTemperatureLevel: Integer?
-  ) {
+  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class EventListAttribute(val value: ArrayList<UInt>)
+
+  class AttributeListAttribute(val value: ArrayList<UInt>)
+
+  suspend fun setTemperature(targetTemperature: Short?, targetTemperatureLevel: UByte?) {
     // Implementation needs to be added here
   }
 
-  fun setTemperature(
-    callback: DefaultClusterCallback,
-    targetTemperature: Integer?,
-    targetTemperatureLevel: Integer?,
+  suspend fun setTemperature(
+    targetTemperature: Short?,
+    targetTemperatureLevel: UByte?,
     timedInvokeTimeoutMs: Int
   ) {
     // Implementation needs to be added here
   }
 
-  interface SupportedTemperatureLevelsAttributeCallback {
-    fun onSuccess(value: ArrayList<String>?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readTemperatureSetpointAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readTemperatureSetpointAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeTemperatureSetpointAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeTemperatureSetpointAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMinTemperatureAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMinTemperatureAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMaxTemperatureAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMaxTemperatureAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readStepAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeStepAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSelectedTemperatureLevelAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSelectedTemperatureLevelAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readMinTemperatureAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readSupportedTemperatureLevelsAttribute(): SupportedTemperatureLevelsAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeMinTemperatureAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeSupportedTemperatureLevelsAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): SupportedTemperatureLevelsAttribute {
     // Implementation needs to be added here
   }
 
-  fun readMaxTemperatureAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeMaxTemperatureAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readStepAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeStepAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readSelectedTemperatureLevelAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readEventListAttribute(): EventListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeSelectedTemperatureLevelAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AttributeListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readSupportedTemperatureLevelsAttribute(
-    callback: SupportedTemperatureLevelsAttributeCallback
-  ) {
+  suspend fun readFeatureMapAttribute(): Long {
     // Implementation needs to be added here
   }
 
-  fun subscribeSupportedTemperatureLevelsAttribute(
-    callback: SupportedTemperatureLevelsAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
     // Implementation needs to be added here
   }
 
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
+  suspend fun readClusterRevisionAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
+  companion object {
+    const val CLUSTER_ID: UInt = 86u
   }
 }

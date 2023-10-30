@@ -20,261 +20,180 @@ package matter.devicecontroller.cluster.clusters
 import java.util.ArrayList
 
 class OperationalStateCluster(private val endpointId: UShort) {
+  class OperationalCommandResponse(
+    val commandResponseState: ChipStructs.OperationalStateClusterErrorStateStruct
+  )
+
+  class PhaseListAttribute(val value: ArrayList<String>?)
+
+  class CurrentPhaseAttribute(val value: UByte?)
+
+  class CountdownTimeAttribute(val value: UInt?)
+
+  class OperationalStateListAttribute(
+    val value: ArrayList<ChipStructs.OperationalStateClusterOperationalStateStruct>
+  )
+
+  class OperationalErrorAttribute(val value: ChipStructs.OperationalStateClusterErrorStateStruct)
+
+  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class EventListAttribute(val value: ArrayList<UInt>)
+
+  class AttributeListAttribute(val value: ArrayList<UInt>)
+
+  suspend fun pause(): OperationalCommandResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun pause(timedInvokeTimeoutMs: Int): OperationalCommandResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun stop(): OperationalCommandResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun stop(timedInvokeTimeoutMs: Int): OperationalCommandResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun start(): OperationalCommandResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun start(timedInvokeTimeoutMs: Int): OperationalCommandResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun resume(): OperationalCommandResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun resume(timedInvokeTimeoutMs: Int): OperationalCommandResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPhaseListAttribute(): PhaseListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePhaseListAttribute(minInterval: Int, maxInterval: Int): PhaseListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readCurrentPhaseAttribute(): CurrentPhaseAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeCurrentPhaseAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CurrentPhaseAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readCountdownTimeAttribute(): CountdownTimeAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeCountdownTimeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CountdownTimeAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readOperationalStateListAttribute(): OperationalStateListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeOperationalStateListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): OperationalStateListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readOperationalStateAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeOperationalStateAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readOperationalErrorAttribute(): OperationalErrorAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeOperationalErrorAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): OperationalErrorAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEventListAttribute(): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFeatureMapAttribute(): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readClusterRevisionAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
   companion object {
     const val CLUSTER_ID: UInt = 96u
-  }
-
-  fun pause(callback: OperationalCommandResponseCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun pause(callback: OperationalCommandResponseCallback, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  fun stop(callback: OperationalCommandResponseCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun stop(callback: OperationalCommandResponseCallback, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  fun start(callback: OperationalCommandResponseCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun start(callback: OperationalCommandResponseCallback, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  fun resume(callback: OperationalCommandResponseCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun resume(callback: OperationalCommandResponseCallback, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  interface OperationalCommandResponseCallback {
-    fun onSuccess(commandResponseState: ChipStructs.OperationalStateClusterErrorStateStruct)
-
-    fun onError(error: Exception)
-  }
-
-  interface PhaseListAttributeCallback {
-    fun onSuccess(value: ArrayList<String>?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface CurrentPhaseAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface CountdownTimeAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface OperationalStateListAttributeCallback {
-    fun onSuccess(value: ArrayList<ChipStructs.OperationalStateClusterOperationalStateStruct>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface OperationalErrorAttributeCallback {
-    fun onSuccess(value: ChipStructs.OperationalStateClusterErrorStateStruct)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readPhaseListAttribute(callback: PhaseListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePhaseListAttribute(
-    callback: PhaseListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readCurrentPhaseAttribute(callback: CurrentPhaseAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeCurrentPhaseAttribute(
-    callback: CurrentPhaseAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readCountdownTimeAttribute(callback: CountdownTimeAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeCountdownTimeAttribute(
-    callback: CountdownTimeAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readOperationalStateListAttribute(callback: OperationalStateListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOperationalStateListAttribute(
-    callback: OperationalStateListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readOperationalStateAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOperationalStateAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readOperationalErrorAttribute(callback: OperationalErrorAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOperationalErrorAttribute(
-    callback: OperationalErrorAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
   }
 }

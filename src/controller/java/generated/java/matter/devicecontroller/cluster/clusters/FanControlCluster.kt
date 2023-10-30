@@ -20,22 +20,24 @@ package matter.devicecontroller.cluster.clusters
 import java.util.ArrayList
 
 class FanControlCluster(private val endpointId: UShort) {
-  companion object {
-    const val CLUSTER_ID: UInt = 514u
-  }
+  class PercentSettingAttribute(val value: UByte?)
 
-  fun step(
-    callback: DefaultClusterCallback,
-    direction: Integer,
-    wrap: Boolean?,
-    lowestOff: Boolean?
-  ) {
+  class SpeedSettingAttribute(val value: UByte?)
+
+  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class EventListAttribute(val value: ArrayList<UInt>)
+
+  class AttributeListAttribute(val value: ArrayList<UInt>)
+
+  suspend fun step(direction: UInt, wrap: Boolean?, lowestOff: Boolean?) {
     // Implementation needs to be added here
   }
 
-  fun step(
-    callback: DefaultClusterCallback,
-    direction: Integer,
+  suspend fun step(
+    direction: UInt,
     wrap: Boolean?,
     lowestOff: Boolean?,
     timedInvokeTimeoutMs: Int
@@ -43,351 +45,222 @@ class FanControlCluster(private val endpointId: UShort) {
     // Implementation needs to be added here
   }
 
-  interface PercentSettingAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface SpeedSettingAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readFanModeAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readFanModeAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun writeFanModeAttribute(callback: DefaultClusterCallback, value: Integer) {
+  suspend fun writeFanModeAttribute(value: UInt) {
     // Implementation needs to be added here
   }
 
-  fun writeFanModeAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeFanModeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  fun subscribeFanModeAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeFanModeAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFanModeSequenceAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeFanModeSequenceAttribute(value: UInt) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeFanModeSequenceAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFanModeSequenceAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPercentSettingAttribute(): PercentSettingAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writePercentSettingAttribute(value: UByte) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writePercentSettingAttribute(value: UByte, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePercentSettingAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): PercentSettingAttribute {
     // Implementation needs to be added here
   }
 
-  fun readFanModeSequenceAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readPercentCurrentAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun writeFanModeSequenceAttribute(callback: DefaultClusterCallback, value: Integer) {
+  suspend fun subscribePercentCurrentAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun writeFanModeSequenceAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun readSpeedMaxAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeFanModeSequenceAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeSpeedMaxAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSpeedSettingAttribute(): SpeedSettingAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeSpeedSettingAttribute(value: UByte) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeSpeedSettingAttribute(value: UByte, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSpeedSettingAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): SpeedSettingAttribute {
     // Implementation needs to be added here
   }
 
-  fun readPercentSettingAttribute(callback: PercentSettingAttributeCallback) {
+  suspend fun readSpeedCurrentAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun writePercentSettingAttribute(callback: DefaultClusterCallback, value: Integer) {
+  suspend fun subscribeSpeedCurrentAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun writePercentSettingAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun readRockSupportAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribePercentSettingAttribute(
-    callback: PercentSettingAttributeCallback,
+  suspend fun subscribeRockSupportAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRockSettingAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeRockSettingAttribute(value: UInt) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeRockSettingAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRockSettingAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readWindSupportAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeWindSupportAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readWindSettingAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeWindSettingAttribute(value: UInt) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeWindSettingAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeWindSettingAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAirflowDirectionAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeAirflowDirectionAttribute(value: UInt) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeAirflowDirectionAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAirflowDirectionAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readPercentCurrentAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribePercentCurrentAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readSpeedMaxAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readEventListAttribute(): EventListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeSpeedMaxAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AttributeListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readSpeedSettingAttribute(callback: SpeedSettingAttributeCallback) {
+  suspend fun readFeatureMapAttribute(): Long {
     // Implementation needs to be added here
   }
 
-  fun writeSpeedSettingAttribute(callback: DefaultClusterCallback, value: Integer) {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
     // Implementation needs to be added here
   }
 
-  fun writeSpeedSettingAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun readClusterRevisionAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeSpeedSettingAttribute(
-    callback: SpeedSettingAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readSpeedCurrentAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSpeedCurrentAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRockSupportAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRockSupportAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRockSettingAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeRockSettingAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeRockSettingAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRockSettingAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readWindSupportAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeWindSupportAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readWindSettingAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeWindSettingAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeWindSettingAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeWindSettingAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAirflowDirectionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeAirflowDirectionAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeAirflowDirectionAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAirflowDirectionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
+  companion object {
+    const val CLUSTER_ID: UInt = 514u
   }
 }
