@@ -10001,7 +10001,7 @@ static id _Nullable DecodeAttributeValueForTemperatureMeasurementCluster(Attribu
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedShort:cppValue];
+        value = [NSNumber numberWithShort:cppValue];
         return value;
     }
     default: {

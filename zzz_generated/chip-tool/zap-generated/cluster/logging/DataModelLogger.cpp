@@ -10533,7 +10533,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("MaxMeasuredValue", 1, value);
         }
         case TemperatureMeasurement::Attributes::Tolerance::Id: {
-            uint16_t value;
+            int16_t value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Tolerance", 1, value);
         }
