@@ -65,7 +65,9 @@ tests:
               type: list
               contains: [0, 1, 8, 65528, 65529, 65531, 65532, 65533]
 
-    - label: "Step 4b: Validate presence of mandatory attribute(UpTime) in AttributeList"
+    - label:
+          "Step 4b: Validate presence of mandatory attribute(UpTime) in
+          AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
       response:
