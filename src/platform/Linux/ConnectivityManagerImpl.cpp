@@ -488,20 +488,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Inte
                         DeviceLayer::SystemLayer().ScheduleLambda([]() {
                             if (mpConnectCallback != nullptr)
                             {
-#if CONFIG_NETWORK_LAYER_BLE
-                                bool supportsConcurrentConnection = CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION;
-                                if (!supportsConcurrentConnection)
-                                {
-                                    // Non-concurrent mode therefore DO NOT send WiFiNetworkEnableResponse as per
-                                    // Matter Specification, 
-                                    ChipLogProgress(DeviceLayer, "Non Conurrent Connection: WiFiNetworkEnableResponse NOT SENT");
-                                    mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
-                                }
-                                else
-#endif                                
-                                {
-                                    mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
-                                }
+                                mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
                                 mpConnectCallback = nullptr;
                             }
                             ConnectivityMgrImpl().PostNetworkConnect();

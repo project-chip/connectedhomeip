@@ -525,7 +525,19 @@ void Instance::OnResult(Status commissioningError, CharSpan debugText, int32_t i
     memcpy(mLastNetworkID, mConnectingNetworkID, mLastNetworkIDLen);
     mLastNetworkingStatusValue.SetNonNull(commissioningError);
 
-    commandHandle->AddResponse(mPath, response);
+#if CONFIG_NETWORK_LAYER_BLE
+    bool supportsConcurrentConnection = CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION;
+    if (!supportsConcurrentConnection)
+    {
+        ChipLogProgress(NetworkProvisioning, "Instance::OnResult Non-Concurrent Mode, ConnectNetworkResponse will NOT be sent");    
+        // Do not send the ConnectNetworkResponse if in non-concurrent mode
+    }
+    else
+#endif
+    {
+        commandHandle->AddResponse(mPath, response);
+    }
+
     if (commissioningError == NetworkCommissioningStatusEnum::kSuccess)
     {
         CommitSavedBreadcrumb();
