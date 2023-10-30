@@ -64,7 +64,7 @@ void AccountLoginManager::HandleGetSetupPin(CommandResponseHelper<GetSetupPINRes
     GetSetupPINResponse response;
     ChipLogProgress(Zcl, "temporary account id: %s returning pin: %s", tempAccountIdentifierString.c_str(), mSetupPin);
 
-    response.setupPIN.SetNonNull(CharSpan::fromCharString(mSetupPin));
+    response.setupPIN = CharSpan::fromCharString(mSetupPin);
     helper.Success(response);
 }
 
@@ -93,14 +93,7 @@ void AccountLoginManager::GetSetupPin(char * setupPin, size_t setupPinSize, cons
     GetSetupPINResponse pinResponse = mCommandDelegate->FormatGetSetupPINResponse(response, status);
     if (status == chip::Protocols::InteractionModel::Status::Success)
     {
-        if (pinResponse.setupPIN.IsNull())
-        {
-            setupPin[0] = '\0';
-        }
-        else
-        {
-            CopyString(setupPin, setupPinSize, pinResponse.setupPIN.Value());
-        }
+        CopyString(setupPin, setupPinSize, pinResponse.setupPIN);
     }
     else
     {
