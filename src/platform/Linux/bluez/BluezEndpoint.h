@@ -65,10 +65,10 @@ namespace Internal {
 class BluezEndpoint
 {
 public:
-    BluezEndpoint(uint32_t aAdapterId, bool aIsCentral);
+    BluezEndpoint();
     ~BluezEndpoint();
 
-    CHIP_ERROR Init(const char * apBleAddr, const char * apBleName);
+    CHIP_ERROR Init(uint32_t aAdapterId, bool aIsCentral, const char * apBleAddr, const char * apBleName);
     void Shutdown();
 
     BluezAdapter1 * GetAdapter() const { return mpAdapter; }

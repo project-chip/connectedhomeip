@@ -187,7 +187,7 @@ private:
     uint32_t mAdapterId = 0;
     char mDeviceName[kMaxDeviceNameLength + 1];
     bool mIsCentral = false;
-    Platform::UniquePtr<BluezEndpoint> mEndpoint;
+    BluezEndpoint mEndpoint;
 
     BluezAdvertisement mBLEAdvertisement;
     ChipAdvType mBLEAdvType    = ChipAdvType::BLUEZ_ADV_TYPE_UNDIRECTED_CONNECTABLE_SCANNABLE;

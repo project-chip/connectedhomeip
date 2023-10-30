@@ -647,7 +647,7 @@ CHIP_ERROR BluezEndpoint::StartupEndpointBindings()
     return CHIP_NO_ERROR;
 }
 
-BluezEndpoint::BluezEndpoint(uint32_t aAdapterId, bool aIsCentral) : mAdapterId(aAdapterId), mIsCentral(aIsCentral)
+BluezEndpoint::BluezEndpoint()
 {
     mpConnMap = g_hash_table_new(g_str_hash, g_str_equal);
 }
@@ -655,16 +655,7 @@ BluezEndpoint::BluezEndpoint(uint32_t aAdapterId, bool aIsCentral) : mAdapterId(
 BluezEndpoint::~BluezEndpoint()
 {
     Shutdown();
-    g_free(mpOwningName);
-    g_free(mpAdapterName);
-    g_free(mpAdapterAddr);
-    g_free(mpRootPath);
-    g_free(mpServicePath);
-    if (mpConnMap != nullptr)
-        g_hash_table_destroy(mpConnMap);
-    g_free(mpPeerDevicePath);
-    if (mpConnectCancellable != nullptr)
-        g_object_unref(mpConnectCancellable);
+    g_hash_table_destroy(mpConnMap);
 }
 
 CHIP_ERROR BluezEndpoint::RegisterGattApplication()
@@ -676,14 +667,17 @@ CHIP_ERROR BluezEndpoint::RegisterGattApplication()
     return err;
 }
 
-CHIP_ERROR BluezEndpoint::Init(const char * apBleAddr, const char * apBleName)
+CHIP_ERROR BluezEndpoint::Init(uint32_t aAdapterId, bool aIsCentral, const char * apBleAddr, const char * apBleName)
 {
     CHIP_ERROR err;
+
+    mAdapterId = aAdapterId;
+    mIsCentral = aIsCentral;
 
     if (apBleAddr != nullptr)
         mpAdapterAddr = g_strdup(apBleAddr);
 
-    if (!mIsCentral)
+    if (!aIsCentral)
     {
         mpAdapterName = g_strdup(apBleName);
     }
@@ -724,9 +718,18 @@ void BluezEndpoint::Shutdown()
                 g_object_unref(self->mpC2);
             if (self->mpC3 != nullptr)
                 g_object_unref(self->mpC3);
+            if (self->mpConnectCancellable != nullptr)
+                g_object_unref(self->mpConnectCancellable);
             return CHIP_NO_ERROR;
         },
         this);
+
+    g_free(mpOwningName);
+    g_free(mpAdapterName);
+    g_free(mpAdapterAddr);
+    g_free(mpRootPath);
+    g_free(mpServicePath);
+    g_free(mpPeerDevicePath);
 }
 
 // ConnectDevice callbacks
