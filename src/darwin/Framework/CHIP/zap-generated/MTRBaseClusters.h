@@ -4533,6 +4533,18 @@ MTR_PROVISIONALLY_AVAILABLE
                                                 reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
 + (void)readAttributeClientsSupportedPerFabricWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
+- (void)readAttributeUserActiveModeTriggerHintWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeUserActiveModeTriggerHintWithParams:(MTRSubscribeParams *)params
+                                      subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                                reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeUserActiveModeTriggerHintWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
+- (void)readAttributeUserActiveModeTriggerInstructionWithCompletion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)subscribeAttributeUserActiveModeTriggerInstructionWithParams:(MTRSubscribeParams *)params
+                                             subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                                       reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler MTR_PROVISIONALLY_AVAILABLE;
++ (void)readAttributeUserActiveModeTriggerInstructionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSString * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 - (void)subscribeAttributeGeneratedCommandListWithParams:(MTRSubscribeParams *)params
                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
@@ -14072,7 +14084,10 @@ typedef NS_ENUM(uint8_t, MTRGeneralDiagnosticsRadioFaultType) {
 } MTR_DEPRECATED("Please use MTRGeneralDiagnosticsRadioFault", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4));
 
 typedef NS_OPTIONS(uint32_t, MTRSoftwareDiagnosticsFeature) {
-    MTRSoftwareDiagnosticsFeatureWaterMarks MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
+    MTRSoftwareDiagnosticsFeatureWatermarks MTR_NEWLY_AVAILABLE = 0x1,
+    MTRSoftwareDiagnosticsFeatureWaterMarks MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
+        MTR_NEWLY_DEPRECATED("Please use MTRSoftwareDiagnosticsFeatureWatermarks")
+    = 0x1,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRThreadNetworkDiagnosticsConnectionStatus) {
@@ -14354,6 +14369,26 @@ typedef NS_OPTIONS(uint32_t, MTRICDManagementFeature) {
     MTRICDManagementFeatureCheckInProtocolSupport MTR_PROVISIONALLY_AVAILABLE = 0x1,
     MTRICDManagementFeatureUserActiveModeTrigger MTR_PROVISIONALLY_AVAILABLE = 0x2,
     MTRICDManagementFeatureLongIdleTimeSupport MTR_PROVISIONALLY_AVAILABLE = 0x4,
+} MTR_PROVISIONALLY_AVAILABLE;
+
+typedef NS_OPTIONS(uint32_t, MTRICDManagementUserActiveModeTriggerBitmap) {
+    MTRICDManagementUserActiveModeTriggerBitmapPowerCycle MTR_PROVISIONALLY_AVAILABLE = 0x1,
+    MTRICDManagementUserActiveModeTriggerBitmapSettingsMenu MTR_PROVISIONALLY_AVAILABLE = 0x2,
+    MTRICDManagementUserActiveModeTriggerBitmapCustomInstruction MTR_PROVISIONALLY_AVAILABLE = 0x4,
+    MTRICDManagementUserActiveModeTriggerBitmapDeviceManual MTR_PROVISIONALLY_AVAILABLE = 0x8,
+    MTRICDManagementUserActiveModeTriggerBitmapActuateSensor MTR_PROVISIONALLY_AVAILABLE = 0x10,
+    MTRICDManagementUserActiveModeTriggerBitmapActuateSensorSeconds MTR_PROVISIONALLY_AVAILABLE = 0x20,
+    MTRICDManagementUserActiveModeTriggerBitmapActuateSensorTimes MTR_PROVISIONALLY_AVAILABLE = 0x40,
+    MTRICDManagementUserActiveModeTriggerBitmapActuateSensorLightsBlink MTR_PROVISIONALLY_AVAILABLE = 0x80,
+    MTRICDManagementUserActiveModeTriggerBitmapResetButton MTR_PROVISIONALLY_AVAILABLE = 0x100,
+    MTRICDManagementUserActiveModeTriggerBitmapResetButtonLightsBlink MTR_PROVISIONALLY_AVAILABLE = 0x200,
+    MTRICDManagementUserActiveModeTriggerBitmapResetButtonSeconds MTR_PROVISIONALLY_AVAILABLE = 0x400,
+    MTRICDManagementUserActiveModeTriggerBitmapResetButtonTimes MTR_PROVISIONALLY_AVAILABLE = 0x800,
+    MTRICDManagementUserActiveModeTriggerBitmapSetupButton MTR_PROVISIONALLY_AVAILABLE = 0x1000,
+    MTRICDManagementUserActiveModeTriggerBitmapSetupButtonSeconds MTR_PROVISIONALLY_AVAILABLE = 0x2000,
+    MTRICDManagementUserActiveModeTriggerBitmapSetupButtonLightsBlink MTR_PROVISIONALLY_AVAILABLE = 0x4000,
+    MTRICDManagementUserActiveModeTriggerBitmapSetupButtonTimes MTR_PROVISIONALLY_AVAILABLE = 0x8000,
+    MTRICDManagementUserActiveModeTriggerBitmapAppDefinedButton MTR_PROVISIONALLY_AVAILABLE = 0x10000,
 } MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRModeSelectFeature) {

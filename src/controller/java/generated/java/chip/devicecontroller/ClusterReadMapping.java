@@ -5917,6 +5917,28 @@ public class ClusterReadMapping {
           readIcdManagementClientsSupportedPerFabricCommandParams
         );
         result.put("readClientsSupportedPerFabricAttribute", readIcdManagementClientsSupportedPerFabricAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readIcdManagementUserActiveModeTriggerHintCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readIcdManagementUserActiveModeTriggerHintAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.IcdManagementCluster) cluster).readUserActiveModeTriggerHintAttribute(
+              (ChipClusters.LongAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+          readIcdManagementUserActiveModeTriggerHintCommandParams
+        );
+        result.put("readUserActiveModeTriggerHintAttribute", readIcdManagementUserActiveModeTriggerHintAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readIcdManagementUserActiveModeTriggerInstructionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readIcdManagementUserActiveModeTriggerInstructionAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.IcdManagementCluster) cluster).readUserActiveModeTriggerInstructionAttribute(
+              (ChipClusters.CharStringAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
+          readIcdManagementUserActiveModeTriggerInstructionCommandParams
+        );
+        result.put("readUserActiveModeTriggerInstructionAttribute", readIcdManagementUserActiveModeTriggerInstructionAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readIcdManagementGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readIcdManagementGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

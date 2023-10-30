@@ -2410,6 +2410,14 @@ namespace ClientsSupportedPerFabric {
 static constexpr AttributeId Id = 0x00000005;
 } // namespace ClientsSupportedPerFabric
 
+namespace UserActiveModeTriggerHint {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace UserActiveModeTriggerHint
+
+namespace UserActiveModeTriggerInstruction {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace UserActiveModeTriggerInstruction
+
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
