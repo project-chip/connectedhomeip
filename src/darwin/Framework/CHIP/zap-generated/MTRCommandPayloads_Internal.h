@@ -514,6 +514,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRGeneralDiagnosticsClusterTimeSnapshotParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRGeneralDiagnosticsClusterTimeSnapshotResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTRSoftwareDiagnosticsClusterResetWatermarksParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;

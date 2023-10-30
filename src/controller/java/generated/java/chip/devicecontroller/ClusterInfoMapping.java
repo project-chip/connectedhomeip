@@ -18933,6 +18933,18 @@ public class ClusterInfoMapping {
     );
     generalDiagnosticsClusterInteractionInfoMap.put("testEventTrigger", generalDiagnosticstestEventTriggerInteractionInfo);
 
+    Map<String, CommandParameterInfo> generalDiagnosticstimeSnapshotCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo generalDiagnosticstimeSnapshotInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.GeneralDiagnosticsCluster) cluster)
+        .timeSnapshot((DefaultClusterCallback) callback
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        generalDiagnosticstimeSnapshotCommandParams
+    );
+    generalDiagnosticsClusterInteractionInfoMap.put("timeSnapshot", generalDiagnosticstimeSnapshotInteractionInfo);
+
     commandMap.put("generalDiagnostics", generalDiagnosticsClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> softwareDiagnosticsClusterInteractionInfoMap = new LinkedHashMap<>();

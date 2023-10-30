@@ -3053,6 +3053,7 @@ private:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * TestEventTrigger                                                  |   0x00 |
+| * TimeSnapshot                                                      |   0x01 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * NetworkInterfaces                                                 | 0x0000 |
@@ -3116,6 +3117,43 @@ public:
 
 private:
     chip::app::Clusters::GeneralDiagnostics::Commands::TestEventTrigger::Type mRequest;
+};
+
+/*
+ * Command TimeSnapshot
+ */
+class GeneralDiagnosticsTimeSnapshot : public ClusterCommand
+{
+public:
+    GeneralDiagnosticsTimeSnapshot(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("time-snapshot", credsIssuerConfig)
+    {
+        ClusterCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::GeneralDiagnostics::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::GeneralDiagnostics::Commands::TimeSnapshot::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
+                        commandId, endpointIds.at(0));
+        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
+    }
+
+    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
+    {
+        constexpr chip::ClusterId clusterId = chip::app::Clusters::GeneralDiagnostics::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::GeneralDiagnostics::Commands::TimeSnapshot::Id;
+
+        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
+                        groupId);
+
+        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::GeneralDiagnostics::Commands::TimeSnapshot::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -13365,6 +13403,7 @@ void registerClusterGeneralDiagnostics(Commands & commands, CredentialIssuerComm
         //
         make_unique<ClusterCommand>(Id, credsIssuerConfig),                 //
         make_unique<GeneralDiagnosticsTestEventTrigger>(credsIssuerConfig), //
+        make_unique<GeneralDiagnosticsTimeSnapshot>(credsIssuerConfig),     //
         //
         // Attributes
         //

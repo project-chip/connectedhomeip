@@ -8346,6 +8346,37 @@ class GeneralDiagnostics(Cluster):
             enableKey: 'bytes' = b""
             eventTrigger: 'uint' = 0
 
+        @dataclass
+        class TimeSnapshot(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000033
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
+        @dataclass
+        class TimeSnapshotResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000033
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="systemTimeUs", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="UTCTimeUs", Tag=1, Type=uint),
+                    ])
+
+            systemTimeUs: 'uint' = 0
+            UTCTimeUs: 'uint' = 0
+
     class Attributes:
         @dataclass
         class NetworkInterfaces(ClusterAttributeDescriptor):
