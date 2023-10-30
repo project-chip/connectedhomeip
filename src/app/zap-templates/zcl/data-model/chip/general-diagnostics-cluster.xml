@@ -103,7 +103,7 @@ limitations under the License.
       <access op="invoke" role="manage"/>
     </command>
 
-    <command source="client" code="0x01" name="TimeSnapshot" optional="false" apiMaturity="provisional">
+    <command source="client" code="0x01" name="TimeSnapshot" response="TimeSnapshotResponse" optional="false" apiMaturity="provisional">
       <description>Take a snapshot of system time and epoch time.</description>
     </command>
 
