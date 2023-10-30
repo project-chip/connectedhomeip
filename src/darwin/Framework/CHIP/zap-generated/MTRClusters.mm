@@ -4440,11 +4440,11 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (void)timeSnapshotWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)timeSnapshotWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRGeneralDiagnosticsClusterTimeSnapshotResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     [self timeSnapshotWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
 }
-- (void)timeSnapshotWithParams:(MTRGeneralDiagnosticsClusterTimeSnapshotParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)timeSnapshotWithParams:(MTRGeneralDiagnosticsClusterTimeSnapshotParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRGeneralDiagnosticsClusterTimeSnapshotResponseParams * _Nullable data, NSError * _Nullable error))completion
 {
     if (params == nil) {
         params = [[MTRGeneralDiagnosticsClusterTimeSnapshotParams
@@ -4452,7 +4452,7 @@ using chip::System::Clock::Timeout;
     }
 
     auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(error);
+        completion(response, error);
     };
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
@@ -4466,7 +4466,7 @@ using chip::System::Clock::Timeout;
                              expectedValueInterval:expectedValueIntervalMs
                                 timedInvokeTimeout:timedInvokeTimeoutMs
                        serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:nil
+                                     responseClass:MTRGeneralDiagnosticsClusterTimeSnapshotResponseParams.class
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }

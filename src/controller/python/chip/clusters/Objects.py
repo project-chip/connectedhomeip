@@ -8351,7 +8351,7 @@ class GeneralDiagnostics(Cluster):
             cluster_id: typing.ClassVar[int] = 0x00000033
             command_id: typing.ClassVar[int] = 0x00000001
             is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = None
+            response_type: typing.ClassVar[str] = 'TimeSnapshotResponse'
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:

@@ -2624,8 +2624,8 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *
  * Take a snapshot of system time and epoch time.
  */
-- (void)timeSnapshotWithParams:(MTRGeneralDiagnosticsClusterTimeSnapshotParams * _Nullable)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
-- (void)timeSnapshotWithCompletion:(MTRStatusCompletion)completion
+- (void)timeSnapshotWithParams:(MTRGeneralDiagnosticsClusterTimeSnapshotParams * _Nullable)params completion:(void (^)(MTRGeneralDiagnosticsClusterTimeSnapshotResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
+- (void)timeSnapshotWithCompletion:(void (^)(MTRGeneralDiagnosticsClusterTimeSnapshotResponseParams * _Nullable data, NSError * _Nullable error))completion
     MTR_PROVISIONALLY_AVAILABLE;
 
 - (void)readAttributeNetworkInterfacesWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));

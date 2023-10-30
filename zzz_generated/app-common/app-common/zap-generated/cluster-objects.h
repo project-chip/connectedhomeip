@@ -8238,7 +8238,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
