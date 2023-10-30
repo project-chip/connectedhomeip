@@ -20,1776 +20,1302 @@ package matter.devicecontroller.cluster.clusters
 import java.util.ArrayList
 
 class ElectricalMeasurementCluster(private val endpointId: UShort) {
-  companion object {
-    const val CLUSTER_ID: UInt = 2820u
-  }
+  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
 
-  fun getProfileInfoCommand(callback: DefaultClusterCallback) {
+  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class EventListAttribute(val value: ArrayList<UInt>)
+
+  class AttributeListAttribute(val value: ArrayList<UInt>)
+
+  suspend fun getProfileInfoCommand() {
     // Implementation needs to be added here
   }
 
-  fun getProfileInfoCommand(callback: DefaultClusterCallback, timedInvokeTimeoutMs: Int) {
+  suspend fun getProfileInfoCommand(timedInvokeTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  fun getMeasurementProfileCommand(
-    callback: DefaultClusterCallback,
-    attributeId: Integer,
-    startTime: Long,
-    numberOfIntervals: Integer
+  suspend fun getMeasurementProfileCommand(
+    attributeId: UShort,
+    startTime: UInt,
+    numberOfIntervals: UInt
   ) {
     // Implementation needs to be added here
   }
 
-  fun getMeasurementProfileCommand(
-    callback: DefaultClusterCallback,
-    attributeId: Integer,
-    startTime: Long,
-    numberOfIntervals: Integer,
+  suspend fun getMeasurementProfileCommand(
+    attributeId: UShort,
+    startTime: UInt,
+    numberOfIntervals: UInt,
     timedInvokeTimeoutMs: Int
   ) {
     // Implementation needs to be added here
   }
 
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readMeasurementTypeAttribute(callback: LongAttributeCallback) {
+  suspend fun readMeasurementTypeAttribute(): Long {
     // Implementation needs to be added here
   }
 
-  fun subscribeMeasurementTypeAttribute(
-    callback: LongAttributeCallback,
+  suspend fun subscribeMeasurementTypeAttribute(minInterval: Int, maxInterval: Int): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDcVoltageAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDcVoltageAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDcVoltageMinAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDcVoltageMinAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDcVoltageMaxAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDcVoltageMaxAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDcCurrentAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDcCurrentAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDcCurrentMinAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDcCurrentMinAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDcCurrentMaxAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDcCurrentMaxAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDcPowerAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDcPowerAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDcPowerMinAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDcPowerMinAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDcPowerMaxAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDcPowerMaxAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDcVoltageMultiplierAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDcVoltageMultiplierAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDcVoltageDivisorAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDcVoltageDivisorAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDcCurrentMultiplierAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDcCurrentMultiplierAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDcCurrentDivisorAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDcCurrentDivisorAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDcPowerMultiplierAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDcPowerMultiplierAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDcPowerDivisorAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDcPowerDivisorAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcFrequencyAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcFrequencyAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcFrequencyMinAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcFrequencyMinAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcFrequencyMaxAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcFrequencyMaxAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readNeutralCurrentAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeNeutralCurrentAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTotalActivePowerAttribute(): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTotalActivePowerAttribute(minInterval: Int, maxInterval: Int): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTotalReactivePowerAttribute(): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTotalReactivePowerAttribute(minInterval: Int, maxInterval: Int): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTotalApparentPowerAttribute(): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTotalApparentPowerAttribute(minInterval: Int, maxInterval: Int): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMeasured1stHarmonicCurrentAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMeasured1stHarmonicCurrentAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readDcVoltageAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readMeasured3rdHarmonicCurrentAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeDcVoltageAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeMeasured3rdHarmonicCurrentAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readDcVoltageMinAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readMeasured5thHarmonicCurrentAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeDcVoltageMinAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeMeasured5thHarmonicCurrentAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readDcVoltageMaxAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readMeasured7thHarmonicCurrentAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeDcVoltageMaxAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeMeasured7thHarmonicCurrentAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readDcCurrentAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readMeasured9thHarmonicCurrentAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeDcCurrentAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeMeasured9thHarmonicCurrentAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readDcCurrentMinAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readMeasured11thHarmonicCurrentAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeDcCurrentMinAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeMeasured11thHarmonicCurrentAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readDcCurrentMaxAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readMeasuredPhase1stHarmonicCurrentAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeDcCurrentMaxAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeMeasuredPhase1stHarmonicCurrentAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readDcPowerAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readMeasuredPhase3rdHarmonicCurrentAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeDcPowerAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeMeasuredPhase3rdHarmonicCurrentAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readDcPowerMinAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readMeasuredPhase5thHarmonicCurrentAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeDcPowerMinAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeMeasuredPhase5thHarmonicCurrentAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readDcPowerMaxAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readMeasuredPhase7thHarmonicCurrentAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeDcPowerMaxAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeMeasuredPhase7thHarmonicCurrentAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readDcVoltageMultiplierAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readMeasuredPhase9thHarmonicCurrentAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeDcVoltageMultiplierAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeMeasuredPhase9thHarmonicCurrentAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readDcVoltageDivisorAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readMeasuredPhase11thHarmonicCurrentAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeDcVoltageDivisorAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeMeasuredPhase11thHarmonicCurrentAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readDcCurrentMultiplierAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAcFrequencyMultiplierAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeDcCurrentMultiplierAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeAcFrequencyMultiplierAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcFrequencyDivisorAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcFrequencyDivisorAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPowerMultiplierAttribute(): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePowerMultiplierAttribute(minInterval: Int, maxInterval: Int): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPowerDivisorAttribute(): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePowerDivisorAttribute(minInterval: Int, maxInterval: Int): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readHarmonicCurrentMultiplierAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeHarmonicCurrentMultiplierAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readDcCurrentDivisorAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readPhaseHarmonicCurrentMultiplierAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeDcCurrentDivisorAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribePhaseHarmonicCurrentMultiplierAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readDcPowerMultiplierAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readInstantaneousVoltageAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeDcPowerMultiplierAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeInstantaneousVoltageAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readInstantaneousLineCurrentAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeInstantaneousLineCurrentAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readDcPowerDivisorAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readInstantaneousActiveCurrentAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeDcPowerDivisorAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeInstantaneousActiveCurrentAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAcFrequencyAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readInstantaneousReactiveCurrentAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcFrequencyAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeInstantaneousReactiveCurrentAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAcFrequencyMinAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readInstantaneousPowerAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcFrequencyMinAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeInstantaneousPowerAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAcFrequencyMaxAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsVoltageAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcFrequencyMaxAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsVoltageAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readNeutralCurrentAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsVoltageMinAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeNeutralCurrentAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsVoltageMinAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readTotalActivePowerAttribute(callback: LongAttributeCallback) {
+  suspend fun readRmsVoltageMaxAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeTotalActivePowerAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsVoltageMaxAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readTotalReactivePowerAttribute(callback: LongAttributeCallback) {
+  suspend fun readRmsCurrentAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeTotalReactivePowerAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsCurrentAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readTotalApparentPowerAttribute(callback: LongAttributeCallback) {
+  suspend fun readRmsCurrentMinAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeTotalApparentPowerAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsCurrentMinAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readMeasured1stHarmonicCurrentAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsCurrentMaxAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeMeasured1stHarmonicCurrentAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsCurrentMaxAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readMeasured3rdHarmonicCurrentAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readActivePowerAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeMeasured3rdHarmonicCurrentAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeActivePowerAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readMeasured5thHarmonicCurrentAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readActivePowerMinAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeMeasured5thHarmonicCurrentAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeActivePowerMinAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readMeasured7thHarmonicCurrentAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readActivePowerMaxAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeMeasured7thHarmonicCurrentAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeActivePowerMaxAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readMeasured9thHarmonicCurrentAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readReactivePowerAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeMeasured9thHarmonicCurrentAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeReactivePowerAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readMeasured11thHarmonicCurrentAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readApparentPowerAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeMeasured11thHarmonicCurrentAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeApparentPowerAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readMeasuredPhase1stHarmonicCurrentAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readPowerFactorAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeMeasuredPhase1stHarmonicCurrentAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribePowerFactorAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readMeasuredPhase3rdHarmonicCurrentAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAverageRmsVoltageMeasurementPeriodAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeMeasuredPhase3rdHarmonicCurrentAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun writeAverageRmsVoltageMeasurementPeriodAttribute(value: UShort) {
     // Implementation needs to be added here
   }
 
-  fun readMeasuredPhase5thHarmonicCurrentAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMeasuredPhase5thHarmonicCurrentAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readMeasuredPhase7thHarmonicCurrentAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMeasuredPhase7thHarmonicCurrentAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readMeasuredPhase9thHarmonicCurrentAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMeasuredPhase9thHarmonicCurrentAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readMeasuredPhase11thHarmonicCurrentAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMeasuredPhase11thHarmonicCurrentAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcFrequencyMultiplierAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcFrequencyMultiplierAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcFrequencyDivisorAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcFrequencyDivisorAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPowerMultiplierAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePowerMultiplierAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPowerDivisorAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePowerDivisorAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readHarmonicCurrentMultiplierAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeHarmonicCurrentMultiplierAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPhaseHarmonicCurrentMultiplierAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePhaseHarmonicCurrentMultiplierAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readInstantaneousVoltageAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeInstantaneousVoltageAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readInstantaneousLineCurrentAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeInstantaneousLineCurrentAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readInstantaneousActiveCurrentAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeInstantaneousActiveCurrentAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readInstantaneousReactiveCurrentAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeInstantaneousReactiveCurrentAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readInstantaneousPowerAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeInstantaneousPowerAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRmsVoltageAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRmsVoltageAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRmsVoltageMinAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRmsVoltageMinAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRmsVoltageMaxAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRmsVoltageMaxAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRmsCurrentAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRmsCurrentAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRmsCurrentMinAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRmsCurrentMinAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRmsCurrentMaxAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRmsCurrentMaxAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readActivePowerAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeActivePowerAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readActivePowerMinAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeActivePowerMinAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readActivePowerMaxAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeActivePowerMaxAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readReactivePowerAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeReactivePowerAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readApparentPowerAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeApparentPowerAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPowerFactorAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePowerFactorAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAverageRmsVoltageMeasurementPeriodAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeAverageRmsVoltageMeasurementPeriodAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun writeAverageRmsVoltageMeasurementPeriodAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
+  suspend fun writeAverageRmsVoltageMeasurementPeriodAttribute(
+    value: UShort,
     timedWriteTimeoutMs: Int
   ) {
     // Implementation needs to be added here
   }
 
-  fun subscribeAverageRmsVoltageMeasurementPeriodAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeAverageRmsVoltageMeasurementPeriodAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAverageRmsUnderVoltageCounterAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAverageRmsUnderVoltageCounterAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun writeAverageRmsUnderVoltageCounterAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer
-  ) {
+  suspend fun writeAverageRmsUnderVoltageCounterAttribute(value: UShort) {
     // Implementation needs to be added here
   }
 
-  fun writeAverageRmsUnderVoltageCounterAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeAverageRmsUnderVoltageCounterAttribute(value: UShort, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  fun subscribeAverageRmsUnderVoltageCounterAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeAverageRmsUnderVoltageCounterAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsExtremeOverVoltagePeriodAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsExtremeOverVoltagePeriodAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun writeRmsExtremeOverVoltagePeriodAttribute(callback: DefaultClusterCallback, value: Integer) {
+  suspend fun writeRmsExtremeOverVoltagePeriodAttribute(value: UShort) {
     // Implementation needs to be added here
   }
 
-  fun writeRmsExtremeOverVoltagePeriodAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeRmsExtremeOverVoltagePeriodAttribute(value: UShort, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsExtremeOverVoltagePeriodAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeRmsExtremeOverVoltagePeriodAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsExtremeUnderVoltagePeriodAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsExtremeUnderVoltagePeriodAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun writeRmsExtremeUnderVoltagePeriodAttribute(callback: DefaultClusterCallback, value: Integer) {
+  suspend fun writeRmsExtremeUnderVoltagePeriodAttribute(value: UShort) {
     // Implementation needs to be added here
   }
 
-  fun writeRmsExtremeUnderVoltagePeriodAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeRmsExtremeUnderVoltagePeriodAttribute(value: UShort, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsExtremeUnderVoltagePeriodAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeRmsExtremeUnderVoltagePeriodAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsVoltageSagPeriodAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsVoltageSagPeriodAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun writeRmsVoltageSagPeriodAttribute(callback: DefaultClusterCallback, value: Integer) {
+  suspend fun writeRmsVoltageSagPeriodAttribute(value: UShort) {
     // Implementation needs to be added here
   }
 
-  fun writeRmsVoltageSagPeriodAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeRmsVoltageSagPeriodAttribute(value: UShort, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsVoltageSagPeriodAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsVoltageSagPeriodAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsVoltageSwellPeriodAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsVoltageSwellPeriodAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun writeRmsVoltageSwellPeriodAttribute(callback: DefaultClusterCallback, value: Integer) {
+  suspend fun writeRmsVoltageSwellPeriodAttribute(value: UShort) {
     // Implementation needs to be added here
   }
 
-  fun writeRmsVoltageSwellPeriodAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeRmsVoltageSwellPeriodAttribute(value: UShort, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsVoltageSwellPeriodAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsVoltageSwellPeriodAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAcVoltageMultiplierAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAcVoltageMultiplierAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcVoltageMultiplierAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeAcVoltageMultiplierAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAcVoltageDivisorAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAcVoltageDivisorAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcVoltageDivisorAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeAcVoltageDivisorAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAcCurrentMultiplierAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAcCurrentMultiplierAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcCurrentMultiplierAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeAcCurrentMultiplierAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAcCurrentDivisorAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAcCurrentDivisorAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcCurrentDivisorAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeAcCurrentDivisorAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAcPowerMultiplierAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAcPowerMultiplierAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcPowerMultiplierAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeAcPowerMultiplierAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAcPowerDivisorAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAcPowerDivisorAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcPowerDivisorAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeAcPowerDivisorAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readOverloadAlarmsMaskAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readOverloadAlarmsMaskAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun writeOverloadAlarmsMaskAttribute(callback: DefaultClusterCallback, value: Integer) {
+  suspend fun writeOverloadAlarmsMaskAttribute(value: UInt) {
     // Implementation needs to be added here
   }
 
-  fun writeOverloadAlarmsMaskAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeOverloadAlarmsMaskAttribute(value: UInt, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  fun subscribeOverloadAlarmsMaskAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeOverloadAlarmsMaskAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readVoltageOverloadAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readVoltageOverloadAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeVoltageOverloadAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeVoltageOverloadAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readCurrentOverloadAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readCurrentOverloadAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeCurrentOverloadAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeCurrentOverloadAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAcOverloadAlarmsMaskAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAcOverloadAlarmsMaskAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun writeAcOverloadAlarmsMaskAttribute(callback: DefaultClusterCallback, value: Integer) {
+  suspend fun writeAcOverloadAlarmsMaskAttribute(value: UInt) {
     // Implementation needs to be added here
   }
 
-  fun writeAcOverloadAlarmsMaskAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeAcOverloadAlarmsMaskAttribute(value: UInt, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcOverloadAlarmsMaskAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeAcOverloadAlarmsMaskAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAcVoltageOverloadAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAcVoltageOverloadAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcVoltageOverloadAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeAcVoltageOverloadAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAcCurrentOverloadAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAcCurrentOverloadAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcCurrentOverloadAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeAcCurrentOverloadAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAcActivePowerOverloadAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAcActivePowerOverloadAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcActivePowerOverloadAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeAcActivePowerOverloadAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAcReactivePowerOverloadAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAcReactivePowerOverloadAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcReactivePowerOverloadAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeAcReactivePowerOverloadAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAverageRmsOverVoltageAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAverageRmsOverVoltageAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAverageRmsOverVoltageAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeAverageRmsOverVoltageAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAverageRmsUnderVoltageAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAverageRmsUnderVoltageAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAverageRmsUnderVoltageAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeAverageRmsUnderVoltageAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsExtremeOverVoltageAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsExtremeOverVoltageAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsExtremeOverVoltageAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsExtremeOverVoltageAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsExtremeUnderVoltageAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsExtremeUnderVoltageAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsExtremeUnderVoltageAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeRmsExtremeUnderVoltageAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsVoltageSagAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsVoltageSagAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsVoltageSagAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsVoltageSagAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsVoltageSwellAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsVoltageSwellAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsVoltageSwellAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsVoltageSwellAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readLineCurrentPhaseBAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readLineCurrentPhaseBAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeLineCurrentPhaseBAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeLineCurrentPhaseBAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readActiveCurrentPhaseBAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readActiveCurrentPhaseBAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeActiveCurrentPhaseBAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeActiveCurrentPhaseBAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readReactiveCurrentPhaseBAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readReactiveCurrentPhaseBAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeReactiveCurrentPhaseBAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeReactiveCurrentPhaseBAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsVoltagePhaseBAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsVoltagePhaseBAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsVoltagePhaseBAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsVoltagePhaseBAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsVoltageMinPhaseBAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsVoltageMinPhaseBAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsVoltageMinPhaseBAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsVoltageMinPhaseBAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsVoltageMaxPhaseBAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsVoltageMaxPhaseBAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsVoltageMaxPhaseBAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsVoltageMaxPhaseBAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsCurrentPhaseBAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsCurrentPhaseBAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsCurrentPhaseBAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsCurrentPhaseBAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsCurrentMinPhaseBAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsCurrentMinPhaseBAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsCurrentMinPhaseBAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsCurrentMinPhaseBAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsCurrentMaxPhaseBAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsCurrentMaxPhaseBAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsCurrentMaxPhaseBAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsCurrentMaxPhaseBAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readActivePowerPhaseBAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readActivePowerPhaseBAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeActivePowerPhaseBAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeActivePowerPhaseBAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readActivePowerMinPhaseBAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readActivePowerMinPhaseBAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeActivePowerMinPhaseBAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeActivePowerMinPhaseBAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readActivePowerMaxPhaseBAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readActivePowerMaxPhaseBAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeActivePowerMaxPhaseBAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeActivePowerMaxPhaseBAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readReactivePowerPhaseBAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readReactivePowerPhaseBAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeReactivePowerPhaseBAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeReactivePowerPhaseBAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readApparentPowerPhaseBAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readApparentPowerPhaseBAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeApparentPowerPhaseBAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeApparentPowerPhaseBAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readPowerFactorPhaseBAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readPowerFactorPhaseBAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribePowerFactorPhaseBAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribePowerFactorPhaseBAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAverageRmsVoltageMeasurementPeriodPhaseBAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAverageRmsVoltageMeasurementPeriodPhaseBAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAverageRmsVoltageMeasurementPeriodPhaseBAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeAverageRmsVoltageMeasurementPeriodPhaseBAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAverageRmsOverVoltageCounterPhaseBAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAverageRmsOverVoltageCounterPhaseBAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAverageRmsOverVoltageCounterPhaseBAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeAverageRmsOverVoltageCounterPhaseBAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAverageRmsUnderVoltageCounterPhaseBAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAverageRmsUnderVoltageCounterPhaseBAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAverageRmsUnderVoltageCounterPhaseBAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeAverageRmsUnderVoltageCounterPhaseBAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsExtremeOverVoltagePeriodPhaseBAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsExtremeOverVoltagePeriodPhaseBAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsExtremeOverVoltagePeriodPhaseBAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeRmsExtremeOverVoltagePeriodPhaseBAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsExtremeUnderVoltagePeriodPhaseBAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsExtremeUnderVoltagePeriodPhaseBAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsExtremeUnderVoltagePeriodPhaseBAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeRmsExtremeUnderVoltagePeriodPhaseBAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsVoltageSagPeriodPhaseBAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsVoltageSagPeriodPhaseBAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsVoltageSagPeriodPhaseBAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeRmsVoltageSagPeriodPhaseBAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsVoltageSwellPeriodPhaseBAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsVoltageSwellPeriodPhaseBAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsVoltageSwellPeriodPhaseBAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeRmsVoltageSwellPeriodPhaseBAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readLineCurrentPhaseCAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readLineCurrentPhaseCAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeLineCurrentPhaseCAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeLineCurrentPhaseCAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readActiveCurrentPhaseCAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readActiveCurrentPhaseCAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeActiveCurrentPhaseCAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeActiveCurrentPhaseCAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readReactiveCurrentPhaseCAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readReactiveCurrentPhaseCAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeReactiveCurrentPhaseCAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeReactiveCurrentPhaseCAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsVoltagePhaseCAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsVoltagePhaseCAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsVoltagePhaseCAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsVoltagePhaseCAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsVoltageMinPhaseCAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsVoltageMinPhaseCAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsVoltageMinPhaseCAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsVoltageMinPhaseCAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsVoltageMaxPhaseCAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsVoltageMaxPhaseCAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsVoltageMaxPhaseCAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsVoltageMaxPhaseCAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsCurrentPhaseCAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsCurrentPhaseCAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsCurrentPhaseCAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsCurrentPhaseCAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsCurrentMinPhaseCAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsCurrentMinPhaseCAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsCurrentMinPhaseCAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsCurrentMinPhaseCAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsCurrentMaxPhaseCAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsCurrentMaxPhaseCAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsCurrentMaxPhaseCAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeRmsCurrentMaxPhaseCAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readActivePowerPhaseCAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readActivePowerPhaseCAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeActivePowerPhaseCAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeActivePowerPhaseCAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readActivePowerMinPhaseCAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readActivePowerMinPhaseCAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeActivePowerMinPhaseCAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeActivePowerMinPhaseCAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readActivePowerMaxPhaseCAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readActivePowerMaxPhaseCAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeActivePowerMaxPhaseCAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeActivePowerMaxPhaseCAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readReactivePowerPhaseCAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readReactivePowerPhaseCAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeReactivePowerPhaseCAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeReactivePowerPhaseCAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readApparentPowerPhaseCAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readApparentPowerPhaseCAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeApparentPowerPhaseCAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeApparentPowerPhaseCAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readPowerFactorPhaseCAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readPowerFactorPhaseCAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribePowerFactorPhaseCAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribePowerFactorPhaseCAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAverageRmsVoltageMeasurementPeriodPhaseCAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAverageRmsVoltageMeasurementPeriodPhaseCAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAverageRmsVoltageMeasurementPeriodPhaseCAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeAverageRmsVoltageMeasurementPeriodPhaseCAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAverageRmsOverVoltageCounterPhaseCAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAverageRmsOverVoltageCounterPhaseCAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAverageRmsOverVoltageCounterPhaseCAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeAverageRmsOverVoltageCounterPhaseCAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAverageRmsUnderVoltageCounterPhaseCAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAverageRmsUnderVoltageCounterPhaseCAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAverageRmsUnderVoltageCounterPhaseCAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeAverageRmsUnderVoltageCounterPhaseCAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsExtremeOverVoltagePeriodPhaseCAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsExtremeOverVoltagePeriodPhaseCAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsExtremeOverVoltagePeriodPhaseCAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeRmsExtremeOverVoltagePeriodPhaseCAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsExtremeUnderVoltagePeriodPhaseCAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsExtremeUnderVoltagePeriodPhaseCAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsExtremeUnderVoltagePeriodPhaseCAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeRmsExtremeUnderVoltagePeriodPhaseCAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsVoltageSagPeriodPhaseCAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsVoltageSagPeriodPhaseCAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsVoltageSagPeriodPhaseCAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeRmsVoltageSagPeriodPhaseCAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readRmsVoltageSwellPeriodPhaseCAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readRmsVoltageSwellPeriodPhaseCAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeRmsVoltageSwellPeriodPhaseCAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeRmsVoltageSwellPeriodPhaseCAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
+  suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
+  suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
+  suspend fun readEventListAttribute(): EventListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
+  suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AttributeListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
+  suspend fun readFeatureMapAttribute(): Long {
     // Implementation needs to be added here
   }
 
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
     // Implementation needs to be added here
   }
 
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readClusterRevisionAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
+  }
+
+  companion object {
+    const val CLUSTER_ID: UInt = 2820u
   }
 }

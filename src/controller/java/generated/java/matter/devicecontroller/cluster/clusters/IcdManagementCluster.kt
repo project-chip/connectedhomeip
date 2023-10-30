@@ -20,250 +20,199 @@ package matter.devicecontroller.cluster.clusters
 import java.util.ArrayList
 
 class IcdManagementCluster(private val endpointId: UShort) {
+  class RegisterClientResponse(val ICDCounter: UInt)
+
+  class RegisteredClientsAttribute(
+    val value: ArrayList<ChipStructs.IcdManagementClusterMonitoringRegistrationStruct>?
+  )
+
+  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class EventListAttribute(val value: ArrayList<UInt>)
+
+  class AttributeListAttribute(val value: ArrayList<UInt>)
+
+  suspend fun registerClient(
+    checkInNodeID: ULong,
+    monitoredSubject: ULong,
+    key: ByteArray,
+    verificationKey: ByteArray?
+  ): RegisterClientResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun registerClient(
+    checkInNodeID: ULong,
+    monitoredSubject: ULong,
+    key: ByteArray,
+    verificationKey: ByteArray?,
+    timedInvokeTimeoutMs: Int
+  ): RegisterClientResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun unregisterClient(checkInNodeID: ULong, verificationKey: ByteArray?) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun unregisterClient(
+    checkInNodeID: ULong,
+    verificationKey: ByteArray?,
+    timedInvokeTimeoutMs: Int
+  ) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun stayActiveRequest() {
+    // Implementation needs to be added here
+  }
+
+  suspend fun stayActiveRequest(timedInvokeTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readIdleModeDurationAttribute(): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeIdleModeDurationAttribute(minInterval: Int, maxInterval: Int): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readActiveModeDurationAttribute(): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeActiveModeDurationAttribute(minInterval: Int, maxInterval: Int): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readActiveModeThresholdAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeActiveModeThresholdAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRegisteredClientsAttribute(): RegisteredClientsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRegisteredClientsAttributeWithFabricFilter(
+    isFabricFiltered: Boolean
+  ): RegisteredClientsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRegisteredClientsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): RegisteredClientsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readICDCounterAttribute(): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeICDCounterAttribute(minInterval: Int, maxInterval: Int): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readClientsSupportedPerFabricAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeClientsSupportedPerFabricAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readUserActiveModeTriggerHintAttribute(): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeUserActiveModeTriggerHintAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readUserActiveModeTriggerInstructionAttribute(): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeUserActiveModeTriggerInstructionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEventListAttribute(): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFeatureMapAttribute(): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readClusterRevisionAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
   companion object {
     const val CLUSTER_ID: UInt = 70u
-  }
-
-  fun registerClient(
-    callback: RegisterClientResponseCallback,
-    checkInNodeID: Long,
-    monitoredSubject: Long,
-    key: ByteArray,
-    verificationKey: ByteArray?
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun registerClient(
-    callback: RegisterClientResponseCallback,
-    checkInNodeID: Long,
-    monitoredSubject: Long,
-    key: ByteArray,
-    verificationKey: ByteArray?,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun unregisterClient(
-    callback: DefaultClusterCallback,
-    checkInNodeID: Long,
-    verificationKey: ByteArray?
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun unregisterClient(
-    callback: DefaultClusterCallback,
-    checkInNodeID: Long,
-    verificationKey: ByteArray?,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun stayActiveRequest(callback: DefaultClusterCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun stayActiveRequest(callback: DefaultClusterCallback, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  interface RegisterClientResponseCallback {
-    fun onSuccess(ICDCounter: Long)
-
-    fun onError(error: Exception)
-  }
-
-  interface RegisteredClientsAttributeCallback {
-    fun onSuccess(value: ArrayList<ChipStructs.IcdManagementClusterMonitoringRegistrationStruct>?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readIdleModeDurationAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeIdleModeDurationAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readActiveModeDurationAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeActiveModeDurationAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readActiveModeThresholdAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeActiveModeThresholdAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRegisteredClientsAttribute(callback: RegisteredClientsAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun readRegisteredClientsAttributeWithFabricFilter(
-    callback: RegisteredClientsAttributeCallback,
-    isFabricFiltered: Boolean
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRegisteredClientsAttribute(
-    callback: RegisteredClientsAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readICDCounterAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeICDCounterAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClientsSupportedPerFabricAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClientsSupportedPerFabricAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
   }
 }

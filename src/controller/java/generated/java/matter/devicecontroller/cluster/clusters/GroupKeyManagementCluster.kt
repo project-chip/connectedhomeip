@@ -20,266 +20,182 @@ package matter.devicecontroller.cluster.clusters
 import java.util.ArrayList
 
 class GroupKeyManagementCluster(private val endpointId: UShort) {
-  companion object {
-    const val CLUSTER_ID: UInt = 63u
-  }
+  class KeySetReadResponse(val groupKeySet: ChipStructs.GroupKeyManagementClusterGroupKeySetStruct)
 
-  fun keySetWrite(
-    callback: DefaultClusterCallback,
-    groupKeySet: ChipStructs.GroupKeyManagementClusterGroupKeySetStruct
-  ) {
+  class KeySetReadAllIndicesResponse(val groupKeySetIDs: ArrayList<UShort>)
+
+  class GroupKeyMapAttribute(
+    val value: ArrayList<ChipStructs.GroupKeyManagementClusterGroupKeyMapStruct>
+  )
+
+  class GroupTableAttribute(
+    val value: ArrayList<ChipStructs.GroupKeyManagementClusterGroupInfoMapStruct>
+  )
+
+  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class EventListAttribute(val value: ArrayList<UInt>)
+
+  class AttributeListAttribute(val value: ArrayList<UInt>)
+
+  suspend fun keySetWrite(groupKeySet: ChipStructs.GroupKeyManagementClusterGroupKeySetStruct) {
     // Implementation needs to be added here
   }
 
-  fun keySetWrite(
-    callback: DefaultClusterCallback,
+  suspend fun keySetWrite(
     groupKeySet: ChipStructs.GroupKeyManagementClusterGroupKeySetStruct,
     timedInvokeTimeoutMs: Int
   ) {
     // Implementation needs to be added here
   }
 
-  fun keySetRead(callback: KeySetReadResponseCallback, groupKeySetID: Integer) {
+  suspend fun keySetRead(groupKeySetID: UShort): KeySetReadResponse {
     // Implementation needs to be added here
   }
 
-  fun keySetRead(
-    callback: KeySetReadResponseCallback,
-    groupKeySetID: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
+  suspend fun keySetRead(groupKeySetID: UShort, timedInvokeTimeoutMs: Int): KeySetReadResponse {
     // Implementation needs to be added here
   }
 
-  fun keySetRemove(callback: DefaultClusterCallback, groupKeySetID: Integer) {
+  suspend fun keySetRemove(groupKeySetID: UShort) {
     // Implementation needs to be added here
   }
 
-  fun keySetRemove(
-    callback: DefaultClusterCallback,
-    groupKeySetID: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
+  suspend fun keySetRemove(groupKeySetID: UShort, timedInvokeTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  fun keySetReadAllIndices(callback: KeySetReadAllIndicesResponseCallback) {
+  suspend fun keySetReadAllIndices(): KeySetReadAllIndicesResponse {
     // Implementation needs to be added here
   }
 
-  fun keySetReadAllIndices(
-    callback: KeySetReadAllIndicesResponseCallback,
-    timedInvokeTimeoutMs: Int
-  ) {
+  suspend fun keySetReadAllIndices(timedInvokeTimeoutMs: Int): KeySetReadAllIndicesResponse {
     // Implementation needs to be added here
   }
 
-  interface KeySetReadResponseCallback {
-    fun onSuccess(groupKeySet: ChipStructs.GroupKeyManagementClusterGroupKeySetStruct)
-
-    fun onError(error: Exception)
-  }
-
-  interface KeySetReadAllIndicesResponseCallback {
-    fun onSuccess(groupKeySetIDs: ArrayList<Integer>)
-
-    fun onError(error: Exception)
-  }
-
-  interface GroupKeyMapAttributeCallback {
-    fun onSuccess(value: ArrayList<ChipStructs.GroupKeyManagementClusterGroupKeyMapStruct>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GroupTableAttributeCallback {
-    fun onSuccess(value: ArrayList<ChipStructs.GroupKeyManagementClusterGroupInfoMapStruct>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readGroupKeyMapAttribute(callback: GroupKeyMapAttributeCallback) {
+  suspend fun readGroupKeyMapAttribute(): GroupKeyMapAttribute {
     // Implementation needs to be added here
   }
 
-  fun readGroupKeyMapAttributeWithFabricFilter(
-    callback: GroupKeyMapAttributeCallback,
+  suspend fun readGroupKeyMapAttributeWithFabricFilter(
     isFabricFiltered: Boolean
-  ) {
+  ): GroupKeyMapAttribute {
     // Implementation needs to be added here
   }
 
-  fun writeGroupKeyMapAttribute(
-    callback: DefaultClusterCallback,
+  suspend fun writeGroupKeyMapAttribute(
     value: ArrayList<ChipStructs.GroupKeyManagementClusterGroupKeyMapStruct>
   ) {
     // Implementation needs to be added here
   }
 
-  fun writeGroupKeyMapAttribute(
-    callback: DefaultClusterCallback,
+  suspend fun writeGroupKeyMapAttribute(
     value: ArrayList<ChipStructs.GroupKeyManagementClusterGroupKeyMapStruct>,
     timedWriteTimeoutMs: Int
   ) {
     // Implementation needs to be added here
   }
 
-  fun subscribeGroupKeyMapAttribute(
-    callback: GroupKeyMapAttributeCallback,
+  suspend fun subscribeGroupKeyMapAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): GroupKeyMapAttribute {
     // Implementation needs to be added here
   }
 
-  fun readGroupTableAttribute(callback: GroupTableAttributeCallback) {
+  suspend fun readGroupTableAttribute(): GroupTableAttribute {
     // Implementation needs to be added here
   }
 
-  fun readGroupTableAttributeWithFabricFilter(
-    callback: GroupTableAttributeCallback,
+  suspend fun readGroupTableAttributeWithFabricFilter(
     isFabricFiltered: Boolean
-  ) {
+  ): GroupTableAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeGroupTableAttribute(
-    callback: GroupTableAttributeCallback,
+  suspend fun subscribeGroupTableAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): GroupTableAttribute {
     // Implementation needs to be added here
   }
 
-  fun readMaxGroupsPerFabricAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readMaxGroupsPerFabricAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeMaxGroupsPerFabricAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeMaxGroupsPerFabricAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMaxGroupKeysPerFabricAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMaxGroupKeysPerFabricAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readMaxGroupKeysPerFabricAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeMaxGroupKeysPerFabricAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
+  suspend fun readEventListAttribute(): EventListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AttributeListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
+  suspend fun readFeatureMapAttribute(): Long {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
     // Implementation needs to be added here
   }
 
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
+  suspend fun readClusterRevisionAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
+  companion object {
+    const val CLUSTER_ID: UInt = 63u
   }
 }

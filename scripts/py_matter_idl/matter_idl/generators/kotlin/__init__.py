@@ -212,9 +212,9 @@ def JavaAttributeCallbackName(attr: Attribute, context: TypeLookupContext) -> st
     global_name = FieldToGlobalName(attr.definition, context)
 
     if global_name:
-        return '{}AttributeCallback'.format(GlobalNameToJavaName(global_name))
+        return '{}'.format(GlobalNameToJavaName(global_name))
 
-    return '{}AttributeCallback'.format(capitalcase(attr.definition.name))
+    return '{}Attribute'.format(capitalcase(attr.definition.name))
 
 
 def IsFieldGlobalName(field: Field, context: TypeLookupContext) -> bool:
@@ -405,43 +405,6 @@ class EncodableValue:
         return e
 
     @property
-    def boxed_java_type(self):
-        t = ParseDataType(self.data_type, self.context)
-
-        if isinstance(t, FundamentalType):
-            if t == FundamentalType.BOOL:
-                return "Boolean"
-            elif t == FundamentalType.FLOAT:
-                return "Float"
-            elif t == FundamentalType.DOUBLE:
-                return "Double"
-            else:
-                raise Exception("Unknown fundamental type")
-        elif isinstance(t, BasicInteger):
-            # the >= 3 will include int24_t to be considered "long"
-            if t.byte_count >= 3:
-                return "Long"
-            else:
-                return "Integer"
-        elif isinstance(t, BasicString):
-            if t.is_binary:
-                return "ByteArray"
-            else:
-                return "String"
-        elif isinstance(t, IdlEnumType):
-            if t.base_type.byte_count >= 3:
-                return "Long"
-            else:
-                return "Integer"
-        elif isinstance(t, IdlBitmapType):
-            if t.base_type.byte_count >= 3:
-                return "Long"
-            else:
-                return "Integer"
-        else:
-            return "Object"
-
-    @property
     def kotlin_type(self):
         t = ParseDataType(self.data_type, self.context)
 
@@ -455,17 +418,22 @@ class EncodableValue:
             else:
                 raise Exception("Unknown fundamental type")
         elif isinstance(t, BasicInteger):
-            # the >= 3 will include int24_t to be considered "long"
             if t.is_signed:
-                if t.byte_count >= 3:
-                    return "Long"
-                else:
+                if t.byte_count <= 1:
+                    return "Byte"
+                if t.byte_count <= 2:
+                    return "Short"
+                if t.byte_count <= 4:
                     return "Int"
-            else:
-                if t.byte_count >= 3:
-                    return "ULong"
-                else:
+                return "Long"
+            else:  # unsigned
+                if t.byte_count <= 1:
+                    return "UByte"
+                if t.byte_count <= 2:
+                    return "UShort"
+                if t.byte_count <= 4:
                     return "UInt"
+                return "ULong"
         elif isinstance(t, BasicString):
             if t.is_binary:
                 return "ByteArray"
@@ -615,6 +583,11 @@ def IsFabricScopedList(attr: Attribute, lookup: TypeLookupContext) -> bool:
     return struct and struct.qualities == StructQuality.FABRIC_SCOPED
 
 
+def CommandHasResponse(command: Command) -> bool:
+    """Returns true if a command has a specific response."""
+    return command.output_param != "DefaultSuccess"
+
+
 def IsResponseStruct(s: Struct) -> bool:
     return s.tag == StructTag.RESPONSE
 
@@ -649,6 +622,7 @@ class __KotlinCodeGenerator(CodeGenerator):
         self.jinja_env.filters['createLookupContext'] = CreateLookupContext
         self.jinja_env.filters['canGenerateSubscribe'] = CanGenerateSubscribe
         self.jinja_env.filters['isFabricScopedList'] = IsFabricScopedList
+        self.jinja_env.filters['hasResponse'] = CommandHasResponse
 
         self.jinja_env.tests['is_response_struct'] = IsResponseStruct
         self.jinja_env.tests['is_using_global_callback'] = _IsUsingGlobalCallback

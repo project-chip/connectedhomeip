@@ -20,216 +20,143 @@ package matter.devicecontroller.cluster.clusters
 import java.util.ArrayList
 
 class GroupsCluster(private val endpointId: UShort) {
+  class AddGroupResponse(val status: UInt, val groupID: UShort)
+
+  class ViewGroupResponse(val status: UInt, val groupID: UShort, val groupName: String)
+
+  class GetGroupMembershipResponse(val capacity: UByte?, val groupList: ArrayList<UShort>)
+
+  class RemoveGroupResponse(val status: UInt, val groupID: UShort)
+
+  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class EventListAttribute(val value: ArrayList<UInt>)
+
+  class AttributeListAttribute(val value: ArrayList<UInt>)
+
+  suspend fun addGroup(groupID: UShort, groupName: String): AddGroupResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun addGroup(
+    groupID: UShort,
+    groupName: String,
+    timedInvokeTimeoutMs: Int
+  ): AddGroupResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun viewGroup(groupID: UShort): ViewGroupResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun viewGroup(groupID: UShort, timedInvokeTimeoutMs: Int): ViewGroupResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun getGroupMembership(groupList: ArrayList<UShort>): GetGroupMembershipResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun getGroupMembership(
+    groupList: ArrayList<UShort>,
+    timedInvokeTimeoutMs: Int
+  ): GetGroupMembershipResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun removeGroup(groupID: UShort): RemoveGroupResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun removeGroup(groupID: UShort, timedInvokeTimeoutMs: Int): RemoveGroupResponse {
+    // Implementation needs to be added here
+  }
+
+  suspend fun removeAllGroups() {
+    // Implementation needs to be added here
+  }
+
+  suspend fun removeAllGroups(timedInvokeTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun addGroupIfIdentifying(groupID: UShort, groupName: String) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun addGroupIfIdentifying(groupID: UShort, groupName: String, timedInvokeTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readNameSupportAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeNameSupportAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEventListAttribute(): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFeatureMapAttribute(): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readClusterRevisionAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
   companion object {
     const val CLUSTER_ID: UInt = 4u
-  }
-
-  fun addGroup(callback: AddGroupResponseCallback, groupID: Integer, groupName: String) {
-    // Implementation needs to be added here
-  }
-
-  fun addGroup(
-    callback: AddGroupResponseCallback,
-    groupID: Integer,
-    groupName: String,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun viewGroup(callback: ViewGroupResponseCallback, groupID: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun viewGroup(callback: ViewGroupResponseCallback, groupID: Integer, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  fun getGroupMembership(
-    callback: GetGroupMembershipResponseCallback,
-    groupList: ArrayList<Integer>
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun getGroupMembership(
-    callback: GetGroupMembershipResponseCallback,
-    groupList: ArrayList<Integer>,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun removeGroup(callback: RemoveGroupResponseCallback, groupID: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun removeGroup(
-    callback: RemoveGroupResponseCallback,
-    groupID: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun removeAllGroups(callback: DefaultClusterCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun removeAllGroups(callback: DefaultClusterCallback, timedInvokeTimeoutMs: Int) {
-    // Implementation needs to be added here
-  }
-
-  fun addGroupIfIdentifying(callback: DefaultClusterCallback, groupID: Integer, groupName: String) {
-    // Implementation needs to be added here
-  }
-
-  fun addGroupIfIdentifying(
-    callback: DefaultClusterCallback,
-    groupID: Integer,
-    groupName: String,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  interface AddGroupResponseCallback {
-    fun onSuccess(status: Integer, groupID: Integer)
-
-    fun onError(error: Exception)
-  }
-
-  interface ViewGroupResponseCallback {
-    fun onSuccess(status: Integer, groupID: Integer, groupName: String)
-
-    fun onError(error: Exception)
-  }
-
-  interface GetGroupMembershipResponseCallback {
-    fun onSuccess(capacity: Integer?, groupList: ArrayList<Integer>)
-
-    fun onError(error: Exception)
-  }
-
-  interface RemoveGroupResponseCallback {
-    fun onSuccess(status: Integer, groupID: Integer)
-
-    fun onError(error: Exception)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readNameSupportAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeNameSupportAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
   }
 }

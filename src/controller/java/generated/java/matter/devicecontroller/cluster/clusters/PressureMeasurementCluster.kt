@@ -20,267 +20,174 @@ package matter.devicecontroller.cluster.clusters
 import java.util.ArrayList
 
 class PressureMeasurementCluster(private val endpointId: UShort) {
+  class MeasuredValueAttribute(val value: Short?)
+
+  class MinMeasuredValueAttribute(val value: Short?)
+
+  class MaxMeasuredValueAttribute(val value: Short?)
+
+  class ScaledValueAttribute(val value: Short?)
+
+  class MinScaledValueAttribute(val value: Short?)
+
+  class MaxScaledValueAttribute(val value: Short?)
+
+  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class EventListAttribute(val value: ArrayList<UInt>)
+
+  class AttributeListAttribute(val value: ArrayList<UInt>)
+
+  suspend fun readMeasuredValueAttribute(): MeasuredValueAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMeasuredValueAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): MeasuredValueAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMinMeasuredValueAttribute(): MinMeasuredValueAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMinMeasuredValueAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): MinMeasuredValueAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMaxMeasuredValueAttribute(): MaxMeasuredValueAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMaxMeasuredValueAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): MaxMeasuredValueAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readToleranceAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeToleranceAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readScaledValueAttribute(): ScaledValueAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeScaledValueAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ScaledValueAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMinScaledValueAttribute(): MinScaledValueAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMinScaledValueAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): MinScaledValueAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMaxScaledValueAttribute(): MaxScaledValueAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMaxScaledValueAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): MaxScaledValueAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readScaledToleranceAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeScaledToleranceAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readScaleAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeScaleAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEventListAttribute(): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFeatureMapAttribute(): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readClusterRevisionAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
   companion object {
     const val CLUSTER_ID: UInt = 1027u
-  }
-
-  interface MeasuredValueAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface MinMeasuredValueAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface MaxMeasuredValueAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface ScaledValueAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface MinScaledValueAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface MaxScaledValueAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readMeasuredValueAttribute(callback: MeasuredValueAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMeasuredValueAttribute(
-    callback: MeasuredValueAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readMinMeasuredValueAttribute(callback: MinMeasuredValueAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMinMeasuredValueAttribute(
-    callback: MinMeasuredValueAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readMaxMeasuredValueAttribute(callback: MaxMeasuredValueAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMaxMeasuredValueAttribute(
-    callback: MaxMeasuredValueAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readToleranceAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeToleranceAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readScaledValueAttribute(callback: ScaledValueAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeScaledValueAttribute(
-    callback: ScaledValueAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readMinScaledValueAttribute(callback: MinScaledValueAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMinScaledValueAttribute(
-    callback: MinScaledValueAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readMaxScaledValueAttribute(callback: MaxScaledValueAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMaxScaledValueAttribute(
-    callback: MaxScaledValueAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readScaledToleranceAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeScaledToleranceAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readScaleAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeScaleAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
   }
 }

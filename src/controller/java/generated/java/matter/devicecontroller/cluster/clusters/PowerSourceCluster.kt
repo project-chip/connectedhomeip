@@ -20,593 +20,394 @@ package matter.devicecontroller.cluster.clusters
 import java.util.ArrayList
 
 class PowerSourceCluster(private val endpointId: UShort) {
+  class WiredAssessedInputVoltageAttribute(val value: UInt?)
+
+  class WiredAssessedInputFrequencyAttribute(val value: UShort?)
+
+  class WiredAssessedCurrentAttribute(val value: UInt?)
+
+  class ActiveWiredFaultsAttribute(val value: ArrayList<UInt>?)
+
+  class BatVoltageAttribute(val value: UInt?)
+
+  class BatPercentRemainingAttribute(val value: UByte?)
+
+  class BatTimeRemainingAttribute(val value: UInt?)
+
+  class ActiveBatFaultsAttribute(val value: ArrayList<UInt>?)
+
+  class BatTimeToFullChargeAttribute(val value: UInt?)
+
+  class BatChargingCurrentAttribute(val value: UInt?)
+
+  class ActiveBatChargeFaultsAttribute(val value: ArrayList<UInt>?)
+
+  class EndpointListAttribute(val value: ArrayList<UShort>)
+
+  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class EventListAttribute(val value: ArrayList<UInt>)
+
+  class AttributeListAttribute(val value: ArrayList<UInt>)
+
+  suspend fun readStatusAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeStatusAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readOrderAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeOrderAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDescriptionAttribute(): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDescriptionAttribute(minInterval: Int, maxInterval: Int): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readWiredAssessedInputVoltageAttribute(): WiredAssessedInputVoltageAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeWiredAssessedInputVoltageAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): WiredAssessedInputVoltageAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readWiredAssessedInputFrequencyAttribute(): WiredAssessedInputFrequencyAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeWiredAssessedInputFrequencyAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): WiredAssessedInputFrequencyAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readWiredCurrentTypeAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeWiredCurrentTypeAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readWiredAssessedCurrentAttribute(): WiredAssessedCurrentAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeWiredAssessedCurrentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): WiredAssessedCurrentAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readWiredNominalVoltageAttribute(): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeWiredNominalVoltageAttribute(minInterval: Int, maxInterval: Int): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readWiredMaximumCurrentAttribute(): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeWiredMaximumCurrentAttribute(minInterval: Int, maxInterval: Int): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readWiredPresentAttribute(): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeWiredPresentAttribute(minInterval: Int, maxInterval: Int): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readActiveWiredFaultsAttribute(): ActiveWiredFaultsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeActiveWiredFaultsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ActiveWiredFaultsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBatVoltageAttribute(): BatVoltageAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBatVoltageAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): BatVoltageAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBatPercentRemainingAttribute(): BatPercentRemainingAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBatPercentRemainingAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): BatPercentRemainingAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBatTimeRemainingAttribute(): BatTimeRemainingAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBatTimeRemainingAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): BatTimeRemainingAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBatChargeLevelAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBatChargeLevelAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBatReplacementNeededAttribute(): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBatReplacementNeededAttribute(minInterval: Int, maxInterval: Int): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBatReplaceabilityAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBatReplaceabilityAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBatPresentAttribute(): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBatPresentAttribute(minInterval: Int, maxInterval: Int): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readActiveBatFaultsAttribute(): ActiveBatFaultsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeActiveBatFaultsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ActiveBatFaultsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBatReplacementDescriptionAttribute(): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBatReplacementDescriptionAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBatCommonDesignationAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBatCommonDesignationAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBatANSIDesignationAttribute(): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBatANSIDesignationAttribute(minInterval: Int, maxInterval: Int): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBatIECDesignationAttribute(): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBatIECDesignationAttribute(minInterval: Int, maxInterval: Int): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBatApprovedChemistryAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBatApprovedChemistryAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBatCapacityAttribute(): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBatCapacityAttribute(minInterval: Int, maxInterval: Int): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBatQuantityAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBatQuantityAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBatChargeStateAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBatChargeStateAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBatTimeToFullChargeAttribute(): BatTimeToFullChargeAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBatTimeToFullChargeAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): BatTimeToFullChargeAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBatFunctionalWhileChargingAttribute(): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBatFunctionalWhileChargingAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readBatChargingCurrentAttribute(): BatChargingCurrentAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeBatChargingCurrentAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): BatChargingCurrentAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readActiveBatChargeFaultsAttribute(): ActiveBatChargeFaultsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeActiveBatChargeFaultsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ActiveBatChargeFaultsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEndpointListAttribute(): EndpointListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEndpointListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): EndpointListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEventListAttribute(): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFeatureMapAttribute(): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readClusterRevisionAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
   companion object {
     const val CLUSTER_ID: UInt = 47u
-  }
-
-  interface WiredAssessedInputVoltageAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface WiredAssessedInputFrequencyAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface WiredAssessedCurrentAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface ActiveWiredFaultsAttributeCallback {
-    fun onSuccess(value: ArrayList<Integer>?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface BatVoltageAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface BatPercentRemainingAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface BatTimeRemainingAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface ActiveBatFaultsAttributeCallback {
-    fun onSuccess(value: ArrayList<Integer>?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface BatTimeToFullChargeAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface BatChargingCurrentAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface ActiveBatChargeFaultsAttributeCallback {
-    fun onSuccess(value: ArrayList<Integer>?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EndpointListAttributeCallback {
-    fun onSuccess(value: ArrayList<Integer>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readStatusAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeStatusAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readOrderAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOrderAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readDescriptionAttribute(callback: CharStringAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeDescriptionAttribute(
-    callback: CharStringAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readWiredAssessedInputVoltageAttribute(callback: WiredAssessedInputVoltageAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeWiredAssessedInputVoltageAttribute(
-    callback: WiredAssessedInputVoltageAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readWiredAssessedInputFrequencyAttribute(
-    callback: WiredAssessedInputFrequencyAttributeCallback
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeWiredAssessedInputFrequencyAttribute(
-    callback: WiredAssessedInputFrequencyAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readWiredCurrentTypeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeWiredCurrentTypeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readWiredAssessedCurrentAttribute(callback: WiredAssessedCurrentAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeWiredAssessedCurrentAttribute(
-    callback: WiredAssessedCurrentAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readWiredNominalVoltageAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeWiredNominalVoltageAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readWiredMaximumCurrentAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeWiredMaximumCurrentAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readWiredPresentAttribute(callback: BooleanAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeWiredPresentAttribute(
-    callback: BooleanAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readActiveWiredFaultsAttribute(callback: ActiveWiredFaultsAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeActiveWiredFaultsAttribute(
-    callback: ActiveWiredFaultsAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readBatVoltageAttribute(callback: BatVoltageAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBatVoltageAttribute(
-    callback: BatVoltageAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readBatPercentRemainingAttribute(callback: BatPercentRemainingAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBatPercentRemainingAttribute(
-    callback: BatPercentRemainingAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readBatTimeRemainingAttribute(callback: BatTimeRemainingAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBatTimeRemainingAttribute(
-    callback: BatTimeRemainingAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readBatChargeLevelAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBatChargeLevelAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readBatReplacementNeededAttribute(callback: BooleanAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBatReplacementNeededAttribute(
-    callback: BooleanAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readBatReplaceabilityAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBatReplaceabilityAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readBatPresentAttribute(callback: BooleanAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBatPresentAttribute(
-    callback: BooleanAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readActiveBatFaultsAttribute(callback: ActiveBatFaultsAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeActiveBatFaultsAttribute(
-    callback: ActiveBatFaultsAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readBatReplacementDescriptionAttribute(callback: CharStringAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBatReplacementDescriptionAttribute(
-    callback: CharStringAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readBatCommonDesignationAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBatCommonDesignationAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readBatANSIDesignationAttribute(callback: CharStringAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBatANSIDesignationAttribute(
-    callback: CharStringAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readBatIECDesignationAttribute(callback: CharStringAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBatIECDesignationAttribute(
-    callback: CharStringAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readBatApprovedChemistryAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBatApprovedChemistryAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readBatCapacityAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBatCapacityAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readBatQuantityAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBatQuantityAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readBatChargeStateAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBatChargeStateAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readBatTimeToFullChargeAttribute(callback: BatTimeToFullChargeAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBatTimeToFullChargeAttribute(
-    callback: BatTimeToFullChargeAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readBatFunctionalWhileChargingAttribute(callback: BooleanAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBatFunctionalWhileChargingAttribute(
-    callback: BooleanAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readBatChargingCurrentAttribute(callback: BatChargingCurrentAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeBatChargingCurrentAttribute(
-    callback: BatChargingCurrentAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readActiveBatChargeFaultsAttribute(callback: ActiveBatChargeFaultsAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeActiveBatChargeFaultsAttribute(
-    callback: ActiveBatChargeFaultsAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEndpointListAttribute(callback: EndpointListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEndpointListAttribute(
-    callback: EndpointListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
   }
 }

@@ -20,1189 +20,847 @@ package matter.devicecontroller.cluster.clusters
 import java.util.ArrayList
 
 class ThermostatCluster(private val endpointId: UShort) {
-  companion object {
-    const val CLUSTER_ID: UInt = 513u
-  }
+  class GetWeeklyScheduleResponse(
+    val numberOfTransitionsForSequence: UByte,
+    val dayOfWeekForSequence: UInt,
+    val modeForSequence: UInt,
+    val transitions: ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransition>
+  )
 
-  fun setpointRaiseLower(callback: DefaultClusterCallback, mode: Integer, amount: Integer) {
+  class LocalTemperatureAttribute(val value: Short?)
+
+  class OutdoorTemperatureAttribute(val value: Short?)
+
+  class TemperatureSetpointHoldDurationAttribute(val value: UShort?)
+
+  class SetpointChangeAmountAttribute(val value: Short?)
+
+  class OccupiedSetbackAttribute(val value: UByte?)
+
+  class OccupiedSetbackMinAttribute(val value: UByte?)
+
+  class OccupiedSetbackMaxAttribute(val value: UByte?)
+
+  class UnoccupiedSetbackAttribute(val value: UByte?)
+
+  class UnoccupiedSetbackMinAttribute(val value: UByte?)
+
+  class UnoccupiedSetbackMaxAttribute(val value: UByte?)
+
+  class ACCoilTemperatureAttribute(val value: Short?)
+
+  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class EventListAttribute(val value: ArrayList<UInt>)
+
+  class AttributeListAttribute(val value: ArrayList<UInt>)
+
+  suspend fun setpointRaiseLower(mode: UInt, amount: Byte) {
     // Implementation needs to be added here
   }
 
-  fun setpointRaiseLower(
-    callback: DefaultClusterCallback,
-    mode: Integer,
-    amount: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
+  suspend fun setpointRaiseLower(mode: UInt, amount: Byte, timedInvokeTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  fun setWeeklySchedule(
-    callback: DefaultClusterCallback,
-    numberOfTransitionsForSequence: Integer,
-    dayOfWeekForSequence: Integer,
-    modeForSequence: Integer,
+  suspend fun setWeeklySchedule(
+    numberOfTransitionsForSequence: UByte,
+    dayOfWeekForSequence: UInt,
+    modeForSequence: UInt,
     transitions: ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransition>
   ) {
     // Implementation needs to be added here
   }
 
-  fun setWeeklySchedule(
-    callback: DefaultClusterCallback,
-    numberOfTransitionsForSequence: Integer,
-    dayOfWeekForSequence: Integer,
-    modeForSequence: Integer,
+  suspend fun setWeeklySchedule(
+    numberOfTransitionsForSequence: UByte,
+    dayOfWeekForSequence: UInt,
+    modeForSequence: UInt,
     transitions: ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransition>,
     timedInvokeTimeoutMs: Int
   ) {
     // Implementation needs to be added here
   }
 
-  fun getWeeklySchedule(
-    callback: GetWeeklyScheduleResponseCallback,
-    daysToReturn: Integer,
-    modeToReturn: Integer
-  ) {
+  suspend fun getWeeklySchedule(daysToReturn: UInt, modeToReturn: UInt): GetWeeklyScheduleResponse {
     // Implementation needs to be added here
   }
 
-  fun getWeeklySchedule(
-    callback: GetWeeklyScheduleResponseCallback,
-    daysToReturn: Integer,
-    modeToReturn: Integer,
+  suspend fun getWeeklySchedule(
+    daysToReturn: UInt,
+    modeToReturn: UInt,
     timedInvokeTimeoutMs: Int
-  ) {
+  ): GetWeeklyScheduleResponse {
     // Implementation needs to be added here
   }
 
-  fun clearWeeklySchedule(callback: DefaultClusterCallback) {
+  suspend fun clearWeeklySchedule() {
     // Implementation needs to be added here
   }
 
-  fun clearWeeklySchedule(callback: DefaultClusterCallback, timedInvokeTimeoutMs: Int) {
+  suspend fun clearWeeklySchedule(timedInvokeTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  interface GetWeeklyScheduleResponseCallback {
-    fun onSuccess(
-      numberOfTransitionsForSequence: Integer,
-      dayOfWeekForSequence: Integer,
-      modeForSequence: Integer,
-      transitions: ArrayList<ChipStructs.ThermostatClusterThermostatScheduleTransition>
-    )
-
-    fun onError(error: Exception)
-  }
-
-  interface LocalTemperatureAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface OutdoorTemperatureAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface TemperatureSetpointHoldDurationAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface SetpointChangeAmountAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface OccupiedSetbackAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface OccupiedSetbackMinAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface OccupiedSetbackMaxAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface UnoccupiedSetbackAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface UnoccupiedSetbackMinAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface UnoccupiedSetbackMaxAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface ACCoilTemperatureAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readLocalTemperatureAttribute(callback: LocalTemperatureAttributeCallback) {
+  suspend fun readLocalTemperatureAttribute(): LocalTemperatureAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeLocalTemperatureAttribute(
-    callback: LocalTemperatureAttributeCallback,
+  suspend fun subscribeLocalTemperatureAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): LocalTemperatureAttribute {
     // Implementation needs to be added here
   }
 
-  fun readOutdoorTemperatureAttribute(callback: OutdoorTemperatureAttributeCallback) {
+  suspend fun readOutdoorTemperatureAttribute(): OutdoorTemperatureAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeOutdoorTemperatureAttribute(
-    callback: OutdoorTemperatureAttributeCallback,
+  suspend fun subscribeOutdoorTemperatureAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): OutdoorTemperatureAttribute {
     // Implementation needs to be added here
   }
 
-  fun readOccupancyAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readOccupancyAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeOccupancyAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeOccupancyAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAbsMinHeatSetpointLimitAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAbsMinHeatSetpointLimitAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAbsMinHeatSetpointLimitAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAbsMaxHeatSetpointLimitAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAbsMinHeatSetpointLimitAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeAbsMaxHeatSetpointLimitAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAbsMaxHeatSetpointLimitAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAbsMinCoolSetpointLimitAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAbsMaxHeatSetpointLimitAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeAbsMinCoolSetpointLimitAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAbsMinCoolSetpointLimitAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAbsMaxCoolSetpointLimitAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAbsMinCoolSetpointLimitAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeAbsMaxCoolSetpointLimitAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readAbsMaxCoolSetpointLimitAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readPICoolingDemandAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeAbsMaxCoolSetpointLimitAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribePICoolingDemandAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPIHeatingDemandAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePIHeatingDemandAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readHVACSystemTypeConfigurationAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeHVACSystemTypeConfigurationAttribute(value: UInt) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeHVACSystemTypeConfigurationAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeHVACSystemTypeConfigurationAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readPICoolingDemandAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readLocalTemperatureCalibrationAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribePICoolingDemandAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun writeLocalTemperatureCalibrationAttribute(value: Byte) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeLocalTemperatureCalibrationAttribute(value: Byte, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeLocalTemperatureCalibrationAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readPIHeatingDemandAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readOccupiedCoolingSetpointAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribePIHeatingDemandAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun writeOccupiedCoolingSetpointAttribute(value: Short) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeOccupiedCoolingSetpointAttribute(value: Short, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeOccupiedCoolingSetpointAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readHVACSystemTypeConfigurationAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readOccupiedHeatingSetpointAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun writeHVACSystemTypeConfigurationAttribute(callback: DefaultClusterCallback, value: Integer) {
+  suspend fun writeOccupiedHeatingSetpointAttribute(value: Short) {
     // Implementation needs to be added here
   }
 
-  fun writeHVACSystemTypeConfigurationAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
+  suspend fun writeOccupiedHeatingSetpointAttribute(value: Short, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeOccupiedHeatingSetpointAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readUnoccupiedCoolingSetpointAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeUnoccupiedCoolingSetpointAttribute(value: Short) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeUnoccupiedCoolingSetpointAttribute(value: Short, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeUnoccupiedCoolingSetpointAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readUnoccupiedHeatingSetpointAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeUnoccupiedHeatingSetpointAttribute(value: Short) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeUnoccupiedHeatingSetpointAttribute(value: Short, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeUnoccupiedHeatingSetpointAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMinHeatSetpointLimitAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeMinHeatSetpointLimitAttribute(value: Short) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeMinHeatSetpointLimitAttribute(value: Short, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMinHeatSetpointLimitAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMaxHeatSetpointLimitAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeMaxHeatSetpointLimitAttribute(value: Short) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeMaxHeatSetpointLimitAttribute(value: Short, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMaxHeatSetpointLimitAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMinCoolSetpointLimitAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeMinCoolSetpointLimitAttribute(value: Short) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeMinCoolSetpointLimitAttribute(value: Short, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMinCoolSetpointLimitAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMaxCoolSetpointLimitAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeMaxCoolSetpointLimitAttribute(value: Short) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeMaxCoolSetpointLimitAttribute(value: Short, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMaxCoolSetpointLimitAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readMinSetpointDeadBandAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeMinSetpointDeadBandAttribute(value: Byte) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeMinSetpointDeadBandAttribute(value: Byte, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMinSetpointDeadBandAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRemoteSensingAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeRemoteSensingAttribute(value: UInt) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeRemoteSensingAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRemoteSensingAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readControlSequenceOfOperationAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeControlSequenceOfOperationAttribute(value: UInt) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeControlSequenceOfOperationAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeControlSequenceOfOperationAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSystemModeAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeSystemModeAttribute(value: UInt) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeSystemModeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSystemModeAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readThermostatRunningModeAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeThermostatRunningModeAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readStartOfWeekAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeStartOfWeekAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readNumberOfWeeklyTransitionsAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeNumberOfWeeklyTransitionsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readNumberOfDailyTransitionsAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeNumberOfDailyTransitionsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTemperatureSetpointHoldAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeTemperatureSetpointHoldAttribute(value: UInt) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeTemperatureSetpointHoldAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeTemperatureSetpointHoldAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readTemperatureSetpointHoldDurationAttribute():
+    TemperatureSetpointHoldDurationAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeTemperatureSetpointHoldDurationAttribute(value: UShort) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeTemperatureSetpointHoldDurationAttribute(
+    value: UShort,
     timedWriteTimeoutMs: Int
   ) {
     // Implementation needs to be added here
   }
 
-  fun subscribeHVACSystemTypeConfigurationAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeTemperatureSetpointHoldDurationAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): TemperatureSetpointHoldDurationAttribute {
     // Implementation needs to be added here
   }
 
-  fun readLocalTemperatureCalibrationAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readThermostatProgrammingOperationModeAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun writeLocalTemperatureCalibrationAttribute(callback: DefaultClusterCallback, value: Integer) {
+  suspend fun writeThermostatProgrammingOperationModeAttribute(value: UInt) {
     // Implementation needs to be added here
   }
 
-  fun writeLocalTemperatureCalibrationAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
+  suspend fun writeThermostatProgrammingOperationModeAttribute(
+    value: UInt,
     timedWriteTimeoutMs: Int
   ) {
     // Implementation needs to be added here
   }
 
-  fun subscribeLocalTemperatureCalibrationAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeThermostatProgrammingOperationModeAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readOccupiedCoolingSetpointAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readThermostatRunningStateAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun writeOccupiedCoolingSetpointAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeOccupiedCoolingSetpointAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOccupiedCoolingSetpointAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeThermostatRunningStateAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Integer {
     // Implementation needs to be added here
   }
 
-  fun readOccupiedHeatingSetpointAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readSetpointChangeSourceAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun writeOccupiedHeatingSetpointAttribute(callback: DefaultClusterCallback, value: Integer) {
+  suspend fun subscribeSetpointChangeSourceAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun writeOccupiedHeatingSetpointAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun readSetpointChangeAmountAttribute(): SetpointChangeAmountAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeOccupiedHeatingSetpointAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeSetpointChangeAmountAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): SetpointChangeAmountAttribute {
     // Implementation needs to be added here
   }
 
-  fun readUnoccupiedCoolingSetpointAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readSetpointChangeSourceTimestampAttribute(): Long {
     // Implementation needs to be added here
   }
 
-  fun writeUnoccupiedCoolingSetpointAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeUnoccupiedCoolingSetpointAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeUnoccupiedCoolingSetpointAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeSetpointChangeSourceTimestampAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): Long {
     // Implementation needs to be added here
   }
 
-  fun readUnoccupiedHeatingSetpointAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readOccupiedSetbackAttribute(): OccupiedSetbackAttribute {
     // Implementation needs to be added here
   }
 
-  fun writeUnoccupiedHeatingSetpointAttribute(callback: DefaultClusterCallback, value: Integer) {
+  suspend fun writeOccupiedSetbackAttribute(value: UByte) {
     // Implementation needs to be added here
   }
 
-  fun writeUnoccupiedHeatingSetpointAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeOccupiedSetbackAttribute(value: UByte, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  fun subscribeUnoccupiedHeatingSetpointAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeOccupiedSetbackAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): OccupiedSetbackAttribute {
     // Implementation needs to be added here
   }
 
-  fun readMinHeatSetpointLimitAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readOccupiedSetbackMinAttribute(): OccupiedSetbackMinAttribute {
     // Implementation needs to be added here
   }
 
-  fun writeMinHeatSetpointLimitAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeMinHeatSetpointLimitAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMinHeatSetpointLimitAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeOccupiedSetbackMinAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): OccupiedSetbackMinAttribute {
     // Implementation needs to be added here
   }
 
-  fun readMaxHeatSetpointLimitAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readOccupiedSetbackMaxAttribute(): OccupiedSetbackMaxAttribute {
     // Implementation needs to be added here
   }
 
-  fun writeMaxHeatSetpointLimitAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeMaxHeatSetpointLimitAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMaxHeatSetpointLimitAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeOccupiedSetbackMaxAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): OccupiedSetbackMaxAttribute {
     // Implementation needs to be added here
   }
 
-  fun readMinCoolSetpointLimitAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readUnoccupiedSetbackAttribute(): UnoccupiedSetbackAttribute {
     // Implementation needs to be added here
   }
 
-  fun writeMinCoolSetpointLimitAttribute(callback: DefaultClusterCallback, value: Integer) {
+  suspend fun writeUnoccupiedSetbackAttribute(value: UByte) {
     // Implementation needs to be added here
   }
 
-  fun writeMinCoolSetpointLimitAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeUnoccupiedSetbackAttribute(value: UByte, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  fun subscribeMinCoolSetpointLimitAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeUnoccupiedSetbackAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): UnoccupiedSetbackAttribute {
     // Implementation needs to be added here
   }
 
-  fun readMaxCoolSetpointLimitAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readUnoccupiedSetbackMinAttribute(): UnoccupiedSetbackMinAttribute {
     // Implementation needs to be added here
   }
 
-  fun writeMaxCoolSetpointLimitAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeMaxCoolSetpointLimitAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMaxCoolSetpointLimitAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeUnoccupiedSetbackMinAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): UnoccupiedSetbackMinAttribute {
     // Implementation needs to be added here
   }
 
-  fun readMinSetpointDeadBandAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readUnoccupiedSetbackMaxAttribute(): UnoccupiedSetbackMaxAttribute {
     // Implementation needs to be added here
   }
 
-  fun writeMinSetpointDeadBandAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeMinSetpointDeadBandAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMinSetpointDeadBandAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeUnoccupiedSetbackMaxAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): UnoccupiedSetbackMaxAttribute {
     // Implementation needs to be added here
   }
 
-  fun readRemoteSensingAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readEmergencyHeatDeltaAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun writeRemoteSensingAttribute(callback: DefaultClusterCallback, value: Integer) {
+  suspend fun writeEmergencyHeatDeltaAttribute(value: UByte) {
     // Implementation needs to be added here
   }
 
-  fun writeRemoteSensingAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeEmergencyHeatDeltaAttribute(value: UByte, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  fun subscribeRemoteSensingAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeEmergencyHeatDeltaAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readACTypeAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeACTypeAttribute(value: UInt) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeACTypeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeACTypeAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readACCapacityAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeACCapacityAttribute(value: UShort) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeACCapacityAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeACCapacityAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readACRefrigerantTypeAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeACRefrigerantTypeAttribute(value: UInt) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeACRefrigerantTypeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeACRefrigerantTypeAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readACCompressorTypeAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeACCompressorTypeAttribute(value: UInt) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeACCompressorTypeAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeACCompressorTypeAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readACErrorCodeAttribute(): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeACErrorCodeAttribute(value: ULong) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeACErrorCodeAttribute(value: ULong, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeACErrorCodeAttribute(minInterval: Int, maxInterval: Int): Long {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readACLouverPositionAttribute(): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeACLouverPositionAttribute(value: UInt) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeACLouverPositionAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeACLouverPositionAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readACCoilTemperatureAttribute(): ACCoilTemperatureAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeACCoilTemperatureAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): ACCoilTemperatureAttribute {
     // Implementation needs to be added here
   }
 
-  fun readControlSequenceOfOperationAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readACCapacityformatAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun writeControlSequenceOfOperationAttribute(callback: DefaultClusterCallback, value: Integer) {
+  suspend fun writeACCapacityformatAttribute(value: UInt) {
     // Implementation needs to be added here
   }
 
-  fun writeControlSequenceOfOperationAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
+  suspend fun writeACCapacityformatAttribute(value: UInt, timedWriteTimeoutMs: Int) {
     // Implementation needs to be added here
   }
 
-  fun subscribeControlSequenceOfOperationAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeACCapacityformatAttribute(minInterval: Int, maxInterval: Int): Integer {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readSystemModeAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun writeSystemModeAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeSystemModeAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSystemModeAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readThermostatRunningModeAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readEventListAttribute(): EventListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeThermostatRunningModeAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AttributeListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readStartOfWeekAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readFeatureMapAttribute(): Long {
     // Implementation needs to be added here
   }
 
-  fun subscribeStartOfWeekAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): Long {
     // Implementation needs to be added here
   }
 
-  fun readNumberOfWeeklyTransitionsAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readClusterRevisionAttribute(): Integer {
     // Implementation needs to be added here
   }
 
-  fun subscribeNumberOfWeeklyTransitionsAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): Integer {
     // Implementation needs to be added here
   }
 
-  fun readNumberOfDailyTransitionsAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeNumberOfDailyTransitionsAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTemperatureSetpointHoldAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeTemperatureSetpointHoldAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeTemperatureSetpointHoldAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTemperatureSetpointHoldAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readTemperatureSetpointHoldDurationAttribute(
-    callback: TemperatureSetpointHoldDurationAttributeCallback
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun writeTemperatureSetpointHoldDurationAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun writeTemperatureSetpointHoldDurationAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeTemperatureSetpointHoldDurationAttribute(
-    callback: TemperatureSetpointHoldDurationAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readThermostatProgrammingOperationModeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeThermostatProgrammingOperationModeAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun writeThermostatProgrammingOperationModeAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeThermostatProgrammingOperationModeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readThermostatRunningStateAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeThermostatRunningStateAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readSetpointChangeSourceAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSetpointChangeSourceAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readSetpointChangeAmountAttribute(callback: SetpointChangeAmountAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSetpointChangeAmountAttribute(
-    callback: SetpointChangeAmountAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readSetpointChangeSourceTimestampAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSetpointChangeSourceTimestampAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readOccupiedSetbackAttribute(callback: OccupiedSetbackAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeOccupiedSetbackAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeOccupiedSetbackAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOccupiedSetbackAttribute(
-    callback: OccupiedSetbackAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readOccupiedSetbackMinAttribute(callback: OccupiedSetbackMinAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOccupiedSetbackMinAttribute(
-    callback: OccupiedSetbackMinAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readOccupiedSetbackMaxAttribute(callback: OccupiedSetbackMaxAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOccupiedSetbackMaxAttribute(
-    callback: OccupiedSetbackMaxAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readUnoccupiedSetbackAttribute(callback: UnoccupiedSetbackAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeUnoccupiedSetbackAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeUnoccupiedSetbackAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeUnoccupiedSetbackAttribute(
-    callback: UnoccupiedSetbackAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readUnoccupiedSetbackMinAttribute(callback: UnoccupiedSetbackMinAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeUnoccupiedSetbackMinAttribute(
-    callback: UnoccupiedSetbackMinAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readUnoccupiedSetbackMaxAttribute(callback: UnoccupiedSetbackMaxAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeUnoccupiedSetbackMaxAttribute(
-    callback: UnoccupiedSetbackMaxAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEmergencyHeatDeltaAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeEmergencyHeatDeltaAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeEmergencyHeatDeltaAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEmergencyHeatDeltaAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readACTypeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeACTypeAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeACTypeAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeACTypeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readACCapacityAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeACCapacityAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeACCapacityAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeACCapacityAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readACRefrigerantTypeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeACRefrigerantTypeAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeACRefrigerantTypeAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeACRefrigerantTypeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readACCompressorTypeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeACCompressorTypeAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeACCompressorTypeAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeACCompressorTypeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readACErrorCodeAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeACErrorCodeAttribute(callback: DefaultClusterCallback, value: Long) {
-    // Implementation needs to be added here
-  }
-
-  fun writeACErrorCodeAttribute(
-    callback: DefaultClusterCallback,
-    value: Long,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeACErrorCodeAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readACLouverPositionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeACLouverPositionAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeACLouverPositionAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeACLouverPositionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readACCoilTemperatureAttribute(callback: ACCoilTemperatureAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeACCoilTemperatureAttribute(
-    callback: ACCoilTemperatureAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readACCapacityformatAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeACCapacityformatAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeACCapacityformatAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeACCapacityformatAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
+  companion object {
+    const val CLUSTER_ID: UInt = 513u
   }
 }
