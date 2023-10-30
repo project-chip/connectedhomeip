@@ -2439,7 +2439,7 @@ server cluster AccountLogin = 1294 {
   }
 
   response struct GetSetupPINResponse = 1 {
-    nullable char_string setupPIN = 0;
+    char_string setupPIN = 0;
   }
 
   timed command access(invoke: administer) GetSetupPIN(GetSetupPINRequest): GetSetupPINResponse = 0;

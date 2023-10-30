@@ -22638,7 +22638,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _setupPIN = nil;
+        _setupPIN = @"";
         _timedInvokeTimeoutMs = nil;
     }
     return self;
@@ -22707,14 +22707,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType &)decodableStruct
 {
     {
-        if (decodableStruct.setupPIN.IsNull()) {
-            self.setupPIN = nil;
-        } else {
-            self.setupPIN = AsString(decodableStruct.setupPIN.Value());
-            if (self.setupPIN == nil) {
-                CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
-                return err;
-            }
+        self.setupPIN = AsString(decodableStruct.setupPIN);
+        if (self.setupPIN == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            return err;
         }
     }
     return CHIP_NO_ERROR;
