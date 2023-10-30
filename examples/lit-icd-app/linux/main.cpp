@@ -22,6 +22,8 @@
 using namespace chip;
 using namespace chip::app;
 
+void ApplicationInit() {}
+
 void ApplicationShutdown() {}
 
 int main(int argc, char * argv[])

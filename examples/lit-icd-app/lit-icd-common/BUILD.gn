@@ -13,10 +13,9 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-
 import("${chip_root}/src/app/chip_data_model.gni")
 
-chip_data_model("all-clusters-common") {
+chip_data_model("lit-icd-common") {
   zap_file = "lit-icd-server-app.zap"
 
   zap_pregenerated_dir =
