@@ -21,7 +21,7 @@ limitations under the License.
     <cluster code="0x0080"/>
     <field name="Visual" mask="0x1"/>
     <field name="Audible" mask="0x2"/>
-    <field name="AlarmSupress" mask="0x4"/>
+    <field name="AlarmSuppress" mask="0x4"/>
     <field name="SensitivityLevel" mask="0x8"/>
   </bitmap>
 
