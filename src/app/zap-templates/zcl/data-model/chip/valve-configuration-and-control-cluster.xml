@@ -27,7 +27,7 @@ limitations under the License.
     <cluster code="0x0081"/>
     <field name="GeneralFault" mask="0x1"/>
     <field name="Blocked" mask="0x2"/>
-    <field name="Leak" mask="0x4"/>
+    <field name="Leaking" mask="0x4"/>
   </bitmap>
 
   <enum name="ValveStateEnum" type="enum8">

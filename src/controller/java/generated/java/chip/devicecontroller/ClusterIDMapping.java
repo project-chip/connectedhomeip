@@ -8032,7 +8032,7 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            SupressRequest(0L),;
+            SuppressRequest(0L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -8050,17 +8050,17 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum SupressRequestCommandField {AlarmsToSuppress(0),;
+        }public enum SuppressRequestCommandField {AlarmsToSuppress(0),;
                     private final int id;
-                    SupressRequestCommandField(int id) {
+                    SuppressRequestCommandField(int id) {
                         this.id = id;
                     }
 
                     public int getID() {
                         return id;
                     }
-                    public static SupressRequestCommandField value(int id) throws NoSuchFieldError {
-                        for (SupressRequestCommandField field : SupressRequestCommandField.values()) {
+                    public static SuppressRequestCommandField value(int id) throws NoSuchFieldError {
+                        for (SuppressRequestCommandField field : SuppressRequestCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

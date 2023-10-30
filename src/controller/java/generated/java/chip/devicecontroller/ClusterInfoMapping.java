@@ -20225,22 +20225,22 @@ public class ClusterInfoMapping {
 
     Map<String, InteractionInfo> booleanSensorConfigurationClusterInteractionInfoMap = new LinkedHashMap<>();
 
-    Map<String, CommandParameterInfo> booleanSensorConfigurationsupressRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    Map<String, CommandParameterInfo> booleanSensorConfigurationsuppressRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
-    CommandParameterInfo booleanSensorConfigurationsupressRequestalarmsToSuppressCommandParameterInfo = new CommandParameterInfo("alarmsToSuppress", Integer.class, Integer.class);
-    booleanSensorConfigurationsupressRequestCommandParams.put("alarmsToSuppress",booleanSensorConfigurationsupressRequestalarmsToSuppressCommandParameterInfo);
-    InteractionInfo booleanSensorConfigurationsupressRequestInteractionInfo = new InteractionInfo(
+    CommandParameterInfo booleanSensorConfigurationsuppressRequestalarmsToSuppressCommandParameterInfo = new CommandParameterInfo("alarmsToSuppress", Integer.class, Integer.class);
+    booleanSensorConfigurationsuppressRequestCommandParams.put("alarmsToSuppress",booleanSensorConfigurationsuppressRequestalarmsToSuppressCommandParameterInfo);
+    InteractionInfo booleanSensorConfigurationsuppressRequestInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.BooleanSensorConfigurationCluster) cluster)
-        .supressRequest((DefaultClusterCallback) callback
+        .suppressRequest((DefaultClusterCallback) callback
         , (Integer)
         commandArguments.get("alarmsToSuppress")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
-        booleanSensorConfigurationsupressRequestCommandParams
+        booleanSensorConfigurationsuppressRequestCommandParams
     );
-    booleanSensorConfigurationClusterInteractionInfoMap.put("supressRequest", booleanSensorConfigurationsupressRequestInteractionInfo);
+    booleanSensorConfigurationClusterInteractionInfoMap.put("suppressRequest", booleanSensorConfigurationsuppressRequestInteractionInfo);
 
     commandMap.put("booleanSensorConfiguration", booleanSensorConfigurationClusterInteractionInfoMap);
 

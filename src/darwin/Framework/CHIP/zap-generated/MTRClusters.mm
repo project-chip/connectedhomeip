@@ -8874,10 +8874,10 @@ using chip::System::Clock::Timeout;
     return self;
 }
 
-- (void)supressRequestWithParams:(MTRBooleanSensorConfigurationClusterSupressRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+- (void)suppressRequestWithParams:(MTRBooleanSensorConfigurationClusterSuppressRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
     if (params == nil) {
-        params = [[MTRBooleanSensorConfigurationClusterSupressRequestParams
+        params = [[MTRBooleanSensorConfigurationClusterSuppressRequestParams
             alloc] init];
     }
 
@@ -8887,7 +8887,7 @@ using chip::System::Clock::Timeout;
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
-    using RequestType = BooleanSensorConfiguration::Commands::SupressRequest::Type;
+    using RequestType = BooleanSensorConfiguration::Commands::SuppressRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:@(self.endpoint)
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())

@@ -5741,7 +5741,7 @@ private:
 | Cluster BooleanSensorConfiguration                                  | 0x0080 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * SupressRequest                                                    |   0x00 |
+| * SuppressRequest                                                   |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * SensitivityLevel                                                  | 0x0000 |
@@ -5761,13 +5761,13 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*
- * Command SupressRequest
+ * Command SuppressRequest
  */
-class BooleanSensorConfigurationSupressRequest : public ClusterCommand
+class BooleanSensorConfigurationSuppressRequest : public ClusterCommand
 {
 public:
-    BooleanSensorConfigurationSupressRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("supress-request", credsIssuerConfig)
+    BooleanSensorConfigurationSuppressRequest(CredentialIssuerCommands * credsIssuerConfig) :
+        ClusterCommand("suppress-request", credsIssuerConfig)
     {
         AddArgument("AlarmsToSuppress", 0, UINT8_MAX, &mRequest.alarmsToSuppress);
         ClusterCommand::AddArguments();
@@ -5776,7 +5776,7 @@ public:
     CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::BooleanSensorConfiguration::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::BooleanSensorConfiguration::Commands::SupressRequest::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::BooleanSensorConfiguration::Commands::SuppressRequest::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
                         commandId, endpointIds.at(0));
@@ -5786,7 +5786,7 @@ public:
     CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
     {
         constexpr chip::ClusterId clusterId = chip::app::Clusters::BooleanSensorConfiguration::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::BooleanSensorConfiguration::Commands::SupressRequest::Id;
+        constexpr chip::CommandId commandId = chip::app::Clusters::BooleanSensorConfiguration::Commands::SuppressRequest::Id;
 
         ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
                         groupId);
@@ -5795,7 +5795,7 @@ public:
     }
 
 private:
-    chip::app::Clusters::BooleanSensorConfiguration::Commands::SupressRequest::Type mRequest;
+    chip::app::Clusters::BooleanSensorConfiguration::Commands::SuppressRequest::Type mRequest;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -16487,8 +16487,8 @@ void registerClusterBooleanSensorConfiguration(Commands & commands, CredentialIs
         //
         // Commands
         //
-        make_unique<ClusterCommand>(Id, credsIssuerConfig),                       //
-        make_unique<BooleanSensorConfigurationSupressRequest>(credsIssuerConfig), //
+        make_unique<ClusterCommand>(Id, credsIssuerConfig),                        //
+        make_unique<BooleanSensorConfigurationSuppressRequest>(credsIssuerConfig), //
         //
         // Attributes
         //

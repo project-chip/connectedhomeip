@@ -17985,15 +17985,15 @@ namespace BooleanSensorConfiguration {
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
-namespace SupressRequest {
+namespace SuppressRequest {
 struct Type;
 struct DecodableType;
-} // namespace SupressRequest
+} // namespace SuppressRequest
 
 } // namespace Commands
 
 namespace Commands {
-namespace SupressRequest {
+namespace SuppressRequest {
 enum class Fields : uint8_t
 {
     kAlarmsToSuppress = 0,
@@ -18003,7 +18003,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SupressRequest::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SuppressRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanSensorConfiguration::Id; }
 
     chip::BitMask<AlarmModeBitmap> alarmsToSuppress = static_cast<chip::BitMask<AlarmModeBitmap>>(0);
@@ -18018,13 +18018,13 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SupressRequest::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SuppressRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanSensorConfiguration::Id; }
 
     chip::BitMask<AlarmModeBitmap> alarmsToSuppress = static_cast<chip::BitMask<AlarmModeBitmap>>(0);
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SupressRequest
+}; // namespace SuppressRequest
 } // namespace Commands
 
 namespace Attributes {
@@ -18146,7 +18146,7 @@ static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
 enum class Fields : uint8_t
 {
     kAlarmsActive     = 0,
-    kAlarmsSuppressed = 0,
+    kAlarmsSuppressed = 1,
 };
 
 struct Type

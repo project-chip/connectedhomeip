@@ -5101,7 +5101,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
-@interface MTRBooleanSensorConfigurationClusterSupressRequestParams : NSObject <NSCopying>
+@interface MTRBooleanSensorConfigurationClusterSuppressRequestParams : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSNumber * _Nonnull alarmsToSuppress MTR_PROVISIONALLY_AVAILABLE;
 /**

@@ -14662,15 +14662,15 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public void supressRequest(DefaultClusterCallback callback, Integer alarmsToSuppress) {
-      supressRequest(chipClusterPtr, callback, alarmsToSuppress, null);
+    public void suppressRequest(DefaultClusterCallback callback, Integer alarmsToSuppress) {
+      suppressRequest(chipClusterPtr, callback, alarmsToSuppress, null);
     }
 
-    public void supressRequest(DefaultClusterCallback callback, Integer alarmsToSuppress, int timedInvokeTimeoutMs) {
-      supressRequest(chipClusterPtr, callback, alarmsToSuppress, timedInvokeTimeoutMs);
+    public void suppressRequest(DefaultClusterCallback callback, Integer alarmsToSuppress, int timedInvokeTimeoutMs) {
+      suppressRequest(chipClusterPtr, callback, alarmsToSuppress, timedInvokeTimeoutMs);
     }
 
-    private native void supressRequest(long chipClusterPtr, DefaultClusterCallback callback, Integer alarmsToSuppress, @Nullable Integer timedInvokeTimeoutMs);
+    private native void suppressRequest(long chipClusterPtr, DefaultClusterCallback callback, Integer alarmsToSuppress, @Nullable Integer timedInvokeTimeoutMs);
 
     public interface GeneratedCommandListAttributeCallback {
       void onSuccess(List<Long> value);

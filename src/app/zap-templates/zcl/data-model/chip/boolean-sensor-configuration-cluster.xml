@@ -53,7 +53,7 @@ limitations under the License.
     <attribute side="server" code="0x0002" define="ALARMS_SUPPRESSED" type="AlarmModeBitmap" isNullable="false" writable="false" optional="true">AlarmsSuppressed</attribute>
     <attribute side="server" code="0x0003" define="ALARMS_ENABLED" type="AlarmModeBitmap" isNullable="false" writable="true" optional="true">AlarmsEnabled</attribute>
 
-    <command source="client" code="0x00" name="SupressRequest" optional="true">
+    <command source="client" code="0x00" name="SuppressRequest" optional="true">
       <description>This command is used to suppress the specified alarm.</description>
       <arg name="AlarmsToSuppress" type="AlarmModeBitmap"/>
     </command>
@@ -61,7 +61,7 @@ limitations under the License.
     <event side="server" code="0x00" priority="info" name="AlarmsStateChanged" optional="true">
       <description>This event SHALL be generated when any bits in the AlarmsActive and/or AlarmsSuppressed attributes change.</description>
       <field id="0" name="AlarmsActive" type="AlarmModeBitmap"/>
-      <field id="0" name="AlarmsSuppressed" type="AlarmModeBitmap" optional="true"/>
+      <field id="1" name="AlarmsSuppressed" type="AlarmModeBitmap" optional="true"/>
     </event>
 
     <event side="server" code="0x01" priority="info" name="SensorFault" optional="true">

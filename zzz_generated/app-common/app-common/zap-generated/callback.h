@@ -9021,11 +9021,11 @@ bool emberAfDishwasherAlarmClusterModifyEnabledAlarmsCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DishwasherAlarm::Commands::ModifyEnabledAlarms::DecodableType & commandData);
 /**
- * @brief Boolean Sensor Configuration Cluster SupressRequest Command callback (from client)
+ * @brief Boolean Sensor Configuration Cluster SuppressRequest Command callback (from client)
  */
-bool emberAfBooleanSensorConfigurationClusterSupressRequestCallback(
+bool emberAfBooleanSensorConfigurationClusterSuppressRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::BooleanSensorConfiguration::Commands::SupressRequest::DecodableType & commandData);
+    const chip::app::Clusters::BooleanSensorConfiguration::Commands::SuppressRequest::DecodableType & commandData);
 /**
  * @brief Valve Configuration and Control Cluster Open Command callback (from client)
  */
