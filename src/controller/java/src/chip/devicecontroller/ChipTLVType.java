@@ -220,6 +220,14 @@ public class ChipTLVType {
             return value;
         }
 
+        public StructElement value(int index) {
+            return value.get(index);
+        }
+
+        public int size() {
+            return value.size();
+        }
+
         @Override
         public TLVType type() { return TLVType.Struct; }
     }
@@ -241,6 +249,10 @@ public class ChipTLVType {
             } catch (ClassCastException e) {
                 return null;
             }
+        }
+
+        public BaseTLVType value() {
+            return value;
         }
     }
 
@@ -290,6 +302,14 @@ public class ChipTLVType {
             } catch (ClassCastException e) {
                 return null;
             }
+        }
+
+        public BaseTLVType value(int index) {
+            return value.get(index);
+        }
+
+        public int size() {
+            return value.size();
         }
 
         @Override
