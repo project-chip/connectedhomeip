@@ -330,13 +330,6 @@
             "OnMode",
             "FeatureMap"
         ],
-        "Laundry Washer Mode": [
-            "SupportedModes",
-            "CurrentMode",
-            "StartUpMode",
-            "OnMode",
-            "FeatureMap"
-        ],
         "Refrigerator And Temperature Controlled Cabinet Mode": [
             "SupportedModes",
             "CurrentMode",

@@ -17,19 +17,19 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-  <cluster>
+  <cluster apiMaturity="provisional">
     <name>Microwave Oven Control</name>
     <domain>Appliances</domain>
     <description>Attributes and commands for configuring the microwave oven control, and reporting cooking stats.</description>
-    <code>0x050F</code>
+    <code>0x005F</code>
     <define>MICROWAVE_OVEN_CONTROL_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <attribute side="server" code="0x0001" define="COOK_TIME" type="elapsed_s" writable="false" optional="false">CookTime</attribute>
-    <attribute side="server" code="0x0002" define="POWER_SETTING" type="int8u" writable="false" optional="false">PowerSetting</attribute>
-    <attribute side="server" code="0x0003" define="MIN_POWER" type="int8u" writable="false" optional="true">MinPower</attribute>
-    <attribute side="server" code="0x0004" define="MAX_POWER" type="int8u" writable="false" optional="true">MaxPower</attribute>
-    <attribute side="server" code="0x0005" define="POWERSTEP" type="int8u" writable="false" optional="true">PowerStep</attribute>
+    <attribute side="server" code="0x0001" define="COOK_TIME" type="elapsed_s" default="30" writable="false" optional="false">CookTime</attribute>
+    <attribute side="server" code="0x0002" define="POWER_SETTING" type="int8u" default="100" writable="false" optional="false">PowerSetting</attribute>
+    <attribute side="server" code="0x0003" define="MIN_POWER" type="int8u" default="10" writable="false" optional="true">MinPower</attribute>
+    <attribute side="server" code="0x0004" define="MAX_POWER" type="int8u" default="100" writable="false" optional="true">MaxPower</attribute>
+    <attribute side="server" code="0x0005" define="POWERSTEP" type="int8u" default="10" writable="false" optional="true">PowerStep</attribute>
 
     <command source="client" code="0x00" name="SetCookingParameters" optional="false">
         <description>Set Cooking Parameters</description>
