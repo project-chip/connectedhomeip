@@ -4967,15 +4967,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadHandlerInvalidSubscribeRequest", chip::app::TestReadInteraction::TestReadHandlerInvalidSubscribeRequest),
     NL_TEST_DEF("TestSubscribeInvalidateFabric", chip::app::TestReadInteraction::TestSubscribeInvalidateFabric),
     NL_TEST_DEF("TestShutdownSubscription", chip::app::TestReadInteraction::TestShutdownSubscription),
-    /*
-        Disable test when running the ICD specific unit tests.
-        Test tests a eporting feature with hard coded time jumps which don't take into account that an ICD
-        can change the requested MaxInterval during the subscription response / request process
-        https://github.com/project-chip/connectedhomeip/issues/28419
-    */
-// #if CHIP_CONFIG_ENABLE_ICD_SERVER != 1
     NL_TEST_DEF("TestSubscribeUrgentWildcardEvent", chip::app::TestReadInteraction::TestSubscribeUrgentWildcardEvent),
-// #endif
     NL_TEST_DEF("TestSubscribeWildcard", chip::app::TestReadInteraction::TestSubscribeWildcard),
     NL_TEST_DEF("TestSubscribePartialOverlap", chip::app::TestReadInteraction::TestSubscribePartialOverlap),
     NL_TEST_DEF("TestSubscribeSetDirtyFullyOverlap", chip::app::TestReadInteraction::TestSubscribeSetDirtyFullyOverlap),
