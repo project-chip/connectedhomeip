@@ -105,7 +105,6 @@ void BLEManagerImpl::_Shutdown()
     mDeviceScanner.reset();
     // Release BLE connection resources (unregister from BlueZ).
     ShutdownBluezBleLayer(mpEndpoint);
-    sleep(10);
     mFlags.Clear(Flags::kBluezBLELayerInitialized);
 }
 
