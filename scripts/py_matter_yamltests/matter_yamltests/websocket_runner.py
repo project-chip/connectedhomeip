@@ -19,6 +19,8 @@ from dataclasses import dataclass
 
 import websockets
 
+from websockets.protocol import State
+
 from .hooks import WebSocketRunnerHooks
 from .runner import TestRunner
 
@@ -45,6 +47,13 @@ class WebSocketRunner(TestRunner):
             config.server_address, config.server_port)
         self._server_startup_command = self._make_server_startup_command(
             config.server_path, config.server_arguments, config.server_port)
+
+    @property
+    def is_connected(self) -> bool:
+        if self._client is None:
+            return False
+
+        return self._client.state == State.OPEN
 
     async def start(self):
         self._server = await self._start_server(self._server_startup_command)
