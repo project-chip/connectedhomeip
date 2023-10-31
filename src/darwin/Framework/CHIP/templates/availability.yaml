@@ -7729,6 +7729,9 @@
 - release: "Future"
   versions: "future"
   introduced:
+      bitmaps:
+          AdministratorCommissioning:
+              - Feature
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7736,6 +7739,9 @@
           SoftwareDiagnostics:
               Feature:
                   - Watermarks
+          AdministratorCommissioning:
+              Feature:
+                  - Basic
   deprecated:
       bitmap values:
           PumpConfigurationAndControl:
@@ -7744,6 +7750,22 @@
           SoftwareDiagnostics:
               Feature:
                   - WaterMarks
+  provisional:
+      attributes:
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              - SupportedWiFiBands
+              - SupportedThreadFeatures
+              - ThreadVersion
+      commands:
+          GeneralDiagnostics:
+              # Targeting Spring 2024 Matter release
+              - TimeSnapshot
+              - TimeSnapshotResponse
+      bitmaps:
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              - ThreadCapabilitiesBitmap
   renames:
       bitmap values:
           PumpConfigurationAndControl:
