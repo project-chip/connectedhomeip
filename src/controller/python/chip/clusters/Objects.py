@@ -32894,7 +32894,7 @@ class Channel(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
-        class ChannelStatusEnum(MatterIntEnum):
+        class StatusEnum(MatterIntEnum):
             kSuccess = 0x00
             kMultipleMatches = 0x01
             kNoMatches = 0x02
@@ -32982,11 +32982,11 @@ class Channel(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=Channel.Enums.ChannelStatusEnum),
+                        ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=Channel.Enums.StatusEnum),
                         ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=typing.Optional[str]),
                     ])
 
-            status: 'Channel.Enums.ChannelStatusEnum' = 0
+            status: 'Channel.Enums.StatusEnum' = 0
             data: 'typing.Optional[str]' = None
 
         @dataclass

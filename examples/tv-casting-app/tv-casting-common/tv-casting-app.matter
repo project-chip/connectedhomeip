@@ -1357,7 +1357,7 @@ client cluster WakeOnLan = 1283 {
 
 /** This cluster provides an interface for controlling the current Channel on a device. */
 client cluster Channel = 1284 {
-  enum ChannelStatusEnum : enum8 {
+  enum StatusEnum : enum8 {
     kSuccess = 0;
     kMultipleMatches = 1;
     kNoMatches = 2;
@@ -1402,7 +1402,7 @@ client cluster Channel = 1284 {
   }
 
   response struct ChangeChannelResponse = 1 {
-    ChannelStatusEnum status = 0;
+    StatusEnum status = 0;
     optional char_string data = 1;
   }
 

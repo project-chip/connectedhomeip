@@ -3105,7 +3105,7 @@ server cluster WakeOnLan = 1283 {
 }
 
 server cluster Channel = 1284 {
-  enum ChannelStatusEnum : ENUM8 {
+  enum StatusEnum : ENUM8 {
     kSuccess = 0;
     kMultipleMatches = 1;
     kNoMatches = 2;

@@ -3723,8 +3723,8 @@ namespace WakeOnLan {} // namespace WakeOnLan
 
 namespace Channel {
 
-// Enum for ChannelStatusEnum
-enum class ChannelStatusEnum : uint8_t
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
 {
     kSuccess         = 0x00,
     kMultipleMatches = 0x01,

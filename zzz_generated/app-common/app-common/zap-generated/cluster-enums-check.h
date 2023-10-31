@@ -2597,9 +2597,9 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(RadonConcentrationMeasu
     }
 }
 
-static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::ChannelStatusEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Channel::StatusEnum val)
 {
-    using EnumType = Channel::ChannelStatusEnum;
+    using EnumType = Channel::StatusEnum;
     switch (val)
     {
     case EnumType::kSuccess:
