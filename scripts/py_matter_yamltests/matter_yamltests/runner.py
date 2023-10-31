@@ -156,12 +156,10 @@ class TestRunner(TestRunnerBase):
     async def _run_with_timeout(self, parser: TestParser, config: TestRunnerConfig):
         status = True
         try:
-            await self.start()
             status = await asyncio.wait_for(self._run(parser, config), parser.timeout)
         except (Exception, CancelledError) as exception:
             status = exception
         finally:
-            await self.stop()
             return status
 
     async def _run(self, parser: TestParser, config: TestRunnerConfig):
