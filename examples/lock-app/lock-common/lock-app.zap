@@ -4285,7 +4285,7 @@
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "type": "int16u",
+              "type": "vendor_id",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -5039,7 +5039,7 @@
           "enabled": 1,
           "attributes": [
             {
-              "name": "IdleModeInterval",
+              "name": "IdleModeDuration",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -5055,7 +5055,7 @@
               "reportableChange": 0
             },
             {
-              "name": "ActiveModeInterval",
+              "name": "ActiveModeDuration",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -5112,7 +5112,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "2",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -6644,5 +6644,6 @@
       "endpointId": 1,
       "networkId": 0
     }
-  ]
+  ],
+  "log": []
 }

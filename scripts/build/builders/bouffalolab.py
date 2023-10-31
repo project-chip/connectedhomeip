@@ -91,7 +91,8 @@ class BouffalolabBuilder(GnBuilder):
                  enable_wifi: bool = False,
                  enable_thread: bool = False,
                  enable_frame_ptr: bool = False,
-                 enable_heap_monitoring: bool = False
+                 enable_heap_monitoring: bool = False,
+                 use_matter_openthread: bool = False
                  ):
 
         if 'BL602' == module_type:
@@ -166,6 +167,9 @@ class BouffalolabBuilder(GnBuilder):
 
         if enable_thread:
             self.argsOpt.append(f'openthread_project_core_config_file="{bouffalo_chip}-openthread-core-bl-config.h"')
+            if not use_matter_openthread:
+                self.argsOpt.append(
+                    'openthread_root="//third_party/connectedhomeip/third_party/bouffalolab/repo/components/network/thread/openthread"')
 
         if enable_cdc:
             if bouffalo_chip != "bl702":

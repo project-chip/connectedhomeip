@@ -1,0 +1,88 @@
+{%- macro encode_value(source, encodable, depth) -%}
+  {%- if encodable.is_nullable -%}
+    @Nullable {{encode_value(source, encodable.without_nullable(), depth + 1)}}
+  {%- elif encodable.is_optional -%}
+    Optional<{{encode_value(source, encodable.without_optional(), depth + 1)}}>
+  {%- elif encodable.is_list -%}
+    ArrayList<{{encode_value(source, encodable.without_list(), depth + 1)}}>
+  {%- elif encodable.is_struct -%}
+    {%- set struct = encodable.get_underlying_struct() -%}
+    ChipStructs.{{source.name}}Cluster{{struct.name}}
+  {%- else -%}
+    {{encodable.boxed_java_type}}
+  {%- endif -%}
+{%- endmacro -%}
+/*
+ *
+ *    Copyright (c) 2023 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+package chip.devicecontroller;
+
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Optional;
+
+public class ChipEventStructs {
+{%- for cluster in clientClusters | sort(attribute='code') -%}
+{%- set typeLookup = idl | createLookupContext(cluster) %}
+{%- for event in cluster.events %}
+{%- if event.fields %}
+public static class {{cluster.name}}Cluster{{event.name}}Event {
+  {%- for field in event.fields %}
+  {%- set encodable = field | asEncodable(typeLookup) %}
+  public {{encode_value(cluster, encodable, 0)}} {{field.name}};
+  {%- endfor %}
+  public {{cluster.name}}Cluster{{event.name}}Event(
+    {%- for field in event.fields %}
+    {%- set encodable = field | asEncodable(typeLookup) %}
+    {{encode_value(cluster, encodable, 0)}} {{field.name}}
+    {%- if loop.index0 < loop.length - 1 -%}{{","}}{%- endif -%}
+    {%- endfor %}
+  ) {
+    {%- for field in event.fields %}
+    {%- set encodable = field | asEncodable(typeLookup) %}
+    this.{{field.name}} = {{field.name}};
+    {%- endfor %}
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("{{cluster.name}}Cluster{{event.name}}Event {\n");
+    {%- for field in event.fields %}
+    {%- set encodable = field | asEncodable(typeLookup) %}
+    output.append("\t{{field.name}}: ");
+    {%- if encodable.is_list %}
+    output.append({{field.name}});
+    {%- elif encodable.is_octet_string %}
+    {%- if encodable.is_optional %}
+    output.append({{field.name}}.isPresent() ? Arrays.toString({{field.name}}.get()) : "");
+    {%- else %}
+    output.append(Arrays.toString({{field.name}}));
+    {%- endif %}
+    {%- else %}
+    output.append({{field.name}});
+    {%- endif %}
+    output.append("\n");
+    {%- endfor %}
+    output.append("}\n");
+    return output.toString();
+  }
+}
+{%- endif %}
+{%- endfor %}
+{%- endfor %}
+}

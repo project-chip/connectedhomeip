@@ -2276,6 +2276,24 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000008: {
+                "attributeName": "SupportedWiFiBands",
+                "attributeId": 0x00000008,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000009: {
+                "attributeName": "SupportedThreadFeatures",
+                "attributeId": 0x00000009,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000000A: {
+                "attributeName": "ThreadVersion",
+                "attributeId": 0x0000000A,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -4213,13 +4231,13 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "IdleModeInterval",
+                "attributeName": "IdleModeDuration",
                 "attributeId": 0x00000000,
                 "type": "int",
                 "reportable": True,
             },
             0x00000001: {
-                "attributeName": "ActiveModeInterval",
+                "attributeName": "ActiveModeDuration",
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
@@ -4246,6 +4264,18 @@ class ChipClusters:
                 "attributeName": "ClientsSupportedPerFabric",
                 "attributeId": 0x00000005,
                 "type": "int",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "UserActiveModeTriggerHint",
+                "attributeId": 0x00000006,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "UserActiveModeTriggerInstruction",
+                "attributeId": 0x00000007,
+                "type": "str",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -4624,13 +4654,6 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
-            0x00000002: {
-                "attributeName": "StartUpMode",
-                "attributeId": 0x00000002,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
-            },
             0x00000003: {
                 "attributeName": "OnMode",
                 "attributeId": 0x00000003,
@@ -4700,13 +4723,6 @@ class ChipClusters:
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "StartUpMode",
-                "attributeId": 0x00000002,
-                "type": "int",
-                "reportable": True,
-                "writable": True,
             },
             0x00000003: {
                 "attributeName": "OnMode",

@@ -1404,24 +1404,10 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @brief The minimum number of scenes to support according to spec
- */
-#ifndef CHIP_CONFIG_MAX_SCENES_PER_ENDPOINT
-#define CHIP_CONFIG_MAX_SCENES_PER_ENDPOINT 16
-#endif
-
-/**
  * @brief Maximum length of Scene names
  */
 #ifndef CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH
 #define CHIP_CONFIG_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH 16
-#endif
-
-/**
- * @brief The maximum number of scenes allowed on a single fabric
- */
-#ifndef CHIP_CONFIG_SCENES_MAX_PER_FABRIC
-#define CHIP_CONFIG_SCENES_MAX_PER_FABRIC (CHIP_CONFIG_MAX_SCENES_PER_ENDPOINT / 2)
 #endif
 
 /**
@@ -1498,21 +1484,21 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC
+ * @def CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
  *
- * @brief Default value for the ICD Management cluster IdleModeInterval attribute, in seconds
+ * @brief Default value for the ICD Management cluster IdleModeDuration attribute, in seconds
  */
-#ifndef CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC
-#define CHIP_CONFIG_ICD_IDLE_MODE_INTERVAL_SEC 2
+#ifndef CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC
+#define CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC 2
 #endif
 
 /**
- * @def CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS
+ * @def CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS
  *
- * @brief Default value for the ICD Management cluster ActiveModeInterval attribute, in milliseconds
+ * @brief Default value for the ICD Management cluster ActiveModeDuration attribute, in milliseconds
  */
-#ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS
-#define CHIP_CONFIG_ICD_ACTIVE_MODE_INTERVAL_MS 300
+#ifndef CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS
+#define CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS 300
 #endif
 
 /**

@@ -27,6 +27,8 @@ executable("chip-tv-casting-app") {
   if (chip_casting_simplified) {
     sources = [
       "${chip_root}/examples/tv-casting-app/tv-casting-common/include/CHIPProjectAppConfig.h",
+      "simple-app-helper.cpp",
+      "simple-app-helper.h",
       "simple-app.cpp",
     ]
   } else {

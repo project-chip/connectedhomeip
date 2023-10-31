@@ -46,6 +46,7 @@ PlatformManagerImpl PlatformManagerImpl::sInstance{ sChipThreadStack };
 static k_timer sOperationalHoursSavingTimer;
 
 #if !defined(CONFIG_NORDIC_SECURITY_BACKEND) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY)
+static bool sChipStackEntropySourceAdded = false;
 static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
 {
     const struct device * entropy = DEVICE_DT_GET(DT_CHOSEN(zephyr_entropy));
@@ -118,9 +119,13 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     SuccessOrExit(err);
 
 #if !defined(CONFIG_NORDIC_SECURITY_BACKEND) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY)
-    // Add entropy source based on Zephyr entropy driver
-    err = chip::Crypto::add_entropy_source(app_entropy_source, NULL, kThreshold);
-    SuccessOrExit(err);
+    if (!sChipStackEntropySourceAdded)
+    {
+        // Add entropy source based on Zephyr entropy driver
+        err = chip::Crypto::add_entropy_source(app_entropy_source, NULL, kThreshold);
+        SuccessOrExit(err);
+        sChipStackEntropySourceAdded = true;
+    }
 #endif // !defined(CONFIG_NORDIC_SECURITY_BACKEND) && !defined(CONFIG_MBEDTLS_ZEPHYR_ENTROPY)
 
     // Call _InitChipStack() on the generic implementation base class to finish the initialization process.

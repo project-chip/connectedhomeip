@@ -102,9 +102,22 @@ private:
     uint8_t mThreadOperationalDataset[CommissioningParameters::kMaxThreadDatasetLen];
     char mCountryCode[CommissioningParameters::kMaxCountryCodeLen];
 
+    // Time zone is statically allocated because it is max 2 and not trivially destructible
+    static constexpr size_t kMaxSupportedTimeZones = 2;
+    app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type mTimeZoneBuf[kMaxSupportedTimeZones];
+    static constexpr size_t kMaxTimeZoneNameLen = 64;
+    char mTimeZoneNames[kMaxTimeZoneNameLen][kMaxSupportedTimeZones];
+
+    // DSTOffsetStructs are similarly not trivially destructible. They don't have a defined size, but we're
+    // going to do static allocation of the buffers anyway until we replace chip::Optional with std::optional.
+    static constexpr size_t kMaxSupportedDstStructs = 10;
+    app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type mDstOffsetsBuf[kMaxSupportedDstStructs];
+
     bool mNeedsNetworkSetup = false;
     ReadCommissioningInfo mDeviceCommissioningInfo;
     bool mNeedsDST = false;
+
+    bool mNeedIcdRegistraion = false;
 
     // TODO: Why were the nonces statically allocated, but the certs dynamically allocated?
     uint8_t * mDAC   = nullptr;

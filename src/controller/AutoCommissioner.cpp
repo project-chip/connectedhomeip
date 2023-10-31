@@ -85,7 +85,9 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
          IsUnsafeSpan(params.GetIcac(), mParams.GetIcac()) || IsUnsafeSpan(params.GetIpk(), mParams.GetIpk()) ||
          IsUnsafeSpan(params.GetAttestationElements(), mParams.GetAttestationElements()) ||
          IsUnsafeSpan(params.GetAttestationSignature(), mParams.GetAttestationSignature()) ||
-         IsUnsafeSpan(params.GetPAI(), mParams.GetPAI()) || IsUnsafeSpan(params.GetDAC(), mParams.GetDAC()));
+         IsUnsafeSpan(params.GetPAI(), mParams.GetPAI()) || IsUnsafeSpan(params.GetDAC(), mParams.GetDAC()) ||
+         IsUnsafeSpan(params.GetTimeZone(), mParams.GetTimeZone()) ||
+         IsUnsafeSpan(params.GetDSTOffsets(), mParams.GetDSTOffsets()));
 
     mParams = params;
 
@@ -174,6 +176,35 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     }
     mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
 
+    if (params.GetDSTOffsets().HasValue())
+    {
+        ChipLogProgress(Controller, "Setting DST offsets from parameters");
+        size_t size = std::min(params.GetDSTOffsets().Value().size(), kMaxSupportedDstStructs);
+        for (size_t i = 0; i < size; ++i)
+        {
+            mDstOffsetsBuf[i] = params.GetDSTOffsets().Value()[i];
+        }
+        auto list = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type>(mDstOffsetsBuf, size);
+        mParams.SetDSTOffsets(list);
+    }
+    if (params.GetTimeZone().HasValue())
+    {
+        ChipLogProgress(Controller, "Setting Time Zone from parameters");
+        size_t size = std::min(params.GetTimeZone().Value().size(), kMaxSupportedTimeZones);
+        for (size_t i = 0; i < size; ++i)
+        {
+            mTimeZoneBuf[i] = params.GetTimeZone().Value()[i];
+            if (mTimeZoneBuf[i].name.HasValue())
+            {
+                auto span = MutableCharSpan(mTimeZoneNames[i], kMaxTimeZoneNameLen);
+                CopyCharSpanToMutableCharSpan(mTimeZoneBuf[i].name.Value(), span);
+                mTimeZoneBuf[i].name.SetValue(span);
+            }
+        }
+        auto list = app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type>(mTimeZoneBuf, size);
+        mParams.SetTimeZone(list);
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -242,12 +273,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             // Per the spec, we restart from after adding the NOC.
             return GetNextCommissioningStage(CommissioningStage::kSendNOC, lastErr);
         }
-        if (mParams.GetCheckForMatchingFabric())
-        {
-            return CommissioningStage::kCheckForMatchingFabric;
-        }
-        return CommissioningStage::kArmFailsafe;
-    case CommissioningStage::kCheckForMatchingFabric:
+        return CommissioningStage::kReadCommissioningInfo2;
+    case CommissioningStage::kReadCommissioningInfo2:
         return CommissioningStage::kArmFailsafe;
     case CommissioningStage::kArmFailsafe:
         return CommissioningStage::kConfigRegulatory;
@@ -635,11 +662,37 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             // Don't send DST unless the device says it needs it
             mNeedsDST = false;
             break;
-        case CommissioningStage::kCheckForMatchingFabric: {
-            chip::NodeId nodeId = report.Get<MatchingFabricInfo>().nodeId;
-            if (nodeId != kUndefinedNodeId)
+        case CommissioningStage::kReadCommissioningInfo2: {
+            bool shouldReadCommissioningInfo2 =
+                mParams.GetCheckForMatchingFabric() || (mParams.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore);
+            if (shouldReadCommissioningInfo2)
             {
-                mParams.SetRemoteNodeId(nodeId);
+                if (!report.Is<ReadCommissioningInfo2>())
+                {
+                    ChipLogError(
+                        Controller,
+                        "[BUG] Should read commissioning info (part 2), but report is not ReadCommissioningInfo2. THIS IS A BUG.");
+                }
+
+                ReadCommissioningInfo2 commissioningInfo = report.Get<ReadCommissioningInfo2>();
+
+                if (mParams.GetCheckForMatchingFabric())
+                {
+                    chip::NodeId nodeId = commissioningInfo.nodeId;
+                    if (nodeId != kUndefinedNodeId)
+                    {
+                        mParams.SetRemoteNodeId(nodeId);
+                    }
+                }
+
+                if (mParams.GetICDRegistrationStrategy() != ICDRegistrationStrategy::kIgnore)
+                {
+                    if (commissioningInfo.isIcd)
+                    {
+                        mNeedIcdRegistraion = true;
+                        ChipLogDetail(Controller, "AutoCommissioner: Device is ICD");
+                    }
+                }
             }
             break;
         }

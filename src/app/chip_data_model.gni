@@ -15,7 +15,7 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/chip_codegen.gni")
-import("${chip_root}/src/lib/core/core.gni")
+import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/platform/python.gni")
 
 _app_root = get_path_info(".", "abspath")
@@ -94,7 +94,8 @@ template("chip_data_model") {
     #       is this during app compile but not others? I am unclear what
     #       zap_pregenerated_dir is supposed to convey. Existence of a directory
     #       does not obviously map to "need command handler cpp compiled in").
-    if (defined(invoker.zap_pregenerated_dir)) {
+    if (defined(invoker.zap_pregenerated_dir) &&
+        !chip_build_controller_dynamic_server) {
       outputs += [ "zap-generated/IMClusterCommandHandler.cpp" ]
     } else {
       if (defined(prune_outputs)) {
@@ -165,19 +166,24 @@ template("chip_data_model") {
       "${_app_root}/clusters/scenes-server/SceneTable.h",
       "${_app_root}/clusters/scenes-server/SceneTableImpl.h",
       "${_app_root}/clusters/scenes-server/scenes-server.h",
-      "${_app_root}/util/DataModelHandler.cpp",
-      "${_app_root}/util/attribute-size-util.cpp",
-      "${_app_root}/util/attribute-storage.cpp",
-      "${_app_root}/util/attribute-table.cpp",
       "${_app_root}/util/binding-table.cpp",
       "${_app_root}/util/binding-table.h",
-      "${_app_root}/util/ember-compatibility-functions.cpp",
       "${_app_root}/util/generic-callback-stubs.cpp",
       "${_app_root}/util/message.cpp",
       "${_app_root}/util/privilege-storage.cpp",
-      "${_app_root}/util/util.cpp",
       "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
     ]
+
+    if (!chip_build_controller_dynamic_server) {
+      sources += [
+        "${_app_root}/util/DataModelHandler.cpp",
+        "${_app_root}/util/attribute-size-util.cpp",
+        "${_app_root}/util/attribute-storage.cpp",
+        "${_app_root}/util/attribute-table.cpp",
+        "${_app_root}/util/ember-compatibility-functions.cpp",
+        "${_app_root}/util/util.cpp",
+      ]
+    }
 
     if (defined(invoker.zap_file)) {
       _zap_file = rebase_path(invoker.zap_file, root_build_dir)

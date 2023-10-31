@@ -80,31 +80,33 @@ Mac OS.
 
 ## Build CHIP Lighting App example
 
-The following steps take examples for `BL602-IoT-Matter-V1` bl602 board, BL706
-develop `XT-ZB6-DevKit` and `BL706DK` bl706 board, and `BL704LDK` BL704L board .
+The following steps take examples for `BL602-IoT-Matter-V1` BL602 board,
+`BL706DK` BL706 board, and `BL704LDK` BL704L board .
 
 -   Build lighting app with UART baudrate 2000000
 
     ```
     ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-light build
-    ./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light build
-    ./scripts/build/build_examples.py --target bouffalolab-bl704ldk-light build
+    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light build
     ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-ethernet build
     ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-wifi build
+    ./scripts/build/build_examples.py --target bouffalolab-bl704ldk-light build
     ```
 
 -   Build lighting app with UART baudrate 115200
 
     ```
     ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-light-115200 build
-    ./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light-115200 build
+    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-light-115200 build
+    ./scripts/build/build_examples.py --target bouffalolab-bl704ldk-light-light-115200 build
     ```
 
 -   Build lighting app with RPC enabled and UART baudrate 115200.
 
     ```
     ./scripts/build/build_examples.py --target bouffalolab-bl602-iot-matter-v1-light-rpc build
-    ./scripts/build/build_examples.py --target bouffalolab-xt-zb6-devkit-light-rpc build
+    ./scripts/build/build_examples.py --target bouffalolab-bl706dk-light-light-rpc build
+    ./scripts/build/build_examples.py --target bouffalolab-bl704ldk-light-light-rpc build
     ```
 
 ### Build options with build_examples.py
@@ -127,6 +129,10 @@ develop `XT-ZB6-DevKit` and `BL706DK` bl706 board, and `BL704LDK` BL704L board .
     application.
 -   `-thread`, to specify that connectivity Thread is enabled for Matter
     application.
+-   `-mot`, to specify to use openthread stack under
+    `third_party/openthread/repo`
+    -   Without `-mot` specified, Matter Thread will use openthread stack under
+        `Bouffalo Lab` SDK
 -   `-fp`, to specify to enable frame pointer feature to print call stack when
     hit an exception for debug purpose.
 
@@ -161,19 +167,19 @@ develop `XT-ZB6-DevKit` and `BL706DK` bl706 board, and `BL704LDK` BL704L board .
     -   Type following command for image download. Please set serial port
         accordingly, here we use /dev/ttyACM0 as a serial port example.
 
-        -   `bl602-iot-matter-v1`, `xt-zb6-devkit` and `bl704ldk` without
-            additional build options
+        -   `bl602-iot-matter-v1`, `bl706dk` and `bl704ldk` without additional
+            build options
 
             ```shell
             ./out/bouffalolab-bl602-iot-matter-v1-light/chip-bl602-lighting-example.flash.py --port /dev/ttyACM0
-            ./out/bouffalolab-xt-zb6-devkit-light/chip-bl702-lighting-example.flash.py --port /dev/ttyACM0
+            ./out/bouffalolab-bl706dk-light/chip-bl702-lighting-example.flash.py --port /dev/ttyACM0
             ./out/bouffalolab-bl704ldk-light/chip-bl702l-lighting-example.flash.py --port /dev/ttyACM0
             ```
 
-        -   `xt-zb6-devkit` with 115200 baudrate setting
+        -   `bl706dk` with 115200 baudrate setting
 
             ```shell
-            ./out/bouffalolab-xt-zb6-devkit-light-115200/chip-bl702-lighting-example.flash.py --port /dev/ttyACM0
+            ./out/bouffalolab-bl706dk-light-115200/chip-bl702-lighting-example.flash.py --port /dev/ttyACM0
             ```
 
         -   To wipe out flash and download image, please append `--erase` to the
@@ -181,7 +187,7 @@ develop `XT-ZB6-DevKit` and `BL706DK` bl706 board, and `BL704LDK` BL704L board .
 
             ```shell
             ./out/bouffalolab-bl602-iot-matter-v1-light/chip-bl602-lighting-example.flash.py --port /dev/ttyACM0 --erase
-            ./out/bouffalolab-xt-zb6-devkit-light-115200/chip-bl702-lighting-example.flash.py --port /dev/ttyACM0 --erase
+            ./out/bouffalolab-bl706dk-light-115200/chip-bl702-lighting-example.flash.py --port /dev/ttyACM0 --erase
             ./out/bouffalolab-bl704ldk-light/chip-bl702l-lighting-example.flash.py --port /dev/ttyACM0 --erase
             ```
 

@@ -25,7 +25,8 @@
 #import "MTRBaseSubscriptionCallback.h"
 #import "MTRCluster.h"
 #import "MTRClusterConstants.h"
-#import "MTRClusters_Internal.h"
+#import "MTRCommandTimedCheck.h"
+#import "MTRDefines_Internal.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
@@ -203,6 +204,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)unitTestReportEndForDevice:(MTRDevice *)device;
 - (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device;
 - (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device;
+- (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device;
 @end
 #endif
 
@@ -240,8 +242,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #pragma mark Subscription and delegate handling
 
 // subscription intervals are in seconds
-#define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN (2)
-#define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX (60)
+#define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN (1 * 60) // 1 minute (for now)
+#define MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX (60 * 60) // 60 minutes
 
 - (void)setDelegate:(id<MTRDeviceDelegate>)delegate queue:(dispatch_queue_t)queue
 {
@@ -597,6 +599,17 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // assume lock is held
 - (void)_setupSubscription
 {
+#ifdef DEBUG
+    id delegate = _weakDelegate.strongObject;
+    Optional<System::Clock::Seconds32> maxIntervalOverride;
+    if (delegate) {
+        if ([delegate respondsToSelector:@selector(unitTestMaxIntervalOverrideForSubscription:)]) {
+            NSNumber * delegateMin = [delegate unitTestMaxIntervalOverrideForSubscription:self];
+            maxIntervalOverride.Emplace(delegateMin.unsignedIntValue);
+        }
+    }
+#endif
+
     os_unfair_lock_assert_owner(&self->_lock);
 
     // for now just subscribe once
@@ -630,12 +643,21 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                    // Select a max interval based on the device's claimed idle sleep interval.
                    auto idleSleepInterval = std::chrono::duration_cast<System::Clock::Seconds32>(
                        session.Value()->GetRemoteMRPConfig().mIdleRetransTimeout);
-                   if (idleSleepInterval.count() < MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN) {
-                       idleSleepInterval = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN);
+
+                   auto maxIntervalCeilingMin = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MIN);
+                   if (idleSleepInterval < maxIntervalCeilingMin) {
+                       idleSleepInterval = maxIntervalCeilingMin;
                    }
-                   if (idleSleepInterval.count() > MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX) {
-                       idleSleepInterval = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX);
+
+                   auto maxIntervalCeilingMax = System::Clock::Seconds32(MTR_DEVICE_SUBSCRIPTION_MAX_INTERVAL_MAX);
+                   if (idleSleepInterval > maxIntervalCeilingMax) {
+                       idleSleepInterval = maxIntervalCeilingMax;
                    }
+#ifdef DEBUG
+                   if (maxIntervalOverride.HasValue()) {
+                       idleSleepInterval = maxIntervalOverride.Value();
+                   }
+#endif
                    readParams.mMaxIntervalCeilingSeconds = static_cast<uint16_t>(idleSleepInterval.count());
 
                    readParams.mpAttributePathParamsList = attributePath.get();
@@ -1078,6 +1100,33 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 - (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
                           clusterID:(NSNumber *)clusterID
                           commandID:(NSNumber *)commandID
+                      commandFields:(NSDictionary<NSString *, id> * _Nullable)commandFields
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                              queue:(dispatch_queue_t)queue
+                         completion:(MTRDeviceResponseHandler)completion
+{
+    if (commandFields == nil) {
+        commandFields = @{
+            MTRTypeKey : MTRStructureValueType,
+            MTRValueKey : @[],
+        };
+    }
+
+    [self invokeCommandWithEndpointID:endpointID
+                            clusterID:clusterID
+                            commandID:commandID
+                        commandFields:commandFields
+                       expectedValues:expectedValues
+                expectedValueInterval:expectedValueInterval
+                   timedInvokeTimeout:nil
+                                queue:queue
+                           completion:completion];
+}
+
+- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                          commandID:(NSNumber *)commandID
                       commandFields:(id)commandFields
                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
@@ -1121,6 +1170,15 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     serverSideProcessingTimeout = [serverSideProcessingTimeout copy];
     timeout = [timeout copy];
 
+    if (timeout == nil && MTRCommandNeedsTimedInvoke(clusterID, commandID)) {
+        timeout = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+    }
+
+    NSDate * cutoffTime;
+    if (timeout) {
+        cutoffTime = [NSDate dateWithTimeIntervalSinceNow:(timeout.doubleValue / 1000)];
+    }
+
     uint64_t expectedValueID = 0;
     NSMutableArray<MTRAttributePath *> * attributePaths = nil;
     if (expectedValues) {
@@ -1139,26 +1197,51 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         *stop = YES;
     }];
     [workItem setReadyHandler:^(MTRDevice * device, NSInteger retryCount, MTRAsyncWorkCompletionBlock workCompletion) {
+        auto workDone = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+            dispatch_async(queue, ^{
+                completion(values, error);
+            });
+            if (error && expectedValues) {
+                [self removeExpectedValuesForAttributePaths:attributePaths expectedValueID:expectedValueID];
+            }
+            workCompletion(MTRAsyncWorkComplete);
+        };
+
+        NSNumber * timedInvokeTimeout = nil;
+        if (timeout) {
+            auto * now = [NSDate now];
+            if ([now compare:cutoffTime] == NSOrderedDescending) {
+                // Our timed invoke timeout has expired already.  Command
+                // was queued for too long.  Do not send it out.
+                workDone(nil, [MTRError errorForIMStatusCode:Status::Timeout]);
+                return;
+            }
+
+            // Recompute the actual timeout left, accounting for time spent
+            // in our queuing and retries.
+            timedInvokeTimeout = @([cutoffTime timeIntervalSinceDate:now] * 1000);
+        }
         MTRBaseDevice * baseDevice = [self newBaseDevice];
         [baseDevice
             _invokeCommandWithEndpointID:endpointID
                                clusterID:clusterID
                                commandID:commandID
                            commandFields:commandFields
-                      timedInvokeTimeout:timeout
+                      timedInvokeTimeout:timedInvokeTimeout
              serverSideProcessingTimeout:serverSideProcessingTimeout
                                    queue:self.queue
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                   // Log the data at the INFO level (not usually persisted permanently),
                                   // but make sure we log the work completion at the DEFAULT level.
                                   MTR_LOG_INFO("Invoke work item [%llu] received command response: %@ error: %@", workItemID, values, error);
-                                  dispatch_async(queue, ^{
-                                      completion(values, error);
-                                  });
-                                  if (error && expectedValues) {
-                                      [self removeExpectedValuesForAttributePaths:attributePaths expectedValueID:expectedValueID];
+                                  // TODO: This 5-retry cap is very arbitrary.
+                                  // TODO: Should there be some sort of backoff here?
+                                  if (error != nil && error.domain == MTRInteractionErrorDomain && error.code == MTRInteractionErrorCodeBusy && retryCount < 5) {
+                                      workCompletion(MTRAsyncWorkNeedsRetry);
+                                      return;
                                   }
-                                  workCompletion(MTRAsyncWorkComplete);
+
+                                  workDone(values, error);
                               }];
     }];
     [_asyncWorkQueue enqueueWorkItem:workItem descriptionWithFormat:@"invoke %@ %@ %@", endpointID, clusterID, commandID];
