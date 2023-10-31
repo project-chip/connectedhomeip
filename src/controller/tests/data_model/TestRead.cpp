@@ -270,13 +270,17 @@ public:
     static void TestReadHandler_OneSubscribeMultipleReads(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_TwoSubscribesMultipleReads(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_MultipleSubscriptionsWithDataVersionFilter(nlTestSuite * apSuite, void * apContext);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER != 1
     static void TestReadHandler_SubscriptionReportingIntervalsTest1(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_SubscriptionReportingIntervalsTest2(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_SubscriptionReportingIntervalsTest3(nlTestSuite * apSuite, void * apContext);
-    static void TestReadHandler_SubscriptionReportingIntervalsTest4(nlTestSuite * apSuite, void * apContext);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+    static void TestReadHandler_SubscriptionReportingIntervalsTest4(nlTestSuite * apSuite, void * apContext);,
+#if CHIP_CONFIG_ENABLE_ICD_SERVER != 1
     static void TestReadHandler_SubscriptionReportingIntervalsTest5(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_SubscriptionReportingIntervalsTest6(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_SubscriptionReportingIntervalsTest7(nlTestSuite * apSuite, void * apContext);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     static void TestReadHandler_SubscriptionReportingIntervalsTest8(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_SubscriptionReportingIntervalsTest9(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandlerResourceExhaustion_MultipleReads(nlTestSuite * apSuite, void * apContext);
@@ -1966,6 +1970,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionAppRejection(nlTestSuite *
     gTestReadInteraction.mEmitSubscriptionError = false;
 }
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
+
 // Subscriber sends the request with particular max-interval value:
 // Max interval equal to client-requested min-interval.
 void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest1(nlTestSuite * apSuite, void * apContext)
@@ -2193,6 +2199,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest3(nl
     gTestReadInteraction.mAlterSubscriptionIntervals = false;
 }
 
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+
 // Subscriber sends the request with particular max-interval value:
 // Max interval greater than client-requested min-interval but lower than 60m:
 // server adjustment to a value greater than client-requested, but greater than 60 (not allowed).
@@ -2258,6 +2266,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest4(nl
     app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
     gTestReadInteraction.mAlterSubscriptionIntervals = false;
 }
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
 
 // Subscriber sends the request with particular max-interval value:
 // Max interval greater than client-requested min-interval but greater than 60m:
@@ -2485,6 +2495,8 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest7(nl
     app::InteractionModelEngine::GetInstance()->UnregisterReadHandlerAppCallback();
     gTestReadInteraction.mAlterSubscriptionIntervals = false;
 }
+
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 // Subscriber sends the request with particular max-interval value:
 // Max interval greater than client-requested min-interval but greater than 60m:
