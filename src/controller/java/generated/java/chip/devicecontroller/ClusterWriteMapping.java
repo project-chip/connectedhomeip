@@ -724,6 +724,30 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("booleanState", writeBooleanStateInteractionInfo);
     Map<String, InteractionInfo> writeIcdManagementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("icdManagement", writeIcdManagementInteractionInfo);
+    Map<String, InteractionInfo> writeLaundryDryerControlsInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeLaundryDryerControlsSelectedDrynessLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo laundryDryerControlsselectedDrynessLevelCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeLaundryDryerControlsSelectedDrynessLevelCommandParams.put(
+        "value",
+        laundryDryerControlsselectedDrynessLevelCommandParameterInfo
+    );
+    InteractionInfo writeLaundryDryerControlsSelectedDrynessLevelAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.LaundryDryerControlsCluster) cluster).writeSelectedDrynessLevelAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeLaundryDryerControlsSelectedDrynessLevelCommandParams
+    );
+    writeLaundryDryerControlsInteractionInfo.put("writeSelectedDrynessLevelAttribute", writeLaundryDryerControlsSelectedDrynessLevelAttributeInteractionInfo);
+    writeAttributeMap.put("laundryDryerControls", writeLaundryDryerControlsInteractionInfo);
     Map<String, InteractionInfo> writeModeSelectInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeModeSelectStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo modeSelectstartUpModeCommandParameterInfo =

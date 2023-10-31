@@ -6577,6 +6577,132 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedLaundryDryerControlsClusterSupportedDrynessLevelsAttributeCallback implements ChipClusters.LaundryDryerControlsCluster.SupportedDrynessLevelsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Integer> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedLaundryDryerControlsClusterSelectedDrynessLevelAttributeCallback implements ChipClusters.LaundryDryerControlsCluster.SelectedDrynessLevelAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedLaundryDryerControlsClusterGeneratedCommandListAttributeCallback implements ChipClusters.LaundryDryerControlsCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedLaundryDryerControlsClusterAcceptedCommandListAttributeCallback implements ChipClusters.LaundryDryerControlsCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedLaundryDryerControlsClusterEventListAttributeCallback implements ChipClusters.LaundryDryerControlsCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedLaundryDryerControlsClusterAttributeListAttributeCallback implements ChipClusters.LaundryDryerControlsCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedModeSelectClusterStandardNamespaceAttributeCallback implements ChipClusters.ModeSelectCluster.StandardNamespaceAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -17101,6 +17227,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.IcdManagementCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("icdManagement", icdManagementClusterInfo);
 
+    ClusterInfo laundryDryerControlsClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.LaundryDryerControlsCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("laundryDryerControls", laundryDryerControlsClusterInfo);
+
     ClusterInfo modeSelectClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.ModeSelectCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("modeSelect", modeSelectClusterInfo);
@@ -17378,6 +17508,7 @@ public class ClusterInfoMapping {
     destination.get("proxyValid").combineCommands(source.get("proxyValid"));
     destination.get("booleanState").combineCommands(source.get("booleanState"));
     destination.get("icdManagement").combineCommands(source.get("icdManagement"));
+    destination.get("laundryDryerControls").combineCommands(source.get("laundryDryerControls"));
     destination.get("modeSelect").combineCommands(source.get("modeSelect"));
     destination.get("laundryWasherMode").combineCommands(source.get("laundryWasherMode"));
     destination.get("refrigeratorAndTemperatureControlledCabinetMode").combineCommands(source.get("refrigeratorAndTemperatureControlledCabinetMode"));
@@ -19642,6 +19773,10 @@ public class ClusterInfoMapping {
     icdManagementClusterInteractionInfoMap.put("stayActiveRequest", icdManagementstayActiveRequestInteractionInfo);
 
     commandMap.put("icdManagement", icdManagementClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> laundryDryerControlsClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    commandMap.put("laundryDryerControls", laundryDryerControlsClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> modeSelectClusterInteractionInfoMap = new LinkedHashMap<>();
 

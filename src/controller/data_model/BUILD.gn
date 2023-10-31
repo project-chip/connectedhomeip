@@ -150,6 +150,8 @@ if (current_os == "android" || matter_enable_java_compilation) {
       "jni/IlluminanceMeasurementClient-ReadImpl.cpp",
       "jni/KeypadInputClient-InvokeSubscribeImpl.cpp",
       "jni/KeypadInputClient-ReadImpl.cpp",
+      "jni/LaundryDryerControlsClient-InvokeSubscribeImpl.cpp",
+      "jni/LaundryDryerControlsClient-ReadImpl.cpp",
       "jni/LaundryWasherModeClient-InvokeSubscribeImpl.cpp",
       "jni/LaundryWasherModeClient-ReadImpl.cpp",
       "jni/LevelControlClient-InvokeSubscribeImpl.cpp",

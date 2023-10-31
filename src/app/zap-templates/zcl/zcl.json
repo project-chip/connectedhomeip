@@ -53,6 +53,7 @@
         "illuminance-measurement-cluster.xml",
         "input-output-value-clusters.xml",
         "keypad-input-cluster.xml",
+        "laundry-dryer-controls-cluster.xml",
         "laundry-washer-mode-cluster.xml",
         "level-control-cluster.xml",
         "localization-configuration-cluster.xml",

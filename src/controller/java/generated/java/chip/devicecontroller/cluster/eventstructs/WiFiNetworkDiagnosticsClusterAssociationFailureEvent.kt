@@ -17,16 +17,19 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
+import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
+import matter.tlv.TlvParsingException
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class WiFiNetworkDiagnosticsClusterAssociationFailureEvent(
-  val associationFailure: UInt,
-  val status: UInt
-) {
-  override fun toString(): String = buildString {
+import java.util.Optional
+
+class WiFiNetworkDiagnosticsClusterAssociationFailureEvent (
+    val associationFailure: UInt,
+    val status: UInt) {
+  override fun toString(): String  = buildString {
     append("WiFiNetworkDiagnosticsClusterAssociationFailureEvent {\n")
     append("\tassociationFailure : $associationFailure\n")
     append("\tstatus : $status\n")
@@ -46,14 +49,11 @@ class WiFiNetworkDiagnosticsClusterAssociationFailureEvent(
     private const val TAG_ASSOCIATION_FAILURE = 0
     private const val TAG_STATUS = 1
 
-    fun fromTlv(
-      tlvTag: Tag,
-      tlvReader: TlvReader
-    ): WiFiNetworkDiagnosticsClusterAssociationFailureEvent {
+    fun fromTlv(tlvTag: Tag, tlvReader: TlvReader) : WiFiNetworkDiagnosticsClusterAssociationFailureEvent {
       tlvReader.enterStructure(tlvTag)
       val associationFailure = tlvReader.getUInt(ContextSpecificTag(TAG_ASSOCIATION_FAILURE))
       val status = tlvReader.getUInt(ContextSpecificTag(TAG_STATUS))
-
+      
       tlvReader.exitContainer()
 
       return WiFiNetworkDiagnosticsClusterAssociationFailureEvent(associationFailure, status)

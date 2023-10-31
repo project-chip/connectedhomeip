@@ -176,6 +176,7 @@
         "ILLUMINANCE_MEASUREMENT_CLUSTER": [],
         "KEYPAD_INPUT_CLUSTER": ["keypad-input-server"],
         "LAUNDRY_WASHER_MODE_CLUSTER": ["mode-base-server"],
+        "LAUNDRY_DRYER_CONTROLS_CLUSTER": ["laundry-dryer-controls-server"],
         "LEVEL_CONTROL_CLUSTER": ["level-control"],
         "LOCALIZATION_CONFIGURATION_CLUSTER": [
             "localization-configuration-server"
