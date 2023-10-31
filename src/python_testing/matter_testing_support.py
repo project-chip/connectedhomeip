@@ -402,7 +402,11 @@ class ProblemNotice:
     spec_location: str = ""
 
     def __str__(self):
-        return f'\nProblem: {str(self.severity)}\n    test_name: {self.test_name}\n    location: {str(self.location)}\n    problem: {self.problem}\n    spec_location: {self.spec_location}\n'
+        return (f'\nProblem: {str(self.severity)}'
+                f'\n    test_name: {self.test_name}'
+                f'\n    location: {str(self.location)}'
+                f'\n    problem: {self.problem}'
+                f'\n    spec_location: {self.spec_location}\n')
 
 
 @dataclass
