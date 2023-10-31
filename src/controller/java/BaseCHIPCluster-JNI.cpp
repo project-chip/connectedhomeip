@@ -385,7 +385,15 @@ jobject decodeValueFromTLV(JNIEnv *env, chip::TLV::TLVReader * data)
 
         err = data->ExitContainer(tlvType);
         VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "Error: TLV container exiting failed: %" CHIP_ERROR_FORMAT, err.Format()));
-        return arrayLists;
+
+        jclass typeCls = nullptr;
+        if (dataTLVType == chip::TLV::kTLVType_Structure) {
+            typeCls = env->FindClass("chip/devicecontroller/ChipTLVType$StructType");
+        } else {
+            typeCls = env->FindClass("chip/devicecontroller/ChipTLVType$ArrayType");
+        }
+        jmethodID constructor      = env->GetMethodID(typeCls, "<init>", "(Ljava/util/ArrayList;)V");
+        return env->NewObject(typeCls, constructor, arrayLists);
     }
     default:
         ChipLogError(Controller, "Error: Unsupported TLV type for conversion : %u", data->GetType());
@@ -397,7 +405,7 @@ static bool isEqualTLVType(JNIEnv * env, const char *typeName, jobject tlvType)
 {
     jclass tlvEnum = env->FindClass("chip/devicecontroller/ChipTLVType$TLVType");
 
-    jfieldID enumFieldID = env->GetStaticFieldID(tlvEnum, typeName, "chip/devicecontroller/ChipTLVType$TLVType");
+    jfieldID enumFieldID = env->GetStaticFieldID(tlvEnum, typeName, "Lchip/devicecontroller/ChipTLVType$TLVType;");
     jobject enumObj      = env->GetStaticObjectField(tlvEnum, enumFieldID);
 
     jmethodID equalsMethodID = env->GetMethodID(tlvEnum, "equals", "(Ljava/lang/Object;)Z");
@@ -506,7 +514,7 @@ static CHIP_ERROR encodeTLVFromValue(JNIEnv *env, jobject jValue, chip::TLV::TLV
         jclass typeClass = env->FindClass("chip/devicecontroller/ChipTLVType$StructType");
         VerifyOrReturnError(typeClass != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
         getSizeMethod = env->GetMethodID(typeClass, "size", "()I");
-        VerifyOrReturnError(getValueMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+        VerifyOrReturnError(getSizeMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
         getValueMethod = env->GetMethodID(typeClass, "value", "(I)Lchip/devicecontroller/ChipTLVType$StructElement;");
         VerifyOrReturnError(getValueMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
 
@@ -578,13 +586,16 @@ JNI_METHOD(jbyteArray, BaseChipCluster, encodeToTlv)(JNIEnv * env, jclass clazz,
     VerifyOrReturnValue(value != nullptr, nullptr, ChipLogError(Controller, "invalid parameter: value is null"));
     chip::TLV::TLVWriter writer;
     uint8_t buffer[CHIP_TLV_WRITER_BUFFER_SIZE];
+    jbyteArray tlv = nullptr;
     writer.Init(buffer, sizeof(buffer));
 
     CHIP_ERROR err = encodeTLVFromValue(env, value, writer, chip::TLV::AnonymousTag());
     VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "Encode Error: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    chip::ByteArray jbyteArray(env, reinterpret_cast<jbyte *>(buffer), writer.GetLengthWritten());
-    return jbyteArray.jniValue();
+    err = chip::JniReferences::GetInstance().N2J_ByteArray(env, buffer, writer.GetLengthWritten(), tlv);
+    VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr, ChipLogError(Controller, "JNI Error: %" CHIP_ERROR_FORMAT, err.Format()));
+
+    return tlv;
 }
 
 JNI_METHOD(jobject, BaseChipCluster, decodeFromTlv)(JNIEnv * env, jclass clazz, jbyteArray tlvBytesObj)
