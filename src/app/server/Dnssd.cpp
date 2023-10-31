@@ -17,8 +17,8 @@
 
 #include <app/server/Dnssd.h>
 
+#include <app-common/zap-generated/cluster-enums.h>
 #include <inttypes.h>
-
 #include <lib/core/Optional.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/ServiceNaming.h>
@@ -176,7 +176,7 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
         // Only advertise the ICD key if the device can be operate as LIT
-        if (Server::GetInstance().GetICDManager().SupportsCheckInProtocol())
+        if (Server::GetInstance().GetICDManager().SupportsFeature(Clusters::IcdManagement::Feature::kLongIdleTimeSupport))
         {
             advertiseParameters.SetICDOperatesAsLIT(
                 Optional<bool>(Server::GetInstance().GetICDManager().GetICDMode() == ICDManager::ICDMode::LIT));
@@ -254,7 +254,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     // Only advertise the ICD key if the device can be operate as LIT
-    if (Server::GetInstance().GetICDManager().SupportsCheckInProtocol())
+    if (Server::GetInstance().GetICDManager().SupportsFeature(Clusters::IcdManagement::Feature::kLongIdleTimeSupport))
     {
         advertiseParameters.SetICDOperatesAsLIT(
             Optional<bool>(Server::GetInstance().GetICDManager().GetICDMode() == ICDManager::ICDMode::LIT));

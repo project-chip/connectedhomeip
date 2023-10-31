@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app-common/zap-generated/cluster-enums.h>
 #include <app/icd/ICDMonitoringTable.h>
 #include <app/icd/ICDNotifier.h>
 #include <app/icd/ICDStateObserver.h>
@@ -58,7 +59,7 @@ public:
     void UpdateOperationState(OperationalState state);
     void SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state);
     bool IsKeepActive() { return mKeepActiveFlags.HasAny(); }
-    bool SupportsCheckInProtocol();
+    bool SupportsFeature(Clusters::IcdManagement::Feature feature);
     ICDMode GetICDMode() { return mICDMode; }
     OperationalState GetOperationalState() { return mOperationalState; }
 
