@@ -646,6 +646,7 @@ struct GeneralCommissioningInfo
     app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum locationCapability =
         app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoorOutdoor;
     ;
+    bool supportsConcurrentConnection = true;
 };
 
 struct ReadCommissioningInfo
@@ -700,7 +701,7 @@ public:
     virtual ~CommissioningDelegate(){};
     /* CommissioningReport is returned after each commissioning step is completed. The reports for each step are:
      * kReadCommissioningInfo - ReadCommissioningInfo
-     * kCheckForMatchingFabric = MatchingFabricInfo
+     * kReadAdditionalAttributes - ReadCommissioningInfo
      * kArmFailsafe: CommissioningErrorInfo if there is an error
      * kConfigRegulatory: CommissioningErrorInfo if there is an error
      * kConfigureUTCTime: None

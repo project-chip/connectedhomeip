@@ -88,6 +88,7 @@ inline constexpr uint16_t kNumMaxActiveDevices = CHIP_CONFIG_CONTROLLER_MAX_ACTI
 void OnBasicFailure(void * context, CHIP_ERROR err);
 void OnBasicSuccess(void * context, const chip::app::DataModel::NullObjectType &);
 void NonConcurrentTimeout(void * context, CHIP_ERROR error);
+void NonConcurrentTimeout(void * context, CHIP_ERROR error);
 
 struct ControllerInitParams
 {
