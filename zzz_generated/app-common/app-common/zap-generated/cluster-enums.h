@@ -1848,6 +1848,27 @@ enum class Feature : uint32_t
 };
 } // namespace DishwasherAlarm
 
+namespace MicrowaveOvenMode {
+
+// Enum for ModeTag
+enum class ModeTag : uint16_t
+{
+    kNormal  = 0x4000,
+    kDefrost = 0x4001,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
+// Bitmap for Feature
+enum class Feature : uint32_t
+{
+    kOnOff = 0x1,
+};
+} // namespace MicrowaveOvenMode
+
 namespace OperationalState {
 
 // Enum for ErrorStateEnum

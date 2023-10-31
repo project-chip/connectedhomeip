@@ -8122,6 +8122,111 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedMicrowaveOvenModeClusterSupportedModesAttributeCallback implements ChipClusters.MicrowaveOvenModeCluster.SupportedModesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.MicrowaveOvenModeClusterModeOptionStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.MicrowaveOvenModeClusterModeOptionStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMicrowaveOvenModeClusterGeneratedCommandListAttributeCallback implements ChipClusters.MicrowaveOvenModeCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMicrowaveOvenModeClusterAcceptedCommandListAttributeCallback implements ChipClusters.MicrowaveOvenModeCluster.AcceptedCommandListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMicrowaveOvenModeClusterEventListAttributeCallback implements ChipClusters.MicrowaveOvenModeCluster.EventListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedMicrowaveOvenModeClusterAttributeListAttributeCallback implements ChipClusters.MicrowaveOvenModeCluster.AttributeListAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Long> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
 
   public static class DelegatedOperationalStateClusterOperationalCommandResponseCallback implements ChipClusters.OperationalStateCluster.OperationalCommandResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
@@ -17041,6 +17146,10 @@ public class ClusterInfoMapping {
       (ptr, endpointId) -> new ChipClusters.DishwasherAlarmCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("dishwasherAlarm", dishwasherAlarmClusterInfo);
 
+    ClusterInfo microwaveOvenModeClusterInfo = new ClusterInfo(
+      (ptr, endpointId) -> new ChipClusters.MicrowaveOvenModeCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("microwaveOvenMode", microwaveOvenModeClusterInfo);
+
     ClusterInfo operationalStateClusterInfo = new ClusterInfo(
       (ptr, endpointId) -> new ChipClusters.OperationalStateCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("operationalState", operationalStateClusterInfo);
@@ -17278,6 +17387,7 @@ public class ClusterInfoMapping {
     destination.get("airQuality").combineCommands(source.get("airQuality"));
     destination.get("smokeCoAlarm").combineCommands(source.get("smokeCoAlarm"));
     destination.get("dishwasherAlarm").combineCommands(source.get("dishwasherAlarm"));
+    destination.get("microwaveOvenMode").combineCommands(source.get("microwaveOvenMode"));
     destination.get("operationalState").combineCommands(source.get("operationalState"));
     destination.get("rvcOperationalState").combineCommands(source.get("rvcOperationalState"));
     destination.get("hepaFilterMonitoring").combineCommands(source.get("hepaFilterMonitoring"));
@@ -19740,6 +19850,10 @@ public class ClusterInfoMapping {
     dishwasherAlarmClusterInteractionInfoMap.put("modifyEnabledAlarms", dishwasherAlarmmodifyEnabledAlarmsInteractionInfo);
 
     commandMap.put("dishwasherAlarm", dishwasherAlarmClusterInteractionInfoMap);
+
+    Map<String, InteractionInfo> microwaveOvenModeClusterInteractionInfoMap = new LinkedHashMap<>();
+
+    commandMap.put("microwaveOvenMode", microwaveOvenModeClusterInteractionInfoMap);
 
     Map<String, InteractionInfo> operationalStateClusterInteractionInfoMap = new LinkedHashMap<>();
 

@@ -1613,6 +1613,17 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Attributes
 } // namespace DishwasherAlarm
 
+namespace MicrowaveOvenMode {
+namespace Attributes {
+
+namespace ClusterRevision {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace MicrowaveOvenMode
+
 namespace OperationalState {
 namespace Attributes {
 

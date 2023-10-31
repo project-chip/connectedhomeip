@@ -3354,6 +3354,21 @@ client cluster MicrowaveOvenMode = 94 {
     kDefrost = 16385;
   }
 
+  bitmap Feature : bitmap32 {
+    kOnOff = 0x1;
+  }
+
+  struct ModeTagStruct {
+    optional vendor_id mfgCode = 0;
+    enum16 value = 1;
+  }
+
+  struct ModeOptionStruct {
+    char_string<64> label = 0;
+    int8u mode = 1;
+    ModeTagStruct modeTags[] = 2;
+  }
+
   readonly attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
   readonly attribute command_id generatedCommandList[] = 65528;

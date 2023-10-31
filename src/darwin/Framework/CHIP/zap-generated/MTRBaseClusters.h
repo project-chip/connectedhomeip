@@ -14532,6 +14532,10 @@ typedef NS_ENUM(uint16_t, MTRMicrowaveOvenModeModeTag) {
     MTRMicrowaveOvenModeModeTagDefrost MTR_PROVISIONALLY_AVAILABLE = 0x4001,
 } MTR_PROVISIONALLY_AVAILABLE;
 
+typedef NS_OPTIONS(uint32_t, MTRMicrowaveOvenModeFeature) {
+    MTRMicrowaveOvenModeFeatureOnOff MTR_PROVISIONALLY_AVAILABLE = 0x1,
+} MTR_PROVISIONALLY_AVAILABLE;
+
 typedef NS_ENUM(uint8_t, MTROperationalStateErrorState) {
     MTROperationalStateErrorStateNoError MTR_PROVISIONALLY_AVAILABLE = 0x00,
     MTROperationalStateErrorStateUnableToStartOrResume MTR_PROVISIONALLY_AVAILABLE = 0x01,

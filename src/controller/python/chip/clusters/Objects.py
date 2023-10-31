@@ -18455,6 +18455,39 @@ class MicrowaveOvenMode(Cluster):
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 0,
 
+    class Bitmaps:
+        class Feature(IntFlag):
+            kOnOff = 0x1
+
+    class Structs:
+        @dataclass
+        class ModeTagStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="mfgCode", Tag=0, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="value", Tag=1, Type=uint),
+                    ])
+
+            mfgCode: 'typing.Optional[uint]' = None
+            value: 'uint' = 0
+
+        @dataclass
+        class ModeOptionStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="label", Tag=0, Type=str),
+                        ClusterObjectFieldDescriptor(Label="mode", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="modeTags", Tag=2, Type=typing.List[MicrowaveOvenMode.Structs.ModeTagStruct]),
+                    ])
+
+            label: 'str' = ""
+            mode: 'uint' = 0
+            modeTags: 'typing.List[MicrowaveOvenMode.Structs.ModeTagStruct]' = field(default_factory=lambda: [])
+
     class Attributes:
         @dataclass
         class SupportedModes(ClusterAttributeDescriptor):
