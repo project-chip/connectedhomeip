@@ -7218,8 +7218,8 @@ CHIPPowerSourceConfigurationSourcesAttributeCallback::~CHIPPowerSourceConfigurat
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPPowerSourceConfigurationSourcesAttributeCallback::CallbackFn(void * context,
-                                                                      const chip::app::DataModel::DecodableList<uint8_t> & list)
+void CHIPPowerSourceConfigurationSourcesAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
