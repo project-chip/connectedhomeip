@@ -2150,6 +2150,10 @@ void TestReadInteraction::TestSubscribeEarlyReport(nlTestSuite * apSuite, void *
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
         delegate.mpReadHandler = engine->ActiveHandlerAt(0);
 
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        delegate.mpReadHandler->GetReportingIntervals(minInterval, maxInterval);
+
         NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
 
@@ -2158,7 +2162,7 @@ void TestReadInteraction::TestSubscribeEarlyReport(nlTestSuite * apSuite, void *
                            gMockClock.GetMonotonicTimestamp() + Seconds16(readPrepareParams.mMinIntervalFloorSeconds));
         NL_TEST_ASSERT(apSuite,
                        reportScheduler->GetMaxTimestampForHandler(delegate.mpReadHandler) ==
-                           gMockClock.GetMonotonicTimestamp() + Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds));
+                           gMockClock.GetMonotonicTimestamp() + Seconds16(maxInterval));
 
         // Confirm that the node is scheduled to run
         NL_TEST_ASSERT(apSuite, reportScheduler->IsReportScheduled(delegate.mpReadHandler));
@@ -2204,7 +2208,7 @@ void TestReadInteraction::TestSubscribeEarlyReport(nlTestSuite * apSuite, void *
                            gMockClock.GetMonotonicTimestamp() + Seconds16(readPrepareParams.mMinIntervalFloorSeconds));
         NL_TEST_ASSERT(apSuite,
                        reportScheduler->GetMaxTimestampForHandler(delegate.mpReadHandler) ==
-                           gMockClock.GetMonotonicTimestamp() + Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds));
+                           gMockClock.GetMonotonicTimestamp() + Seconds16(maxInterval));
 
         // Confirm that the node is scheduled to run
         NL_TEST_ASSERT(apSuite, reportScheduler->IsReportScheduled(delegate.mpReadHandler));
@@ -2214,11 +2218,11 @@ void TestReadInteraction::TestSubscribeEarlyReport(nlTestSuite * apSuite, void *
         node->SetIntervalTimeStamps(delegate.mpReadHandler, gMockClock.GetMonotonicTimestamp() + Milliseconds32(50));
         NL_TEST_ASSERT(apSuite,
                        reportScheduler->GetMaxTimestampForHandler(delegate.mpReadHandler) ==
-                           gMockClock.GetMonotonicTimestamp() + Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds) +
+                           gMockClock.GetMonotonicTimestamp() + Seconds16(maxInterval) +
                                Milliseconds32(50));
 
         // Advance monotonic timestamp for min interval to elapse
-        gMockClock.AdvanceMonotonic(Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds));
+        gMockClock.AdvanceMonotonic(Seconds16(maxInterval));
 
         NL_TEST_ASSERT(apSuite, !InteractionModelEngine::GetInstance()->GetReportingEngine().IsRunScheduled());
         // Service Timer expired event
@@ -2370,7 +2374,7 @@ void TestReadInteraction::TestSubscribeUrgentWildcardEvent(nlTestSuite * apSuite
         NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
         NL_TEST_ASSERT(apSuite, !nonUrgentDelegate.mGotEventResponse);
 
-        // The min-interval should have elapsed for urgen subscription, and our handler should still
+        // The min-interval should have elapsed for the urgent subscription, and our handler should still
         // not be dirty or reportable.
         NL_TEST_ASSERT(apSuite,
                        reportScheduler->GetMinTimestampForHandler(delegate.mpReadHandler) <
@@ -2831,8 +2835,12 @@ void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite
         NL_TEST_ASSERT(apSuite, engine->ActiveHandlerAt(0) != nullptr);
         delegate.mpReadHandler = engine->ActiveHandlerAt(0);
 
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        delegate.mpReadHandler->GetReportingIntervals(minInterval, maxInterval);
+
         // Advance monotonic timestamp for min interval to elapse
-        gMockClock.AdvanceMonotonic(System::Clock::Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds));
+        gMockClock.AdvanceMonotonic(System::Clock::Seconds16(maxInterval));
         ctx.GetIOContext().DriveIO();
 
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().IsRunScheduled());
@@ -4958,7 +4966,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestShutdownSubscription", chip::app::TestReadInteraction::TestShutdownSubscription),
     /*
         Disable test when running the ICD specific unit tests.
-        Test tests reporting feature with hard coded time jumps which don't take into account that an ICD
+        Test tests a eporting feature with hard coded time jumps which don't take into account that an ICD
         can change the requested MaxInterval during the subscription response / request process
         https://github.com/project-chip/connectedhomeip/issues/28419
     */
