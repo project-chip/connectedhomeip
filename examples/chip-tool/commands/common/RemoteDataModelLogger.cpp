@@ -260,6 +260,11 @@ CHIP_ERROR LogDiscoveredNodeData(const chip::Dnssd::DiscoveredNodeData & nodeDat
         value["mrpRetryActiveThreshold"] = resolutionData.mrpRetryActiveThreshold.Value().count();
     }
 
+    if (resolutionData.ICDOperatesAsLIT.HasValue())
+    {
+        value["ICDoperatesAsLIT"] = resolutionData.ICDOperatesAsLIT.Value();
+    }
+
     Json::Value rootValue;
     rootValue[kValueKey] = value;
 

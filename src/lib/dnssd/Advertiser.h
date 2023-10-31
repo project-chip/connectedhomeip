@@ -101,6 +101,13 @@ public:
     }
     Optional<bool> GetTcpSupported() const { return mTcpSupported; }
 
+    Derived & SetICDOperatesAsLIT(Optional<bool> ICDOperatesAsLIT)
+    {
+        mICDOperatesAsLIT = ICDOperatesAsLIT;
+        return *reinterpret_cast<Derived *>(this);
+    }
+    Optional<bool> GetICDOperatesAsLIT() const { return mICDOperatesAsLIT; }
+
 private:
     uint16_t mPort                   = CHIP_PORT;
     Inet::InterfaceId mInterfaceId   = Inet::InterfaceId::Null();
@@ -109,6 +116,7 @@ private:
     size_t mMacLength                = 0;
     Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
     Optional<bool> mTcpSupported;
+    Optional<bool> mICDOperatesAsLIT;
 };
 
 /// Defines parameters required for advertising a CHIP node

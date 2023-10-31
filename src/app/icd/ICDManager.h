@@ -58,6 +58,7 @@ public:
     void UpdateOperationState(OperationalState state);
     void SetKeepActiveModeRequirements(KeepActiveFlags flag, bool state);
     bool IsKeepActive() { return mKeepActiveFlags.HasAny(); }
+    bool SupportsCheckInProtocol();
     ICDMode GetICDMode() { return mICDMode; }
     OperationalState GetOperationalState() { return mOperationalState; }
 
@@ -96,8 +97,6 @@ private:
     static constexpr uint32_t kMinIdleModeDuration    = 500;
     static constexpr uint32_t kMinActiveModeDuration  = 300;
     static constexpr uint16_t kMinActiveModeThreshold = 300;
-
-    bool SupportsCheckInProtocol();
 
     BitFlags<KeepActiveFlags> mKeepActiveFlags{ 0 };
 

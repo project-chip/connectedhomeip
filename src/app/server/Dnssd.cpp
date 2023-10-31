@@ -165,14 +165,23 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
             Crypto::DRBG_get_bytes(macBuffer, sizeof(macBuffer));
         }
 
-        const auto advertiseParameters = chip::Dnssd::OperationalAdvertisingParameters()
-                                             .SetPeerId(fabricInfo.GetPeerId())
-                                             .SetMac(mac)
-                                             .SetPort(GetSecuredPort())
-                                             .SetInterfaceId(GetInterfaceId())
-                                             .SetLocalMRPConfig(GetLocalMRPConfig())
-                                             .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
-                                             .EnableIpV4(true);
+        auto advertiseParameters = chip::Dnssd::OperationalAdvertisingParameters()
+                                       .SetPeerId(fabricInfo.GetPeerId())
+                                       .SetMac(mac)
+                                       .SetPort(GetSecuredPort())
+                                       .SetInterfaceId(GetInterfaceId())
+                                       .SetLocalMRPConfig(GetLocalMRPConfig())
+                                       .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
+                                       .EnableIpV4(true);
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+        // Only advertise the ICD key if the device can be operate as LIT
+        if (Server::GetInstance().GetICDManager().SupportsCheckInProtocol())
+        {
+            advertiseParameters.SetICDOperatesAsLIT(
+                Optional<bool>(Server::GetInstance().GetICDManager().GetICDMode() == ICDManager::ICDMode::LIT));
+        }
+#endif
 
         auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 
@@ -242,6 +251,15 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
     }
 
     advertiseParameters.SetLocalMRPConfig(GetLocalMRPConfig()).SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT));
+
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    // Only advertise the ICD key if the device can be operate as LIT
+    if (Server::GetInstance().GetICDManager().SupportsCheckInProtocol())
+    {
+        advertiseParameters.SetICDOperatesAsLIT(
+            Optional<bool>(Server::GetInstance().GetICDManager().GetICDMode() == ICDManager::ICDMode::LIT));
+    }
+#endif
 
     if (commissionableNode)
     {

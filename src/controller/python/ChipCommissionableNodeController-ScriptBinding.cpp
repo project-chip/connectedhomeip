@@ -117,6 +117,12 @@ void pychip_CommissionableNodeController_PrintDiscoveredCommissioners(
             ChipLogProgress(Discovery, "\tMrp Interval active\tNot present");
         }
         ChipLogProgress(Discovery, "\tSupports TCP\t\t%d", dnsSdInfo->resolutionData.supportsTcp);
+
+        if (dnsSdInfo->resolutionData.ICDOperatesAsLIT.HasValue())
+        {
+            ChipLogProgress(Discovery, "\tICD operates as %s", dnsSdInfo->resolutionData.ICDOperatesAsLIT.Value() ? "LIT" : "SIT");
+        }
+
         for (unsigned j = 0; j < dnsSdInfo->resolutionData.numIPs; ++j)
         {
             char buf[chip::Inet::IPAddress::kMaxStringLength];

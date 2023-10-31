@@ -911,7 +911,9 @@ class ReplTestRunner:
                 'pairingHint': response.pairingHint,
                 'mrpRetryIntervalIdle': response.mrpRetryIntervalIdle,
                 'mrpRetryIntervalActive': response.mrpRetryIntervalActive,
+                'mrpRetryActiveThreshold': response.mrpRetryActiveThreshold,
                 'supportsTcp': response.supportsTcp,
+                'ICDOperatesAsLIT': response.ICDOperatesAsLIT,
                 'addresses': response.addresses,
                 'rotatingId': response.rotatingId,
 

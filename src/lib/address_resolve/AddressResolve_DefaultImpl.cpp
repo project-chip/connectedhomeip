@@ -287,6 +287,11 @@ void Resolver::OnOperationalNodeResolved(const Dnssd::ResolvedNodeData & nodeDat
         result.mrpRemoteConfig = nodeData.resolutionData.GetRemoteMRPConfig();
         result.supportsTcp     = nodeData.resolutionData.supportsTcp;
 
+        if (nodeData.resolutionData.ICDOperatesAsLIT.HasValue())
+        {
+            result.ICDOperatesAsLIT = nodeData.resolutionData.ICDOperatesAsLIT.Value();
+        }
+
         for (size_t i = 0; i < nodeData.resolutionData.numIPs; i++)
         {
 #if !INET_CONFIG_ENABLE_IPV4

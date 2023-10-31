@@ -48,6 +48,7 @@ struct CommonResolutionData
     uint16_t port                         = 0;
     char hostName[kHostNameMaxLength + 1] = {};
     bool supportsTcp                      = false;
+    Optional<bool> ICDOperatesAsLIT;
     Optional<System::Clock::Milliseconds32> mrpRetryIntervalIdle;
     Optional<System::Clock::Milliseconds32> mrpRetryIntervalActive;
     Optional<System::Clock::Milliseconds16> mrpRetryActiveThreshold;
@@ -81,12 +82,14 @@ struct CommonResolutionData
     void Reset()
     {
         memset(hostName, 0, sizeof(hostName));
-        mrpRetryIntervalIdle   = NullOptional;
-        mrpRetryIntervalActive = NullOptional;
-        numIPs                 = 0;
-        port                   = 0;
-        supportsTcp            = false;
-        interfaceId            = Inet::InterfaceId::Null();
+        mrpRetryIntervalIdle    = NullOptional;
+        mrpRetryIntervalActive  = NullOptional;
+        mrpRetryActiveThreshold = NullOptional;
+        ICDOperatesAsLIT        = NullOptional;
+        numIPs                  = 0;
+        port                    = 0;
+        supportsTcp             = false;
+        interfaceId             = Inet::InterfaceId::Null();
         for (auto & addr : ipAddress)
         {
             addr = chip::Inet::IPAddress::Any;
@@ -127,7 +130,23 @@ struct CommonResolutionData
         {
             ChipLogDetail(Discovery, "\tMrp Interval active: not present");
         }
+        if (mrpRetryActiveThreshold.HasValue())
+        {
+            ChipLogDetail(Discovery, "\tMrp Active Threshold: %" PRIu16 " ms", mrpRetryActiveThreshold.Value().count());
+        }
+        else
+        {
+            ChipLogDetail(Discovery, "\tMrp Active Threshold: not present");
+        }
         ChipLogDetail(Discovery, "\tTCP Supported: %d", supportsTcp);
+        if (ICDOperatesAsLIT.HasValue())
+        {
+            ChipLogDetail(Discovery, "\tThe ICD operates in %s", ICDOperatesAsLIT.Value() ? "LIT" : "SIT");
+        }
+        else
+        {
+            ChipLogDetail(Discovery, "\tICD: not present");
+        }
     }
 };
 
