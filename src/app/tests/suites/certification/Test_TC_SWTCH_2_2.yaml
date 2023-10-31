@@ -47,13 +47,13 @@ tests:
     - label: "Step 2a: Set up subscription to SwitchLatched event"
       PICS: SWTCH.S.F00
       verification: |
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          ./chip-tool interactive start         
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          ./chip-tool interactive start
 
           Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
 
-          switch subscribe-event switch-latched 1 100 1 1 
+          switch subscribe-event switch-latched 1 100 1 1
 
           [1697604266.130621][7393:7395] CHIP:DMG: SubscribeResponseMessage =
           [1697604266.130624][7393:7395] CHIP:DMG: {
@@ -66,7 +66,7 @@ tests:
     - label: "Step 2b: Operator sets switch to first position"
       PICS: SWTCH.S.F00
       verification: |
-          On Raspi platform to trigger the event,  give the below command by opening an another terminal in DUT 
+          On Raspi platform to trigger the event,  give the below command by opening an another terminal in DUT
           (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have the capability to generate this event)
 
           echo '{"Name":"SwitchLatched","NewPosition":0}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
@@ -103,19 +103,19 @@ tests:
 
           [1697604732.758383][7384:7386] CHIP:-: Received payload: "{"Name":"SwitchLatched","NewPosition":1}"
           [1697604732.758668][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to 4dbcc0aa
-          [1697604732.758703][7384:7384] CHIP:-: The latching switch is moved to a new position:1 
+          [1697604732.758703][7384:7384] CHIP:-: The latching switch is moved to a new position:1
           [1697604732.758712][7384:7384] CHIP:ZCL: SwitchServer: OnSwitchLatch
           [1697604732.758757][7384:7384] CHIP:EVL: LogEvent event number: 0x0000000000000007 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x0 Epoch timestamp: 0x0000018B41208756
 
           switch read-event switch-latched 1 1
 
-          Verify TH receives SwitchLatched event with NewPosition set to 1 on TH(Chip-tool) log and below is the sample log provided for the raspi platform: 
+          Verify TH receives SwitchLatched event with NewPosition set to 1 on TH(Chip-tool) log and below is the sample log provided for the raspi platform:
 
-          [1687257297.110327][17168:17170] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000 [1687257297.110330][17168:17170] CHIP:TOO: Event number: 7 
-          [1687257297.110333][17168:17170] CHIP:TOO: Priority: Info 
-          [1687257297.110336][17168:17170] CHIP:TOO: Timestamp: 1687257190679 
-          [1687257297.110341][17168:17170] CHIP:TOO: SwitchLatched: { 
-          [1687257297.110345][17168:17170] CHIP:TOO: NewPosition: 1 
+          [1687257297.110327][17168:17170] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Event 0x0000_0000 [1687257297.110330][17168:17170] CHIP:TOO: Event number: 7
+          [1687257297.110333][17168:17170] CHIP:TOO: Priority: Info
+          [1687257297.110336][17168:17170] CHIP:TOO: Timestamp: 1687257190679
+          [1687257297.110341][17168:17170] CHIP:TOO: SwitchLatched: {
+          [1687257297.110345][17168:17170] CHIP:TOO: NewPosition: 1
           [1687257297.110349][17168:17170] CHIP:TOO: }
       disabled: true
 
@@ -147,7 +147,7 @@ tests:
           [1697605547.058012][7525:7527] CHIP:TOO: Endpoint: 1 Cluster: 0x0000_003B Attribute 0x0000_0000 DataVersion: 1304215724
           [1697605547.058063][7525:7527] CHIP:TOO:   NumberOfPositions: 2
 
-          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT 
+          On Raspi platform to trigger the event give the below command by opening an another terminal in DUT
           (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have the capability to generate this event)
 
           echo '{"Name":"SwitchLatched","NewPosition":2}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
@@ -262,14 +262,14 @@ tests:
     - label: "Step 3a: Set up subscription to InitialPress event"
       PICS: SWTCH.S.F01
       verification: |
-          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch. 
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-           ./chip-tool interactive start       
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+           ./chip-tool interactive start
 
           Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
-                           
+
           switch subscribe-event initial-press 1 100 1 1
 
           [1697606330.206997][7536:7538] CHIP:DMG: SubscribeResponseMessage =
@@ -377,12 +377,12 @@ tests:
       verification: |
           Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          1. ./chip-tool interactive start   
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          1. ./chip-tool interactive start
 
           Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
-                 
+
           switch subscribe-event initial-press 1 100 1 1
 
           [1697607013.770976][7736:7738] CHIP:DMG: SubscribeResponseMessage =
@@ -413,7 +413,7 @@ tests:
     - label: "Step 4c: Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
-          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch. 
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
           On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
@@ -445,7 +445,7 @@ tests:
     - label: "Step 4d: Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
-          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch. 
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
           On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
@@ -459,7 +459,7 @@ tests:
           [1697607957.484622][7384:7384] CHIP:ZCL: SwitchServer: OnShortRelease
           [1697607957.484732][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
           [1697607957.484765][7384:7384] CHIP:EVL: LogEvent event number: 0x0000000000000013 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x3 Epoch timestamp: 0x0000018B4151BBEC
-                     
+
           switch read-event short-release 1 1
 
           Verify TH receive ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
@@ -509,7 +509,7 @@ tests:
     - label: "Step 4f: Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F02 && !SWTCH.S.F03
       verification: |
-          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch. 
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
           On Raspi platform to trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor DUT should have capability to generate this event)
 
@@ -523,7 +523,7 @@ tests:
           [1697608242.276296][7384:7384] CHIP:ZCL: SwitchServer: OnShortRelease
           [1697608242.276424][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
           [1697608242.276468][7384:7384] CHIP:EVL: LogEvent event number: 0x0000000000000015 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x3 Epoch timestamp: 0x0000018B41561464
-                             
+
           switch read-event short-release 1 1
 
           Verify TH receives ShortRelease event with PreviousPosition set to 1 on TH (chip-tool) log and below is the sample log provided for the raspi platform:
@@ -542,15 +542,15 @@ tests:
           ShortRelease, LongRelease events"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
-          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch. 
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
-          ./chip-tool interactive start   
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
+          ./chip-tool interactive start
 
           Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
 
-          switch subscribe-event  initial-press 1 100 1 1 
+          switch subscribe-event  initial-press 1 100 1 1
 
 
           [1697608480.015747][7767:7769] CHIP:DMG: SubscribeResponseMessage =
@@ -562,7 +562,7 @@ tests:
 
           Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
 
-          switch subscribe-event  long-press 1 100 1 1 
+          switch subscribe-event  long-press 1 100 1 1
 
           [1697608527.530605][7767:7769] CHIP:DMG: SubscribeResponseMessage =
           [1697608527.530609][7767:7769] CHIP:DMG: {
@@ -573,7 +573,7 @@ tests:
 
           Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
 
-          switch subscribe-event short-release 1 100 1 1 
+          switch subscribe-event short-release 1 100 1 1
 
           [1697608580.243388][7767:7769] CHIP:DMG: SubscribeResponseMessage =
           [1697608580.243391][7767:7769] CHIP:DMG: {
@@ -584,7 +584,7 @@ tests:
 
           Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
 
-          switch subscribe-event  long-release 1 100 1 1 
+          switch subscribe-event  long-release 1 100 1 1
 
           [1697608657.944735][7767:7769] CHIP:DMG: SubscribeResponseMessage =
           [1697608657.944738][7767:7769] CHIP:DMG: {
@@ -603,7 +603,7 @@ tests:
     - label: "Step 5c: Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
-          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch. 
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
           On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
@@ -617,7 +617,7 @@ tests:
           [1697608754.629132][7384:7384] CHIP:ZCL: SwitchServer: OnInitialPress
           [1697608754.629247][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
           [1697608754.629277][7384:7384] CHIP:EVL: LogEvent event number: 0x0000000000000016 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x1 Epoch timestamp: 0x0000018B415DE5C5
-                               
+
           switch read-event initial-press   1 1
 
           Verify TH receives InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
@@ -634,7 +634,7 @@ tests:
     - label: "Step 5d: Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
-          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch. 
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
           On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
@@ -649,7 +649,7 @@ tests:
           [1697608936.890948][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
           [1697608936.890983][7384:7384] CHIP:EVL: LogEvent event number: 0x0000000000000017 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x3 Epoch timestamp: 0x0000018B4160ADBA
 
-          switch read-event short-release 1 1 
+          switch read-event short-release 1 1
 
           Verify TH receives ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
@@ -667,7 +667,7 @@ tests:
           seconds)"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
-          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch. 
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
           On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
@@ -683,7 +683,7 @@ tests:
           [1697609110.499002][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
           [1697609110.499030][7384:7384] CHIP:EVL: LogEvent event number: 0x0000000000000018 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x1 Epoch timestamp: 0x0000018B416353E2
 
-          switch read-event initial-press   1 1 
+          switch read-event initial-press   1 1
 
           Verify InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
@@ -710,8 +710,8 @@ tests:
           [1697609280.509174][7384:7384] CHIP:EVL: LogEvent event number: 0x0000000000000019 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x2 Epoch timestamp: 0x0000018B4165EBFC
           [1697609280.509203][7384:7384] CHIP:DMG: Endpoint 1, Cluster 0x0000_005C update version to e31eae9f
 
-                             
-          switch read-event long-press 1 1    
+
+          switch read-event long-press 1 1
 
           Verify TH receives longPress event with NewPosition set to 1 on TH (chip-tool) log and below is the sample log provided for the raspi platform:
 
@@ -727,7 +727,7 @@ tests:
     - label: "Step 5f: Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F03
       verification: |
-          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch. 
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
           On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
@@ -761,16 +761,16 @@ tests:
           MultiPressOngoing, MultiPressComplete events"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch. 
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
-          Please use Interactive mode to Verify the subscription of an event 
-          Here the command to enter interactive mode:--   
+          Please use Interactive mode to Verify the subscription of an event
+          Here the command to enter interactive mode:--
 
-          ./chip-tool interactive start  
+          ./chip-tool interactive start
 
           Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
 
-          switch subscribe-event initial-press 1 100 1 1 
+          switch subscribe-event initial-press 1 100 1 1
 
           [1697609572.733866][7767:7769] CHIP:DMG: SubscribeResponseMessage =
           [1697609572.733870][7767:7769] CHIP:DMG: {
@@ -781,7 +781,7 @@ tests:
 
           Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
 
-          switch subscribe-event short-release 1 100 1 1 
+          switch subscribe-event short-release 1 100 1 1
 
           [1697609772.052026][7767:7769] CHIP:DMG: SubscribeResponseMessage =
           [1697609772.052029][7767:7769] CHIP:DMG: {
@@ -803,7 +803,7 @@ tests:
 
           Set up the subscription between DUT and TH by sending the command mentioned below, and verify that the subscription is activated successfully
 
-          switch subscribe-event multi-press-complete 1 100 1 1 
+          switch subscribe-event multi-press-complete 1 100 1 1
 
           [1697609646.344664][7767:7769] CHIP:DMG: SubscribeResponseMessage =
           [1697609646.344669][7767:7769] CHIP:DMG: {
@@ -822,7 +822,7 @@ tests:
     - label: "Step 6c: Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch. 
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
           On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
@@ -836,7 +836,7 @@ tests:
           [1697609895.678800][7384:7384] CHIP:ZCL: SwitchServer: OnInitialPress
           [1697609895.678917][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
           [1697609895.678949][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001D priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x1 Epoch timestamp: 0x0000018B416F4EFE
-                          
+
           switch read-event initial-press   1 1
 
           Verify TH receives InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
@@ -853,7 +853,7 @@ tests:
     - label: "Step 6d: Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch. 
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
           On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
@@ -869,8 +869,8 @@ tests:
           [1697610020.643356][7384:7384] CHIP:EVL: Dropped 1 event from buffer with priority 1 and event number  0x0000000000000005 due to overflow: event priority_level: 1
           [1697610020.643427][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
           [1697610020.643456][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001E priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x3 Epoch timestamp: 0x0000018B41713723
-                       
-          switch read-event short-release 1 1 
+
+          switch read-event short-release 1 1
 
           Verify TH receives ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
@@ -895,7 +895,7 @@ tests:
           [1697610133.481287][7384:7384] CHIP:ZCL: SwitchServer: OnMultiPressComplete
           [1697610133.481399][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
           [1697610133.481431][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001F priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x6 Epoch timestamp: 0x0000018B4172EFE9
-                           
+
           switch read-event multi-press-complete 1 1
 
           Verify TH receives MultiPressComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
@@ -913,7 +913,7 @@ tests:
     - label: "Step 6e: Operator operates switch (press briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch. 
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
           On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
@@ -927,8 +927,8 @@ tests:
           [1697609895.678800][7384:7384] CHIP:ZCL: SwitchServer: OnInitialPress
           [1697609895.678917][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
           [1697609895.678949][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001D priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x1 Epoch timestamp: 0x0000018B416F4EFE
-                          
-          switch read-event initial-press   1 1 
+
+          switch read-event initial-press   1 1
 
           Verify TH receives InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
@@ -944,7 +944,7 @@ tests:
     - label: "Step 6f: Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch. 
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
           On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
@@ -959,8 +959,8 @@ tests:
           [1697610020.643356][7384:7384] CHIP:EVL: Dropped 1 event from buffer with priority 1 and event number  0x0000000000000005 due to overflow: event priority_level: 1
           [1697610020.643427][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
           [1697610020.643456][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001E priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x3 Epoch timestamp: 0x0000018B41713723
-                       
-          switch read-event short-release 1 1        
+
+          switch read-event short-release 1 1
 
           Verify TH receives ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
@@ -978,7 +978,7 @@ tests:
           briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch. 
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
           On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
@@ -992,8 +992,8 @@ tests:
           [1697609895.678800][7384:7384] CHIP:ZCL: SwitchServer: OnInitialPress
           [1697609895.678917][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
           [1697609895.678949][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001D priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x1 Epoch timestamp: 0x0000018B416F4EFE
-                          
-          switch read-event initial-press   1 1   
+
+          switch read-event initial-press   1 1
 
           Verify TH receives InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
@@ -1037,7 +1037,7 @@ tests:
     - label: "Step 6h: Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch. 
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
           On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
@@ -1052,8 +1052,8 @@ tests:
           [1697610020.643356][7384:7384] CHIP:EVL: Dropped 1 event from buffer with priority 1 and event number  0x0000000000000005 due to overflow: event priority_level: 1
           [1697610020.643427][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
           [1697610020.643456][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001E priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x3 Epoch timestamp: 0x0000018B41713723
-                       
-          switch read-event short-release 1 1   
+
+          switch read-event short-release 1 1
 
           Verify TH receives ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
@@ -1063,7 +1063,7 @@ tests:
           [1697610069.134665][7767:7769] CHIP:TOO:   Timestamp: 1697610020643
           [1697610069.134669][7767:7769] CHIP:TOO:   ShortRelease: {
           [1697610069.134672][7767:7769] CHIP:TOO:     PreviousPosition: 1
-          [1697610069.134675][7767:7769] CHIP:TOO:    } 
+          [1697610069.134675][7767:7769] CHIP:TOO:    }
 
           On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
@@ -1079,7 +1079,7 @@ tests:
           [1697610593.918693][7384:7384] CHIP:EVL: Dropped 1 event from buffer with priority 1 and event number  0x0000000000000007 due to overflow: event priority_level: 1
           [1697610593.918774][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
           [1697610593.918814][7384:7384] CHIP:EVL: LogEvent event number: 0x0000000000000021 priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x6 Epoch timestamp: 0x0000018B4179F67E
-                            
+
           switch read-event multi-press-complete 1 1
 
           Verify TH receives MultiPressComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 2 on TH chip-tool log and below is the sample log provided for the raspi platform:
@@ -1105,7 +1105,7 @@ tests:
     - label: "Step 6j: Operator operates switch (press briefly)"
       PICS: ""
       verification: |
-          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch. 
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
           On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
@@ -1119,8 +1119,8 @@ tests:
           [1697609895.678800][7384:7384] CHIP:ZCL: SwitchServer: OnInitialPress
           [1697609895.678917][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
           [1697609895.678949][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001D priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x1 Epoch timestamp: 0x0000018B416F4EFE
-                          
-          switch read-event initial-press   1 1  
+
+          switch read-event initial-press   1 1
 
           Verify TH receives InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
@@ -1136,7 +1136,7 @@ tests:
     - label: "Step 6k: Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch. 
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
           On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
@@ -1151,8 +1151,8 @@ tests:
           [1697610020.643356][7384:7384] CHIP:EVL: Dropped 1 event from buffer with priority 1 and event number  0x0000000000000005 due to overflow: event priority_level: 1
           [1697610020.643427][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
           [1697610020.643456][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001E priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x3 Epoch timestamp: 0x0000018B41713723
-                       
-           switch read-event short-release 1 1 
+
+           switch read-event short-release 1 1
 
           Verify TH receives ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
@@ -1170,7 +1170,7 @@ tests:
           briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch. 
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
           On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
@@ -1184,8 +1184,8 @@ tests:
           [1697609895.678800][7384:7384] CHIP:ZCL: SwitchServer: OnInitialPress
           [1697609895.678917][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
           [1697609895.678949][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001D priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x1 Epoch timestamp: 0x0000018B416F4EFE
-                          
-          switch read-event initial-press   1 1 
+
+          switch read-event initial-press   1 1
 
           Verify TH receives InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
@@ -1200,7 +1200,7 @@ tests:
           On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
           echo '{"Name":"MultiPressOngoing","NewPosition":1,"CurrentNumberOfPressesCounted":2}' > /tmp/chip_all_clusters_fifo_<PID>  (PID of DUT)
-                 
+
           DUT generated the MultiPressongoing event with NewPosition set to 1 and CurrentNumberOfPressesCounted set to 2:
 
           [1697611293.571665][7384:7386] CHIP:-: Received payload: "{"Name":"MultiPressOngoing","NewPosition":1,"CurrentNumberOfPressesCounted":2}"
@@ -1229,7 +1229,7 @@ tests:
     - label: "Step 6m: Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch. 
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
           On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
@@ -1244,8 +1244,8 @@ tests:
           [1697610020.643356][7384:7384] CHIP:EVL: Dropped 1 event from buffer with priority 1 and event number  0x0000000000000005 due to overflow: event priority_level: 1
           [1697610020.643427][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
           [1697610020.643456][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001E priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x3 Epoch timestamp: 0x0000018B41713723
-                       
-          switch read-event short-release 1 1   
+
+          switch read-event short-release 1 1
 
           Verify TH receives ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
 
@@ -1263,7 +1263,7 @@ tests:
           briefly)"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch. 
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
           On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
@@ -1277,7 +1277,7 @@ tests:
           [1697609895.678800][7384:7384] CHIP:ZCL: SwitchServer: OnInitialPress
           [1697609895.678917][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
           [1697609895.678949][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001D priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x1 Epoch timestamp: 0x0000018B416F4EFE
-                          
+
           switch read-event  initial-press 1 1
 
           Verify TH receives InitialPress event with NewPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
@@ -1319,7 +1319,7 @@ tests:
     - label: "Step 6o: Operator releases switch"
       PICS: SWTCH.S.F01 && SWTCH.S.F04
       verification: |
-          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch. 
+          Note : Please skip this step if LATCH SWITCH feature is implemented, because a device can support either a latching switch or a momentary switch.
 
           On Raspi platform To trigger the event give the below command by opening an another terminal in DUT (Below is the example command developed in all-clusters-app to generate the event, Vendor Dut should have capability to generate this event)
 
@@ -1334,7 +1334,7 @@ tests:
           [1697610020.643356][7384:7384] CHIP:EVL: Dropped 1 event from buffer with priority 1 and event number  0x0000000000000005 due to overflow: event priority_level: 1
           [1697610020.643427][7384:7384] CHIP:EVL: Copy Event to next buffer with priority 1
           [1697610020.643456][7384:7384] CHIP:EVL: LogEvent event number: 0x000000000000001E priority: 1, endpoint id:  0x1 cluster id: 0x0000_003B event id: 0x3 Epoch timestamp: 0x0000018B41713723
-                       
+
           switch read-event short-release  1 1
 
           Verify TH receives ShortRelease event with PreviousPosition set to 1 on TH chip-tool log and below is the sample log provided for the raspi platform:
@@ -1357,8 +1357,8 @@ tests:
           [1659694592.347850][2530:2538] CHIP:-: Received payload: "{"Name":"MultiPressComplete","PreviousPosition":1,"TotalNumberOfPressesCounted":3}"
           [1659694592.348389][2530:2530] CHIP:DMG: Endpoint 1, Cluster 0x0000_003B update version to ee5e772b
           [1659694592.348481][2530:2530] CHIP:-: The new position when the momentary switch has been pressed in a multi-press sequence:1
-                              
-           switch read-event multi-press-complete 1 1  
+
+           switch read-event multi-press-complete 1 1
 
           Verify TH receives MultiPressonComplete event with PreviousPosition set to 1 and TotalNumberOfPressesCounted set to 3 on TH (chip-tool) log and below is the sample log provided for the raspi platform:
 

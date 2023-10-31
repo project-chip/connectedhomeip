@@ -60,10 +60,10 @@ tests:
           [1698725144.232758][1963:1963] CHIP:DMG:                         Cluster = 0x25,
           [1698725144.232828][1963:1963] CHIP:DMG:                         Attribute = 0x0000_0000,
           [1698725144.232893][1963:1963] CHIP:DMG:                 }
-          [1698725144.232959][1963:1963] CHIP:DMG:                         
+          [1698725144.232959][1963:1963] CHIP:DMG:
           [1698725144.233018][1963:1963] CHIP:DMG:         ],
-          [1698725144.233083][1963:1963] CHIP:DMG:                 
-          [1698725144.233142][1963:1963] CHIP:DMG:         isFabricFiltered = true, 
+          [1698725144.233083][1963:1963] CHIP:DMG:
+          [1698725144.233142][1963:1963] CHIP:DMG:         isFabricFiltered = true,
           [1698725144.233199][1963:1963] CHIP:DMG:         InteractionModelRevision = 11
           [1698725144.233252][1963:1963] CHIP:DMG: },
 
@@ -83,15 +83,15 @@ tests:
           [1698729275.160992][1963:1963] CHIP:DMG:                         Cluster = 0x25,
           [1698729275.161070][1963:1963] CHIP:DMG:                         Attribute = 0x0000_0001,
           [1698729275.161143][1963:1963] CHIP:DMG:                 }
-          [1698729275.161211][1963:1963] CHIP:DMG:                         
+          [1698729275.161211][1963:1963] CHIP:DMG:
           [1698729275.161270][1963:1963] CHIP:DMG:         ],
-          [1698729275.161335][1963:1963] CHIP:DMG:                 
-          [1698729275.161395][1963:1963] CHIP:DMG:         isFabricFiltered = true, 
+          [1698729275.161335][1963:1963] CHIP:DMG:
+          [1698729275.161395][1963:1963] CHIP:DMG:         isFabricFiltered = true,
           [1698729275.161452][1963:1963] CHIP:DMG:         InteractionModelRevision = 11
           [1698729275.161505][1963:1963] CHIP:DMG: },
 
 
-          2. Use the above obtained ActionID to verify the following commands 
+          2. Use the above obtained ActionID to verify the following commands
            ./chip-tool actions instant-action 4097 1 1
       disabled: true
 
@@ -104,8 +104,8 @@ tests:
 
           [1698724321.817293][1963:1963] CHIP:DMG: InvokeRequestMessage =
           [1698724321.817361][1963:1963] CHIP:DMG: {
-          [1698724321.817413][1963:1963] CHIP:DMG:         suppressResponse = false, 
-          [1698724321.817475][1963:1963] CHIP:DMG:         timedRequest = false, 
+          [1698724321.817413][1963:1963] CHIP:DMG:         suppressResponse = false,
+          [1698724321.817475][1963:1963] CHIP:DMG:         timedRequest = false,
           [1698724321.817532][1963:1963] CHIP:DMG:         InvokeRequests =
           [1698724321.817603][1963:1963] CHIP:DMG:         [
           [1698724321.817659][1963:1963] CHIP:DMG:                 CommandDataIB =
@@ -116,15 +116,15 @@ tests:
           [1698724321.818141][1963:1963] CHIP:DMG:                                 ClusterId = 0x25,
           [1698724321.818232][1963:1963] CHIP:DMG:                                 CommandId = 0x0,
           [1698724321.818319][1963:1963] CHIP:DMG:                         },
-          [1698724321.818399][1963:1963] CHIP:DMG:                         
-          [1698724321.818462][1963:1963] CHIP:DMG:                         CommandFields = 
+          [1698724321.818399][1963:1963] CHIP:DMG:
+          [1698724321.818462][1963:1963] CHIP:DMG:                         CommandFields =
           [1698724321.818537][1963:1963] CHIP:DMG:                         {
-          [1698724321.818607][1963:1963] CHIP:DMG:                                 0x0 = 4097, 
+          [1698724321.818607][1963:1963] CHIP:DMG:                                 0x0 = 4097,
           [1698724321.818697][1963:1963] CHIP:DMG:                         },
           [1698724321.818767][1963:1963] CHIP:DMG:                 },
-          [1698724321.818838][1963:1963] CHIP:DMG:                 
+          [1698724321.818838][1963:1963] CHIP:DMG:
           [1698724321.818894][1963:1963] CHIP:DMG:         ],
-          [1698724321.818963][1963:1963] CHIP:DMG:         
+          [1698724321.818963][1963:1963] CHIP:DMG:
           [1698724321.819017][1963:1963] CHIP:DMG:         InteractionModelRevision = 11
           [1698724321.819088][1963:1963] CHIP:DMG: },
       disabled: true
