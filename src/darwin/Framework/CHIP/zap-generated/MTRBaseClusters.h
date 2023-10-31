@@ -15869,16 +15869,16 @@ typedef NS_OPTIONS(uint32_t, MTRRadonConcentrationMeasurementFeature) {
     MTRRadonConcentrationMeasurementFeatureAverageMeasurement MTR_PROVISIONALLY_AVAILABLE = 0x20,
 } MTR_PROVISIONALLY_AVAILABLE;
 
-typedef NS_ENUM(uint8_t, MTRChannelStatus) {
-    MTRChannelStatusSuccess MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRChannelStatusMultipleMatches MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRChannelStatusNoMatches MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
-
 typedef NS_ENUM(uint8_t, MTRChannelLineupInfoType) {
     MTRChannelLineupInfoTypeMSO MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x00,
     MTRChannelLineupInfoTypeMso MTR_DEPRECATED("Please use MTRChannelLineupInfoTypeMSO", ios(16.1, 16.4), macos(13.0, 13.3), watchos(9.1, 9.4), tvos(16.1, 16.4)) = 0x00,
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+
+typedef NS_ENUM(uint8_t, MTRChannelStatus) {
+    MTRChannelStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRChannelStatusMultipleMatches MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRChannelStatusNoMatches MTR_PROVISIONALLY_AVAILABLE = 0x02,
+} MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRChannelFeature) {
     MTRChannelFeatureChannelList MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,

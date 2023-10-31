@@ -32894,6 +32894,14 @@ class Channel(Cluster):
     clusterRevision: 'uint' = None
 
     class Enums:
+        class LineupInfoTypeEnum(MatterIntEnum):
+            kMso = 0x00
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving and unknown
+            # enum value. This specific should never be transmitted.
+            kUnknownEnumValue = 1,
+
         class StatusEnum(MatterIntEnum):
             kSuccess = 0x00
             kMultipleMatches = 0x01
@@ -32903,14 +32911,6 @@ class Channel(Cluster):
             # be used by code to process how it handles receiving and unknown
             # enum value. This specific should never be transmitted.
             kUnknownEnumValue = 3,
-
-        class LineupInfoTypeEnum(MatterIntEnum):
-            kMso = 0x00
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving and unknown
-            # enum value. This specific should never be transmitted.
-            kUnknownEnumValue = 1,
 
     class Bitmaps:
         class Feature(IntFlag):

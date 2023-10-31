@@ -3136,14 +3136,14 @@ server cluster WakeOnLan = 1283 {
 
 /** This cluster provides an interface for controlling the current Channel on a device. */
 server cluster Channel = 1284 {
+  enum LineupInfoTypeEnum : enum8 {
+    kMSO = 0;
+  }
+
   enum StatusEnum : enum8 {
     kSuccess = 0;
     kMultipleMatches = 1;
     kNoMatches = 2;
-  }
-
-  enum LineupInfoTypeEnum : enum8 {
-    kMSO = 0;
   }
 
   bitmap Feature : bitmap32 {
