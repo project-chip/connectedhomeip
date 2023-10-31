@@ -8176,6 +8176,16 @@ struct Type;
 struct DecodableType;
 } // namespace TestEventTrigger
 
+namespace TimeSnapshot {
+struct Type;
+struct DecodableType;
+} // namespace TimeSnapshot
+
+namespace TimeSnapshotResponse {
+struct Type;
+struct DecodableType;
+} // namespace TimeSnapshotResponse
+
 } // namespace Commands
 
 namespace Commands {
@@ -8214,6 +8224,69 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestEventTrigger
+namespace TimeSnapshot {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TimeSnapshot::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TimeSnapshot::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TimeSnapshot
+namespace TimeSnapshotResponse {
+enum class Fields : uint8_t
+{
+    kSystemTimeUs = 0,
+    kUTCTimeUs    = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TimeSnapshotResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    uint64_t systemTimeUs = static_cast<uint64_t>(0);
+    DataModel::Nullable<uint64_t> UTCTimeUs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TimeSnapshotResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    uint64_t systemTimeUs = static_cast<uint64_t>(0);
+    DataModel::Nullable<uint64_t> UTCTimeUs;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TimeSnapshotResponse
 } // namespace Commands
 
 namespace Attributes {

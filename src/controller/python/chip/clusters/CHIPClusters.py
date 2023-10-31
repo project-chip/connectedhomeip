@@ -2397,6 +2397,12 @@ class ChipClusters:
                     "eventTrigger": "int",
                 },
             },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "TimeSnapshot",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000000: {

@@ -4626,6 +4626,15 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("systemTimeUs", indent + 1, value.systemTimeUs));
+    ReturnErrorOnFailure(DataModelLogger::LogValue("UTCTimeUs", indent + 1, value.UTCTimeUs));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const TimeSynchronization::Commands::SetTimeZoneResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -13707,6 +13716,17 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("RetrieveLogsResponse", 1, value);
+        }
+        }
+        break;
+    }
+    case GeneralDiagnostics::Id: {
+        switch (path.mCommandId)
+        {
+        case GeneralDiagnostics::Commands::TimeSnapshotResponse::Id: {
+            GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("TimeSnapshotResponse", 1, value);
         }
         }
         break;

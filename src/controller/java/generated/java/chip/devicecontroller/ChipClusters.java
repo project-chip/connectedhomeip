@@ -6062,7 +6062,22 @@ public class ChipClusters {
       testEventTrigger(chipClusterPtr, callback, enableKey, eventTrigger, timedInvokeTimeoutMs);
     }
 
+    public void timeSnapshot(TimeSnapshotResponseCallback callback) {
+      timeSnapshot(chipClusterPtr, callback, null);
+    }
+
+    public void timeSnapshot(TimeSnapshotResponseCallback callback, int timedInvokeTimeoutMs) {
+      timeSnapshot(chipClusterPtr, callback, timedInvokeTimeoutMs);
+    }
+
     private native void testEventTrigger(long chipClusterPtr, DefaultClusterCallback callback, byte[] enableKey, Long eventTrigger, @Nullable Integer timedInvokeTimeoutMs);
+
+    private native void timeSnapshot(long chipClusterPtr, TimeSnapshotResponseCallback callback, @Nullable Integer timedInvokeTimeoutMs);
+
+    public interface TimeSnapshotResponseCallback {
+      void onSuccess(Long systemTimeUs, @Nullable Long UTCTimeUs);
+      void onError(Exception error);
+    }
 
     public interface NetworkInterfacesAttributeCallback {
       void onSuccess(List<ChipStructs.GeneralDiagnosticsClusterNetworkInterface> value);
