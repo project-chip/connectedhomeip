@@ -90,8 +90,6 @@ public class ChipClusters {
     private Optional<Long> timeoutMillis = Optional.empty();
 
     public BaseChipCluster(long devicePtr, int endpointId) {
-      chipClusterPtr = initWithDevice(devicePtr, endpointId);
-
       this.devicePtr = devicePtr;
       this.endpointId = endpointId;
     }
@@ -110,6 +108,7 @@ public class ChipClusters {
       return timeoutMillis == null ? Optional.empty() : timeoutMillis;
     }
 
+    @Deprecated
     public abstract long initWithDevice(long devicePtr, int endpointId);
 
     protected void readAttribute(
@@ -274,7 +273,7 @@ public class ChipClusters {
     public void onResponse(InvokeElement invokeElement, long successCode) {
       byte[] tlv = invokeElement.getTlvByteArray();
       if (tlv == null) {
-        callback.onError(new ChipClusterException(CHIP_ERROR_UNSUPPORTED_COMMAND));
+        onResponse(null);
         return;
       }
       BaseTLVType value = BaseChipCluster.decodeFromTlv(tlv);
@@ -296,7 +295,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void identify(DefaultClusterCallback callback, Integer identifyTime) {
       identify(callback, identifyTime, 0);
@@ -613,7 +615,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void addGroup(AddGroupResponseCallback callback, Integer groupID, String groupName) {
       addGroup(callback, groupID, groupName, 0);
@@ -1064,7 +1069,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void addScene(AddSceneResponseCallback callback, Integer groupID, Integer sceneID, Integer transitionTime, String sceneName, ArrayList<ChipStructs.ScenesClusterExtensionFieldSet> extensionFieldSets) {
       addScene(callback, groupID, sceneID, transitionTime, sceneName, extensionFieldSets, 0);
@@ -2077,7 +2085,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void off(DefaultClusterCallback callback) {
       off(callback, 0);
@@ -2585,7 +2596,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
@@ -2856,7 +2870,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void moveToLevel(DefaultClusterCallback callback, Integer level, @Nullable Integer transitionTime, Integer optionsMask, Integer optionsOverride) {
       moveToLevel(callback, level, transitionTime, optionsMask, optionsOverride, 0);
@@ -3848,7 +3865,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
@@ -4382,7 +4402,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
@@ -4583,7 +4606,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface DeviceTypeListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.DescriptorClusterDeviceTypeStruct> value);
@@ -4949,7 +4975,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface BindingAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.BindingClusterTargetStruct> value);
@@ -5200,7 +5229,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface AclAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.AccessControlClusterAccessControlEntryStruct> value);
@@ -5588,7 +5620,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void instantAction(DefaultClusterCallback callback, Integer actionID, Optional<Long> invokeID) {
       instantAction(callback, actionID, invokeID, 0);
@@ -6204,7 +6239,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void mfgSpecificPing(DefaultClusterCallback callback) {
       mfgSpecificPing(callback, 0);
@@ -7075,7 +7113,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void queryImage(QueryImageResponseCallback callback, Integer vendorID, Integer productID, Long softwareVersion, ArrayList<Integer> protocolsSupported, Optional<Integer> hardwareVersion, Optional<String> location, Optional<Boolean> requestorCanConsent, Optional<byte[]> metadataForProvider) {
       queryImage(callback, vendorID, productID, softwareVersion, protocolsSupported, hardwareVersion, location, requestorCanConsent, metadataForProvider, 0);
@@ -7459,7 +7500,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void announceOTAProvider(DefaultClusterCallback callback, Long providerNodeID, Integer vendorID, Integer announcementReason, Optional<byte[]> metadataForNode, Integer endpoint) {
       announceOTAProvider(callback, providerNodeID, vendorID, announcementReason, metadataForNode, endpoint, 0);
@@ -7838,7 +7882,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface SupportedLocalesAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<String> value);
@@ -8113,7 +8160,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface SupportedCalendarTypesAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Integer> value);
@@ -8429,7 +8479,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
@@ -8671,7 +8724,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface SourcesAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Integer> value);
@@ -8905,7 +8961,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface WiredAssessedInputVoltageAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Long value);
@@ -10082,7 +10141,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void armFailSafe(ArmFailSafeResponseCallback callback, Integer expiryLengthSeconds, Long breadcrumb) {
       armFailSafe(callback, expiryLengthSeconds, breadcrumb, 0);
@@ -10578,7 +10640,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void scanNetworks(ScanNetworksResponseCallback callback, @Nullable Optional<byte[]> ssid, Optional<Long> breadcrumb) {
       scanNetworks(callback, ssid, breadcrumb, 0);
@@ -11360,7 +11425,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void retrieveLogsRequest(RetrieveLogsResponseCallback callback, Integer intent, Integer requestedProtocol, Optional<String> transferFileDesignator) {
       retrieveLogsRequest(callback, intent, requestedProtocol, transferFileDesignator, 0);
@@ -11625,7 +11693,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void testEventTrigger(DefaultClusterCallback callback, byte[] enableKey, Long eventTrigger) {
       testEventTrigger(callback, enableKey, eventTrigger, 0);
@@ -12157,7 +12228,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void resetWatermarks(DefaultClusterCallback callback) {
       resetWatermarks(callback, 0);
@@ -12495,7 +12569,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void resetCounts(DefaultClusterCallback callback) {
       resetCounts(callback, 0);
@@ -14620,7 +14697,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void resetCounts(DefaultClusterCallback callback) {
       resetCounts(callback, 0);
@@ -15267,7 +15347,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void resetCounts(DefaultClusterCallback callback) {
       resetCounts(callback, 0);
@@ -15758,7 +15841,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void setUTCTime(DefaultClusterCallback callback, Long UTCTime, Integer granularity, Optional<Integer> timeSource) {
       setUTCTime(callback, UTCTime, granularity, timeSource, 0);
@@ -16487,7 +16573,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface ProductAppearanceAttributeCallback extends BaseAttributeCallback {
       void onSuccess(ChipStructs.BridgedDeviceBasicInformationClusterProductAppearanceStruct value);
@@ -17168,7 +17257,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
@@ -17456,7 +17548,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
 
     public void openCommissioningWindow(DefaultClusterCallback callback, Integer commissioningTimeout, byte[] PAKEPasscodeVerifier, Integer discriminator, Long iterations, byte[] salt, int timedInvokeTimeoutMs) {
@@ -17818,7 +17913,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void attestationRequest(AttestationResponseCallback callback, byte[] attestationNonce) {
       attestationRequest(callback, attestationNonce, 0);
@@ -18563,7 +18661,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void keySetWrite(DefaultClusterCallback callback, ChipStructs.GroupKeyManagementClusterGroupKeySetStruct groupKeySet) {
       keySetWrite(callback, groupKeySet, 0);
@@ -19018,7 +19119,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface LabelListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.FixedLabelClusterLabelStruct> value);
@@ -19252,7 +19356,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface LabelListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<ChipStructs.UserLabelClusterLabelStruct> value);
@@ -19498,7 +19605,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
@@ -19699,7 +19809,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
@@ -19900,7 +20013,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
@@ -20101,7 +20217,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
@@ -20331,7 +20450,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void registerClient(RegisterClientResponseCallback callback, Long checkInNodeID, Long monitoredSubject, byte[] key, Optional<byte[]> verificationKey) {
       registerClient(callback, checkInNodeID, monitoredSubject, key, verificationKey, 0);
@@ -20804,7 +20926,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void changeToMode(DefaultClusterCallback callback, Integer newMode) {
       changeToMode(callback, newMode, 0);
@@ -21240,7 +21365,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void changeToMode(ChangeToModeResponseCallback callback, Integer newMode) {
       changeToMode(callback, newMode, 0);
@@ -21635,7 +21763,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void changeToMode(ChangeToModeResponseCallback callback, Integer newMode) {
       changeToMode(callback, newMode, 0);
@@ -22030,7 +22161,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface SpinSpeedsAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<String> value);
@@ -22383,7 +22517,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void changeToMode(ChangeToModeResponseCallback callback, Integer newMode) {
       changeToMode(callback, newMode, 0);
@@ -22778,7 +22915,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void changeToMode(ChangeToModeResponseCallback callback, Integer newMode) {
       changeToMode(callback, newMode, 0);
@@ -23173,7 +23313,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void setTemperature(DefaultClusterCallback callback, Optional<Integer> targetTemperature, Optional<Integer> targetTemperatureLevel) {
       setTemperature(callback, targetTemperature, targetTemperatureLevel, 0);
@@ -23577,7 +23720,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
@@ -23865,7 +24011,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void changeToMode(ChangeToModeResponseCallback callback, Integer newMode) {
       changeToMode(callback, newMode, 0);
@@ -24260,7 +24409,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
@@ -24490,7 +24642,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void selfTestRequest(DefaultClusterCallback callback) {
       selfTestRequest(callback, 0);
@@ -25097,7 +25252,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void reset(DefaultClusterCallback callback, Long alarms) {
       reset(callback, alarms, 0);
@@ -25456,7 +25614,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void pause(OperationalCommandResponseCallback callback) {
       pause(callback, 0);
@@ -25963,7 +26124,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void pause(OperationalCommandResponseCallback callback) {
       pause(callback, 0);
@@ -26470,7 +26634,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void resetCondition(DefaultClusterCallback callback) {
       resetCondition(callback, 0);
@@ -26882,7 +27049,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void resetCondition(DefaultClusterCallback callback) {
       resetCondition(callback, 0);
@@ -27294,7 +27464,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
 
     public void lockDoor(DefaultClusterCallback callback, Optional<byte[]> PINCode, int timedInvokeTimeoutMs) {
@@ -29544,7 +29717,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void upOrOpen(DefaultClusterCallback callback) {
       upOrOpen(callback, 0);
@@ -30562,7 +30738,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void barrierControlGoToPercent(DefaultClusterCallback callback, Integer percentOpen) {
       barrierControlGoToPercent(callback, percentOpen, 0);
@@ -31163,7 +31342,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface MaxPressureAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Integer value);
@@ -32151,7 +32333,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void setpointRaiseLower(DefaultClusterCallback callback, Integer mode, Integer amount) {
       setpointRaiseLower(callback, mode, amount, 0);
@@ -34276,7 +34461,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void step(DefaultClusterCallback callback, Integer direction, Optional<Boolean> wrap, Optional<Boolean> lowestOff) {
       step(callback, direction, wrap, lowestOff, 0);
@@ -34946,7 +35134,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
@@ -35270,7 +35461,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void moveToHue(DefaultClusterCallback callback, Integer hue, Integer direction, Integer transitionTime, Integer optionsMask, Integer optionsOverride) {
       moveToHue(callback, hue, direction, transitionTime, optionsMask, optionsOverride, 0);
@@ -37866,7 +38060,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface IntrinsicBallastFactorAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Integer value);
@@ -38613,7 +38810,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface MeasuredValueAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Integer value);
@@ -38975,7 +39175,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface MeasuredValueAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Integer value);
@@ -39304,7 +39507,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface MeasuredValueAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Integer value);
@@ -39790,7 +39996,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface MeasuredValueAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Integer value);
@@ -40119,7 +40328,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface MeasuredValueAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Integer value);
@@ -40448,7 +40660,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
@@ -41105,7 +41320,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface MeasuredValueAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Float value);
@@ -41645,7 +41863,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface MeasuredValueAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Float value);
@@ -42185,7 +42406,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface MeasuredValueAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Float value);
@@ -42725,7 +42949,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface MeasuredValueAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Float value);
@@ -43265,7 +43492,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface MeasuredValueAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Float value);
@@ -43805,7 +44035,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface MeasuredValueAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Float value);
@@ -44345,7 +44578,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface MeasuredValueAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Float value);
@@ -44885,7 +45121,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface MeasuredValueAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Float value);
@@ -45425,7 +45664,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface MeasuredValueAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Float value);
@@ -45965,7 +46207,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface MeasuredValueAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Float value);
@@ -46505,7 +46750,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
@@ -46735,7 +46983,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void changeChannel(ChangeChannelResponseCallback callback, String match) {
       changeChannel(callback, match, 0);
@@ -47123,7 +47374,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void navigateTarget(NavigateTargetResponseCallback callback, Integer target, Optional<String> data) {
       navigateTarget(callback, target, data, 0);
@@ -47432,7 +47686,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void play(PlaybackResponseCallback callback) {
       play(callback, 0);
@@ -48246,7 +48503,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void selectInput(DefaultClusterCallback callback, Integer index) {
       selectInput(callback, index, 0);
@@ -48589,7 +48849,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void sleep(DefaultClusterCallback callback) {
       sleep(callback, 0);
@@ -48807,7 +49070,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void sendKey(SendKeyResponseCallback callback, Integer keyCode) {
       sendKey(callback, keyCode, 0);
@@ -49043,7 +49309,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void launchContent(LauncherResponseCallback callback, ChipStructs.ContentLauncherClusterContentSearchStruct search, Boolean autoPlay, Optional<String> data) {
       launchContent(callback, search, autoPlay, data, 0);
@@ -49414,7 +49683,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void selectOutput(DefaultClusterCallback callback, Integer index) {
       selectOutput(callback, index, 0);
@@ -49723,7 +49995,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void launchApp(LauncherResponseCallback callback, Optional<ChipStructs.ApplicationLauncherClusterApplicationStruct> application, Optional<byte[]> data) {
       launchApp(callback, application, data, 0);
@@ -50124,7 +50399,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public interface ApplicationAttributeCallback extends BaseAttributeCallback {
       void onSuccess(ChipStructs.ApplicationBasicClusterApplicationStruct value);
@@ -50565,7 +50843,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
 
     public void getSetupPIN(GetSetupPINResponseCallback callback, String tempAccountIdentifier, int timedInvokeTimeoutMs) {
@@ -50834,7 +51115,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void getProfileInfoCommand(DefaultClusterCallback callback) {
       getProfileInfoCommand(callback, 0);
@@ -54889,7 +55173,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void test(DefaultClusterCallback callback) {
       test(callback, 0);
@@ -59602,7 +59889,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void failAtFault(DefaultClusterCallback callback, Integer type, Long id, Long numCallsToSkip, Long numCallsToFail, Boolean takeMutex) {
       failAtFault(callback, type, id, numCallsToSkip, numCallsToFail, takeMutex, 0);
@@ -59869,7 +60159,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 
     public void ping(DefaultClusterCallback callback) {
       ping(callback, 0);

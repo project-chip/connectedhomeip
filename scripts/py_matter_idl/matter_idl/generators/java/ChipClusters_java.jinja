@@ -167,8 +167,6 @@ public class ChipClusters {
     private Optional<Long> timeoutMillis = Optional.empty();
 
     public BaseChipCluster(long devicePtr, int endpointId) {
-      chipClusterPtr = initWithDevice(devicePtr, endpointId);
-
       this.devicePtr = devicePtr;
       this.endpointId = endpointId;
     }
@@ -187,6 +185,7 @@ public class ChipClusters {
       return timeoutMillis == null ? Optional.empty() : timeoutMillis;
     }
 
+    @Deprecated
     public abstract long initWithDevice(long devicePtr, int endpointId);
 
     protected void readAttribute(
@@ -351,7 +350,7 @@ public class ChipClusters {
     public void onResponse(InvokeElement invokeElement, long successCode) {
       byte[] tlv = invokeElement.getTlvByteArray();
       if (tlv == null) {
-        callback.onError(new ChipClusterException(CHIP_ERROR_UNSUPPORTED_COMMAND));
+        onResponse(null);
         return;
       }
       BaseTLVType value = BaseChipCluster.decodeFromTlv(tlv);
@@ -374,7 +373,10 @@ public class ChipClusters {
     }
 
     @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
+    @Deprecated
+    public long initWithDevice(long devicePtr, int endpointId) {
+      return 0L;
+    }
 {% for command in cluster.commands | sort(attribute='code') -%}
 {%- set callbackName = command | javaCommandCallbackName() -%}
 {%- if not command.is_timed_invoke %}
