@@ -251,6 +251,16 @@ enum PublicEventTypes
      * sending messages to other nodes.
      */
     kServerReady,
+
+    /**
+     * Signals the application that device is going to factory reset.
+     */
+    kFactoryReset,
+
+    /**
+     * Signals the application that device is going to reset matter data.
+     */
+    kMatterDataReset,
 };
 
 /**

@@ -81,6 +81,16 @@ void CommonDeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, i
             chip::app::DnssdServer::Instance().StartServer();
         }
         break;
+
+    case DeviceEventType::PublicEventTypes::kFactoryReset: {
+        ESP_LOGI(TAG, "App performing factory reset");
+    }
+    break;
+
+    case DeviceEventType::PublicEventTypes::kMatterDataReset: {
+        ESP_LOGI(TAG, "App performing Matter data reset");
+    }
+    break;
     }
 
     ESP_LOGI(TAG, "Current free heap: %u\n", static_cast<unsigned int>(heap_caps_get_free_size(MALLOC_CAP_8BIT)));

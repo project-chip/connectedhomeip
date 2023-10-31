@@ -72,7 +72,14 @@ private:
 #endif
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
     bool CanFactoryReset(void) override;
+
+    // InitiateFactoryReset erases matter data (chip config, counters, kvs) along with wifi credentials
+    // and complete nvs erase.
     void InitiateFactoryReset(void) override;
+
+    // InitiateMatterDataReset erases matter data only (chip config, counters, kvs namespaces).
+    void InitiateMatterDataReset(void);
+
     CHIP_ERROR MapConfigError(esp_err_t error);
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;
     CHIP_ERROR WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t value) override;
@@ -96,6 +103,7 @@ private:
     // ===== Private members reserved for use by this class only.
 
     static void DoFactoryReset(intptr_t arg);
+    static void DoMatterDataReset(intptr_t arg);
 };
 
 /**
