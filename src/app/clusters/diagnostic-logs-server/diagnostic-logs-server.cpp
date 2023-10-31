@@ -110,7 +110,7 @@ CHIP_ERROR DiagnosticLogsServer::HandleLogRequestForBDXProtocol(Messaging::Excha
     LogProviderDelegate * logProviderDelegate = DiagnosticLogs::GetLogProviderDelegate(endpointId);
 
     VerifyOrReturnError(!(DiagnosticLogs::isLogProviderDelegateNull(logProviderDelegate, endpointId)), CHIP_ERROR_INCORRECT_STATE);
-    
+
     mDiagnosticLogsBDXTransferHandler =  new DiagnosticLogsBDXTransferHandler();
     CHIP_ERROR error = mDiagnosticLogsBDXTransferHandler->InitializeTransfer(
         exchangeCtx, scopedPeerNodeId.GetFabricIndex(), scopedPeerNodeId.GetNodeId(), logProviderDelegate, intent, fileDesignator);
@@ -189,7 +189,7 @@ void DiagnosticLogsServer::HandleLogRequestForResponsePayload(CommandHandler * c
     }
 
     mLogSessionHandle = logProviderDelegate->StartLogCollection(intent);
-    
+
     if (mLogSessionHandle == kInvalidLogSessionHandle)
     {
         response.status = StatusEnum::kNoLogs;

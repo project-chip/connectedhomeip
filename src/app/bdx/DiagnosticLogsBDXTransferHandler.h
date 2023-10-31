@@ -52,9 +52,9 @@ public:
     void Reset();
 
 private:
-    
+
     void SendNextBlock(MutableByteSpan & buffer);
-    
+
     chip::Optional<chip::FabricIndex> mFabricIndex;
     chip::Optional<chip::NodeId> mNodeId;
 

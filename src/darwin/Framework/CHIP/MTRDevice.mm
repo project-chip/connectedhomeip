@@ -1469,7 +1469,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             {
                 [self _startTimerForDownload:timeout];
             }
-            
+
             MTRDiagnosticLogsClusterRetrieveLogsRequestParams * requestParams = [[MTRDiagnosticLogsClusterRetrieveLogsRequestParams alloc] init];
             requestParams.intent = [NSNumber numberWithInteger:type];
             requestParams.requestedProtocol = [NSNumber numberWithUnsignedChar:chip::to_underlying(chip::app::Clusters::DiagnosticLogs::TransferProtocolEnum::kBdx)];
@@ -1480,7 +1480,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                                             if (self->_diagnosticLogsTransferHandler->IsInBDXSession() && error == nil) {
                                                 return;
                                             }
-                                            
+
                                             if ([self _isErrorResponse:response]) {
                                                 if (self->_timerSource) {
                                                     dispatch_source_cancel(self->_timerSource);

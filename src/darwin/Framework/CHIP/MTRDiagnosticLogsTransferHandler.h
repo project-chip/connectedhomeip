@@ -48,7 +48,7 @@ public:
     ~MTRDiagnosticLogsTransferHandler() {};
 
     void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event) override;
-    
+
     void AbortTransfer(chip::bdx::StatusCode reason);
 
     bool IsInBDXSession() { return mInitialized; }
@@ -69,7 +69,7 @@ private:
     CHIP_ERROR OnTransferSessionEnd(chip::bdx::TransferSession::OutputEvent & event);
 
     CHIP_ERROR OnBlockReceived(chip::bdx::TransferSession::OutputEvent & event);
-    
+
     void Reset();
 
     // The fabric index of the node with which the BDX session is established.
@@ -86,7 +86,7 @@ private:
     std::function<void(bool)> mCallback;
 
     bool mInitialized = false;
-    
+
     bool isBlockEOFSent = false;
 
     uint64_t downloadedBytes = 0;

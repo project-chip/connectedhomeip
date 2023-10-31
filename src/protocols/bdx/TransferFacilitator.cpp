@@ -140,7 +140,7 @@ CHIP_ERROR Initiator::InitiateTransfer(System::Layer * layer, TransferRole role,
 void Initiator::ResetTransfer()
 {
     mTransfer.Reset();
-    mSystemLayer = nullptr;   
+    mSystemLayer = nullptr;
     ChipLogProgress(BDX, "Stop polling for messages");
     mStopPolling = true;
 }

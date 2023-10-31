@@ -278,5 +278,5 @@ void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
     LogProvider::getLogProvider().SetEndUserSupportLogFileDesignator(AppOptions::GetEndUserSupportLogFileDesignator());
     LogProvider::getLogProvider().SetNetworkDiagnosticsLogFileDesignator(AppOptions::GetNetworkDiagnosticsLogFileDesignator());
     LogProvider::getLogProvider().SetCrashLogFileDesignator(AppOptions::GetCrashLogFileDesignator());
-    
+
 }

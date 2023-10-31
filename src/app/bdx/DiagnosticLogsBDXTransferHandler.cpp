@@ -64,7 +64,7 @@ CHIP_ERROR DiagnosticLogsBDXTransferHandler::InitializeTransfer(chip::Messaging:
 
     mExchangeCtx = exchangeCtx->GetExchangeMgr()->NewContext(exchangeCtx->GetSessionHandle(), this);
     VerifyOrReturnError(mExchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
-    
+
     mIntent   = intent;
     mDelegate = delegate;
     mFabricIndex.SetValue(fabricIndex);

@@ -35,7 +35,7 @@ constexpr bdx::TransferRole kBdxRole = bdx::TransferRole::kReceiver;
 CHIP_ERROR MTRDiagnosticLogsTransferHandler::PrepareForTransfer(System::Layer * _Nonnull layer, FabricIndex fabricIndex, NodeId nodeId)
 {
     assertChipStackLockedByCurrentThread();
-    
+
     ReturnErrorOnFailure(ConfigureState(fabricIndex, nodeId));
 
     BitFlags<bdx::TransferControlFlags> flags(bdx::TransferControlFlags::kReceiverDrive);
@@ -199,7 +199,7 @@ void MTRDiagnosticLogsTransferHandler::HandleTransferSessionOutput(TransferSessi
             // Need to call OnTransferSessionEnd(event). Need to fix this and remove isBlockEOFSent.
             break;
     case TransferSession::OutputEventType::kMsgToSend:
-        err = OnMessageToSend(event);      
+        err = OnMessageToSend(event);
         if (event.msgTypeData.HasMessageType(MessageType::BlockAckEOF))
         {
             // TODO: This is a hack for determinin that the Ack EOF is sent before cleaning up.
