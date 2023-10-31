@@ -3258,7 +3258,7 @@
           AudioOutput:
               - OutputTypeEnum
           ApplicationLauncher:
-              - ApplicationLauncherStatusEnum
+              - StatusEnum
           ApplicationBasic:
               - ApplicationStatusEnum
           TestCluster:
@@ -4137,7 +4137,7 @@
                   - Internal
                   - Other
           ApplicationLauncher:
-              ApplicationLauncherStatusEnum:
+              StatusEnum:
                   - Success
                   - AppNotAvailable
                   - SystemBusy
