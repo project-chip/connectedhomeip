@@ -55,7 +55,7 @@ CHIP_ERROR StatPeakHandler(int argc, char ** argv)
     }
 
 #if defined(CHIP_CRYPTO_MBEDTLS) && defined(MBEDTLS_MEMORY_DEBUG)
-    size_t maxUsed = 0;
+    size_t maxUsed   = 0;
     size_t maxBlocks = 0;
 
     mbedtls_memory_buffer_alloc_max_get(&maxUsed, &maxBlocks);
