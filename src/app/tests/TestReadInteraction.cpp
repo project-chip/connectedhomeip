@@ -1742,7 +1742,6 @@ void TestReadInteraction::TestICDProcessSubscribeRequestSupMinInterval(nlTestSui
         NL_TEST_ASSERT(apSuite, minInterval == kMinInterval);
         NL_TEST_ASSERT(apSuite, maxInterval == (2 * idleModeDuration));
 
-
         printf("---------------------------- maxInterval : %d \n", maxInterval);
         printf("---------------------------- idleModeDuration : %d \n", idleModeDuration);
     }
