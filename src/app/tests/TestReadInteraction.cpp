@@ -1687,8 +1687,8 @@ void TestReadInteraction::TestICDProcessSubscribeRequestSupMinInterval(nlTestSui
     err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    uint16_t kMinInterval        = 3;
-    uint16_t kMaxIntervalCeiling = 5;
+    uint16_t kMinInterval        = 305; // Default IdleModeDuration is 300
+    uint16_t kMaxIntervalCeiling = 605;
 
     Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(nullptr, false);
 
@@ -1741,6 +1741,10 @@ void TestReadInteraction::TestICDProcessSubscribeRequestSupMinInterval(nlTestSui
 
         NL_TEST_ASSERT(apSuite, minInterval == kMinInterval);
         NL_TEST_ASSERT(apSuite, maxInterval == (2 * idleModeDuration));
+
+
+        printf("---------------------------- maxInterval : %d \n", maxInterval);
+        printf("---------------------------- idleModeDuration : %d \n", idleModeDuration);
     }
     engine->Shutdown();
 
@@ -1837,8 +1841,8 @@ void TestReadInteraction::TestICDProcessSubscribeRequestInvalidIdleModeDuration(
     err           = engine->Init(&ctx.GetExchangeManager(), &ctx.GetFabricTable(), app::reporting::GetDefaultReportScheduler());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    uint16_t kMinInterval        = 3;
-    uint16_t kMaxIntervalCeiling = 3;
+    uint16_t kMinInterval        = 400;
+    uint16_t kMaxIntervalCeiling = 400;
 
     Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(nullptr, false);
 
@@ -2080,9 +2084,13 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
         NL_TEST_ASSERT(apSuite, delegate.mGotReport);
         NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
 
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        delegate.mpReadHandler->GetReportingIntervals(minInterval, maxInterval);
+
         // Test empty report
         // Advance monotonic timestamp for min interval to elapse
-        gMockClock.AdvanceMonotonic(System::Clock::Seconds16(readPrepareParams.mMaxIntervalCeilingSeconds));
+        gMockClock.AdvanceMonotonic(System::Clock::Seconds16(maxInterval));
         ctx.GetIOContext().DriveIO();
 
         NL_TEST_ASSERT(apSuite, engine->GetReportingEngine().IsRunScheduled());
@@ -4969,9 +4977,9 @@ const nlTest sTests[] =
         can change the requested MaxInterval during the subscription response / request process
         https://github.com/project-chip/connectedhomeip/issues/28419
     */
-#if CHIP_CONFIG_ENABLE_ICD_SERVER != 1
+// #if CHIP_CONFIG_ENABLE_ICD_SERVER != 1
     NL_TEST_DEF("TestSubscribeUrgentWildcardEvent", chip::app::TestReadInteraction::TestSubscribeUrgentWildcardEvent),
-#endif
+// #endif
     NL_TEST_DEF("TestSubscribeWildcard", chip::app::TestReadInteraction::TestSubscribeWildcard),
     NL_TEST_DEF("TestSubscribePartialOverlap", chip::app::TestReadInteraction::TestSubscribePartialOverlap),
     NL_TEST_DEF("TestSubscribeSetDirtyFullyOverlap", chip::app::TestReadInteraction::TestSubscribeSetDirtyFullyOverlap),
