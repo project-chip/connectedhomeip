@@ -31,15 +31,15 @@ namespace app {
 namespace Clusters {
 namespace DiagnosticLogs {
 /**
- * An implementation of the handler than initiates a BDX transfer as a Sender using the synchronous Sender Drive
+ * The BDX transfer handler than initiates a BDX transfer session as a Sender using the synchronous Sender Drive
  * transfer mode. It gets the chunks of the log from the accessory and sends the block accross to the receiver until
  * all the blocks have been transferred and the accessory reports that end of file is reached.
  */
 class DiagnosticLogsBDXTransferHandler : public chip::bdx::Initiator
 {
 public:
-    DiagnosticLogsBDXTransferHandler() {}
-    ~DiagnosticLogsBDXTransferHandler() {}
+    DiagnosticLogsBDXTransferHandler() {};
+    ~DiagnosticLogsBDXTransferHandler() {};
 
     CHIP_ERROR Init();
 
@@ -52,6 +52,9 @@ public:
     void Reset();
 
 private:
+    
+    void SendNextBlock(MutableByteSpan & buffer);
+    
     chip::Optional<chip::FabricIndex> mFabricIndex;
     chip::Optional<chip::NodeId> mNodeId;
 
@@ -66,8 +69,6 @@ private:
     LogProviderDelegate * mDelegate;
 
     IntentEnum mIntent;
-
-    char mFileDesignator[chip::bdx::kMaxFileDesignatorLen];
 };
 
 } // namespace DiagnosticLogs

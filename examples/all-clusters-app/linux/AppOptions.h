@@ -27,6 +27,9 @@ class AppOptions
 public:
     static chip::ArgParser::OptionSet * GetOptions();
     static chip::Credentials::DeviceAttestationCredentialsProvider * GetDACProvider();
+    static char * GetEndUserSupportLogFileDesignator();
+    static char * GetNetworkDiagnosticsLogFileDesignator();
+    static char * GetCrashLogFileDesignator();
 
 private:
     static bool HandleOptions(const char * program, chip::ArgParser::OptionSet * options, int identifier, const char * name,

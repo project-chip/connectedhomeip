@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ using chip::Protocols::InteractionModel::Status;
 static constexpr size_t kDiagnosticLogsLogProviderDelegateTableSize =
     EMBER_AF_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 static_assert(kDiagnosticLogsLogProviderDelegateTableSize < kEmberInvalidEndpointIndex,
-              "DiagnosticLogs LogProviderDelegate table size error");
+              "DiagnosticLogs: log provider delegate table size error");
 
 namespace chip {
 namespace app {
@@ -57,7 +57,7 @@ bool isLogProviderDelegateNull(LogProviderDelegate * logProviderDelegate, Endpoi
 {
     if (logProviderDelegate == nullptr)
     {
-        ChipLogProgress(Zcl, "Diagnostic logs has no LogProviderDelegate set for endpoint:%u", endpoint);
+        ChipLogProgress(Zcl, "Diagnosticlogs: no log provider delegate set for endpoint:%u", endpoint);
         return true;
     }
     return false;
@@ -74,7 +74,6 @@ void DiagnosticLogsServer::SetDefaultLogProviderDelegate(EndpointId endpoint, Lo
 {
     uint16_t ep =
         emberAfGetClusterServerEndpointIndex(endpoint, DiagnosticLogs::Id, EMBER_AF_DIAGNOSTIC_LOGS_CLUSTER_SERVER_ENDPOINT_COUNT);
-    // if endpoint is found
     if (ep < kDiagnosticLogsLogProviderDelegateTableSize)
     {
         gLogProviderDelegateTable[ep] = logProviderDelegate;
@@ -101,23 +100,6 @@ bool DiagnosticLogsServer::HasValidFileDesignator(CharSpan transferFileDesignato
 CHIP_ERROR DiagnosticLogsServer::HandleLogRequestForBDXProtocol(Messaging::ExchangeContext * exchangeCtx, EndpointId endpointId,
                                                                 IntentEnum intent, CharSpan fileDesignator)
 {
-    // if bdx is not supported and logs fit return in log content. if node doesn't support bdx have a compile time guard for the BDX
-    // code a) Create a handler for BDX. we need to get the exchange mgr from the command handler and create a new exchange context
-    // with the LogProviderDelegate pointing to the handler for BDX and send Init. b) when we get sendaccept send a response (how to
-    // send a delayed response save the command object). hold on to the commandhandler/obj and call the setstatus/addrepsonse. no
-    // send accept -> return in log content - how muchever fits send it. If a failure StatusReport is received in response to the
-    // SendInit message, the Node SHALL send a RetrieveLogsResponse command with a Status of Denied. where the Node is able to fit
-    // the entirety of the requested logs within the LogContent field, the Status field of the RetrieveLogsResponse SHALL be set to
-    // Exhausted
-
-    // how to send a delayed response save the command object) - Handle object in  CommandHandler. use that. set i am going to
-    // respond to you and continue. b) register with/ask the accessory for the blocks, specify the size of the blocks based on BDX
-    // negotiated block size - can accessory not support the block size? report an error -> send no logs in completion where do we
-    // define this api? this needs to be supported by accessories like doorlock etc. Seems like we would need a
-    // diagnosticlogsLogProviderDelegate here. c) When block is received, build up the block with incremented block number and send
-    // it across. d) request the next block once we receive a block ack. e) Send the next block until accessory says its sending the
-    // last block f) Send block eof g) Wait for block EOF ack and tear down the BDX stuff. h) any errors occur or bdx timeouts ->
-    // tear down the BDX stuff.
 
     VerifyOrReturnError(exchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -128,8 +110,9 @@ CHIP_ERROR DiagnosticLogsServer::HandleLogRequestForBDXProtocol(Messaging::Excha
     LogProviderDelegate * logProviderDelegate = DiagnosticLogs::GetLogProviderDelegate(endpointId);
 
     VerifyOrReturnError(!(DiagnosticLogs::isLogProviderDelegateNull(logProviderDelegate, endpointId)), CHIP_ERROR_INCORRECT_STATE);
-
-    CHIP_ERROR error = mDiagnosticLogsBDXTransferHandler.InitializeTransfer(
+    
+    mDiagnosticLogsBDXTransferHandler =  new DiagnosticLogsBDXTransferHandler();
+    CHIP_ERROR error = mDiagnosticLogsBDXTransferHandler->InitializeTransfer(
         exchangeCtx, scopedPeerNodeId.GetFabricIndex(), scopedPeerNodeId.GetNodeId(), logProviderDelegate, intent, fileDesignator);
     return error;
 }
@@ -143,7 +126,7 @@ void DiagnosticLogsServer::HandleBDXResponse(CHIP_ERROR error)
 
     if (commandHandle == nullptr)
     {
-        ChipLogError(Controller, "DiagnosticLogsServer: Unable to handle BDX response. commandHandler is null");
+        ChipLogError(Zcl, "HandleBDXResponse - commandHandler is null");
         return;
     }
 
@@ -155,10 +138,7 @@ void DiagnosticLogsServer::HandleBDXResponse(CHIP_ERROR error)
     }
     else
     {
-        // Fallback on the response payload log request
-        HandleLogRequestForResponsePayload(commandHandle, mRequestPath, mIntent);
-        mDiagnosticLogsBDXTransferHandler.Reset();
-        mAsyncCommandHandle.Release();
+       SendErrorResponseAndReset(commandHandle, mRequestPath, StatusEnum::kNoLogs);
     }
 }
 
@@ -166,6 +146,18 @@ void DiagnosticLogsServer::SetAsyncCommandHandleAndPath(CommandHandler * command
 {
     mAsyncCommandHandle = CommandHandler::Handle(commandObj);
     mRequestPath        = commandPath;
+}
+
+void DiagnosticLogsServer::SendErrorResponseAndReset(chip::app::CommandHandler * commandHandler, chip::app::ConcreteCommandPath path, StatusEnum status)
+{
+    Commands::RetrieveLogsResponse::Type response;
+    if (commandHandler != nullptr)
+    {
+        response.status = status;
+        commandHandler->AddResponse(path, response);
+    }
+    //mDiagnosticLogsBDXTransferHandler->Reset();
+    //delete(mDiagnosticLogsBDXTransferHandler);
 }
 
 #endif
@@ -190,13 +182,20 @@ void DiagnosticLogsServer::HandleLogRequestForResponsePayload(CommandHandler * c
 
     if (!buffer.Alloc(kLogContentMaxSize))
     {
-        ChipLogError(BDX, "buffer not allocated");
+        ChipLogError(Zcl, "buffer not allocated");
         response.status = StatusEnum::kNoLogs;
         commandHandler->AddResponse(path, response);
         return;
     }
 
     mLogSessionHandle = logProviderDelegate->StartLogCollection(intent);
+    
+    if (mLogSessionHandle == kInvalidLogSessionHandle)
+    {
+        response.status = StatusEnum::kNoLogs;
+        commandHandler->AddResponse(path, response);
+        return;
+    }
 
     MutableByteSpan mutableBuffer;
 
@@ -252,12 +251,12 @@ static void HandleRetrieveLogRequest(CommandHandler * commandObj, const Concrete
         if (!transferFileDesignator.HasValue() ||
             !DiagnosticLogsServer::Instance().HasValidFileDesignator(transferFileDesignator.Value()))
         {
+            ChipLogError(Zcl, "HandleRetrieveLogRequest - fileDesignator not valid for BDX protocol");
             response.status = StatusEnum::kNoLogs;
             commandObj->AddResponse(commandPath, response);
             return;
         }
 
-        // if log fits just send it.
         if (DiagnosticLogsServer::Instance().IsBDXProtocolRequested(protocol))
         {
             CHIP_ERROR err = DiagnosticLogsServer::Instance().HandleLogRequestForBDXProtocol(
@@ -289,7 +288,4 @@ bool emberAfDiagnosticLogsClusterRetrieveLogsRequestCallback(CommandHandler * co
     return true;
 }
 
-void MatterDiagnosticLogsPluginServerInitCallback()
-{
-    // Nothing to do, the server init routine will be done in Instance::Init()
-}
+void MatterDiagnosticLogsPluginServerInitCallback() {}

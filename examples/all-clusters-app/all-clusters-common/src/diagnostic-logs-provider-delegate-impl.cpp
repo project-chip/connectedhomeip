@@ -35,17 +35,14 @@ LogSessionHandle LogProvider::StartLogCollection(IntentEnum logType)
 
     // Open the file of type
     const char * fileName = GetLogFilePath(logType);
-    ChipLogError(BDX, "get file name %s", fileName);
     if (fileName != nullptr)
     {
-        //
-        /*std::ifstream mFileStream(fileName, std::ifstream::in);
-        //mFileStream.open(fileName, std::ifstream::in);
+        mFileStream.open(fileName, std::ios_base::binary | std::ios_base::in);
         if (!mFileStream.good())
         {
             ChipLogError(BDX, "Failed to open the log file");
             return kInvalidLogSessionHandle;
-        }*/
+        }
         sLogSessionHandle++;
         mLogSessionHandle = sLogSessionHandle;
         return mLogSessionHandle;
@@ -63,39 +60,34 @@ uint64_t LogProvider::GetNextChunk(LogSessionHandle logSessionHandle, chip::Muta
         return kChunkSizeZero;
     }
 
-    const char * fd = "/tmp/bdxlogs.txt";
-
-    std::ifstream logFile(fd, std::ifstream::in);
-    if (!logFile.good())
+    if (!mFileStream.is_open())
     {
-        ChipLogError(BDX, "Failed to open the log file");
+        ChipLogError(BDX, "File is not open");
         return kChunkSizeZero;
     }
 
-    logFile.seekg(static_cast<long long>(mTotalNumberOfBytesConsumed));
-    logFile.read(reinterpret_cast<char *>(outBuffer.data()), kLogContentMaxSize);
+    mFileStream.seekg(static_cast<long long>(mTotalNumberOfBytesConsumed));
+    mFileStream.read(reinterpret_cast<char *>(outBuffer.data()), kLogContentMaxSize);
 
-    if (!(logFile.good() || logFile.eof()))
+    if (!(mFileStream.good() || mFileStream.eof()))
     {
         ChipLogError(BDX, "Failed to read the log file");
-        logFile.close();
+        mFileStream.close();
         return kChunkSizeZero;
     }
 
-    outIsEOF           = (logFile.peek() == EOF);
-    uint64_t bytesRead = static_cast<uint64_t>(logFile.gcount());
+    uint64_t bytesRead = static_cast<uint64_t>(mFileStream.gcount());
+    outIsEOF           = (mFileStream.peek() == EOF);
 
-    ChipLogError(BDX, "GetNextChunk bytesRead %llu outIsEOF %d", bytesRead, outIsEOF);
     mTotalNumberOfBytesConsumed += bytesRead;
-    logFile.close();
     return bytesRead;
 }
 
 void LogProvider::EndLogCollection(LogSessionHandle logSessionHandle)
 {
-    if (logSessionHandle == mLogSessionHandle)
+    if (logSessionHandle == mLogSessionHandle && mFileStream.is_open())
     {
-        // logFile.close();
+        mFileStream.close();
     }
 }
 
@@ -110,7 +102,6 @@ uint64_t LogProvider::GetTotalNumberOfBytesConsumed(LogSessionHandle logSessionH
 
 const char * LogProvider::GetLogFilePath(IntentEnum logType)
 {
-    ChipLogError(BDX, "GetLogFilePath %hu", logType);
     switch (logType)
     {
     case IntentEnum::kEndUserSupport:
@@ -126,7 +117,6 @@ const char * LogProvider::GetLogFilePath(IntentEnum logType)
 
 void LogProvider::SetEndUserSupportLogFileDesignator(const char * logFileName)
 {
-    ChipLogError(BDX, "SetEndUserSupportLogFileDesignator %s", logFileName);
     strncpy(mEndUserSupportLogFileDesignator, logFileName, strlen(logFileName));
 }
 

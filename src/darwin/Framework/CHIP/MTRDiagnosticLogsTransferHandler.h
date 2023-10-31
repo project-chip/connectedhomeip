@@ -45,13 +45,13 @@ public:
         mCallback = callback;
     }
 
-    ~MTRDiagnosticLogsTransferHandler();
+    ~MTRDiagnosticLogsTransferHandler() {};
 
     void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event) override;
+    
+    void AbortTransfer(chip::bdx::StatusCode reason);
 
-    void Reset();
-
-    bool IsInBDXSession() { return mIsInBDXSession; }
+    bool IsInBDXSession() { return mInitialized; }
 
 protected:
     CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * _Nonnull ec, const chip::PayloadHeader & payloadHeader,
@@ -69,9 +69,8 @@ private:
     CHIP_ERROR OnTransferSessionEnd(chip::bdx::TransferSession::OutputEvent & event);
 
     CHIP_ERROR OnBlockReceived(chip::bdx::TransferSession::OutputEvent & event);
-
-    // CHIP_ERROR  OnUnsolicitedMessageReceived(
-    // const chip::PayloadHeader & payloadHeader, chip::Messaging::ExchangeDelegate * _Nonnull & newDelegate) override;
+    
+    void Reset();
 
     // The fabric index of the node with which the BDX session is established.
     chip::Optional<chip::FabricIndex> mFabricIndex;
@@ -86,8 +85,9 @@ private:
     NSFileHandle * _Nullable mFileHandle;
     std::function<void(bool)> mCallback;
 
-    bool mIsInBDXSession = false;
+    bool mInitialized = false;
+    
+    bool isBlockEOFSent = false;
 
     uint64_t downloadedBytes = 0;
-    uint64_t totalFileBytes = 0;
 };

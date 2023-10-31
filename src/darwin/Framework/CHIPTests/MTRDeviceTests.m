@@ -38,7 +38,7 @@
 #import <XCTest/XCTest.h>
 
 static const uint16_t kPairingTimeoutInSeconds = 10;
-static const uint16_t kDownloadLogTimeoutInSeconds = 1000;
+static const uint16_t kDownloadLogTimeoutInSeconds = 70;
 static const uint16_t kTimeoutInSeconds = 3;
 static const uint64_t kDeviceId = 0x12344321;
 static NSString * kOnboardingPayload = @"MT:-24J0AFN00KA0648G00";
@@ -276,7 +276,7 @@ static BOOL sNeedsStackShutdown = YES;
     // just exists to make the setup not look like it's happening inside other
     // tests.
 }
-/*
+
 - (void)test001_ReadAttribute
 {
     XCTestExpectation * expectation =
@@ -2696,13 +2696,13 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     // Wait for report
     [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
-}*/
+}
 
-- (void)test901_DownloadLogTypeEndUserSupport
+- (void)test901_DownloadEndUserSupportLog_NoTimeout
 {
     MTRDeviceController * controller = sController;
     XCTAssertNotNil(controller);
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Log Transfer Complete"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"End User Support Log Transfer Complete"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -2710,6 +2710,59 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
         MTRDevice * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:controller];
         XCTAssertNotNil(device);
         [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:0 queue:queue completion:^(NSURL * _Nullable logResult, NSError * error) {
+            XCTAssertNil(error);
+            XCTAssertNotNil(logResult);
+
+            NSError * attributesError = nil;
+            NSDictionary * fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[logResult path] error:&attributesError];
+
+            size_t fileSize = [fileAttributes fileSize];
+            XCTAssertTrue(fileSize > 0);
+            NSLog(@"test901_DownloadEndUserSupportLog_NoTimeout expectation fulfill");
+            [expectation fulfill];
+        }];
+    });
+    [self waitForExpectations:[NSArray arrayWithObject:expectation] timeout:kDownloadLogTimeoutInSeconds];
+}
+
+- (void)test902_DownloadNetworkDiagnosticsLog_NoTimeout
+{
+    MTRDeviceController * controller = sController;
+    XCTAssertNotNil(controller);
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Network Diagnostics Log Transfer Complete"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    dispatch_async(queue, ^{
+        MTRDevice * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:controller];
+        XCTAssertNotNil(device);
+        [device downloadLogOfType:MTRDiagnosticLogTypeNetworkDiagnostics timeout:0 queue:queue completion:^(NSURL * _Nullable logResult, NSError * error) {
+            XCTAssertNil(error);
+            XCTAssertNotNil(logResult);
+
+            NSError * attributesError = nil;
+            NSDictionary * fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:[logResult path] error:&attributesError];
+
+            size_t fileSize = [fileAttributes fileSize];
+            XCTAssertTrue(fileSize > 0);
+            [expectation fulfill];
+        }];
+    });
+    [self waitForExpectations:[NSArray arrayWithObject:expectation] timeout:kDownloadLogTimeoutInSeconds];
+}
+
+- (void)test903_DownloadCrashLog_NoTimeout
+{
+    MTRDeviceController * controller = sController;
+    XCTAssertNotNil(controller);
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Crash Log Transfer Complete"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    dispatch_async(queue, ^{
+        MTRDevice * device = [MTRDevice deviceWithNodeID:@(kDeviceId) controller:controller];
+        XCTAssertNotNil(device);
+        [device downloadLogOfType:MTRDiagnosticLogTypeCrash timeout:0 queue:queue completion:^(NSURL * _Nullable logResult, NSError * error) {
             XCTAssertNil(error);
             XCTAssertNotNil(logResult);
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2023 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -70,13 +70,15 @@ public:
     bool HasValidFileDesignator(chip::CharSpan transferFileDesignator);
 
     bool IsBDXProtocolRequested(TransferProtocolEnum requestedProtocol);
+    
+    void SendErrorResponseAndReset(chip::app::CommandHandler * commandHandler, chip::app::ConcreteCommandPath path, StatusEnum status);
 
 #endif
 
 private:
 #if CHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER
 
-    DiagnosticLogsBDXTransferHandler mDiagnosticLogsBDXTransferHandler;
+    DiagnosticLogsBDXTransferHandler * mDiagnosticLogsBDXTransferHandler;
 
 #endif
 
@@ -84,10 +86,8 @@ private:
 
     chip::app::CommandHandler::Handle mAsyncCommandHandle;
     chip::app::ConcreteCommandPath mRequestPath = chip::app::ConcreteCommandPath(0, 0, 0);
-    ;
     IntentEnum mIntent;
 
-    // Instance
     static DiagnosticLogsServer sInstance;
 };
 

@@ -52,9 +52,9 @@ public:
 
     void SetCrashLogFileDesignator(const char * logFileName);
 
-    LogProvider() = default;
+    LogProvider() { };
 
-    ~LogProvider() = default;
+    ~LogProvider() { };
 
     static inline LogProvider & getLogProvider() { return sInstance; }
 
@@ -65,7 +65,7 @@ private:
     char mNetworkDiagnosticsLogFileDesignator[kLogFileDesignatorMaxLen];
     char mCrashLogFileDesignator[kLogFileDesignatorMaxLen];
 
-    // std::ifstream mFileStream;
+    std::ifstream mFileStream;
 
     LogSessionHandle mLogSessionHandle;
 

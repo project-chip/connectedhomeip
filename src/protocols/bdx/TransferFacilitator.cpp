@@ -68,7 +68,11 @@ void TransferFacilitator::OnResponseTimeout(Messaging::ExchangeContext * ec)
 void TransferFacilitator::PollTimerHandler(chip::System::Layer * systemLayer, void * appState)
 {
     VerifyOrReturn(appState != nullptr);
-    static_cast<TransferFacilitator *>(appState)->PollForOutput();
+    VerifyOrReturn(systemLayer != nullptr);
+    if (appState != nullptr)
+    {
+        static_cast<TransferFacilitator *>(appState)->PollForOutput();
+    }
 }
 
 void TransferFacilitator::PollForOutput()
@@ -114,6 +118,7 @@ CHIP_ERROR Responder::PrepareForTransfer(System::Layer * layer, TransferRole rol
 void Responder::ResetTransfer()
 {
     mTransfer.Reset();
+    mSystemLayer = nullptr;
     ChipLogProgress(BDX, "Stop polling for messages");
     mStopPolling = true;
 }
@@ -135,6 +140,7 @@ CHIP_ERROR Initiator::InitiateTransfer(System::Layer * layer, TransferRole role,
 void Initiator::ResetTransfer()
 {
     mTransfer.Reset();
+    mSystemLayer = nullptr;   
     ChipLogProgress(BDX, "Stop polling for messages");
     mStopPolling = true;
 }

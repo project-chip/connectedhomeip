@@ -215,8 +215,8 @@ typedef NS_ENUM(NSInteger, MTRDiagnosticLogType) {
 /**
  * Download log of the desired type from the device.
  *
- * Note: The consumer of this API should move the file that the NSURL in the MTRDiagnosticLogResult points to
- * or open it for reading before the completion handler returns. Otherwise, the file will be deleted, and the data will be lost.
+ * Note: The consumer of this API should move the file that the logResult points to or open it for reading before the
+ * completion handler returns. Otherwise, the file will be deleted, and the data will be lost.
  *
  * @param type       The type of log being requested. This should correspond to a value in the enum MTRDiagnosticLogType.
  * @param timeout    The timeout for getting the log. If the timeout expires, completion will be called with whatever
@@ -224,7 +224,8 @@ typedef NS_ENUM(NSInteger, MTRDiagnosticLogType) {
  *                   If the timeout is set to 0, the request will not expire and completion will not be called until
  *                   the log is fully retrieved or an error occurs.
  * @param queue      The queue on which completion will be called.
- * @param completion The completion that will be called to pass in the URL for the requested log.
+ * @param completion The completion that will be called to return the URL of the requested log if successful. Otherwise
+ *                   returns an error.
  */
 - (void)downloadLogOfType:(MTRDiagnosticLogType)type
                   timeout:(NSTimeInterval)timeout

@@ -391,7 +391,7 @@ CHIP_ERROR TransferSession::PrepareBlockAck()
         mState            = TransferState::kTransferDone;
         mAwaitingResponse = false;
     }
-
+    ChipLogError(BDX, "sending block ack %hhu", msgType);
     PrepareOutgoingMessageEvent(msgType, mPendingOutput, mMsgTypeData);
 
     return CHIP_NO_ERROR;

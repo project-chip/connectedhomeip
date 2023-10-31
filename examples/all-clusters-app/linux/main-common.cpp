@@ -17,6 +17,7 @@
  */
 
 #include "AllClustersCommandDelegate.h"
+#include "AppOptions.h"
 #include "WindowCoveringManager.h"
 #include "air-quality-instance.h"
 #include "diagnostic-logs-provider-delegate-impl.h"
@@ -274,4 +275,8 @@ void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
 {
     ChipLogProgress(NotSpecified, "SetDefaultLogProviderDelegate");
     DiagnosticLogsServer::Instance().SetDefaultLogProviderDelegate(endpoint, &LogProvider::getLogProvider());
+    LogProvider::getLogProvider().SetEndUserSupportLogFileDesignator(AppOptions::GetEndUserSupportLogFileDesignator());
+    LogProvider::getLogProvider().SetNetworkDiagnosticsLogFileDesignator(AppOptions::GetNetworkDiagnosticsLogFileDesignator());
+    LogProvider::getLogProvider().SetCrashLogFileDesignator(AppOptions::GetCrashLogFileDesignator());
+    
 }
