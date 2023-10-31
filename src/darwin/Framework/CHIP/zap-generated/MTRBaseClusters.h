@@ -14230,8 +14230,8 @@ typedef NS_ENUM(uint8_t, MTRAdministratorCommissioningStatusCode) {
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_OPTIONS(uint32_t, MTRAdministratorCommissioningFeature) {
-    MTRAdministratorCommissioningFeatureBasic MTR_PROVISIONALLY_AVAILABLE = 0x1,
-} MTR_PROVISIONALLY_AVAILABLE;
+    MTRAdministratorCommissioningFeatureBasic MTR_NEWLY_AVAILABLE = 0x1,
+} MTR_NEWLY_AVAILABLE;
 
 typedef NS_ENUM(uint8_t, MTROperationalCredentialsCertificateChainType) {
     MTROperationalCredentialsCertificateChainTypeDACCertificate MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4)) = 0x01,
