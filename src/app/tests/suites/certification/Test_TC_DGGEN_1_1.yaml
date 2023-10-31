@@ -169,12 +169,12 @@ tests:
       response:
           constraints:
               type: list
-              contains: [0]
+              contains: [0, 1]
 
     - label: "Step 7: TH reads GeneratedCommandList from DUT"
       command: "readAttribute"
       attribute: "GeneratedCommandList"
       response:
-          value: []
+          value: [2]
           constraints:
               type: list
