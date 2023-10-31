@@ -1485,11 +1485,12 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @brief The maximum number of clusters per scene, defaults to 3 for a typical usecase (onOff + level control + color control
- * cluster). Needs to be changed in case a greater number of clusters is chosen.
+ * @brief The maximum number of clusters per scene, we recommend using 3 for a typical use case (onOff + level control + color
+ * control cluster). Needs to be changed in case a greater number of clusters is chosen. Now set to 4 to allow for the addition of
+ * the mode select cluster.
  */
 #ifndef CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE
-#define CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE 3
+#define CHIP_CONFIG_SCENES_MAX_CLUSTERS_PER_SCENE 4
 #endif
 
 /**
