@@ -798,56 +798,34 @@ static void EndpointCleanup(BluezEndpoint * apEndpoint)
 {
     if (apEndpoint != nullptr)
     {
-        if (apEndpoint->mpOwningName != nullptr)
-        {
-            g_free(apEndpoint->mpOwningName);
-            apEndpoint->mpOwningName = nullptr;
-        }
-        if (apEndpoint->mpAdapterName != nullptr)
-        {
-            g_free(apEndpoint->mpAdapterName);
-            apEndpoint->mpAdapterName = nullptr;
-        }
-        if (apEndpoint->mpAdapterAddr != nullptr)
-        {
-            g_free(apEndpoint->mpAdapterAddr);
-            apEndpoint->mpAdapterAddr = nullptr;
-        }
-        if (apEndpoint->mpRootPath != nullptr)
-        {
-            g_free(apEndpoint->mpRootPath);
-            apEndpoint->mpRootPath = nullptr;
-        }
-        if (apEndpoint->mpAdvPath != nullptr)
-        {
-            g_free(apEndpoint->mpAdvPath);
-            apEndpoint->mpAdvPath = nullptr;
-        }
-        if (apEndpoint->mpServicePath != nullptr)
-        {
-            g_free(apEndpoint->mpServicePath);
-            apEndpoint->mpServicePath = nullptr;
-        }
+        g_free(apEndpoint->mpOwningName);
+        g_free(apEndpoint->mpAdapterName);
+        g_free(apEndpoint->mpAdapterAddr);
+        g_free(apEndpoint->mpRootPath);
+        g_free(apEndpoint->mpAdvPath);
+        g_free(apEndpoint->mpServicePath);
+        if (apEndpoint->mpObjMgr != nullptr)
+            g_object_unref(apEndpoint->mpObjMgr);
+        if (apEndpoint->mpAdapter != nullptr)
+            g_object_unref(apEndpoint->mpAdapter);
+        if (apEndpoint->mpDevice != nullptr)
+            g_object_unref(apEndpoint->mpDevice);
+        if (apEndpoint->mpRoot != nullptr)
+            g_object_unref(apEndpoint->mpRoot);
+        if (apEndpoint->mpService != nullptr)
+            g_object_unref(apEndpoint->mpService);
+        if (apEndpoint->mpC1 != nullptr)
+            g_object_unref(apEndpoint->mpC1);
+        if (apEndpoint->mpC2 != nullptr)
+            g_object_unref(apEndpoint->mpC2);
+        if (apEndpoint->mpC3 != nullptr)
+            g_object_unref(apEndpoint->mpC3);
         if (apEndpoint->mpConnMap != nullptr)
-        {
             g_hash_table_destroy(apEndpoint->mpConnMap);
-            apEndpoint->mpConnMap = nullptr;
-        }
-        if (apEndpoint->mpAdvertisingUUID != nullptr)
-        {
-            g_free(apEndpoint->mpAdvertisingUUID);
-            apEndpoint->mpAdvertisingUUID = nullptr;
-        }
-        if (apEndpoint->mpPeerDevicePath != nullptr)
-        {
-            g_free(apEndpoint->mpPeerDevicePath);
-            apEndpoint->mpPeerDevicePath = nullptr;
-        }
+        g_free(apEndpoint->mpAdvertisingUUID);
+        g_free(apEndpoint->mpPeerDevicePath);
         if (apEndpoint->mpConnectCancellable != nullptr)
-        {
             g_object_unref(apEndpoint->mpConnectCancellable);
-            apEndpoint->mpConnectCancellable = nullptr;
-        }
         g_free(apEndpoint);
     }
 }
@@ -1114,7 +1092,6 @@ exit:
 CHIP_ERROR ShutdownBluezBleLayer(BluezEndpoint * apEndpoint)
 {
     VerifyOrReturnError(apEndpoint != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    g_object_unref(apEndpoint->mpAdapter);
     EndpointCleanup(apEndpoint);
     return CHIP_NO_ERROR;
 }
