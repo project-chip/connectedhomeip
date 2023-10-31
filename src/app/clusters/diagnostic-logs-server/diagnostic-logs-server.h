@@ -71,7 +71,8 @@ public:
 
     bool IsBDXProtocolRequested(TransferProtocolEnum requestedProtocol);
 
-    void SendErrorResponseAndReset(chip::app::CommandHandler * commandHandler, chip::app::ConcreteCommandPath path, StatusEnum status);
+    void SendErrorResponseAndReset(chip::app::CommandHandler * commandHandler, chip::app::ConcreteCommandPath path,
+                                   StatusEnum status);
 
 #endif
 

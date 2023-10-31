@@ -52,9 +52,9 @@ public:
 
     void SetCrashLogFileDesignator(const char * logFileName);
 
-    LogProvider() { };
+    LogProvider(){};
 
-    ~LogProvider() { };
+    ~LogProvider(){};
 
     static inline LogProvider & getLogProvider() { return sInstance; }
 

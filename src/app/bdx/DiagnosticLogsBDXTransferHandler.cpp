@@ -145,8 +145,7 @@ void DiagnosticLogsBDXTransferHandler::HandleTransferSessionOutput(TransferSessi
 
         break;
     }
-    case TransferSession::OutputEventType::kAcceptReceived:
-    {
+    case TransferSession::OutputEventType::kAcceptReceived: {
         mLogSessionHandle = mDelegate->StartLogCollection(mIntent);
 
         if (mLogSessionHandle == kInvalidLogSessionHandle)
@@ -160,8 +159,7 @@ void DiagnosticLogsBDXTransferHandler::HandleTransferSessionOutput(TransferSessi
         DiagnosticLogsServer::Instance().HandleBDXResponse(CHIP_NO_ERROR);
     }
     // Fallthrough
-    case TransferSession::OutputEventType::kAckReceived:
-    {
+    case TransferSession::OutputEventType::kAckReceived: {
         uint16_t blockSize   = mTransfer.GetTransferBlockSize();
         uint16_t bytesToRead = blockSize;
 
@@ -242,11 +240,11 @@ void DiagnosticLogsBDXTransferHandler::Reset()
     if (mDelegate != nullptr)
     {
         mDelegate->EndLogCollection(mLogSessionHandle);
-        mDelegate     = nullptr;
+        mDelegate = nullptr;
     }
     mLogSessionHandle = kInvalidLogSessionHandle;
-    mInitialized  = false;
-    mNumBytesSent = 0;
+    mInitialized      = false;
+    mNumBytesSent     = 0;
 }
 
 #endif

@@ -18,9 +18,9 @@
 
 #include "AppOptions.h"
 
+#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Server.h>
-#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
 
 using namespace chip::ArgParser;
 using namespace chip::app::Clusters::DiagnosticLogs;
@@ -59,7 +59,8 @@ bool AppOptions::HandleOptions(const char * program, OptionSet * options, int id
         ChipLogError(BDX, "kOptionEndUserSupportFilePath setting end user fd");
         if (strlen(value) > kLogFileDesignatorMaxLen)
         {
-            PrintArgError("%s: Invalid file path length. Must be less that %d: %d\n", program, kLogFileDesignatorMaxLen, strlen(value));
+            PrintArgError("%s: Invalid file path length. Must be less that %d: %d\n", program, kLogFileDesignatorMaxLen,
+                          strlen(value));
         }
         strncpy(mEndUserSupportLogFileDesignator, value, strlen(value));
         break;
@@ -67,7 +68,8 @@ bool AppOptions::HandleOptions(const char * program, OptionSet * options, int id
     case kOptionNetworkDiagnosticsFilePath: {
         if (strlen(value) > kLogFileDesignatorMaxLen)
         {
-            PrintArgError("%s: Invalid file path length. Must be less that %d: %d\n", program, kLogFileDesignatorMaxLen, strlen(value));
+            PrintArgError("%s: Invalid file path length. Must be less that %d: %d\n", program, kLogFileDesignatorMaxLen,
+                          strlen(value));
         }
         strncpy(mNetworkDiagnosticsLogFileDesignator, value, strlen(value));
         break;
@@ -75,7 +77,8 @@ bool AppOptions::HandleOptions(const char * program, OptionSet * options, int id
     case kOptionCrashFilePath: {
         if (strlen(value) > kLogFileDesignatorMaxLen)
         {
-            PrintArgError("%s: Invalid file path length. Must be less that %d: %d\n", program, kLogFileDesignatorMaxLen, strlen(value));
+            PrintArgError("%s: Invalid file path length. Must be less that %d: %d\n", program, kLogFileDesignatorMaxLen,
+                          strlen(value));
         }
         strncpy(mCrashLogFileDesignator, value, strlen(value));
         break;

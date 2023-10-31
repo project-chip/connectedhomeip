@@ -1353,9 +1353,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
     dispatch_source_set_event_handler(_timerSource, ^{
         dispatch_async(self.queue, ^{
-            if (self->_diagnosticLogsTransferHandler != nil)
-            {
-                self->_diagnosticLogsTransferHandler->AbortTransfer( chip::bdx::StatusCode::kUnknown);
+            if (self->_diagnosticLogsTransferHandler != nil) {
+                self->_diagnosticLogsTransferHandler->AbortTransfer(chip::bdx::StatusCode::kUnknown);
             }
         });
         dispatch_source_cancel(self->_timerSource);
@@ -1398,27 +1397,25 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     return (response == nil || (response.status != nil && [response.status intValue] != 0 && [response.status intValue] != 1) || response.logContent.length == 0);
 }
 
--(void)_invokeCompletion:(void (^)(NSURL * _Nullable logResult, NSError * error))completion
-                filepath:(NSURL * _Nullable)filepath
-                   queue:(dispatch_queue_t)queue
-                   error:(NSError * _Nullable)error
+- (void)_invokeCompletion:(void (^)(NSURL * _Nullable logResult, NSError * error))completion
+                 filepath:(NSURL * _Nullable)filepath
+                    queue:(dispatch_queue_t)queue
+                    error:(NSError * _Nullable)error
 {
-    if (self->_diagnosticLogsTransferHandler != nil)
-    {
-        delete(self->_diagnosticLogsTransferHandler);
+    if (self->_diagnosticLogsTransferHandler != nil) {
+        delete (self->_diagnosticLogsTransferHandler);
     }
     dispatch_async(queue, ^{
         completion(filepath, error);
     });
 }
 
--(void)_invokeCompletionWithError:(void (^)(NSURL * _Nullable logResult, NSError * error))completion
-                   queue:(dispatch_queue_t)queue
-                   error:(NSError * _Nullable)error
+- (void)_invokeCompletionWithError:(void (^)(NSURL * _Nullable logResult, NSError * error))completion
+                             queue:(dispatch_queue_t)queue
+                             error:(NSError * _Nullable)error
 {
     [self _invokeCompletion:completion filepath:nil queue:queue error:error];
 }
-
 
 - (void)_downloadLogOfType:(MTRDiagnosticLogType)type
                    timeout:(NSTimeInterval)timeout
@@ -1441,8 +1438,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         [self _invokeCompletionWithError:completion queue:queue error:[NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeInvalidState userInfo:nil]];
     }
 
-    if (self->_diagnosticLogsTransferHandler != nullptr && self->_diagnosticLogsTransferHandler->IsInBDXSession())
-    {
+    if (self->_diagnosticLogsTransferHandler != nullptr && self->_diagnosticLogsTransferHandler->IsInBDXSession()) {
         [self _invokeCompletionWithError:completion queue:queue error:[NSError errorWithDomain:MTRInteractionErrorDomain code:MTRInteractionErrorCodeBusy userInfo:nil]];
     }
 
@@ -1465,8 +1461,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
         dispatch_async(self.queue, ^{
             // Start a timer if a timeout is provided
-            if (timeout > 0)
-            {
+            if (timeout > 0) {
                 [self _startTimerForDownload:timeout];
             }
 

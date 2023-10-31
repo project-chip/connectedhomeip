@@ -38,8 +38,8 @@ namespace DiagnosticLogs {
 class DiagnosticLogsBDXTransferHandler : public chip::bdx::Initiator
 {
 public:
-    DiagnosticLogsBDXTransferHandler() {};
-    ~DiagnosticLogsBDXTransferHandler() {};
+    DiagnosticLogsBDXTransferHandler(){};
+    ~DiagnosticLogsBDXTransferHandler(){};
 
     CHIP_ERROR Init();
 
@@ -52,7 +52,6 @@ public:
     void Reset();
 
 private:
-
     void SendNextBlock(MutableByteSpan & buffer);
 
     chip::Optional<chip::FabricIndex> mFabricIndex;

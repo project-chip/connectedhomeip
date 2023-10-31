@@ -96,8 +96,7 @@ CHIP_ERROR MTRDiagnosticLogsTransferHandler::OnTransferSessionEnd(TransferSessio
         error = CHIP_ERROR_INTERNAL;
     }
     // Notify the MTRDevice via the callback that the BDX transfer has completed with error or success.
-    if (mCallback)
-    {
+    if (mCallback) {
         mCallback(error != CHIP_NO_ERROR ? NO : YES);
     }
     Reset();
@@ -196,23 +195,21 @@ void MTRDiagnosticLogsTransferHandler::HandleTransferSessionOutput(TransferSessi
         }
         break;
     case TransferSession::OutputEventType::kAckEOFReceived:
-            // Need to call OnTransferSessionEnd(event). Need to fix this and remove isBlockEOFSent.
-            break;
+        // Need to call OnTransferSessionEnd(event). Need to fix this and remove isBlockEOFSent.
+        break;
     case TransferSession::OutputEventType::kMsgToSend:
         err = OnMessageToSend(event);
-        if (event.msgTypeData.HasMessageType(MessageType::BlockAckEOF))
-        {
+        if (event.msgTypeData.HasMessageType(MessageType::BlockAckEOF)) {
             // TODO: This is a hack for determinin that the Ack EOF is sent before cleaning up.
             // Need to fix this.
             isBlockEOFSent = true;
         }
         break;
     case TransferSession::OutputEventType::kNone:
-         if (isBlockEOFSent)
-         {
+        if (isBlockEOFSent) {
             OnTransferSessionEnd(event);
-         }
-         break;
+        }
+        break;
     case TransferSession::OutputEventType::kQueryWithSkipReceived:
     case TransferSession::OutputEventType::kQueryReceived:
     case TransferSession::OutputEventType::kAckReceived:

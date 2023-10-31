@@ -111,8 +111,8 @@ CHIP_ERROR DiagnosticLogsServer::HandleLogRequestForBDXProtocol(Messaging::Excha
 
     VerifyOrReturnError(!(DiagnosticLogs::isLogProviderDelegateNull(logProviderDelegate, endpointId)), CHIP_ERROR_INCORRECT_STATE);
 
-    mDiagnosticLogsBDXTransferHandler =  new DiagnosticLogsBDXTransferHandler();
-    CHIP_ERROR error = mDiagnosticLogsBDXTransferHandler->InitializeTransfer(
+    mDiagnosticLogsBDXTransferHandler = new DiagnosticLogsBDXTransferHandler();
+    CHIP_ERROR error                  = mDiagnosticLogsBDXTransferHandler->InitializeTransfer(
         exchangeCtx, scopedPeerNodeId.GetFabricIndex(), scopedPeerNodeId.GetNodeId(), logProviderDelegate, intent, fileDesignator);
     return error;
 }
@@ -138,7 +138,7 @@ void DiagnosticLogsServer::HandleBDXResponse(CHIP_ERROR error)
     }
     else
     {
-       SendErrorResponseAndReset(commandHandle, mRequestPath, StatusEnum::kNoLogs);
+        SendErrorResponseAndReset(commandHandle, mRequestPath, StatusEnum::kNoLogs);
     }
 }
 
@@ -148,7 +148,8 @@ void DiagnosticLogsServer::SetAsyncCommandHandleAndPath(CommandHandler * command
     mRequestPath        = commandPath;
 }
 
-void DiagnosticLogsServer::SendErrorResponseAndReset(chip::app::CommandHandler * commandHandler, chip::app::ConcreteCommandPath path, StatusEnum status)
+void DiagnosticLogsServer::SendErrorResponseAndReset(chip::app::CommandHandler * commandHandler,
+                                                     chip::app::ConcreteCommandPath path, StatusEnum status)
 {
     Commands::RetrieveLogsResponse::Type response;
     if (commandHandler != nullptr)
@@ -156,8 +157,8 @@ void DiagnosticLogsServer::SendErrorResponseAndReset(chip::app::CommandHandler *
         response.status = status;
         commandHandler->AddResponse(path, response);
     }
-    //mDiagnosticLogsBDXTransferHandler->Reset();
-    //delete(mDiagnosticLogsBDXTransferHandler);
+    // mDiagnosticLogsBDXTransferHandler->Reset();
+    // delete(mDiagnosticLogsBDXTransferHandler);
 }
 
 #endif
