@@ -6463,6 +6463,7 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenControlCluster(Attribute
 {
     using namespace Clusters::MicrowaveOvenControl;
     switch (aAttributeId) {
+#if MTR_ENABLE_PROVISIONAL
     case Attributes::CookTime::Id: {
         using TypeInfo = Attributes::CookTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -6474,6 +6475,8 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenControlCluster(Attribute
         value = [NSNumber numberWithUnsignedInt:cppValue];
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
     case Attributes::PowerSetting::Id: {
         using TypeInfo = Attributes::PowerSetting::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -6485,6 +6488,8 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenControlCluster(Attribute
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
     case Attributes::MinPower::Id: {
         using TypeInfo = Attributes::MinPower::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -6496,6 +6501,8 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenControlCluster(Attribute
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
     case Attributes::MaxPower::Id: {
         using TypeInfo = Attributes::MaxPower::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -6507,6 +6514,8 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenControlCluster(Attribute
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
     case Attributes::PowerStep::Id: {
         using TypeInfo = Attributes::PowerStep::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -6518,6 +6527,7 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenControlCluster(Attribute
         value = [NSNumber numberWithUnsignedChar:cppValue];
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }
