@@ -1970,7 +1970,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionAppRejection(nlTestSuite *
     gTestReadInteraction.mEmitSubscriptionError = false;
 }
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
+#if CHIP_CONFIG_ENABLE_ICD_SERVER != 1
 
 // Subscriber sends the request with particular max-interval value:
 // Max interval equal to client-requested min-interval.
@@ -2267,7 +2267,7 @@ void TestReadInteraction::TestReadHandler_SubscriptionReportingIntervalsTest4(nl
     gTestReadInteraction.mAlterSubscriptionIntervals = false;
 }
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
+#if CHIP_CONFIG_ENABLE_ICD_SERVER != 1
 
 // Subscriber sends the request with particular max-interval value:
 // Max interval greater than client-requested min-interval but greater than 60m:
