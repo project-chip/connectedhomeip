@@ -81,19 +81,6 @@ shared_library("jni") {
     ]
   }
 
-  if (matter_enable_java_generated_api) {
-    sources += [
-      "CHIPDefaultCallbacks.cpp",
-      "CHIPDefaultCallbacks.h",
-      "zap-generated/CHIPClustersWrite-JNI.cpp",
-      "zap-generated/CHIPInvokeCallbacks.cpp",
-      "zap-generated/CHIPInvokeCallbacks.h",
-      "zap-generated/CHIPReadCallbacks.cpp",
-    ]
-
-    deps += [ "${chip_root}/src/controller/data_model:java-jni-sources" ]
-  }
-
   if (chip_build_controller_dynamic_server) {
     defines += [ "CHIP_DEVICE_CONFIG_DYNAMIC_SERVER" ]
   }
