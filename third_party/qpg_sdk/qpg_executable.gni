@@ -19,13 +19,6 @@ import("${build_root}/toolchain/flashable_executable.gni")
 import("${chip_root}/src/platform/device.gni")
 import("qpg_sdk.gni")
 
-declare_args() {
-  matter_device_vid = ""
-  matter_device_pid = ""
-  matter_device_software_version = ""
-  matter_device_software_version_string = ""
-}
-
 # Run the generator script that takes a .HEX file and adds the OTA header to it.
 #
 # This requires a Python script, given by ota_header_generator,
@@ -76,20 +69,6 @@ template("qpg_executable") {
   defines = []
   if (defined(invoker.defines)) {
     defines += invoker.defines
-  }
-
-  # Overrule CHIPProjectConfig.h settings
-  if (matter_device_vid != "") {
-    defines += [ "CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID=${matter_device_vid}" ]
-  }
-  if (matter_device_pid != "") {
-    defines += [ "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${matter_device_pid}" ]
-  }
-  if (matter_device_software_version_string != "") {
-    defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${matter_device_software_version_string}\"" ]
-  }
-  if (matter_device_software_version != "") {
-    defines += [ "CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${matter_device_software_version}" ]
   }
 
   # Copy flashing dependencies to the output directory so that the output
