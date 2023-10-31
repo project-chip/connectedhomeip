@@ -7733,6 +7733,8 @@
           Scenes:
               - CopyModeBitmap
               - NameSupportBitmap
+          AdministratorCommissioning:
+              - Feature
       bitmap values:
           PumpConfigurationAndControl:
               PumpStatusBitmap:
@@ -7745,6 +7747,9 @@
           SoftwareDiagnostics:
               Feature:
                   - Watermarks
+          AdministratorCommissioning:
+              Feature:
+                  - Basic
   deprecated:
       bitmaps:
           Scenes:
@@ -7756,6 +7761,22 @@
           SoftwareDiagnostics:
               Feature:
                   - WaterMarks
+  provisional:
+      attributes:
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              - SupportedWiFiBands
+              - SupportedThreadFeatures
+              - ThreadVersion
+      commands:
+          GeneralDiagnostics:
+              # Targeting Spring 2024 Matter release
+              - TimeSnapshot
+              - TimeSnapshotResponse
+      bitmaps:
+          NetworkCommissioning:
+              # Targeting Spring 2024 Matter release
+              - ThreadCapabilitiesBitmap
   renames:
       bitmaps:
           Scenes:

@@ -1148,10 +1148,10 @@
             { ZAP_SIMPLE_DEFAULT(0x8000), 0x00000001, 2, ZAP_TYPE(TEMPERATURE),                                                    \
               ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MinMeasuredValue */                                                               \
             { ZAP_SIMPLE_DEFAULT(0x8000), 0x00000002, 2, ZAP_TYPE(TEMPERATURE),                                                    \
-              ZAP_ATTRIBUTE_MASK(NULLABLE) },                                 /* MaxMeasuredValue */                               \
-            { ZAP_EMPTY_DEFAULT(), 0x00000003, 2, ZAP_TYPE(TEMPERATURE), 0 }, /* Tolerance */                                      \
-            { ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), 0 },  /* FeatureMap */                                     \
-            { ZAP_SIMPLE_DEFAULT(4), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },    /* ClusterRevision */                                \
+              ZAP_ATTRIBUTE_MASK(NULLABLE) },                                /* MaxMeasuredValue */                                \
+            { ZAP_EMPTY_DEFAULT(), 0x00000003, 2, ZAP_TYPE(INT16U), 0 },     /* Tolerance */                                       \
+            { ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32), 0 }, /* FeatureMap */                                      \
+            { ZAP_SIMPLE_DEFAULT(4), 0x0000FFFD, 2, ZAP_TYPE(INT16U), 0 },   /* ClusterRevision */                                 \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Pressure Measurement (server) */                                                              \
             { ZAP_SIMPLE_DEFAULT(0x0000), 0x00000000, 2, ZAP_TYPE(INT16S), ZAP_ATTRIBUTE_MASK(NULLABLE) }, /* MeasuredValue */     \

@@ -1854,6 +1854,8 @@ enum class Feature : uint32_t
 };
 } // namespace DishwasherAlarm
 
+namespace MicrowaveOvenControl {} // namespace MicrowaveOvenControl
+
 namespace OperationalState {
 
 // Enum for ErrorStateEnum
