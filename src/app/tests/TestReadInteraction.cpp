@@ -2218,8 +2218,7 @@ void TestReadInteraction::TestSubscribeEarlyReport(nlTestSuite * apSuite, void *
         node->SetIntervalTimeStamps(delegate.mpReadHandler, gMockClock.GetMonotonicTimestamp() + Milliseconds32(50));
         NL_TEST_ASSERT(apSuite,
                        reportScheduler->GetMaxTimestampForHandler(delegate.mpReadHandler) ==
-                           gMockClock.GetMonotonicTimestamp() + Seconds16(maxInterval) +
-                               Milliseconds32(50));
+                           gMockClock.GetMonotonicTimestamp() + Seconds16(maxInterval) + Milliseconds32(50));
 
         // Advance monotonic timestamp for min interval to elapse
         gMockClock.AdvanceMonotonic(Seconds16(maxInterval));
