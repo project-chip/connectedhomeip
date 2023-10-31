@@ -3128,8 +3128,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullabl
 } // namespace MaxMeasuredValue
 
 namespace Tolerance {
-EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // temperature
-EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Tolerance
 
 namespace FeatureMap {
