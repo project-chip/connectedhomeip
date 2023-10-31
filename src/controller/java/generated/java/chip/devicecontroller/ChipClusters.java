@@ -26893,14 +26893,6 @@ public class ChipClusters {
         readCurrentAppAttribute(chipClusterPtr, callback);
     }
 
-    public void writeCurrentAppAttribute(DefaultClusterCallback callback, ChipStructs.ApplicationLauncherClusterApplicationEPStruct value) {
-        writeCurrentAppAttribute(chipClusterPtr, callback, value, null);
-    }
-
-    public void writeCurrentAppAttribute(DefaultClusterCallback callback, ChipStructs.ApplicationLauncherClusterApplicationEPStruct value, int timedWriteTimeoutMs) {
-        writeCurrentAppAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
-    }
-
     public void subscribeCurrentAppAttribute(
         CurrentAppAttributeCallback callback, int minInterval, int maxInterval) {
         subscribeCurrentAppAttribute(chipClusterPtr, callback, minInterval, maxInterval);
@@ -26971,8 +26963,6 @@ public class ChipClusters {
     private native void subscribeCatalogListAttribute(long chipClusterPtr, CatalogListAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readCurrentAppAttribute(long chipClusterPtr, CurrentAppAttributeCallback callback);
-
-    private native void writeCurrentAppAttribute(long chipClusterPtr, DefaultClusterCallback callback, ChipStructs.ApplicationLauncherClusterApplicationEPStruct value, @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeCurrentAppAttribute(long chipClusterPtr, CurrentAppAttributeCallback callback, int minInterval, int maxInterval);
 

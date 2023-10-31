@@ -20159,7 +20159,7 @@ void registerClusterApplicationLauncher(Commands & commands, CredentialIssuerCom
             Id, "catalog-list", Attributes::CatalogList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
             chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEPStruct::Type>>>(
-            Id, "current-app", Attributes::CurrentApp::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+            Id, "current-app", Attributes::CurrentApp::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //

@@ -6286,7 +6286,7 @@ client cluster ApplicationLauncher = 1292 {
   }
 
   readonly attribute optional int16u catalogList[] = 0;
-  attribute optional nullable ApplicationEPStruct currentApp = 1;
+  readonly attribute optional nullable ApplicationEPStruct currentApp = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -6343,7 +6343,7 @@ server cluster ApplicationLauncher = 1292 {
   }
 
   readonly attribute int16u catalogList[] = 0;
-  attribute nullable ApplicationEPStruct currentApp = 1;
+  readonly attribute nullable ApplicationEPStruct currentApp = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
