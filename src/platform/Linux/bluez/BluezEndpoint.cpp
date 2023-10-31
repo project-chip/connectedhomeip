@@ -90,6 +90,8 @@ static gboolean BluezAdvertisingRelease(BluezLEAdvertisement1 * aAdv, GDBusMetho
     ChipLogDetail(DeviceLayer, "Release adv object in %s", __func__);
 
     g_dbus_object_manager_server_unexport(endpoint->mpRoot, endpoint->mpAdvPath);
+    g_object_unref(endpoint->mpAdv);
+    endpoint->mpAdv          = nullptr;
     endpoint->mIsAdvertising = false;
     isSuccess                = true;
 exit:
@@ -229,14 +231,12 @@ exit:
 
 static CHIP_ERROR BluezAdvSetup(BluezEndpoint * endpoint)
 {
-    BluezLEAdvertisement1 * adv;
-
     VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
     VerifyOrExit(endpoint->mIsAdvertising == FALSE, ChipLogError(DeviceLayer, "FAIL: Advertising already enabled in %s", __func__));
     VerifyOrExit(endpoint->mpAdapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL endpoint->mpAdapter in %s", __func__));
 
-    adv = BluezAdvertisingCreate(endpoint);
-    VerifyOrExit(adv != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adv in %s", __func__));
+    endpoint->mpAdv = BluezAdvertisingCreate(endpoint);
+    VerifyOrExit(endpoint->mpAdv != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL adv in %s", __func__));
 
 exit:
     return CHIP_NO_ERROR;
@@ -820,6 +820,8 @@ static void EndpointCleanup(BluezEndpoint * apEndpoint)
             g_object_unref(apEndpoint->mpC2);
         if (apEndpoint->mpC3 != nullptr)
             g_object_unref(apEndpoint->mpC3);
+        if (apEndpoint->mpAdv != nullptr)
+            g_object_unref(apEndpoint->mpAdv);
         if (apEndpoint->mpConnMap != nullptr)
             g_hash_table_destroy(apEndpoint->mpConnMap);
         g_free(apEndpoint->mpAdvertisingUUID);
