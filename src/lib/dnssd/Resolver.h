@@ -132,7 +132,7 @@ struct CommonResolutionData
         }
         if (mrpRetryActiveThreshold.HasValue())
         {
-            ChipLogDetail(Discovery, "\tMrp Active Threshold: %" PRIu16 " ms", mrpRetryActiveThreshold.Value().count());
+            ChipLogDetail(Discovery, "\tMrp Active Threshold: %u ms", mrpRetryActiveThreshold.Value().count());
         }
         else
         {
