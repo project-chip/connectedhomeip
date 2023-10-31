@@ -276,9 +276,8 @@ public:
     static void TestReadHandler_SubscriptionReportingIntervalsTest3(nlTestSuite * apSuite, void * apContext);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     static void TestReadHandler_SubscriptionReportingIntervalsTest4(nlTestSuite * apSuite, void * apContext);
-    ,
 #if CHIP_CONFIG_ENABLE_ICD_SERVER != 1
-        static void TestReadHandler_SubscriptionReportingIntervalsTest5(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_SubscriptionReportingIntervalsTest5(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_SubscriptionReportingIntervalsTest6(nlTestSuite * apSuite, void * apContext);
     static void TestReadHandler_SubscriptionReportingIntervalsTest7(nlTestSuite * apSuite, void * apContext);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
