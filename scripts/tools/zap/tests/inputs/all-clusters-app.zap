@@ -11586,7 +11586,7 @@
               "code": 0,
               "mfgCode": null,
               "side": "server",
-              "type": "int16s",
+              "type": "temperature",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -11602,7 +11602,7 @@
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "int16s",
+              "type": "temperature",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -11618,7 +11618,7 @@
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "type": "int16s",
+              "type": "temperature",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -11634,7 +11634,7 @@
               "code": 3,
               "mfgCode": null,
               "side": "server",
-              "type": "int16u",
+              "type": "temperature",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -16797,6 +16797,5 @@
       "endpointId": 65534,
       "networkId": 0
     }
-  ],
-  "log": []
+  ]
 }

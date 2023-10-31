@@ -2518,6 +2518,7 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
         }
         return value;
     }
+#if MTR_ENABLE_PROVISIONAL
     case Attributes::SupportedWiFiBands::Id: {
         using TypeInfo = Attributes::SupportedWiFiBands::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -2544,6 +2545,8 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
         }
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
     case Attributes::SupportedThreadFeatures::Id: {
         using TypeInfo = Attributes::SupportedThreadFeatures::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -2555,6 +2558,8 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
         value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
     case Attributes::ThreadVersion::Id: {
         using TypeInfo = Attributes::ThreadVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -2566,6 +2571,7 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
         value = [NSNumber numberWithUnsignedShort:cppValue];
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }
