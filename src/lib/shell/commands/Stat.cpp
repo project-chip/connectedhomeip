@@ -25,7 +25,7 @@
 #include <crypto/CryptoBuildConfig.h>
 #endif // CHIP_HAVE_CONFIG_H
 
-#if defined(CHIP_CRYPTO_MBEDTLS)
+#if CHIP_CRYPTO_MBEDTLS
 #include <mbedtls/memory_buffer_alloc.h>
 #endif
 
@@ -54,7 +54,7 @@ CHIP_ERROR StatPeakHandler(int argc, char ** argv)
         streamer_printf(streamer_get(), "Heap allocated bytes: %u\r\n", static_cast<unsigned>(heapWatermark));
     }
 
-#if defined(CHIP_CRYPTO_MBEDTLS) && defined(MBEDTLS_MEMORY_DEBUG)
+#if CHIP_CRYPTO_MBEDTLS && defined(MBEDTLS_MEMORY_DEBUG)
     size_t maxUsed   = 0;
     size_t maxBlocks = 0;
 
@@ -81,7 +81,7 @@ CHIP_ERROR StatResetHandler(int argc, char ** argv)
         ReturnErrorOnFailure(DeviceLayer::GetDiagnosticDataProvider().ResetWatermarks());
     }
 
-#if defined(CHIP_CRYPTO_MBEDTLS) && defined(MBEDTLS_MEMORY_DEBUG)
+#if CHIP_CRYPTO_MBEDTLS && defined(MBEDTLS_MEMORY_DEBUG)
     mbedtls_memory_buffer_alloc_max_reset();
 #endif
 
