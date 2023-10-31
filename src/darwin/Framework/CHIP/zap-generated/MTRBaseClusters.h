@@ -16089,10 +16089,10 @@ typedef NS_OPTIONS(uint32_t, MTRAudioOutputFeature) {
 } MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 typedef NS_ENUM(uint8_t, MTRApplicationLauncherStatus) {
-    MTRApplicationLauncherStatusSuccess MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x00,
-    MTRApplicationLauncherStatusAppNotAvailable MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x01,
-    MTRApplicationLauncherStatusSystemBusy MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x02,
-} MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
+    MTRApplicationLauncherStatusSuccess MTR_PROVISIONALLY_AVAILABLE = 0x00,
+    MTRApplicationLauncherStatusAppNotAvailable MTR_PROVISIONALLY_AVAILABLE = 0x01,
+    MTRApplicationLauncherStatusSystemBusy MTR_PROVISIONALLY_AVAILABLE = 0x02,
+} MTR_PROVISIONALLY_AVAILABLE;
 
 typedef NS_OPTIONS(uint32_t, MTRApplicationLauncherFeature) {
     MTRApplicationLauncherFeatureApplicationPlatform MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1)) = 0x1,
