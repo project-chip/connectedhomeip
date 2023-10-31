@@ -6129,9 +6129,9 @@ namespace Attributes {
 namespace Sources {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const uint8_t>;
-    using DecodableType    = chip::app::DataModel::DecodableList<uint8_t>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<uint8_t> &;
+    using Type             = chip::app::DataModel::List<const chip::EndpointId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::EndpointId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::EndpointId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSourceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Sources::Id; }
@@ -8177,6 +8177,16 @@ struct Type;
 struct DecodableType;
 } // namespace TestEventTrigger
 
+namespace TimeSnapshot {
+struct Type;
+struct DecodableType;
+} // namespace TimeSnapshot
+
+namespace TimeSnapshotResponse {
+struct Type;
+struct DecodableType;
+} // namespace TimeSnapshotResponse
+
 } // namespace Commands
 
 namespace Commands {
@@ -8215,6 +8225,69 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestEventTrigger
+namespace TimeSnapshot {
+enum class Fields : uint8_t
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TimeSnapshot::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = Clusters::GeneralDiagnostics::Commands::TimeSnapshotResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TimeSnapshot::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TimeSnapshot
+namespace TimeSnapshotResponse {
+enum class Fields : uint8_t
+{
+    kSystemTimeUs = 0,
+    kUTCTimeUs    = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TimeSnapshotResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    uint64_t systemTimeUs = static_cast<uint64_t>(0);
+    DataModel::Nullable<uint64_t> UTCTimeUs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TimeSnapshotResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
+
+    uint64_t systemTimeUs = static_cast<uint64_t>(0);
+    DataModel::Nullable<uint64_t> UTCTimeUs;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TimeSnapshotResponse
 } // namespace Commands
 
 namespace Attributes {
@@ -14117,6 +14190,31 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClientsSupportedPerFabric
+namespace UserActiveModeTriggerHint {
+struct TypeInfo
+{
+    using Type             = chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap>;
+    using DecodableType    = chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap>;
+    using DecodableArgType = chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap>;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UserActiveModeTriggerHint::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace UserActiveModeTriggerHint
+namespace UserActiveModeTriggerInstruction {
+struct TypeInfo
+{
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::IcdManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UserActiveModeTriggerInstruction::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+    static constexpr size_t MaxLength() { return 128; }
+};
+} // namespace UserActiveModeTriggerInstruction
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -14168,6 +14266,9 @@ struct TypeInfo
         Attributes::RegisteredClients::TypeInfo::DecodableType registeredClients;
         Attributes::ICDCounter::TypeInfo::DecodableType ICDCounter                               = static_cast<uint32_t>(0);
         Attributes::ClientsSupportedPerFabric::TypeInfo::DecodableType clientsSupportedPerFabric = static_cast<uint16_t>(0);
+        Attributes::UserActiveModeTriggerHint::TypeInfo::DecodableType userActiveModeTriggerHint =
+            static_cast<chip::BitMask<chip::app::Clusters::IcdManagement::UserActiveModeTriggerBitmap>>(0);
+        Attributes::UserActiveModeTriggerInstruction::TypeInfo::DecodableType userActiveModeTriggerInstruction;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;
@@ -24965,9 +25066,9 @@ struct TypeInfo
 namespace Tolerance {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
@@ -25022,7 +25123,7 @@ struct TypeInfo
         Attributes::MeasuredValue::TypeInfo::DecodableType measuredValue;
         Attributes::MinMeasuredValue::TypeInfo::DecodableType minMeasuredValue;
         Attributes::MaxMeasuredValue::TypeInfo::DecodableType maxMeasuredValue;
-        Attributes::Tolerance::TypeInfo::DecodableType tolerance = static_cast<uint16_t>(0);
+        Attributes::Tolerance::TypeInfo::DecodableType tolerance = static_cast<int16_t>(0);
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::EventList::TypeInfo::DecodableType eventList;

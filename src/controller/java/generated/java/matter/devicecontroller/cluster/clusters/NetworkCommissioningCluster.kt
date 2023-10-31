@@ -20,422 +20,290 @@ package matter.devicecontroller.cluster.clusters
 import java.util.ArrayList
 
 class NetworkCommissioningCluster(private val endpointId: UShort) {
+  class ScanNetworksResponse(
+    val networkingStatus: UInt,
+    val debugText: String?,
+    val wiFiScanResults:
+      ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResultStruct>?,
+    val threadScanResults:
+      ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResultStruct>?
+  )
+
+  class NetworkConfigResponse(
+    val networkingStatus: UInt,
+    val debugText: String?,
+    val networkIndex: UByte?
+  )
+
+  class ConnectNetworkResponse(
+    val networkingStatus: UInt,
+    val debugText: String?,
+    val errorValue: Int?
+  )
+
+  class NetworksAttribute(
+    val value: ArrayList<ChipStructs.NetworkCommissioningClusterNetworkInfoStruct>
+  )
+
+  class LastNetworkingStatusAttribute(val value: UInt?)
+
+  class LastNetworkIDAttribute(val value: ByteArray?)
+
+  class LastConnectErrorValueAttribute(val value: Int?)
+
+  class SupportedWiFiBandsAttribute(val value: ArrayList<UInt>?)
+
+  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class EventListAttribute(val value: ArrayList<UInt>)
+
+  class AttributeListAttribute(val value: ArrayList<UInt>)
+
+  suspend fun scanNetworks(
+    ssid: ByteArray?,
+    breadcrumb: ULong?,
+    timedInvokeTimeoutMs: Int? = null
+  ): ScanNetworksResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun addOrUpdateWiFiNetwork(
+    ssid: ByteArray,
+    credentials: ByteArray,
+    breadcrumb: ULong?,
+    timedInvokeTimeoutMs: Int? = null
+  ): NetworkConfigResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun addOrUpdateThreadNetwork(
+    operationalDataset: ByteArray,
+    breadcrumb: ULong?,
+    timedInvokeTimeoutMs: Int? = null
+  ): NetworkConfigResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun removeNetwork(
+    networkID: ByteArray,
+    breadcrumb: ULong?,
+    timedInvokeTimeoutMs: Int? = null
+  ): NetworkConfigResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun connectNetwork(
+    networkID: ByteArray,
+    breadcrumb: ULong?,
+    timedInvokeTimeoutMs: Int? = null
+  ): ConnectNetworkResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun reorderNetwork(
+    networkID: ByteArray,
+    networkIndex: UByte,
+    breadcrumb: ULong?,
+    timedInvokeTimeoutMs: Int? = null
+  ): NetworkConfigResponse {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun readMaxNetworksAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeMaxNetworksAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readNetworksAttribute(): NetworksAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeNetworksAttribute(minInterval: Int, maxInterval: Int): NetworksAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readScanMaxTimeSecondsAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeScanMaxTimeSecondsAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readConnectMaxTimeSecondsAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeConnectMaxTimeSecondsAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readInterfaceEnabledAttribute(): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeInterfaceEnabledAttribute(value: Boolean) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeInterfaceEnabledAttribute(value: Boolean, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeInterfaceEnabledAttribute(minInterval: Int, maxInterval: Int): Boolean {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readLastNetworkingStatusAttribute(): LastNetworkingStatusAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeLastNetworkingStatusAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): LastNetworkingStatusAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readLastNetworkIDAttribute(): LastNetworkIDAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeLastNetworkIDAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): LastNetworkIDAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readLastConnectErrorValueAttribute(): LastConnectErrorValueAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeLastConnectErrorValueAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): LastConnectErrorValueAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSupportedWiFiBandsAttribute(): SupportedWiFiBandsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSupportedWiFiBandsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): SupportedWiFiBandsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSupportedThreadFeaturesAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSupportedThreadFeaturesAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readThreadVersionAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeThreadVersionAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEventListAttribute(): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFeatureMapAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readClusterRevisionAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
   companion object {
     const val CLUSTER_ID: UInt = 49u
-  }
-
-  fun scanNetworks(callback: ScanNetworksResponseCallback, ssid: ByteArray?, breadcrumb: Long?) {
-    // Implementation needs to be added here
-  }
-
-  fun scanNetworks(
-    callback: ScanNetworksResponseCallback,
-    ssid: ByteArray?,
-    breadcrumb: Long?,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun addOrUpdateWiFiNetwork(
-    callback: NetworkConfigResponseCallback,
-    ssid: ByteArray,
-    credentials: ByteArray,
-    breadcrumb: Long?
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun addOrUpdateWiFiNetwork(
-    callback: NetworkConfigResponseCallback,
-    ssid: ByteArray,
-    credentials: ByteArray,
-    breadcrumb: Long?,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun addOrUpdateThreadNetwork(
-    callback: NetworkConfigResponseCallback,
-    operationalDataset: ByteArray,
-    breadcrumb: Long?
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun addOrUpdateThreadNetwork(
-    callback: NetworkConfigResponseCallback,
-    operationalDataset: ByteArray,
-    breadcrumb: Long?,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun removeNetwork(
-    callback: NetworkConfigResponseCallback,
-    networkID: ByteArray,
-    breadcrumb: Long?
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun removeNetwork(
-    callback: NetworkConfigResponseCallback,
-    networkID: ByteArray,
-    breadcrumb: Long?,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun connectNetwork(
-    callback: ConnectNetworkResponseCallback,
-    networkID: ByteArray,
-    breadcrumb: Long?
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun connectNetwork(
-    callback: ConnectNetworkResponseCallback,
-    networkID: ByteArray,
-    breadcrumb: Long?,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun reorderNetwork(
-    callback: NetworkConfigResponseCallback,
-    networkID: ByteArray,
-    networkIndex: Integer,
-    breadcrumb: Long?
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun reorderNetwork(
-    callback: NetworkConfigResponseCallback,
-    networkID: ByteArray,
-    networkIndex: Integer,
-    breadcrumb: Long?,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  interface ScanNetworksResponseCallback {
-    fun onSuccess(
-      networkingStatus: Integer,
-      debugText: String?,
-      wiFiScanResults:
-        ArrayList<ChipStructs.NetworkCommissioningClusterWiFiInterfaceScanResultStruct>?,
-      threadScanResults:
-        ArrayList<ChipStructs.NetworkCommissioningClusterThreadInterfaceScanResultStruct>?
-    )
-
-    fun onError(error: Exception)
-  }
-
-  interface NetworkConfigResponseCallback {
-    fun onSuccess(networkingStatus: Integer, debugText: String?, networkIndex: Integer?)
-
-    fun onError(error: Exception)
-  }
-
-  interface ConnectNetworkResponseCallback {
-    fun onSuccess(networkingStatus: Integer, debugText: String?, errorValue: Long?)
-
-    fun onError(error: Exception)
-  }
-
-  interface NetworksAttributeCallback {
-    fun onSuccess(value: ArrayList<ChipStructs.NetworkCommissioningClusterNetworkInfoStruct>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface LastNetworkingStatusAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface LastNetworkIDAttributeCallback {
-    fun onSuccess(value: ByteArray?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface LastConnectErrorValueAttributeCallback {
-    fun onSuccess(value: Long?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface SupportedWiFiBandsAttributeCallback {
-    fun onSuccess(value: ArrayList<Integer>?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readMaxNetworksAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeMaxNetworksAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readNetworksAttribute(callback: NetworksAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeNetworksAttribute(
-    callback: NetworksAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readScanMaxTimeSecondsAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeScanMaxTimeSecondsAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readConnectMaxTimeSecondsAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeConnectMaxTimeSecondsAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readInterfaceEnabledAttribute(callback: BooleanAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeInterfaceEnabledAttribute(callback: DefaultClusterCallback, value: Boolean) {
-    // Implementation needs to be added here
-  }
-
-  fun writeInterfaceEnabledAttribute(
-    callback: DefaultClusterCallback,
-    value: Boolean,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeInterfaceEnabledAttribute(
-    callback: BooleanAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readLastNetworkingStatusAttribute(callback: LastNetworkingStatusAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeLastNetworkingStatusAttribute(
-    callback: LastNetworkingStatusAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readLastNetworkIDAttribute(callback: LastNetworkIDAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeLastNetworkIDAttribute(
-    callback: LastNetworkIDAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readLastConnectErrorValueAttribute(callback: LastConnectErrorValueAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeLastConnectErrorValueAttribute(
-    callback: LastConnectErrorValueAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readSupportedWiFiBandsAttribute(callback: SupportedWiFiBandsAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSupportedWiFiBandsAttribute(
-    callback: SupportedWiFiBandsAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readSupportedThreadFeaturesAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeSupportedThreadFeaturesAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readThreadVersionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeThreadVersionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
   }
 }

@@ -20,224 +20,165 @@ package matter.devicecontroller.cluster.clusters
 import java.util.ArrayList
 
 class AccessControlCluster(private val endpointId: UShort) {
-  companion object {
-    const val CLUSTER_ID: UInt = 31u
-  }
+  class AclAttribute(
+    val value: ArrayList<ChipStructs.AccessControlClusterAccessControlEntryStruct>
+  )
 
-  interface AclAttributeCallback {
-    fun onSuccess(value: ArrayList<ChipStructs.AccessControlClusterAccessControlEntryStruct>)
+  class ExtensionAttribute(
+    val value: ArrayList<ChipStructs.AccessControlClusterAccessControlExtensionStruct>?
+  )
 
-    fun onError(ex: Exception)
+  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
 
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
+  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
 
-  interface ExtensionAttributeCallback {
-    fun onSuccess(value: ArrayList<ChipStructs.AccessControlClusterAccessControlExtensionStruct>?)
+  class EventListAttribute(val value: ArrayList<UInt>)
 
-    fun onError(ex: Exception)
+  class AttributeListAttribute(val value: ArrayList<UInt>)
 
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readAclAttribute(callback: AclAttributeCallback) {
+  suspend fun readAclAttribute(): AclAttribute {
     // Implementation needs to be added here
   }
 
-  fun readAclAttributeWithFabricFilter(callback: AclAttributeCallback, isFabricFiltered: Boolean) {
+  suspend fun readAclAttributeWithFabricFilter(isFabricFiltered: Boolean): AclAttribute {
     // Implementation needs to be added here
   }
 
-  fun writeAclAttribute(
-    callback: DefaultClusterCallback,
+  suspend fun writeAclAttribute(
     value: ArrayList<ChipStructs.AccessControlClusterAccessControlEntryStruct>
   ) {
     // Implementation needs to be added here
   }
 
-  fun writeAclAttribute(
-    callback: DefaultClusterCallback,
+  suspend fun writeAclAttribute(
     value: ArrayList<ChipStructs.AccessControlClusterAccessControlEntryStruct>,
     timedWriteTimeoutMs: Int
   ) {
     // Implementation needs to be added here
   }
 
-  fun subscribeAclAttribute(callback: AclAttributeCallback, minInterval: Int, maxInterval: Int) {
+  suspend fun subscribeAclAttribute(minInterval: Int, maxInterval: Int): AclAttribute {
     // Implementation needs to be added here
   }
 
-  fun readExtensionAttribute(callback: ExtensionAttributeCallback) {
+  suspend fun readExtensionAttribute(): ExtensionAttribute {
     // Implementation needs to be added here
   }
 
-  fun readExtensionAttributeWithFabricFilter(
-    callback: ExtensionAttributeCallback,
+  suspend fun readExtensionAttributeWithFabricFilter(
     isFabricFiltered: Boolean
-  ) {
+  ): ExtensionAttribute {
     // Implementation needs to be added here
   }
 
-  fun writeExtensionAttribute(
-    callback: DefaultClusterCallback,
+  suspend fun writeExtensionAttribute(
     value: ArrayList<ChipStructs.AccessControlClusterAccessControlExtensionStruct>
   ) {
     // Implementation needs to be added here
   }
 
-  fun writeExtensionAttribute(
-    callback: DefaultClusterCallback,
+  suspend fun writeExtensionAttribute(
     value: ArrayList<ChipStructs.AccessControlClusterAccessControlExtensionStruct>,
     timedWriteTimeoutMs: Int
   ) {
     // Implementation needs to be added here
   }
 
-  fun subscribeExtensionAttribute(
-    callback: ExtensionAttributeCallback,
+  suspend fun subscribeExtensionAttribute(minInterval: Int, maxInterval: Int): ExtensionAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readSubjectsPerAccessControlEntryAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeSubjectsPerAccessControlEntryAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): UShort {
     // Implementation needs to be added here
   }
 
-  fun readSubjectsPerAccessControlEntryAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readTargetsPerAccessControlEntryAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  fun subscribeSubjectsPerAccessControlEntryAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeTargetsPerAccessControlEntryAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): UShort {
     // Implementation needs to be added here
   }
 
-  fun readTargetsPerAccessControlEntryAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readAccessControlEntriesPerFabricAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  fun subscribeTargetsPerAccessControlEntryAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeAccessControlEntriesPerFabricAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): UShort {
     // Implementation needs to be added here
   }
 
-  fun readAccessControlEntriesPerFabricAttribute(callback: IntegerAttributeCallback) {
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeAccessControlEntriesPerFabricAttribute(
-    callback: IntegerAttributeCallback,
+  suspend fun subscribeGeneratedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): GeneratedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
+  suspend fun subscribeAcceptedCommandListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AcceptedCommandListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
+  suspend fun readEventListAttribute(): EventListAttribute {
     // Implementation needs to be added here
   }
 
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
     minInterval: Int,
     maxInterval: Int
-  ) {
+  ): AttributeListAttribute {
     // Implementation needs to be added here
   }
 
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
+  suspend fun readFeatureMapAttribute(): UInt {
     // Implementation needs to be added here
   }
 
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
     // Implementation needs to be added here
   }
 
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
+  suspend fun readClusterRevisionAttribute(): UShort {
     // Implementation needs to be added here
   }
 
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
     // Implementation needs to be added here
   }
 
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
+  companion object {
+    const val CLUSTER_ID: UInt = 31u
   }
 }

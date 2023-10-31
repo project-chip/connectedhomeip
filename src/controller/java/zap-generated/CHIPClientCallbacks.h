@@ -210,8 +210,8 @@ typedef void (*UnitLocalizationEventListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::EventId> & data);
 typedef void (*UnitLocalizationAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-typedef void (*PowerSourceConfigurationSourcesListAttributeCallback)(void * context,
-                                                                     const chip::app::DataModel::DecodableList<uint8_t> & data);
+typedef void (*PowerSourceConfigurationSourcesListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & data);
 typedef void (*PowerSourceConfigurationGeneratedCommandListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
 typedef void (*PowerSourceConfigurationAcceptedCommandListListAttributeCallback)(

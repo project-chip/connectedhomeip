@@ -15,30 +15,22 @@
  *    limitations under the License.
  */
 
-package chip.devicecontroller.cluster
+/**
+ *    @file
+ *      This file defines the chip::Optional class to handle values which may
+ *      or may not be present.
+ *
+ */
+#pragma once
 
-import matter.tlv.NullValue
-import matter.tlv.Tag
-import matter.tlv.TlvReader
+namespace chip {
 
-fun TlvReader.getBoolean(tag: Tag): Boolean {
-  return getBool(tag)
-}
+/// Unchecked is a disambiguation tag that can be used to provide and select a variant of a
+/// constructor or other method that omits the runtime checks performed by the default variant.
+struct UncheckedType
+{
+    explicit UncheckedType() = default;
+};
+inline constexpr UncheckedType Unchecked{};
 
-fun TlvReader.getString(tag: Tag): String {
-  return getUtf8String(tag)
-}
-
-fun TlvReader.getByteArray(tag: Tag): ByteArray {
-  return getByteString(tag)
-}
-
-fun TlvReader.isNull(): Boolean {
-  val value = peekElement().value
-  return (value is NullValue)
-}
-
-fun TlvReader.isNextTag(tag: Tag): Boolean {
-  val nextTag = peekElement().tag
-  return (nextTag == tag)
-}
+} // namespace chip

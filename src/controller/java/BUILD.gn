@@ -328,9 +328,7 @@ kotlin_library("chipcluster") {
 
   deps = [ ":tlv" ]
 
-  sources = [ "src/chip/devicecontroller/cluster/TlvReaderExtension.kt" ]
-
-  sources += structs_sources
+  sources = structs_sources
   sources += eventstructs_sources
 
   kotlinc_flags = [ "-Xlint:deprecation" ]

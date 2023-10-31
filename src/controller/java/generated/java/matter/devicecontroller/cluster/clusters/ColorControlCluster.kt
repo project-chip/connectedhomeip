@@ -20,1413 +20,943 @@ package matter.devicecontroller.cluster.clusters
 import java.util.ArrayList
 
 class ColorControlCluster(private val endpointId: UShort) {
+  class NumberOfPrimariesAttribute(val value: UByte?)
+
+  class Primary1IntensityAttribute(val value: UByte?)
+
+  class Primary2IntensityAttribute(val value: UByte?)
+
+  class Primary3IntensityAttribute(val value: UByte?)
+
+  class Primary4IntensityAttribute(val value: UByte?)
+
+  class Primary5IntensityAttribute(val value: UByte?)
+
+  class Primary6IntensityAttribute(val value: UByte?)
+
+  class ColorPointRIntensityAttribute(val value: UByte?)
+
+  class ColorPointGIntensityAttribute(val value: UByte?)
+
+  class ColorPointBIntensityAttribute(val value: UByte?)
+
+  class StartUpColorTemperatureMiredsAttribute(val value: UShort?)
+
+  class GeneratedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class AcceptedCommandListAttribute(val value: ArrayList<UInt>)
+
+  class EventListAttribute(val value: ArrayList<UInt>)
+
+  class AttributeListAttribute(val value: ArrayList<UInt>)
+
+  suspend fun moveToHue(
+    hue: UByte,
+    direction: UInt,
+    transitionTime: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun moveHue(
+    moveMode: UInt,
+    rate: UByte,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun stepHue(
+    stepMode: UInt,
+    stepSize: UByte,
+    transitionTime: UByte,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun moveToSaturation(
+    saturation: UByte,
+    transitionTime: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun moveSaturation(
+    moveMode: UInt,
+    rate: UByte,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun stepSaturation(
+    stepMode: UInt,
+    stepSize: UByte,
+    transitionTime: UByte,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun moveToHueAndSaturation(
+    hue: UByte,
+    saturation: UByte,
+    transitionTime: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun moveToColor(
+    colorX: UShort,
+    colorY: UShort,
+    transitionTime: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun moveColor(
+    rateX: Short,
+    rateY: Short,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun stepColor(
+    stepX: Short,
+    stepY: Short,
+    transitionTime: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun moveToColorTemperature(
+    colorTemperatureMireds: UShort,
+    transitionTime: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun enhancedMoveToHue(
+    enhancedHue: UShort,
+    direction: UInt,
+    transitionTime: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun enhancedMoveHue(
+    moveMode: UInt,
+    rate: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun enhancedStepHue(
+    stepMode: UInt,
+    stepSize: UShort,
+    transitionTime: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun enhancedMoveToHueAndSaturation(
+    enhancedHue: UShort,
+    saturation: UByte,
+    transitionTime: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun colorLoopSet(
+    updateFlags: UInt,
+    action: UInt,
+    direction: UInt,
+    time: UShort,
+    startHue: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun stopMoveStep(
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun moveColorTemperature(
+    moveMode: UInt,
+    rate: UShort,
+    colorTemperatureMinimumMireds: UShort,
+    colorTemperatureMaximumMireds: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun stepColorTemperature(
+    stepMode: UInt,
+    stepSize: UShort,
+    transitionTime: UShort,
+    colorTemperatureMinimumMireds: UShort,
+    colorTemperatureMaximumMireds: UShort,
+    optionsMask: UInt,
+    optionsOverride: UInt,
+    timedInvokeTimeoutMs: Int? = null
+  ) {
+    if (timedInvokeTimeoutMs != null) {
+      // Do the action with timedInvokeTimeoutMs
+    } else {
+      // Do the action without timedInvokeTimeoutMs
+    }
+  }
+
+  suspend fun readCurrentHueAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeCurrentHueAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readCurrentSaturationAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeCurrentSaturationAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readRemainingTimeAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeRemainingTimeAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readCurrentXAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeCurrentXAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readCurrentYAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeCurrentYAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readDriftCompensationAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeDriftCompensationAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readCompensationTextAttribute(): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeCompensationTextAttribute(minInterval: Int, maxInterval: Int): CharString {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readColorTemperatureMiredsAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeColorTemperatureMiredsAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readColorModeAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeColorModeAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readOptionsAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeOptionsAttribute(value: UInt) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeOptionsAttribute(value: UInt, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeOptionsAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readNumberOfPrimariesAttribute(): NumberOfPrimariesAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeNumberOfPrimariesAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): NumberOfPrimariesAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPrimary1XAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePrimary1XAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPrimary1YAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePrimary1YAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPrimary1IntensityAttribute(): Primary1IntensityAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePrimary1IntensityAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Primary1IntensityAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPrimary2XAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePrimary2XAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPrimary2YAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePrimary2YAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPrimary2IntensityAttribute(): Primary2IntensityAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePrimary2IntensityAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Primary2IntensityAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPrimary3XAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePrimary3XAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPrimary3YAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePrimary3YAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPrimary3IntensityAttribute(): Primary3IntensityAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePrimary3IntensityAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Primary3IntensityAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPrimary4XAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePrimary4XAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPrimary4YAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePrimary4YAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPrimary4IntensityAttribute(): Primary4IntensityAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePrimary4IntensityAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Primary4IntensityAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPrimary5XAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePrimary5XAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPrimary5YAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePrimary5YAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPrimary5IntensityAttribute(): Primary5IntensityAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePrimary5IntensityAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Primary5IntensityAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPrimary6XAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePrimary6XAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPrimary6YAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePrimary6YAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readPrimary6IntensityAttribute(): Primary6IntensityAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribePrimary6IntensityAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): Primary6IntensityAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readWhitePointXAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeWhitePointXAttribute(value: UShort) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeWhitePointXAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeWhitePointXAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readWhitePointYAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeWhitePointYAttribute(value: UShort) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeWhitePointYAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeWhitePointYAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readColorPointRXAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeColorPointRXAttribute(value: UShort) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeColorPointRXAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeColorPointRXAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readColorPointRYAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeColorPointRYAttribute(value: UShort) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeColorPointRYAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeColorPointRYAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readColorPointRIntensityAttribute(): ColorPointRIntensityAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeColorPointRIntensityAttribute(value: UByte) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeColorPointRIntensityAttribute(value: UByte, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeColorPointRIntensityAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ColorPointRIntensityAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readColorPointGXAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeColorPointGXAttribute(value: UShort) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeColorPointGXAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeColorPointGXAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readColorPointGYAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeColorPointGYAttribute(value: UShort) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeColorPointGYAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeColorPointGYAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readColorPointGIntensityAttribute(): ColorPointGIntensityAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeColorPointGIntensityAttribute(value: UByte) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeColorPointGIntensityAttribute(value: UByte, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeColorPointGIntensityAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ColorPointGIntensityAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readColorPointBXAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeColorPointBXAttribute(value: UShort) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeColorPointBXAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeColorPointBXAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readColorPointBYAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeColorPointBYAttribute(value: UShort) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeColorPointBYAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeColorPointBYAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readColorPointBIntensityAttribute(): ColorPointBIntensityAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeColorPointBIntensityAttribute(value: UByte) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeColorPointBIntensityAttribute(value: UByte, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeColorPointBIntensityAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): ColorPointBIntensityAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEnhancedCurrentHueAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEnhancedCurrentHueAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEnhancedColorModeAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEnhancedColorModeAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readColorLoopActiveAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeColorLoopActiveAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readColorLoopDirectionAttribute(): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeColorLoopDirectionAttribute(minInterval: Int, maxInterval: Int): UByte {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readColorLoopTimeAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeColorLoopTimeAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readColorLoopStartEnhancedHueAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeColorLoopStartEnhancedHueAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readColorLoopStoredEnhancedHueAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeColorLoopStoredEnhancedHueAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readColorCapabilitiesAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeColorCapabilitiesAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readColorTempPhysicalMinMiredsAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeColorTempPhysicalMinMiredsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readColorTempPhysicalMaxMiredsAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeColorTempPhysicalMaxMiredsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readCoupleColorTempToLevelMinMiredsAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeCoupleColorTempToLevelMinMiredsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readStartUpColorTemperatureMiredsAttribute(): StartUpColorTemperatureMiredsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeStartUpColorTemperatureMiredsAttribute(value: UShort) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun writeStartUpColorTemperatureMiredsAttribute(value: UShort, timedWriteTimeoutMs: Int) {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeStartUpColorTemperatureMiredsAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): StartUpColorTemperatureMiredsAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeGeneratedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): GeneratedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAcceptedCommandListAttribute(): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAcceptedCommandListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AcceptedCommandListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readEventListAttribute(): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeEventListAttribute(minInterval: Int, maxInterval: Int): EventListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readAttributeListAttribute(): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeAttributeListAttribute(
+    minInterval: Int,
+    maxInterval: Int
+  ): AttributeListAttribute {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readFeatureMapAttribute(): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeFeatureMapAttribute(minInterval: Int, maxInterval: Int): UInt {
+    // Implementation needs to be added here
+  }
+
+  suspend fun readClusterRevisionAttribute(): UShort {
+    // Implementation needs to be added here
+  }
+
+  suspend fun subscribeClusterRevisionAttribute(minInterval: Int, maxInterval: Int): UShort {
+    // Implementation needs to be added here
+  }
+
   companion object {
     const val CLUSTER_ID: UInt = 768u
-  }
-
-  fun moveToHue(
-    callback: DefaultClusterCallback,
-    hue: Integer,
-    direction: Integer,
-    transitionTime: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveToHue(
-    callback: DefaultClusterCallback,
-    hue: Integer,
-    direction: Integer,
-    transitionTime: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveHue(
-    callback: DefaultClusterCallback,
-    moveMode: Integer,
-    rate: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveHue(
-    callback: DefaultClusterCallback,
-    moveMode: Integer,
-    rate: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun stepHue(
-    callback: DefaultClusterCallback,
-    stepMode: Integer,
-    stepSize: Integer,
-    transitionTime: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun stepHue(
-    callback: DefaultClusterCallback,
-    stepMode: Integer,
-    stepSize: Integer,
-    transitionTime: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveToSaturation(
-    callback: DefaultClusterCallback,
-    saturation: Integer,
-    transitionTime: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveToSaturation(
-    callback: DefaultClusterCallback,
-    saturation: Integer,
-    transitionTime: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveSaturation(
-    callback: DefaultClusterCallback,
-    moveMode: Integer,
-    rate: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveSaturation(
-    callback: DefaultClusterCallback,
-    moveMode: Integer,
-    rate: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun stepSaturation(
-    callback: DefaultClusterCallback,
-    stepMode: Integer,
-    stepSize: Integer,
-    transitionTime: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun stepSaturation(
-    callback: DefaultClusterCallback,
-    stepMode: Integer,
-    stepSize: Integer,
-    transitionTime: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveToHueAndSaturation(
-    callback: DefaultClusterCallback,
-    hue: Integer,
-    saturation: Integer,
-    transitionTime: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveToHueAndSaturation(
-    callback: DefaultClusterCallback,
-    hue: Integer,
-    saturation: Integer,
-    transitionTime: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveToColor(
-    callback: DefaultClusterCallback,
-    colorX: Integer,
-    colorY: Integer,
-    transitionTime: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveToColor(
-    callback: DefaultClusterCallback,
-    colorX: Integer,
-    colorY: Integer,
-    transitionTime: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveColor(
-    callback: DefaultClusterCallback,
-    rateX: Integer,
-    rateY: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveColor(
-    callback: DefaultClusterCallback,
-    rateX: Integer,
-    rateY: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun stepColor(
-    callback: DefaultClusterCallback,
-    stepX: Integer,
-    stepY: Integer,
-    transitionTime: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun stepColor(
-    callback: DefaultClusterCallback,
-    stepX: Integer,
-    stepY: Integer,
-    transitionTime: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveToColorTemperature(
-    callback: DefaultClusterCallback,
-    colorTemperatureMireds: Integer,
-    transitionTime: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveToColorTemperature(
-    callback: DefaultClusterCallback,
-    colorTemperatureMireds: Integer,
-    transitionTime: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun enhancedMoveToHue(
-    callback: DefaultClusterCallback,
-    enhancedHue: Integer,
-    direction: Integer,
-    transitionTime: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun enhancedMoveToHue(
-    callback: DefaultClusterCallback,
-    enhancedHue: Integer,
-    direction: Integer,
-    transitionTime: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun enhancedMoveHue(
-    callback: DefaultClusterCallback,
-    moveMode: Integer,
-    rate: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun enhancedMoveHue(
-    callback: DefaultClusterCallback,
-    moveMode: Integer,
-    rate: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun enhancedStepHue(
-    callback: DefaultClusterCallback,
-    stepMode: Integer,
-    stepSize: Integer,
-    transitionTime: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun enhancedStepHue(
-    callback: DefaultClusterCallback,
-    stepMode: Integer,
-    stepSize: Integer,
-    transitionTime: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun enhancedMoveToHueAndSaturation(
-    callback: DefaultClusterCallback,
-    enhancedHue: Integer,
-    saturation: Integer,
-    transitionTime: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun enhancedMoveToHueAndSaturation(
-    callback: DefaultClusterCallback,
-    enhancedHue: Integer,
-    saturation: Integer,
-    transitionTime: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun colorLoopSet(
-    callback: DefaultClusterCallback,
-    updateFlags: Integer,
-    action: Integer,
-    direction: Integer,
-    time: Integer,
-    startHue: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun colorLoopSet(
-    callback: DefaultClusterCallback,
-    updateFlags: Integer,
-    action: Integer,
-    direction: Integer,
-    time: Integer,
-    startHue: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun stopMoveStep(
-    callback: DefaultClusterCallback,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun stopMoveStep(
-    callback: DefaultClusterCallback,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveColorTemperature(
-    callback: DefaultClusterCallback,
-    moveMode: Integer,
-    rate: Integer,
-    colorTemperatureMinimumMireds: Integer,
-    colorTemperatureMaximumMireds: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun moveColorTemperature(
-    callback: DefaultClusterCallback,
-    moveMode: Integer,
-    rate: Integer,
-    colorTemperatureMinimumMireds: Integer,
-    colorTemperatureMaximumMireds: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun stepColorTemperature(
-    callback: DefaultClusterCallback,
-    stepMode: Integer,
-    stepSize: Integer,
-    transitionTime: Integer,
-    colorTemperatureMinimumMireds: Integer,
-    colorTemperatureMaximumMireds: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun stepColorTemperature(
-    callback: DefaultClusterCallback,
-    stepMode: Integer,
-    stepSize: Integer,
-    transitionTime: Integer,
-    colorTemperatureMinimumMireds: Integer,
-    colorTemperatureMaximumMireds: Integer,
-    optionsMask: Integer,
-    optionsOverride: Integer,
-    timedInvokeTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  interface NumberOfPrimariesAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface Primary1IntensityAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface Primary2IntensityAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface Primary3IntensityAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface Primary4IntensityAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface Primary5IntensityAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface Primary6IntensityAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface ColorPointRIntensityAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface ColorPointGIntensityAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface ColorPointBIntensityAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface StartUpColorTemperatureMiredsAttributeCallback {
-    fun onSuccess(value: Integer?)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface GeneratedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AcceptedCommandListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface EventListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  interface AttributeListAttributeCallback {
-    fun onSuccess(value: ArrayList<Long>)
-
-    fun onError(ex: Exception)
-
-    fun onSubscriptionEstablished(subscriptionId: Long)
-  }
-
-  fun readCurrentHueAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeCurrentHueAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readCurrentSaturationAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeCurrentSaturationAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readRemainingTimeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeRemainingTimeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readCurrentXAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeCurrentXAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readCurrentYAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeCurrentYAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readDriftCompensationAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeDriftCompensationAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readCompensationTextAttribute(callback: CharStringAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeCompensationTextAttribute(
-    callback: CharStringAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readColorTemperatureMiredsAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeColorTemperatureMiredsAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readColorModeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeColorModeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readOptionsAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeOptionsAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeOptionsAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeOptionsAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readNumberOfPrimariesAttribute(callback: NumberOfPrimariesAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeNumberOfPrimariesAttribute(
-    callback: NumberOfPrimariesAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPrimary1XAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePrimary1XAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPrimary1YAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePrimary1YAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPrimary1IntensityAttribute(callback: Primary1IntensityAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePrimary1IntensityAttribute(
-    callback: Primary1IntensityAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPrimary2XAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePrimary2XAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPrimary2YAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePrimary2YAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPrimary2IntensityAttribute(callback: Primary2IntensityAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePrimary2IntensityAttribute(
-    callback: Primary2IntensityAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPrimary3XAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePrimary3XAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPrimary3YAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePrimary3YAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPrimary3IntensityAttribute(callback: Primary3IntensityAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePrimary3IntensityAttribute(
-    callback: Primary3IntensityAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPrimary4XAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePrimary4XAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPrimary4YAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePrimary4YAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPrimary4IntensityAttribute(callback: Primary4IntensityAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePrimary4IntensityAttribute(
-    callback: Primary4IntensityAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPrimary5XAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePrimary5XAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPrimary5YAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePrimary5YAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPrimary5IntensityAttribute(callback: Primary5IntensityAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePrimary5IntensityAttribute(
-    callback: Primary5IntensityAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPrimary6XAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePrimary6XAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPrimary6YAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePrimary6YAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readPrimary6IntensityAttribute(callback: Primary6IntensityAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribePrimary6IntensityAttribute(
-    callback: Primary6IntensityAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readWhitePointXAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeWhitePointXAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeWhitePointXAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeWhitePointXAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readWhitePointYAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeWhitePointYAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeWhitePointYAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeWhitePointYAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readColorPointRXAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeColorPointRXAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeColorPointRXAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeColorPointRXAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readColorPointRYAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeColorPointRYAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeColorPointRYAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeColorPointRYAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readColorPointRIntensityAttribute(callback: ColorPointRIntensityAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeColorPointRIntensityAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeColorPointRIntensityAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeColorPointRIntensityAttribute(
-    callback: ColorPointRIntensityAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readColorPointGXAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeColorPointGXAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeColorPointGXAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeColorPointGXAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readColorPointGYAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeColorPointGYAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeColorPointGYAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeColorPointGYAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readColorPointGIntensityAttribute(callback: ColorPointGIntensityAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeColorPointGIntensityAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeColorPointGIntensityAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeColorPointGIntensityAttribute(
-    callback: ColorPointGIntensityAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readColorPointBXAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeColorPointBXAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeColorPointBXAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeColorPointBXAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readColorPointBYAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeColorPointBYAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeColorPointBYAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeColorPointBYAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readColorPointBIntensityAttribute(callback: ColorPointBIntensityAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun writeColorPointBIntensityAttribute(callback: DefaultClusterCallback, value: Integer) {
-    // Implementation needs to be added here
-  }
-
-  fun writeColorPointBIntensityAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeColorPointBIntensityAttribute(
-    callback: ColorPointBIntensityAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEnhancedCurrentHueAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEnhancedCurrentHueAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEnhancedColorModeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEnhancedColorModeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readColorLoopActiveAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeColorLoopActiveAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readColorLoopDirectionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeColorLoopDirectionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readColorLoopTimeAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeColorLoopTimeAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readColorLoopStartEnhancedHueAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeColorLoopStartEnhancedHueAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readColorLoopStoredEnhancedHueAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeColorLoopStoredEnhancedHueAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readColorCapabilitiesAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeColorCapabilitiesAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readColorTempPhysicalMinMiredsAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeColorTempPhysicalMinMiredsAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readColorTempPhysicalMaxMiredsAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeColorTempPhysicalMaxMiredsAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readCoupleColorTempToLevelMinMiredsAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeCoupleColorTempToLevelMinMiredsAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readStartUpColorTemperatureMiredsAttribute(
-    callback: StartUpColorTemperatureMiredsAttributeCallback
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun writeStartUpColorTemperatureMiredsAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun writeStartUpColorTemperatureMiredsAttribute(
-    callback: DefaultClusterCallback,
-    value: Integer,
-    timedWriteTimeoutMs: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeStartUpColorTemperatureMiredsAttribute(
-    callback: StartUpColorTemperatureMiredsAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readGeneratedCommandListAttribute(callback: GeneratedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeGeneratedCommandListAttribute(
-    callback: GeneratedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAcceptedCommandListAttribute(callback: AcceptedCommandListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAcceptedCommandListAttribute(
-    callback: AcceptedCommandListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readEventListAttribute(callback: EventListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeEventListAttribute(
-    callback: EventListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readAttributeListAttribute(callback: AttributeListAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeAttributeListAttribute(
-    callback: AttributeListAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readFeatureMapAttribute(callback: LongAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeFeatureMapAttribute(
-    callback: LongAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
-  }
-
-  fun readClusterRevisionAttribute(callback: IntegerAttributeCallback) {
-    // Implementation needs to be added here
-  }
-
-  fun subscribeClusterRevisionAttribute(
-    callback: IntegerAttributeCallback,
-    minInterval: Int,
-    maxInterval: Int
-  ) {
-    // Implementation needs to be added here
   }
 }

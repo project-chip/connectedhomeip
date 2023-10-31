@@ -3800,7 +3800,8 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            TestEventTrigger(0L),;
+            TestEventTrigger(0L),
+            TimeSnapshot(1L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -5968,6 +5969,8 @@ public class ClusterIDMapping {
             RegisteredClients(3L),
             ICDCounter(4L),
             ClientsSupportedPerFabric(5L),
+            UserActiveModeTriggerHint(6L),
+            UserActiveModeTriggerInstruction(7L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             EventList(65530L),

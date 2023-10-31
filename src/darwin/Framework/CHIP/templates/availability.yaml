@@ -7742,6 +7742,9 @@
                   - CopyAllScenes
               NameSupportBitmap:
                   - SceneNames
+          SoftwareDiagnostics:
+              Feature:
+                  - Watermarks
   deprecated:
       bitmaps:
           Scenes:
@@ -7750,6 +7753,9 @@
           PumpConfigurationAndControl:
               PumpStatusBitmap:
                   - Supplyfault
+          SoftwareDiagnostics:
+              Feature:
+                  - WaterMarks
   renames:
       bitmaps:
           Scenes:
@@ -7758,3 +7764,6 @@
           PumpConfigurationAndControl:
               PumpStatusBitmap:
                   SupplyFault: Supplyfault
+          SoftwareDiagnostics:
+              Feature:
+                  Watermarks: WaterMarks

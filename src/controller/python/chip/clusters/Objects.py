@@ -8349,6 +8349,37 @@ class GeneralDiagnostics(Cluster):
             enableKey: 'bytes' = b""
             eventTrigger: 'uint' = 0
 
+        @dataclass
+        class TimeSnapshot(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000033
+            command_id: typing.ClassVar[int] = 0x00000001
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'TimeSnapshotResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
+        @dataclass
+        class TimeSnapshotResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000033
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[str] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="systemTimeUs", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="UTCTimeUs", Tag=1, Type=typing.Union[Nullable, uint]),
+                    ])
+
+            systemTimeUs: 'uint' = 0
+            UTCTimeUs: 'typing.Union[Nullable, uint]' = NullValue
+
     class Attributes:
         @dataclass
         class NetworkInterfaces(ClusterAttributeDescriptor):
@@ -8723,7 +8754,7 @@ class SoftwareDiagnostics(Cluster):
 
     class Bitmaps:
         class Feature(IntFlag):
-            kWaterMarks = 0x1
+            kWatermarks = 0x1
 
     class Structs:
         @dataclass
@@ -14708,6 +14739,8 @@ class IcdManagement(Cluster):
                 ClusterObjectFieldDescriptor(Label="registeredClients", Tag=0x00000003, Type=typing.Optional[typing.List[IcdManagement.Structs.MonitoringRegistrationStruct]]),
                 ClusterObjectFieldDescriptor(Label="ICDCounter", Tag=0x00000004, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clientsSupportedPerFabric", Tag=0x00000005, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="userActiveModeTriggerHint", Tag=0x00000006, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="userActiveModeTriggerInstruction", Tag=0x00000007, Type=typing.Optional[str]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -14722,6 +14755,8 @@ class IcdManagement(Cluster):
     registeredClients: 'typing.Optional[typing.List[IcdManagement.Structs.MonitoringRegistrationStruct]]' = None
     ICDCounter: 'typing.Optional[uint]' = None
     clientsSupportedPerFabric: 'typing.Optional[uint]' = None
+    userActiveModeTriggerHint: 'typing.Optional[uint]' = None
+    userActiveModeTriggerInstruction: 'typing.Optional[str]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -14734,6 +14769,25 @@ class IcdManagement(Cluster):
             kCheckInProtocolSupport = 0x1
             kUserActiveModeTrigger = 0x2
             kLongIdleTimeSupport = 0x4
+
+        class UserActiveModeTriggerBitmap(IntFlag):
+            kPowerCycle = 0x1
+            kSettingsMenu = 0x2
+            kCustomInstruction = 0x4
+            kDeviceManual = 0x8
+            kActuateSensor = 0x10
+            kActuateSensorSeconds = 0x20
+            kActuateSensorTimes = 0x40
+            kActuateSensorLightsBlink = 0x80
+            kResetButton = 0x100
+            kResetButtonLightsBlink = 0x200
+            kResetButtonSeconds = 0x400
+            kResetButtonTimes = 0x800
+            kSetupButton = 0x1000
+            kSetupButtonSeconds = 0x2000
+            kSetupButtonLightsBlink = 0x4000
+            kSetupButtonTimes = 0x8000
+            kAppDefinedButton = 0x10000
 
     class Structs:
         @dataclass
@@ -14917,6 +14971,38 @@ class IcdManagement(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
             value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class UserActiveModeTriggerHint(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000046
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000006
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class UserActiveModeTriggerInstruction(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000046
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000007
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[str])
+
+            value: 'typing.Optional[str]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -27521,7 +27607,7 @@ class TemperatureMeasurement(Cluster):
                 ClusterObjectFieldDescriptor(Label="measuredValue", Tag=0x00000000, Type=typing.Union[Nullable, int]),
                 ClusterObjectFieldDescriptor(Label="minMeasuredValue", Tag=0x00000001, Type=typing.Union[Nullable, int]),
                 ClusterObjectFieldDescriptor(Label="maxMeasuredValue", Tag=0x00000002, Type=typing.Union[Nullable, int]),
-                ClusterObjectFieldDescriptor(Label="tolerance", Tag=0x00000003, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="tolerance", Tag=0x00000003, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="eventList", Tag=0x0000FFFA, Type=typing.List[uint]),
@@ -27533,7 +27619,7 @@ class TemperatureMeasurement(Cluster):
     measuredValue: 'typing.Union[Nullable, int]' = None
     minMeasuredValue: 'typing.Union[Nullable, int]' = None
     maxMeasuredValue: 'typing.Union[Nullable, int]' = None
-    tolerance: 'typing.Optional[uint]' = None
+    tolerance: 'typing.Optional[int]' = None
     generatedCommandList: 'typing.List[uint]' = None
     acceptedCommandList: 'typing.List[uint]' = None
     eventList: 'typing.List[uint]' = None
@@ -27602,9 +27688,9 @@ class TemperatureMeasurement(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[int])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Optional[int]' = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):

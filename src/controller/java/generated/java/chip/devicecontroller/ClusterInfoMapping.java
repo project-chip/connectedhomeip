@@ -3638,6 +3638,30 @@ public class ClusterInfoMapping {
     }
   }
 
+
+  public static class DelegatedGeneralDiagnosticsClusterTimeSnapshotResponseCallback implements ChipClusters.GeneralDiagnosticsCluster.TimeSnapshotResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Long systemTimeUs, @Nullable Long UTCTimeUs) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo systemTimeUsResponseValue = new CommandResponseInfo("systemTimeUs", "Long");
+      responseValues.put(systemTimeUsResponseValue, systemTimeUs);
+      CommandResponseInfo UTCTimeUsResponseValue = new CommandResponseInfo("UTCTimeUs", "Long");
+      responseValues.put(UTCTimeUsResponseValue, UTCTimeUs);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
   public static class DelegatedGeneralDiagnosticsClusterNetworkInterfacesAttributeCallback implements ChipClusters.GeneralDiagnosticsCluster.NetworkInterfacesAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -18932,6 +18956,18 @@ public class ClusterInfoMapping {
         generalDiagnosticstestEventTriggerCommandParams
     );
     generalDiagnosticsClusterInteractionInfoMap.put("testEventTrigger", generalDiagnosticstestEventTriggerInteractionInfo);
+
+    Map<String, CommandParameterInfo> generalDiagnosticstimeSnapshotCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo generalDiagnosticstimeSnapshotInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.GeneralDiagnosticsCluster) cluster)
+          .timeSnapshot((ChipClusters.GeneralDiagnosticsCluster.TimeSnapshotResponseCallback) callback
+            );
+        },
+        () -> new DelegatedGeneralDiagnosticsClusterTimeSnapshotResponseCallback(),
+        generalDiagnosticstimeSnapshotCommandParams
+      );
+    generalDiagnosticsClusterInteractionInfoMap.put("timeSnapshot", generalDiagnosticstimeSnapshotInteractionInfo);
 
     commandMap.put("generalDiagnostics", generalDiagnosticsClusterInteractionInfoMap);
 

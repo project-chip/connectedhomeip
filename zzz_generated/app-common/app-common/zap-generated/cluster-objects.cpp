@@ -6457,6 +6457,65 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 } // namespace TestEventTrigger.
+namespace TimeSnapshot {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+    }
+}
+} // namespace TimeSnapshot.
+namespace TimeSnapshotResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kSystemTimeUs), systemTimeUs);
+    encoder.Encode(to_underlying(Fields::kUTCTimeUs), UTCTimeUs);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        auto __element = __iterator.Next();
+        if (std::holds_alternative<CHIP_ERROR>(__element))
+        {
+            return std::get<CHIP_ERROR>(__element);
+        }
+
+        CHIP_ERROR err              = CHIP_NO_ERROR;
+        const uint8_t __context_tag = std::get<uint8_t>(__element);
+
+        if (__context_tag == to_underlying(Fields::kSystemTimeUs))
+        {
+            err = DataModel::Decode(reader, systemTimeUs);
+        }
+        else if (__context_tag == to_underlying(Fields::kUTCTimeUs))
+        {
+            err = DataModel::Decode(reader, UTCTimeUs);
+        }
+        else
+        {
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+} // namespace TimeSnapshotResponse.
 } // namespace Commands
 
 namespace Attributes {
@@ -10437,6 +10496,10 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, ICDCounter);
     case Attributes::ClientsSupportedPerFabric::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, clientsSupportedPerFabric);
+    case Attributes::UserActiveModeTriggerHint::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, userActiveModeTriggerHint);
+    case Attributes::UserActiveModeTriggerInstruction::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, userActiveModeTriggerInstruction);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():

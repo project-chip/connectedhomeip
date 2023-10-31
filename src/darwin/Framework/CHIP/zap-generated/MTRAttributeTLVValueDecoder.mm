@@ -1830,7 +1830,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceConfigurationCluster(Attri
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
                 NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -2518,6 +2518,7 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
         }
         return value;
     }
+#if MTR_ENABLE_PROVISIONAL
     case Attributes::SupportedWiFiBands::Id: {
         using TypeInfo = Attributes::SupportedWiFiBands::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -2544,6 +2545,8 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
         }
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
     case Attributes::SupportedThreadFeatures::Id: {
         using TypeInfo = Attributes::SupportedThreadFeatures::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -2555,6 +2558,8 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
         value = [NSNumber numberWithUnsignedShort:cppValue.Raw()];
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
     case Attributes::ThreadVersion::Id: {
         using TypeInfo = Attributes::ThreadVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;
@@ -2566,6 +2571,7 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
         value = [NSNumber numberWithUnsignedShort:cppValue];
         return value;
     }
+#endif // MTR_ENABLE_PROVISIONAL
     default: {
         break;
     }
@@ -5196,6 +5202,37 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(AttributeId aAtt
         }
         NSNumber * _Nonnull value;
         value = [NSNumber numberWithUnsignedShort:cppValue];
+        return value;
+    }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+    case Attributes::UserActiveModeTriggerHint::Id: {
+        using TypeInfo = Attributes::UserActiveModeTriggerHint::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedInt:cppValue.Raw()];
+        return value;
+    }
+#endif // MTR_ENABLE_PROVISIONAL
+#if MTR_ENABLE_PROVISIONAL
+    case Attributes::UserActiveModeTriggerInstruction::Id: {
+        using TypeInfo = Attributes::UserActiveModeTriggerInstruction::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSString * _Nonnull value;
+        value = AsString(cppValue);
+        if (value == nil) {
+            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+            *aError = err;
+            return nil;
+        }
         return value;
     }
 #endif // MTR_ENABLE_PROVISIONAL
@@ -9921,7 +9958,7 @@ static id _Nullable DecodeAttributeValueForTemperatureMeasurementCluster(Attribu
             return nil;
         }
         NSNumber * _Nonnull value;
-        value = [NSNumber numberWithUnsignedShort:cppValue];
+        value = [NSNumber numberWithShort:cppValue];
         return value;
     }
     default: {

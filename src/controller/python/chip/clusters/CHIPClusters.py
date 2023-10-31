@@ -2397,6 +2397,12 @@ class ChipClusters:
                     "eventTrigger": "int",
                 },
             },
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "TimeSnapshot",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -4264,6 +4270,18 @@ class ChipClusters:
                 "attributeName": "ClientsSupportedPerFabric",
                 "attributeId": 0x00000005,
                 "type": "int",
+                "reportable": True,
+            },
+            0x00000006: {
+                "attributeName": "UserActiveModeTriggerHint",
+                "attributeId": 0x00000006,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000007: {
+                "attributeName": "UserActiveModeTriggerInstruction",
+                "attributeId": 0x00000007,
+                "type": "str",
                 "reportable": True,
             },
             0x0000FFF8: {
