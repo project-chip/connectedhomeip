@@ -74,6 +74,7 @@ class AttributeRequirement:
     # Optional filters to apply to specific locations
     filter_cluster: Optional[int] = field(default=None)
 
+
 @dataclass
 class ClusterAttributeDeny:
     cluster_id: Union[str, int]
@@ -304,7 +305,7 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
                 # Lint rejected attributes
                 for check in self._deny_attributes:
                     if check.cluster_id not in [cluster_definition.name, cluster_definition.code]:
-                        continue # different cluster
+                        continue  # different cluster
 
                     if check.attribute_id is None:
                         self._AddLintError(
@@ -319,9 +320,8 @@ class RequiredAttributesRule(ErrorAccumulatingRule):
                             cluster_str = f"{cluster_definition.name}({cluster_definition.code})"
                             attribute_str = f"{attr.name}({name_to_code_map[attr.name]})"
                             self._AddLintError(
-                               f"EP{endpoint.number}: attribute {cluster_str}::{attribute_str} is DENIED!",
-                               self._ParseLocation(cluster.parse_meta))
-
+                                f"EP{endpoint.number}: attribute {cluster_str}::{attribute_str} is DENIED!",
+                                self._ParseLocation(cluster.parse_meta))
 
 
 @dataclass
