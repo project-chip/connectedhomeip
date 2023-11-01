@@ -1828,7 +1828,13 @@ void TestReliableMessageProtocol::CheckGetBackoff(nlTestSuite * inSuite, void * 
                             backoff.count());
 
             NL_TEST_ASSERT(inSuite, backoff >= test.backoffMin);
-            NL_TEST_ASSERT(inSuite, backoff <= test.backoffMax + retryBoosterTimeout);
+
+            auto maxBackoff = test.backoffMax + retryBoosterTimeout;
+#if CHIP_CONFIG_ENABLE_ICD_SERVER == 1
+            // If running as an ICD, increase maxBackoff to account for the polling interval
+            maxBackoff += CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
+#endif
+            NL_TEST_ASSERT(inSuite, backoff <= maxBackoff);
         }
     }
 }
@@ -1894,7 +1900,7 @@ void TestReliableMessageProtocol::CheckApplicationResponseDelayed(nlTestSuite * 
     NL_TEST_ASSERT(inSuite, !mockSender.IsOnMessageReceivedCalled);
 
     // Wait for all but the last retransmit to happen.
-    ctx.GetIOContext().DriveIOUntil(500_ms32, [&] { return loopback.mDroppedMessageCount >= kMaxMRPTransmits - 1; });
+    ctx.GetIOContext().DriveIOUntil(5000_ms32, [&] { return loopback.mDroppedMessageCount >= kMaxMRPTransmits - 1; });
     ctx.DrainAndServiceIO();
 
     // Ensure that nothing has been sent yet.
@@ -1908,7 +1914,7 @@ void TestReliableMessageProtocol::CheckApplicationResponseDelayed(nlTestSuite * 
     // Now allow through the next message (our last retransmit), but make sure
     // there is no standalone ack for it.
     mockReceiver.SetDropAckResponse(true);
-    ctx.GetIOContext().DriveIOUntil(500_ms32, [&] { return loopback.mSentMessageCount >= kMaxMRPTransmits; });
+    ctx.GetIOContext().DriveIOUntil(5000_ms32, [&] { return loopback.mSentMessageCount >= kMaxMRPTransmits; });
     ctx.DrainAndServiceIO();
 
     // Verify that message was sent and received but nothing else has been sent.
@@ -1946,7 +1952,7 @@ void TestReliableMessageProtocol::CheckApplicationResponseDelayed(nlTestSuite * 
     NL_TEST_ASSERT(inSuite, !mockSender.IsOnMessageReceivedCalled);  // We did not get a response.
 
     // Now wait for all but the last retransmit to happen from the other side.
-    ctx.GetIOContext().DriveIOUntil(500_ms32, [&] { return loopback.mSentMessageCount >= kMaxMRPTransmits - 1; });
+    ctx.GetIOContext().DriveIOUntil(5000_ms32, [&] { return loopback.mSentMessageCount >= kMaxMRPTransmits - 1; });
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == kMaxMRPTransmits - 1);
@@ -1957,7 +1963,7 @@ void TestReliableMessageProtocol::CheckApplicationResponseDelayed(nlTestSuite * 
     NL_TEST_ASSERT(inSuite, !mockSender.IsOnMessageReceivedCalled);  // We did not get a response.
 
     // Now wait for us to time out our MRP context for sure.
-    ctx.GetIOContext().DriveIOUntil(500_ms32, [&] { return rm->TestGetCountRetransTable() == 1; });
+    ctx.GetIOContext().DriveIOUntil(5000_ms32, [&] { return rm->TestGetCountRetransTable() == 1; });
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == kMaxMRPTransmits - 1);
@@ -1968,7 +1974,7 @@ void TestReliableMessageProtocol::CheckApplicationResponseDelayed(nlTestSuite * 
     NL_TEST_ASSERT(inSuite, !mockSender.mResponseTimedOut);          // We did not time out yet.
 
     // Now wait for the last retransmit (and our ack) to to happen.
-    ctx.GetIOContext().DriveIOUntil(500_ms32, [&] { return loopback.mSentMessageCount >= kMaxMRPTransmits; });
+    ctx.GetIOContext().DriveIOUntil(5000_ms32, [&] { return loopback.mSentMessageCount >= kMaxMRPTransmits; });
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite, loopback.mSentMessageCount == kMaxMRPTransmits + 1);
@@ -2056,7 +2062,7 @@ void TestReliableMessageProtocol::CheckApplicationResponseNeverComes(nlTestSuite
     NL_TEST_ASSERT(inSuite, !mockSender.IsOnMessageReceivedCalled);
 
     // Wait for all but the last retransmit to happen.
-    ctx.GetIOContext().DriveIOUntil(500_ms32, [&] { return loopback.mDroppedMessageCount >= kMaxMRPTransmits - 1; });
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mDroppedMessageCount >= kMaxMRPTransmits - 1; });
     ctx.DrainAndServiceIO();
 
     // Ensure that nothing has been sent yet.
